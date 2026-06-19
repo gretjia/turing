@@ -26,26 +26,28 @@ Foundation (substrate — fully atomized, built first):
 - [x] **MOD-EVIDENCE** (plan M10) — Receipt import + evidence digests + Macro anchor binding. (deps: TAPE, CODEC)
 - [x] **MOD-REPLAY** (plan M16) — deterministic replay (byte-equal) + Handoff bundle. (deps: TAPE, REGISTRY, CODEC)  ← S-7 GATE
 Loop (needed for Stage 1 E2E with fake worker):
-- [ ] **MOD-BOOT** (plan M4) — Project Spec as Boot INPUT; seed Q_0; SystemBootstrapped/ProjectAdopted/GoalStateAccepted/ModulePlanAccepted.
-- [ ] **MOD-PLANNER** (plan M6) — progressive Module→Atom expansion; AtomProposed.
-- [ ] **MOD-CAPSULE** (plan M7+M11) — Shielded Work Capsule + FailureMemory (FailureClass→abstract rule, scoped inject); WorkCapsuleBuilt.  ← S-4 GATE
-- [ ] **MOD-WORKER** (plan M8) — WorkerAdapter seam + **fake/manual deterministic Worker** + timeout/kill/retry (PG reap); WorkerDispatched/WorkerReceiptImported. (real ≥2 adapters = Stage 2/BLOCKED)
-- [ ] **MOD-REDUCE** (plan M14+M15) — reduce Tape→q_t, derive WorkGraph, Textual Panorama (Authorized-vs-Accepted labels).
-- [ ] **MOD-EXPLORE** (plan M12+M13) — Exploration Archive/Promote + HumanSteerInjected.
-- [ ] **MOD-SIGN** (plan M17) — SigningBackend seam + ApprovalCard canonical_bytes→hash/signature derivation (in-proc deterministic signer; keyring deferred).
-- [ ] **MOD-E2E** (Stage 1) — loop driver: drive full loop w/ fake worker through BOTH predicate branches; S-3/S-4/S-7 green; FREEZE registry.
+- [x] **MOD-BOOT** (plan M4) — Project Spec as Boot INPUT; seed Q_0; SystemBootstrapped/ProjectAdopted/GoalStateAccepted/ModulePlanAccepted.
+- [x] **MOD-PLANNER** (plan M6) — progressive Module→Atom expansion; AtomProposed.
+- [x] **MOD-CAPSULE** (plan M7+M11) — Shielded Work Capsule + FailureMemory (FailureClass→abstract rule, scoped inject); WorkCapsuleBuilt.  ← S-4 GATE
+- [x] **MOD-WORKER** (plan M8) — WorkerAdapter seam + **fake/manual deterministic Worker** + timeout/kill/retry (PG reap); WorkerDispatched/WorkerReceiptImported. (real ≥2 adapters = Stage 2/BLOCKED)
+- [x] **MOD-REDUCE** (plan M14+M15) — reduce Tape→q_t, derive WorkGraph, Textual Panorama (Authorized-vs-Accepted labels).
+- [x] **MOD-EXPLORE** (plan M12+M13) — Exploration Archive/Promote + HumanSteerInjected.
+- [x] **MOD-SIGN** (plan M17) — SigningBackend seam + ApprovalCard canonical_bytes→hash/signature derivation (in-proc deterministic signer; keyring deferred).
+- [x] **MOD-E2E** (Stage 1) — loop driver: drive full loop w/ fake worker through BOTH predicate branches; S-3/S-4/S-7 green; FREEZE registry.
 
-## Status
-- **stage:** Stage 0 ✅ SHIPPED · Foundation build IN FLIGHT (Workflow `wecrsyjag` / run `wf_3ad7868e-465`)
-- **current_module:** Foundation (codec/registry/schemas/envelope/tape/reduce/evidence/replay/predicate/cli)
-- **modules_shipped:** [Stage-0 baseline: contracts B-1…B-5 + ADRs 0001-0007/WORKER-001 + S-1 PRE green + S-2 PRE green]
-- **lessons:** (see LESSONS.md)
-- **next_action (on foundation workflow completion):** run the orchestrator integration gate
-  `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'` + `PYTHONPATH=src python3 tests/integration/kernel_smoke.py`;
-  triage audit findings; rework any red module; commit+push Foundation; then launch the LOOP-MODULES workflow
-  (BOOT/PLANNER/CAPSULE+FailureMemory/WORKER+fake/REDUCE+PANORAMA/EXPLORE+HumanSteer/SIGN); then Stage-1 E2E.
-- **Test framework:** stdlib `unittest` (pytest not installed; kernel stays dependency-free). Import path: `PYTHONPATH=src` (+ root conftest.py).
-- **Orchestrator gate authored (Verifier≠Implementer):** `tests/integration/kernel_smoke.py` (S-1/S-7 partial on real kernel).
+## Status — 🎯 MILESTONE REACHED
+- **stage:** Stage 0 ✅ · Foundation ✅ · **Stage 1 ✅ SHIPPED = THE MILESTONE** · Stage 2/3 ⛔ BLOCKED (credentialed)
+- **milestone:** full locally-buildable scope + fake/manual-worker full-loop E2E + replay/handoff green.
+  `loop_e2e.py` ALL_PASS (10/10): accepted=2, failed=1, both predicate branches; S-3/S-4/S-7 green;
+  registry FROZEN v1.0.0. 373 unit tests OK. See `MILESTONE_REPORT.md` + `evidence/stage1/`.
+- **modules_shipped:** [Stage-0 baseline; Foundation kernel (10 mods, 235 tests, kernel_smoke 10/10);
+  Loop layer (boot/planner/capsule+FailureMemory/worker+fake/signing/explore/panorama/loop) — loop_e2e 10/10]
+- **lessons:** LESSONS.md (LF-1 advance-requires-PASS, LF-2 replay-recompute, LF-3 glossary-beats-merge)
+- **next_action:** NONE buildable locally — remaining work (Stage 2 real ≥2 adapters + GitHub; Stage 3 dogfood)
+  is credential-gated → BLOCKED.md. To unblock: authorize the credentialed Worker+GitHub batch (one human input).
+- **Test framework:** stdlib `unittest`. Import path: `PYTHONPATH=src` (+ root conftest.py).
+- **Re-run gates any time:** `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'` ·
+  `PYTHONPATH=src python3 tests/integration/loop_e2e.py` · `... kernel_smoke.py`.
 
 ### Shipgate 0 receipt — `evidence/stage0/`
 - S-1 PRE: ALL_PASS (sha256 ✓ · failure-is-state ✓ · advance rule ✓ · mixed-hash exit128 ✓ · replay-equal ✓ · 2 refs ✓)

@@ -165,7 +165,25 @@ class FailureMemory:
     def relevant_rules(self, atom: dict) -> list[dict]        # ONLY rules whose class is relevant to atom
 ```
 
-## signing.py
+## explore.py  (Exploration + Human Steer)
+```python
+def register_exploration(tape: "Tape", exploration: dict) -> str   # PRESERVE record of an explored branch
+def archive_exploration(tape: "Tape", exploration_id: str, *, predicate_pass: bool) -> str  # ExplorationArchived (SOVEREIGN_ACCEPT)
+def promote_exploration(tape: "Tape", exploration_id: str, *, predicate_pass: bool) -> str   # ExplorationPromoted (SOVEREIGN_ACCEPT)
+def inject_human_steer(tape: "Tape", message: dict) -> str          # HumanSteerInjected (PROPOSAL, typed Tape event)
+```
+
+## loop.py  (Stage-1 E2E driver)
+```python
+def run_loop(spec: dict, tape_dir: str, *, worker=None, max_atoms: int = 3) -> dict
+    # Drives the full loop with a (fake) Worker: boot -> goalstate -> module plan -> for each atom:
+    #   expand -> build shielded capsule (inject only relevant FailureClass rule) -> dispatch worker to an
+    #   isolated worktree -> import receipt -> predicate.evaluate -> {FAIL: FailureNode + classify ; PASS:
+    #   CandidateAccepted (advance)} -> reduce/panorama. Then HandoffGenerated. MUST traverse BOTH predicate
+    #   branches (>=1 FailureNode AND >=1 CandidateAccepted). Returns a summary dict:
+    #   {accepted: int, failed: int, accepted_head, tape_tip, branches_covered: bool, handoff_bundle}.
+    # Worker defaults to FakeWorker; pass a scenario list so the run produces both a fail and an accept.
+```
 ```python
 class SigningBackend(abc.ABC):
     @abc.abstractmethod

@@ -1,7 +1,8 @@
 {
   "contract": "turingos.event_registry",
-  "version": "1.0.0-provisional",
-  "status": "PROVISIONAL — frozen ONLY after Stage 1 first E2E loop (S-7) validates it; never before",
+  "version": "1.0.0",
+  "status": "FROZEN — Stage-1 first E2E loop validated the 18-event count (S-7 green, loop_e2e ALL_PASS, 2026-06-20). Further change is an additive project-level registry amendment, never a constitution amendment.",
+  "frozen_after": "Stage-1 E2E (loop_e2e.py ALL_PASS): both predicate branches traversed, replay/handoff byte-equal, shield only-relevant, S-3/S-4/S-7 green.",
   "governance": "authoritative versioned PROJECT contract, subordinate to the constitution — NOT law",
   "authority": "plan App C §C.3 / App B §B.5 / App D §D.2.1",
   "closed_world": true,
