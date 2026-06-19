@@ -87,6 +87,10 @@ class Tape:
         # builds envelope (registry-derived head_effect), runs local guard (FF, schema-known,
         # head_effect, payload_hash, single-writer identity, accepted_head ancestor),
         # writes ONE commit, advances tape_tip; advances accepted_head iff head_effect==ADVANCE AND predicate_pass.
+        # INVARIANT (tape-canonical replay): for an ADVANCE (SOVEREIGN_ACCEPT) event, predicate_pass MUST be
+        #   True, else raise RejectedAppend — a FAILED accept is emitted as a FailureNode (OBSERVATION), never
+        #   as a non-advancing SOVEREIGN_ACCEPT. Thus "SOVEREIGN_ACCEPT on the tape <=> accepted_head advanced",
+        #   so replay rebuilds accepted_head = last SOVEREIGN_ACCEPT commit, Tape-only, with no predicate_pass flag stored.
         # returns event_id ("mu:"+oid). Raises GuardReject on any guard failure (no commit).
     def read_event(self, event_id: str) -> dict                 # {event_type, payload, envelope, parents, oid}
     def walk(self) -> list[dict]                                # genesis..tape_tip in order

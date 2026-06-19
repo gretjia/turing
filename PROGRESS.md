@@ -19,12 +19,12 @@
 
 ## Build-module decomposition (derived from plan §4.1 M1–M17 + App E spikes; dependency-ordered)
 Foundation (substrate — fully atomized, built first):
-- [ ] **MOD-CODEC**  (plan M2) — `turingos.jcs.v1`: JCS serialize, ASCII-key/no-float guard, `content_digest=sha256(JCS(payload))`. (no deps)
-- [ ] **MOD-REGISTRY** (plan M3) — 18 events, 3 classes, `registry[type].class`, closed-world `head_effect`. (no deps)
-- [ ] **MOD-TAPE** (plan M1) — SHA-256 Micro ChainTape, 2 refs, FF-only append, 7-field envelope guard (5 load-bearing), `accepted_head` advance rule, single-writer guard + handoff. (deps: CODEC, REGISTRY)  ← S-1, S-2 land here as GATEs
-- [ ] **MOD-PREDICATE** (plan M5) — deterministic predicate kernel over Tape bytes (9 checks). (deps: TAPE, REGISTRY, CODEC, schemas)  ← S-3 GATE
-- [ ] **MOD-EVIDENCE** (plan M10) — Receipt import + evidence digests + Macro anchor binding. (deps: TAPE, CODEC)
-- [ ] **MOD-REPLAY** (plan M16) — deterministic replay (byte-equal) + Handoff bundle. (deps: TAPE, REGISTRY, CODEC)  ← S-7 GATE
+- [x] **MOD-CODEC**  (plan M2) — `turingos.jcs.v1`: JCS serialize, ASCII-key/no-float guard, `content_digest=sha256(JCS(payload))`. (no deps)
+- [x] **MOD-REGISTRY** (plan M3) — 18 events, 3 classes, `registry[type].class`, closed-world `head_effect`. (no deps)
+- [x] **MOD-TAPE** (plan M1) — SHA-256 Micro ChainTape, 2 refs, FF-only append, 7-field envelope guard (5 load-bearing), `accepted_head` advance rule, single-writer guard + handoff. (deps: CODEC, REGISTRY)  ← S-1, S-2 land here as GATEs
+- [x] **MOD-PREDICATE** (plan M5) — deterministic predicate kernel over Tape bytes (9 checks). (deps: TAPE, REGISTRY, CODEC, schemas)  ← S-3 GATE
+- [x] **MOD-EVIDENCE** (plan M10) — Receipt import + evidence digests + Macro anchor binding. (deps: TAPE, CODEC)
+- [x] **MOD-REPLAY** (plan M16) — deterministic replay (byte-equal) + Handoff bundle. (deps: TAPE, REGISTRY, CODEC)  ← S-7 GATE
 Loop (needed for Stage 1 E2E with fake worker):
 - [ ] **MOD-BOOT** (plan M4) — Project Spec as Boot INPUT; seed Q_0; SystemBootstrapped/ProjectAdopted/GoalStateAccepted/ModulePlanAccepted.
 - [ ] **MOD-PLANNER** (plan M6) — progressive Module→Atom expansion; AtomProposed.
@@ -36,11 +36,16 @@ Loop (needed for Stage 1 E2E with fake worker):
 - [ ] **MOD-E2E** (Stage 1) — loop driver: drive full loop w/ fake worker through BOTH predicate branches; S-3/S-4/S-7 green; FREEZE registry.
 
 ## Status
-- **stage:** Stage 0 ✅ SHIPPED (Shipgate 0 PASS) → Foundation build (in progress)
-- **current_module:** Foundation (MOD-CODEC/REGISTRY/TAPE/PREDICATE/EVIDENCE/REPLAY)
+- **stage:** Stage 0 ✅ SHIPPED · Foundation build IN FLIGHT (Workflow `wecrsyjag` / run `wf_3ad7868e-465`)
+- **current_module:** Foundation (codec/registry/schemas/envelope/tape/reduce/evidence/replay/predicate/cli)
 - **modules_shipped:** [Stage-0 baseline: contracts B-1…B-5 + ADRs 0001-0007/WORKER-001 + S-1 PRE green + S-2 PRE green]
 - **lessons:** (see LESSONS.md)
-- **next_action:** write Foundation PREDICATE.md; launch foundation Workflow (implement by dependency layer + adversarial audit, Verifier≠Implementer); then orchestrator integration gate (full pytest + real-Tape kernel smoke).
+- **next_action (on foundation workflow completion):** run the orchestrator integration gate
+  `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'` + `PYTHONPATH=src python3 tests/integration/kernel_smoke.py`;
+  triage audit findings; rework any red module; commit+push Foundation; then launch the LOOP-MODULES workflow
+  (BOOT/PLANNER/CAPSULE+FailureMemory/WORKER+fake/REDUCE+PANORAMA/EXPLORE+HumanSteer/SIGN); then Stage-1 E2E.
+- **Test framework:** stdlib `unittest` (pytest not installed; kernel stays dependency-free). Import path: `PYTHONPATH=src` (+ root conftest.py).
+- **Orchestrator gate authored (Verifier≠Implementer):** `tests/integration/kernel_smoke.py` (S-1/S-7 partial on real kernel).
 
 ### Shipgate 0 receipt — `evidence/stage0/`
 - S-1 PRE: ALL_PASS (sha256 ✓ · failure-is-state ✓ · advance rule ✓ · mixed-hash exit128 ✓ · replay-equal ✓ · 2 refs ✓)

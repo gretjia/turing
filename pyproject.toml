@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "turingos"
+version = "1.0.0-mvl"
+description = "TuringOS 1.0 — the Minimum Complete Loop (sovereign, constitution-governed OS for code projects)"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+tui = ["textual>=0.50"]
+
+[project.scripts]
+turingos = "turingos.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
