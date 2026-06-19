@@ -1,0 +1,41 @@
+{
+  "contract": "turingos.event_registry",
+  "version": "1.0.0-provisional",
+  "status": "PROVISIONAL — frozen ONLY after Stage 1 first E2E loop (S-7) validates it; never before",
+  "governance": "authoritative versioned PROJECT contract, subordinate to the constitution — NOT law",
+  "authority": "plan App C §C.3 / App B §B.5 / App D §D.2.1",
+  "closed_world": true,
+  "closed_world_rule": "unknown_event_type => reject",
+  "classes": {
+    "SOVEREIGN_ACCEPT": {"head_effect": "ADVANCE", "touches": ["accepted_head", "tape_tip"], "predicate_gates_advance": true},
+    "PROPOSAL": {"head_effect": "PRESERVE", "touches": ["tape_tip"], "predicate_gates_advance": false},
+    "OBSERVATION": {"head_effect": "PRESERVE", "touches": ["tape_tip"], "predicate_gates_advance": false}
+  },
+  "events": [
+    {"n": 1,  "name": "SystemBootstrapped",       "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "Boot — machine/project root established [Art. IV]"},
+    {"n": 2,  "name": "ProjectAdopted",           "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "Boot/Adopt — Project Spec consumed as Boot INPUT [Art. IV]"},
+    {"n": 3,  "name": "GoalStateAccepted",        "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "GoalState accepted (GoalStateRatified is a retired alias)"},
+    {"n": 4,  "name": "ModulePlanAccepted",       "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "Module Map accepted"},
+    {"n": 5,  "name": "AtomProposed",             "class": "PROPOSAL",         "head_effect": "PRESERVE", "predicate_gated": false, "stage": "progressive Module->Atom expansion"},
+    {"n": 6,  "name": "WorkCapsuleBuilt",         "class": "PROPOSAL",         "head_effect": "PRESERVE", "predicate_gated": false, "stage": "Shielded Work Capsule built (scope-limited, shield-injected)"},
+    {"n": 7,  "name": "WorkerDispatched",         "class": "PROPOSAL",         "head_effect": "PRESERVE", "predicate_gated": false, "stage": "dispatch to replaceable Worker (carries ordinary authorization — a Tape event, NOT a 3rd-ref advance)"},
+    {"n": 8,  "name": "HumanSteerInjected",       "class": "PROPOSAL",         "head_effect": "PRESERVE", "predicate_gated": false, "stage": "typed Human Steer event injected into the loop"},
+    {"n": 9,  "name": "WorkerReceiptImported",    "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "import Worker Receipt (NOT acceptance)"},
+    {"n": 10, "name": "MacroObservationImported", "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "import Macro Git/worktree/PR/CI evidence (Macro never directly sovereign)"},
+    {"n": 11, "name": "PredicateEvaluated",       "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "deterministic Predicate result recorded on tape [Art. I.1]"},
+    {"n": 12, "name": "CandidateAccepted",        "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "PASS path — new sovereign world state admitted"},
+    {"n": 13, "name": "CandidateRejected",        "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "non-failure rejection (superseded/withdrawn) recorded on tape"},
+    {"n": 14, "name": "FailureNode",              "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "FAIL path — failure-is-state [Art. 0.2/0.3]; carries failure_class; classify -> retry/recompile"},
+    {"n": 15, "name": "ExplorationArchived",      "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "Exploration archived (sovereign disposition)"},
+    {"n": 16, "name": "ExplorationPromoted",      "class": "SOVEREIGN_ACCEPT", "head_effect": "ADVANCE",  "predicate_gated": true,  "stage": "Exploration promoted into accepted state"},
+    {"n": 17, "name": "ReplayVerified",           "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "deterministic replay equality verified"},
+    {"n": 18, "name": "HandoffGenerated",         "class": "OBSERVATION",      "head_effect": "PRESERVE", "predicate_gated": false, "stage": "Replay/Handoff produced; also records explicit writer handoff"}
+  ],
+  "counts": {"total": 18, "SOVEREIGN_ACCEPT": 7, "PROPOSAL": 4, "OBSERVATION": 7},
+  "notes": [
+    "Only the 7 SOVEREIGN_ACCEPT events advance accepted_head, and each ONLY on a deterministic Predicate PASS [Art. I.1].",
+    "head_effect is REGISTRY-DERIVED: never writer-trusted. An envelope whose carried head_effect disagrees with registry[type].class is REJECTED.",
+    "failure_class (payload axis on FailureNode) is orthogonal to event_type (envelope axis); the failure-class registry is a separate companion contract.",
+    "Names are append-only and never renumbered. A new type is a project-level registry amendment, not a constitution amendment."
+  ]
+}

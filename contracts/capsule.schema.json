@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "turingos.capsule.v1",
+  "title": "Shielded Work Capsule",
+  "description": "Scope + atom allowlist + budget + injected abstract rule. Gate/scoring logic is EXCLUDED (Art. III.4 Goodhart shield). ASCII-only load-bearing keys, no floats (turingos.jcs.v1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "capsule_id", "atom_id", "allowed_files", "budget", "acceptance_commands", "context"],
+  "properties": {
+    "schema_id": {"const": "turingos.capsule.v1"},
+    "capsule_id": {"type": "string", "pattern": "^cap:[0-9a-f]{8,64}$"},
+    "atom_id": {"type": "string", "minLength": 1},
+    "module_id": {"type": "string"},
+    "goal_ref": {"type": "string", "description": "accepted_head OID the capsule was built against"},
+    "intent": {"type": "string", "description": "one-line atom intent (load-bearing scope, not gate logic)"},
+    "allowed_files": {"type": "array", "items": {"type": "string"}, "description": "the ONLY paths the candidate may touch (scope)"},
+    "forbidden_files": {"type": "array", "items": {"type": "string"}, "default": []},
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wall_seconds", "max_retries"],
+      "properties": {
+        "wall_seconds": {"type": "integer", "minimum": 1},
+        "max_retries": {"type": "integer", "minimum": 0}
+      }
+    },
+    "injected_rules": {
+      "type": "array",
+      "description": "ONLY the relevant abstract FailureClass rules (shield). Raw failure payloads / worker stdout / unrelated rules are FORBIDDEN here.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["failure_class", "rule"],
+        "properties": {
+          "failure_class": {"type": "string"},
+          "rule": {"type": "string", "description": "abstract rule text, e.g. 'declared tests must include boundary case X'"}
+        }
+      },
+      "default": []
+    },
+    "acceptance_commands": {"type": "array", "items": {"type": "string"}, "minItems": 1, "description": "declared tests, FROZEN before dispatch — predicate P6 re-runs these"},
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tape_tip", "accepted_head"],
+      "properties": {
+        "tape_tip": {"type": "string"},
+        "accepted_head": {"type": "string"}
+      }
+    }
+  }
+}

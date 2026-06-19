@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "turingos.receipt.v1",
+  "title": "Worker Receipt (adapter-agnostic)",
+  "description": "Imported via WorkerReceiptImported. Receipt != acceptance. Identical schema/terms regardless of which adapter ran (S-6). Worker self-reports are recorded but NOT trusted as the gate; the deterministic Predicate re-derives/re-runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "receipt_id", "capsule_id", "worker_id", "worktree_path", "candidate", "status"],
+  "properties": {
+    "schema_id": {"const": "turingos.receipt.v1"},
+    "receipt_id": {"type": "string", "pattern": "^rcpt:[0-9a-f]{8,64}$"},
+    "capsule_id": {"type": "string", "pattern": "^cap:[0-9a-f]{8,64}$", "description": "binds the receipt to its capsule"},
+    "worker_id": {"type": "string", "description": "adapter-agnostic worker identity, e.g. 'fake', 'claude', 'codex'"},
+    "worktree_path": {"type": "string", "description": "the isolated Macro worktree the candidate was built in"},
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tree_oid", "files_touched"],
+      "properties": {
+        "tree_oid": {"type": "string", "description": "Macro Git tree OID — the anchor predicate P7 binds against (ANCHOR_BINDS_HASH)"},
+        "files_touched": {"type": "array", "items": {"type": "string"}, "description": "paths the candidate changed (checked against capsule scope, P3)"},
+        "macro_commit": {"type": "string", "description": "optional Macro commit OID"}
+      }
+    },
+    "declared_test_results": {
+      "type": "array",
+      "description": "worker self-reported test results (recorded for audit; predicate P6 RE-RUNS, never trusts these)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "exit_code"],
+        "properties": {
+          "command": {"type": "string"},
+          "exit_code": {"type": "integer"}
+        }
+      },
+      "default": []
+    },
+    "evidence_digests": {"type": "array", "items": {"type": "string"}, "default": []},
+    "status": {"enum": ["ok", "failed", "timeout", "killed"], "description": "normalized worker outcome (adapter-agnostic)"},
+    "no_orphan": {"type": "boolean", "description": "process-group reap confirmed no orphan (PG-REAP)"}
+  }
+}

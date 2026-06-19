@@ -1,0 +1,15 @@
+{
+  "w1_ff_admitted": true,
+  "w2_wrong_writer_rejected": true,
+  "w2_wrong_writer_rejected_msg": "wrong_writer: W2 != current W1",
+  "w1_non_ff_rejected": true,
+  "w1_non_ff_rejected_msg": "non_ff: parent 8d5e1d4412690fce98b93d373a79f68ec7be082cad884b85116fa1fb71f14b22 != tip 1abde639b0fffc2a8d7a35cf15ff2b575c4a45def42885e3331daecc58991183",
+  "handoff_recorded": true,
+  "handoff_changed_writer": true,
+  "w2_admitted_after_handoff": true,
+  "w1_rejected_after_handoff": true,
+  "w1_rejected_after_handoff_msg": "wrong_writer: W1 != current W2",
+  "no_epoch_lease_fencing_required": true,
+  "SPIKE": "S-2",
+  "ALL_PASS": true
+}
