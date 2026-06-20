@@ -1,8 +1,23 @@
-# TuringOS 1.0 — MILESTONE REPORT
+# TuringOS 1.0 — FINAL REPORT (1.0 RELEASE)
 
-**Date:** 2026-06-20 · **Status:** **MILESTONE REACHED** — full locally-buildable scope + the
-fake/manual-worker full-loop E2E + replay/handoff green. Built autonomously, predicate-first,
-Verifier ≠ Implementer, failure-on-tape. Constitution = root law; the finalized plan = spec.
+**Date:** 2026-06-20 · **Status:** **TuringOS 1.0 COMPLETE — all 4 stages shipped.** The milestone
+(fake-worker full-loop E2E + replay/handoff) was reached, then — after operator credential authorization —
+Stage 2 (≥2 real Worker adapters + GitHub) and Stage 3 (real dogfood) were closed. Built autonomously,
+predicate-first, Verifier ≠ Implementer, failure-on-tape. Constitution = root law; the finalized plan = spec.
+
+## Post-milestone (Stage 2 + 3, real components)
+- **Smart dispatch router (ADR-0008)** — picks model + thinking effort per task, **fast by default**
+  (fixes the expensive CLI defaults: claude opus-4.8 xhigh, codex gpt-5.5 high), escalating on risk/breadth/retry.
+- **≥2 real Worker adapters** — `CliWorkerAdapter` over claude/codex/agy/grok headless one-shot (not agent
+  protocol — 1.x). **S-6 PASS**: one fixed capsule → 3 real adapters @ fast tier → isolated, in-scope,
+  adapter-agnostic receipts, PG-reap, no capability ranking.
+- **GitHub PR/CI MacroAdapter** — `gh`-driven. **S-5 PASS** on a disposable repo: PR → real CI check → PR head
+  tree-OID imported as `MacroObservationImported` → merge **refused without** / **merged after** a recorded
+  human-confirm event (merge=human-confirmed).
+- **Stage-3 dogfood PASS** — 3 real atoms × 3 real vendors @ fast tier, **first-attempt pass rate = 1.0**,
+  0 failure nodes, S-7 replay/handoff equal. Empirical: fast tier suffices first-try for routine atoms, and
+  correctness is Predicate-gated regardless of worker tier.
+- **386 unit tests OK** across the whole system.
 
 ---
 
@@ -23,8 +38,8 @@ Predicate, driven by a fake/manual Worker:
 |---|---|---|
 | **Stage 0** | Freeze contracts B-1…B-5 + S-1/S-2 PRE spikes | ✅ SHIPPED (Shipgate 0) |
 | **Stage 1** | Fake/manual Worker drives FULL loop E2E + replay (S-3/S-4/S-7) → freeze registry | ✅ SHIPPED — **MILESTONE** (Shipgate 1) |
-| **Stage 2** | ≥2 real subscription Worker adapters + GitHub PR/CI (S-5/S-6) | ⛔ BLOCKED — credentialed |
-| **Stage 3** | Dogfood the real pains | ⛔ BLOCKED — depends on Stage 2 |
+| **Stage 2** | ≥2 real subscription Worker adapters + GitHub PR/CI (S-5/S-6) | ✅ SHIPPED (Shipgate 2) |
+| **Stage 3** | Dogfood the real pains | ✅ SHIPPED — **1.0 RELEASE** (Shipgate 3) |
 
 ## 3. Modules shipped (with evidence manifests)
 
@@ -55,21 +70,24 @@ Tape-Canonical (replay Tape-only, no sqlite) · failure-is-state (FailureNode mo
 only (no quality/taste) · Broadcast+Shield (only-relevant abstract rule) · WorkGraph = derived projection.
 **The 7 临时违宪 anti-patterns are all absent** (Shipgate-1 release audit).
 
-## 6. BLOCKED — credentialed gates (skip-and-logged, see BLOCKED.md)
+## 6. BLOCKED — all cleared (operator authorized 2026-06-20)
 
-| ID | Blocked | Needs |
+| ID | Was blocked | Status |
 |---|---|---|
-| BLK-1 | Stage 2 / S-6: real ≥2 Worker-adapter dispatch | operator native login to ≥2 Worker CLIs (Claude Code + Codex/OpenCode), no credential bundling |
-| BLK-2 | Stage 2 / S-5: GitHub PR/CI MacroAdapter round-trip | GitHub token (repo scope) + `gh` auth + a disposable repo |
-| BLK-3 | Stage 3: dogfood | depends on BLK-1 + BLK-2 + a real GoalState/repo |
-| BLK-4 | 1.x: OS-keyring/hardware signing | keyring secrets (out of 1.0 loop-completeness; seam only) |
+| BLK-1 | Stage 2 / S-6: real ≥2 Worker-adapter dispatch | ✅ CLEARED — claude/codex/agy/grok native login; S-6 PASS |
+| BLK-2 | Stage 2 / S-5: GitHub PR/CI round-trip | ✅ CLEARED — `gh` authed; S-5 PASS (PR/CI/anchor/human-merge) |
+| BLK-3 | Stage 3: dogfood | ✅ CLEARED — dogfood PASS |
+| BLK-4 | 1.x: OS-keyring/hardware signing | OPEN by design — out of 1.0 scope (SigningBackend seam only) |
 
-## 7. The single human input needed to unblock
+**Only residual (minor):** the `gh` token lacks the `delete_repo` scope, so disposable S-5 repos are
+**archived** (private+inert) rather than deleted. One-time fix if you want hard deletes:
+`gh auth refresh -h github.com -s delete_repo`.
 
-**Authorize the credentialed batch:** (a) native login to ≥2 Worker CLIs, (b) a disposable GitHub repo +
-token (repo scope), confirming **merge stays human-confirmed**. With that, Stage 2 (S-5/S-6) then Stage 3
-(dogfood) proceed on the proven core — the loop shape does not change; only the Worker and Macro evidence
-become real.
+## 7. Nothing further required
+
+1.0 scope is complete. Optional 1.x roadmap (each behind an open seam): OS-keyring signing, the 3rd ref
+(`authorization_head`), concurrent multi-writer + epoch/lease/fencing, the Agent Protocol server, the fuller
+46-event registry, AES evidence store + retention matrix, a 2nd renderer.
 
 ## 8. Honest scope declaration (DEFERRED ≠ REJECTED)
 

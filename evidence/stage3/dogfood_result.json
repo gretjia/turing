@@ -1,0 +1,72 @@
+{
+  "atoms": [
+    {
+      "atom": "atom-factorial",
+      "worker": "claude",
+      "attempts": [
+        {
+          "attempt": 0,
+          "tier": "fast",
+          "passed": true,
+          "status": "ok",
+          "reason_codes": [],
+          "files_touched": [
+            "mathx.py"
+          ]
+        }
+      ],
+      "final_pass": true
+    },
+    {
+      "atom": "atom-slugify",
+      "worker": "codex",
+      "attempts": [
+        {
+          "attempt": 0,
+          "tier": "fast",
+          "passed": true,
+          "status": "ok",
+          "reason_codes": [],
+          "files_touched": [
+            "strutil.py"
+          ]
+        }
+      ],
+      "final_pass": true
+    },
+    {
+      "atom": "atom-parsekv",
+      "worker": "agy",
+      "attempts": [
+        {
+          "attempt": 0,
+          "tier": "fast",
+          "passed": true,
+          "status": "ok",
+          "reason_codes": [],
+          "files_touched": [
+            "parsekv.py"
+          ]
+        }
+      ],
+      "final_pass": true
+    }
+  ],
+  "tiers_used": [
+    "fast",
+    "fast",
+    "fast"
+  ],
+  "replay_rebuilds_accepted_head": true,
+  "replay_equal": true,
+  "handoff_rebuild_equal": true,
+  "n_atoms": 3,
+  "accepted": 3,
+  "first_attempt_pass": 3,
+  "first_attempt_pass_rate": 1.0,
+  "failure_nodes": 0,
+  "q_t_active_goal": {
+    "goal": "dogfood: deliver small real utilities via the loop"
+  },
+  "DOGFOOD_PASS": true
+}

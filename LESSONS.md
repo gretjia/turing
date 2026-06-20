@@ -25,3 +25,18 @@
   glossary made parallel module builds merge cleanly (eval "glossary beats swarm merge"). Adversarial audit
   caught the one real defect (tape). *How to apply:* keep INTERFACES.md the single source of API truth; never
   let an implementer change a frozen signature unilaterally.
+
+## Stage 2 / 3
+- **LF-4 (fast-tier empirical):** at the router fast tier (claude sonnet/low, codex effort=low, agy Gemini-Flash-Low)
+  the first-attempt pass rate on 3 real non-trivial atoms was **1.0** (Stage-3 dogfood). *Why:* fast tier is
+  good enough first-try for routine atoms AND correctness never depends on it (Predicate gates every accept).
+  *How to apply:* keep fast the default; let the Predicate + retry-escalation handle the hard tail; only raise
+  the default for a project whose measured first-attempt pass rate is low.
+- **LF-5 (worker cost):** every Worker CLI defaults to the operator's EXPENSIVE tier (claude opus-4.8 xhigh;
+  codex `model_reasoning_effort=high`). NEVER dispatch `-p` unqualified — always inject model+effort via the
+  smart router (`dispatch_router`). See [[turingos-fast-worker-dispatch]].
+- **LF-6 (worktree hygiene):** real workers self-verify by running code (e.g. python), creating `__pycache__`;
+  write those to `.git/info/exclude` (local, untracked) so build noise never pollutes `files_touched` / trips
+  the scope check. *How to apply:* `CliWorkerAdapter._ensure_git` seeds the exclude.
+- **LF-7 (gh delete scope):** `gh repo delete` needs the `delete_repo` token scope (separate from `repo`).
+  Absent it, self-heal by ARCHIVING the disposable repo. One-time fix: `gh auth refresh -h github.com -s delete_repo`.

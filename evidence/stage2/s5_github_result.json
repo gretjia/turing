@@ -1,0 +1,42 @@
+{
+  "steps": {
+    "repo_created": true,
+    "base_pushed": true,
+    "candidate_pushed": true,
+    "pr_opened": true,
+    "ci_observed": true,
+    "anchor_recorded": true,
+    "merge_refused_without_confirm": true,
+    "merged_after_confirm": true
+  },
+  "login": "gretjia",
+  "repo": "gretjia/turingos-s5-a51cb9dc",
+  "tree_oid": "f86c9f7d907c65d60bd011ba190be99ef4cf7fe1",
+  "pr": 1,
+  "ci": {
+    "state": "success",
+    "checks": [
+      [
+        "ok",
+        "pass",
+        "3s",
+        "https://github.com/gretjia/turingos-s5-a51cb9dc/actions/runs/27857938969/job/82448732268"
+      ]
+    ],
+    "rc": 0
+  },
+  "macro_observation_event": "mu:c06a5c5efb4fba4ae14dc98bae3411c6874db0d8ca13e06289222556498c80db",
+  "human_confirm_event": "mu:fc1384e311f0629b05b5c5f7f56d5c6aa10ba5d8807a5140cfbb276e66527041",
+  "merge": {
+    "merged": true,
+    "rc": 0,
+    "human_confirm_event_id": "mu:fc1384e311f0629b05b5c5f7f56d5c6aa10ba5d8807a5140cfbb276e66527041",
+    "detail": ""
+  },
+  "S5_PASS": true,
+  "delete": {
+    "deleted": false,
+    "rc": 1,
+    "detail": "HTTP 403: Must have admin rights to Repository. (https://api.github.com/repos/gretjia/turingos-s5-a51cb9dc)\nThis API operation needs the \"delete_repo\" scope. To request it, run:  gh auth refresh -h gi"
+  }
+}

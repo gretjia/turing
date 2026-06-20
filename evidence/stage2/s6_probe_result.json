@@ -1,0 +1,60 @@
+[dispatch] claude (timeout 240s)...
+  -> ok rc=0 15.8s artifact_ok=True
+[dispatch] codex (timeout 240s)...
+  -> ok rc=0 13.4s artifact_ok=True
+[dispatch] agy (timeout 240s)...
+  -> ok rc=0 24.2s artifact_ok=True
+[dispatch] grok (timeout 240s)...
+  -> failed rc=2 0.1s artifact_ok=False
+{
+  "installed": [
+    "claude",
+    "codex",
+    "agy",
+    "grok"
+  ],
+  "runs": [
+    {
+      "worker": "claude",
+      "status": "ok",
+      "rc": 0,
+      "elapsed_s": 15.8,
+      "no_orphan": true,
+      "artifact_ok": true,
+      "tail": "Created `hello.txt` containing exactly `ok`.\n"
+    },
+    {
+      "worker": "codex",
+      "status": "ok",
+      "rc": 0,
+      "elapsed_s": 13.4,
+      "no_orphan": true,
+      "artifact_ok": true,
+      "tail": "1040000gn/T/tos_s6_probe_uw0hn728/codex\n       2 hello.txt\n           6f  6b                                                        \n\n\ncodex\nCreated `hello.txt` containing exactly `ok` with no trailing newline.\ntokens used\n16,113\nCreated `hello.txt` containing exactly `ok` with no trailing newline.\n"
+    },
+    {
+      "worker": "agy",
+      "status": "ok",
+      "rc": 0,
+      "elapsed_s": 24.2,
+      "no_orphan": true,
+      "artifact_ok": true,
+      "tail": "I have created the file `hello.txt` in the current working directory containing exactly the text `ok` (lowercase, no quotes, no trailing newline) and have made no other modifications.\n"
+    },
+    {
+      "worker": "grok",
+      "status": "failed",
+      "rc": 2,
+      "elapsed_s": 0.1,
+      "no_orphan": true,
+      "artifact_ok": false,
+      "tail": "error: invalid value 'text' for '--output-format <OUTPUT_FORMAT>'\n  [possible values: plain, json, streaming-json]\n\nFor more information, try '--help'.\n"
+    }
+  ],
+  "adapters_succeeded": [
+    "claude",
+    "codex",
+    "agy"
+  ],
+  "S6_PRE_PASS": true
+}

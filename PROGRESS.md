@@ -35,19 +35,19 @@ Loop (needed for Stage 1 E2E with fake worker):
 - [x] **MOD-SIGN** (plan M17) — SigningBackend seam + ApprovalCard canonical_bytes→hash/signature derivation (in-proc deterministic signer; keyring deferred).
 - [x] **MOD-E2E** (Stage 1) — loop driver: drive full loop w/ fake worker through BOTH predicate branches; S-3/S-4/S-7 green; FREEZE registry.
 
-## Status — 🎯 MILESTONE REACHED
-- **stage:** Stage 0 ✅ · Foundation ✅ · **Stage 1 ✅ SHIPPED = THE MILESTONE** · Stage 2/3 ⛔ BLOCKED (credentialed)
-- **milestone:** full locally-buildable scope + fake/manual-worker full-loop E2E + replay/handoff green.
-  `loop_e2e.py` ALL_PASS (10/10): accepted=2, failed=1, both predicate branches; S-3/S-4/S-7 green;
-  registry FROZEN v1.0.0. 373 unit tests OK. See `MILESTONE_REPORT.md` + `evidence/stage1/`.
-- **modules_shipped:** [Stage-0 baseline; Foundation kernel (10 mods, 235 tests, kernel_smoke 10/10);
-  Loop layer (boot/planner/capsule+FailureMemory/worker+fake/signing/explore/panorama/loop) — loop_e2e 10/10]
-- **lessons:** LESSONS.md (LF-1 advance-requires-PASS, LF-2 replay-recompute, LF-3 glossary-beats-merge)
-- **next_action:** NONE buildable locally — remaining work (Stage 2 real ≥2 adapters + GitHub; Stage 3 dogfood)
-  is credential-gated → BLOCKED.md. To unblock: authorize the credentialed Worker+GitHub batch (one human input).
-- **Test framework:** stdlib `unittest`. Import path: `PYTHONPATH=src` (+ root conftest.py).
-- **Re-run gates any time:** `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'` ·
-  `PYTHONPATH=src python3 tests/integration/loop_e2e.py` · `... kernel_smoke.py`.
+## Status — ✅ TuringOS 1.0 COMPLETE (all 4 stages shipped)
+- **stages:** Stage 0 ✅ · Foundation ✅ · Stage 1 ✅ (milestone) · **Stage 2 ✅ (real ≥2 adapters + GitHub)** · **Stage 3 ✅ (dogfood / 1.0 RELEASE)**
+- **Stage 2:** S-6 PRE+GATE PASS (claude/codex/agy real dispatch, fast tier, isolated, adapter-agnostic, PG-reap, no ranking);
+  S-5 PASS (disposable repo PR#1 → real CI check → tree-OID anchor imported → merge refused-without/merged-after human-confirm). Smart router (ADR-0008) defaults fast, escalates on risk/breadth/retry. `evidence/stage2/`.
+- **Stage 3:** dogfood PASS — 3 real atoms × 3 real vendors @ fast tier, **first-attempt pass rate = 1.0**, 0 failure nodes,
+  S-7 replay/handoff equal on the dogfood tape. `evidence/stage3/`. 386 unit tests OK.
+- **modules_shipped:** [Stage-0 baseline; Foundation kernel; Loop layer; Stage-2: dispatch_router + worker/cli + macro]
+- **lessons:** LESSONS.md (LF-1..LF-3 + LF-4 fast-tier-empirical + LF-5 router-cost)
+- **BLOCKED:** all cleared (operator authorized). Only residual: `delete_repo` token scope (disposable repos archived not deleted; one-time `gh auth refresh -s delete_repo`). BLK-4 OS-keyring signing remains 1.x (out of 1.0 scope).
+- **next_action:** NONE — 1.0 scope complete. Optional 1.x: keyring signing, 3rd ref, multi-writer, agent-protocol, 46-event registry.
+- **Test framework:** stdlib `unittest`, `PYTHONPATH=src`. Re-run all gates:
+  `python3 -m unittest discover -s tests -p 'test_*.py'` · `tests/integration/{kernel_smoke,loop_e2e}.py` ·
+  `evidence/stage2/{s6_gate,s5_github}.py` · `evidence/stage3/dogfood.py`.
 
 ### Shipgate 0 receipt — `evidence/stage0/`
 - S-1 PRE: ALL_PASS (sha256 ✓ · failure-is-state ✓ · advance rule ✓ · mixed-hash exit128 ✓ · replay-equal ✓ · 2 refs ✓)

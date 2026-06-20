@@ -210,6 +210,35 @@ class FakeWorker(WorkerAdapter):                              # deterministic st
     def __init__(self, scenario: str = "pass"): ...           # scenario in {"pass","fail_scope","fail_test",...}
 ```
 
+## dispatch_router.py  (smart cost/effort router — Stage 2, ADR-0008)
+```python
+TIERS = ("fast", "standard", "deep")
+def select_tier(capsule: dict) -> str           # fast by default; escalate on risk_class/breadth/retry; capsule['tier'] overrides
+def worker_flags(worker_id: str, tier: str) -> list   # per-CLI model+effort flags (claude --model/--effort, codex -c model_reasoning_effort=, agy --model "<.. (Low)>", grok --model/--effort)
+def describe(worker_id: str, tier: str) -> str
+```
+
+## worker/cli.py  (real subscription CLI adapters — Stage 2, ADR-0008)
+```python
+class CliWorkerAdapter(WorkerAdapter):           # drives claude/codex/agy/grok headless in an isolated worktree
+    def __init__(self, worker_id, argv_builder=None, *, tier=None): ...   # tier=None -> router decides (fast default)
+    def run(self, capsule, worktree) -> dict      # builds prompt from capsule, injects router model/effort, commits candidate, returns turingos.receipt.v1 (tree_oid + files_touched)
+def build_prompt(capsule: dict) -> str
+ARGV_BUILDERS = {"claude":..., "codex":..., "agy":..., "grok":...}
+```
+
+## macro.py  (GitHub PR/CI MacroAdapter — Stage 2, plan M9/F-9)
+```python
+def gh_login() -> str
+def create_repo(name, *, private=True) -> str            # 'owner/name'
+def push_branch(worktree, repo_full, branch) -> None     # over gh-authenticated https
+def open_pr(repo_full, head, base, title, body) -> int   # PR number
+def observe_ci(repo_full, pr, *, watch=True) -> dict      # {state, checks}
+def import_pr_observation(tape, repo_full, pr, tree_oid, ci) -> str   # MacroObservationImported (anchor = PR head tree OID)
+def merge(repo_full, pr, *, human_confirm_event_id, admin=True) -> dict  # REFUSES without a recorded human-confirm (merge=human-confirmed)
+def delete_repo(repo_full) -> dict
+```
+
 ## cli.py  (entrypoints — used by E2E + spikes)
 ```
 turingos tape-init <dir>
