@@ -1,0 +1,80 @@
+{
+  "schema_id": "turingos.failure_class_registry.v1",
+  "pack_version": "v5.3.1",
+  "status": "FROZEN_V5_3_1",
+  "as_of": "2026-06-21",
+  "lineage": "17-class human-ratified TuringOS 1.0 baseline. Names and ordinals are append-only. Recovery policy is frozen separately in failure_disposition_map_v5_3_1.json.",
+  "count": 17,
+  "observer_derived": true,
+  "append_only": true,
+  "values": [
+    {
+      "name": "AUTH_REQUIRED",
+      "ordinal": 1
+    },
+    {
+      "name": "TIMEOUT_SOFT",
+      "ordinal": 2
+    },
+    {
+      "name": "TIMEOUT_HARD",
+      "ordinal": 3
+    },
+    {
+      "name": "TIMEOUT_OR_NETWORK_RETRY",
+      "ordinal": 4
+    },
+    {
+      "name": "OUTPUT_SCHEMA_VIOLATION",
+      "ordinal": 5
+    },
+    {
+      "name": "NO_DIFF",
+      "ordinal": 6
+    },
+    {
+      "name": "WRONG_DIFF",
+      "ordinal": 7
+    },
+    {
+      "name": "DIRTY_WORKTREE",
+      "ordinal": 8
+    },
+    {
+      "name": "AMBIGUOUS_MUTATION",
+      "ordinal": 9
+    },
+    {
+      "name": "RESUME_UNAVAILABLE",
+      "ordinal": 10
+    },
+    {
+      "name": "STEER_REJECTED",
+      "ordinal": 11
+    },
+    {
+      "name": "UNKNOWN_NONZERO",
+      "ordinal": 12
+    },
+    {
+      "name": "SEMANTIC_FAILURE",
+      "ordinal": 13
+    },
+    {
+      "name": "OVER_SCOPE",
+      "ordinal": 14
+    },
+    {
+      "name": "CREDENTIAL_VIOLATION",
+      "ordinal": 15
+    },
+    {
+      "name": "SANDBOX_VIOLATION",
+      "ordinal": 16
+    },
+    {
+      "name": "OBSERVER_MISMATCH",
+      "ordinal": 17
+    }
+  ]
+}

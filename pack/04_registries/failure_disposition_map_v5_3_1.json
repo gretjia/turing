@@ -1,0 +1,91 @@
+{
+  "schema_id": "turingos.failure_disposition_map.v1",
+  "pack_version": "v5.3.1",
+  "status": "FROZEN_V5_3_1",
+  "source_failure_registry": "04_registries/failure_class_registry_v5_3_1.json",
+  "dispositions": [
+    "RETRY",
+    "REPLAN",
+    "WAIT_FOR_HUMAN",
+    "SAFETY_HALT",
+    "TERMINATE"
+  ],
+  "count": 17,
+  "mapping": [
+    {
+      "failure_class": "AUTH_REQUIRED",
+      "disposition": "WAIT_FOR_HUMAN"
+    },
+    {
+      "failure_class": "TIMEOUT_SOFT",
+      "disposition": "RETRY"
+    },
+    {
+      "failure_class": "TIMEOUT_HARD",
+      "disposition": "TERMINATE"
+    },
+    {
+      "failure_class": "TIMEOUT_OR_NETWORK_RETRY",
+      "disposition": "RETRY"
+    },
+    {
+      "failure_class": "OUTPUT_SCHEMA_VIOLATION",
+      "disposition": "REPLAN"
+    },
+    {
+      "failure_class": "NO_DIFF",
+      "disposition": "REPLAN"
+    },
+    {
+      "failure_class": "WRONG_DIFF",
+      "disposition": "REPLAN"
+    },
+    {
+      "failure_class": "DIRTY_WORKTREE",
+      "disposition": "WAIT_FOR_HUMAN"
+    },
+    {
+      "failure_class": "AMBIGUOUS_MUTATION",
+      "disposition": "SAFETY_HALT"
+    },
+    {
+      "failure_class": "RESUME_UNAVAILABLE",
+      "disposition": "REPLAN"
+    },
+    {
+      "failure_class": "STEER_REJECTED",
+      "disposition": "REPLAN"
+    },
+    {
+      "failure_class": "UNKNOWN_NONZERO",
+      "disposition": "WAIT_FOR_HUMAN"
+    },
+    {
+      "failure_class": "SEMANTIC_FAILURE",
+      "disposition": "REPLAN"
+    },
+    {
+      "failure_class": "OVER_SCOPE",
+      "disposition": "SAFETY_HALT"
+    },
+    {
+      "failure_class": "CREDENTIAL_VIOLATION",
+      "disposition": "SAFETY_HALT"
+    },
+    {
+      "failure_class": "SANDBOX_VIOLATION",
+      "disposition": "SAFETY_HALT"
+    },
+    {
+      "failure_class": "OBSERVER_MISMATCH",
+      "disposition": "SAFETY_HALT"
+    }
+  ],
+  "semantics": {
+    "RETRY": "Same frozen capsule may be dispatched again only after a new RetryAuthorized event and a fresh single-use CapabilityGrant.",
+    "REPLAN": "A new WorkCapsule must be built; the failed capsule is never re-dispatched unchanged.",
+    "WAIT_FOR_HUMAN": "Operation enters WAITING_HUMAN; Worker, tool and token budgets do not burn while paused.",
+    "SAFETY_HALT": "System appends a terminal safety failure and stops the affected sovereign loop before any further effect.",
+    "TERMINATE": "Affected operation ends as an ordinary terminal failure without asserting a system-wide safety breach."
+  }
+}

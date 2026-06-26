@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: ["main", "goal/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  python-and-rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python test tooling
+        run: python3 -m pip install --upgrade pytest
+
+      - name: Install Rust toolchain
+        run: rustup toolchain install 1.96.0 --profile minimal --component rustfmt --component clippy
+
+      - name: Python tests
+        run: python3 -m pytest
+
+      - name: Rust formatting
+        run: cargo fmt --all -- --check
+
+      - name: Rust clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Rust tests
+        run: cargo test --workspace
+
+      - name: Headless evidence preflight
+        run: |
+          set +e
+          python3 tools/headless/build_evidence_bundle.py \
+            --book "$GITHUB_WORKSPACE/evidence/g12/phase_capsule.json" \
+            --out evidence/g12/evidence_bundle.ci.json
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            python3 - <<'PY'
+import json
+from pathlib import Path
+p = Path("evidence/g12/evidence_bundle.ci.json")
+data = json.loads(p.read_text())
+allowed = {"grok_cli_missing", "claude_cli_missing", "runsc_missing"}
+not_run = set(data.get("not_run", []))
+unexpected = sorted(not_run - allowed)
+if unexpected:
+    raise SystemExit(f"unexpected NOT_RUN blockers: {unexpected}")
+PY
+          fi

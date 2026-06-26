@@ -1,0 +1,28 @@
+[package]
+name = "turing-replay"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+# Closed schema types (MicroEventEnvelope / HeadSet) + the JCS codec + the embedded event
+# registry; and the pure head-transition reducer the fold re-runs. Path deps on the
+# workspace crates — the registry/codec/reducer are the ratified source.
+turing-contracts = { path = "../turing-contracts" }
+turing-kernel = { path = "../turing-kernel" }
+# Reads the frozen Tape (walk parents, cat-file the committed `event` blob bodies) via the
+# native SHA-256 Git plumbing.
+turing-git-tape = { path = "../turing-git-tape" }
+# JSON model for the committed body / the reconstruction projection. Pinned exact
+# (dependency_policy: no runtime-latest); preserve_order keeps the same parser flavor as the
+# contracts crate.
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[dev-dependencies]
+# Pinned exact (dependency_policy: no runtime-latest). The SG-19 test builds + reads payload
+# JSON and mints the frozen-Tape fixture commits.
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[lints]
+workspace = true

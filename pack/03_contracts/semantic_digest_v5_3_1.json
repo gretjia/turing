@@ -1,0 +1,543 @@
+{
+  "schema_id": "turingos.semantic_digest.v1",
+  "status": "FROZEN_V5_3_1",
+  "closes_blocker": "B1",
+  "as_of": "2026-06-21",
+  "revision": "rev3",
+  "revision_note": "rev3 additionally separates the Git-minted event_id from the committed MicroEventEnvelope body and pins content_digest == payload_hash == sha256(JCS(payload)).",
+  "root_law": "00_authority/constitution_root_law.md Art. 0.2",
+  "depends_on": "turingos.jcs.v1 (restricted RFC 8785; floats forbidden; ASCII load-bearing keys; arrays order-preserving)",
+  "problem": "A self-digest field D lives inside object O and is defined as a digest of O. Naive sha256(JCS(O)) is an unsatisfiable fixed point. Earlier packs had no unified exclusion rule across goal_digest / graph_hash / projection_hash / visible_card_hash.",
+  "algorithm": {
+    "name": "semantic_digest",
+    "steps": [
+      "1. sub = json_pointer_get(O, entry.target_pointer)   -- '' selects the whole object; '/payload' selects the sibling payload subtree",
+      "2. sub = apply_canonical_sort(sub, entry.canonical_sort)   -- sort declared arrays by declared keys (JCS preserves array order, so order-independent digests MUST sort here)",
+      "3. for ptr in entry.self_pointers: sub = json_pointer_delete(sub, ptr)   -- true nested JSON-Pointer; a non-resolving pointer raises, never a silent no-op",
+      "4. exclusion = global.excluded_key_names UNION entry.extra_excluded_key_names; sub = recursively drop every dict key whose name is in exclusion",
+      "5. digest = lowercase_hex(sha256(turingos.jcs.v1(sub)))",
+      "6. determinism: no clock, no randomness, no environment read (the SG-10 cross-implementation oracle property)."
+    ],
+    "required_properties": {
+      "P1_determinism": "same (O, entry) => same digest on re-run and across implementations",
+      "P2_stability": "mutating only excluded fields (self-digest field, global names, or entry.extra_excluded_key_names) leaves the digest unchanged",
+      "P3_sensitivity": "mutating any included (semantic) field changes the digest",
+      "P4_fixed_point_resolution": "a self-digest field is always in its own self_pointers, so the digest is independent of its own value",
+      "P_order": "for digests over a graph/array (graph_hash), permuting the canonical_sort arrays leaves the digest unchanged (achieves SG-71 node/edge order independence)",
+      "P_target": "content_digest/payload_hash digest the sibling /payload subtree and equal the independently computed sha256(JCS(payload)); they are stable to envelope-level fields"
+    }
+  },
+  "global": {
+    "excluded_key_names": [
+      "human_summary",
+      "description",
+      "label",
+      "display",
+      "x",
+      "y",
+      "layout",
+      "elk",
+      "localized"
+    ],
+    "rationale": "Non-semantic presentation / localization / graph-layout fields. Projection owns no truth, so they must never influence a sovereign digest.",
+    "lint_rule": "No governed payload schema may use an excluded key as semantic data. check_semantic_digest_v5_3_1.py scans 03_contracts and 05_schemas."
+  },
+  "digest_fields": [
+    {
+      "field": "content_digest",
+      "schema_id": "micro_event_envelope.v1",
+      "self": false,
+      "entry": {
+        "target_pointer": "/payload",
+        "self_pointers": []
+      },
+      "required_before_ref_move": true,
+      "note": "Digests the SIBLING /payload subtree (target_pointer consumed by the helper); not inside the object it digests, so not a fixed point. Equals sha256(JCS(payload)) (P_target)."
+    },
+    {
+      "field": "payload_hash",
+      "schema_id": "micro_event_envelope.v1",
+      "self": false,
+      "entry": {
+        "target_pointer": "/payload",
+        "self_pointers": []
+      },
+      "required_before_ref_move": true,
+      "note": "Append-envelope synonym of content_digest; identical mechanism and value."
+    },
+    {
+      "field": "goal_digest",
+      "schema_id": "goal_state.v1",
+      "self": true,
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/goal_digest"
+        ]
+      },
+      "required_before_ref_move": true,
+      "note": "Self-referential: excludes itself + global non-semantic keys."
+    },
+    {
+      "field": "graph_hash",
+      "schema_id": "work_graph.v1",
+      "self": true,
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/graph_hash"
+        ],
+        "canonical_sort": [
+          {
+            "array_pointer": "/nodes",
+            "sort_keys": [
+              "id"
+            ]
+          },
+          {
+            "array_pointer": "/edges",
+            "sort_keys": [
+              "src",
+              "dst",
+              "kind"
+            ]
+          }
+        ]
+      },
+      "required_before_ref_move": true,
+      "note": "Self-referential AND order-independent: nodes sorted by id, edges by (src,dst,kind) BEFORE canonicalization, with a TOTAL-ORDER tie-break on each element's full canonical bytes so duplicate ids / parallel edges cannot reintroduce order-dependence. Layout keys (x,y,label,layout,elk) are global-excluded, so graph_hash is layout-independent (SG-71)."
+    },
+    {
+      "field": "projection_hash",
+      "schema_id": "projection_view.v1",
+      "self": true,
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/projection_hash"
+        ],
+        "extra_excluded_key_names": [
+          "cache_index",
+          "built_at",
+          "disposable_counter",
+          "sqlite_path"
+        ]
+      },
+      "required_before_ref_move": false,
+      "note": "Self-referential. Cache/index/build-time fields excluded (scoped to this field, not global) so projection_hash reproduces after cache deletion (SG-72)."
+    },
+    {
+      "field": "visible_card_hash",
+      "schema_id": "approval_card.v1",
+      "self": true,
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/visible_card_hash"
+        ],
+        "extra_excluded_key_names": [
+          "localized_chrome",
+          "chrome",
+          "explanation"
+        ]
+      },
+      "required_before_ref_move": true,
+      "note": "Self-referential. Localization/explanatory chrome excluded (global + scoped) so visible == hashed == signed == gate-consumed bytes (SG-59 four-byte identity)."
+    }
+  ],
+  "not_self_digest_reference": {
+    "note": "These digest fields summarize OTHER content (sibling file, foreign payload, external evidence) and are NOT fixed points; plain sha256(JCS(target)).",
+    "fields": [
+      "sampling_plan_digest",
+      "implementation_digest",
+      "evidence_digest",
+      "pack_manifest_sha256",
+      "canonical_spec_sha256",
+      "constitution_sha256",
+      "event_registry_sha256",
+      "diff_hash",
+      "tree_hash",
+      "stdout_digest",
+      "stderr_digest"
+    ]
+  },
+  "forbidden": {
+    "head_set_after": "An event can never embed its own Git OID. head_set_after is forbidden in every payload (HeadSet is derived mechanically post-mint).",
+    "additional_self_digest": "A new self-digest field WITHOUT an entry here is an SG-81 failure (closed-world reject)."
+  },
+  "canonical_vectors": [
+    {
+      "name": "goal_digest",
+      "field": "goal_digest",
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/goal_digest"
+        ]
+      },
+      "input": {
+        "schema_id": "goal_state.v1",
+        "goal_digest": "PLACEHOLDER",
+        "goal_id": "goal-001",
+        "objective": "Build TuringOS P0 sovereign control plane",
+        "human_summary": "构建 TuringOS P0",
+        "constraints": [
+          "finite_budget",
+          "human_ratification_required"
+        ],
+        "budget": {
+          "ticks": 1000,
+          "wall_ms": 86400000
+        }
+      },
+      "expected_semantic_digest": "9a549a898e94716e8ca179be48722fce96678251d62d4c06754225485d5c14bd",
+      "noise_ops": [
+        {
+          "pointer": "/goal_digest",
+          "value": "DIFFERENT"
+        },
+        {
+          "pointer": "/human_summary",
+          "value": "完全不同的文案"
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/objective",
+          "value": "Build something entirely different"
+        }
+      ]
+    },
+    {
+      "name": "graph_hash",
+      "field": "graph_hash",
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/graph_hash"
+        ],
+        "canonical_sort": [
+          {
+            "array_pointer": "/nodes",
+            "sort_keys": [
+              "id"
+            ]
+          },
+          {
+            "array_pointer": "/edges",
+            "sort_keys": [
+              "src",
+              "dst",
+              "kind"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "schema_id": "work_graph.v1",
+        "graph_hash": "PLACEHOLDER",
+        "nodes": [
+          {
+            "id": "n2",
+            "kind": "Atom",
+            "x": 10,
+            "y": 20,
+            "label": "build"
+          },
+          {
+            "id": "n1",
+            "kind": "Goal",
+            "x": 0,
+            "y": 0,
+            "label": "root"
+          }
+        ],
+        "edges": [
+          {
+            "src": "n1",
+            "dst": "n2",
+            "kind": "contains"
+          }
+        ]
+      },
+      "expected_semantic_digest": "6b71ed334f39c0cc6909c5774420d8b76ece0410a3d79c3efe2a3be2c4a16b02",
+      "noise_ops": [
+        {
+          "pointer": "/nodes/0/x",
+          "value": 999
+        },
+        {
+          "pointer": "/nodes/0/label",
+          "value": "X"
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/nodes/0/kind",
+          "value": "Milestone"
+        }
+      ]
+    },
+    {
+      "name": "graph_hash_parallel",
+      "field": "graph_hash",
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/graph_hash"
+        ],
+        "canonical_sort": [
+          {
+            "array_pointer": "/nodes",
+            "sort_keys": [
+              "id"
+            ]
+          },
+          {
+            "array_pointer": "/edges",
+            "sort_keys": [
+              "src",
+              "dst",
+              "kind"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "schema_id": "work_graph.v1",
+        "graph_hash": "PLACEHOLDER",
+        "nodes": [
+          {
+            "id": "n1",
+            "kind": "Goal"
+          },
+          {
+            "id": "n1",
+            "kind": "Atom"
+          },
+          {
+            "id": "n2",
+            "kind": "Milestone"
+          }
+        ],
+        "edges": [
+          {
+            "src": "n1",
+            "dst": "n2",
+            "kind": "dep",
+            "cond": "A"
+          },
+          {
+            "src": "n1",
+            "dst": "n2",
+            "kind": "dep",
+            "cond": "B"
+          }
+        ]
+      },
+      "expected_semantic_digest": "21d88deb18807744129f3d2d9e2c2f4fcdf2ad48e13771f9421239c1ff2b5aa9",
+      "note": "Total-order stress: duplicate node id (n1) differing in kind, and two PARALLEL edges sharing (src,dst,kind) differing only in a 4th semantic field. P_order over BOTH /nodes and /edges must hold; the full-byte tie-break makes it so.",
+      "noise_ops": [
+        {
+          "pointer": "/graph_hash",
+          "value": "X"
+        },
+        {
+          "pointer": "/nodes/0/label",
+          "value": "zzz"
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/edges/0/cond",
+          "value": "Z"
+        }
+      ]
+    },
+    {
+      "name": "projection_hash",
+      "field": "projection_hash",
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/projection_hash"
+        ],
+        "extra_excluded_key_names": [
+          "cache_index",
+          "built_at",
+          "disposable_counter",
+          "sqlite_path"
+        ]
+      },
+      "input": {
+        "schema_id": "projection_view.v1",
+        "projection_hash": "PLACEHOLDER",
+        "accepted_head": "mu:abc123",
+        "node_summaries": [
+          {
+            "id": "n1",
+            "status": "Accepted"
+          }
+        ],
+        "cache_index": {
+          "sqlite_path": "/tmp/proj.db"
+        },
+        "built_at": "2026-06-21T00:00:00Z",
+        "disposable_counter": 42
+      },
+      "expected_semantic_digest": "976e86335dfab70be2c963212744ba59a72f82dd37715df790f40428c6adb5cb",
+      "noise_ops": [
+        {
+          "pointer": "/built_at",
+          "value": "2099-01-01T00:00:00Z"
+        },
+        {
+          "pointer": "/disposable_counter",
+          "value": 0
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/accepted_head",
+          "value": "mu:DIFFERENT"
+        }
+      ]
+    },
+    {
+      "name": "visible_card_hash",
+      "field": "visible_card_hash",
+      "entry": {
+        "target_pointer": "",
+        "self_pointers": [
+          "/visible_card_hash"
+        ],
+        "extra_excluded_key_names": [
+          "localized_chrome",
+          "chrome",
+          "explanation"
+        ]
+      },
+      "input": {
+        "schema_id": "approval_card.v1",
+        "visible_card_hash": "PLACEHOLDER",
+        "target_head": "mu:def456",
+        "authority_epoch": 0,
+        "decision": "APPROVE",
+        "human_summary": "请批准",
+        "localized_chrome": {
+          "lang": "zh",
+          "footer": "x"
+        }
+      },
+      "expected_semantic_digest": "3ef71f3287d0406e833d52067f29f17ca2be9f99aca7d47dea07e60f8784dde0",
+      "noise_ops": [
+        {
+          "pointer": "/human_summary",
+          "value": "totally different"
+        },
+        {
+          "pointer": "/localized_chrome",
+          "value": {
+            "lang": "en"
+          }
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/decision",
+          "value": "REJECT"
+        }
+      ]
+    },
+    {
+      "name": "content_digest",
+      "field": "content_digest",
+      "entry": {
+        "target_pointer": "/payload",
+        "self_pointers": []
+      },
+      "input": {
+        "schema_id": "micro_event_envelope.v1",
+        "content_digest": "PLACEHOLDER",
+        "writer_id": "turingd",
+        "payload": {
+          "schema_id": "goal_state.v1",
+          "goal_id": "goal-9",
+          "objective": "X",
+          "human_summary": "本地化"
+        },
+        "prev_tape_tip": "mu:0000000000000000000000000000000000000000000000000000000000000000",
+        "authorization_head_before": null,
+        "accepted_head_before": null
+      },
+      "expected_semantic_digest": "317d70bd958db75dee5483853f5d699445f8d3f9fa2f1c8f05e673a3c2a6062a",
+      "independent_equals_target": true,
+      "noise_ops": [
+        {
+          "pointer": "/prev_tape_tip",
+          "value": "mu:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        },
+        {
+          "pointer": "/content_digest",
+          "value": "ZZ"
+        },
+        {
+          "pointer": "/writer_id",
+          "value": "other"
+        },
+        {
+          "pointer": "/payload/human_summary",
+          "value": "diff"
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/payload/objective",
+          "value": "Y"
+        }
+      ]
+    },
+    {
+      "name": "payload_hash",
+      "field": "payload_hash",
+      "entry": {
+        "target_pointer": "/payload",
+        "self_pointers": []
+      },
+      "input": {
+        "schema_id": "micro_event_envelope.v1",
+        "content_digest": "PLACEHOLDER",
+        "writer_id": "turingd",
+        "payload": {
+          "schema_id": "goal_state.v1",
+          "goal_id": "goal-9",
+          "objective": "X",
+          "human_summary": "本地化"
+        },
+        "prev_tape_tip": "mu:0000000000000000000000000000000000000000000000000000000000000000",
+        "authorization_head_before": null,
+        "accepted_head_before": null,
+        "payload_hash": "PLACEHOLDER"
+      },
+      "expected_semantic_digest": "317d70bd958db75dee5483853f5d699445f8d3f9fa2f1c8f05e673a3c2a6062a",
+      "independent_equals_target": true,
+      "noise_ops": [
+        {
+          "pointer": "/prev_tape_tip",
+          "value": "mu:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        },
+        {
+          "pointer": "/payload/human_summary",
+          "value": "diff"
+        }
+      ],
+      "change_ops": [
+        {
+          "pointer": "/payload/objective",
+          "value": "Y"
+        }
+      ]
+    }
+  ],
+  "pack_version": "v5.3.1"
+}

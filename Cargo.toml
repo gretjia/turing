@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/turing-contracts",
+    "crates/turing-git-tape",
+    "crates/turing-kernel",
+    "crates/turing-replay",
+]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.96.0"
+version = "0.0.0"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "warn"

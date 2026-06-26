@@ -1,0 +1,14 @@
+[package]
+name = "turing-kernel"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+# Closed schema types (MicroEventEnvelope / HeadSet enums) + the embedded event registry.
+# Path dependency on the workspace crate; the registry/codec are the ratified source.
+turing-contracts = { path = "../turing-contracts" }
+
+[lints]
+workspace = true

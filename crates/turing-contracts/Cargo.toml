@@ -1,0 +1,21 @@
+[package]
+name = "turing-contracts"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+# Pinned exact (dependency_policy: no runtime-latest).
+# serde/serde_json: JSON model + the dup-key-rejecting strict parser (custom Visitor).
+# sha2: SHA-256 for semantic_digest. hex: lowercase hex of the digest.
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+sha2 = "=0.10.9"
+hex = "=0.4.3"
+
+[dev-dependencies]
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[lints]
+workspace = true

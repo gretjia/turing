@@ -1,0 +1,24 @@
+[package]
+name = "turing-git-tape"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+# Closed schema types (MicroEventEnvelope / HeadSet) + the JCS codec + the embedded
+# event registry; and the pure head-transition reducer. Path deps on the workspace crates.
+turing-contracts = { path = "../turing-contracts" }
+turing-kernel = { path = "../turing-kernel" }
+# JSON model for the committed body. Pinned exact (dependency_policy: no runtime-latest);
+# preserve_order keeps the same parser flavor as the contracts crate.
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[dev-dependencies]
+# Pinned exact (dependency_policy: no runtime-latest). Used by SG-09 / SG-12 tests to
+# create isolated, auto-cleaned temp repositories, and to build/read payload JSON.
+tempfile = "=3.27.0"
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[lints]
+workspace = true

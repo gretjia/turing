@@ -71,7 +71,7 @@ class HeadlessContractTests(unittest.TestCase):
             bad_exit["exit_status"] = 1
             self.assertEqual(compute_product(bad_exit), "FAIL")
 
-    def test_evidence_bundle_reports_python_repo_rust_kernel_gap(self):
+    def test_evidence_bundle_reports_rust_kernel_environment(self):
         with tempfile.TemporaryDirectory() as td:
             out = Path(td) / "evidence_bundle.json"
             result = subprocess.run(
@@ -88,15 +88,19 @@ class HeadlessContractTests(unittest.TestCase):
                 capture_output=True,
             )
 
-            self.assertNotEqual(result.returncode, 0)
             bundle = json.loads(out.read_text())
             self.assertEqual(bundle["schema_id"], "EvidenceBundle.v1")
             self.assertEqual(bundle["m2_status"], "DISABLED")
-            self.assertIn("rust_authority_kernel_missing", bundle["not_run"])
+            self.assertNotIn("rust_authority_kernel_missing", bundle["not_run"])
+            self.assertNotIn("cargo_lock_missing", bundle["not_run"])
             self.assertIn("READY_FOR_HUMAN_GENESIS_SIGNATURE", bundle["state_ceiling"])
             self.assertEqual(bundle["forbidden_claims_present"], [])
             self.assertTrue((Path(td) / "human_decision_ledger.json").exists())
             self.assertTrue((Path(td) / "pack_disposition.json").exists())
+            if bundle["not_run"]:
+                self.assertNotEqual(result.returncode, 0)
+            else:
+                self.assertEqual(result.returncode, 0)
 
     def test_grok_wrapper_emits_schema_valid_not_run_report_when_external_tool_missing(self):
         with tempfile.TemporaryDirectory() as td:

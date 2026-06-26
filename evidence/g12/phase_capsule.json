@@ -1,11 +1,19 @@
 {
   "schema_id": "PhaseCapsule.v1",
   "phase_id": "F0-F8",
-  "objective": "Run the Foundation /GOAL HEADLESS TRIAD against github.com/gretjia/turing to the highest mechanically provable no-human state by adding non-authority headless evidence wrappers and emitting honest NOT_RUN/BLOCKED artifacts where the selected repo lacks Rust authority-kernel or real runsc/Grok/Claude closure evidence.",
+  "objective": "Run the Foundation /GOAL HEADLESS TRIAD against github.com/gretjia/turing to the highest mechanically provable no-human state by setting up the omega-vm and GitHub test environments, adding the Rust authority-kernel workspace and supply-chain lockfile to this repo, preserving non-authority headless wrappers, and emitting honest NOT_RUN/BLOCKED artifacts only for remaining human-only or externally unavailable gates.",
   "allowed_files": [
+    ".github/workflows/**",
+    "Cargo.lock",
+    "Cargo.toml",
+    "crates/**",
     "evidence/g12/**",
+    "pack/03_contracts/semantic_digest_v5_3_1.json",
+    "pack/04_registries/*.json",
+    "rust-toolchain.toml",
     "schemas/*.v1.schema.json",
     "tests/test_headless_contract.py",
+    "tests/test_environment_contract.py",
     "tools/goal_handoff.py",
     "tools/headless/**"
   ],
@@ -21,7 +29,11 @@
   ],
   "acceptance_commands": [
     "python3 -m pytest tests/test_headless_contract.py",
+    "python3 -m pytest tests/test_environment_contract.py",
     "python3 -m pytest",
+    "cargo fmt --all -- --check",
+    "cargo clippy --workspace --all-targets -- -D warnings",
+    "cargo test --workspace",
     "python3 tools/headless/build_evidence_bundle.py --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --out evidence/g12/evidence_bundle.json",
     "python3 tools/headless/grok_verify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --evidence evidence/g12/evidence_bundle.json --out evidence/g12/grok_verification_report.json",
     "python3 tools/headless/claude_final_ratify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --grok-report evidence/g12/grok_verification_report.json --evidence evidence/g12/evidence_bundle.json --out evidence/g12/claude_final_ratification_packet.json",
