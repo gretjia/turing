@@ -1,0 +1,36 @@
+{
+  "book_digest": "sha256:7545daefbdccec27734c38e064a55044af95cd962a3dec578c826de5f614c467",
+  "created_at": "2026-06-26T15:47:46.672782Z",
+  "repo": "/home/zephryj/turingos_backup/work/turing",
+  "requests": [
+    {
+      "decision": "Provide human OG-10/genesis Ed25519 signature over exact canonical GenesisEnvelope.v1 bytes.",
+      "id": "HDR-001",
+      "required_before": "HUMAN_RATIFIED_OR_M2_ENABLED",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "WAIT_FOR_HUMAN"
+    },
+    {
+      "decision": "Provision independent verifier key custody disjoint from implementer, ratifier, and genesis signer keys.",
+      "id": "HDR-002",
+      "required_before": "CLOSURE_CERTIFICATE_V1",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "WAIT_FOR_HUMAN"
+    },
+    {
+      "decision": "Select or provide the Rust authority-kernel implementation repo/crates for this Foundation P0 goal.",
+      "id": "HDR-003",
+      "required_before": "F1_AUTHORITY_OWNER_CLOSURE",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "ADDRESSED"
+    },
+    {
+      "decision": "Approve supply-chain closure evidence before any genesis signature request.",
+      "id": "HDR-004",
+      "required_before": "READY_FOR_HUMAN_GENESIS_SIGNATURE",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "ADDRESSED"
+    }
+  ],
+  "schema_id": "HumanDecisionLedger.v1"
+}

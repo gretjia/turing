@@ -1,0 +1,67 @@
+{
+  "clean_fixture_results": [
+    {
+      "argv": [
+        "/home/zephryj/.local/bin/runsc",
+        "--rootless",
+        "--ignore-cgroups",
+        "--network=none",
+        "do",
+        "/bin/true"
+      ],
+      "executed": true,
+      "exit_status": 0,
+      "id": "runsc_green_true",
+      "verdict": "PASS"
+    }
+  ],
+  "command_argv": [
+    "/home/zephryj/.local/bin/runsc",
+    "--rootless",
+    "--ignore-cgroups",
+    "--network=none",
+    "do",
+    "<probe>"
+  ],
+  "command_digest": "sha256:e6d89f98d053ab78ee4c2b3fdd7ee1c0d1fa93dfc59dbe746d316c88fd43dbff",
+  "created_at": "2026-06-26T15:47:36.365649Z",
+  "exit_status": 0,
+  "gate_id": "G7-RUNSC-RED-GREEN",
+  "input_digest": "sha256:f39a01fd4423c340e6fe7b1667aaa978afaf8b4f00e25ad6124fa7af0073ba1b",
+  "not_run": [],
+  "output_digest": "sha256:bab4feda5f6ac1ada81e9d12c1edbdb91bb2ec50a3f6cacca9198cc0b8176c03",
+  "phase_id": "F5",
+  "product": "PASS",
+  "reasons": [
+    {
+      "id": "runsc_green_executes_true",
+      "verdict": "PASS"
+    },
+    {
+      "id": "runsc_red_preserves_child_failure",
+      "verdict": "PASS"
+    }
+  ],
+  "schema_id": "GateResult.v1",
+  "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tampered_fixture_results": [
+    {
+      "argv": [
+        "/home/zephryj/.local/bin/runsc",
+        "--rootless",
+        "--ignore-cgroups",
+        "--network=none",
+        "do",
+        "/bin/sh",
+        "-c",
+        "exit 7"
+      ],
+      "executed": true,
+      "exit_status": 7,
+      "id": "runsc_red_exit_7",
+      "verdict": "FAIL"
+    }
+  ],
+  "tool_digest": "sha256:4ec073363641a44cc5d171f63f1e23b76016ef632eb3269395c79ac8aecb71bc"
+}

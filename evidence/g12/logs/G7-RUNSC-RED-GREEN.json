@@ -1,0 +1,30 @@
+{
+  "green": {
+    "argv": [
+      "/home/zephryj/.local/bin/runsc",
+      "--rootless",
+      "--ignore-cgroups",
+      "--network=none",
+      "do",
+      "/bin/true"
+    ],
+    "exit_status": 0,
+    "stderr": "",
+    "stdout": ""
+  },
+  "red": {
+    "argv": [
+      "/home/zephryj/.local/bin/runsc",
+      "--rootless",
+      "--ignore-cgroups",
+      "--network=none",
+      "do",
+      "/bin/sh",
+      "-c",
+      "exit 7"
+    ],
+    "exit_status": 7,
+    "stderr": "",
+    "stdout": ""
+  }
+}

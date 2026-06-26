@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "tools/headless/run_local_gates.py",
+    "--out-dir",
+    "evidence/g12"
+  ],
+  "cwd": "/tmp/turingos-grok-clean-x5v_1qqt/clone",
+  "exit_status": 0,
+  "schema_id": "CleanCloneGateExecution.v1",
+  "stderr": "",
+  "stdout": "{\"products\": {\"G-ADVERSARY-UNION\": \"PASS\", \"G-CARGO-CLIPPY\": \"PASS\", \"G-CARGO-FMT\": \"PASS\", \"G-CARGO-TEST\": \"PASS\", \"G-PYTEST\": \"PASS\", \"G1-RUST-AUTHORITY-KERNEL\": \"PASS\", \"G7-RUNSC-RED-GREEN\": \"PASS\"}, \"summary\": \"evidence/g12/local_gate_summary.json\"}\n"
+}

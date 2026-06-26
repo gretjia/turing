@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "tools/headless/run_adversary_union.py",
+    "--out",
+    "evidence/g12/adversary_union_run.json"
+  ],
+  "exit_status": 0,
+  "stderr": "",
+  "stdout": "{\"out\": \"evidence/g12/adversary_union_run.json\", \"product\": \"PASS\"}\n"
+}

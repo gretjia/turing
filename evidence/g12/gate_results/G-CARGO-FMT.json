@@ -1,0 +1,64 @@
+{
+  "clean_fixture_results": [
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/home/zephryj/turingos_backup/work/turing/tools/headless/fixture_probe.py",
+        "--fixture",
+        "evidence/g12/fixtures/G-CARGO-FMT-clean.json"
+      ],
+      "executed": true,
+      "exit_status": 0,
+      "fixture_digest": "sha256:aa2bd25305d133633138fcaddc8084952578de96c62617d0e546c2d4dfd02f82",
+      "fixture_path": "evidence/g12/fixtures/G-CARGO-FMT-clean.json",
+      "id": "G-CARGO-FMT_clean_fixture",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_digest": "sha256:da8af3fcc70630a0372be76649c83e1c49bee2489d904177eab505a1f2aa33c9",
+      "verdict": "PASS"
+    }
+  ],
+  "command_argv": [
+    "cargo",
+    "fmt",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "command_digest": "sha256:620356485e4f6a761a31beff0395aae66676d3f8434959ef3c123d15e60ce6d2",
+  "created_at": "2026-06-26T15:47:32.561764Z",
+  "exit_status": 0,
+  "gate_id": "G-CARGO-FMT",
+  "input_digest": "sha256:a28e702258aa618abfbbe4a9e9f099af81fa74765ca8940c7841d660b57c67f2",
+  "not_run": [],
+  "output_digest": "sha256:63f691cc964fd4057efbe4e75df62edcf9f951350670fb27cea8a897a17a7050",
+  "phase_id": "F0-F8",
+  "product": "PASS",
+  "reasons": [
+    {
+      "id": "command_exit_zero",
+      "verdict": "PASS"
+    }
+  ],
+  "schema_id": "GateResult.v1",
+  "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tampered_fixture_results": [
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "/home/zephryj/turingos_backup/work/turing/tools/headless/fixture_probe.py",
+        "--fixture",
+        "evidence/g12/fixtures/G-CARGO-FMT-tampered.json"
+      ],
+      "executed": true,
+      "exit_status": 4,
+      "fixture_digest": "sha256:fb10d842c90320e0cf2bf3d7279c9b067beb004e29e11a506f666500f7757902",
+      "fixture_path": "evidence/g12/fixtures/G-CARGO-FMT-tampered.json",
+      "id": "G-CARGO-FMT_tampered_fixture",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_digest": "sha256:1bf1858b38391d30004b6610c5535c6d746dd218fa30049e1d56a90c3d9b7301",
+      "verdict": "FAIL"
+    }
+  ],
+  "tool_digest": "sha256:4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10"
+}

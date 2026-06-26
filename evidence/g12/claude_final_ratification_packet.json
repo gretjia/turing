@@ -1,0 +1,110 @@
+{
+  "candidate": "26658784d67a8bf5c4397bb4f1f937195e0fb547",
+  "created_at": "2026-06-26T15:52:24.770352Z",
+  "evidence_bundle": "/home/zephryj/turingos_backup/work/turing/evidence/g12/evidence_bundle.json",
+  "evidence_bundle_digest": "sha256:f3b4f5a1ed54b83312e5896e532f5b88c745dbde7003dacab12d6220b8605e39",
+  "external_invocation": {
+    "agent_id": "claude_code_final_ratifier",
+    "clean_clone_digest": "sha256:40c65f0cdd13e4e9dcec75f71cd6e14aa42b929a931778867b6a25d0d141f171",
+    "command_argv": [
+      "claude",
+      "-p",
+      "<prompt>",
+      "--permission-mode",
+      "plan",
+      "--output-format",
+      "json"
+    ],
+    "cwd": "/tmp/turingos-claude-ratifier-ymsgs6if/clone",
+    "env_allowlist_digest": "sha256:877d8f3a34a41264ad818ad7f27800ea199fee3236a23d846933ff0348644f87",
+    "exit_status": 0,
+    "key_ids_visible_to_agent": [],
+    "model_family": "claude",
+    "produced_packet_digest": null,
+    "produced_packet_path": "evidence/g12/claude_final_ratification_packet.json",
+    "role": "final_model_ratifier",
+    "schema_id": "ExternalAgentInvocation.v1",
+    "source_write_permission": false,
+    "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdin_digest": null,
+    "stdout_digest": "sha256:8603e1e24b503b6cc9bcb310f9ea5026173fb2b1d8f4d872347c798be86d1c00",
+    "tool_binary_digest": "sha256:c9f04d929f18bd9a101f3897f27de4e1e0f15ebe8400d4aaf02983d73dd66b1d"
+  },
+  "forbidden_claims_present": [],
+  "grok_report": "evidence/g12/grok_verification_report.json",
+  "grok_report_digest": "sha256:835ffeeb16c5865c838d2c415e537939301abda7bc94dd6afa833861b17c12b9",
+  "m2_status": "DISABLED",
+  "model_packet": {
+    "api_error_status": null,
+    "duration_api_ms": 42431,
+    "duration_ms": 42921,
+    "fast_mode_state": "off",
+    "is_error": false,
+    "modelUsage": {
+      "claude-opus-4-8[1m]": {
+        "cacheCreationInputTokens": 23291,
+        "cacheReadInputTokens": 0,
+        "contextWindow": 1000000,
+        "costUSD": 0.361705,
+        "inputTokens": 10609,
+        "maxOutputTokens": 64000,
+        "outputTokens": 3030,
+        "webSearchRequests": 0
+      }
+    },
+    "num_turns": 2,
+    "permission_denials": [],
+    "result": "{\"summary\":\"Evidence is mechanically complete and internally consistent for model-level ratification. The independent verifier report (grok, role independent_verifier, read-only clean clone) returns a pass verdict; its clean_clone_digest matches the bundle's working-tree digest and the candidate commit 26658784 agrees across both packets. All eight gates in the matrix are pass with receipts and receipt digests, and the deterministic clean-clone runs (pytest, cargo fmt/clippy/test --workspace, and the local-gates harness) each exit zero, supplying the required autonomous mechanical supply-chain/test evidence. forbidden_claims_present is empty in both packets, the M2 capability is disabled, every not_run list is empty, and the implementer-origin state is addressed across all phases. The candidate is mechanically ready for human genesis-signature review. The empty key-ids-visible-to-agent (independent verifier-key custody) and the genesis signature itself remain human-only decisions; per the ratifier rules these are non-blocking and are surfaced as human decision requests rather than ratification obstacles. This model-level ratification is not, and does not assert, human ratification, signed-foundation, capability-enabled, or any closed status.\",\"verdict\":\"MODEL_RATIFIED\",\"blocking_reasons\":[]}",
+    "session_id": "f200d8a3-096c-47d7-95b1-1f2ef0eba41c",
+    "stop_reason": "tool_use",
+    "structured_output": {
+      "blocking_reasons": [],
+      "summary": "Evidence is mechanically complete and internally consistent for model-level ratification. The independent verifier report (grok, role independent_verifier, read-only clean clone) returns a pass verdict; its clean_clone_digest matches the bundle's working-tree digest and the candidate commit 26658784 agrees across both packets. All eight gates in the matrix are pass with receipts and receipt digests, and the deterministic clean-clone runs (pytest, cargo fmt/clippy/test --workspace, and the local-gates harness) each exit zero, supplying the required autonomous mechanical supply-chain/test evidence. forbidden_claims_present is empty in both packets, the M2 capability is disabled, every not_run list is empty, and the implementer-origin state is addressed across all phases. The candidate is mechanically ready for human genesis-signature review. The empty key-ids-visible-to-agent (independent verifier-key custody) and the genesis signature itself remain human-only decisions; per the ratifier rules these are non-blocking and are surfaced as human decision requests rather than ratification obstacles. This model-level ratification is not, and does not assert, human ratification, signed-foundation, capability-enabled, or any closed status.",
+      "verdict": "MODEL_RATIFIED"
+    },
+    "subtype": "success",
+    "terminal_reason": "completed",
+    "time_to_request_ms": 272,
+    "total_cost_usd": 0.361705,
+    "ttft_ms": 36858,
+    "ttft_stream_ms": 4184,
+    "type": "result",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 23291,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 23291,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "not_available",
+      "input_tokens": 10609,
+      "iterations": [],
+      "output_tokens": 3030,
+      "server_tool_use": {
+        "web_fetch_requests": 0,
+        "web_search_requests": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    },
+    "uuid": "c2746b51-8d99-4934-b2b0-1eae150a7cbc"
+  },
+  "model_structured_output": {
+    "blocking_reasons": [],
+    "summary": "Evidence is mechanically complete and internally consistent for model-level ratification. The independent verifier report (grok, role independent_verifier, read-only clean clone) returns a pass verdict; its clean_clone_digest matches the bundle's working-tree digest and the candidate commit 26658784 agrees across both packets. All eight gates in the matrix are pass with receipts and receipt digests, and the deterministic clean-clone runs (pytest, cargo fmt/clippy/test --workspace, and the local-gates harness) each exit zero, supplying the required autonomous mechanical supply-chain/test evidence. forbidden_claims_present is empty in both packets, the M2 capability is disabled, every not_run list is empty, and the implementer-origin state is addressed across all phases. The candidate is mechanically ready for human genesis-signature review. The empty key-ids-visible-to-agent (independent verifier-key custody) and the genesis signature itself remain human-only decisions; per the ratifier rules these are non-blocking and are surfaced as human decision requests rather than ratification obstacles. This model-level ratification is not, and does not assert, human ratification, signed-foundation, capability-enabled, or any closed status.",
+    "verdict": "MODEL_RATIFIED"
+  },
+  "not_run": [],
+  "packet_digest": "sha256:52a63fb10460fe1959c65a70cc87728c8af0448939158a494befd3cceb985eef",
+  "project_book": "/home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md",
+  "project_book_digest": "sha256:7545daefbdccec27734c38e064a55044af95cd962a3dec578c826de5f614c467",
+  "reason": null,
+  "schema_id": "FinalRatificationPacket.v1",
+  "state_ceiling": "READY_FOR_HUMAN_GENESIS_SIGNATURE",
+  "verdict": "MODEL_RATIFIED",
+  "working_repo": {
+    "current_commit": "26658784d67a8bf5c4397bb4f1f937195e0fb547",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "remote": "https://github.com/gretjia/turing.git"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "products": {
+    "G-ADVERSARY-UNION": "PASS",
+    "G-CARGO-CLIPPY": "PASS",
+    "G-CARGO-FMT": "PASS",
+    "G-CARGO-TEST": "PASS",
+    "G-PYTEST": "PASS",
+    "G1-RUST-AUTHORITY-KERNEL": "PASS",
+    "G7-RUNSC-RED-GREEN": "PASS"
+  },
+  "receipts": [
+    "evidence/g12/gate_results/G1-RUST-AUTHORITY-KERNEL.json",
+    "evidence/g12/gate_results/G-ADVERSARY-UNION.json",
+    "evidence/g12/gate_results/G-PYTEST.json",
+    "evidence/g12/gate_results/G-CARGO-FMT.json",
+    "evidence/g12/gate_results/G-CARGO-CLIPPY.json",
+    "evidence/g12/gate_results/G-CARGO-TEST.json",
+    "evidence/g12/gate_results/G7-RUNSC-RED-GREEN.json"
+  ],
+  "schema_id": "LocalGateSummary.v1"
+}

@@ -1,0 +1,39 @@
+{
+  "manifest": "/home/zephryj/turingos_backup/work/turing/evidence/g12/required_adversaries.union.v1.json",
+  "manifest_digest": "sha256:656827182302bfd5390b056281d98b1b8f6a965588e99c7db28c6b9518dd9528",
+  "product": "PASS",
+  "results": [
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "tools/headless/fixture_probe.py",
+        "--fixture",
+        "/tmp/tmp7aao4zuc/fixture.json"
+      ],
+      "exit_status": 4,
+      "id": "ADV-FIXTURE-FORBIDDEN-CLAIM",
+      "passed": true,
+      "stderr": "",
+      "stdout": "forbidden claims rejected: ['M2_ENABLED']\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/python3",
+        "tools/headless/fixture_probe.py",
+        "--fixture",
+        "/tmp/tmpttwyxr3v/fixture.json"
+      ],
+      "exit_status": 3,
+      "id": "ADV-FIXTURE-NOT-RUN-ABSORBS",
+      "passed": true,
+      "stderr": "",
+      "stdout": "not_run rejected\n"
+    },
+    {
+      "id": "ADV-GATE-UNEXECUTED-FIXTURE-REJECTED",
+      "passed": true,
+      "product": "FAIL"
+    }
+  ],
+  "schema_id": "AdversaryUnionRun.v1"
+}

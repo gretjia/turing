@@ -1,0 +1,223 @@
+{
+  "candidate": "26658784d67a8bf5c4397bb4f1f937195e0fb547",
+  "closure_certificate": null,
+  "created_at": "2026-06-26T15:51:20.889584Z",
+  "deterministic_clean_clone_gate_failures": [],
+  "deterministic_clean_clone_gates": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "pytest"
+      ],
+      "exit_status": 0,
+      "log_digest": "sha256:3700ac8b43754c68af9d16876f80581ccbe3067dba41b052bb17445ce414673f",
+      "log_path": "evidence/g12/logs/G12-A-clean-clone-1.json",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_digest": "sha256:14ae3254894d098021bd66d8a1b587e7a7ed50b63685a5176ac9ba1355b6f7ff"
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_status": 0,
+      "log_digest": "sha256:a581aa53a2ae07be6714084d4b8a5b8f37f5cdb9cb47d4bd1bdac02868bf9c9a",
+      "log_path": "evidence/g12/logs/G12-A-clean-clone-2.json",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_status": 0,
+      "log_digest": "sha256:a851ffeab6bbf528fc8ffe63f51dd3aa92bf3f69c1c0456e66d4858df5146e20",
+      "log_path": "evidence/g12/logs/G12-A-clean-clone-3.json",
+      "stderr_digest": "sha256:3b2b893676d513dbbac125ecd8fd51bd6e7f9f5c4635f08a479da09fe797de31",
+      "stdout_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "exit_status": 0,
+      "log_digest": "sha256:6c96f27bcd98633e0fcdec39014f38780640fc5ed88ce64f5240551bf17edb8b",
+      "log_path": "evidence/g12/logs/G12-A-clean-clone-4.json",
+      "stderr_digest": "sha256:5b489d206eb1e4f5b76a4bc81e8bd975d7fdf48c358e4a2c7ac0c4c82b128b25",
+      "stdout_digest": "sha256:405a687c900e93273bec54aecdc2844973bfff1c2ff626aab7297732ba78c422"
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/headless/run_local_gates.py",
+        "--out-dir",
+        "evidence/g12"
+      ],
+      "exit_status": 0,
+      "log_digest": "sha256:fe940feb245851817b6b88ed15559c0e6654161c05d13b2f781fbce96d04f742",
+      "log_path": "evidence/g12/logs/G12-A-clean-clone-5.json",
+      "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_digest": "sha256:782b83d9b81a01a6b19b6bb05b6b5815df493c7721e90192819e5d58ecc25d07"
+    }
+  ],
+  "evidence_bundle": "/home/zephryj/turingos_backup/work/turing/evidence/g12/evidence_bundle.json",
+  "evidence_bundle_digest": "sha256:f3b4f5a1ed54b83312e5896e532f5b88c745dbde7003dacab12d6220b8605e39",
+  "external_invocation": {
+    "agent_id": "grok_build_verifier",
+    "clean_clone_digest": "sha256:40c65f0cdd13e4e9dcec75f71cd6e14aa42b929a931778867b6a25d0d141f171",
+    "command_argv": [
+      "grok",
+      "-p",
+      "<prompt>",
+      "--cwd",
+      "/tmp/turingos-grok-clean-x5v_1qqt/clone",
+      "--output-format",
+      "json"
+    ],
+    "cwd": "/tmp/turingos-grok-clean-x5v_1qqt/clone",
+    "env_allowlist_digest": "sha256:877d8f3a34a41264ad818ad7f27800ea199fee3236a23d846933ff0348644f87",
+    "exit_status": 0,
+    "key_ids_visible_to_agent": [],
+    "model_family": "grok",
+    "produced_packet_digest": null,
+    "produced_packet_path": "evidence/g12/grok_verification_report.json",
+    "role": "independent_verifier",
+    "schema_id": "ExternalAgentInvocation.v1",
+    "source_write_permission": false,
+    "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdin_digest": null,
+    "stdout_digest": "sha256:1578b3f1f78cd8ee849acd9c877dde59798c58ec4f37cb5c931f702e932fe7c9",
+    "tool_binary_digest": "sha256:df9081d320bbe647c97375fc866eda9d4974259782682f68c2e89cb559529daa"
+  },
+  "forbidden_claims_present": [],
+  "m2_status": "DISABLED",
+  "model_packet": {
+    "requestId": "427356eb-f95b-45a6-b556-662f072d61c2",
+    "sessionId": "019f04a0-b962-74d2-b9be-85ba5a0c6bea",
+    "stopReason": "EndTurn",
+    "structuredOutput": {
+      "blocking_reasons": [],
+      "summary": "EvidenceBundle.v1 shows all listed mechanical gates PASS on clean-clone runs including G1-RUST-AUTHORITY-KERNEL and G7-RUNSC-RED-GREEN with receipts; forbidden_claims_present is empty, m2_status is DISABLED, and state_ceiling is READY_FOR_HUMAN_GENESIS_SIGNATURE without overclaiming ratification. Autonomous mechanical evidence is ready for human genesis-signature review and separate human custody decisions for independent verifier keys.",
+      "verdict": "PASS"
+    },
+    "text": "{\"verdict\":\"PASS\",\"summary\":\"EvidenceBundle.v1 shows all listed mechanical gates PASS on clean-clone runs including G1-RUST-AUTHORITY-KERNEL and G7-RUNSC-RED-GREEN with receipts; forbidden_claims_present is empty, m2_status is DISABLED, and state_ceiling is READY_FOR_HUMAN_GENESIS_SIGNATURE without overclaiming ratification. Autonomous mechanical evidence is ready for human genesis-signature review and separate human custody decisions for independent verifier keys.\",\"blocking_reasons\":[]}",
+    "thought": "The user wants me to act as an independent verifier for TuringOS Foundation. I need to produce exactly one minified JSON object with only three keys: verdict, summary, blocking_reasons.\n{\n  \"verdict\": \"PASS\",\n  \"summary\": \"Autonomous mechanical evidence complete and ready for human genesis-signature review\",\n  \"blocking_reasons\": []\n}\n\n## Explanation\n\nThe verdict is determined by exhaustive verification that the EvidenceBundle.v1 satisfies all deterministic clean-clone gate criteria and that no blocking conditions are present."
+  },
+  "model_structured_output": {
+    "blocking_reasons": [],
+    "summary": "EvidenceBundle.v1 shows all listed mechanical gates PASS on clean-clone runs including G1-RUST-AUTHORITY-KERNEL and G7-RUNSC-RED-GREEN with receipts; forbidden_claims_present is empty, m2_status is DISABLED, and state_ceiling is READY_FOR_HUMAN_GENESIS_SIGNATURE without overclaiming ratification. Autonomous mechanical evidence is ready for human genesis-signature review and separate human custody decisions for independent verifier keys.",
+    "verdict": "PASS"
+  },
+  "not_run": [],
+  "packet_digest": "sha256:36b727733eeffe449cbb82f770eb30f1adbbe9b93e01332426b103e5ba6a1c4d",
+  "project_book": "/home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md",
+  "project_book_digest": "sha256:7545daefbdccec27734c38e064a55044af95cd962a3dec578c826de5f614c467",
+  "reasons": [
+    {
+      "clone_digest": "sha256:40c65f0cdd13e4e9dcec75f71cd6e14aa42b929a931778867b6a25d0d141f171",
+      "id": "clean_read_only_clone",
+      "verdict": "PASS"
+    },
+    {
+      "id": "real_linux_pinned_runsc",
+      "verdict": "PASS"
+    },
+    {
+      "id": "rust_authority_kernel_evidence",
+      "verdict": "PASS"
+    },
+    {
+      "id": "deterministic_clean_clone_gates",
+      "records": [
+        {
+          "argv": [
+            "python3",
+            "-m",
+            "pytest"
+          ],
+          "exit_status": 0,
+          "log_digest": "sha256:3700ac8b43754c68af9d16876f80581ccbe3067dba41b052bb17445ce414673f",
+          "log_path": "evidence/g12/logs/G12-A-clean-clone-1.json",
+          "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_digest": "sha256:14ae3254894d098021bd66d8a1b587e7a7ed50b63685a5176ac9ba1355b6f7ff"
+        },
+        {
+          "argv": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_status": 0,
+          "log_digest": "sha256:a581aa53a2ae07be6714084d4b8a5b8f37f5cdb9cb47d4bd1bdac02868bf9c9a",
+          "log_path": "evidence/g12/logs/G12-A-clean-clone-2.json",
+          "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "argv": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_status": 0,
+          "log_digest": "sha256:a851ffeab6bbf528fc8ffe63f51dd3aa92bf3f69c1c0456e66d4858df5146e20",
+          "log_path": "evidence/g12/logs/G12-A-clean-clone-3.json",
+          "stderr_digest": "sha256:3b2b893676d513dbbac125ecd8fd51bd6e7f9f5c4635f08a479da09fe797de31",
+          "stdout_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "argv": [
+            "cargo",
+            "test",
+            "--workspace"
+          ],
+          "exit_status": 0,
+          "log_digest": "sha256:6c96f27bcd98633e0fcdec39014f38780640fc5ed88ce64f5240551bf17edb8b",
+          "log_path": "evidence/g12/logs/G12-A-clean-clone-4.json",
+          "stderr_digest": "sha256:5b489d206eb1e4f5b76a4bc81e8bd975d7fdf48c358e4a2c7ac0c4c82b128b25",
+          "stdout_digest": "sha256:405a687c900e93273bec54aecdc2844973bfff1c2ff626aab7297732ba78c422"
+        },
+        {
+          "argv": [
+            "python3",
+            "tools/headless/run_local_gates.py",
+            "--out-dir",
+            "evidence/g12"
+          ],
+          "exit_status": 0,
+          "log_digest": "sha256:fe940feb245851817b6b88ed15559c0e6654161c05d13b2f781fbce96d04f742",
+          "log_path": "evidence/g12/logs/G12-A-clean-clone-5.json",
+          "stderr_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_digest": "sha256:782b83d9b81a01a6b19b6bb05b6b5815df493c7721e90192819e5d58ecc25d07"
+        }
+      ],
+      "verdict": "PASS"
+    }
+  ],
+  "schema_id": "GrokVerificationReport.v1",
+  "state_ceiling": "READY_FOR_HUMAN_GENESIS_SIGNATURE",
+  "verdict": "PASS",
+  "working_repo": {
+    "current_commit": "26658784d67a8bf5c4397bb4f1f937195e0fb547",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "remote": "https://github.com/gretjia/turing.git"
+  }
+}

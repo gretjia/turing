@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_status": 0,
+  "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s\n",
+  "stdout": ""
+}

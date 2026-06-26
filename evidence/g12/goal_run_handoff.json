@@ -1,0 +1,171 @@
+{
+  "addressed_classes": [],
+  "artifacts": {
+    "claude_packet": "evidence/g12/claude_final_ratification_packet.json",
+    "claude_packet_digest": "sha256:01197d7c42adc1f2c942c2eb6ba1b37609a04f0dadc368cb6757f9ba83aa275b",
+    "evidence_bundle": "evidence/g12/evidence_bundle.json",
+    "evidence_bundle_digest": "sha256:f3b4f5a1ed54b83312e5896e532f5b88c745dbde7003dacab12d6220b8605e39",
+    "grok_report": "evidence/g12/grok_verification_report.json",
+    "grok_report_digest": "sha256:835ffeeb16c5865c838d2c415e537939301abda7bc94dd6afa833861b17c12b9",
+    "human_decision_ledger": "evidence/g12/human_decision_ledger.json",
+    "human_decision_ledger_digest": "sha256:5ff50e40998191a783207444d8861c940468857c2eaabfa1d663773065c0420c",
+    "pack_disposition": "evidence/g12/pack_disposition.json",
+    "pack_disposition_digest": "sha256:25fb3fd0ef104707652de43a23247731b9c66993ccc95ff2119b7b881096a37f"
+  },
+  "closed_derived_classes": [],
+  "created_at": "2026-06-26T15:52:39.324972Z",
+  "forbidden_claims_present": [],
+  "gate_matrix": [
+    {
+      "gate_id": "G-ADVERSARY-UNION",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G-ADVERSARY-UNION.json",
+      "receipt_digest": "sha256:88f5108d3559a95674b702df8606cc00486dd2fbd977f7d65b47f800103982ba"
+    },
+    {
+      "gate_id": "G-CARGO-CLIPPY",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G-CARGO-CLIPPY.json",
+      "receipt_digest": "sha256:1bda8d2b503be237cf4165529e693ba6b3694befd0b6b789f286f50dc862793a"
+    },
+    {
+      "gate_id": "G-CARGO-FMT",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G-CARGO-FMT.json",
+      "receipt_digest": "sha256:fc98aaa0dd98e37cba44dc57b524febe97f89595cd5c1c4da84806267bd4af24"
+    },
+    {
+      "gate_id": "G-CARGO-TEST",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G-CARGO-TEST.json",
+      "receipt_digest": "sha256:65dbc118e44f1ae874bfefe8bafe3c8f1a4615ea9e3b9ee4cd3dc8bd83751826"
+    },
+    {
+      "gate_id": "G-PYTEST",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G-PYTEST.json",
+      "receipt_digest": "sha256:fe1c06f99612299d2dffe2f0fecbd4340a7028a4b39a41b245bd73de76016132"
+    },
+    {
+      "gate_id": "G0-G11-PREFLIGHT",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G0-G11-PREFLIGHT.json",
+      "receipt_digest": "sha256:72bc122d2179db82ecd313f40bf4b655248bfd49b07516b425dc9341732736f3"
+    },
+    {
+      "gate_id": "G1-RUST-AUTHORITY-KERNEL",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G1-RUST-AUTHORITY-KERNEL.json",
+      "receipt_digest": "sha256:27ec1872595cc58321f1718a3a8b22c4c6ac5ebb5278fb7d52cf54fe1a66f0cd"
+    },
+    {
+      "gate_id": "G7-RUNSC-RED-GREEN",
+      "not_run": [],
+      "product": "PASS",
+      "receipt": "evidence/g12/gate_results/G7-RUNSC-RED-GREEN.json",
+      "receipt_digest": "sha256:0c84e4a26a518325cd1cd099705ebfdc736aa72f4bc31641ebcac20274d559eb"
+    },
+    {
+      "gate_id": "G12-A",
+      "not_run": [],
+      "product": "PASS"
+    },
+    {
+      "gate_id": "G12-B",
+      "not_run": [],
+      "product": "PASS"
+    }
+  ],
+  "human_decisions_required": [
+    {
+      "decision": "Provide human OG-10/genesis Ed25519 signature over exact canonical GenesisEnvelope.v1 bytes.",
+      "id": "HDR-001",
+      "required_before": "HUMAN_RATIFIED_OR_M2_ENABLED",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "WAIT_FOR_HUMAN"
+    },
+    {
+      "decision": "Provision independent verifier key custody disjoint from implementer, ratifier, and genesis signer keys.",
+      "id": "HDR-002",
+      "required_before": "CLOSURE_CERTIFICATE_V1",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "WAIT_FOR_HUMAN"
+    },
+    {
+      "decision": "Select or provide the Rust authority-kernel implementation repo/crates for this Foundation P0 goal.",
+      "id": "HDR-003",
+      "required_before": "F1_AUTHORITY_OWNER_CLOSURE",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "ADDRESSED"
+    },
+    {
+      "decision": "Approve supply-chain closure evidence before any genesis signature request.",
+      "id": "HDR-004",
+      "required_before": "READY_FOR_HUMAN_GENESIS_SIGNATURE",
+      "schema_id": "HumanDecisionRequest.v1",
+      "status": "ADDRESSED"
+    }
+  ],
+  "implementation_origin_state_max": "IMPLEMENTER_ADDRESSED",
+  "m2_status": "DISABLED",
+  "not_run": [],
+  "packet_digest": "sha256:7b2e65a48ac3d9d0cca577b9bbd5d7c2d1b7aebdf39e7f8f3d9c05ccb4f3d7ce",
+  "phase_matrix": [
+    {
+      "phase_id": "F0",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F1",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F2",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F3",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F4",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F5",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F6",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F7",
+      "status": "IMPLEMENTER_ADDRESSED"
+    },
+    {
+      "phase_id": "F8",
+      "status": "IMPLEMENTER_ADDRESSED"
+    }
+  ],
+  "project_book": "/home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md",
+  "project_book_digest": "sha256:7545daefbdccec27734c38e064a55044af95cd962a3dec578c826de5f614c467",
+  "ratifier_packet_digest": "sha256:01197d7c42adc1f2c942c2eb6ba1b37609a04f0dadc368cb6757f9ba83aa275b",
+  "schema_id": "GoalRunHandoff.v1",
+  "state_ceiling": "READY_FOR_HUMAN_GENESIS_SIGNATURE",
+  "status": "MODEL_FINAL_RATIFIED",
+  "verifier_packet_digest": "sha256:835ffeeb16c5865c838d2c415e537939301abda7bc94dd6afa833861b17c12b9",
+  "working_repo": {
+    "branch": "goal/headless-triad",
+    "commit": "26658784d67a8bf5c4397bb4f1f937195e0fb547",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "remote": "https://github.com/gretjia/turing.git"
+  }
+}
