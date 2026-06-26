@@ -44,14 +44,14 @@ jobs:
           rc=$?
           if [ "$rc" -ne 0 ]; then
             python3 - <<'PY'
-import json
-from pathlib import Path
-p = Path("evidence/g12/evidence_bundle.ci.json")
-data = json.loads(p.read_text())
-allowed = {"grok_cli_missing", "claude_cli_missing", "runsc_missing"}
-not_run = set(data.get("not_run", []))
-unexpected = sorted(not_run - allowed)
-if unexpected:
-    raise SystemExit(f"unexpected NOT_RUN blockers: {unexpected}")
-PY
+          import json
+          from pathlib import Path
+          p = Path("evidence/g12/evidence_bundle.ci.json")
+          data = json.loads(p.read_text())
+          allowed = {"grok_cli_missing", "claude_cli_missing", "runsc_missing"}
+          not_run = set(data.get("not_run", []))
+          unexpected = sorted(not_run - allowed)
+          if unexpected:
+              raise SystemExit(f"unexpected NOT_RUN blockers: {unexpected}")
+          PY
           fi

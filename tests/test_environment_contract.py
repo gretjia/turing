@@ -5,6 +5,8 @@ import subprocess
 import unittest
 from pathlib import Path
 
+import yaml
+
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -53,6 +55,8 @@ class EnvironmentContractTests(unittest.TestCase):
         workflow = REPO / ".github/workflows/ci.yml"
         self.assertTrue(workflow.exists(), "GitHub Actions workflow is required")
         text = workflow.read_text(encoding="utf-8")
+        parsed = yaml.safe_load(text)
+        self.assertIn("jobs", parsed)
         for needle in [
             "python3 -m pytest",
             "cargo fmt --all -- --check",
