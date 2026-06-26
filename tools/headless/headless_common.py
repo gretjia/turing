@@ -289,6 +289,8 @@ def structured_output(packet: dict[str, Any]) -> dict[str, Any]:
     directly. Treat missing/null/non-object structured output as absent.
     """
     nested = packet.get("structuredOutput")
+    if not isinstance(nested, dict):
+        nested = packet.get("structured_output")
     if isinstance(nested, dict):
         return nested
     if "verdict" in packet:

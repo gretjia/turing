@@ -29,6 +29,21 @@ def tool_path_for(argv: list[str]) -> Path:
     return Path(resolved) if resolved else Path(__file__).resolve()
 
 
+def authority_kernel_command() -> list[str]:
+    return [
+        "cargo",
+        "test",
+        "-p",
+        "turing-contracts",
+        "-p",
+        "turing-git-tape",
+        "-p",
+        "turing-kernel",
+        "-p",
+        "turing-replay",
+    ]
+
+
 def run(argv: list[str], cwd: Path) -> dict:
     proc = subprocess.run(argv, cwd=cwd, text=True, capture_output=True)
     return {
@@ -143,6 +158,7 @@ def main(argv: list[str] | None = None) -> int:
     (out_dir / "gate_results").mkdir(parents=True, exist_ok=True)
 
     receipts = []
+    receipts.append(write_command_gate(repo, out_dir, "G1-RUST-AUTHORITY-KERNEL", authority_kernel_command()))
     if not args.skip_slow:
         receipts.append(write_command_gate(repo, out_dir, "G-PYTEST", ["python3", "-m", "pytest"]))
         receipts.append(

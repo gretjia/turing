@@ -85,6 +85,14 @@ class HeadlessContractTests(unittest.TestCase):
                 }
             }
             self.assertEqual(structured_output(wrapped)["verdict"], "PASS")
+            underscored = {
+                "structured_output": {
+                    "verdict": "MODEL_RATIFIED",
+                    "summary": "ok",
+                    "blocking_reasons": [],
+                }
+            }
+            self.assertEqual(structured_output(underscored)["verdict"], "MODEL_RATIFIED")
             text_wrapped = {
                 "text": 'Reading files first.\\n{"verdict":"FAIL","summary":"blocked","blocking_reasons":["x"]}'
             }
@@ -109,13 +117,30 @@ class HeadlessContractTests(unittest.TestCase):
         self.assertIn('"schema_id":"EvidenceBundle.v1"', prompt)
         self.assertIn("GrokVerificationReport.v1 JSON:", prompt)
         self.assertIn('"verdict":"PASS"', prompt)
+        for forbidden in ["HUMAN_RATIFIED", "OG10_SIGNED", "FOUNDATION_READY", "M2_ENABLED"]:
+            self.assertNotIn(forbidden, prompt)
 
     def test_local_gate_resolves_actual_tool_binary(self):
         sys.path.insert(0, str(REPO / "tools/headless"))
-        from run_local_gates import tool_path_for
+        from run_local_gates import authority_kernel_command, tool_path_for
 
         expected = Path(shutil.which("python3") or sys.executable).resolve()
         self.assertEqual(tool_path_for(["python3", "-V"]).resolve(), expected)
+        self.assertEqual(
+            authority_kernel_command(),
+            [
+                "cargo",
+                "test",
+                "-p",
+                "turing-contracts",
+                "-p",
+                "turing-git-tape",
+                "-p",
+                "turing-kernel",
+                "-p",
+                "turing-replay",
+            ],
+        )
 
     def test_evidence_bundle_reports_rust_kernel_environment(self):
         with tempfile.TemporaryDirectory() as td:

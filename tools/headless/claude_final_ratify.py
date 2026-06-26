@@ -36,13 +36,14 @@ def build_claude_prompt(book: Path, evidence: Path, grok_report: Path) -> str:
     grok_report_text = grok_report.read_text(encoding="utf-8")
     return (
         "You are Claude Code FinalRatifier for TuringOS Foundation. "
-        "Return JSON only. MODEL_RATIFIED is not HUMAN_RATIFIED. "
+        "Return JSON only. Model ratification is not human ratification. "
         "Reject or NOT_RUN if Grok evidence, gate receipts, or autonomous mechanical "
         "supply-chain/test evidence is missing. Human-only genesis signature and "
         "independent verifier-key custody gaps should remain human decision requests; "
         "they do not prevent MODEL_RATIFIED when the candidate is mechanically ready "
-        "for human genesis-signature review. Do not claim HUMAN_RATIFIED, OG10_SIGNED, "
-        "FOUNDATION_READY, M2_ENABLED, or CLOSED.\n"
+        "for human genesis-signature review. Do not claim any human-ratified, "
+        "OG-10-signed, foundation-ready, M2-enabled, or closed state. Do not spell "
+        "restricted uppercase status identifiers in your response.\n"
         f"Project book path: {book}\n"
         f"EvidenceBundle.v1 JSON:\n{evidence_text}\n"
         f"GrokVerificationReport.v1 JSON:\n{grok_report_text}\n"
