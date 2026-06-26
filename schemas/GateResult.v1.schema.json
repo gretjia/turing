@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "command_argv": {"items": {"type": "string"}, "type": "array"},
+    "exit_status": {"type": "integer"},
+    "gate_id": {"type": "string"},
+    "input_digest": {"type": "string"},
+    "not_run": {"items": {"type": "string"}, "type": "array"},
+    "output_digest": {"type": ["string", "null"]},
+    "product": {"enum": ["PASS", "FAIL", "NOT_RUN", "BLOCKED"]},
+    "reasons": {"items": {"type": "object"}, "type": "array"},
+    "schema_id": {"const": "GateResult.v1"},
+    "stderr_digest": {"type": "string"},
+    "stdout_digest": {"type": "string"},
+    "tool_digest": {"type": "string"}
+  },
+  "required": [
+    "schema_id",
+    "gate_id",
+    "command_argv",
+    "exit_status",
+    "product",
+    "reasons",
+    "not_run",
+    "tool_digest",
+    "input_digest",
+    "output_digest",
+    "stdout_digest",
+    "stderr_digest"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "artifacts": {"type": "object"},
+    "forbidden_claims_present": {"items": {"type": "string"}, "type": "array"},
+    "m2_status": {"const": "DISABLED"},
+    "not_run": {"items": {"type": "string"}, "type": "array"},
+    "packet_digest": {"type": "string"},
+    "schema_id": {"const": "GoalRunHandoff.v1"},
+    "status": {"enum": ["BLOCKED_NOT_RUN", "IMPLEMENTER_ADDRESSED", "MODEL_FINAL_RATIFIED", "READY_FOR_HUMAN_GENESIS_SIGNATURE"]}
+  },
+  "required": [
+    "schema_id",
+    "status",
+    "artifacts",
+    "not_run",
+    "m2_status",
+    "forbidden_claims_present",
+    "packet_digest"
+  ],
+  "type": "object"
+}

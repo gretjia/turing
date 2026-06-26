@@ -1,0 +1,47 @@
+{
+  "schema_id": "PhaseCapsule.v1",
+  "phase_id": "F0-F8",
+  "objective": "Run the Foundation /GOAL HEADLESS TRIAD against github.com/gretjia/turing to the highest mechanically provable no-human state by adding non-authority headless evidence wrappers and emitting honest NOT_RUN/BLOCKED artifacts where the selected repo lacks Rust authority-kernel or real runsc/Grok/Claude closure evidence.",
+  "allowed_files": [
+    "evidence/g12/**",
+    "schemas/*.v1.schema.json",
+    "tests/test_headless_contract.py",
+    "tools/goal_handoff.py",
+    "tools/headless/**"
+  ],
+  "forbidden_files": [
+    "/home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md",
+    "/home/zephryj/turingos_backup/work/turingos_research/Reference Docs/Turingos宪法.md",
+    "contracts/**",
+    "src/**",
+    "private_keys/**",
+    "**/*private*key*",
+    "**/*.pem",
+    "**/*.key"
+  ],
+  "acceptance_commands": [
+    "python3 -m pytest tests/test_headless_contract.py",
+    "python3 -m pytest",
+    "python3 tools/headless/build_evidence_bundle.py --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --out evidence/g12/evidence_bundle.json",
+    "python3 tools/headless/grok_verify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --evidence evidence/g12/evidence_bundle.json --out evidence/g12/grok_verification_report.json",
+    "python3 tools/headless/claude_final_ratify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --grok-report evidence/g12/grok_verification_report.json --evidence evidence/g12/evidence_bundle.json --out evidence/g12/claude_final_ratification_packet.json",
+    "python3 tools/goal_handoff.py --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --evidence evidence/g12/evidence_bundle.json --grok-report evidence/g12/grok_verification_report.json --claude-packet evidence/g12/claude_final_ratification_packet.json --out evidence/g12/goal_run_handoff.json"
+  ],
+  "required_evidence": [
+    "evidence/g12/evidence_bundle.json",
+    "evidence/g12/gate_results/*.json",
+    "evidence/g12/grok_verification_report.json",
+    "evidence/g12/goal_run_handoff.json",
+    "evidence/g12/human_decision_ledger.json",
+    "evidence/g12/pack_disposition.json"
+  ],
+  "abort_conditions": [
+    "Any edit to the constitution, root project book, contracts, or src authority/runtime files.",
+    "Any claim of HUMAN_RATIFIED, OG10_SIGNED, FOUNDATION_READY, M2_ENABLED, or implementer-origin CLOSED.",
+    "Any GateResult product PASS with exit_status != 0, any NOT_RUN entry, missing command/input/output/tool digest, missing clean fixture evidence, or missing tampered fixture evidence.",
+    "Any launch-path closure claim without clean clone plus real Linux plus pinned runsc RED/GREEN evidence.",
+    "Any Claude final-ratifier invocation before Grok G12-A PASS.",
+    "Any attempt to treat this Python CLI repo as a complete Rust authority-kernel implementation without evidence."
+  ],
+  "external_verification_required": true
+}
