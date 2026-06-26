@@ -34,6 +34,7 @@
     "cargo fmt --all -- --check",
     "cargo clippy --workspace --all-targets -- -D warnings",
     "cargo test --workspace",
+    "python3 tools/headless/run_adversary_union.py --out evidence/g12/adversary_union_run.json",
     "python3 tools/headless/run_local_gates.py --out-dir evidence/g12",
     "python3 tools/headless/build_evidence_bundle.py --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --out evidence/g12/evidence_bundle.json",
     "python3 tools/headless/grok_verify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --evidence evidence/g12/evidence_bundle.json --out evidence/g12/grok_verification_report.json",
@@ -42,6 +43,8 @@
   ],
   "required_evidence": [
     "evidence/g12/evidence_bundle.json",
+    "evidence/g12/adversary_union_run.json",
+    "evidence/g12/required_adversaries.union.v1.json",
     "evidence/g12/gate_results/*.json",
     "evidence/g12/grok_verification_report.json",
     "evidence/g12/goal_run_handoff.json",

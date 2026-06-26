@@ -1,0 +1,20 @@
+{
+  "schema_id": "required_adversaries.union.v1",
+  "probes": [
+    {
+      "id": "ADV-FIXTURE-FORBIDDEN-CLAIM",
+      "kind": "fixture_probe",
+      "expected_exit": "nonzero"
+    },
+    {
+      "id": "ADV-FIXTURE-NOT-RUN-ABSORBS",
+      "kind": "fixture_probe",
+      "expected_exit": "nonzero"
+    },
+    {
+      "id": "ADV-GATE-UNEXECUTED-FIXTURE-REJECTED",
+      "kind": "gate_product_probe",
+      "expected_product": "FAIL"
+    }
+  ]
+}

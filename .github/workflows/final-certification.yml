@@ -1,0 +1,72 @@
+name: final-certification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  final-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK: ${{ github.workspace }}/evidence/g12/phase_capsule.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python test tooling
+        run: python3 -m pip install --upgrade pytest
+
+      - name: Install Rust toolchain
+        run: rustup toolchain install 1.96.0 --profile minimal --component rustfmt --component clippy
+
+      - name: Deterministic local gate receipts
+        run: python3 tools/headless/run_local_gates.py --out-dir evidence/g12
+
+      - name: Evidence bundle
+        run: |
+          python3 tools/headless/build_evidence_bundle.py \
+            --book "$TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK" \
+            --out evidence/g12/evidence_bundle.json
+
+      - name: Grok independent verification
+        run: |
+          python3 tools/headless/grok_verify.py \
+            --candidate "$(git rev-parse HEAD)" \
+            --book "$TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK" \
+            --evidence evidence/g12/evidence_bundle.json \
+            --out evidence/g12/grok_verification_report.json
+
+      - name: Claude final ratification
+        run: |
+          python3 tools/headless/claude_final_ratify.py \
+            --candidate "$(git rev-parse HEAD)" \
+            --book "$TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK" \
+            --grok-report evidence/g12/grok_verification_report.json \
+            --evidence evidence/g12/evidence_bundle.json \
+            --out evidence/g12/claude_final_ratification_packet.json
+
+      - name: Goal handoff
+        run: |
+          python3 tools/goal_handoff.py \
+            --book "$TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK" \
+            --evidence evidence/g12/evidence_bundle.json \
+            --grok-report evidence/g12/grok_verification_report.json \
+            --claude-packet evidence/g12/claude_final_ratification_packet.json \
+            --out evidence/g12/goal_run_handoff.json
+
+      - name: Upload final evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: headless-triad-final-evidence
+          if-no-files-found: error
+          path: |
+            evidence/g12/evidence_bundle.json
+            evidence/g12/gate_results/*.json
+            evidence/g12/grok_verification_report.json
+            evidence/g12/claude_final_ratification_packet.json
+            evidence/g12/goal_run_handoff.json
+            evidence/g12/human_decision_ledger.json
+            evidence/g12/pack_disposition.json
+            evidence/g12/local_gate_summary.json
+            evidence/g12/adversary_union_run.json
+            evidence/g12/logs/*.json

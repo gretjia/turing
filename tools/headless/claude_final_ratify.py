@@ -5,18 +5,22 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 from headless_common import (
     NO_HUMAN_STATE_CEILING,
     attach_packet_digest,
     base_env_digest,
-    clean_fixture_pass,
+    executed_clean_fixture,
+    executed_tampered_fixture,
     forbidden_claims_present,
     gate_result,
     git_commit,
     git_remote,
+    git_tree_digest,
     load_json,
     maybe_sha256_path,
     packet_digest,
@@ -24,7 +28,6 @@ from headless_common import (
     sha256_path,
     stream_digest,
     structured_output,
-    tampered_fixture_fail,
     utc_now,
     which_digest,
     write_json,
@@ -50,7 +53,27 @@ def build_claude_prompt(book: Path, evidence: Path, grok_report: Path) -> str:
     )
 
 
-def maybe_run_claude(book: Path, evidence: Path, grok_report: Path) -> tuple[int, str, str, dict]:
+def make_ratifier_clone(repo: Path, candidate: str) -> tuple[Path, str]:
+    temp = Path(tempfile.mkdtemp(prefix="turingos-claude-ratifier-"))
+    clone = temp / "clone"
+    proc = subprocess.run(
+        ["git", "clone", "--quiet", "--no-local", str(repo), str(clone)],
+        text=True,
+        capture_output=True,
+    )
+    if proc.returncode != 0:
+        shutil.rmtree(temp, ignore_errors=True)
+        raise RuntimeError(proc.stderr or "failed to clone ratifier repo")
+    proc = subprocess.run(["git", "checkout", "--quiet", candidate], cwd=clone, text=True, capture_output=True)
+    if proc.returncode != 0:
+        shutil.rmtree(temp, ignore_errors=True)
+        raise RuntimeError(proc.stderr or "failed to checkout ratifier candidate")
+    return clone, str(temp)
+
+
+def maybe_run_claude(
+    book: Path, evidence: Path, grok_report: Path, ratifier_clone: Path
+) -> tuple[int, str, str, dict]:
     claude, _digest = which_digest("claude")
     if claude is None:
         return 127, "", "claude CLI missing", {}
@@ -81,6 +104,7 @@ def maybe_run_claude(book: Path, evidence: Path, grok_report: Path) -> tuple[int
             "--json-schema",
             json.dumps(schema, separators=(",", ":")),
         ],
+        cwd=ratifier_clone,
         text=True,
         capture_output=True,
         timeout=300,
@@ -135,13 +159,16 @@ def main(argv: list[str] | None = None) -> int:
     stdout = ""
     stderr = ""
     model_packet: dict = {}
+    ratifier_clone: Path | None = None
+    ratifier_temp_root: str | None = None
     external_invocation = {
         "schema_id": "ExternalAgentInvocation.v1",
         "agent_id": "claude_code_final_ratifier",
         "model_family": "claude",
         "role": "final_model_ratifier",
         "command_argv": [],
-        "cwd": str(repo),
+        "cwd": None,
+        "clean_clone_digest": None,
         "stdin_digest": None,
         "stdout_digest": stream_digest(""),
         "stderr_digest": stream_digest(""),
@@ -156,10 +183,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if not not_run:
         try:
-            rc, stdout, stderr, model_packet = maybe_run_claude(book, evidence, grok_report_path)
+            ratifier_clone, ratifier_temp_root = make_ratifier_clone(repo, args.candidate)
+            rc, stdout, stderr, model_packet = maybe_run_claude(book, evidence, grok_report_path, ratifier_clone)
         except subprocess.TimeoutExpired as e:
             rc, stdout, stderr, model_packet = 124, e.stdout or "", e.stderr or "claude timed out", {}
+        except RuntimeError as e:
+            rc, stdout, stderr, model_packet = 125, "", str(e), {}
         external_invocation["command_argv"] = ["claude", "-p", "<prompt>", "--permission-mode", "plan", "--output-format", "json"]
+        external_invocation["cwd"] = str(ratifier_clone) if ratifier_clone else None
+        external_invocation["clean_clone_digest"] = git_tree_digest(ratifier_clone) if ratifier_clone else None
         external_invocation["stdout_digest"] = stream_digest(stdout)
         external_invocation["stderr_digest"] = stream_digest(stderr)
         external_invocation["exit_status"] = rc
@@ -235,10 +267,12 @@ def main(argv: list[str] | None = None) -> int:
         output_path=out,
         stdout=stdout,
         stderr=stderr,
-        clean_fixture_results=[clean_fixture_pass()],
-        tampered_fixture_results=[tampered_fixture_fail()],
+        clean_fixture_results=[executed_clean_fixture(repo, out.parent, "G12-B")],
+        tampered_fixture_results=[executed_tampered_fixture(repo, out.parent, "G12-B")],
     )
     write_json(gate_dir / "G12-B.json", gate)
+    if ratifier_temp_root:
+        shutil.rmtree(ratifier_temp_root, ignore_errors=True)
     print_packet_summary(packet)
     return 0 if verdict == "MODEL_RATIFIED" else 1
 

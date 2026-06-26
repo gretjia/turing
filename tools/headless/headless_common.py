@@ -124,9 +124,13 @@ def compute_product(result: dict[str, Any]) -> str:
     if not result.get("tampered_fixture_results"):
         return "FAIL"
     for fixture in result["clean_fixture_results"]:
+        if fixture.get("executed") is not True or "exit_status" not in fixture:
+            return "FAIL"
         if fixture.get("verdict") != "PASS":
             return "FAIL"
     for fixture in result["tampered_fixture_results"]:
+        if fixture.get("executed") is not True or "exit_status" not in fixture:
+            return "FAIL"
         if fixture.get("verdict") == "PASS":
             return "FAIL"
     return "PASS"
@@ -248,12 +252,79 @@ def detect_missing_foundation_primitives(repo: Path) -> list[str]:
     return sorted(set(missing))
 
 
+def run_fixture_probe(repo: Path, out_dir: Path, gate_id: str, fixture: dict[str, Any], expected: str) -> dict[str, Any]:
+    fixture_dir = out_dir / "fixtures"
+    fixture_dir.mkdir(parents=True, exist_ok=True)
+    fixture_path = fixture_dir / f"{gate_id}-{expected}.json"
+    write_json(fixture_path, fixture)
+    probe = repo / "tools/headless/fixture_probe.py"
+    proc = subprocess.run(
+        [sys.executable, str(probe), "--fixture", str(fixture_path)],
+        cwd=repo,
+        text=True,
+        capture_output=True,
+    )
+    if expected == "clean":
+        verdict = "PASS" if proc.returncode == 0 else "FAIL"
+    else:
+        verdict = "FAIL" if proc.returncode != 0 else "PASS"
+    return {
+        "id": f"{gate_id}_{expected}_fixture",
+        "verdict": verdict,
+        "executed": True,
+        "argv": [sys.executable, str(probe), "--fixture", str(fixture_path)],
+        "exit_status": proc.returncode,
+        "fixture_path": str(fixture_path),
+        "fixture_digest": sha256_path(fixture_path),
+        "stdout_digest": stream_digest(proc.stdout),
+        "stderr_digest": stream_digest(proc.stderr),
+    }
+
+
+def executed_clean_fixture(repo: Path, out_dir: Path, gate_id: str) -> dict[str, Any]:
+    return run_fixture_probe(
+        repo,
+        out_dir,
+        gate_id,
+        {
+            "schema_id": "FixtureProbe.v1",
+            "claim": "IMPLEMENTER_ADDRESSED",
+            "not_run": [],
+        },
+        "clean",
+    )
+
+
+def executed_tampered_fixture(repo: Path, out_dir: Path, gate_id: str) -> dict[str, Any]:
+    return run_fixture_probe(
+        repo,
+        out_dir,
+        gate_id,
+        {
+            "schema_id": "FixtureProbe.v1",
+            "claim": "M2_ENABLED",
+            "not_run": [],
+        },
+        "tampered",
+    )
+
+
 def clean_fixture_pass() -> dict[str, Any]:
-    return {"id": "clean_fixture_schema_shape", "verdict": "PASS"}
+    return {
+        "id": "clean_fixture_schema_shape",
+        "verdict": "PASS",
+        "executed": False,
+        "exit_status": None,
+    }
 
 
 def tampered_fixture_fail() -> dict[str, Any]:
-    return {"id": "tampered_fixture_forbidden_claim", "verdict": "FAIL"}
+    return {
+        "id": "tampered_fixture_forbidden_claim",
+        "verdict": "FAIL",
+        "executed": False,
+        "exit_status": None,
+    }
 
 
 def base_env_digest() -> str:

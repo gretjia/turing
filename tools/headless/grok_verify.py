@@ -19,8 +19,9 @@ from headless_common import (
     NO_HUMAN_STATE_CEILING,
     attach_packet_digest,
     base_env_digest,
-    clean_fixture_pass,
     detect_missing_foundation_primitives,
+    executed_clean_fixture,
+    executed_tampered_fixture,
     forbidden_claims_present,
     gate_result,
     git_commit,
@@ -34,7 +35,6 @@ from headless_common import (
     sha256_path,
     stream_digest,
     structured_output,
-    tampered_fixture_fail,
     utc_now,
     which_digest,
     write_json,
@@ -74,7 +74,50 @@ def make_clean_clone(repo: Path, candidate: str) -> tuple[Path | None, str | Non
     return clone, str(temp)
 
 
-def maybe_run_grok(clone: Path, book: Path, evidence: Path) -> tuple[int, str, str, dict]:
+def clean_clone_gate_commands() -> list[list[str]]:
+    return [
+        ["python3", "-m", "pytest"],
+        ["cargo", "fmt", "--all", "--", "--check"],
+        ["cargo", "clippy", "--workspace", "--all-targets", "--", "-D", "warnings"],
+        ["cargo", "test", "--workspace"],
+        ["python3", "tools/headless/run_local_gates.py", "--out-dir", "evidence/g12"],
+    ]
+
+
+def run_clean_clone_gates(clone: Path, out_dir: Path) -> tuple[list[dict], list[str]]:
+    records: list[dict] = []
+    failures: list[str] = []
+    log_dir = out_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    for index, argv in enumerate(clean_clone_gate_commands(), start=1):
+        proc = subprocess.run(argv, cwd=clone, text=True, capture_output=True, timeout=900)
+        log_path = log_dir / f"G12-A-clean-clone-{index}.json"
+        log = {
+            "schema_id": "CleanCloneGateExecution.v1",
+            "argv": argv,
+            "cwd": str(clone),
+            "exit_status": proc.returncode,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+        }
+        write_json(log_path, log)
+        record = {
+            "argv": argv,
+            "exit_status": proc.returncode,
+            "stdout_digest": stream_digest(proc.stdout),
+            "stderr_digest": stream_digest(proc.stderr),
+            "log_path": str(log_path),
+            "log_digest": sha256_path(log_path),
+        }
+        records.append(record)
+        if proc.returncode != 0:
+            failures.append(" ".join(argv))
+    return records, failures
+
+
+def maybe_run_grok(
+    clone: Path, book: Path, evidence: Path, clean_clone_gate_records: list[dict]
+) -> tuple[int, str, str, dict]:
     grok, _digest = which_digest("grok")
     if grok is None:
         return 127, "", "grok CLI missing", {}
@@ -89,8 +132,10 @@ def maybe_run_grok(clone: Path, book: Path, evidence: Path) -> tuple[int, str, s
         "additionalProperties": False,
     }
     evidence_text = evidence.read_text(encoding="utf-8")
+    clean_clone_text = json.dumps(clean_clone_gate_records, sort_keys=True, separators=(",", ":"))
     prompt = (
         "You are the independent verifier for TuringOS Foundation. "
+        "The wrapper already executed deterministic clean-clone gates before this model review. "
         "Do not use tools. Your entire response must be exactly one minified JSON "
         "object with only these three keys: verdict, summary, blocking_reasons. "
         "Do not use Markdown, code fences, schema_id, timestamps, nested objects, "
@@ -103,6 +148,7 @@ def maybe_run_grok(clone: Path, book: Path, evidence: Path) -> tuple[int, str, s
         "ready for human genesis-signature review, not human ratification. "
         f"Project book path: {book}\nClean clone path: {clone}\n"
         f"EvidenceBundle.v1 JSON:\n{evidence_text}\n"
+        f"Deterministic clean-clone gate records JSON:\n{clean_clone_text}\n"
     )
     proc = subprocess.run(
         [
@@ -179,6 +225,8 @@ def main(argv: list[str] | None = None) -> int:
     stdout = ""
     stderr = ""
     grok_packet: dict = {}
+    clean_clone_gate_records: list[dict] = []
+    clean_clone_gate_failures: list[str] = []
     external_invocation = {
         "schema_id": "ExternalAgentInvocation.v1",
         "agent_id": "grok_build_verifier",
@@ -201,8 +249,11 @@ def main(argv: list[str] | None = None) -> int:
 
     # Deterministic blockers dominate. Grok cannot convert missing platform facts into PASS.
     if not not_run and clone is not None:
+        clean_clone_gate_records, clean_clone_gate_failures = run_clean_clone_gates(clone, out.parent)
+        if clean_clone_gate_failures:
+            not_run.append("clean_clone_gate_failed")
         try:
-            rc, stdout, stderr, grok_packet = maybe_run_grok(clone, book, evidence)
+            rc, stdout, stderr, grok_packet = maybe_run_grok(clone, book, evidence, clean_clone_gate_records)
         except subprocess.TimeoutExpired as e:
             rc, stdout, stderr, grok_packet = 124, e.stdout or "", e.stderr or "grok timed out", {}
         external_invocation["command_argv"] = ["grok", "-p", "<prompt>", "--cwd", str(clone), "--output-format", "json"]
@@ -234,6 +285,11 @@ def main(argv: list[str] | None = None) -> int:
             if not any(x.endswith("rust_authority_kernel_missing") for x in not_run)
             else "NOT_RUN",
         },
+        {
+            "id": "deterministic_clean_clone_gates",
+            "verdict": "PASS" if clean_clone_gate_records and not clean_clone_gate_failures else "NOT_RUN",
+            "records": clean_clone_gate_records,
+        },
     ]
     report = {
         "schema_id": "GrokVerificationReport.v1",
@@ -252,6 +308,8 @@ def main(argv: list[str] | None = None) -> int:
         "reasons": reasons,
         "not_run": not_run,
         "closure_certificate": None,
+        "deterministic_clean_clone_gates": clean_clone_gate_records,
+        "deterministic_clean_clone_gate_failures": clean_clone_gate_failures,
         "external_invocation": external_invocation,
         "model_packet": grok_packet,
         "model_structured_output": structured_output(grok_packet),
@@ -286,8 +344,8 @@ def main(argv: list[str] | None = None) -> int:
         output_path=out,
         stdout=stdout,
         stderr=stderr,
-        clean_fixture_results=[clean_fixture_pass()],
-        tampered_fixture_results=[tampered_fixture_fail()],
+        clean_fixture_results=[executed_clean_fixture(repo, out.parent, "G12-A")],
+        tampered_fixture_results=[executed_tampered_fixture(repo, out.parent, "G12-A")],
     )
     write_json(gate_dir / "G12-A.json", gate)
     if temp_root:

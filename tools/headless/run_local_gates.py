@@ -10,10 +10,10 @@ import subprocess
 from pathlib import Path
 
 from headless_common import (
-    clean_fixture_pass,
+    executed_clean_fixture,
+    executed_tampered_fixture,
     gate_result,
     sha256_path,
-    tampered_fixture_fail,
     which_digest,
     write_json,
 )
@@ -77,8 +77,8 @@ def write_command_gate(repo: Path, out_dir: Path, gate_id: str, argv: list[str])
         output_path=log_path,
         stdout=result["stdout"],
         stderr=result["stderr"],
-        clean_fixture_results=[clean_fixture_pass()],
-        tampered_fixture_results=[tampered_fixture_fail()],
+        clean_fixture_results=[executed_clean_fixture(repo, out_dir, gate_id)],
+        tampered_fixture_results=[executed_tampered_fixture(repo, out_dir, gate_id)],
     )
     write_json(out_dir / "gate_results" / f"{gate_id}.json", receipt)
     return receipt
@@ -136,10 +136,22 @@ def write_runsc_gate(repo: Path, out_dir: Path) -> dict:
         stdout=green["stdout"] + red["stdout"],
         stderr=green["stderr"] + red["stderr"],
         clean_fixture_results=[
-            {"id": "runsc_green_true", "verdict": "PASS" if green["exit_status"] == 0 else "FAIL"}
+            {
+                "id": "runsc_green_true",
+                "verdict": "PASS" if green["exit_status"] == 0 else "FAIL",
+                "executed": True,
+                "exit_status": green["exit_status"],
+                "argv": green["argv"],
+            }
         ],
         tampered_fixture_results=[
-            {"id": "runsc_red_exit_7", "verdict": "FAIL" if red["exit_status"] == 7 else "PASS"}
+            {
+                "id": "runsc_red_exit_7",
+                "verdict": "FAIL" if red["exit_status"] == 7 else "PASS",
+                "executed": True,
+                "exit_status": red["exit_status"],
+                "argv": red["argv"],
+            }
         ],
     )
     write_json(out_dir / "gate_results" / "G7-RUNSC-RED-GREEN.json", receipt)
@@ -159,6 +171,14 @@ def main(argv: list[str] | None = None) -> int:
 
     receipts = []
     receipts.append(write_command_gate(repo, out_dir, "G1-RUST-AUTHORITY-KERNEL", authority_kernel_command()))
+    receipts.append(
+        write_command_gate(
+            repo,
+            out_dir,
+            "G-ADVERSARY-UNION",
+            ["python3", "tools/headless/run_adversary_union.py", "--out", str(out_dir / "adversary_union_run.json")],
+        )
+    )
     if not args.skip_slow:
         receipts.append(write_command_gate(repo, out_dir, "G-PYTEST", ["python3", "-m", "pytest"]))
         receipts.append(

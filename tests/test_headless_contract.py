@@ -64,10 +64,18 @@ class HeadlessContractTests(unittest.TestCase):
                 "output_digest": sha256_path(out),
                 "stdout_digest": "sha256:" + hashlib.sha256(b"").hexdigest(),
                 "stderr_digest": "sha256:" + hashlib.sha256(b"").hexdigest(),
-                "tampered_fixture_results": [{"id": "mutant", "verdict": "FAIL"}],
-                "clean_fixture_results": [{"id": "clean", "verdict": "PASS"}],
+                "tampered_fixture_results": [
+                    {"id": "mutant", "verdict": "FAIL", "executed": True, "exit_status": 1}
+                ],
+                "clean_fixture_results": [
+                    {"id": "clean", "verdict": "PASS", "executed": True, "exit_status": 0}
+                ],
             }
             self.assertEqual(compute_product(pass_result), "PASS")
+
+            unexecuted_fixture = dict(pass_result)
+            unexecuted_fixture["clean_fixture_results"] = [{"id": "clean", "verdict": "PASS"}]
+            self.assertEqual(compute_product(unexecuted_fixture), "FAIL")
 
             blocked = dict(pass_result)
             blocked["not_run"] = ["rust_authority_kernel_missing"]
@@ -97,6 +105,49 @@ class HeadlessContractTests(unittest.TestCase):
                 "text": 'Reading files first.\\n{"verdict":"FAIL","summary":"blocked","blocking_reasons":["x"]}'
             }
             self.assertEqual(structured_output(text_wrapped)["verdict"], "FAIL")
+
+    def test_fixture_probes_execute_clean_and_tampered_inputs(self):
+        sys.path.insert(0, str(REPO / "tools/headless"))
+        from headless_common import executed_clean_fixture, executed_tampered_fixture
+
+        with tempfile.TemporaryDirectory() as td:
+            out_dir = Path(td)
+            clean = executed_clean_fixture(REPO, out_dir, "G-TEST")
+            tampered = executed_tampered_fixture(REPO, out_dir, "G-TEST")
+
+        self.assertTrue(clean["executed"])
+        self.assertEqual(clean["verdict"], "PASS")
+        self.assertEqual(clean["exit_status"], 0)
+        self.assertTrue(tampered["executed"])
+        self.assertEqual(tampered["verdict"], "FAIL")
+        self.assertNotEqual(tampered["exit_status"], 0)
+
+    def test_grok_g12_declares_deterministic_clean_clone_gate_plan(self):
+        sys.path.insert(0, str(REPO / "tools/headless"))
+        from grok_verify import clean_clone_gate_commands
+
+        commands = clean_clone_gate_commands()
+        self.assertIn(["python3", "-m", "pytest"], commands)
+        self.assertIn(["cargo", "fmt", "--all", "--", "--check"], commands)
+        self.assertIn(["cargo", "clippy", "--workspace", "--all-targets", "--", "-D", "warnings"], commands)
+        self.assertIn(["cargo", "test", "--workspace"], commands)
+        self.assertIn(["python3", "tools/headless/run_local_gates.py", "--out-dir", "evidence/g12"], commands)
+
+    def test_claude_ratifier_uses_independent_clone(self):
+        sys.path.insert(0, str(REPO / "tools/headless"))
+        from claude_final_ratify import make_ratifier_clone
+
+        candidate = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
+        clone, temp_root = make_ratifier_clone(REPO, candidate)
+        try:
+            self.assertNotEqual(clone.resolve(), REPO.resolve())
+            self.assertTrue((clone / ".git").exists())
+            self.assertEqual(
+                subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=clone, text=True).strip(),
+                candidate,
+            )
+        finally:
+            shutil.rmtree(temp_root, ignore_errors=True)
 
     def test_claude_prompt_embeds_evidence_and_grok_json(self):
         sys.path.insert(0, str(REPO / "tools/headless"))

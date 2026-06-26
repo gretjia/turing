@@ -10,8 +10,9 @@ from headless_common import (
     NO_HUMAN_STATE_CEILING,
     attach_packet_digest,
     base_env_digest,
-    clean_fixture_pass,
     detect_missing_foundation_primitives,
+    executed_clean_fixture,
+    executed_tampered_fixture,
     forbidden_claims_present,
     gate_result,
     git_commit,
@@ -21,7 +22,6 @@ from headless_common import (
     print_packet_summary,
     runsc_version,
     sha256_path,
-    tampered_fixture_fail,
     utc_now,
     which_digest,
     write_json,
@@ -161,8 +161,8 @@ def main(argv: list[str] | None = None) -> int:
         tool_path=script,
         input_paths=[book, repo / "evidence/g12/phase_capsule.json"],
         output_path=preflight_log,
-        clean_fixture_results=[clean_fixture_pass()],
-        tampered_fixture_results=[tampered_fixture_fail()],
+        clean_fixture_results=[executed_clean_fixture(repo, out_dir, "G0-G11-PREFLIGHT")],
+        tampered_fixture_results=[executed_tampered_fixture(repo, out_dir, "G0-G11-PREFLIGHT")],
     )
 
     gate_dir = out_dir / "gate_results"

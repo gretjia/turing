@@ -67,6 +67,28 @@ class EnvironmentContractTests(unittest.TestCase):
         ]:
             self.assertIn(needle, text)
 
+    def test_final_certification_workflow_archives_evidence_without_soft_fail(self):
+        workflow = REPO / ".github/workflows/final-certification.yml"
+        self.assertTrue(workflow.exists(), "Final certification workflow is required")
+        text = workflow.read_text(encoding="utf-8")
+        parsed = yaml.safe_load(text)
+        self.assertIn("jobs", parsed)
+        self.assertNotIn("|| true", text)
+        for needle in [
+            "tools/headless/run_local_gates.py --out-dir evidence/g12",
+            "tools/headless/build_evidence_bundle.py",
+            "tools/headless/grok_verify.py",
+            "tools/headless/claude_final_ratify.py",
+            "tools/goal_handoff.py",
+            "actions/upload-artifact",
+            "evidence/g12/evidence_bundle.json",
+            "evidence/g12/gate_results/*.json",
+            "evidence/g12/grok_verification_report.json",
+            "evidence/g12/claude_final_ratification_packet.json",
+            "evidence/g12/goal_run_handoff.json",
+        ]:
+            self.assertIn(needle, text)
+
 
 if __name__ == "__main__":
     unittest.main()
