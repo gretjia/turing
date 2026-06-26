@@ -279,3 +279,29 @@ def print_packet_summary(packet: dict[str, Any]) -> None:
             sort_keys=True,
         )
     )
+
+
+def structured_output(packet: dict[str, Any]) -> dict[str, Any]:
+    """Return schema-constrained model output from a CLI wrapper packet.
+
+    Grok/Claude CLIs may wrap schema output in an outer session object under
+    `structuredOutput`; older/plain invocations may return the structured object
+    directly. Treat missing/null/non-object structured output as absent.
+    """
+    nested = packet.get("structuredOutput")
+    if isinstance(nested, dict):
+        return nested
+    if "verdict" in packet:
+        return packet
+    text = packet.get("text")
+    if isinstance(text, str):
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            try:
+                parsed = json.loads(text[start : end + 1])
+            except json.JSONDecodeError:
+                parsed = {}
+            if isinstance(parsed, dict) and "verdict" in parsed:
+                return parsed
+    return {}

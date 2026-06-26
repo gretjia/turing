@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -43,7 +44,7 @@ class HeadlessContractTests(unittest.TestCase):
 
     def test_gate_result_pass_invariants_and_not_run_domination(self):
         sys.path.insert(0, str(REPO / "tools/headless"))
-        from headless_common import compute_product, write_json
+        from headless_common import compute_product, structured_output, write_json
 
         with tempfile.TemporaryDirectory() as td:
             out = Path(td) / "sample.json"
@@ -70,6 +71,46 @@ class HeadlessContractTests(unittest.TestCase):
             bad_exit = dict(pass_result)
             bad_exit["exit_status"] = 1
             self.assertEqual(compute_product(bad_exit), "FAIL")
+
+            wrapped = {
+                "structuredOutput": {
+                    "verdict": "PASS",
+                    "summary": "ok",
+                    "blocking_reasons": [],
+                }
+            }
+            self.assertEqual(structured_output(wrapped)["verdict"], "PASS")
+            text_wrapped = {
+                "text": 'Reading files first.\\n{"verdict":"FAIL","summary":"blocked","blocking_reasons":["x"]}'
+            }
+            self.assertEqual(structured_output(text_wrapped)["verdict"], "FAIL")
+
+    def test_claude_prompt_embeds_evidence_and_grok_json(self):
+        sys.path.insert(0, str(REPO / "tools/headless"))
+        from claude_final_ratify import build_claude_prompt
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            book = root / "book.md"
+            evidence = root / "evidence.json"
+            grok_report = root / "grok.json"
+            book.write_text("book", encoding="utf-8")
+            evidence.write_text('{"schema_id":"EvidenceBundle.v1","not_run":[]}', encoding="utf-8")
+            grok_report.write_text('{"schema_id":"GrokVerificationReport.v1","verdict":"PASS"}', encoding="utf-8")
+
+            prompt = build_claude_prompt(book, evidence, grok_report)
+
+        self.assertIn("EvidenceBundle.v1 JSON:", prompt)
+        self.assertIn('"schema_id":"EvidenceBundle.v1"', prompt)
+        self.assertIn("GrokVerificationReport.v1 JSON:", prompt)
+        self.assertIn('"verdict":"PASS"', prompt)
+
+    def test_local_gate_resolves_actual_tool_binary(self):
+        sys.path.insert(0, str(REPO / "tools/headless"))
+        from run_local_gates import tool_path_for
+
+        expected = Path(shutil.which("python3") or sys.executable).resolve()
+        self.assertEqual(tool_path_for(["python3", "-V"]).resolve(), expected)
 
     def test_evidence_bundle_reports_rust_kernel_environment(self):
         with tempfile.TemporaryDirectory() as td:

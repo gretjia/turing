@@ -33,6 +33,7 @@ from headless_common import (
     print_packet_summary,
     sha256_path,
     stream_digest,
+    structured_output,
     tampered_fixture_fail,
     utc_now,
     which_digest,
@@ -87,11 +88,21 @@ def maybe_run_grok(clone: Path, book: Path, evidence: Path) -> tuple[int, str, s
         "required": ["verdict", "summary", "blocking_reasons"],
         "additionalProperties": False,
     }
+    evidence_text = evidence.read_text(encoding="utf-8")
     prompt = (
         "You are the independent verifier for TuringOS Foundation. "
-        "Return JSON only. Treat missing Rust authority-kernel evidence, missing "
-        "runsc RED/GREEN evidence, or human-only signature gaps as blocking. "
-        f"Project book: {book}\nEvidence bundle: {evidence}\n"
+        "Do not use tools. Your entire response must be exactly one minified JSON "
+        "object with only these three keys: verdict, summary, blocking_reasons. "
+        "Do not use Markdown, code fences, schema_id, timestamps, nested objects, "
+        "or any extra keys. "
+        "Treat missing Rust authority-kernel evidence and missing runsc RED/GREEN "
+        "evidence as blocking. Human-only genesis signatures and "
+        "independent verifier key custody must remain human decision requests; do not "
+        "claim HUMAN_RATIFIED, OG10_SIGNED, FOUNDATION_READY, M2_ENABLED, or CLOSED "
+        "for this no-human run. PASS means the autonomous mechanical evidence is "
+        "ready for human genesis-signature review, not human ratification. "
+        f"Project book path: {book}\nClean clone path: {clone}\n"
+        f"EvidenceBundle.v1 JSON:\n{evidence_text}\n"
     )
     proc = subprocess.run(
         [
@@ -105,6 +116,10 @@ def maybe_run_grok(clone: Path, book: Path, evidence: Path) -> tuple[int, str, s
             "--json-schema",
             json.dumps(schema, separators=(",", ":")),
             "--disable-web-search",
+            "--no-plan",
+            "--verbatim",
+            "--tools",
+            "",
             "--max-turns",
             "1",
         ],
@@ -131,8 +146,8 @@ def main(argv: list[str] | None = None) -> int:
 
     script = Path(__file__).resolve()
     repo = script.parents[2]
-    book = Path(args.book)
-    evidence = Path(args.evidence)
+    book = Path(args.book).resolve()
+    evidence = Path(args.evidence).resolve()
     out = Path(args.out)
     gate_dir = out.parent / "gate_results"
 
@@ -196,7 +211,9 @@ def main(argv: list[str] | None = None) -> int:
         external_invocation["exit_status"] = rc
         if rc != 0:
             not_run.append("grok_cli_failed")
-        elif grok_packet.get("verdict") != "PASS":
+        elif not isinstance(grok_packet.get("structuredOutput"), dict):
+            not_run.append("grok_structured_output_missing")
+        elif structured_output(grok_packet).get("verdict") != "PASS":
             not_run.append("grok_model_not_pass")
 
     not_run = sorted(set(not_run))
@@ -237,6 +254,7 @@ def main(argv: list[str] | None = None) -> int:
         "closure_certificate": None,
         "external_invocation": external_invocation,
         "model_packet": grok_packet,
+        "model_structured_output": structured_output(grok_packet),
         "state_ceiling": NO_HUMAN_STATE_CEILING,
         "m2_status": "DISABLED",
         "forbidden_claims_present": forbidden_claims_present([json.dumps(grok_packet), " ".join(not_run)]),

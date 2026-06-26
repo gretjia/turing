@@ -34,6 +34,7 @@
     "cargo fmt --all -- --check",
     "cargo clippy --workspace --all-targets -- -D warnings",
     "cargo test --workspace",
+    "python3 tools/headless/run_local_gates.py --out-dir evidence/g12",
     "python3 tools/headless/build_evidence_bundle.py --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --out evidence/g12/evidence_bundle.json",
     "python3 tools/headless/grok_verify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --evidence evidence/g12/evidence_bundle.json --out evidence/g12/grok_verification_report.json",
     "python3 tools/headless/claude_final_ratify.py --candidate $(git rev-parse HEAD) --book /home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md --grok-report evidence/g12/grok_verification_report.json --evidence evidence/g12/evidence_bundle.json --out evidence/g12/claude_final_ratification_packet.json",

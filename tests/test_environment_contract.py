@@ -58,6 +58,7 @@ class EnvironmentContractTests(unittest.TestCase):
             "cargo fmt --all -- --check",
             "cargo clippy --workspace --all-targets -- -D warnings",
             "cargo test --workspace",
+            "tools/headless/run_local_gates.py",
             "tools/headless/build_evidence_bundle.py",
         ]:
             self.assertIn(needle, text)

@@ -32,6 +32,9 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace
 
+      - name: Local gate receipts
+        run: python3 tools/headless/run_local_gates.py --out-dir evidence/g12 --skip-slow || true
+
       - name: Headless evidence preflight
         run: |
           set +e

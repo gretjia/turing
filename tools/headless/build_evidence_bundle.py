@@ -17,6 +17,7 @@ from headless_common import (
     git_commit,
     git_remote,
     git_tree_digest,
+    load_json,
     print_packet_summary,
     runsc_version,
     sha256_path,
@@ -119,6 +120,20 @@ def main(argv: list[str] | None = None) -> int:
     pack_path = out_dir / "pack_disposition.json"
     write_json(human_path, human_ledger)
     write_json(pack_path, pack_disposition)
+    preflight_log = out_dir / "logs" / "G0-G11-PREFLIGHT.json"
+    write_json(
+        preflight_log,
+        {
+            "repo": str(repo),
+            "book": str(book),
+            "not_run": not_run,
+            "tooling": {
+                "grok": grok_path,
+                "claude": claude_path,
+                "runsc": runsc_path,
+            },
+        },
+    )
 
     command_argv = ["python3", str(script.relative_to(repo)), "--book", str(book), "--out", str(out)]
     gate = gate_result(
@@ -145,13 +160,31 @@ def main(argv: list[str] | None = None) -> int:
         not_run=not_run,
         tool_path=script,
         input_paths=[book, repo / "evidence/g12/phase_capsule.json"],
-        output_path=out,
+        output_path=preflight_log,
         clean_fixture_results=[clean_fixture_pass()],
         tampered_fixture_results=[tampered_fixture_fail()],
     )
 
     gate_dir = out_dir / "gate_results"
-    write_json(gate_dir / "G0-G11-PREFLIGHT.json", gate)
+    preflight_path = gate_dir / "G0-G11-PREFLIGHT.json"
+    write_json(preflight_path, gate)
+
+    gate_paths = sorted(path for path in gate_dir.glob("*.json") if not path.stem.startswith("G12-"))
+    gate_matrix = []
+    for gate_path in gate_paths:
+        try:
+            receipt = load_json(gate_path)
+        except Exception:
+            continue
+        gate_matrix.append(
+            {
+                "gate_id": receipt.get("gate_id", gate_path.stem),
+                "product": receipt.get("product"),
+                "not_run": receipt.get("not_run", []),
+                "receipt": str(gate_path),
+                "receipt_digest": sha256_path(gate_path),
+            }
+        )
 
     texts_for_forbidden = [
         " ".join(pack_disposition["mandatory_dispositions"]),
@@ -183,16 +216,8 @@ def main(argv: list[str] | None = None) -> int:
             {"phase_id": phase, "status": "NOT_RUN" if not_run else "IMPLEMENTER_ADDRESSED"}
             for phase in ["F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"]
         ],
-        "gate_results": [str(gate_dir / "G0-G11-PREFLIGHT.json")],
-        "gate_matrix": [
-            {
-                "gate_id": "G0-G11-PREFLIGHT",
-                "product": gate["product"],
-                "not_run": gate["not_run"],
-            },
-            {"gate_id": "G12-A", "product": "NOT_RUN", "not_run": ["grok_report_not_yet_run"]},
-            {"gate_id": "G12-B", "product": "NOT_RUN", "not_run": ["claude_packet_not_yet_run"]},
-        ],
+        "gate_results": [str(path) for path in gate_paths],
+        "gate_matrix": gate_matrix,
         "not_run": not_run,
         "state_ceiling": NO_HUMAN_STATE_CEILING,
         "implementer_origin_state_max": "IMPLEMENTER_ADDRESSED",
@@ -205,10 +230,6 @@ def main(argv: list[str] | None = None) -> int:
     }
     bundle = attach_packet_digest(bundle)
     write_json(out, bundle)
-    # Re-write gate after output exists so GateResult carries output_digest.
-    gate["output_digest"] = sha256_path(out)
-    gate["product"] = "NOT_RUN" if not_run else "PASS"
-    write_json(gate_dir / "G0-G11-PREFLIGHT.json", gate)
     print_packet_summary(bundle)
     return 1 if not_run else 0
 

@@ -23,11 +23,30 @@ from headless_common import (
     print_packet_summary,
     sha256_path,
     stream_digest,
+    structured_output,
     tampered_fixture_fail,
     utc_now,
     which_digest,
     write_json,
 )
+
+
+def build_claude_prompt(book: Path, evidence: Path, grok_report: Path) -> str:
+    evidence_text = evidence.read_text(encoding="utf-8")
+    grok_report_text = grok_report.read_text(encoding="utf-8")
+    return (
+        "You are Claude Code FinalRatifier for TuringOS Foundation. "
+        "Return JSON only. MODEL_RATIFIED is not HUMAN_RATIFIED. "
+        "Reject or NOT_RUN if Grok evidence, gate receipts, or autonomous mechanical "
+        "supply-chain/test evidence is missing. Human-only genesis signature and "
+        "independent verifier-key custody gaps should remain human decision requests; "
+        "they do not prevent MODEL_RATIFIED when the candidate is mechanically ready "
+        "for human genesis-signature review. Do not claim HUMAN_RATIFIED, OG10_SIGNED, "
+        "FOUNDATION_READY, M2_ENABLED, or CLOSED.\n"
+        f"Project book path: {book}\n"
+        f"EvidenceBundle.v1 JSON:\n{evidence_text}\n"
+        f"GrokVerificationReport.v1 JSON:\n{grok_report_text}\n"
+    )
 
 
 def maybe_run_claude(book: Path, evidence: Path, grok_report: Path) -> tuple[int, str, str, dict]:
@@ -47,13 +66,7 @@ def maybe_run_claude(book: Path, evidence: Path, grok_report: Path) -> tuple[int
         "required": ["verdict", "summary", "blocking_reasons"],
         "additionalProperties": False,
     }
-    prompt = (
-        "You are Claude Code FinalRatifier for TuringOS Foundation. "
-        "Return JSON only. MODEL_RATIFIED is not HUMAN_RATIFIED. "
-        "Reject or NOT_RUN if Grok evidence, gate receipts, supply-chain closure, "
-        "or human genesis signature authority is missing.\n"
-        f"Project book: {book}\nEvidence: {evidence}\nGrok report: {grok_report}\n"
-    )
+    prompt = build_claude_prompt(book, evidence, grok_report)
     proc = subprocess.run(
         [
             claude,
@@ -91,9 +104,9 @@ def main(argv: list[str] | None = None) -> int:
 
     script = Path(__file__).resolve()
     repo = script.parents[2]
-    book = Path(args.book)
+    book = Path(args.book).resolve()
     grok_report_path = Path(args.grok_report)
-    evidence = Path(args.evidence)
+    evidence = Path(args.evidence).resolve()
     out = Path(args.out)
     gate_dir = out.parent / "gate_results"
 
@@ -152,11 +165,11 @@ def main(argv: list[str] | None = None) -> int:
         if rc != 0:
             not_run.append("claude_cli_failed")
             reason = "CLAUDE_CLI_FAILED"
-        elif model_packet.get("verdict") != "MODEL_RATIFIED":
-            reason = model_packet.get("verdict", "MODEL_REJECTED")
+        elif structured_output(model_packet).get("verdict") != "MODEL_RATIFIED":
+            reason = structured_output(model_packet).get("verdict", "MODEL_REJECTED")
 
     not_run = sorted(set(not_run))
-    verdict = "NOT_RUN" if not_run else model_packet.get("verdict", "MODEL_REJECTED")
+    verdict = "NOT_RUN" if not_run else structured_output(model_packet).get("verdict", "MODEL_REJECTED")
     packet = {
         "schema_id": "FinalRatificationPacket.v1",
         "created_at": utc_now(),
@@ -171,6 +184,7 @@ def main(argv: list[str] | None = None) -> int:
         "evidence_bundle_digest": maybe_sha256_path(evidence),
         "external_invocation": external_invocation,
         "model_packet": model_packet,
+        "model_structured_output": structured_output(model_packet),
         "not_run": not_run,
         "state_ceiling": NO_HUMAN_STATE_CEILING,
         "m2_status": "DISABLED",
