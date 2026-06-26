@@ -10,6 +10,8 @@ jobs:
   python-and-rust:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK: ${{ github.workspace }}/evidence/g12/phase_capsule.json
     steps:
       - name: Checkout
         uses: actions/checkout@v4

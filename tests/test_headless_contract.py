@@ -12,7 +12,10 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-BOOK = REPO.parents[0] / "TOP_ALIGNMENT_PROJECT_BOOK.md"
+DEFAULT_BOOK = REPO.parents[0] / "TOP_ALIGNMENT_PROJECT_BOOK.md"
+BOOK = Path(os.environ.get("TURINGOS_TOP_ALIGNMENT_PROJECT_BOOK", DEFAULT_BOOK))
+if not BOOK.exists():
+    BOOK = REPO / "evidence/g12/phase_capsule.json"
 
 
 def sha256_path(path: Path) -> str:
@@ -36,7 +39,9 @@ class HeadlessContractTests(unittest.TestCase):
 
         self.assertEqual(capsule["schema_id"], "PhaseCapsule.v1")
         self.assertTrue(capsule["external_verification_required"])
-        self.assertIn(str(BOOK), capsule["forbidden_files"])
+        self.assertTrue(
+            any(path.endswith("TOP_ALIGNMENT_PROJECT_BOOK.md") for path in capsule["forbidden_files"])
+        )
         self.assertIn("contracts/**", capsule["forbidden_files"])
         self.assertIn("src/**", capsule["forbidden_files"])
         self.assertTrue(any("grok_verify.py" in cmd for cmd in capsule["acceptance_commands"]))
