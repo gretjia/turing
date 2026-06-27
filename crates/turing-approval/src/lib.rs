@@ -4,9 +4,12 @@
 //! gate, and replay the same canonical payload bytes. Localized display copy is
 //! deliberately outside that signed payload.
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::sync::{Mutex, OnceLock};
 
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier};
 use rand_core::OsRng;
@@ -22,6 +25,7 @@ pub const APPROVAL_PAYLOAD_SCHEMA_ID: &str = "approval_payload.v2";
 pub enum SignatureRoute {
     None,
     OsKeyring,
+    LocalFileDev,
     HardwareFuture,
 }
 
@@ -143,31 +147,108 @@ pub trait SigningBackend {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OsKeyringSigningBackend {
     key_id: String,
+    provider: OsKeyringProvider,
 }
 
 impl OsKeyringSigningBackend {
     #[must_use]
     pub fn new(key_id: impl Into<String>) -> Self {
+        let provider = if std::env::var_os("TURINGOS_APPROVAL_IN_MEMORY_KEYRING").as_deref()
+            == Some(std::ffi::OsStr::new("1"))
+        {
+            OsKeyringProvider::InMemory
+        } else {
+            OsKeyringProvider::Platform
+        };
         OsKeyringSigningBackend {
             key_id: key_id.into(),
+            provider,
         }
     }
 
-    fn key_store_dir() -> PathBuf {
-        if let Some(dir) = std::env::var_os("TURINGOS_APPROVAL_KEYRING_DIR") {
+    #[must_use]
+    pub fn new_in_memory_for_tests(key_id: impl Into<String>) -> Self {
+        OsKeyringSigningBackend {
+            key_id: key_id.into(),
+            provider: OsKeyringProvider::InMemory,
+        }
+    }
+
+    fn load_or_create_signing_key(&self) -> Result<SigningKey, SigningError> {
+        match self.provider {
+            OsKeyringProvider::Platform => self.load_or_create_platform_key(),
+            OsKeyringProvider::InMemory => Ok(in_memory_os_keyring_key(&self.key_id)),
+        }
+    }
+
+    fn load_or_create_platform_key(&self) -> Result<SigningKey, SigningError> {
+        match secret_tool_lookup(&self.key_id)? {
+            Some(seed_hex) => decode_signing_key_hex(&seed_hex).map_err(|message| {
+                SigningError::OsKeyringUnavailable {
+                    provider: "secret-tool",
+                    message,
+                }
+            }),
+            None => {
+                let mut rng = OsRng;
+                let signing_key = SigningKey::generate(&mut rng);
+                let seed_hex = hex::encode(signing_key.to_bytes());
+                secret_tool_store(&self.key_id, &seed_hex)?;
+                Ok(signing_key)
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum OsKeyringProvider {
+    Platform,
+    InMemory,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LocalFileSigningBackend {
+    key_id: String,
+    key_store_dir: Option<PathBuf>,
+}
+
+impl LocalFileSigningBackend {
+    #[must_use]
+    pub fn new(key_id: impl Into<String>) -> Self {
+        LocalFileSigningBackend {
+            key_id: key_id.into(),
+            key_store_dir: None,
+        }
+    }
+
+    #[must_use]
+    pub fn with_key_store_dir(
+        key_id: impl Into<String>,
+        key_store_dir: impl Into<PathBuf>,
+    ) -> Self {
+        LocalFileSigningBackend {
+            key_id: key_id.into(),
+            key_store_dir: Some(key_store_dir.into()),
+        }
+    }
+
+    fn key_store_dir(&self) -> PathBuf {
+        if let Some(dir) = &self.key_store_dir {
+            dir.clone()
+        } else if let Some(dir) = std::env::var_os("TURINGOS_APPROVAL_LOCAL_FILE_KEY_DIR") {
             PathBuf::from(dir)
         } else {
             std::env::var_os("HOME")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("."))
                 .join(".turingos")
-                .join("approval_keyring")
+                .join("approval_local_file_keys")
         }
     }
 
     fn key_store_path(&self) -> PathBuf {
         let name = jcs::sha256_hex(self.key_id.as_bytes());
-        Self::key_store_dir().join(format!("{name}.json"))
+        self.key_store_dir().join(format!("{name}.json"))
     }
 
     fn load_or_create_signing_key(&self) -> Result<SigningKey, SigningError> {
@@ -271,6 +352,100 @@ impl OsKeyringSigningBackend {
     }
 }
 
+fn in_memory_os_keyring() -> &'static Mutex<BTreeMap<String, SigningKey>> {
+    static KEYRING: OnceLock<Mutex<BTreeMap<String, SigningKey>>> = OnceLock::new();
+    KEYRING.get_or_init(|| Mutex::new(BTreeMap::new()))
+}
+
+fn in_memory_os_keyring_key(key_id: &str) -> SigningKey {
+    let mut keyring = in_memory_os_keyring()
+        .lock()
+        .expect("in-memory OS keyring mutex poisoned");
+    keyring
+        .entry(key_id.to_string())
+        .or_insert_with(|| {
+            let mut rng = OsRng;
+            SigningKey::generate(&mut rng)
+        })
+        .clone()
+}
+
+fn secret_tool_lookup(key_id: &str) -> Result<Option<String>, SigningError> {
+    let output = Command::new("secret-tool")
+        .args(["lookup", "service", "turingos-approval", "key_id", key_id])
+        .output()
+        .map_err(|error| SigningError::OsKeyringUnavailable {
+            provider: "secret-tool",
+            message: error.to_string(),
+        })?;
+    if output.status.success() {
+        let seed_hex = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if seed_hex.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(seed_hex))
+        }
+    } else {
+        Ok(None)
+    }
+}
+
+fn secret_tool_store(key_id: &str, seed_hex: &str) -> Result<(), SigningError> {
+    let mut child = Command::new("secret-tool")
+        .args([
+            "store",
+            "--label",
+            &format!("TuringOS approval key {key_id}"),
+            "service",
+            "turingos-approval",
+            "key_id",
+            key_id,
+        ])
+        .stdin(Stdio::piped())
+        .spawn()
+        .map_err(|error| SigningError::OsKeyringUnavailable {
+            provider: "secret-tool",
+            message: error.to_string(),
+        })?;
+    {
+        let stdin = child
+            .stdin
+            .as_mut()
+            .ok_or_else(|| SigningError::OsKeyringUnavailable {
+                provider: "secret-tool",
+                message: "secret-tool stdin unavailable".to_string(),
+            })?;
+        stdin.write_all(seed_hex.as_bytes()).map_err(|error| {
+            SigningError::OsKeyringUnavailable {
+                provider: "secret-tool",
+                message: error.to_string(),
+            }
+        })?;
+    }
+    let status = child
+        .wait()
+        .map_err(|error| SigningError::OsKeyringUnavailable {
+            provider: "secret-tool",
+            message: error.to_string(),
+        })?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(SigningError::OsKeyringUnavailable {
+            provider: "secret-tool",
+            message: format!("secret-tool store exited with {status}"),
+        })
+    }
+}
+
+fn decode_signing_key_hex(seed_hex: &str) -> Result<SigningKey, String> {
+    let seed = hex::decode(seed_hex.trim()).map_err(|error| error.to_string())?;
+    let seed: [u8; 32] = seed
+        .try_into()
+        .map_err(|_| "signing key seed must be 32 bytes".to_string())?;
+    Ok(SigningKey::from_bytes(&seed))
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct KeyRecord {
@@ -326,6 +501,72 @@ impl SigningBackend for OsKeyringSigningBackend {
         if signature.signature_route != SignatureRoute::OsKeyring {
             return Err(SigningError::RouteMismatch {
                 expected: SignatureRoute::OsKeyring,
+                observed: signature.signature_route,
+            });
+        }
+        if signature.key_id != self.key_id {
+            return Err(SigningError::SignatureVerificationFailed {
+                key_id: signature.key_id.clone(),
+            });
+        }
+        let bytes = card.canonical_bytes()?;
+        if signature.signed_payload_hash != digest(&bytes) {
+            return Err(SigningError::SignatureVerificationFailed {
+                key_id: self.key_id.clone(),
+            });
+        }
+        let signing_key = self.load_or_create_signing_key()?;
+        let verifying_key = signing_key.verifying_key();
+        let ed25519_signature = decode_signature(&signature.signature)?;
+        verifying_key
+            .verify(&bytes, &ed25519_signature)
+            .map_err(|_| SigningError::SignatureVerificationFailed {
+                key_id: self.key_id.clone(),
+            })
+    }
+}
+
+impl SigningBackend for LocalFileSigningBackend {
+    fn key_id(&self) -> &str {
+        &self.key_id
+    }
+
+    fn route(&self) -> SignatureRoute {
+        SignatureRoute::LocalFileDev
+    }
+
+    fn exports_plaintext_key(&self) -> bool {
+        true
+    }
+
+    fn sign(&self, card: &ApprovalCard) -> Result<SignatureEnvelope, SigningError> {
+        if card.payload.signature_route != SignatureRoute::LocalFileDev {
+            return Err(SigningError::RouteMismatch {
+                expected: card.payload.signature_route,
+                observed: SignatureRoute::LocalFileDev,
+            });
+        }
+        let bytes = card.canonical_bytes()?;
+        let signing_key = self.load_or_create_signing_key()?;
+        let signature = signing_key.sign(&bytes);
+        Ok(SignatureEnvelope {
+            schema_id: "approval_signature.v1".to_string(),
+            key_id: self.key_id.clone(),
+            authority_epoch: card.payload.authority_epoch,
+            signature_route: SignatureRoute::LocalFileDev,
+            signed_payload_hash: digest(&bytes),
+            signature: encode_signature(&signature),
+        })
+    }
+
+    fn verify(
+        &self,
+        card: &ApprovalCard,
+        signature: &SignatureEnvelope,
+    ) -> Result<(), SigningError> {
+        if signature.signature_route != SignatureRoute::LocalFileDev {
+            return Err(SigningError::RouteMismatch {
+                expected: SignatureRoute::LocalFileDev,
                 observed: signature.signature_route,
             });
         }
@@ -436,6 +677,10 @@ pub enum SigningError {
         path: PathBuf,
         message: String,
     },
+    OsKeyringUnavailable {
+        provider: &'static str,
+        message: String,
+    },
     SignatureInvalidEncoding(String),
     SignatureVerificationFailed {
         key_id: String,
@@ -460,6 +705,9 @@ impl std::fmt::Display for SigningError {
             }
             SigningError::KeyMaterialCorrupt { path, message } => {
                 write!(f, "approval key store {path:?} is corrupt: {message}")
+            }
+            SigningError::OsKeyringUnavailable { provider, message } => {
+                write!(f, "OS keyring provider {provider} unavailable: {message}")
             }
             SigningError::SignatureInvalidEncoding(message) => {
                 write!(f, "invalid signature encoding: {message}")

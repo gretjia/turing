@@ -112,6 +112,7 @@ fn approval_preview_renders_human_card_without_writing_truth() {
 #[test]
 fn approval_sign_emits_os_keyring_signature_without_writing_truth() {
     let output = turing()
+        .env("TURINGOS_APPROVAL_IN_MEMORY_KEYRING", "1")
         .args([
             "approval",
             "sign",

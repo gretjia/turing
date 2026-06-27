@@ -1499,34 +1499,63 @@ fn derive_candidate_predicate_checks(
     let replay = turing_replay::replay_tape(repo, &heads.tape_tip)
         .map_err(|error| format!("tape replay failed: {error}"))?;
     let _ = replay;
+    let envelopes = load_tape_envelopes(repo)?;
     let candidate_id = candidate_payload
         .get("candidate_id")
         .and_then(Value::as_str);
     let capsule_id = candidate_payload.get("capsule_id").and_then(Value::as_str);
     let macro_anchor_id = candidate_payload
         .get("macro_anchor_id")
+        .or_else(|| candidate_payload.get("macro_anchor"))
         .and_then(Value::as_str);
     let worker_receipt_id = candidate_payload
         .get("worker_receipt_id")
         .and_then(Value::as_str);
+    let capsule_on_tape = capsule_id.is_some_and(|id| {
+        tape_has_payload_field(
+            &envelopes,
+            &[
+                "WorkCapsuleBuilt",
+                "WorkerDispatchAuthorized",
+                "WorkerDispatched",
+            ],
+            "capsule_id",
+            id,
+        )
+    });
+    let macro_anchor_on_tape = macro_anchor_id.is_some_and(|id| {
+        id.starts_with("macro:")
+            && tape_has_payload_field(
+                &envelopes,
+                &["MacroObservationImported", "MacroArtifactProposed"],
+                "macro_id",
+                id,
+            )
+    });
+    let worker_receipt_on_tape = match (worker_receipt_id, capsule_id) {
+        (Some(receipt_id), Some(capsule_id)) if receipt_id.starts_with("rcp_") => {
+            tape_has_worker_receipt(&envelopes, receipt_id, capsule_id)
+        }
+        _ => false,
+    };
 
     let checks = vec![
-        if candidate_id.is_some() && capsule_id.is_some() {
+        if candidate_id.is_some() && capsule_id.is_some() && capsule_on_tape {
             PredicateCheck::pass("capsule_contract")
         } else {
-            PredicateCheck::fail("capsule_contract", "CAPSULE_CONTRACT_INCOMPLETE")
+            PredicateCheck::fail("capsule_contract", "CAPSULE_CONTRACT_NOT_ON_TAPE")
         },
-        if macro_anchor_id.is_some_and(|id| id.starts_with("macro:")) {
+        if macro_anchor_on_tape {
             PredicateCheck::pass("macro_anchor")
         } else {
             PredicateCheck::fail("macro_anchor", "MACRO_ANCHOR_ID_MUST_USE_MACRO_PREFIX")
         },
-        if worker_receipt_id.is_some_and(|id| id.starts_with("rcp_")) {
+        if worker_receipt_on_tape {
             PredicateCheck::pass("worker_receipt")
         } else {
-            PredicateCheck::fail("worker_receipt", "WORKER_RECEIPT_ID_REQUIRED")
+            PredicateCheck::fail("worker_receipt", "WORKER_RECEIPT_NOT_ON_TAPE")
         },
-        if candidate_id.is_some() && capsule_id.is_some() {
+        if candidate_id.is_some() && capsule_id.is_some() && capsule_on_tape {
             PredicateCheck::pass("scope.allowed")
         } else {
             PredicateCheck::fail("scope.allowed", "CANDIDATE_SCOPE_INVALID")
@@ -1545,6 +1574,30 @@ fn derive_candidate_predicate_checks(
     ];
 
     Ok(checks)
+}
+
+fn tape_has_payload_field(
+    envelopes: &[(String, MicroEventEnvelope)],
+    event_types: &[&str],
+    field: &str,
+    expected: &str,
+) -> bool {
+    envelopes.iter().any(|(_, envelope)| {
+        event_types.contains(&envelope.event_type.as_str())
+            && envelope.payload.get(field).and_then(Value::as_str) == Some(expected)
+    })
+}
+
+fn tape_has_worker_receipt(
+    envelopes: &[(String, MicroEventEnvelope)],
+    receipt_id: &str,
+    capsule_id: &str,
+) -> bool {
+    envelopes.iter().any(|(_, envelope)| {
+        envelope.event_type == "WorkerReceiptImported"
+            && envelope.payload.get("receipt_id").and_then(Value::as_str) == Some(receipt_id)
+            && envelope.payload.get("capsule_id").and_then(Value::as_str) == Some(capsule_id)
+    })
 }
 
 fn parse_failure_payload(value: &Value) -> Result<FailureNodePayload, String> {
@@ -1681,6 +1734,7 @@ fn parse_approval_signature_route(raw: &str) -> Result<ApprovalSignatureRoute, S
     match raw {
         "None" => Ok(ApprovalSignatureRoute::None),
         "OsKeyring" => Ok(ApprovalSignatureRoute::OsKeyring),
+        "LocalFileDev" => Ok(ApprovalSignatureRoute::LocalFileDev),
         "HardwareFuture" => Ok(ApprovalSignatureRoute::HardwareFuture),
         other => Err(format!("unknown approval signature route {other:?}")),
     }
@@ -1690,6 +1744,7 @@ fn approval_signature_route_str(route: ApprovalSignatureRoute) -> &'static str {
     match route {
         ApprovalSignatureRoute::None => "None",
         ApprovalSignatureRoute::OsKeyring => "OsKeyring",
+        ApprovalSignatureRoute::LocalFileDev => "LocalFileDev",
         ApprovalSignatureRoute::HardwareFuture => "HardwareFuture",
     }
 }

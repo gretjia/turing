@@ -196,6 +196,9 @@ fn approval_sign(
     let signature = match card.payload().signature_route {
         SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id).sign(&card),
         SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id).sign(&card),
+        SignatureRoute::LocalFileDev => {
+            return Err("approval sign does not expose local-file dev signing".to_string());
+        }
         SignatureRoute::None => {
             return Err("approval sign requires a signing route, got none".to_string());
         }
@@ -208,6 +211,7 @@ fn approval_sign(
         SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id)
             .verify(&card, &signature)
             .map_err(|error| format!("approval verification failed: {error}"))?,
+        SignatureRoute::LocalFileDev => unreachable!(),
         SignatureRoute::None => unreachable!(),
     }
     Ok(format!(
@@ -256,6 +260,7 @@ fn parse_signature_route(value: &str) -> Result<SignatureRoute, String> {
     match value {
         "none" => Ok(SignatureRoute::None),
         "os-keyring" => Ok(SignatureRoute::OsKeyring),
+        "local-file-dev" => Ok(SignatureRoute::LocalFileDev),
         "hardware-future" => Ok(SignatureRoute::HardwareFuture),
         other => Err(format!("unknown signature route {other:?}")),
     }
