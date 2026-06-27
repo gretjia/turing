@@ -17,6 +17,7 @@
 
 pub mod envelope;
 pub mod failure;
+pub mod goal;
 pub mod identity;
 pub mod jcs;
 pub mod payload;
