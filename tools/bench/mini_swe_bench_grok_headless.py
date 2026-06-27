@@ -19,6 +19,10 @@ from typing import Any
 
 
 THINKING_CONTRACT = "grok_reasoning_effort_low_no_plan_no_memory_no_subagents"
+DEFAULT_META_PROVIDER = "deepseek"
+DEFAULT_META_MODEL = "deepseek-v4-pro"
+DEFAULT_META_BASE_URL = "https://api.deepseek.com/v1"
+DEFAULT_META_API_KEY_ENV = "DEEPSEEK_API_KEY"
 FORBIDDEN_ACCEPTANCE_SIGNALS = [
     "exit_code_0",
     "ci_green",
@@ -41,6 +45,24 @@ def worker_id_for(model: str) -> str:
     }
     canonical = json.dumps(seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return "worker:sha256:" + hashlib.sha256(canonical).hexdigest()
+
+
+def meta_ai_provider(
+    provider: str,
+    model: str,
+    base_url: str,
+    api_key_env: str,
+) -> dict[str, Any]:
+    return {
+        "schema_id": "MetaAIProvider.v1",
+        "provider": provider,
+        "model": model,
+        "base_url": base_url,
+        "api_key_env": api_key_env,
+        "credential_material": "env_only_not_serialized",
+        "authority": "none",
+        "accepted_head_authority": False,
+    }
 
 
 def grok_worker_argv(cwd: str, prompt: str, model: str, max_turns: int) -> list[str]:
@@ -154,6 +176,10 @@ def build_packet(
     model: str,
     max_turns: int,
     dry_run: bool,
+    meta_provider: str,
+    meta_model: str,
+    meta_base_url: str,
+    meta_api_key_env: str,
 ) -> dict[str, Any]:
     runs: list[dict[str, Any]] = []
     for task in tasks:
@@ -183,6 +209,12 @@ def build_packet(
         "created_at": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "model": model,
         "worker_id": worker_id_for(model),
+        "meta_ai": meta_ai_provider(
+            provider=meta_provider,
+            model=meta_model,
+            base_url=meta_base_url,
+            api_key_env=meta_api_key_env,
+        ),
         "thinking_contract": THINKING_CONTRACT,
         "dry_run": dry_run,
         "truth_guard": {
@@ -211,6 +243,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--meta-provider", default=DEFAULT_META_PROVIDER)
+    parser.add_argument("--meta-model", default=DEFAULT_META_MODEL)
+    parser.add_argument("--meta-base-url", default=DEFAULT_META_BASE_URL)
+    parser.add_argument("--meta-api-key-env", default=DEFAULT_META_API_KEY_ENV)
     args = parser.parse_args(argv)
 
     tasks_path = Path(args.tasks_jsonl)
@@ -228,6 +264,10 @@ def main(argv: list[str] | None = None) -> int:
         model=args.model,
         max_turns=args.max_turns,
         dry_run=args.dry_run,
+        meta_provider=args.meta_provider,
+        meta_model=args.meta_model,
+        meta_base_url=args.meta_base_url,
+        meta_api_key_env=args.meta_api_key_env,
     )
     write_json(Path(args.out), packet)
     if not args.dry_run:

@@ -73,6 +73,16 @@ def test_dry_run_writes_baseline_and_turingos_plan(tmp_path):
     assert packet["schema_id"] == "MiniSweBenchGrokHeadlessRun.v1"
     assert packet["benchmark"] == "swe_bench_verified_mini"
     assert packet["worker_id"].startswith("worker:sha256:")
+    assert packet["meta_ai"] == {
+        "schema_id": "MetaAIProvider.v1",
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "base_url": "https://api.deepseek.com/v1",
+        "api_key_env": "DEEPSEEK_API_KEY",
+        "credential_material": "env_only_not_serialized",
+        "authority": "none",
+        "accepted_head_authority": False,
+    }
     assert packet["thinking_contract"] == "grok_reasoning_effort_low_no_plan_no_memory_no_subagents"
     assert packet["truth_guard"]["accepted_head_policy"] == "predicate_only"
     assert packet["truth_guard"]["forbidden_acceptance_signals"] == [
@@ -87,3 +97,44 @@ def test_dry_run_writes_baseline_and_turingos_plan(tmp_path):
         assert ["--reasoning-effort", "low"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
         assert "--no-plan" in argv
         assert run["task"]["instance_id"] == "django__django-00001"
+
+
+def test_meta_ai_env_key_is_not_serialized(tmp_path, monkeypatch):
+    harness = load_harness()
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "sk-test-secret-must-not-appear")
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "sympy__sympy-00001",
+                "repo": "https://github.com/sympy/sympy",
+                "base_commit": "def456",
+                "problem_statement": "Fix the failing symbolic regression.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "run.json"
+
+    rc = harness.main(
+        [
+            "--tasks-jsonl",
+            str(tasks),
+            "--out",
+            str(out),
+            "--dry-run",
+            "--meta-provider",
+            "deepseek",
+            "--meta-model",
+            "deepseek-v4-pro",
+            "--meta-api-key-env",
+            "DEEPSEEK_API_KEY",
+        ]
+    )
+
+    assert rc == 0
+    raw = out.read_text(encoding="utf-8")
+    assert "sk-test-secret-must-not-appear" not in raw
+    assert "DEEPSEEK_API_KEY" in raw

@@ -18,6 +18,25 @@ Grok is a Macro worker, not a Micro authority.
 - Exit code, CI green, Grok self-report, and official benchmark labels cannot move
   `accepted_head`.
 
+DeepSeek V4 Pro is the default MetaAI provider for this benchmark track.
+
+- MetaAI is a non-authority strategy/review layer.
+- Default provider: `deepseek`.
+- Default model: `deepseek-v4-pro`.
+- Default base URL: `https://api.deepseek.com/v1`.
+- Credential material must be supplied only through `DEEPSEEK_API_KEY`.
+- The harness records the env var name, never the key value or key hash.
+- MetaAI cannot move `accepted_head`, `authorization_head`, or any Micro ref.
+- MetaAI output is not truth; predicate/replay evidence remains the truth gate.
+
+If an API key has been pasted into chat or logs, rotate it before running the
+benchmark and export only the replacement key in the shell that launches the
+harness:
+
+```bash
+export DEEPSEEK_API_KEY=...
+```
+
 ## Dry Run
 
 Prepare a SWE-bench Verified Mini JSONL with one task per line:
@@ -32,6 +51,9 @@ Generate an auditable two-arm plan:
 python3 tools/bench/mini_swe_bench_grok_headless.py \
   --tasks-jsonl /path/to/verified-mini.jsonl \
   --out evidence/bench/mini_swe_bench_grok_headless_plan.json \
+  --meta-provider deepseek \
+  --meta-model deepseek-v4-pro \
+  --meta-api-key-env DEEPSEEK_API_KEY \
   --dry-run \
   --limit 50
 ```
@@ -45,6 +67,7 @@ The packet contains:
 - prompt hashes
 - truth guard
 - thinking contract
+- DeepSeek MetaAI provider contract, without credential material
 
 ## No PASS No HALT
 
@@ -69,4 +92,3 @@ Only after that loop passes should this track run real task execution and compar
 - failure classes
 - replay pass rate
 - invalid accepted-head attempts
-
