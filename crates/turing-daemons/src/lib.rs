@@ -3,10 +3,11 @@
 use std::io::{BufRead, BufReader, Write};
 #[cfg(unix)]
 use std::os::unix::net::UnixListener;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use serde_json::{Value, json};
+use turing_git_tape::append::Append;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DaemonContract {
@@ -24,11 +25,38 @@ impl DaemonContract {
     }
 }
 
+#[derive(Debug, Clone)]
+struct DaemonRuntime {
+    contract: DaemonContract,
+    micro_git: Option<PathBuf>,
+}
+
 pub fn run_daemon(contract: DaemonContract) -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.as_slice() {
         [serve, socket_flag, socket] if serve == "--serve" && socket_flag == "--socket" => {
-            match serve_unix_socket(contract, socket) {
+            let runtime = DaemonRuntime {
+                contract,
+                micro_git: None,
+            };
+            match serve_unix_socket(runtime, socket) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(error) => {
+                    eprintln!("{} serve failed: {error}", contract.role);
+                    ExitCode::from(2)
+                }
+            }
+        }
+        [serve, socket_flag, socket, micro_git_flag, micro_git]
+            if serve == "--serve"
+                && socket_flag == "--socket"
+                && micro_git_flag == "--micro-git" =>
+        {
+            let runtime = DaemonRuntime {
+                contract,
+                micro_git: Some(PathBuf::from(micro_git)),
+            };
+            match serve_unix_socket(runtime, socket) {
                 Ok(()) => ExitCode::SUCCESS,
                 Err(error) => {
                     eprintln!("{} serve failed: {error}", contract.role);
@@ -59,7 +87,7 @@ pub fn run_daemon(contract: DaemonContract) -> ExitCode {
 }
 
 #[cfg(unix)]
-fn serve_unix_socket(contract: DaemonContract, socket: &str) -> std::io::Result<()> {
+fn serve_unix_socket(runtime: DaemonRuntime, socket: &str) -> std::io::Result<()> {
     let path = Path::new(socket);
     if path.exists() {
         std::fs::remove_file(path)?;
@@ -79,7 +107,7 @@ fn serve_unix_socket(contract: DaemonContract, socket: &str) -> std::io::Result<
             })
         });
         let shutdown = request.get("method").and_then(Value::as_str) == Some("daemon.shutdown");
-        let response = jsonrpc_response(contract, &request);
+        let response = jsonrpc_response(&runtime, &request);
         writeln!(stream, "{response}")?;
         if shutdown {
             break;
@@ -89,35 +117,25 @@ fn serve_unix_socket(contract: DaemonContract, socket: &str) -> std::io::Result<
 }
 
 #[cfg(not(unix))]
-fn serve_unix_socket(_contract: DaemonContract, _socket: &str) -> std::io::Result<()> {
+fn serve_unix_socket(_runtime: DaemonRuntime, _socket: &str) -> std::io::Result<()> {
     Err(std::io::Error::other(
         "Unix sockets are required for private-local daemon tests",
     ))
 }
 
-fn jsonrpc_response(contract: DaemonContract, request: &Value) -> Value {
+fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
     let id = request.get("id").cloned().unwrap_or(Value::Null);
     match request.get("method").and_then(Value::as_str) {
         Some("daemon.check") => json!({
             "jsonrpc": "2.0",
             "id": id,
             "result": {
-                "role": contract.role,
-                "can_move_accepted_head": contract.can_move_accepted_head,
+                "role": runtime.contract.role,
+                "can_move_accepted_head": runtime.contract.can_move_accepted_head,
                 "single_loop_subroutine": true,
             }
         }),
-        Some("heads.read") => json!({
-            "jsonrpc": "2.0",
-            "id": id,
-            "result": {
-                "source": "micro_tape",
-                "can_write_truth": false,
-                "tape_tip": Value::Null,
-                "authorization_head": Value::Null,
-                "accepted_head": Value::Null,
-            }
-        }),
+        Some("heads.read") => read_heads_response(runtime, id),
         Some("daemon.shutdown") => json!({
             "jsonrpc": "2.0",
             "id": id,
@@ -142,4 +160,64 @@ fn jsonrpc_response(contract: DaemonContract, request: &Value) -> Value {
             }
         }),
     }
+}
+
+fn read_heads_response(runtime: &DaemonRuntime, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "source": "micro_tape",
+                "can_write_truth": false,
+                "tape_tip": Value::Null,
+                "authorization_head": Value::Null,
+                "accepted_head": Value::Null,
+            }
+        });
+    };
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+
+    match tape.head_set_guarded() {
+        Ok(Some(heads)) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "source": "micro_tape",
+                "can_write_truth": false,
+                "tape_tip": heads.tape_tip,
+                "authorization_head": heads.authorization_head,
+                "accepted_head": heads.accepted_head,
+            }
+        }),
+        Ok(None) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "source": "micro_tape",
+                "can_write_truth": false,
+                "tape_tip": Value::Null,
+                "authorization_head": Value::Null,
+                "accepted_head": Value::Null,
+            }
+        }),
+        Err(error) => jsonrpc_error(id, -32000, format!("cannot read coherent heads: {error}")),
+    }
+}
+
+fn jsonrpc_error(id: Value, code: i64, message: String) -> Value {
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "error": {
+            "code": code,
+            "message": message,
+        }
+    })
 }
