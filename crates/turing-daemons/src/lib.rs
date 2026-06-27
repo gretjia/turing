@@ -27,7 +27,7 @@ use turing_execd::capability::{
 };
 use turing_execd::{FakeWorker, WorkerRunRequest};
 use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
-use turing_pput::WorkerPromptShield;
+use turing_pput::{CostEvent, PputProjection, Split, WorkerPromptShield};
 use turing_predicate::{PredicateCheck, PredicateKernel};
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
@@ -239,6 +239,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         }
         Some("pput.prompt.validate") if runtime.contract.role == "turing-pputd" => {
             pput_prompt_validate_response(request, id)
+        }
+        Some("pput.snapshot.write") if runtime.contract.role == "turing-pputd" => {
+            pput_snapshot_write_response(runtime, request, id)
         }
         Some("projection.build") if runtime.contract.role == "turing-viewd" => {
             projection_build_response(request, id)
@@ -1064,6 +1067,112 @@ fn pput_prompt_validate_response(request: &Value, id: Value) -> Value {
     }
 }
 
+fn pput_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(project_root) = &runtime.project_root else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "pput.snapshot.write requires --project".to_string(),
+        );
+    };
+    let project_root = match std::fs::canonicalize(project_root) {
+        Ok(path) => path,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
+        }
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let cost_events = match parse_cost_events(params) {
+        Ok(events) => events,
+        Err(message) => return invalid_params(id, message),
+    };
+    let projection = match PputProjection::from_tape_events(&cost_events) {
+        Ok(projection) => projection,
+        Err(error) => return jsonrpc_error(id, -32000, format!("PPUT replay failed: {error}")),
+    };
+
+    let state_dir = project_root.join(".turingos");
+    if let Err(error) = std::fs::create_dir_all(&state_dir) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot create {}: {error}", state_dir.display()),
+        );
+    }
+    let snapshot_path = state_dir.join("pput_projection.json");
+    let mut snapshot = json!({
+        "schema_id": "pput_projection_snapshot.v1",
+        "source": projection.source,
+        "cost_event_count": cost_events.len(),
+        "total_tokens": projection.total_tokens,
+        "total_wall_time_ms": projection.total_wall_time_ms,
+        "hidden_evaluator": true,
+        "hidden_from_worker_prompt": true,
+        "raw_formula_exposed": false,
+        "heldout_ids_exposed": false,
+        "can_move_accepted_head": false,
+        "head_effect": "PRESERVE",
+    });
+    let preimage = match jcs::canonicalize(&snapshot) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("PPUT projection canonicalization failed: {error}"),
+            );
+        }
+    };
+    let pput_projection_hash = format!("sha256:{}", jcs::sha256_hex(&preimage));
+    snapshot
+        .as_object_mut()
+        .expect("snapshot is object")
+        .insert(
+            "pput_projection_hash".to_string(),
+            Value::String(pput_projection_hash.clone()),
+        );
+    let text = match serde_json::to_string(&snapshot) {
+        Ok(text) => text,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("PPUT snapshot serialization failed: {error}"),
+            );
+        }
+    };
+    if let Err(error) = std::fs::write(&snapshot_path, text) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot write {}: {error}", snapshot_path.display()),
+        );
+    }
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "schema_id": "pput_projection_snapshot.v1",
+            "source": snapshot["source"],
+            "cost_event_count": snapshot["cost_event_count"],
+            "total_tokens": snapshot["total_tokens"],
+            "total_wall_time_ms": snapshot["total_wall_time_ms"],
+            "hidden_evaluator": snapshot["hidden_evaluator"],
+            "hidden_from_worker_prompt": snapshot["hidden_from_worker_prompt"],
+            "raw_formula_exposed": snapshot["raw_formula_exposed"],
+            "heldout_ids_exposed": snapshot["heldout_ids_exposed"],
+            "can_move_accepted_head": snapshot["can_move_accepted_head"],
+            "head_effect": snapshot["head_effect"],
+            "pput_projection_hash": pput_projection_hash,
+            "snapshot_path": snapshot_path.to_string_lossy(),
+        }
+    })
+}
+
 fn projection_build_response(request: &Value, id: Value) -> Value {
     let params = match request.get("params") {
         Some(params) => params,
@@ -1454,6 +1563,80 @@ fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
             .map(EconomyEvent::RewardDistributed)
             .map_err(|error| format!("invalid RewardDistributed: {error}")),
         other => Err(format!("unknown economy event_type {other:?}")),
+    }
+}
+
+fn parse_cost_events(params: &Value) -> Result<Vec<CostEvent>, String> {
+    let events = params
+        .get("cost_events")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "cost_events array is required".to_string())?;
+    events.iter().map(parse_cost_event).collect()
+}
+
+fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
+    let schema_id = required_str(value, "schema_id")?;
+    if schema_id != "cost_event.v1" {
+        return Err(format!("unsupported cost event schema_id {schema_id:?}"));
+    }
+    let event_type = required_str(value, "event_type")?;
+    if event_type != "CostEvent" {
+        return Err(format!("unsupported cost event_type {event_type:?}"));
+    }
+    let head_effect = required_str(value, "head_effect")?;
+    if head_effect != "PRESERVE" {
+        return Err(format!(
+            "CostEvent head_effect must be PRESERVE, got {head_effect:?}"
+        ));
+    }
+    let prompt_tokens = required_u64(value, "prompt_tokens")?;
+    let completion_tokens = required_u64(value, "completion_tokens")?;
+    let tool_tokens = required_u64(value, "tool_tokens")?;
+    let tool_stdout_tokens = required_u64(value, "tool_stdout_tokens")?;
+    let total_tokens = required_u64(value, "total_tokens")?;
+    let computed_total = prompt_tokens
+        .checked_add(completion_tokens)
+        .and_then(|count| count.checked_add(tool_tokens))
+        .and_then(|count| count.checked_add(tool_stdout_tokens))
+        .ok_or_else(|| "CostEvent token total overflow".to_string())?;
+    if total_tokens != computed_total {
+        return Err(format!(
+            "CostEvent total_tokens {total_tokens} does not match counted total {computed_total}"
+        ));
+    }
+    let counted_in_total = required_bool(value, "counted_in_total")?;
+    if !counted_in_total {
+        return Err("CostEvent counted_in_total must be true".to_string());
+    }
+
+    Ok(CostEvent {
+        schema_id,
+        event_type,
+        head_effect,
+        run_id: required_str(value, "run_id")?,
+        problem_id: required_str(value, "problem_id")?,
+        split: parse_pput_split(&required_str(value, "split")?)?,
+        agent_id: required_str(value, "agent_id")?,
+        branch_id: required_str(value, "branch_id")?,
+        capsule_id: required_str(value, "capsule_id")?,
+        prompt_tokens,
+        completion_tokens,
+        tool_tokens,
+        tool_stdout_tokens,
+        total_tokens,
+        wall_time_ms: required_u64(value, "wall_time_ms")?,
+        tool_stdout_hash: required_digest(value, "tool_stdout_hash")?,
+        counted_in_total,
+    })
+}
+
+fn parse_pput_split(raw: &str) -> Result<Split, String> {
+    match raw {
+        "adaptation" | "Adaptation" => Ok(Split::Adaptation),
+        "meta_validation" | "MetaValidation" => Ok(Split::MetaValidation),
+        "heldout" | "Heldout" => Ok(Split::Heldout),
+        "dogfood" | "Dogfood" => Ok(Split::Dogfood),
+        other => Err(format!("unknown PPUT split {other:?}")),
     }
 }
 

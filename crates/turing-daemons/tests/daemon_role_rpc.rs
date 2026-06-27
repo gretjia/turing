@@ -182,6 +182,98 @@ fn pputd_serves_hidden_prompt_shield() {
 }
 
 #[test]
+fn pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let project = dir.path().join("project");
+    std::fs::create_dir(&project).expect("create project dir");
+    let state_dir = project.join(".turingos");
+    std::fs::create_dir(&state_dir).expect("create state dir");
+    let project_root = std::fs::canonicalize(&project).expect("canonical project");
+    std::fs::write(
+        state_dir.join("project.json"),
+        json!({
+            "schema_id": "operator_project.v1",
+            "project_root": project_root.to_str().expect("UTF-8 project path"),
+            "truth_source": "micro_tape",
+            "can_write_micro_truth": false,
+            "credential_material_included": false
+        })
+        .to_string(),
+    )
+    .expect("write project metadata");
+
+    let socket = dir.path().join("pputd-snapshot.sock");
+    let mut child = spawn_daemon_with_project("turing-pputd", &socket, &project);
+    wait_for_socket(&socket, &mut child);
+
+    let response = rpc(
+        &socket,
+        "pput.snapshot.write",
+        json!({
+            "cost_events": [
+                {
+                    "schema_id": "cost_event.v1",
+                    "event_type": "CostEvent",
+                    "head_effect": "PRESERVE",
+                    "run_id": "run_snapshot",
+                    "problem_id": "problem_snapshot",
+                    "split": "heldout",
+                    "agent_id": "agent_worker",
+                    "branch_id": "branch_failed",
+                    "capsule_id": "wc_snapshot",
+                    "prompt_tokens": 2,
+                    "completion_tokens": 3,
+                    "tool_tokens": 5,
+                    "tool_stdout_tokens": 7,
+                    "total_tokens": 17,
+                    "wall_time_ms": 100,
+                    "tool_stdout_hash": digest('f'),
+                    "counted_in_total": true
+                }
+            ]
+        }),
+    );
+
+    assert_eq!(
+        response["result"]["schema_id"],
+        "pput_projection_snapshot.v1"
+    );
+    assert_eq!(response["result"]["source"], "micro_tape_only");
+    assert_eq!(response["result"]["cost_event_count"], 1);
+    assert_eq!(response["result"]["total_tokens"], 17);
+    assert_eq!(response["result"]["total_wall_time_ms"], 100);
+    assert_eq!(response["result"]["hidden_evaluator"], true);
+    assert_eq!(response["result"]["hidden_from_worker_prompt"], true);
+    assert_eq!(response["result"]["raw_formula_exposed"], false);
+    assert_eq!(response["result"]["heldout_ids_exposed"], false);
+    assert_eq!(response["result"]["can_move_accepted_head"], false);
+    assert_eq!(
+        response["result"]["snapshot_path"],
+        state_dir
+            .join("pput_projection.json")
+            .to_str()
+            .expect("UTF-8 snapshot path")
+    );
+    assert!(
+        response["result"]["pput_projection_hash"]
+            .as_str()
+            .expect("PPUT projection hash")
+            .starts_with("sha256:")
+    );
+
+    let snapshot =
+        std::fs::read_to_string(state_dir.join("pput_projection.json")).expect("PPUT snapshot");
+    assert!(snapshot.contains(r#""schema_id":"pput_projection_snapshot.v1""#));
+    assert!(snapshot.contains(r#""hidden_from_worker_prompt":true"#));
+    assert!(snapshot.contains(r#""raw_formula_exposed":false"#));
+    assert!(!snapshot.contains("VPPUT_i"));
+    assert!(!snapshot.contains(r#""heldout_ids""#));
+    assert!(!snapshot.contains(r#""accepted_head""#));
+
+    shutdown(socket, child);
+}
+
+#[test]
 fn viewd_builds_disposable_projection_without_truth_write() {
     let dir = tempfile::tempdir().expect("temp dir");
     let socket = dir.path().join("viewd.sock");
