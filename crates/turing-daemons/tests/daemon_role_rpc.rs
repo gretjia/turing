@@ -193,6 +193,44 @@ fn execd_authorizes_scoped_grants_without_head_authority() {
 }
 
 #[test]
+fn execd_dispatches_fake_worker_without_head_authority() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let socket = dir.path().join("execd-dispatch.sock");
+    let mut child = spawn_daemon("turing-execd", &socket);
+    wait_for_socket(&socket, &mut child);
+
+    let dispatched = rpc(
+        &socket,
+        "dispatch.request",
+        json!({
+            "worker_kind": "Fake",
+            "worker_id": "worker_fake_rpc",
+            "capsule_id": "wc_rpc",
+            "grant_id": "grant_rpc"
+        }),
+    );
+
+    assert_eq!(dispatched["result"]["receipt_type"], "WorkerDispatched");
+    assert_eq!(dispatched["result"]["schema_id"], "execution_receipt.v1");
+    assert_eq!(dispatched["result"]["capsule_id"], "wc_rpc");
+    assert_eq!(dispatched["result"]["worker_id"], "worker_fake_rpc");
+    assert_eq!(dispatched["result"]["grant_id"], "grant_rpc");
+    assert_eq!(dispatched["result"]["exit_code"], 0);
+    assert_eq!(dispatched["result"]["credential_material_absent"], true);
+    assert_eq!(dispatched["result"]["micro_refs_moved"], false);
+    assert_eq!(dispatched["result"]["can_move_accepted_head"], false);
+    assert_eq!(dispatched["result"]["head_effect"], "PRESERVE");
+    assert!(
+        dispatched["result"]["receipt_id"]
+            .as_str()
+            .expect("receipt id")
+            .starts_with("rcp_")
+    );
+
+    shutdown(socket, child);
+}
+
+#[test]
 fn mcp_lists_read_only_resources_and_typed_commands_without_truth() {
     let dir = tempfile::tempdir().expect("temp dir");
     let socket = dir.path().join("mcp.sock");

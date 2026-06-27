@@ -22,6 +22,7 @@ use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
     SignatureRoute, ToolRequest,
 };
+use turing_execd::{FakeWorker, WorkerRunRequest};
 use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
 use turing_pput::WorkerPromptShield;
 use turing_predicate::{PredicateCheck, PredicateKernel};
@@ -174,6 +175,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
+        }
+        Some("dispatch.request") if runtime.contract.role == "turing-execd" => {
+            dispatch_request_response(request, id)
         }
         Some("mcp.resources.list") if runtime.contract.role == "turing-mcp" => {
             mcp_resources_list_response(id)
@@ -727,6 +731,68 @@ fn grant_authorize_response(request: &Value, id: Value) -> Value {
             }
         }),
     }
+}
+
+fn dispatch_request_response(request: &Value, id: Value) -> Value {
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let worker_kind = match required_str(params, "worker_kind") {
+        Ok(worker_kind) => worker_kind,
+        Err(message) => return invalid_params(id, message),
+    };
+    if worker_kind != "Fake" {
+        return invalid_params(
+            id,
+            format!("dispatch.request supports Fake worker_kind, got {worker_kind:?}"),
+        );
+    }
+    let worker_id = match required_str(params, "worker_id") {
+        Ok(worker_id) => worker_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let capsule_id = match required_str(params, "capsule_id") {
+        Ok(capsule_id) => capsule_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let grant_id = match required_str(params, "grant_id") {
+        Ok(grant_id) => grant_id,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    let worker = FakeWorker::new(worker_id);
+    let receipt = match worker.run(WorkerRunRequest {
+        capsule_id,
+        grant_id,
+    }) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("dispatch failed: {error}")),
+    };
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "receipt_type": "WorkerDispatched",
+            "schema_id": receipt.schema_id,
+            "receipt_id": receipt.receipt_id,
+            "capsule_id": receipt.capsule_id,
+            "worker_id": receipt.worker_id,
+            "grant_id": receipt.grant_id,
+            "exit_code": receipt.exit_code,
+            "timeout_class": receipt.timeout_class,
+            "stdout_hash": receipt.stdout_hash,
+            "stderr_hash": receipt.stderr_hash,
+            "done_json_hash": receipt.done_json_hash,
+            "observer_measurement_hash": receipt.observer_measurement_hash,
+            "provenance": "FULL",
+            "credential_material_absent": receipt.credential_material_absent,
+            "micro_refs_moved": receipt.micro_refs_moved,
+            "can_move_accepted_head": false,
+            "head_effect": "PRESERVE",
+        }
+    })
 }
 
 fn mcp_resources_list_response(id: Value) -> Value {

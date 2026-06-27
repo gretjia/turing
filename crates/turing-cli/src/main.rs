@@ -137,9 +137,9 @@ turing-mcp --check
   predicate-routed candidate verify/write, and minimal OS-keyring atom authorization; richer
   predicate packs and hardware/human approval UX remain pending.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
-  minimal sidecar RPCs for grant authorization, resource manifests, shadow budget suggestion,
-  prompt shielding, and disposable projection building. Full persistent project services remain
-  pending.
+  minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
+  budget suggestion, prompt shielding, and disposable projection building. Full persistent project
+  services remain pending.
 - Operator project persistence and installed binary wiring remain pending.
 "#,
         tape_tip = report.tape_tip,
