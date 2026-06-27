@@ -150,6 +150,94 @@ fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
 }
 
 #[test]
+fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let project = dir.path().join("project");
+    std::fs::create_dir(&project).expect("create project dir");
+    let state_dir = project.join(".turingos");
+    std::fs::create_dir(&state_dir).expect("create state dir");
+    let project_root = std::fs::canonicalize(&project).expect("canonical project");
+    std::fs::write(
+        state_dir.join("project.json"),
+        json!({
+            "schema_id": "operator_project.v1",
+            "project_root": project_root.to_str().expect("UTF-8 project path"),
+            "truth_source": "micro_tape",
+            "can_write_micro_truth": false,
+            "credential_material_included": false
+        })
+        .to_string(),
+    )
+    .expect("write project metadata");
+
+    let socket = dir.path().join("wallet-snapshot.sock");
+    let mut child = spawn_daemon_with_project("turing-marketd", &socket, &project);
+    wait_for_socket(&socket, &mut child);
+
+    let response = rpc(
+        &socket,
+        "wallet.snapshot.write",
+        json!({
+            "events": [
+                {
+                    "event_type": "PositionMinted",
+                    "schema_id": "position_minted.v1",
+                    "market_id": "mkt_wallet",
+                    "agent_id": "agent_a",
+                    "coin_in": "5",
+                    "yes_out": "5",
+                    "no_out": "5",
+                    "invariant": "coin_in == yes_out == no_out"
+                },
+                {
+                    "event_type": "RewardDistributed",
+                    "schema_id": "reward_distributed.v1",
+                    "market_id": "mkt_wallet",
+                    "agent_id": "agent_a",
+                    "reward_coin": "2",
+                    "slash_coin": "1",
+                    "reason": "PREDICATE_SETTLEMENT"
+                }
+            ]
+        }),
+    );
+
+    assert_eq!(
+        response["result"]["schema_id"],
+        "wallet_projection_snapshot.v1"
+    );
+    assert_eq!(response["result"]["source"], "micro_tape_only");
+    assert_eq!(response["result"]["wallet_count"], 1);
+    assert_eq!(response["result"]["derived_only"], true);
+    assert_eq!(response["result"]["credential_material_included"], false);
+    assert_eq!(response["result"]["can_move_accepted_head"], false);
+    assert_eq!(
+        response["result"]["snapshot_path"],
+        state_dir
+            .join("wallet_projection.json")
+            .to_str()
+            .expect("UTF-8 snapshot path")
+    );
+    assert!(
+        response["result"]["wallet_projection_hash"]
+            .as_str()
+            .expect("wallet projection hash")
+            .starts_with("sha256:")
+    );
+
+    let snapshot =
+        std::fs::read_to_string(state_dir.join("wallet_projection.json")).expect("wallet snapshot");
+    assert!(snapshot.contains(r#""schema_id":"wallet_projection_snapshot.v1""#));
+    assert!(snapshot.contains(r#""agent_a""#));
+    assert!(snapshot.contains(r#""mkt_wallet":"5""#));
+    assert!(snapshot.contains(r#""credential_material_included":false"#));
+    assert!(!snapshot.contains(r#""accepted_head""#));
+    assert!(!snapshot.contains("credential_hash"));
+
+    shutdown(socket, child);
+}
+
+#[test]
 fn pputd_serves_hidden_prompt_shield() {
     let dir = tempfile::tempdir().expect("temp dir");
     let socket = dir.path().join("pputd.sock");

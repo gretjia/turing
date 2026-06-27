@@ -20,6 +20,7 @@ use turing_contracts::registry;
 use turing_economy::{
     AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay, MarketRouter,
     MarketRouterMode, MarketSettled, PositionMinted, PriceSignal, RewardDistributed,
+    WalletProjection,
 };
 use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
@@ -236,6 +237,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         }
         Some("market.snapshot.write") if runtime.contract.role == "turing-marketd" => {
             market_snapshot_write_response(runtime, request, id)
+        }
+        Some("wallet.snapshot.write") if runtime.contract.role == "turing-marketd" => {
+            wallet_snapshot_write_response(runtime, request, id)
         }
         Some("pput.prompt.validate") if runtime.contract.role == "turing-pputd" => {
             pput_prompt_validate_response(request, id)
@@ -1039,6 +1043,118 @@ fn market_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: 
             "can_move_accepted_head": snapshot["can_move_accepted_head"],
             "head_effect": snapshot["head_effect"],
             "market_projection_hash": market_projection_hash,
+            "snapshot_path": snapshot_path.to_string_lossy(),
+        }
+    })
+}
+
+fn wallet_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(project_root) = &runtime.project_root else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "wallet.snapshot.write requires --project".to_string(),
+        );
+    };
+    let project_root = match std::fs::canonicalize(project_root) {
+        Ok(path) => path,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
+        }
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let events = match parse_economy_events(params) {
+        Ok(events) => events,
+        Err(message) => return invalid_params(id, message),
+    };
+    let projection = match WalletProjection::from_tape_events(&events) {
+        Ok(projection) => projection,
+        Err(error) => return jsonrpc_error(id, -32000, format!("wallet replay failed: {error}")),
+    };
+
+    let state_dir = project_root.join(".turingos");
+    if let Err(error) = std::fs::create_dir_all(&state_dir) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot create {}: {error}", state_dir.display()),
+        );
+    }
+    let snapshot_path = state_dir.join("wallet_projection.json");
+    let mut wallets = serde_json::Map::new();
+    for (agent_id, wallet) in &projection.wallets {
+        wallets.insert(
+            agent_id.clone(),
+            json!({
+                "agent_id": wallet.agent_id,
+                "coin_balance": wallet.coin_balance,
+                "yes_positions": wallet.yes_positions,
+                "no_positions": wallet.no_positions,
+            }),
+        );
+    }
+    let mut snapshot = json!({
+        "schema_id": "wallet_projection_snapshot.v1",
+        "source": projection.source,
+        "wallet_count": projection.wallets.len(),
+        "wallets": wallets,
+        "derived_only": true,
+        "truth_source": "micro_tape",
+        "credential_material_included": false,
+        "can_move_accepted_head": false,
+        "head_effect": "PRESERVE",
+    });
+    let preimage = match jcs::canonicalize(&snapshot) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("wallet projection canonicalization failed: {error}"),
+            );
+        }
+    };
+    let wallet_projection_hash = format!("sha256:{}", jcs::sha256_hex(&preimage));
+    snapshot
+        .as_object_mut()
+        .expect("snapshot is object")
+        .insert(
+            "wallet_projection_hash".to_string(),
+            Value::String(wallet_projection_hash.clone()),
+        );
+    let text = match serde_json::to_string(&snapshot) {
+        Ok(text) => text,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("wallet snapshot serialization failed: {error}"),
+            );
+        }
+    };
+    if let Err(error) = std::fs::write(&snapshot_path, text) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot write {}: {error}", snapshot_path.display()),
+        );
+    }
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "schema_id": "wallet_projection_snapshot.v1",
+            "source": snapshot["source"],
+            "wallet_count": snapshot["wallet_count"],
+            "derived_only": snapshot["derived_only"],
+            "credential_material_included": snapshot["credential_material_included"],
+            "can_move_accepted_head": snapshot["can_move_accepted_head"],
+            "head_effect": snapshot["head_effect"],
+            "wallet_projection_hash": wallet_projection_hash,
             "snapshot_path": snapshot_path.to_string_lossy(),
         }
     })

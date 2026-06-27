@@ -53,6 +53,7 @@ turingd --serve --socket /tmp/turingd.sock
   budget suggestion, prompt shielding, disposable projection building, and read-only project
   status. `turing-viewd` also supports derived project-scoped projection snapshot write with
   `can_write_truth=false`; `turing-marketd` supports derived project-scoped market projection
-  snapshot write with `price_not_truth=true`; `turing-pputd` supports hidden project-scoped
-  PPUT projection snapshot write with `hidden_from_worker_prompt=true` and
-  `raw_formula_exposed=false`. All sidecar snapshot writes are derived-only and cannot own truth.
+  snapshot write with `price_not_truth=true` and wallet projection snapshot write with
+  `credential_material_included=false`; `turing-pputd` supports hidden project-scoped
+  PPUT projection snapshot write with `hidden_from_worker_prompt=true` and `raw_formula_exposed=false`.
+  All sidecar snapshot writes are derived-only and cannot own truth.

@@ -222,6 +222,8 @@ fn handoff_generate_writes_real_projection_hashes() {
         "projection snapshot write",
         "market projection",
         "price_not_truth=true",
+        "wallet projection snapshot write",
+        "credential_material_included=false",
         "PPUT projection snapshot write",
         "hidden_from_worker_prompt=true",
         "raw_formula_exposed=false",
