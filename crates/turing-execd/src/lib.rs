@@ -359,6 +359,167 @@ pub mod capability {
     }
 }
 
+#[cfg(unix)]
+pub mod process {
+    use std::io;
+    use std::os::unix::process::CommandExt;
+    use std::process::{Command, Stdio};
+    use std::thread;
+    use std::time::{Duration, Instant};
+
+    use turing_contracts::jcs;
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct ProcessSpec {
+        pub program: String,
+        pub args: Vec<String>,
+        pub timeout: Duration,
+        pub term_grace: Duration,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum TimeoutClass {
+        None,
+        Soft,
+        Hard,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct ProcessGroupReceipt {
+        pub timeout_class: TimeoutClass,
+        pub term_sent: bool,
+        pub kill_sent: bool,
+        pub no_orphans: bool,
+        pub exit_code: Option<i32>,
+        pub stdout_hash: String,
+        pub stderr_hash: String,
+        pub elapsed: Duration,
+    }
+
+    #[derive(Debug)]
+    pub enum ProcessError {
+        Spawn(io::Error),
+        Wait(io::Error),
+        Signal(io::Error),
+    }
+
+    impl std::fmt::Display for ProcessError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                ProcessError::Spawn(e) => write!(f, "process spawn failed: {e}"),
+                ProcessError::Wait(e) => write!(f, "process wait failed: {e}"),
+                ProcessError::Signal(e) => write!(f, "process-group signal failed: {e}"),
+            }
+        }
+    }
+
+    impl std::error::Error for ProcessError {}
+
+    #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+    pub struct ProcessGroupRunner;
+
+    impl ProcessGroupRunner {
+        #[must_use]
+        pub fn new() -> Self {
+            ProcessGroupRunner
+        }
+
+        pub fn run(&self, spec: ProcessSpec) -> Result<ProcessGroupReceipt, ProcessError> {
+            let start = Instant::now();
+            let mut child = Command::new(&spec.program)
+                .args(&spec.args)
+                .stdin(Stdio::null())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .process_group(0)
+                .spawn()
+                .map_err(ProcessError::Spawn)?;
+            let pgid = child.id();
+
+            let mut term_sent = false;
+            let mut kill_sent = false;
+            let mut timeout_class = TimeoutClass::None;
+
+            loop {
+                if child.try_wait().map_err(ProcessError::Wait)?.is_some() {
+                    break;
+                }
+                if start.elapsed() >= spec.timeout {
+                    term_sent = true;
+                    timeout_class = TimeoutClass::Soft;
+                    signal_group(pgid, "-TERM").map_err(ProcessError::Signal)?;
+                    thread::sleep(spec.term_grace);
+                    if child.try_wait().map_err(ProcessError::Wait)?.is_none() {
+                        kill_sent = true;
+                        timeout_class = TimeoutClass::Hard;
+                        signal_group(pgid, "-KILL").map_err(ProcessError::Signal)?;
+                    }
+                    break;
+                }
+                thread::sleep(Duration::from_millis(10));
+            }
+
+            let output = child.wait_with_output().map_err(ProcessError::Wait)?;
+            let no_orphans = wait_for_empty_group(pgid, Duration::from_secs(1));
+
+            Ok(ProcessGroupReceipt {
+                timeout_class,
+                term_sent,
+                kill_sent,
+                no_orphans,
+                exit_code: output.status.code(),
+                stdout_hash: hash_bytes(&output.stdout),
+                stderr_hash: hash_bytes(&output.stderr),
+                elapsed: start.elapsed(),
+            })
+        }
+    }
+
+    fn signal_group(pgid: u32, signal: &str) -> io::Result<()> {
+        let status = Command::new("kill")
+            .arg(signal)
+            .arg("--")
+            .arg(format!("-{pgid}"))
+            .status()?;
+        if status.success() {
+            Ok(())
+        } else {
+            Err(io::Error::other(format!(
+                "kill {signal} process group {pgid} exited with {status}"
+            )))
+        }
+    }
+
+    fn wait_for_empty_group(pgid: u32, timeout: Duration) -> bool {
+        let start = Instant::now();
+        while start.elapsed() < timeout {
+            if process_group_empty(pgid) {
+                return true;
+            }
+            thread::sleep(Duration::from_millis(10));
+        }
+        process_group_empty(pgid)
+    }
+
+    fn process_group_empty(pgid: u32) -> bool {
+        match Command::new("kill")
+            .arg("-0")
+            .arg("--")
+            .arg(format!("-{pgid}"))
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+        {
+            Ok(status) => !status.success(),
+            Err(_) => false,
+        }
+    }
+
+    fn hash_bytes(bytes: &[u8]) -> String {
+        format!("sha256:{}", jcs::sha256_hex(bytes))
+    }
+}
+
 use serde_json::json;
 use turing_contracts::jcs;
 use workers::{
