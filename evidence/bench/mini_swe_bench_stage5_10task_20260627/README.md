@@ -138,3 +138,7 @@ python3 tools/bench/audit_mini_swe_bench_substrate_coverage.py \
 - `turingos_incremental/substrate_coverage_audit.json`
 - `substrate_coverage_audit_with_meta.json`
 - `meta_ai_review_deepseek_v4_pro.json`
+- `micro_tape_audit/micro_tape_decision_dag.md`
+- `micro_tape_audit/micro_tape_decision_dag.dot`
+- `micro_tape_audit_all_attempts/micro_tape_decision_dag.md`
+- `micro_tape_audit_all_attempts/independent_agent_review_deepseek_v4_pro.json`
