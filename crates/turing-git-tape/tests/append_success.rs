@@ -184,10 +184,7 @@ fn append_envelope_requires_seven_fields() {
         );
 
         let mut tampered = body.clone();
-        tampered
-            .as_object_mut()
-            .expect("body object")
-            .remove(field);
+        tampered.as_object_mut().expect("body object").remove(field);
         assert!(
             turing_contracts::envelope::MicroEventEnvelope::from_jcs_value(&tampered).is_err(),
             "missing required append field {field} must fail closed"
@@ -204,6 +201,58 @@ fn append_envelope_requires_seven_fields() {
         json!("system_constitution_accepted.v1")
     );
     assert_payload_digest(&body);
+}
+
+#[test]
+fn predicate_fail_records_failure_node_and_preserves_heads() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path();
+    git::init_sha256(repo).expect("init sha256 repo");
+
+    let tape = Append::open(repo).expect("open the Tape over a fresh sha256 repo");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"a".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("genesis append succeeds");
+
+    let failure = tape
+        .append(
+            AppendRequest::new(
+                "FailureNode",
+                "writer:predicate",
+                json!({
+                    "verified": false,
+                    "failure_class": "SEMANTIC_FAILURE",
+                    "candidate_digest": "sha256:".to_string() + &"b".repeat(64),
+                    "observation_digest": "sha256:".to_string() + &"c".repeat(64),
+                    "detail": "predicate failed",
+                }),
+            )
+            .predicate_fail(),
+        )
+        .expect("failure node append succeeds");
+
+    assert_eq!(failure.head_moved, HeadMoved::None);
+    assert_eq!(failure.accepted_head_after, genesis.event_id);
+    assert_eq!(failure.tape_tip_after, failure.event_id);
+
+    let body = read_committed_body(repo, &failure.event_id);
+    assert_eq!(body["event_type"], json!("FailureNode"));
+    assert_eq!(body["predicate_product"], json!("FAIL"));
+    assert_eq!(body["verified"], json!(false));
+    assert_receipt_consistent(
+        repo,
+        &failure,
+        &body,
+        HeadMoved::None,
+        Some(&genesis.event_id),
+    );
 }
 
 /// Assert the commit named by `event_id` is non-merge: zero parents for genesis,

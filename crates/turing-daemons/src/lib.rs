@@ -8,6 +8,8 @@ use std::process::ExitCode;
 
 use serde_json::{Value, json};
 use turing_contracts::envelope::HeadEffect;
+use turing_contracts::envelope::PredicateProduct;
+use turing_contracts::failure::{FailureClass, FailureNodePayload};
 use turing_contracts::registry;
 use turing_economy::{CandidateRoute, MarketRouter, MarketRouterMode, PriceSignal};
 use turing_execd::capability::{
@@ -16,6 +18,7 @@ use turing_execd::capability::{
 };
 use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
 use turing_pput::WorkerPromptShield;
+use turing_predicate::{PredicateCheck, PredicateKernel};
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -148,6 +151,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("event.append_preserve") if runtime.contract.role == "turingd" => {
             append_preserve_response(runtime, request, id)
         }
+        Some("candidate.verify_write") if runtime.contract.role == "turingd" => {
+            candidate_verify_write_response(runtime, request, id)
+        }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
         }
@@ -245,6 +251,90 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             "head_effect": "PRESERVE",
             "accepted_head_moved": accepted_head_moved,
             "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+fn candidate_verify_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "candidate.verify_write requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(writer_id) => writer_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let candidate_payload = match params.get("candidate_payload") {
+        Some(payload) => payload.clone(),
+        None => return invalid_params(id, "candidate_payload is required"),
+    };
+    let checks = match parse_predicate_checks(params) {
+        Ok(checks) => checks,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    let report = match PredicateKernel.run("CandidateAccepted", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+
+    let (write_event_type, failure_class, receipt) = if report.product == PredicateProduct::Pass {
+        match tape.append(
+            AppendRequest::new("CandidateAccepted", writer_id, candidate_payload).predicate_pass(),
+        ) {
+            Ok(receipt) => ("CandidateAccepted", None, receipt),
+            Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+        }
+    } else {
+        let failure = match params.get("failure").map(parse_failure_payload) {
+            Some(Ok(payload)) => payload,
+            Some(Err(message)) => return invalid_params(id, message),
+            None => return invalid_params(id, "failure object is required on predicate FAIL"),
+        };
+        match tape.append(
+            AppendRequest::new(
+                "FailureNode",
+                writer_id,
+                serde_json::to_value(&failure).expect("FailureNodePayload serializes"),
+            )
+            .predicate_fail(),
+        ) {
+            Ok(receipt) => ("FailureNode", Some(FailureClass::SemanticFailure), receipt),
+            Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+        }
+    };
+
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "write_event_type": write_event_type,
+            "event_id": receipt.event_id,
+            "predicate_product": predicate_product_str(report.product),
+            "predicate_report_hash": report.report_hash,
+            "failed_predicates": report.failed_predicates,
+            "reject_class": report.reject_class,
+            "failure_class": failure_class.map(FailureClass::as_registry_str),
+            "accepted_head_moved": accepted_head_moved,
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,
@@ -426,6 +516,41 @@ fn projection_build_response(request: &Value, id: Value) -> Value {
     }
 }
 
+fn parse_predicate_checks(params: &Value) -> Result<Vec<PredicateCheck>, String> {
+    let checks = params
+        .get("checks")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "checks array is required".to_string())?;
+    checks
+        .iter()
+        .map(|check| {
+            let check_id = required_str(check, "check_id")?;
+            let passed = required_bool(check, "passed")?;
+            if passed {
+                Ok(PredicateCheck::pass(check_id))
+            } else {
+                Ok(PredicateCheck::fail(
+                    check_id,
+                    optional_str(check, "reject_class")?
+                        .unwrap_or_else(|| "SEMANTIC_FAILURE".to_string()),
+                ))
+            }
+        })
+        .collect()
+}
+
+fn parse_failure_payload(value: &Value) -> Result<FailureNodePayload, String> {
+    let candidate_digest = required_digest(value, "candidate_digest")?;
+    let observation_digest = required_digest(value, "observation_digest")?;
+    let detail = optional_str(value, "detail")?;
+    Ok(FailureNodePayload::new(
+        FailureClass::SemanticFailure,
+        candidate_digest,
+        observation_digest,
+        detail,
+    ))
+}
+
 fn parse_grant(value: &Value) -> Result<CapabilityGrant, String> {
     let budget = value
         .get("budget")
@@ -596,6 +721,25 @@ fn read_heads_response(runtime: &DaemonRuntime, id: Value) -> Value {
             }
         }),
         Err(error) => jsonrpc_error(id, -32000, format!("cannot read coherent heads: {error}")),
+    }
+}
+
+fn required_digest(value: &Value, key: &str) -> Result<String, String> {
+    let digest = required_str(value, key)?;
+    let Some(hex) = digest.strip_prefix("sha256:") else {
+        return Err(format!("{key} must be sha256:<64 hex>"));
+    };
+    if hex.len() != 64 || !hex.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+        return Err(format!("{key} must be sha256:<64 hex>"));
+    }
+    Ok(digest)
+}
+
+fn predicate_product_str(product: PredicateProduct) -> &'static str {
+    match product {
+        PredicateProduct::Pass => "PASS",
+        PredicateProduct::Fail => "FAIL",
+        PredicateProduct::NotRun => "NOT_RUN",
     }
 }
 

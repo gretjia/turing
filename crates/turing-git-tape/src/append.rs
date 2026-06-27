@@ -117,7 +117,8 @@ pub struct CommittedReceipt {
 /// The caller supplies the registry event name, an opaque writer id, and the payload.
 /// `event_schema_id`, `head_effect`, `class`, and the head movement are all derived from
 /// the embedded registry — never taken from the caller. The predicate product defaults to
-/// `NOT_RUN`; [`Self::predicate_pass`] sets PASS for predicate-required events.
+/// `NOT_RUN`; [`Self::predicate_pass`] sets PASS for predicate-required events and
+/// [`Self::predicate_fail`] records FAIL through `FailureNode`.
 #[derive(Debug, Clone)]
 pub struct AppendRequest {
     event_type: String,
@@ -130,6 +131,8 @@ pub struct AppendRequest {
 enum ProductChoice {
     /// Use the registry: PASS if predicate_required, else NOT_RUN.
     Pass,
+    /// Record a predicate FAIL through the FailureNode finalization path.
+    Fail,
     /// Caller did not assert PASS; predicate-free events still resolve to NOT_RUN.
     Unspecified,
 }
@@ -156,6 +159,16 @@ impl AppendRequest {
         self.product = ProductChoice::Pass;
         self
     }
+
+    /// Assert the Candidate Predicate failed and route the result through `FailureNode`.
+    ///
+    /// Failed sovereign candidates must become failure nodes rather than non-advancing
+    /// sovereign accept events. Any event type other than `FailureNode` rejects this product.
+    #[must_use]
+    pub fn predicate_fail(mut self) -> Self {
+        self.product = ProductChoice::Fail;
+        self
+    }
 }
 
 /// Errors from an append on the success path.
@@ -171,6 +184,8 @@ pub enum AppendError {
     /// path never fabricates a verified PASS; the caller must assert the predicate result
     /// (FAIL / failure-node finalization arrives in SG-13).
     PredicateProductRequired(String),
+    /// Predicate FAIL finalization is valid only for `FailureNode`.
+    PredicateFailRequiresFailureNode(String),
     /// The repository's `tape_tip` exists but `accepted_head` does not (or vice-versa) —
     /// an incoherent pre-state that is not a clean genesis and not a normal post-state.
     IncoherentPreState(String),
@@ -198,6 +213,12 @@ impl std::fmt::Display for AppendError {
                 f,
                 "predicate-required event {t:?} needs an explicit predicate product (no fabricated PASS)"
             ),
+            AppendError::PredicateFailRequiresFailureNode(t) => {
+                write!(
+                    f,
+                    "event {t:?} cannot record predicate FAIL; use FailureNode"
+                )
+            }
             AppendError::IncoherentPreState(m) => write!(f, "incoherent pre-state: {m}"),
             AppendError::MissingHead(m) => write!(f, "missing required head: {m}"),
             AppendError::ExhaustedRetries { attempts } => {
@@ -248,6 +269,8 @@ pub enum StaleAppendError {
     UnknownEventType(String),
     /// A predicate-required event was staged without an asserted product.
     PredicateProductRequired(String),
+    /// Predicate FAIL finalization is valid only for `FailureNode`.
+    PredicateFailRequiresFailureNode(String),
     /// An incoherent pre-state was observed mid-retry (e.g. `tape_tip` present but
     /// `accepted_head` absent) — not a clean genesis and not a normal post-state.
     IncoherentPreState(String),
@@ -273,6 +296,12 @@ impl std::fmt::Display for StaleAppendError {
                 f,
                 "predicate-required event {t:?} needs an explicit predicate product"
             ),
+            StaleAppendError::PredicateFailRequiresFailureNode(t) => {
+                write!(
+                    f,
+                    "event {t:?} cannot record predicate FAIL; use FailureNode"
+                )
+            }
             StaleAppendError::IncoherentPreState(m) => write!(f, "incoherent pre-state: {m}"),
             StaleAppendError::MissingHead(m) => write!(f, "missing required head: {m}"),
             StaleAppendError::ExhaustedRetries { attempts } => write!(
@@ -314,6 +343,9 @@ impl From<AppendError> for StaleAppendError {
             AppendError::PredicateProductRequired(t) => {
                 StaleAppendError::PredicateProductRequired(t)
             }
+            AppendError::PredicateFailRequiresFailureNode(t) => {
+                StaleAppendError::PredicateFailRequiresFailureNode(t)
+            }
             AppendError::IncoherentPreState(m) => StaleAppendError::IncoherentPreState(m),
             AppendError::MissingHead(m) => StaleAppendError::MissingHead(m),
             AppendError::ExhaustedRetries { attempts } => {
@@ -331,6 +363,9 @@ impl From<StaleAppendError> for AppendError {
             StaleAppendError::UnknownEventType(t) => AppendError::UnknownEventType(t),
             StaleAppendError::PredicateProductRequired(t) => {
                 AppendError::PredicateProductRequired(t)
+            }
+            StaleAppendError::PredicateFailRequiresFailureNode(t) => {
+                AppendError::PredicateFailRequiresFailureNode(t)
             }
             StaleAppendError::IncoherentPreState(m) => AppendError::IncoherentPreState(m),
             StaleAppendError::MissingHead(m) => AppendError::MissingHead(m),
@@ -526,6 +561,19 @@ impl Append {
                         req.event_type.clone(),
                     ));
                 }
+                ProductChoice::Fail => {
+                    return Err(AppendError::PredicateFailRequiresFailureNode(
+                        req.event_type.clone(),
+                    ));
+                }
+            }
+        } else if req.product == ProductChoice::Fail {
+            if req.event_type == "FailureNode" {
+                PredicateProduct::Fail
+            } else {
+                return Err(AppendError::PredicateFailRequiresFailureNode(
+                    req.event_type.clone(),
+                ));
             }
         } else {
             PredicateProduct::NotRun

@@ -193,6 +193,108 @@ fn turingd_appends_preserve_events_without_moving_accepted_head() {
     assert!(status.success(), "turingd shutdown failed: {status}");
 }
 
+#[test]
+fn turingd_verify_write_routes_predicate_pass_and_fail() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:genesis",
+            json!({"constitution_digest": "sha256:".to_string() + &"d".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+
+    let socket = dir.path().join("turingd-verify-write.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let passed = rpc_params(
+        &socket,
+        "candidate.verify_write",
+        json!({
+            "writer_id": "writer:predicate",
+            "candidate_payload": {
+                "candidate_id": "cand_pass",
+                "capsule_id": "wc_rpc"
+            },
+            "checks": [
+                {"check_id": "capsule_contract", "passed": true},
+                {"check_id": "macro_anchor", "passed": true}
+            ],
+            "failure": {
+                "candidate_digest": digest('e'),
+                "observation_digest": digest('f'),
+                "detail": "unused on pass"
+            }
+        }),
+    );
+    let accepted_id = passed["result"]["event_id"]
+        .as_str()
+        .expect("accepted event id")
+        .to_string();
+    assert_eq!(passed["result"]["write_event_type"], "CandidateAccepted");
+    assert_eq!(passed["result"]["predicate_product"], "PASS");
+    assert_eq!(passed["result"]["accepted_head_moved"], true);
+    assert_eq!(passed["result"]["head_set"]["accepted_head"], accepted_id);
+    assert!(
+        passed["result"]["predicate_report_hash"]
+            .as_str()
+            .expect("predicate report hash")
+            .starts_with("sha256:")
+    );
+
+    let failed = rpc_params(
+        &socket,
+        "candidate.verify_write",
+        json!({
+            "writer_id": "writer:predicate",
+            "candidate_payload": {
+                "candidate_id": "cand_fail",
+                "capsule_id": "wc_rpc"
+            },
+            "checks": [
+                {
+                    "check_id": "capsule_contract",
+                    "passed": false,
+                    "reject_class": "OVER_SCOPE"
+                },
+                {"check_id": "macro_anchor", "passed": true}
+            ],
+            "failure": {
+                "candidate_digest": digest('a'),
+                "observation_digest": digest('b'),
+                "detail": "scope violation"
+            }
+        }),
+    );
+    assert_eq!(failed["result"]["write_event_type"], "FailureNode");
+    assert_eq!(failed["result"]["predicate_product"], "FAIL");
+    assert_eq!(failed["result"]["failure_class"], "SEMANTIC_FAILURE");
+    assert_eq!(failed["result"]["accepted_head_moved"], false);
+    assert_eq!(failed["result"]["head_set"]["accepted_head"], accepted_id);
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
 fn rpc(socket: &Path, method: &str) -> Value {
     let mut stream = UnixStream::connect(socket).expect("connect to turingd socket");
     writeln!(stream, r#"{{"jsonrpc":"2.0","id":1,"method":"{method}"}}"#).expect("write request");
@@ -232,4 +334,8 @@ fn wait_for_socket(socket: &Path, child: &mut Child) {
     }
     let _ = child.kill();
     panic!("turingd socket did not appear at {}", socket.display());
+}
+
+fn digest(ch: char) -> String {
+    format!("sha256:{}", ch.to_string().repeat(64))
 }
