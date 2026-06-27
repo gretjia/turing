@@ -377,6 +377,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-qualification"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
+ "turing-contracts",
+ "turing-economy",
+ "turing-execd",
+ "turing-failure",
+ "turing-git-tape",
+ "turing-loop",
+ "turing-pput",
+ "turing-projection",
+ "turing-replay",
+]
+
+[[package]]
 name = "turing-replay"
 version = "0.0.0"
 dependencies = [

@@ -1,0 +1,23 @@
+[package]
+name = "turing-qualification"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+turing-contracts = { path = "../turing-contracts" }
+turing-economy = { path = "../turing-economy" }
+turing-execd = { path = "../turing-execd" }
+turing-failure = { path = "../turing-failure" }
+turing-git-tape = { path = "../turing-git-tape" }
+turing-loop = { path = "../turing-loop" }
+turing-pput = { path = "../turing-pput" }
+turing-projection = { path = "../turing-projection" }
+turing-replay = { path = "../turing-replay" }
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+tempfile = "=3.27.0"
+
+[lints]
+workspace = true
