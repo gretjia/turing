@@ -27,10 +27,17 @@ turing pput replay --verify
 turing audit invariants
 turing audit market
 turing audit pput
+turingd --check
+turing-execd --check
+turing-marketd --check
+turing-pputd --check
+turing-viewd --check
+turing-mcp --check
 ```
 
 ## Known Risks
 
 - Generated evidence is from a temporary private-local qualification Tape.
-- Long-running daemon packaging for turingd, marketd, pputd, viewd, and mcp remains pending.
+- Daemon boundary binaries exist and report process contracts, but long-running socket/RPC
+  services for turingd, marketd, pputd, viewd, and mcp remain pending.
 - Operator project persistence and installed binary wiring remain pending.
