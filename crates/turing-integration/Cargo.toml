@@ -1,0 +1,12 @@
+[package]
+name = "turing-integration"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+turing-contracts = { path = "../turing-contracts" }
+
+[lints]
+workspace = true

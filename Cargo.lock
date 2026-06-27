@@ -327,6 +327,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-integration"
+version = "0.0.0"
+dependencies = [
+ "turing-contracts",
+]
+
+[[package]]
 name = "turing-kernel"
 version = "0.0.0"
 dependencies = [
