@@ -214,7 +214,7 @@ fn assert_receipt_consistent(
 // --- the trajectory ---------------------------------------------------------
 
 #[test]
-fn append_trajectory_moves_exactly_the_registry_head() {
+fn three_refs_advance_rules() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path();
     git::init_sha256(repo).expect("init sha256 repo");
