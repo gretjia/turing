@@ -223,3 +223,133 @@ pub mod rtool {
         }
     }
 }
+
+pub mod tick {
+    use std::path::Path;
+
+    use serde_json::Value;
+
+    use crate::rtool::{self, QRead, ReadError};
+    use turing_git_tape::append::{Append, AppendError, AppendRequest, CommittedReceipt};
+
+    /// The observable Single Loop phase order for one tick.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum TickPhase {
+        Read,
+        Propose,
+        Verify,
+        WriteAccept,
+        WriteReject,
+        Compress,
+        BroadcastShield,
+        HaltCheck,
+    }
+
+    /// A bounded, already-verified decision for the write phase.
+    ///
+    /// This is deliberately not a planner or market loop. Higher layers may generate
+    /// candidates, but this type is the one-tick input after the verify gate decides
+    /// which branch lands on Tape.
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum TickDecision {
+        AcceptCandidate { writer_id: String, payload: Value },
+        RejectFailure { writer_id: String, payload: Value },
+    }
+
+    /// Result of one runtime tick.
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct TickReport {
+        pub phase_order: Vec<TickPhase>,
+        pub wrote_event: bool,
+        pub write_event_type: String,
+        pub receipt: CommittedReceipt,
+        pub q_before: QRead,
+        pub q_after: QRead,
+        pub halted: bool,
+    }
+
+    #[derive(Debug)]
+    pub enum TickError {
+        Read(ReadError),
+        Append(AppendError),
+    }
+
+    impl std::fmt::Display for TickError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                TickError::Read(e) => write!(f, "tick read error: {e}"),
+                TickError::Append(e) => write!(f, "tick append error: {e}"),
+            }
+        }
+    }
+
+    impl std::error::Error for TickError {
+        fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+            match self {
+                TickError::Read(e) => Some(e),
+                TickError::Append(e) => Some(e),
+            }
+        }
+    }
+
+    impl From<ReadError> for TickError {
+        fn from(e: ReadError) -> Self {
+            TickError::Read(e)
+        }
+    }
+
+    impl From<AppendError> for TickError {
+        fn from(e: AppendError) -> Self {
+            TickError::Append(e)
+        }
+    }
+
+    /// Execute exactly one Single Loop tick over the Micro Tape.
+    pub fn single_tick(repo: &Path, decision: TickDecision) -> Result<TickReport, TickError> {
+        let q_before = rtool::read_q(repo, None)?;
+
+        let (write_phase, write_event_type, writer_id, payload, predicate_pass) = match decision {
+            TickDecision::AcceptCandidate { writer_id, payload } => (
+                TickPhase::WriteAccept,
+                "CandidateAccepted",
+                writer_id,
+                payload,
+                true,
+            ),
+            TickDecision::RejectFailure { writer_id, payload } => (
+                TickPhase::WriteReject,
+                "FailureNode",
+                writer_id,
+                payload,
+                false,
+            ),
+        };
+
+        let tape = Append::open(repo)?;
+        let request = AppendRequest::new(write_event_type, writer_id, payload);
+        let receipt = if predicate_pass {
+            tape.append(request.predicate_pass())?
+        } else {
+            tape.append(request)?
+        };
+        let q_after = rtool::read_q(repo, None)?;
+
+        Ok(TickReport {
+            phase_order: vec![
+                TickPhase::Read,
+                TickPhase::Propose,
+                TickPhase::Verify,
+                write_phase,
+                TickPhase::Compress,
+                TickPhase::BroadcastShield,
+                TickPhase::HaltCheck,
+            ],
+            wrote_event: true,
+            write_event_type: write_event_type.to_string(),
+            receipt,
+            q_before,
+            q_after,
+            halted: false,
+        })
+    }
+}
