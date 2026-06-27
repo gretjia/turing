@@ -50,6 +50,25 @@ For the incremental Stage5 TuringOS arm, the independent coverage auditor report
 
 The raw coverage file records the pre-official-evidence predicate gate as `FailureNode`; the final predicate result after official evidence import is recorded in `patch_eval_incremental/patch_eval_summary.json` under `micro_tape_import`.
 
+## Micro Tape Protocol Replay Audit
+
+The protocol verifier intentionally downgrades the earlier broad MicroTape PASS. The current all-attempts report is:
+
+- overall: `PARTIAL`
+- replay_structural_integrity: `PASS`
+- bundle_accessibility: `PASS`
+- basic_ref_reconstruction: `PASS`
+- git_topology: `PASS`
+- canonical_payload_hash: `PASS`
+- registry_head_effect: `PASS`
+- accepted_head_authority: `PASS`
+- authorization_head: `LEGACY_MISSING`
+- economic_timing: `WARN`
+- market_accounting_correctness: `WARN`
+- constitutional_protocol_audit: `PARTIAL`
+
+The warning is load-bearing: existing benchmark tapes settle market/reward and record progress PPUT before terminal official evaluator evidence / final accept. Failed runs correctly keep `progress = 0`; accepted runs need a terminal post-accept PPUT accounting event before capability-metric claims.
+
 ## MetaAI Review
 
 DeepSeek MetaAI review:
@@ -140,5 +159,8 @@ python3 tools/bench/audit_mini_swe_bench_substrate_coverage.py \
 - `meta_ai_review_deepseek_v4_pro.json`
 - `micro_tape_audit/micro_tape_decision_dag.md`
 - `micro_tape_audit/micro_tape_decision_dag.dot`
+- `micro_tape_audit/micro_tape_decision_dag_audit.json`
 - `micro_tape_audit_all_attempts/micro_tape_decision_dag.md`
+- `micro_tape_audit_all_attempts/micro_tape_decision_dag.dot`
+- `micro_tape_audit_all_attempts/micro_tape_decision_dag_audit.json`
 - `micro_tape_audit_all_attempts/independent_agent_review_deepseek_v4_pro.json`

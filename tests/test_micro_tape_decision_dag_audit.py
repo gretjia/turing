@@ -20,36 +20,60 @@ def run(cmd, cwd):
     subprocess.run(cmd, cwd=cwd, check=True, text=True, capture_output=True)
 
 
-def commit_event(repo, event):
+def commit_event(repo, event, *, parent=None):
     (repo / "event").write_text(json.dumps(event, sort_keys=True) + "\n", encoding="utf-8")
     run(["git", "add", "event"], repo)
-    run(
-        [
-            "git",
-            "-c",
-            "user.name=Test",
-            "-c",
-            "user.email=test@example.com",
-            "commit",
-            "-m",
-            "turingos micro event",
-        ],
-        repo,
-    )
+    cmd = [
+        "git",
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.com",
+        "commit",
+        "-m",
+        "turingos micro event",
+    ]
+    if parent == "none":
+        tree = subprocess.check_output(["git", "write-tree"], cwd=repo, text=True).strip()
+        oid = subprocess.check_output(
+            [
+                "git",
+                "-c",
+                "user.name=Test",
+                "-c",
+                "user.email=test@example.com",
+                "commit-tree",
+                tree,
+                "-m",
+                "turingos micro event",
+            ],
+            cwd=repo,
+            text=True,
+        ).strip()
+        run(["git", "reset", "--hard", oid], repo)
+        return oid
+    run(cmd, repo)
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
 
 
-def event(seq, event_type, prev, accepted, payload, *, head_effect="PRESERVE", product="PASS"):
+def registry_row(event_type):
     auditor = load_auditor()
+    registry = auditor.load_event_registry()
+    return registry[event_type]
+
+
+def event(seq, event_type, prev, accepted, payload, *, head_effect=None, product="PASS"):
+    auditor = load_auditor()
+    row = registry_row(event_type)
     payload_hash = auditor.sha256_json(payload)
     return {
         "accepted_head_before": accepted,
         "authority_epoch": 0,
         "authorization_head_before": None,
         "content_digest": payload_hash,
-        "event_schema_id": event_type.lower() + ".v1",
+        "event_schema_id": row["payload_schema_id"],
         "event_type": event_type,
-        "head_effect": head_effect,
+        "head_effect": head_effect or row["head_effect"],
         "payload": payload,
         "payload_hash": payload_hash,
         "predicate_product": product,
@@ -61,104 +85,241 @@ def event(seq, event_type, prev, accepted, payload, *, head_effect="PRESERVE", p
     }
 
 
-def make_bundle(tmp_path):
-    repo = tmp_path / "repo"
-    bundle = tmp_path / "micro_tape.bundle"
+def make_bundle(tmp_path, specs, *, break_git_parent_at=None):
+    repo = tmp_path / f"repo_{len(list(tmp_path.iterdir()))}"
+    bundle = tmp_path / f"{repo.name}.bundle"
     run(["git", "init", "--object-format=sha256", str(repo)], tmp_path)
     accepted = None
+    authorization = None
     prev = None
-
-    genesis = event(
-        0,
-        "SystemConstitutionAccepted",
-        prev,
-        accepted,
-        {"constitution_digest": "sha256:" + "1" * 64},
-        head_effect="ADVANCE",
-    )
-    oid0 = commit_event(repo, genesis)
-    accepted = "mu:" + oid0
-    prev = "mu:" + oid0
-
-    capsule = event(
-        1,
-        "WorkCapsuleBuilt",
-        prev,
-        accepted,
-        {"capsule_id": "wc_test", "private_contract_hash": "sha256:" + "2" * 64},
-    )
-    oid1 = commit_event(repo, capsule)
-    prev = "mu:" + oid1
-
-    receipt = event(
-        2,
-        "WorkerReceiptImported",
-        prev,
-        accepted,
-        {"capsule_id": "wc_test", "receipt_id": "rcp_test", "patch_hash": "sha256:" + "3" * 64},
-    )
-    oid2 = commit_event(repo, receipt)
-    prev = "mu:" + oid2
-
-    macro = event(
-        3,
-        "MacroObservationImported",
-        prev,
-        accepted,
-        {"capsule_id": "wc_test", "macro_id": "macro:diff:test", "diff_hash": "sha256:" + "3" * 64},
-    )
-    oid3 = commit_event(repo, macro)
-    prev = "mu:" + oid3
-
-    evidence = event(
-        4,
-        "OfficialEvaluatorEvidenceImported",
-        prev,
-        accepted,
-        {
-            "capsule_id": "wc_test",
-            "evidence_id": "ev_official_test",
-            "macro_anchor_id": "macro:diff:test",
-            "result": "PASS",
-            "worker_receipt_id": "rcp_test",
-        },
-    )
-    oid4 = commit_event(repo, evidence)
-    prev = "mu:" + oid4
-
-    accept = event(
-        5,
-        "CandidateAccepted",
-        prev,
-        accepted,
-        {
-            "candidate_id": "cand_test",
-            "capsule_id": "wc_test",
-            "macro_anchor_id": "macro:diff:test",
-            "official_evaluator_evidence_id": "ev_official_test",
-            "worker_receipt_id": "rcp_test",
-        },
-        head_effect="ADVANCE",
-    )
-    oid5 = commit_event(repo, accept)
-    run(["git", "update-ref", "refs/turingos/tape_tip", oid5], repo)
-    run(["git", "update-ref", "refs/turingos/accepted_head", oid5], repo)
+    last_oid = None
+    for seq, spec in enumerate(specs):
+        item = event(
+            seq,
+            spec["event_type"],
+            prev,
+            accepted,
+            spec.get("payload", {}),
+            head_effect=spec.get("head_effect"),
+            product=spec.get("product", "PASS"),
+        )
+        parent_mode = "none" if break_git_parent_at == seq else None
+        oid = commit_event(repo, item, parent=parent_mode)
+        event_id = "mu:" + oid
+        row = registry_row(spec["event_type"])
+        if row["event_class"] == "SOVEREIGN_ACCEPT" and item["predicate_product"] == "PASS":
+            accepted = event_id
+        if row["event_class"] == "AUTHORIZATION" and item["predicate_product"] == "PASS":
+            authorization = event_id
+        prev = event_id
+        last_oid = oid
+    assert last_oid is not None
+    run(["git", "update-ref", "refs/turingos/tape_tip", last_oid], repo)
+    if accepted:
+        run(["git", "update-ref", "refs/turingos/accepted_head", accepted.removeprefix("mu:")], repo)
+    if authorization:
+        run(["git", "update-ref", "refs/turingos/authorization_head", authorization.removeprefix("mu:")], repo)
     run(["git", "bundle", "create", str(bundle), "--all"], repo)
     return bundle
 
 
+def accepted_specs():
+    return [
+        {
+            "event_type": "SystemConstitutionAccepted",
+            "payload": {"constitution_digest": "sha256:" + "1" * 64},
+        },
+        {
+            "event_type": "WorkCapsuleBuilt",
+            "payload": {"capsule_id": "wc_test", "private_contract_hash": "sha256:" + "2" * 64},
+        },
+        {
+            "event_type": "WorkerReceiptImported",
+            "payload": {"capsule_id": "wc_test", "receipt_id": "rcp_test", "patch_hash": "sha256:" + "3" * 64},
+        },
+        {
+            "event_type": "MacroObservationImported",
+            "payload": {"capsule_id": "wc_test", "macro_id": "macro:diff:test", "diff_hash": "sha256:" + "3" * 64},
+        },
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "payload": {
+                "capsule_id": "wc_test",
+                "evidence_id": "ev_official_test",
+                "macro_anchor_id": "macro:diff:test",
+                "result": "PASS",
+                "worker_receipt_id": "rcp_test",
+            },
+        },
+        {
+            "event_type": "CandidateAccepted",
+            "payload": {
+                "candidate_id": "cand_test",
+                "capsule_id": "wc_test",
+                "macro_anchor_id": "macro:diff:test",
+                "official_evaluator_evidence_id": "ev_official_test",
+                "worker_receipt_id": "rcp_test",
+            },
+        },
+    ]
+
+
 def test_micro_tape_auditor_replays_bundle_and_builds_reference_dag(tmp_path):
     auditor = load_auditor()
-    bundle = make_bundle(tmp_path)
+    bundle = make_bundle(tmp_path, accepted_specs())
 
     report = auditor.audit_bundles([bundle], tmp_path / "work")
 
-    assert report["verdict"] == "PASS"
+    assert report["verdict"] == "PARTIAL"
+    assert report["status_summary"]["replay_structural_integrity"] == "PASS"
+    assert report["status_summary"]["constitutional_protocol_audit"] == "PARTIAL"
     assert report["aggregate"]["bundle_count"] == 1
     assert report["aggregate"]["event_count"] == 6
     run_report = report["runs"][0]
     assert run_report["replay_valid"] is True
+    assert run_report["path_class"] == "accepted_path"
     assert run_report["derived_refs"]["accepted_head"] == run_report["actual_refs"]["accepted_head"]
     assert run_report["event_counts"]["CandidateAccepted"] == 1
     assert any(edge["kind"] == "official_evidence_to_accept" for edge in run_report["dag_edges"])
     assert any(step["event_type"] == "CandidateAccepted" for step in run_report["golden_path"])
+
+
+def test_registry_authorization_moves_authorization_head_not_accepted_head(tmp_path):
+    auditor = load_auditor()
+    bundle = make_bundle(
+        tmp_path,
+        [
+            {
+                "event_type": "SystemConstitutionAccepted",
+                "payload": {"constitution_digest": "sha256:" + "1" * 64},
+            },
+            {
+                "event_type": "AtomAuthorized",
+                "payload": {"atom_id": "atom:test", "approval_id": "approval:test"},
+            },
+        ],
+    )
+
+    run_report = auditor.audit_bundles([bundle], tmp_path / "work")["runs"][0]
+
+    assert run_report["checks"]["registry_head_effect"] == "PASS"
+    assert run_report["checks"]["authorization_head"] == "PASS"
+    assert run_report["derived_refs"]["authorization_head"] == run_report["actual_refs"]["authorization_head"]
+    assert run_report["derived_refs"]["accepted_head"] == run_report["events"][0]["event_id"]
+
+
+def test_head_effect_disagreement_fails_closed_registry(tmp_path):
+    auditor = load_auditor()
+    specs = accepted_specs()
+    specs[-1] = {**specs[-1], "head_effect": "PRESERVE"}
+    bundle = make_bundle(tmp_path, specs)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work")
+
+    assert report["verdict"] == "FAIL"
+    assert report["runs"][0]["checks"]["registry_head_effect"] == "FAIL"
+    assert any("head_effect PRESERVE != registry ADVANCE" in p for p in report["runs"][0]["replay_problems"])
+
+
+def test_official_fail_is_failed_path_not_golden_path_and_pput_zero_is_valid(tmp_path):
+    auditor = load_auditor()
+    bundle = make_bundle(
+        tmp_path,
+        [
+            {
+                "event_type": "SystemConstitutionAccepted",
+                "payload": {"constitution_digest": "sha256:" + "1" * 64},
+            },
+            {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "wc_fail"}},
+            {
+                "event_type": "PPUTAccounted",
+                "payload": {"capsule_id": "wc_fail", "progress": 0, "vpput_raw": "0"},
+            },
+            {
+                "event_type": "OfficialEvaluatorEvidenceImported",
+                "payload": {"capsule_id": "wc_fail", "evidence_id": "ev_fail", "result": "FAIL"},
+            },
+            {
+                "event_type": "FailureNode",
+                "payload": {"capsule_id": "wc_fail", "failure_class": "OFFICIAL_EVAL_FAIL"},
+            },
+        ],
+    )
+
+    run_report = auditor.audit_bundles([bundle], tmp_path / "work")["runs"][0]
+
+    assert run_report["path_class"] == "failed_path"
+    assert run_report["golden_path"] == []
+    assert run_report["checks"]["economic_timing"] == "PASS"
+    assert not any(f["finding"] == "failed_run_has_nonzero_pput_progress" for f in run_report["execution_findings"])
+
+
+def test_market_and_pput_timing_downgrade_overall_to_partial(tmp_path):
+    auditor = load_auditor()
+    specs = [
+        {
+            "event_type": "SystemConstitutionAccepted",
+            "payload": {"constitution_digest": "sha256:" + "1" * 64},
+        },
+        {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "wc_timing"}},
+        {"event_type": "MarketCreated", "payload": {"market_id": "mkt_timing", "capsule_id": "wc_timing"}},
+        {"event_type": "MarketSettled", "payload": {"market_id": "mkt_timing", "result": "NO"}},
+        {"event_type": "RewardDistributed", "payload": {"market_id": "mkt_timing", "agent_id": "agent:test"}},
+        {"event_type": "CostEvent", "payload": {"capsule_id": "wc_timing", "total_tokens": 1, "wall_time_ms": 1}},
+        {"event_type": "PPUTAccounted", "payload": {"capsule_id": "wc_timing", "progress": 0, "vpput_raw": "0"}},
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "payload": {"capsule_id": "wc_timing", "evidence_id": "ev_timing", "result": "PASS"},
+        },
+        {
+            "event_type": "CandidateAccepted",
+            "payload": {
+                "candidate_id": "cand_timing",
+                "capsule_id": "wc_timing",
+                "official_evaluator_evidence_id": "ev_timing",
+            },
+        },
+    ]
+    bundle = make_bundle(tmp_path, specs)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work")
+
+    assert report["verdict"] == "PARTIAL"
+    assert report["status_summary"]["market_accounting_correctness"] == "WARN"
+    assert report["status_summary"]["economic_timing"] == "WARN"
+    findings = {item["finding"] for item in report["runs"][0]["execution_findings"]}
+    assert "market_settled_before_terminal_evidence" in findings
+    assert "pput_final_accounting_missing_after_accept" in findings
+
+
+def test_repeated_event_types_are_rendered_as_distinct_dag_nodes(tmp_path):
+    auditor = load_auditor()
+    specs = accepted_specs()
+    specs.insert(
+        4,
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "payload": {"capsule_id": "wc_test", "evidence_id": "ev_failed_first", "result": "FAIL"},
+        },
+    )
+    bundle = make_bundle(tmp_path, specs)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work")
+    run_report = report["runs"][0]
+
+    official_nodes = [event for event in run_report["events"] if event["event_type"] == "OfficialEvaluatorEvidenceImported"]
+    assert len(official_nodes) == 2
+    assert len({event["node_id"] for event in official_nodes}) == 2
+    markdown_lines = auditor.render_tree_for_run(run_report)
+    assert sum("OfficialEvaluatorEvidenceImported" in line for line in markdown_lines) == 2
+
+
+def test_git_parent_mismatch_fails_even_if_payload_prev_claims_ok(tmp_path):
+    auditor = load_auditor()
+    bundle = make_bundle(tmp_path, accepted_specs(), break_git_parent_at=2)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work")
+
+    assert report["verdict"] == "FAIL"
+    assert report["runs"][0]["checks"]["git_topology"] == "FAIL"
+    assert any("commit parent count" in p or "commit parent" in p for p in report["runs"][0]["replay_problems"])
