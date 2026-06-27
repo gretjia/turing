@@ -161,6 +161,204 @@ pub mod workers {
     impl std::error::Error for WorkerProfileError {}
 }
 
+pub mod capability {
+    use std::path::{Component, Path};
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct CapabilityGrant {
+        pub grant_id: String,
+        pub capsule_id: String,
+        pub agent_id: String,
+        pub market_id: Option<String>,
+        pub budget: Budget,
+        pub scope: CapabilityScope,
+        pub risk: Risk,
+        pub authorization_event: Option<String>,
+        pub signature_route: SignatureRoute,
+    }
+
+    impl CapabilityGrant {
+        pub fn authorize(&self, request: &ToolRequest) -> Result<(), GrantError> {
+            if !self.scope.allowed_tools.contains(&request.tool) {
+                return Err(GrantError::ToolDenied(request.tool.clone()));
+            }
+
+            if let Some(path) = request.path.as_deref() {
+                validate_relative_path(path)?;
+                if self
+                    .scope
+                    .forbidden_paths
+                    .iter()
+                    .any(|forbidden| path_is_within(path, forbidden))
+                {
+                    return Err(GrantError::ForbiddenPath(path.to_string()));
+                }
+                if !self
+                    .scope
+                    .allowed_paths
+                    .iter()
+                    .any(|allowed| path_is_within(path, allowed))
+                {
+                    return Err(GrantError::PathOutsideScope(path.to_string()));
+                }
+            }
+
+            if request.requested_tool_call_index > self.budget.max_tool_calls {
+                return Err(GrantError::ToolCallBudgetExceeded {
+                    requested: request.requested_tool_call_index,
+                    max: self.budget.max_tool_calls,
+                });
+            }
+            if request.mutated_files_after > self.budget.max_mutated_files {
+                return Err(GrantError::MutatedFileBudgetExceeded {
+                    requested: request.mutated_files_after,
+                    max: self.budget.max_mutated_files,
+                });
+            }
+            if request.needs_network && self.scope.network == NetworkScope::Denied {
+                return Err(GrantError::NetworkDenied);
+            }
+            if request.action == ActionClass::IrreversibleMacro
+                && (self.authorization_event.is_none()
+                    || self.signature_route == SignatureRoute::None)
+            {
+                return Err(GrantError::IrreversibleActionNeedsAuthorization);
+            }
+
+            Ok(())
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Budget {
+        pub max_tokens: u64,
+        pub max_wall_time_ms: u64,
+        pub max_tool_calls: u64,
+        pub max_mutated_files: u64,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct CapabilityScope {
+        pub allowed_paths: Vec<String>,
+        pub forbidden_paths: Vec<String>,
+        pub allowed_tools: Vec<String>,
+        pub network: NetworkScope,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum NetworkScope {
+        Denied,
+        Allowlist,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum RiskClass {
+        P0,
+        P1,
+        P2,
+        P3,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct Risk {
+        pub risk_class: RiskClass,
+        pub human_before_dispatch: bool,
+        pub human_before_accept: bool,
+        pub human_before_merge: bool,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum SignatureRoute {
+        None,
+        OsKeyring,
+        HardwareFuture,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum ActionClass {
+        FileRead,
+        FileWrite,
+        Command,
+        IrreversibleMacro,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct ToolRequest {
+        pub tool: String,
+        pub path: Option<String>,
+        pub action: ActionClass,
+        pub mutates: bool,
+        pub requested_tool_call_index: u64,
+        pub mutated_files_after: u64,
+        pub needs_network: bool,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum GrantError {
+        ToolDenied(String),
+        PathTraversal(String),
+        ForbiddenPath(String),
+        PathOutsideScope(String),
+        ToolCallBudgetExceeded { requested: u64, max: u64 },
+        MutatedFileBudgetExceeded { requested: u64, max: u64 },
+        NetworkDenied,
+        IrreversibleActionNeedsAuthorization,
+    }
+
+    impl std::fmt::Display for GrantError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                GrantError::ToolDenied(tool) => write!(f, "tool {tool:?} is outside grant scope"),
+                GrantError::PathTraversal(path) => {
+                    write!(f, "path {path:?} escapes the worktree")
+                }
+                GrantError::ForbiddenPath(path) => write!(f, "path {path:?} is forbidden"),
+                GrantError::PathOutsideScope(path) => {
+                    write!(f, "path {path:?} is outside allowed scope")
+                }
+                GrantError::ToolCallBudgetExceeded { requested, max } => {
+                    write!(
+                        f,
+                        "tool call budget exceeded: requested {requested}, max {max}"
+                    )
+                }
+                GrantError::MutatedFileBudgetExceeded { requested, max } => write!(
+                    f,
+                    "mutated file budget exceeded: requested {requested}, max {max}"
+                ),
+                GrantError::NetworkDenied => write!(f, "network access denied by grant"),
+                GrantError::IrreversibleActionNeedsAuthorization => {
+                    write!(
+                        f,
+                        "irreversible macro action requires authorization and signature"
+                    )
+                }
+            }
+        }
+    }
+
+    impl std::error::Error for GrantError {}
+
+    fn validate_relative_path(path: &str) -> Result<(), GrantError> {
+        let parsed = Path::new(path);
+        for component in parsed.components() {
+            match component {
+                Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                    return Err(GrantError::PathTraversal(path.to_string()));
+                }
+                Component::CurDir | Component::Normal(_) => {}
+            }
+        }
+        Ok(())
+    }
+
+    fn path_is_within(path: &str, root: &str) -> bool {
+        let path = Path::new(path);
+        let root = Path::new(root);
+        path == root || path.starts_with(root)
+    }
+}
+
 use serde_json::json;
 use turing_contracts::jcs;
 use workers::{
