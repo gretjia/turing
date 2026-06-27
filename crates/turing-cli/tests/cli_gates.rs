@@ -110,6 +110,81 @@ fn approval_preview_renders_human_card_without_writing_truth() {
 }
 
 #[test]
+fn approval_sign_emits_os_keyring_signature_without_writing_truth() {
+    let output = turing()
+        .args([
+            "approval",
+            "sign",
+            "--key-id",
+            "operator-local-key",
+            "--approval-id",
+            "ap_cli_sign",
+            "--authority-epoch",
+            "7",
+            "--action",
+            "capsule_approve",
+            "--subject",
+            "wc_cli",
+            "--risk",
+            "P2",
+            "--evidence-digest",
+            "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "--signature-route",
+            "os-keyring",
+        ])
+        .output()
+        .expect("run approval sign");
+
+    assert!(output.status.success(), "sign failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("approval signature:"));
+    assert!(stdout.contains("approval_id=ap_cli_sign"));
+    assert!(stdout.contains("key_id=operator-local-key"));
+    assert!(stdout.contains("signature_route=OsKeyring"));
+    assert!(stdout.contains("signed_payload_hash=sha256:"));
+    assert!(stdout.contains("signature=sha256:"));
+    assert!(stdout.contains("writes_micro_truth=false"));
+    assert!(!stdout.contains("plaintext"));
+    assert!(!stdout.contains("credential"));
+}
+
+#[test]
+fn approval_sign_hardware_future_fails_closed_without_signature() {
+    let output = turing()
+        .args([
+            "approval",
+            "sign",
+            "--key-id",
+            "future-hsm-slot-0",
+            "--approval-id",
+            "ap_cli_hardware",
+            "--authority-epoch",
+            "7",
+            "--action",
+            "capsule_approve",
+            "--subject",
+            "wc_cli",
+            "--risk",
+            "P2",
+            "--evidence-digest",
+            "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "--signature-route",
+            "hardware-future",
+        ])
+        .output()
+        .expect("run hardware approval sign");
+
+    assert!(!output.status.success(), "hardware sign should fail closed");
+    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+    assert!(stderr.contains("hardware signing backend"));
+    assert!(stderr.contains("reserved"));
+    assert!(stderr.contains("unavailable"));
+    assert!(!stderr.contains("signature=sha256:"));
+    assert!(!stderr.contains("plaintext"));
+    assert!(!stderr.contains("credential"));
+}
+
+#[test]
 fn handoff_generate_writes_real_projection_hashes() {
     let dir = tempfile::tempdir().expect("temp dir");
     let output_path = dir.path().join("handoff.md");
@@ -142,6 +217,8 @@ fn handoff_generate_writes_real_projection_hashes() {
         "cargo test --workspace",
         "scripts/install-local.sh",
         "turing approval preview",
+        "turing approval sign",
+        "hardware-future route fails closed",
         "scope/budget/provenance/replay",
         "turing replay --verify",
         "Known Risks",

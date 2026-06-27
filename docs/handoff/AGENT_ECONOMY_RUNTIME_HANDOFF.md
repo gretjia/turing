@@ -23,6 +23,7 @@ bash demo/demo_agent_economy_e2e.sh
 bash demo/demo_rescue_agent_economy.sh
 scripts/install-local.sh --prefix /tmp/turingos-local --profile debug
 turing approval preview --approval-id ap_preview --authority-epoch 1 --action capsule_approve --subject wc_latest --risk P2 --evidence-digest sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --signature-route none
+turing approval sign --key-id operator-local-key --approval-id ap_sign --authority-epoch 1 --action capsule_approve --subject wc_latest --risk P2 --evidence-digest sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --signature-route os-keyring
 turing replay --verify
 turing market replay --verify
 turing pput replay --verify
@@ -45,8 +46,8 @@ turingd --serve --socket /tmp/turingd.sock
   reads, goal submission, capsule dispatch approval/rejection, preserve-only append,
   predicate-routed candidate verify/write with an expanded CandidateAccepted predicate pack
   covering capsule/macro/worker/scope/budget/provenance/replay, minimal OS-keyring atom
-  authorization, read-only ApprovalCard preview UX, and read-only persistent project status.
-  Hardware signing UX remains pending.
+  authorization, read-only ApprovalCard preview/sign UX, and read-only persistent project status.
+  hardware-future route fails closed until a real hardware backend is wired.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, disposable projection building, and read-only project

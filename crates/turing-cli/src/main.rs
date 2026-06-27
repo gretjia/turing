@@ -3,7 +3,8 @@ use std::process::ExitCode;
 
 use serde_json::json;
 use turing_approval::{
-    APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, DisplayCopy, SignatureRoute,
+    APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, DisplayCopy, HardwareSigningBackend,
+    OsKeyringSigningBackend, SignatureRoute, SigningBackend,
 };
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
@@ -103,8 +104,37 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             evidence_digest,
             signature_route,
         ),
+        [
+            "approval",
+            "sign",
+            "--key-id",
+            key_id,
+            "--approval-id",
+            approval_id,
+            "--authority-epoch",
+            authority_epoch,
+            "--action",
+            action,
+            "--subject",
+            subject,
+            "--risk",
+            risk,
+            "--evidence-digest",
+            evidence_digest,
+            "--signature-route",
+            signature_route,
+        ] => approval_sign(
+            key_id,
+            approval_id,
+            authority_epoch,
+            action,
+            subject,
+            risk,
+            evidence_digest,
+            signature_route,
+        ),
         _ => Err(format!(
-            "unknown turing command: {:?}. supported: boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
+            "unknown turing command: {:?}. supported: boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
             args
         )),
     }
@@ -119,11 +149,83 @@ fn approval_preview(
     evidence_digest: &str,
     signature_route: &str,
 ) -> Result<String, String> {
+    let card = build_approval_card(
+        approval_id,
+        authority_epoch,
+        action,
+        subject,
+        risk,
+        evidence_digest,
+        signature_route,
+    )?;
+    let surfaces = card
+        .byte_surfaces()
+        .map_err(|error| format!("invalid approval card: {error}"))?;
+    Ok(format!(
+        "approval preview: approval_id={} action={} subject={} risk={} authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
+        approval_id,
+        action,
+        subject,
+        risk,
+        card.payload().authority_epoch,
+        card.payload().signature_route,
+        surfaces.visible_card_hash,
+        surfaces.visible_card_hash,
+    ))
+}
+
+fn approval_sign(
+    key_id: &str,
+    approval_id: &str,
+    authority_epoch: &str,
+    action: &str,
+    subject: &str,
+    risk: &str,
+    evidence_digest: &str,
+    signature_route: &str,
+) -> Result<String, String> {
+    let card = build_approval_card(
+        approval_id,
+        authority_epoch,
+        action,
+        subject,
+        risk,
+        evidence_digest,
+        signature_route,
+    )?;
+    let signature = match card.payload().signature_route {
+        SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id).sign(&card),
+        SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id).sign(&card),
+        SignatureRoute::None => {
+            return Err("approval sign requires a signing route, got none".to_string());
+        }
+    }
+    .map_err(|error| format!("approval signing failed: {error}"))?;
+    Ok(format!(
+        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} signed_payload_hash={} signature={} writes_micro_truth=false",
+        approval_id,
+        signature.key_id,
+        signature.authority_epoch,
+        signature.signature_route,
+        signature.signed_payload_hash,
+        signature.signature,
+    ))
+}
+
+fn build_approval_card(
+    approval_id: &str,
+    authority_epoch: &str,
+    action: &str,
+    subject: &str,
+    risk: &str,
+    evidence_digest: &str,
+    signature_route: &str,
+) -> Result<ApprovalCard, String> {
     let authority_epoch = authority_epoch
         .parse::<u64>()
         .map_err(|error| format!("invalid authority epoch {authority_epoch:?}: {error}"))?;
     let signature_route = parse_signature_route(signature_route)?;
-    let card = ApprovalCard::new(
+    Ok(ApprovalCard::new(
         ApprovalPayload {
             schema_id: APPROVAL_PAYLOAD_SCHEMA_ID.to_string(),
             approval_id: approval_id.to_string(),
@@ -138,20 +240,6 @@ fn approval_preview(
             title_zh: "主权授权预览".to_string(),
             body_en: "Review this approval card before signing or dispatch.".to_string(),
         },
-    );
-    let surfaces = card
-        .byte_surfaces()
-        .map_err(|error| format!("invalid approval card: {error}"))?;
-    Ok(format!(
-        "approval preview: approval_id={} action={} subject={} risk={} authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
-        approval_id,
-        action,
-        subject,
-        risk,
-        authority_epoch,
-        signature_route,
-        surfaces.visible_card_hash,
-        surfaces.visible_card_hash,
     ))
 }
 
@@ -223,6 +311,7 @@ bash demo/demo_agent_economy_e2e.sh
 bash demo/demo_rescue_agent_economy.sh
 scripts/install-local.sh --prefix /tmp/turingos-local --profile debug
 turing approval preview --approval-id ap_preview --authority-epoch 1 --action capsule_approve --subject wc_latest --risk P2 --evidence-digest sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --signature-route none
+turing approval sign --key-id operator-local-key --approval-id ap_sign --authority-epoch 1 --action capsule_approve --subject wc_latest --risk P2 --evidence-digest sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --signature-route os-keyring
 turing replay --verify
 turing market replay --verify
 turing pput replay --verify
@@ -244,8 +333,8 @@ turing-mcp --check
   reads, goal submission, capsule dispatch approval/rejection, preserve-only append,
   predicate-routed candidate verify/write with an expanded CandidateAccepted predicate pack
   covering capsule/macro/worker/scope/budget/provenance/replay, minimal OS-keyring atom
-  authorization, read-only ApprovalCard preview UX, and read-only persistent project status.
-  Hardware signing UX remains pending.
+  authorization, read-only ApprovalCard preview/sign UX, and read-only persistent project status.
+  hardware-future route fails closed until a real hardware backend is wired.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, disposable projection building, and read-only project
