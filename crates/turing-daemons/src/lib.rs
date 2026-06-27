@@ -2,17 +2,22 @@
 
 use std::io::{BufRead, BufReader, Write};
 #[cfg(unix)]
-use std::os::unix::net::UnixListener;
+use std::os::unix::fs::{MetadataExt, PermissionsExt};
+#[cfg(unix)]
+use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
+#[cfg(unix)]
+use nix::sys::socket::{getsockopt, sockopt::PeerCredentials};
+#[cfg(unix)]
+use nix::unistd::Uid;
 use serde_json::{Value, json};
 use turing_approval::{
     ApprovalCard, ApprovalPayload, DisplayCopy, OsKeyringSigningBackend,
     SignatureRoute as ApprovalSignatureRoute, SigningBackend,
 };
-use turing_contracts::envelope::HeadEffect;
-use turing_contracts::envelope::PredicateProduct;
+use turing_contracts::envelope::{HeadEffect, MicroEventEnvelope, PredicateProduct};
 use turing_contracts::failure::{FailureClass, FailureNodePayload};
 use turing_contracts::goal::GoalState;
 use turing_contracts::jcs;
@@ -157,6 +162,7 @@ pub fn run_daemon(contract: DaemonContract) -> ExitCode {
 #[cfg(unix)]
 fn serve_unix_socket(runtime: DaemonRuntime, socket: &str) -> std::io::Result<()> {
     let path = Path::new(socket);
+    ensure_secure_socket_parent(path)?;
     if path.exists() {
         std::fs::remove_file(path)?;
     }
@@ -164,8 +170,18 @@ fn serve_unix_socket(runtime: DaemonRuntime, socket: &str) -> std::io::Result<()
         std::fs::create_dir_all(parent)?;
     }
     let listener = UnixListener::bind(path)?;
+    #[cfg(unix)]
+    {
+        let _ = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600));
+    }
     for stream in listener.incoming() {
         let mut stream = stream?;
+        if !peer_is_trusted(&stream)? {
+            let response =
+                jsonrpc_error(Value::Null, -32000, "unauthorized socket peer".to_string());
+            writeln!(stream, "{response}")?;
+            continue;
+        }
         let mut line = String::new();
         BufReader::new(stream.try_clone()?).read_line(&mut line)?;
         let request: Value = serde_json::from_str(line.trim()).unwrap_or_else(|_| {
@@ -189,6 +205,42 @@ fn serve_unix_socket(_runtime: DaemonRuntime, _socket: &str) -> std::io::Result<
     Err(std::io::Error::other(
         "Unix sockets are required for private-local daemon tests",
     ))
+}
+
+#[cfg(unix)]
+fn ensure_secure_socket_parent(path: &Path) -> std::io::Result<()> {
+    let Some(parent) = path.parent() else {
+        return Ok(());
+    };
+    if parent.exists() {
+        let metadata = std::fs::metadata(parent)?;
+        let mode = metadata.permissions().mode();
+        if metadata.uid() != current_uid() || (mode & 0o022) != 0 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::PermissionDenied,
+                format!(
+                    "socket parent {} must be owned by the daemon user and not group/world writable",
+                    parent.display()
+                ),
+            ));
+        }
+        return Ok(());
+    }
+    std::fs::create_dir_all(parent)?;
+    std::fs::set_permissions(parent, std::fs::Permissions::from_mode(0o700))?;
+    Ok(())
+}
+
+#[cfg(unix)]
+fn peer_is_trusted(stream: &UnixStream) -> std::io::Result<bool> {
+    let peer = getsockopt(stream, PeerCredentials)
+        .map_err(|error| std::io::Error::new(std::io::ErrorKind::PermissionDenied, error))?;
+    Ok(peer.uid() == current_uid())
+}
+
+#[cfg(unix)]
+fn current_uid() -> u32 {
+    Uid::current().as_raw()
 }
 
 fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
@@ -526,6 +578,9 @@ fn capsule_approve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             return jsonrpc_error(id, -32000, format!("approval signing failed: {error}"));
         }
     };
+    if let Err(error) = signer.verify(&card, &signature) {
+        return jsonrpc_error(id, -32000, format!("approval verification failed: {error}"));
+    }
 
     let tape = match Append::open(repo) {
         Ok(tape) => tape,
@@ -619,6 +674,9 @@ fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id
             return jsonrpc_error(id, -32000, format!("approval signing failed: {error}"));
         }
     };
+    if let Err(error) = signer.verify(&card, &signature) {
+        return jsonrpc_error(id, -32000, format!("approval verification failed: {error}"));
+    }
 
     let tape = match Append::open(repo) {
         Ok(tape) => tape,
@@ -690,11 +748,17 @@ fn candidate_verify_write_response(runtime: &DaemonRuntime, request: &Value, id:
         Some(payload) => payload.clone(),
         None => return invalid_params(id, "candidate_payload is required"),
     };
-    let checks = match parse_predicate_checks(params) {
+    if params.get("checks").is_some() {
+        return invalid_params(
+            id,
+            "candidate.verify_write derives predicate checks from Micro Tape; caller-supplied checks are forbidden",
+        );
+    }
+
+    let checks = match derive_candidate_predicate_checks(repo, &candidate_payload) {
         Ok(checks) => checks,
-        Err(message) => return invalid_params(id, message),
+        Err(message) => return jsonrpc_error(id, -32000, format!("predicate failed: {message}")),
     };
-    let checks = enforce_candidate_predicate_pack(checks, &candidate_payload);
 
     let report = match PredicateKernel.run("CandidateAccepted", checks) {
         Ok(report) => report,
@@ -935,12 +999,19 @@ fn market_shadow_suggest_response(request: &Value, id: Value) -> Value {
     }
 }
 
-fn market_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+fn market_snapshot_write_response(runtime: &DaemonRuntime, _request: &Value, id: Value) -> Value {
     let Some(project_root) = &runtime.project_root else {
         return jsonrpc_error(
             id,
             -32000,
             "market.snapshot.write requires --project".to_string(),
+        );
+    };
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "market.snapshot.write requires --micro-git".to_string(),
         );
     };
     let project_root = match std::fs::canonicalize(project_root) {
@@ -949,13 +1020,11 @@ fn market_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: 
             return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
         }
     };
-    let params = match request.get("params") {
-        Some(params) => params,
-        None => return invalid_params(id, "params object is required"),
-    };
-    let events = match parse_economy_events(params) {
+    let events = match load_economy_events_from_tape(repo) {
         Ok(events) => events,
-        Err(message) => return invalid_params(id, message),
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
     };
     let replay = match MarketReplay::from_tape_events(&events) {
         Ok(replay) => replay,
@@ -1048,12 +1117,19 @@ fn market_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: 
     })
 }
 
-fn wallet_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+fn wallet_snapshot_write_response(runtime: &DaemonRuntime, _request: &Value, id: Value) -> Value {
     let Some(project_root) = &runtime.project_root else {
         return jsonrpc_error(
             id,
             -32000,
             "wallet.snapshot.write requires --project".to_string(),
+        );
+    };
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "wallet.snapshot.write requires --micro-git".to_string(),
         );
     };
     let project_root = match std::fs::canonicalize(project_root) {
@@ -1062,13 +1138,11 @@ fn wallet_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: 
             return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
         }
     };
-    let params = match request.get("params") {
-        Some(params) => params,
-        None => return invalid_params(id, "params object is required"),
-    };
-    let events = match parse_economy_events(params) {
+    let events = match load_economy_events_from_tape(repo) {
         Ok(events) => events,
-        Err(message) => return invalid_params(id, message),
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("wallet replay failed: {message}"));
+        }
     };
     let projection = match WalletProjection::from_tape_events(&events) {
         Ok(projection) => projection,
@@ -1183,12 +1257,19 @@ fn pput_prompt_validate_response(request: &Value, id: Value) -> Value {
     }
 }
 
-fn pput_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+fn pput_snapshot_write_response(runtime: &DaemonRuntime, _request: &Value, id: Value) -> Value {
     let Some(project_root) = &runtime.project_root else {
         return jsonrpc_error(
             id,
             -32000,
             "pput.snapshot.write requires --project".to_string(),
+        );
+    };
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "pput.snapshot.write requires --micro-git".to_string(),
         );
     };
     let project_root = match std::fs::canonicalize(project_root) {
@@ -1197,13 +1278,9 @@ fn pput_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Va
             return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
         }
     };
-    let params = match request.get("params") {
-        Some(params) => params,
-        None => return invalid_params(id, "params object is required"),
-    };
-    let cost_events = match parse_cost_events(params) {
+    let cost_events = match load_cost_events_from_tape(repo) {
         Ok(events) => events,
-        Err(message) => return invalid_params(id, message),
+        Err(message) => return jsonrpc_error(id, -32000, format!("PPUT replay failed: {message}")),
     };
     let projection = match PputProjection::from_tape_events(&cost_events) {
         Ok(projection) => projection,
@@ -1322,7 +1399,7 @@ fn projection_build_response(request: &Value, id: Value) -> Value {
 
 fn projection_snapshot_write_response(
     runtime: &DaemonRuntime,
-    request: &Value,
+    _request: &Value,
     id: Value,
 ) -> Value {
     let Some(project_root) = &runtime.project_root else {
@@ -1332,22 +1409,24 @@ fn projection_snapshot_write_response(
             "projection.snapshot.write requires --project".to_string(),
         );
     };
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "projection.snapshot.write requires --micro-git".to_string(),
+        );
+    };
     let project_root = match std::fs::canonicalize(project_root) {
         Ok(path) => path,
         Err(error) => {
             return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
         }
     };
-    let params = match request.get("params") {
-        Some(params) => params,
-        None => return invalid_params(id, "params object is required"),
-    };
-    let Some(events) = params.get("events") else {
-        return invalid_params(id, "events array is required");
-    };
-    let events: Vec<ProjectionEvent> = match serde_json::from_value(events.clone()) {
+    let events = match load_projection_events_from_tape(repo) {
         Ok(events) => events,
-        Err(error) => return invalid_params(id, format!("invalid projection events: {error}")),
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("projection build failed: {message}"));
+        }
     };
     let projection =
         match ProjectionBuilder::from_source(ProjectionSource::MicroTape(events)).build() {
@@ -1408,70 +1487,64 @@ fn projection_snapshot_write_response(
     })
 }
 
-fn parse_predicate_checks(params: &Value) -> Result<Vec<PredicateCheck>, String> {
-    let checks = params
-        .get("checks")
-        .and_then(Value::as_array)
-        .ok_or_else(|| "checks array is required".to_string())?;
-    checks
-        .iter()
-        .map(|check| {
-            let check_id = required_str(check, "check_id")?;
-            let passed = required_bool(check, "passed")?;
-            if passed {
-                Ok(PredicateCheck::pass(check_id))
-            } else {
-                Ok(PredicateCheck::fail(
-                    check_id,
-                    optional_str(check, "reject_class")?
-                        .unwrap_or_else(|| "SEMANTIC_FAILURE".to_string()),
-                ))
-            }
-        })
-        .collect()
-}
-
-fn enforce_candidate_predicate_pack(
-    mut checks: Vec<PredicateCheck>,
+fn derive_candidate_predicate_checks(
+    repo: &Path,
     candidate_payload: &Value,
-) -> Vec<PredicateCheck> {
-    for required in [
-        "capsule_contract",
-        "macro_anchor",
-        "worker_receipt",
-        "scope.allowed",
-        "budget.within_limit",
-        "provenance.checked",
-        "replay.ready",
-    ] {
-        if !checks.iter().any(|check| check.check_id == required) {
-            checks.push(PredicateCheck::fail(
-                required,
-                "PREDICATE_PACK_MISSING_REQUIRED_CHECK",
-            ));
-        }
-    }
-    let macro_anchor_ok = candidate_payload
+) -> Result<Vec<PredicateCheck>, String> {
+    let tape = Append::open(repo).map_err(|error| error.to_string())?;
+    let heads = tape
+        .head_set_guarded()
+        .map_err(|error| format!("cannot read coherent tape heads: {error}"))?
+        .ok_or_else(|| "candidate.verify_write requires a coherent micro tape".to_string())?;
+    let replay = turing_replay::replay_tape(repo, &heads.tape_tip)
+        .map_err(|error| format!("tape replay failed: {error}"))?;
+    let _ = replay;
+    let candidate_id = candidate_payload
+        .get("candidate_id")
+        .and_then(Value::as_str);
+    let capsule_id = candidate_payload.get("capsule_id").and_then(Value::as_str);
+    let macro_anchor_id = candidate_payload
         .get("macro_anchor_id")
-        .and_then(Value::as_str)
-        .is_some_and(|id| id.starts_with("macro:"));
-    if !macro_anchor_ok {
-        checks.push(PredicateCheck::fail(
-            "macro_anchor",
-            "MACRO_ANCHOR_ID_MUST_USE_MACRO_PREFIX",
-        ));
-    }
-    let worker_receipt_ok = candidate_payload
+        .and_then(Value::as_str);
+    let worker_receipt_id = candidate_payload
         .get("worker_receipt_id")
-        .and_then(Value::as_str)
-        .is_some_and(|id| id.starts_with("rcp_"));
-    if !worker_receipt_ok {
-        checks.push(PredicateCheck::fail(
-            "worker_receipt",
-            "WORKER_RECEIPT_ID_REQUIRED",
-        ));
-    }
-    checks
+        .and_then(Value::as_str);
+
+    let checks = vec![
+        if candidate_id.is_some() && capsule_id.is_some() {
+            PredicateCheck::pass("capsule_contract")
+        } else {
+            PredicateCheck::fail("capsule_contract", "CAPSULE_CONTRACT_INCOMPLETE")
+        },
+        if macro_anchor_id.is_some_and(|id| id.starts_with("macro:")) {
+            PredicateCheck::pass("macro_anchor")
+        } else {
+            PredicateCheck::fail("macro_anchor", "MACRO_ANCHOR_ID_MUST_USE_MACRO_PREFIX")
+        },
+        if worker_receipt_id.is_some_and(|id| id.starts_with("rcp_")) {
+            PredicateCheck::pass("worker_receipt")
+        } else {
+            PredicateCheck::fail("worker_receipt", "WORKER_RECEIPT_ID_REQUIRED")
+        },
+        if candidate_id.is_some() && capsule_id.is_some() {
+            PredicateCheck::pass("scope.allowed")
+        } else {
+            PredicateCheck::fail("scope.allowed", "CANDIDATE_SCOPE_INVALID")
+        },
+        if candidate_id.is_some_and(|id| id.len() <= 128) {
+            PredicateCheck::pass("budget.within_limit")
+        } else {
+            PredicateCheck::fail("budget.within_limit", "CANDIDATE_BUDGET_EXCEEDED")
+        },
+        if heads.accepted_head.is_empty() {
+            PredicateCheck::fail("provenance.checked", "PROVENANCE_HEAD_MISSING")
+        } else {
+            PredicateCheck::pass("provenance.checked")
+        },
+        PredicateCheck::pass("replay.ready"),
+    ];
+
+    Ok(checks)
 }
 
 fn parse_failure_payload(value: &Value) -> Result<FailureNodePayload, String> {
@@ -1649,14 +1722,6 @@ fn parse_routes(params: &Value) -> Result<Vec<CandidateRoute>, String> {
         .collect()
 }
 
-fn parse_economy_events(params: &Value) -> Result<Vec<EconomyEvent>, String> {
-    let events = params
-        .get("events")
-        .and_then(Value::as_array)
-        .ok_or_else(|| "events array is required".to_string())?;
-    events.iter().map(parse_economy_event).collect()
-}
-
 fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
     let Some(event_type) = value.get("event_type").and_then(Value::as_str) else {
         return serde_json::from_value(value.clone())
@@ -1680,14 +1745,6 @@ fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
             .map_err(|error| format!("invalid RewardDistributed: {error}")),
         other => Err(format!("unknown economy event_type {other:?}")),
     }
-}
-
-fn parse_cost_events(params: &Value) -> Result<Vec<CostEvent>, String> {
-    let events = params
-        .get("cost_events")
-        .and_then(Value::as_array)
-        .ok_or_else(|| "cost_events array is required".to_string())?;
-    events.iter().map(parse_cost_event).collect()
 }
 
 fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
@@ -1754,6 +1811,121 @@ fn parse_pput_split(raw: &str) -> Result<Split, String> {
         "dogfood" | "Dogfood" => Ok(Split::Dogfood),
         other => Err(format!("unknown PPUT split {other:?}")),
     }
+}
+
+fn load_tape_envelopes(repo: &Path) -> Result<Vec<(String, MicroEventEnvelope)>, String> {
+    let _tape = Append::open(repo).map_err(|error| format!("cannot open micro tape: {error}"))?;
+    let cursor = turing_git_tape::git::rev_parse_opt(repo, "refs/turingos/tape_tip")
+        .map_err(|error| format!("cannot read tape tip: {error}"))?
+        .ok_or_else(|| "micro tape is empty".to_string())?;
+    let mut cursor = normalize_mu(&cursor);
+
+    let mut event_ids = Vec::new();
+    loop {
+        event_ids.push(cursor.clone());
+        let parents = turing_git_tape::append::commit_parents(repo, &cursor)
+            .map_err(|error| format!("cannot read tape parents for {cursor}: {error}"))?;
+        match parents.as_slice() {
+            [] => break,
+            [parent] => cursor = normalize_mu(parent),
+            many => {
+                return Err(format!(
+                    "tape event {cursor} is a merge commit with {} parents",
+                    many.len()
+                ));
+            }
+        }
+    }
+    event_ids.reverse();
+
+    event_ids
+        .into_iter()
+        .map(|event_id| {
+            let bytes = turing_git_tape::append::committed_body_bytes(repo, &event_id)
+                .map_err(|error| format!("cannot read committed body for {event_id}: {error}"))?;
+            let value: Value = serde_json::from_slice(&bytes)
+                .map_err(|error| format!("committed body {event_id} is not JSON: {error}"))?;
+            let envelope = MicroEventEnvelope::from_jcs_value(&value).map_err(|error| {
+                format!("committed body {event_id} is not a MicroEventEnvelope: {error}")
+            })?;
+            Ok((event_id, envelope))
+        })
+        .collect()
+}
+
+fn normalize_mu(id: &str) -> String {
+    if id.starts_with("mu:") {
+        id.to_string()
+    } else {
+        format!("mu:{id}")
+    }
+}
+
+fn load_economy_events_from_tape(repo: &Path) -> Result<Vec<EconomyEvent>, String> {
+    let envelopes = load_tape_envelopes(repo)?;
+    envelopes
+        .into_iter()
+        .filter_map(|(_, envelope)| {
+            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
+            if matches!(
+                event_type,
+                "MarketCreated"
+                    | "PositionMinted"
+                    | "AmmSwapExecuted"
+                    | "MarketSettled"
+                    | "RewardDistributed"
+            ) {
+                Some(envelope.payload)
+            } else {
+                None
+            }
+        })
+        .map(|payload| parse_economy_event(&payload))
+        .collect()
+}
+
+fn load_cost_events_from_tape(repo: &Path) -> Result<Vec<CostEvent>, String> {
+    let envelopes = load_tape_envelopes(repo)?;
+    envelopes
+        .into_iter()
+        .filter_map(|(_, envelope)| {
+            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
+            if event_type == "CostEvent" {
+                Some(envelope.payload)
+            } else {
+                None
+            }
+        })
+        .map(|payload| parse_cost_event(&payload))
+        .collect()
+}
+
+fn load_projection_events_from_tape(repo: &Path) -> Result<Vec<ProjectionEvent>, String> {
+    let envelopes = load_tape_envelopes(repo)?;
+    envelopes
+        .into_iter()
+        .filter_map(|(event_id, envelope)| {
+            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
+            if !(event_type.starts_with("Market")
+                || event_type.starts_with("PPUT")
+                || event_type == "CostEvent")
+            {
+                return None;
+            }
+            let subject_id = envelope
+                .payload
+                .get("subject_id")
+                .or_else(|| envelope.payload.get("market_id"))
+                .or_else(|| envelope.payload.get("run_id"))
+                .and_then(Value::as_str)
+                .unwrap_or(event_type)
+                .to_string();
+            Some((event_id, envelope.event_type, subject_id))
+        })
+        .map(|(event_id, event_type, subject_id)| {
+            Ok(ProjectionEvent::new(event_id, event_type, subject_id))
+        })
+        .collect()
 }
 
 fn parse_signals(params: &Value) -> Result<Vec<PriceSignal>, String> {

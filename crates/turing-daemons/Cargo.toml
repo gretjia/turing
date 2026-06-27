@@ -30,12 +30,14 @@ name = "turing-viewd"
 path = "src/bin/turing-viewd.rs"
 
 [dependencies]
+nix = { version = "=0.30.1", features = ["socket", "user"] }
 serde_json = { version = "=1.0.150", features = ["preserve_order"] }
 turing-approval = { path = "../turing-approval" }
 turing-contracts = { path = "../turing-contracts" }
 turing-economy = { path = "../turing-economy" }
 turing-execd = { path = "../turing-execd" }
 turing-git-tape = { path = "../turing-git-tape" }
+turing-replay = { path = "../turing-replay" }
 turing-predicate = { path = "../turing-predicate" }
 turing-pput = { path = "../turing-pput" }
 turing-projection = { path = "../turing-projection" }

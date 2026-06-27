@@ -175,8 +175,7 @@ fn canonical_codec_acceptance_profile_rejects_forbidden_values() {
     let canonical = jcs::canonicalize(&value).expect("canonical bytes");
 
     assert_eq!(
-        canonical,
-        br#"{"a":1,"nested":{"b":2},"z":"local"}"#,
+        canonical, br#"{"a":1,"nested":{"b":2},"z":"local"}"#,
         "canonical bytes must be deterministic and key-sorted"
     );
     assert!(
@@ -210,8 +209,8 @@ fn canonical_codec_acceptance_profile_rejects_forbidden_values() {
 #[test]
 fn ascii_key_linter_rejects_keys_but_allows_localized_values() {
     let localized_value = r#"{"human_summary":"中文说明","schema_id":"demo.v1"}"#;
-    let parsed = jcs::parse_strict(localized_value)
-        .expect("non-ASCII human-facing values are allowed");
+    let parsed =
+        jcs::parse_strict(localized_value).expect("non-ASCII human-facing values are allowed");
     let canonical = String::from_utf8(jcs::canonicalize(&parsed).expect("canonical bytes"))
         .expect("canonical JSON remains UTF-8");
     assert!(

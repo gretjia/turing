@@ -142,7 +142,7 @@ fn approval_sign_emits_os_keyring_signature_without_writing_truth() {
     assert!(stdout.contains("key_id=operator-local-key"));
     assert!(stdout.contains("signature_route=OsKeyring"));
     assert!(stdout.contains("signed_payload_hash=sha256:"));
-    assert!(stdout.contains("signature=sha256:"));
+    assert!(stdout.contains("signature=ed25519:"));
     assert!(stdout.contains("writes_micro_truth=false"));
     assert!(!stdout.contains("plaintext"));
     assert!(!stdout.contains("credential"));

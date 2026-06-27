@@ -6,6 +6,9 @@ version.workspace = true
 publish = false
 
 [dependencies]
+ed25519-dalek = { version = "=2.2.0", features = ["rand_core"] }
+rand_core = { version = "=0.6.4", features = ["getrandom"] }
+hex = "=0.4.3"
 turing-contracts = { path = "../turing-contracts" }
 serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = { version = "=1.0.150", features = ["preserve_order"] }

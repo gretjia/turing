@@ -69,7 +69,7 @@ fn signing_backend_has_no_plaintext_default_and_hardware_slot() {
     assert_eq!(signature.key_id, "operator-local-key");
     assert_eq!(signature.authority_epoch, 7);
     assert_eq!(signature.signature_route, SignatureRoute::OsKeyring);
-    assert!(signature.signature.starts_with("sha256:"));
+    assert!(signature.signature.starts_with("ed25519:"));
 
     let hardware = HardwareSigningBackend::slot("future-hsm-slot-0");
     assert!(!hardware.exports_plaintext_key());
@@ -77,4 +77,38 @@ fn signing_backend_has_no_plaintext_default_and_hardware_slot() {
         hardware.sign(&card),
         Err(SigningError::HardwareBackendUnavailable { .. })
     ));
+}
+
+#[test]
+fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() {
+    let card = ApprovalCard::new(
+        approval_payload(),
+        DisplayCopy {
+            title_zh: "批准".to_string(),
+            body_en: "Approve.".to_string(),
+        },
+    );
+
+    let os = OsKeyringSigningBackend::new("operator-local-key");
+    let signature = os.sign(&card).expect("signature envelope");
+    let surfaces = card.byte_surfaces().expect("canonical surfaces");
+
+    let recomputable = format!(
+        "sha256:{}{}",
+        turing_contracts::jcs::sha256_hex(&surfaces.canonical_bytes),
+        "operator-local-key"
+    );
+    assert_ne!(signature.signature, recomputable);
+    os.verify(&card, &signature).expect("signature verifies");
+
+    let mut tampered_payload = approval_payload();
+    tampered_payload.risk_class = "P3".to_string();
+    let tampered = ApprovalCard::new(
+        tampered_payload,
+        DisplayCopy {
+            title_zh: "批准".to_string(),
+            body_en: "Approve.".to_string(),
+        },
+    );
+    assert!(os.verify(&tampered, &signature).is_err());
 }

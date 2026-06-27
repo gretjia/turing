@@ -289,15 +289,6 @@ fn turingd_verify_write_routes_predicate_pass_and_fail() {
                 "macro_anchor_id": "macro:diff_rpc",
                 "worker_receipt_id": "rcp_pass"
             },
-            "checks": [
-                {"check_id": "capsule_contract", "passed": true},
-                {"check_id": "macro_anchor", "passed": true},
-                {"check_id": "worker_receipt", "passed": true},
-                {"check_id": "scope.allowed", "passed": true},
-                {"check_id": "budget.within_limit", "passed": true},
-                {"check_id": "provenance.checked", "passed": true},
-                {"check_id": "replay.ready", "passed": true}
-            ],
             "failure": {
                 "candidate_digest": digest('e'),
                 "observation_digest": digest('f'),
@@ -327,16 +318,10 @@ fn turingd_verify_write_routes_predicate_pass_and_fail() {
             "writer_id": "writer:predicate",
             "candidate_payload": {
                 "candidate_id": "cand_fail",
-                "capsule_id": "wc_rpc"
+                "capsule_id": "wc_rpc",
+                "macro_anchor_id": format!("mu:{}", "0".repeat(64)),
+                "worker_receipt_id": "rcp_fail"
             },
-            "checks": [
-                {
-                    "check_id": "capsule_contract",
-                    "passed": false,
-                    "reject_class": "OVER_SCOPE"
-                },
-                {"check_id": "macro_anchor", "passed": true}
-            ],
             "failure": {
                 "candidate_digest": digest('a'),
                 "observation_digest": digest('b'),
@@ -357,7 +342,7 @@ fn turingd_verify_write_routes_predicate_pass_and_fail() {
 }
 
 #[test]
-fn turingd_verify_write_rejects_missing_required_predicate_pack_check() {
+fn turingd_verify_write_rejects_missing_macro_anchor_from_derived_predicate_pack() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");
     std::fs::create_dir(&repo).expect("create micro git dir");
@@ -397,9 +382,6 @@ fn turingd_verify_write_rejects_missing_required_predicate_pack_check() {
                 "candidate_id": "cand_missing_macro_anchor",
                 "capsule_id": "wc_rpc"
             },
-            "checks": [
-                {"check_id": "capsule_contract", "passed": true}
-            ],
             "failure": {
                 "candidate_digest": digest('3'),
                 "observation_digest": digest('4'),
@@ -426,6 +408,82 @@ fn turingd_verify_write_rejects_missing_required_predicate_pack_check() {
             .expect("failed predicates")
             .iter()
             .any(|value| value == "macro_anchor")
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
+#[test]
+fn turingd_verify_write_rejects_caller_supplied_predicate_checks() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let _genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"a".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+
+    let socket = dir
+        .path()
+        .join("turingd-verify-write-ignores-booleans.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let response = rpc_params(
+        &socket,
+        "candidate.verify_write",
+        json!({
+            "writer_id": "writer:predicate",
+            "candidate_payload": {
+                "candidate_id": "cand_ignore_client_bools",
+                "capsule_id": "wc_rpc",
+                "macro_anchor_id": "macro:diff_rpc",
+                "worker_receipt_id": "rcp_ignore_client_bools"
+            },
+            "checks": [
+                {"check_id": "capsule_contract", "passed": true},
+                {"check_id": "macro_anchor", "passed": true},
+                {"check_id": "worker_receipt", "passed": true},
+                {"check_id": "scope.allowed", "passed": true},
+                {"check_id": "budget.within_limit", "passed": true},
+                {"check_id": "provenance.checked", "passed": true},
+                {"check_id": "replay.ready", "passed": true}
+            ],
+            "failure": {
+                "candidate_digest": digest('d'),
+                "observation_digest": digest('e'),
+                "detail": "client tried to supply predicate checks"
+            }
+        }),
+    );
+
+    assert_eq!(response["error"]["code"], -32602);
+    assert!(
+        response["error"]["message"]
+            .as_str()
+            .expect("error message")
+            .contains("caller-supplied checks are forbidden")
     );
 
     let shutdown = rpc(&socket, "daemon.shutdown");
@@ -474,12 +532,9 @@ fn turingd_verify_write_rejects_micro_id_as_macro_anchor() {
             "candidate_payload": {
                 "candidate_id": "cand_bad_anchor",
                 "capsule_id": "wc_rpc",
-                "macro_anchor_id": format!("mu:{}", "6".repeat(64))
+                "macro_anchor_id": format!("mu:{}", "6".repeat(64)),
+                "worker_receipt_id": "rcp_bad_anchor"
             },
-            "checks": [
-                {"check_id": "capsule_contract", "passed": true},
-                {"check_id": "macro_anchor", "passed": true}
-            ],
             "failure": {
                 "candidate_digest": digest('7'),
                 "observation_digest": digest('8'),
@@ -556,10 +611,6 @@ fn turingd_verify_write_rejects_missing_worker_receipt() {
                 "capsule_id": "wc_rpc",
                 "macro_anchor_id": "macro:diff_rpc"
             },
-            "checks": [
-                {"check_id": "capsule_contract", "passed": true},
-                {"check_id": "macro_anchor", "passed": true}
-            ],
             "failure": {
                 "candidate_digest": digest('9'),
                 "observation_digest": digest('a'),
@@ -595,13 +646,13 @@ fn turingd_verify_write_rejects_missing_worker_receipt() {
 }
 
 #[test]
-fn turingd_verify_write_rejects_missing_scope_budget_provenance_replay_checks() {
+fn turingd_verify_write_accepts_derived_predicate_pack_without_checks() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");
     std::fs::create_dir(&repo).expect("create micro git dir");
     git::init_sha256(&repo).expect("init micro git");
     let tape = Append::open(&repo).expect("open tape");
-    let genesis = tape
+    let _genesis = tape
         .append(
             AppendRequest::new(
                 "SystemConstitutionAccepted",
@@ -632,50 +683,23 @@ fn turingd_verify_write_rejects_missing_scope_budget_provenance_replay_checks() 
         json!({
             "writer_id": "writer:predicate",
             "candidate_payload": {
-                "candidate_id": "cand_missing_expanded_pack",
+                "candidate_id": "cand_derived_pack",
                 "capsule_id": "wc_rpc",
                 "macro_anchor_id": "macro:diff_rpc",
                 "worker_receipt_id": "rcp_pack"
-            },
-            "checks": [
-                {"check_id": "capsule_contract", "passed": true},
-                {"check_id": "macro_anchor", "passed": true},
-                {"check_id": "worker_receipt", "passed": true}
-            ],
-            "failure": {
-                "candidate_digest": digest('b'),
-                "observation_digest": digest('c'),
-                "detail": "expanded predicate pack checks missing"
             }
         }),
     );
 
     let event_id = rejected["result"]["event_id"]
         .as_str()
-        .expect("failure event id")
+        .expect("accepted event id")
         .to_string();
-    assert_eq!(rejected["result"]["write_event_type"], "FailureNode");
-    assert_eq!(rejected["result"]["predicate_product"], "FAIL");
-    assert_eq!(rejected["result"]["accepted_head_moved"], false);
+    assert_eq!(rejected["result"]["write_event_type"], "CandidateAccepted");
+    assert_eq!(rejected["result"]["predicate_product"], "PASS");
+    assert_eq!(rejected["result"]["accepted_head_moved"], true);
     assert_eq!(rejected["result"]["head_set"]["tape_tip"], event_id);
-    assert_eq!(
-        rejected["result"]["head_set"]["accepted_head"],
-        genesis.event_id
-    );
-    let failed = rejected["result"]["failed_predicates"]
-        .as_array()
-        .expect("failed predicates");
-    for required in [
-        "scope.allowed",
-        "budget.within_limit",
-        "provenance.checked",
-        "replay.ready",
-    ] {
-        assert!(
-            failed.iter().any(|value| value == required),
-            "missing failed predicate {required}"
-        );
-    }
+    assert_eq!(rejected["result"]["head_set"]["accepted_head"], event_id);
 
     let shutdown = rpc(&socket, "daemon.shutdown");
     assert_eq!(shutdown["result"]["shutdown"], true);

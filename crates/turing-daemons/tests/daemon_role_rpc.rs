@@ -1,10 +1,13 @@
 use std::io::{BufRead, BufReader, Write};
+use std::os::unix::fs::PermissionsExt;
 use std::os::unix::net::UnixStream;
 use std::path::Path;
 use std::process::{Child, Command};
 use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
+use turing_git_tape::append::{Append, AppendRequest};
+use turing_git_tape::git;
 
 #[test]
 fn marketd_serves_shadow_suggestions_without_authority() {
@@ -63,8 +66,73 @@ fn marketd_serves_shadow_suggestions_without_authority() {
 }
 
 #[test]
+fn daemons_reject_world_writable_socket_parents() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let unsafe_parent = dir.path().join("unsafe");
+    std::fs::create_dir(&unsafe_parent).expect("create unsafe parent");
+    let mut perms = std::fs::metadata(&unsafe_parent)
+        .expect("metadata")
+        .permissions();
+    perms.set_mode(0o777);
+    std::fs::set_permissions(&unsafe_parent, perms).expect("chmod unsafe parent");
+
+    let socket = unsafe_parent.join("marketd.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turing-marketd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+        ])
+        .spawn()
+        .expect("spawn marketd");
+
+    let start = Instant::now();
+    let mut status = None;
+    while start.elapsed() < Duration::from_secs(2) {
+        if let Some(exit) = child.try_wait().expect("poll child") {
+            status = Some(exit);
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    let status = status.expect("daemon should exit on unsafe socket parent");
+    assert!(!status.success(), "daemon must reject unsafe socket parent");
+}
+
+#[test]
 fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
     let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:genesis",
+            json!({"constitution_digest": "sha256:".to_string() + &"1".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+    tape.append(
+        AppendRequest::new(
+            "MarketCreated",
+            "writer:market",
+            json!({
+                "schema_id": "market_created.v1",
+                "event_type": "MarketCreated",
+                "head_effect": "PRESERVE",
+                "market_id": "mkt_tape",
+                "initial_pool_y": "120",
+                "initial_pool_n": "80",
+                "k": "9600",
+                "truth_status": "statistical_signal_only"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append tape market");
     let project = dir.path().join("project");
     std::fs::create_dir(&project).expect("create project dir");
     let state_dir = project.join(".turingos");
@@ -84,7 +152,8 @@ fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
     .expect("write project metadata");
 
     let socket = dir.path().join("marketd-snapshot.sock");
-    let mut child = spawn_daemon_with_project("turing-marketd", &socket, &project);
+    let mut child =
+        spawn_daemon_with_project_and_micro_git("turing-marketd", &socket, &project, &repo);
     wait_for_socket(&socket, &mut child);
 
     let response = rpc(
@@ -96,19 +165,11 @@ fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
                     "event_type": "MarketCreated",
                     "schema_id": "market_created.v1",
                     "head_effect": "PRESERVE",
-                    "market_id": "mkt_snapshot",
-                    "initial_pool_y": "100",
-                    "initial_pool_n": "100",
+                    "market_id": "mkt_forged",
+                    "initial_pool_y": "1000",
+                    "initial_pool_n": "1000",
                     "k": "10000",
                     "truth_status": "statistical_signal_only"
-                },
-                {
-                    "event_type": "MarketSettled",
-                    "schema_id": "market_settled.v1",
-                    "market_id": "mkt_snapshot",
-                    "result": "YES",
-                    "settlement_event_id": format!("mu:{}", "e".repeat(64)),
-                    "price_not_truth_ack": true
                 }
             ]
         }),
@@ -142,7 +203,8 @@ fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
     assert!(snapshot.contains(r#""schema_id":"market_projection_snapshot.v1""#));
     assert!(snapshot.contains(r#""price_not_truth":true"#));
     assert!(snapshot.contains(r#""can_move_accepted_head":false"#));
-    assert!(snapshot.contains(r#""mkt_snapshot""#));
+    assert!(snapshot.contains(r#""mkt_tape""#));
+    assert!(!snapshot.contains(r#""mkt_forged""#));
     assert!(!snapshot.contains(r#""accepted_head""#));
     assert!(!snapshot.contains("authorization_event"));
 
@@ -152,6 +214,70 @@ fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
 #[test]
 fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
     let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:genesis",
+            json!({"constitution_digest": "sha256:".to_string() + &"2".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+    tape.append(
+        AppendRequest::new(
+            "PositionMinted",
+            "writer:wallet",
+            json!({
+                "schema_id": "position_minted.v1",
+                "event_type": "PositionMinted",
+                "market_id": "mkt_tape_wallet",
+                "agent_id": "agent_tape",
+                "coin_in": "5",
+                "yes_out": "5",
+                "no_out": "5",
+                "invariant": "coin_in == yes_out == no_out"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append wallet mint");
+    tape.append(
+        AppendRequest::new(
+            "PositionMinted",
+            "writer:wallet",
+            json!({
+                "schema_id": "position_minted.v1",
+                "market_id": "mkt_wallet_tape",
+                "agent_id": "agent_tape",
+                "coin_in": "5",
+                "yes_out": "5",
+                "no_out": "5",
+                "invariant": "coin_in == yes_out == no_out"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append mint");
+    tape.append(
+        AppendRequest::new(
+            "RewardDistributed",
+            "writer:wallet",
+            json!({
+                "schema_id": "reward_distributed.v1",
+                "market_id": "mkt_wallet_tape",
+                "agent_id": "agent_tape",
+                "reward_coin": "2",
+                "slash_coin": "1",
+                "reason": "PREDICATE_SETTLEMENT"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append reward");
     let project = dir.path().join("project");
     std::fs::create_dir(&project).expect("create project dir");
     let state_dir = project.join(".turingos");
@@ -171,7 +297,8 @@ fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
     .expect("write project metadata");
 
     let socket = dir.path().join("wallet-snapshot.sock");
-    let mut child = spawn_daemon_with_project("turing-marketd", &socket, &project);
+    let mut child =
+        spawn_daemon_with_project_and_micro_git("turing-marketd", &socket, &project, &repo);
     wait_for_socket(&socket, &mut child);
 
     let response = rpc(
@@ -182,21 +309,12 @@ fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
                 {
                     "event_type": "PositionMinted",
                     "schema_id": "position_minted.v1",
-                    "market_id": "mkt_wallet",
-                    "agent_id": "agent_a",
-                    "coin_in": "5",
-                    "yes_out": "5",
-                    "no_out": "5",
+                    "market_id": "mkt_forged",
+                    "agent_id": "agent_forged",
+                    "coin_in": "50",
+                    "yes_out": "50",
+                    "no_out": "50",
                     "invariant": "coin_in == yes_out == no_out"
-                },
-                {
-                    "event_type": "RewardDistributed",
-                    "schema_id": "reward_distributed.v1",
-                    "market_id": "mkt_wallet",
-                    "agent_id": "agent_a",
-                    "reward_coin": "2",
-                    "slash_coin": "1",
-                    "reason": "PREDICATE_SETTLEMENT"
                 }
             ]
         }),
@@ -228,8 +346,9 @@ fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
     let snapshot =
         std::fs::read_to_string(state_dir.join("wallet_projection.json")).expect("wallet snapshot");
     assert!(snapshot.contains(r#""schema_id":"wallet_projection_snapshot.v1""#));
-    assert!(snapshot.contains(r#""agent_a""#));
-    assert!(snapshot.contains(r#""mkt_wallet":"5""#));
+    assert!(snapshot.contains(r#""agent_tape""#));
+    assert!(snapshot.contains(r#""yes_positions":{"mkt_tape_wallet":"5"}"#));
+    assert!(!snapshot.contains(r#""agent_forged""#));
     assert!(snapshot.contains(r#""credential_material_included":false"#));
     assert!(!snapshot.contains(r#""accepted_head""#));
     assert!(!snapshot.contains("credential_hash"));
@@ -272,6 +391,46 @@ fn pputd_serves_hidden_prompt_shield() {
 #[test]
 fn pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage() {
     let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:genesis",
+            json!({"constitution_digest": "sha256:".to_string() + &"3".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+    tape.append(
+        AppendRequest::new(
+            "CostEvent",
+            "writer:pput",
+            json!({
+                "schema_id": "cost_event.v1",
+                "event_type": "CostEvent",
+                "head_effect": "PRESERVE",
+                "run_id": "run_tape",
+                "problem_id": "problem_tape",
+                "split": "heldout",
+                "agent_id": "agent_worker",
+                "branch_id": "branch_failed",
+                "capsule_id": "wc_snapshot",
+                "prompt_tokens": 2,
+                "completion_tokens": 3,
+                "tool_tokens": 5,
+                "tool_stdout_tokens": 7,
+                "total_tokens": 17,
+                "wall_time_ms": 100,
+                "tool_stdout_hash": digest('f'),
+                "counted_in_total": true
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append cost event");
     let project = dir.path().join("project");
     std::fs::create_dir(&project).expect("create project dir");
     let state_dir = project.join(".turingos");
@@ -291,7 +450,8 @@ fn pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage() {
     .expect("write project metadata");
 
     let socket = dir.path().join("pputd-snapshot.sock");
-    let mut child = spawn_daemon_with_project("turing-pputd", &socket, &project);
+    let mut child =
+        spawn_daemon_with_project_and_micro_git("turing-pputd", &socket, &project, &repo);
     wait_for_socket(&socket, &mut child);
 
     let response = rpc(
@@ -303,18 +463,18 @@ fn pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage() {
                     "schema_id": "cost_event.v1",
                     "event_type": "CostEvent",
                     "head_effect": "PRESERVE",
-                    "run_id": "run_snapshot",
-                    "problem_id": "problem_snapshot",
+                    "run_id": "run_forged",
+                    "problem_id": "problem_forged",
                     "split": "heldout",
                     "agent_id": "agent_worker",
                     "branch_id": "branch_failed",
                     "capsule_id": "wc_snapshot",
-                    "prompt_tokens": 2,
-                    "completion_tokens": 3,
-                    "tool_tokens": 5,
-                    "tool_stdout_tokens": 7,
-                    "total_tokens": 17,
-                    "wall_time_ms": 100,
+                    "prompt_tokens": 20,
+                    "completion_tokens": 30,
+                    "tool_tokens": 50,
+                    "tool_stdout_tokens": 70,
+                    "total_tokens": 170,
+                    "wall_time_ms": 1000,
                     "tool_stdout_hash": digest('f'),
                     "counted_in_total": true
                 }
@@ -406,6 +566,64 @@ fn viewd_builds_disposable_projection_without_truth_write() {
 #[test]
 fn viewd_writes_project_scoped_projection_snapshot_without_truth_write() {
     let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:genesis",
+            json!({"constitution_digest": "sha256:".to_string() + &"4".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+    tape.append(
+        AppendRequest::new(
+            "MarketCreated",
+            "writer:view",
+            json!({
+                "schema_id": "market_created.v1",
+                "event_type": "MarketCreated",
+                "head_effect": "PRESERVE",
+                "market_id": "mkt_tape_projection",
+                "initial_pool_y": "100",
+                "initial_pool_n": "100",
+                "k": "10000",
+                "truth_status": "statistical_signal_only"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append market event");
+    tape.append(
+        AppendRequest::new(
+            "CostEvent",
+            "writer:view",
+            json!({
+                "schema_id": "cost_event.v1",
+                "event_type": "CostEvent",
+                "head_effect": "PRESERVE",
+                "run_id": "run_tape_projection",
+                "problem_id": "problem_tape_projection",
+                "split": "heldout",
+                "agent_id": "agent_projection",
+                "branch_id": "branch_projection",
+                "capsule_id": "wc_projection",
+                "prompt_tokens": 1,
+                "completion_tokens": 1,
+                "tool_tokens": 1,
+                "tool_stdout_tokens": 1,
+                "total_tokens": 4,
+                "wall_time_ms": 50,
+                "tool_stdout_hash": digest('e'),
+                "counted_in_total": true
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append cost event");
     let project = dir.path().join("project");
     std::fs::create_dir(&project).expect("create project dir");
     let state_dir = project.join(".turingos");
@@ -425,7 +643,8 @@ fn viewd_writes_project_scoped_projection_snapshot_without_truth_write() {
     .expect("write project metadata");
 
     let socket = dir.path().join("viewd-snapshot.sock");
-    let mut child = spawn_daemon_with_project("turing-viewd", &socket, &project);
+    let mut child =
+        spawn_daemon_with_project_and_micro_git("turing-viewd", &socket, &project, &repo);
     wait_for_socket(&socket, &mut child);
 
     let response = rpc(
@@ -436,12 +655,12 @@ fn viewd_writes_project_scoped_projection_snapshot_without_truth_write() {
                 {
                     "event_id": format!("mu:{}", "c".repeat(64)),
                     "event_type": "MarketCreated",
-                    "subject_id": "mkt_snapshot"
+                    "subject_id": "mkt_forged"
                 },
                 {
                     "event_id": format!("mu:{}", "d".repeat(64)),
                     "event_type": "PPUTAccounted",
-                    "subject_id": "run_snapshot"
+                    "subject_id": "run_forged"
                 }
             ]
         }),
@@ -470,7 +689,8 @@ fn viewd_writes_project_scoped_projection_snapshot_without_truth_write() {
     assert!(snapshot.contains(r#""schema_id":"projection_snapshot.v1""#));
     assert!(snapshot.contains(r#""can_write_truth":false"#));
     assert!(snapshot.contains(r#""projection_hash":"sha256:"#));
-    assert!(!snapshot.contains("accepted because CI passed"));
+    assert!(!snapshot.contains(r#""mkt_forged""#));
+    assert!(!snapshot.contains(r#""run_forged""#));
 
     shutdown(socket, child);
 }
@@ -671,6 +891,26 @@ fn spawn_daemon_with_project(name: &str, socket: &Path, project: &Path) -> Child
             "--serve",
             "--socket",
             socket.to_str().expect("UTF-8 socket path"),
+            "--project",
+            project.to_str().expect("UTF-8 project path"),
+        ])
+        .spawn()
+        .expect("spawn daemon")
+}
+
+fn spawn_daemon_with_project_and_micro_git(
+    name: &str,
+    socket: &Path,
+    project: &Path,
+    micro_git: &Path,
+) -> Child {
+    Command::new(bin(name))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            micro_git.to_str().expect("UTF-8 micro git path"),
             "--project",
             project.to_str().expect("UTF-8 project path"),
         ])

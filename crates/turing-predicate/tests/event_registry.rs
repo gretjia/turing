@@ -1,6 +1,8 @@
 use turing_contracts::envelope::HeadEffect;
 use turing_contracts::registry::{self, EventClass, TargetRef};
-use turing_predicate::{event_registry_closed_world, registered_event_count, registered_event_names};
+use turing_predicate::{
+    event_registry_closed_world, registered_event_count, registered_event_names,
+};
 
 #[test]
 fn event_registry_closed_world_rejects_unknown_events() {
@@ -52,7 +54,11 @@ fn economy_events_preserve_only() {
         let row = event_registry_closed_world(name).expect("economy event resolves");
         assert_eq!(row.class, EventClass::Economy, "{name} is ECONOMY");
         assert_eq!(row.head_effect, HeadEffect::Preserve, "{name} is PRESERVE");
-        assert_eq!(row.target_ref, TargetRef::TapeTip, "{name} targets tape_tip");
+        assert_eq!(
+            row.target_ref,
+            TargetRef::TapeTip,
+            "{name} targets tape_tip"
+        );
     }
 
     for expected in [

@@ -201,6 +201,15 @@ fn approval_sign(
         }
     }
     .map_err(|error| format!("approval signing failed: {error}"))?;
+    match card.payload().signature_route {
+        SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id)
+            .verify(&card, &signature)
+            .map_err(|error| format!("approval verification failed: {error}"))?,
+        SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id)
+            .verify(&card, &signature)
+            .map_err(|error| format!("approval verification failed: {error}"))?,
+        SignatureRoute::None => unreachable!(),
+    }
     Ok(format!(
         "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} signed_payload_hash={} signature={} writes_micro_truth=false",
         approval_id,
