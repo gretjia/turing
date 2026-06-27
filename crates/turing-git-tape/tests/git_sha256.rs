@@ -36,6 +36,21 @@ fn assert_sha256_oid(label: &str, oid: &str) {
 }
 
 #[test]
+fn init_sha256_micro_git() {
+    let report: QualificationReport = qualify_sha256().expect("SHA-256 micro.git init qualifies");
+
+    assert_eq!(
+        report.object_format, "sha256",
+        "micro.git must use native SHA-256 object format"
+    );
+    assert_sha256_oid("commit", &report.commit_oid);
+    assert!(
+        report.fsck_clean,
+        "initialized SHA-256 micro.git must pass git fsck --strict"
+    );
+}
+
+#[test]
 fn qualifies_native_sha256_object_store() {
     let report: QualificationReport = qualify_sha256().expect("SHA-256 qualification must succeed");
 
