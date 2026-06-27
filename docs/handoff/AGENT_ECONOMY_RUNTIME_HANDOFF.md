@@ -39,8 +39,10 @@ turingd --serve --socket /tmp/turingd.sock
 ## Known Risks
 
 - Generated evidence is from a temporary private-local qualification Tape.
-- `turingd` has a minimal Unix socket JSON-RPC health/read-only heads surface; full
-  persistent project heads, append routes, predicate routing, and approval APIs remain pending.
-- Daemon boundary binaries exist for marketd, pputd, viewd, mcp, and execd, but their
-  long-running socket/RPC services remain pending.
+- `turingd` has Unix socket JSON-RPC health/read-only heads, including configured
+  `--micro-git` head reads; append routes, predicate routing, and approval APIs remain pending.
+- `turing-marketd`, `turing-pputd`, and `turing-viewd` have minimal sidecar RPCs for
+  shadow budget suggestion, prompt shielding, and disposable projection building. Full
+  persistent project services remain pending.
+- `turing-execd` and `turing-mcp` still expose only boundary checks in this handoff.
 - Operator project persistence and installed binary wiring remain pending.

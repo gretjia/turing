@@ -7,7 +7,10 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use serde_json::{Value, json};
+use turing_economy::{CandidateRoute, MarketRouter, MarketRouterMode, PriceSignal};
 use turing_git_tape::append::Append;
+use turing_pput::WorkerPromptShield;
+use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DaemonContract {
@@ -136,6 +139,15 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
         Some("heads.read") => read_heads_response(runtime, id),
+        Some("market.shadow.suggest") if runtime.contract.role == "turing-marketd" => {
+            market_shadow_suggest_response(request, id)
+        }
+        Some("pput.prompt.validate") if runtime.contract.role == "turing-pputd" => {
+            pput_prompt_validate_response(request, id)
+        }
+        Some("projection.build") if runtime.contract.role == "turing-viewd" => {
+            projection_build_response(request, id)
+        }
         Some("daemon.shutdown") => json!({
             "jsonrpc": "2.0",
             "id": id,
@@ -160,6 +172,149 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
     }
+}
+
+fn market_shadow_suggest_response(request: &Value, id: Value) -> Value {
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let routes = match parse_routes(params) {
+        Ok(routes) => routes,
+        Err(message) => return invalid_params(id, message),
+    };
+    let signals = match parse_signals(params) {
+        Ok(signals) => signals,
+        Err(message) => return invalid_params(id, message),
+    };
+    let price_signal_hash = match required_str(params, "price_signal_hash") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let pput_prior_hash = match required_str(params, "pput_prior_hash") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    match MarketRouter::new(MarketRouterMode::Shadow).suggest(
+        &routes,
+        &signals,
+        &price_signal_hash,
+        &pput_prior_hash,
+    ) {
+        Ok(suggestion) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "schema_id": suggestion.schema_id,
+                "mode": "Shadow",
+                "route_id": suggestion.route_id,
+                "market_id": suggestion.market_id,
+                "price_signal_hash": suggestion.price_signal_hash,
+                "pput_prior_hash": suggestion.pput_prior_hash,
+                "diversity_policy_hash": suggestion.diversity_policy_hash,
+                "max_tokens": suggestion.max_tokens,
+                "emits_authorization": suggestion.emits_authorization,
+                "can_move_accepted_head": suggestion.can_move_accepted_head,
+                "head_effect": suggestion.head_effect,
+            }
+        }),
+        Err(error) => jsonrpc_error(
+            id,
+            -32000,
+            format!("market shadow suggestion failed: {error}"),
+        ),
+    }
+}
+
+fn pput_prompt_validate_response(request: &Value, id: Value) -> Value {
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let prompt = match params.get("prompt").and_then(Value::as_str) {
+        Some(prompt) => prompt,
+        None => return invalid_params(id, "prompt string is required"),
+    };
+    match WorkerPromptShield::validate(prompt) {
+        Ok(()) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "hidden_evaluator": true,
+                "worker_prompt_visible": true,
+                "contains_pput_formula": false,
+            }
+        }),
+        Err(error) => jsonrpc_error(id, -32000, format!("worker prompt leakage: {error}")),
+    }
+}
+
+fn projection_build_response(request: &Value, id: Value) -> Value {
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let Some(events) = params.get("events") else {
+        return invalid_params(id, "events array is required");
+    };
+    let events: Vec<ProjectionEvent> = match serde_json::from_value(events.clone()) {
+        Ok(events) => events,
+        Err(error) => return invalid_params(id, format!("invalid projection events: {error}")),
+    };
+
+    match ProjectionBuilder::from_source(ProjectionSource::MicroTape(events)).build() {
+        Ok(projection) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "schema_id": projection.schema_id,
+                "source": projection.source,
+                "event_count": projection.event_count,
+                "market_event_count": projection.market_event_count,
+                "pput_event_count": projection.pput_event_count,
+                "can_write_truth": projection.can_write_truth,
+                "projection_hash": projection.projection_hash,
+            }
+        }),
+        Err(error) => jsonrpc_error(id, -32000, format!("projection build failed: {error}")),
+    }
+}
+
+fn parse_routes(params: &Value) -> Result<Vec<CandidateRoute>, String> {
+    let routes = params
+        .get("routes")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "routes array is required".to_string())?;
+    routes
+        .iter()
+        .map(|route| {
+            Ok(CandidateRoute {
+                route_id: required_str(route, "route_id")?,
+                market_id: required_str(route, "market_id")?,
+                expected_failure_domain: required_str(route, "expected_failure_domain")?,
+                requested_tokens: required_u64(route, "requested_tokens")?,
+            })
+        })
+        .collect()
+}
+
+fn parse_signals(params: &Value) -> Result<Vec<PriceSignal>, String> {
+    let signals = params
+        .get("signals")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "signals array is required".to_string())?;
+    signals
+        .iter()
+        .map(|signal| {
+            Ok(PriceSignal {
+                market_id: required_str(signal, "market_id")?,
+                yes_price: required_str(signal, "yes_price")?,
+                no_price: required_str(signal, "no_price")?,
+                truth_status: required_str(signal, "truth_status")?,
+            })
+        })
+        .collect()
 }
 
 fn read_heads_response(runtime: &DaemonRuntime, id: Value) -> Value {
@@ -209,6 +364,25 @@ fn read_heads_response(runtime: &DaemonRuntime, id: Value) -> Value {
         }),
         Err(error) => jsonrpc_error(id, -32000, format!("cannot read coherent heads: {error}")),
     }
+}
+
+fn required_str(value: &Value, key: &str) -> Result<String, String> {
+    value
+        .get(key)
+        .and_then(Value::as_str)
+        .map(ToString::to_string)
+        .ok_or_else(|| format!("{key} string is required"))
+}
+
+fn required_u64(value: &Value, key: &str) -> Result<u64, String> {
+    value
+        .get(key)
+        .and_then(Value::as_u64)
+        .ok_or_else(|| format!("{key} unsigned integer is required"))
+}
+
+fn invalid_params(id: Value, message: impl Into<String>) -> Value {
+    jsonrpc_error(id, -32602, message.into())
 }
 
 fn jsonrpc_error(id: Value, code: i64, message: String) -> Value {

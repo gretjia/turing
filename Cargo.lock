@@ -296,7 +296,10 @@ version = "0.0.0"
 dependencies = [
  "serde_json",
  "tempfile",
+ "turing-economy",
  "turing-git-tape",
+ "turing-pput",
+ "turing-projection",
 ]
 
 [[package]]
