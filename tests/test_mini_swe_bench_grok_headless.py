@@ -18,7 +18,7 @@ def load_harness():
     return module
 
 
-def test_grok_headless_argv_turns_planning_and_reasoning_down():
+def test_grok_headless_argv_turns_planning_memory_and_subagents_off():
     harness = load_harness()
     argv = harness.grok_worker_argv(
         cwd="/tmp/turingos-mini-swe/task",
@@ -31,9 +31,9 @@ def test_grok_headless_argv_turns_planning_and_reasoning_down():
     assert ["--cwd", "/tmp/turingos-mini-swe/task"] in [
         argv[i : i + 2] for i in range(len(argv) - 1)
     ]
-    assert ["--output-format", "json"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
-    assert ["--reasoning-effort", "low"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
-    assert ["--effort", "low"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
+    assert ["--output-format", "plain"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
+    assert "--reasoning-effort" not in argv
+    assert "--effort" not in argv
     assert "--always-approve" in argv
     assert "--no-plan" in argv
     assert "--no-memory" in argv
@@ -121,7 +121,7 @@ def test_dry_run_writes_baseline_and_turingos_plan(tmp_path):
         "authority": "none",
         "accepted_head_authority": False,
     }
-    assert packet["thinking_contract"] == "grok_reasoning_effort_low_no_plan_no_memory_no_subagents"
+    assert packet["thinking_contract"] == "grok_no_plan_no_memory_no_subagents_plain_output"
     assert packet["truth_guard"]["accepted_head_policy"] == "predicate_only"
     assert packet["truth_guard"]["forbidden_acceptance_signals"] == [
         "exit_code_0",
@@ -135,8 +135,10 @@ def test_dry_run_writes_baseline_and_turingos_plan(tmp_path):
     }
     for run in packet["runs"]:
         argv = run["grok_command"]["argv"]
-        assert ["--reasoning-effort", "low"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
+        assert ["--output-format", "plain"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
         assert "--no-plan" in argv
+        assert "--reasoning-effort" not in argv
+        assert "--effort" not in argv
         assert run["task"]["instance_id"] == "django__django-00001"
 
 

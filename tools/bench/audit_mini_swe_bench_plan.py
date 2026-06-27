@@ -140,10 +140,12 @@ def audit_plan(plan: dict[str, Any], min_tasks: int, allow_smoke: bool) -> dict[
         for flag in ["--always-approve", "--disable-web-search", "--no-plan", "--no-memory", "--no-subagents", "--verbatim"]:
             if flag not in argv:
                 blocking.append(finding("grok_flag_missing", f"argv missing {flag}"))
-        if not argv_has_pair(argv, "--reasoning-effort", "low"):
-            blocking.append(finding("grok_reasoning_effort", "Grok reasoning effort must be low"))
-        if not argv_has_pair(argv, "--effort", "low"):
-            blocking.append(finding("grok_effort", "Grok effort must be low"))
+        if argv_has_pair(argv, "--output-format", "json"):
+            blocking.append(finding("grok_json_thought_leakage", "Grok JSON output exposes a thought field; use plain output"))
+        if not argv_has_pair(argv, "--output-format", "plain"):
+            blocking.append(finding("grok_output_format", "Grok worker output must use plain output"))
+        if "--reasoning-effort" in argv or "--effort" in argv:
+            blocking.append(finding("grok_unsupported_effort_flag", "current Grok CLI model rejects effort/reasoning flags"))
 
     task_count = len(by_task)
     minimum_real_tasks = int(design.get("minimum_real_tasks", min_tasks) or min_tasks)

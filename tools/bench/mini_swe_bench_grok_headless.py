@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 
-THINKING_CONTRACT = "grok_reasoning_effort_low_no_plan_no_memory_no_subagents"
+THINKING_CONTRACT = "grok_no_plan_no_memory_no_subagents_plain_output"
 DEFAULT_META_PROVIDER = "deepseek"
 DEFAULT_META_MODEL = "deepseek-v4-pro"
 DEFAULT_META_BASE_URL = "https://api.deepseek.com/v1"
@@ -120,7 +120,7 @@ def grok_worker_argv(cwd: str, prompt: str, model: str, max_turns: int) -> list[
         "--cwd",
         cwd,
         "--output-format",
-        "json",
+        "plain",
         "--model",
         model,
         "--always-approve",
@@ -128,10 +128,6 @@ def grok_worker_argv(cwd: str, prompt: str, model: str, max_turns: int) -> list[
         "--no-plan",
         "--no-memory",
         "--no-subagents",
-        "--reasoning-effort",
-        "low",
-        "--effort",
-        "low",
         "--max-turns",
         str(max_turns),
         "--verbatim",
