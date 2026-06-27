@@ -954,7 +954,7 @@ fn enforce_candidate_predicate_pack(
     mut checks: Vec<PredicateCheck>,
     candidate_payload: &Value,
 ) -> Vec<PredicateCheck> {
-    for required in ["capsule_contract", "macro_anchor"] {
+    for required in ["capsule_contract", "macro_anchor", "worker_receipt"] {
         if !checks.iter().any(|check| check.check_id == required) {
             checks.push(PredicateCheck::fail(
                 required,
@@ -970,6 +970,16 @@ fn enforce_candidate_predicate_pack(
         checks.push(PredicateCheck::fail(
             "macro_anchor",
             "MACRO_ANCHOR_ID_MUST_USE_MACRO_PREFIX",
+        ));
+    }
+    let worker_receipt_ok = candidate_payload
+        .get("worker_receipt_id")
+        .and_then(Value::as_str)
+        .is_some_and(|id| id.starts_with("rcp_"));
+    if !worker_receipt_ok {
+        checks.push(PredicateCheck::fail(
+            "worker_receipt",
+            "WORKER_RECEIPT_ID_REQUIRED",
         ));
     }
     checks
