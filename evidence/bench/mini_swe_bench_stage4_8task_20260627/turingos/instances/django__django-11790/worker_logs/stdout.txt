@@ -1,0 +1,20 @@
+**Patch left in worktree** (minimal change to [django/contrib/auth/forms.py](/tmp/turingos_substrate_worktrees/1f04c4e4ccda6a3a/django/contrib/auth/forms.py) only; verified via direct execution that `AuthenticationForm().fields['username'].widget.attrs['maxlength']` (int, from `UserModel`) and rendered `<input ... maxlength="...">` are now present):
+
+```diff
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index a0cfed0995..f0f235903f 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -191,7 +191,9 @@ class AuthenticationForm(forms.Form):
+
+         # Set the max length and label for the "username" field.
+         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+-        self.fields['username'].max_length = self.username_field.max_length or 254
++        max_length = self.username_field.max_length or 254
++        self.fields['username'].max_length = max_length
++        self.fields['username'].widget.attrs['maxlength'] = max_length
+         if self.fields['username'].label is None:
+             self.fields['username'].label = capfirst(self.username_field.verbose_name)
+```
+
+(The root cause was that the field is declared at class level (so `CharField`/`UsernameField.widget_attrs` + `Field.__init__` only run with `max_length=None`), and the runtime assignment of `.max_length` was never reflected into `widget.attrs`.)

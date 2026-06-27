@@ -41,16 +41,36 @@ def read_optional(path: Path, limit: int = 6000) -> str:
     return path.read_text(encoding="utf-8", errors="replace")[:limit]
 
 
+def find_first_existing(paths: list[Path]) -> Path | None:
+    for path in paths:
+        if path.exists():
+            return path
+    return None
+
+
+def find_substrate_dir(paths: list[Path]) -> Path | None:
+    for path in paths:
+        if (path / "substrate_coverage.json").exists():
+            return path
+    return None
+
+
 def build_review_payload(evidence_dir: Path) -> tuple[str, dict[str, Any]]:
-    substrate_dir = evidence_dir
-    if not (substrate_dir / "substrate_coverage.json").exists() and (evidence_dir / "turingos" / "substrate_coverage.json").exists():
-        substrate_dir = evidence_dir / "turingos"
+    substrate_dir = find_substrate_dir(
+        [
+            evidence_dir,
+            evidence_dir / "turingos",
+            evidence_dir / "turingos_incremental",
+        ]
+    )
+    if substrate_dir is None:
+        substrate_dir = evidence_dir
     coverage_audit = load_json(substrate_dir / "substrate_coverage_audit.json")
     coverage = load_json(substrate_dir / "substrate_coverage.json")
     smoke = load_json(substrate_dir / "substrate_smoke_result.json")
     runs = [run for run in coverage.get("turingos_arm_runs", []) if isinstance(run, dict)]
     first_run = runs[0] if runs else {}
-    direct_roots = [evidence_dir / "direct", evidence_dir]
+    direct_roots = [evidence_dir / "direct", evidence_dir / "direct_incremental", evidence_dir]
     direct_results = []
     for direct_root in direct_roots:
         if not direct_root.exists():
@@ -58,8 +78,13 @@ def build_review_payload(evidence_dir: Path) -> tuple[str, dict[str, Any]]:
         for result_path in sorted(direct_root.glob("direct_baseline_*/result.json")):
             direct_results.append(load_json(result_path))
     patch_eval = None
-    patch_eval_path = evidence_dir / "patch_eval" / "patch_eval_summary.json"
-    if patch_eval_path.exists():
+    patch_eval_path = find_first_existing(
+        [
+            evidence_dir / "patch_eval" / "patch_eval_summary.json",
+            evidence_dir / "patch_eval_incremental" / "patch_eval_summary.json",
+        ]
+    )
+    if patch_eval_path is not None:
         patch_eval = load_json(patch_eval_path)
     loop_eval = None
     loop_eval_path = evidence_dir / "loop_eval_summary.json"

@@ -1,0 +1,8 @@
+**The fix has been implemented with the minimal patch (one logical change to apply the same `min(batch_size, max_batch_size)` capping logic used in `bulk_update()`).**
+
+- Edited [django/db/models/query.py](/tmp/turingos_direct_grok_stage4_8task/7648f2fba0a76f2d/django/db/models/query.py) (the `_batched_insert` helper called by `bulk_create`).
+- Existing `bulk_create` tests (26 tests) all pass.
+- Verified via direct inspection + DB ops that user-provided `batch_size` (e.g. 1000) is now capped at the compatible `bulk_batch_size(...)` value (e.g. ~499 for SQLite + 2 fields) without overriding it, while smaller values and `None` continue to work as before.
+- Diff is the smallest possible that addresses the root cause described in the issue (and matches the suggested logic). 
+
+No other files were changed. (Candidate patch is ready in the worktree.)

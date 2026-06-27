@@ -1,0 +1,23 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "base_url": "https://api.deepseek.com/v1",
+  "context_hash": "sha256:fab1fe492a0d7f6c16cc1190faa6f3c9e67d2949df50f9138102a6a873c6181d",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:6f1b747b697028e626be5af81ce9b592db32477ef84e392657f10ed4b6a7b185",
+  "request_hash": "sha256:582a820406dc1a25a2b14caeee106d37fb2ad0d4a2b45a98e8b076bccfa6047e",
+  "review": {
+    "benchmark_claim_allowed": false,
+    "findings": "Smoke-scale directional lead observed (TuringOS 9/10 vs Direct 7/10), but not statistically significant (McNemar p=0.5). Substrate coverage complete with real worker substrate smoke. Truth boundaries respected; no forbidden truth signals used. Claim limited to directional observation only; no benchmark claim allowed.",
+    "next_required_gate": "larger_ramp_allowed_as_smoke_scale_only_after_stage5_verification; still_no_statistical_significance_claim",
+    "schema_id": "MetaAIAuditResult.v1",
+    "substrate_complete": true,
+    "verdict": "PASS"
+  },
+  "review_content_hash": "sha256:9be2f1d4a5b25755b461aead76ccafdb49231f515d0e8c7705d065d13e172361",
+  "schema_id": "DeepSeekMetaAIReviewRun.v1",
+  "status": "PASS"
+}

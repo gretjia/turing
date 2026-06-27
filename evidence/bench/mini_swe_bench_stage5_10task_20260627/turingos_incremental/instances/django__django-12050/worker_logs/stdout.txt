@@ -1,0 +1,13 @@
+The patch is complete. Here's the summary:
+
+**Problem:** `Query.resolve_lookup_value` in [django/db/models/sql/query.py:1074](/tmp/turingos_substrate_worktrees/e9fd9a077a0753fb/django/db/models/sql/query.py) always coerced list/tuple values to `tuple`, breaking exact value queries for fields that depend on input type (e.g., PickledField).
+
+**Fix:** Changed `value = tuple(resolved_values)` to `value = type(value)(resolved_values)` to preserve the input iterable type.
+
+**Diff:**
+```diff
+-            value = tuple(resolved_values)
++            value = type(value)(resolved_values)
+```
+
+All 376 queries tests pass. The worktree contains the patch.

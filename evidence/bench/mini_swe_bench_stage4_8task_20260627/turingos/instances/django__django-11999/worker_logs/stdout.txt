@@ -1,0 +1,19 @@
+**Patch applied to [django/db/models/fields/__init__.py](/tmp/turingos_substrate_worktrees/7418630fc6aaba50/django/db/models/fields/__init__.py) (only change; no test/benchmark files edited).**
+
+```diff
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index ee45bb941e..090c8f5033 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -762,7 +762,7 @@ class Field(RegisterLookupMixin):
+             # such fields can't be deferred (we don't have a check for this).
+             if not getattr(cls, self.attname, None):
+                 setattr(cls, self.attname, self.descriptor_class(self))
+-        if self.choices is not None:
++        if self.choices is not None and 'get_%s_display' % self.name not in cls.__dict__:
+             setattr(cls, 'get_%s_display' % self.name,
+                     partialmethod(cls._get_FIELD_display, field=self))
+ 
+```
+
+(Verified via minimal in-memory model reproduction that direct `get_FOO_display` overrides now win for local + abstract-inherited choice fields, while auto-generated display methods continue to be provided otherwise. Worktree left with only this edit.)

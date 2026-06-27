@@ -641,6 +641,68 @@ def test_meta_ai_review_missing_key_is_not_run_and_does_not_serialize_secret(tmp
     assert "sk-" not in out.read_text(encoding="utf-8")
 
 
+def test_meta_ai_review_context_reads_incremental_ramp_layout(tmp_path):
+    reviewer = load_module(META_REVIEW, "run_deepseek_meta_review")
+    evidence = tmp_path / "stage5"
+    substrate = evidence / "turingos_incremental"
+    direct = evidence / "direct_incremental" / "direct_baseline_django__django-12039"
+    patch_eval = evidence / "patch_eval_incremental"
+    worker_logs = substrate / "instances" / "django__django-12039" / "worker_logs"
+    worker_logs.mkdir(parents=True)
+    direct.mkdir(parents=True)
+    patch_eval.mkdir(parents=True)
+    (worker_logs / "diff.patch").write_text("diff --git a/app.py b/app.py\n", encoding="utf-8")
+    (worker_logs / "stderr.txt").write_text("", encoding="utf-8")
+    (worker_logs / "stdout.txt").write_text("worker output\n", encoding="utf-8")
+    (substrate / "substrate_coverage_audit.json").write_text(
+        json.dumps({"schema_id": "MiniSweBenchSubstrateCoverageAudit.v1", "verdict": "PASS"}),
+        encoding="utf-8",
+    )
+    (substrate / "substrate_smoke_result.json").write_text(
+        json.dumps({"schema_id": "MiniSweBenchSubstrateSmokeResult.v1", "worker_process": "grok_cli"}),
+        encoding="utf-8",
+    )
+    (substrate / "substrate_coverage.json").write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "sample_size": 1,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-12039",
+                        "worker_mode": "grok",
+                        "worker_id": "worker:sha256:" + "a" * 64,
+                        "worker_exit_code": 0,
+                        "predicate_write_event_type": "FailureNode",
+                        "process_calls": {"turingd": 1, "grok_cli": 1},
+                        "event_calls": {"WorkCapsuleBuilt": 1},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (direct / "result.json").write_text(
+        json.dumps({"schema_id": "DirectGrokBaselineSmoke.v1", "instance_id": "django__django-12039"}),
+        encoding="utf-8",
+    )
+    (patch_eval / "patch_eval_summary.json").write_text(
+        json.dumps({"schema_id": "DjangoSweBenchPatchEvalSummary.v1", "by_arm": {"turingos": {"pass": 1}}}),
+        encoding="utf-8",
+    )
+    (evidence / "loop_eval_summary.json").write_text(
+        json.dumps({"schema_id": "MiniSweBenchRampLoopSummary.v1", "results": {"turingos_pass": 9}}),
+        encoding="utf-8",
+    )
+
+    _prompt, context = reviewer.build_review_payload(evidence)
+
+    assert context["substrate_smoke_result"]["worker_process"] == "grok_cli"
+    assert context["direct_baseline_results"][0]["instance_id"] == "django__django-12039"
+    assert context["patch_eval_summary"]["by_arm"]["turingos"]["pass"] == 1
+    assert context["loop_eval_summary"]["results"]["turingos_pass"] == 9
+
+
 def test_direct_baseline_dry_run_writes_redacted_commands(tmp_path):
     tasks = tmp_path / "tasks.jsonl"
     tasks.write_text(
@@ -785,6 +847,33 @@ def test_gate_a_evaluator_payload_detects_test_edits_and_is_micro_tape_importabl
     assert payload["forbidden_test_edit_detected"] is True
     assert payload["forbidden_test_edit_paths"] == ["tests/migrations/test_writer.py"]
     assert payload["truth_source"] == "official_evaluator_macro_evidence"
+
+
+def test_gate_a_evaluator_payload_covers_missing_patch_as_importable_failure():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    task = {
+        "instance_id": "django__django-11964",
+        "test_patch": "diff --git a/tests/example.py b/tests/example.py\n",
+        "FAIL_TO_PASS": ["tests.example.TestCase.test_regression"],
+    }
+
+    payload = evaluator.official_evaluator_evidence_payload(
+        task=task,
+        arm="turingos",
+        candidate_patch_text="",
+        apply_candidate_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        apply_test_patch_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        target_test_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        capsule_id="wc_django__django-11964",
+        macro_anchor_id="macro:diff:django__django-11964",
+        worker_receipt_id="rcp_empty",
+        failure_class_override="MISSING_OR_EMPTY_PATCH",
+    )
+
+    assert payload["result"] == "FAIL"
+    assert payload["failure_class"] == "MISSING_OR_EMPTY_PATCH"
+    assert payload["candidate_patch_hash"] == "sha256:" + hashlib.sha256(b"").hexdigest()
+    assert payload["capsule_id"] == "wc_django__django-11964"
 
 
 def test_gate_a_evaluator_builds_candidate_payload_from_evidence_and_substrate_refs():

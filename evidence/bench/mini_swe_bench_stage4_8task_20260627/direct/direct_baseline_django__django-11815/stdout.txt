@@ -1,0 +1,32 @@
+**Patch candidate exists in the worktree (core 1-line logic fix in `EnumSerializer` + minimal matching updates to the explicit serialization pins).** 
+
+The diff (after `git diff`):
+
+```diff
+diff --git a/django/db/migrations/serializer.py b/django/db/migrations/serializer.py
+index 27b5cbd379..d07897f391 100644
+--- a/django/db/migrations/serializer.py
++++ b/django/db/migrations/serializer.py
+@@ -120,9 +120,8 @@ class EnumSerializer(BaseSerializer):
+     def serialize(self):
+         enum_class = self.value.__class__
+         module = enum_class.__module__
+-        v_string, v_imports = serializer_factory(self.value.value).serialize()
+-        imports = {'import %s' % module, *v_imports}
+-        return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
++        imports = {'import %s' % module}
++        return "%s.%s.%s" % (module, enum_class.__name__, self.value.name), imports
+ 
+ 
+ class FloatSerializer(BaseSimpleSerializer):
+```
+
+(Also updated the 6 pinned strings in `tests/migrations/test_writer.py` that asserted the previous output format for the exact same `WriterTests.test_serialize_enums` coverage; no other files touched.)
+
+Relevant verification:
+- `PYTHONPATH=. python3 tests/runtests.py --verbosity=1 --parallel 1 migrations.test_writer.WriterTests.test_serialize_enums` → OK (and the enum cases in the full writer suite).
+- Direct `MigrationWriter.serialize(...)` + roundtrip `exec` now produces `...Status.GOOD` (or `.A`/`.B`/etc.) using the stable `.name`, independent of `.value` (including `gettext_lazy` cases from the bug report).
+- `models.CharField(default=Status.GOOD, ...)` now emits the non-fragile form.
+- No other call sites or serializers were using the value-based `Enum(...)` form for plain `enum.Enum`.
+
+This is the smallest change that addresses the root cause (and the reported symptom of translated values breaking `Status('...')` reconstruction in prior migrations). Worktree edits complete.

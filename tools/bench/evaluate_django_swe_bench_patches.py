@@ -118,12 +118,16 @@ def official_evaluator_evidence_payload(
     macro_anchor_id: str | None = None,
     worker_receipt_id: str | None = None,
     worker_stop_class: str | None = None,
+    failure_class_override: str | None = None,
 ) -> dict[str, Any]:
     forbidden_paths = detect_forbidden_test_edits(candidate_patch_text)
     candidate_status = _status(apply_candidate_result)
     test_patch_status = _status(apply_test_patch_result)
     target_status = _status(target_test_result)
-    if forbidden_paths:
+    if failure_class_override is not None:
+        result = "FAIL"
+        failure_class = failure_class_override
+    elif forbidden_paths:
         result = "FAIL"
         failure_class = "SCOPE_VIOLATION_TEST_EDIT"
     elif candidate_status != "PASS":
@@ -354,7 +358,24 @@ def evaluate_patch(
             "reason": "only django/django target-test evaluation is supported by this smoke evaluator",
         }
     if not patch.exists() or not patch.read_text(encoding="utf-8", errors="replace").strip():
-        return {"instance_id": instance_id, "arm": arm, "result": "FAIL", "reason": "missing_or_empty_patch"}
+        patch_text = patch.read_text(encoding="utf-8", errors="replace") if patch.exists() else ""
+        evidence = official_evaluator_evidence_payload(
+            task=task,
+            arm=arm,
+            candidate_patch_text=patch_text,
+            apply_candidate_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+            apply_test_patch_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+            target_test_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+            failure_class_override="MISSING_OR_EMPTY_PATCH",
+            **_substrate_ref_kwargs(substrate_run),
+        )
+        return {
+            "instance_id": instance_id,
+            "arm": arm,
+            "result": "FAIL",
+            "reason": "missing_or_empty_patch",
+            "official_evaluator_evidence": evidence,
+        }
     patch_text = patch.read_text(encoding="utf-8", errors="replace")
     forbidden_paths = detect_forbidden_test_edits(patch_text)
     if forbidden_paths:

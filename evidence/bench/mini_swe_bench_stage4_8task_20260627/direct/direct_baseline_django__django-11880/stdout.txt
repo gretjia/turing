@@ -1,0 +1,8 @@
+**Patch applied** (smallest change: +1 line in `Field.__deepcopy__` to ensure `error_messages` is deep-copied, matching the existing pattern for `widget` + reported root cause + forms.py deepcopy of `base_fields`).
+
+- Verified reproduction (shared dict + cross-instance mutation) before.
+- Verified fix (distinct dicts, isolated mutation) after.
+- `PYTHONPATH=. python tests/runtests.py forms_tests` → 646 tests OK (0 failures).
+- `git diff` confirms minimal candidate patch in the worktree. 
+
+Done.

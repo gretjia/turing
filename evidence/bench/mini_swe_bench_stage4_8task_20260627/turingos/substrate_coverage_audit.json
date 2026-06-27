@@ -1,0 +1,61 @@
+{
+  "auditor_independence": {
+    "imports_benchmark_harness": false,
+    "input_surface": "coverage_json_only"
+  },
+  "blocking_findings": [],
+  "event_counts": {
+    "BudgetAllocated": 8,
+    "CostEvent": 8,
+    "EvidenceBound": 8,
+    "FailureNode": 16,
+    "GoalStateProposed": 8,
+    "MacroObservationImported": 8,
+    "MarketCreated": 8,
+    "MarketSettled": 8,
+    "PPUTAccounted": 8,
+    "PositionMinted": 8,
+    "PredicateEvaluated": 8,
+    "RewardDistributed": 8,
+    "SystemConstitutionAccepted": 8,
+    "WorkCapsuleBuilt": 8,
+    "WorkerReceiptImported": 8
+  },
+  "meta_ai": null,
+  "min_sample_size_checked": 8,
+  "module_counts": {
+    "M0_law_goal_harness": 8,
+    "M10_evidence_approval": 8,
+    "M11_failure_memory": 8,
+    "M12_market_substrate": 8,
+    "M13_marketrouter_shadow": 8,
+    "M14_pput_accounting": 8,
+    "M15_projection": 8,
+    "M16_integration_queue": 8,
+    "M17_e2e_handoff": 8,
+    "M1_canonical_codec": 8,
+    "M2_micro_git_tape": 8,
+    "M3_event_registry": 8,
+    "M4_single_loop": 8,
+    "M5_goal_module_atom_capsule": 8,
+    "M6_worker_profiles": 8,
+    "M7_executor_broker": 8,
+    "M8_macro_observer": 8,
+    "M9_predicate_kernel": 8
+  },
+  "process_counts": {
+    "grok_cli": 8,
+    "turing-execd": 8,
+    "turing-marketd": 16,
+    "turing-mcp": 8,
+    "turing-pputd": 8,
+    "turing-viewd": 8,
+    "turingd": 8
+  },
+  "required_worker_process": "grok_cli",
+  "sample_size": 8,
+  "schema_id": "MiniSweBenchSubstrateCoverageAudit.v1",
+  "scientific_status": "SUBSTRATE_COVERAGE_READY",
+  "verdict": "PASS",
+  "warnings": []
+}

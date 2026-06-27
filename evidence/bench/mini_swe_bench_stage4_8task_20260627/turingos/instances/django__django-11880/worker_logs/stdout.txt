@@ -1,0 +1,17 @@
+**Patch applied** (smallest change for the reported `__deepcopy__` issue on `error_messages`):
+
+```diff
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index 03cd8af8d7..18007accab 100644
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -199,6 +199,7 @@ class Field:
+         result = copy.copy(self)
+         memo[id(self)] = result
+         result.widget = copy.deepcopy(self.widget, memo)
++        result.error_messages = copy.deepcopy(self.error_messages, memo)
+         result.validators = self.validators[:]
+         return result
+```
+
+The edit is isolated to [django/forms/fields.py](/tmp/turingos_substrate_worktrees/bbf3e5d501cce7ac/django/forms/fields.py) (the only source file inspected/edited). No test/benchmark files were touched. The worktree contains the patch.

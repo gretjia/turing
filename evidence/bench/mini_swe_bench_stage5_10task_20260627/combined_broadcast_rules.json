@@ -1,0 +1,41 @@
+{
+  "schema_id": "BenchmarkBroadcastRules.v1",
+  "source": "stage5_combined_gatea_stage4_failure_memory",
+  "rules": [
+    {
+      "failure_class": "TARGET_TEST_TYPE_MISMATCH",
+      "guidance": "When setting widget attrs from a field max_length, preserve the runtime integer value; do not convert it to a string unless the surrounding API explicitly requires strings.",
+      "rule_id": "br_recovery_11790_maxlength_runtime_type",
+      "source_evidence_id": "ev_recovery_11790_official_eval_fail",
+      "source_instance_id": "django__django-11790"
+    },
+    {
+      "failure_class": "TARGET_TEST_SERIALIZATION_FORM",
+      "guidance": "For Django migration serialization of enum members and RegexFlag members, emit bracket lookup syntax using the member name, for example EnumClass['NAME'], rather than value construction or dot attribute syntax.",
+      "rule_id": "br_recovery_11815_enum_bracket_lookup",
+      "source_evidence_id": "ev_recovery_11815_official_eval_fail",
+      "source_instance_id": "django__django-11815"
+    },
+    {
+      "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+      "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+      "rule_id": "br_recovery_no_benchmark_test_edits",
+      "source_evidence_id": "ev_recovery_scope_policy",
+      "source_instance_id": "stage3"
+    },
+    {
+      "failure_class": "MISSING_OR_EMPTY_PATCH",
+      "guidance": "Do not stop with an unchanged worktree. Inspect the failing behavior and leave a concrete production-code patch; if no safe patch exists, explain the blocker without claiming completion.",
+      "rule_id": "br_stage4_11964_missing_patch",
+      "source_evidence_id": "ev_stage4_11964_missing_patch",
+      "source_instance_id": "django__django-11964"
+    },
+    {
+      "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+      "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+      "rule_id": "br_stage4_no_benchmark_test_edits",
+      "source_evidence_id": "ev_stage4_scope_policy",
+      "source_instance_id": "stage4"
+    }
+  ]
+}

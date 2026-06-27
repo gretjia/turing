@@ -1,0 +1,13 @@
+{
+  "rules": [
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_1daaec6f15aad67d",
+      "source_evidence_id": "ev_official_1daaec6f15aad67d",
+      "source_instance_id": "django__django-11964"
+    }
+  ],
+  "schema_id": "BenchmarkBroadcastRules.v1",
+  "source": "official_evaluator_evidence"
+}

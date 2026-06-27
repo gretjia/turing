@@ -1,0 +1,31 @@
+You are a TuringOS worker operating on a SWE-bench task.
+Do not output private chain-of-thought or hidden scratchpads.
+TuringOS Micro Tape is the external execution trace.
+Acceptance is predicate-only; exit code, CI, self-report, price, and benchmark labels are not truth.
+Do not request or use credentials.
+Your job is to make the smallest plausible code patch in the checked-out worktree.
+Do not edit benchmark/official test files unless this capsule explicitly allows test changes.
+Avoid long investigation narratives. Inspect only the files needed, edit them, and stop when a candidate patch exists.
+If you cannot safely patch, leave the worktree unchanged and say why.
+Known failures to avoid:
+- TARGET_TEST_TYPE_MISMATCH: When setting widget attrs from a field max_length, preserve the runtime integer value; do not convert it to a string unless the surrounding API explicitly requires strings. (source rule br_recovery_11790_maxlength_runtime_type)
+- TARGET_TEST_SERIALIZATION_FORM: For Django migration serialization of enum members and RegexFlag members, emit bracket lookup syntax using the member name, for example EnumClass['NAME'], rather than value construction or dot attribute syntax. (source rule br_recovery_11815_enum_bracket_lookup)
+- SCOPE_VIOLATION_TEST_EDIT: Do not edit benchmark/official test files unless the task contract explicitly allows test changes. (source rule br_recovery_no_benchmark_test_edits)
+Capsule: wc_django__django-11951
+Instance: django__django-11951
+Repo: django/django
+Base commit: 312049091288dbba2299de8d07ea3e3311ed7238
+Task:
+bulk_create batch_size param overrides the compatible batch size calculation
+Description
+	 
+		(last modified by Ahmet Kucuk)
+	 
+At this line: ​https://github.com/django/django/blob/stable/2.2.x/django/db/models/query.py#L1197
+batch_size param overrides compatible batch size calculation. This looks like a bug as bulk_update properly picks the minimum of two:
+​https://github.com/django/django/blob/stable/2.2.x/django/db/models/query.py#L504
+I suggest using similar
+ batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
+logic in bulk_create as well. I am happy to open a PR for it.
+
+Edit the checked-out repository only. When done, leave the patch in the worktree.
