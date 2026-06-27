@@ -4,7 +4,8 @@
 //! predicate-side closed-world API over the single embedded registry owned by
 //! `turing-contracts`.
 
-use turing_contracts::registry::{self, RegistryRow};
+use turing_contracts::identity::MicroOid;
+use turing_contracts::registry::{self, EventClass, RegistryRow, TargetRef};
 use turing_contracts::{envelope::PredicateProduct, jcs};
 
 /// Predicate admission errors.
@@ -155,4 +156,81 @@ fn report_hash(
     });
     let bytes = jcs::canonicalize(&value).expect("predicate report hash uses valid JCS values");
     format!("sha256:{}", jcs::sha256_hex(&bytes))
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MarketPputPredicateError {
+    UnknownEventType(String),
+    NotEconomyEvent(String),
+    EconomyEventCanMoveTruth(String),
+    InvalidSettlementEventId(String),
+    PputLeakage(String),
+}
+
+impl std::fmt::Display for MarketPputPredicateError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MarketPputPredicateError::UnknownEventType(event_type) => {
+                write!(f, "unknown event_type {event_type:?}")
+            }
+            MarketPputPredicateError::NotEconomyEvent(event_type) => {
+                write!(f, "event {event_type:?} is not an economy event")
+            }
+            MarketPputPredicateError::EconomyEventCanMoveTruth(event_type) => {
+                write!(f, "economy event {event_type:?} can move truth")
+            }
+            MarketPputPredicateError::InvalidSettlementEventId(id) => {
+                write!(f, "market settlement id {id:?} is not a Micro mu: id")
+            }
+            MarketPputPredicateError::PputLeakage(marker) => {
+                write!(f, "worker prompt leaks hidden PPUT marker {marker:?}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for MarketPputPredicateError {}
+
+pub fn market_event_preserves_truth(event_type: &str) -> Result<(), MarketPputPredicateError> {
+    let row = registry::registry(event_type)
+        .ok_or_else(|| MarketPputPredicateError::UnknownEventType(event_type.to_string()))?;
+    if row.class != EventClass::Economy {
+        return Err(MarketPputPredicateError::NotEconomyEvent(
+            event_type.to_string(),
+        ));
+    }
+    if row.target_ref != TargetRef::TapeTip
+        || row.head_effect != turing_contracts::envelope::HeadEffect::Preserve
+    {
+        return Err(MarketPputPredicateError::EconomyEventCanMoveTruth(
+            event_type.to_string(),
+        ));
+    }
+    Ok(())
+}
+
+pub fn market_settlement_event_is_micro(
+    settlement_event_id: &str,
+) -> Result<(), MarketPputPredicateError> {
+    MicroOid::parse(settlement_event_id)
+        .map(|_| ())
+        .map_err(|_| {
+            MarketPputPredicateError::InvalidSettlementEventId(settlement_event_id.to_string())
+        })
+}
+
+pub fn no_pput_in_worker_prompt(prompt: &str) -> Result<(), MarketPputPredicateError> {
+    let lower = prompt.to_ascii_lowercase();
+    for (canonical, needle) in [
+        ("VPPUT", "vpput"),
+        ("PPUT", "pput"),
+        ("heldout", "heldout"),
+        ("hidden evaluator", "hidden evaluator"),
+        ("progress / (tokens", "progress / (tokens"),
+    ] {
+        if lower.contains(needle) {
+            return Err(MarketPputPredicateError::PputLeakage(canonical.to_string()));
+        }
+    }
+    Ok(())
 }
