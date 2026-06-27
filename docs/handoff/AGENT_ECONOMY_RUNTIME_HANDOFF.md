@@ -51,4 +51,5 @@ turingd --serve --socket /tmp/turingd.sock
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, disposable projection building, and read-only project
-  status. Broader project-scoped mutable sidecar services remain pending.
+  status. `turing-viewd` also supports derived project-scoped projection snapshot write with
+  `can_write_truth=false`. Broader market/PPUT sidecar persistence remains pending.

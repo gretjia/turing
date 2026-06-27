@@ -137,6 +137,78 @@ fn viewd_builds_disposable_projection_without_truth_write() {
 }
 
 #[test]
+fn viewd_writes_project_scoped_projection_snapshot_without_truth_write() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let project = dir.path().join("project");
+    std::fs::create_dir(&project).expect("create project dir");
+    let state_dir = project.join(".turingos");
+    std::fs::create_dir(&state_dir).expect("create state dir");
+    let project_root = std::fs::canonicalize(&project).expect("canonical project");
+    std::fs::write(
+        state_dir.join("project.json"),
+        json!({
+            "schema_id": "operator_project.v1",
+            "project_root": project_root.to_str().expect("UTF-8 project path"),
+            "truth_source": "micro_tape",
+            "can_write_micro_truth": false,
+            "credential_material_included": false
+        })
+        .to_string(),
+    )
+    .expect("write project metadata");
+
+    let socket = dir.path().join("viewd-snapshot.sock");
+    let mut child = spawn_daemon_with_project("turing-viewd", &socket, &project);
+    wait_for_socket(&socket, &mut child);
+
+    let response = rpc(
+        &socket,
+        "projection.snapshot.write",
+        json!({
+            "events": [
+                {
+                    "event_id": format!("mu:{}", "c".repeat(64)),
+                    "event_type": "MarketCreated",
+                    "subject_id": "mkt_snapshot"
+                },
+                {
+                    "event_id": format!("mu:{}", "d".repeat(64)),
+                    "event_type": "PPUTAccounted",
+                    "subject_id": "run_snapshot"
+                }
+            ]
+        }),
+    );
+
+    assert_eq!(response["result"]["schema_id"], "projection_snapshot.v1");
+    assert_eq!(response["result"]["source"], "micro_tape_only");
+    assert_eq!(response["result"]["can_write_truth"], false);
+    assert_eq!(response["result"]["event_count"], 2);
+    assert_eq!(
+        response["result"]["snapshot_path"],
+        state_dir
+            .join("projection.json")
+            .to_str()
+            .expect("UTF-8 snapshot path")
+    );
+    assert!(
+        response["result"]["projection_hash"]
+            .as_str()
+            .expect("projection hash")
+            .starts_with("sha256:")
+    );
+
+    let snapshot =
+        std::fs::read_to_string(state_dir.join("projection.json")).expect("projection snapshot");
+    assert!(snapshot.contains(r#""schema_id":"projection_snapshot.v1""#));
+    assert!(snapshot.contains(r#""can_write_truth":false"#));
+    assert!(snapshot.contains(r#""projection_hash":"sha256:"#));
+    assert!(!snapshot.contains("accepted because CI passed"));
+
+    shutdown(socket, child);
+}
+
+#[test]
 fn execd_authorizes_scoped_grants_without_head_authority() {
     let dir = tempfile::tempdir().expect("temp dir");
     let socket = dir.path().join("execd.sock");

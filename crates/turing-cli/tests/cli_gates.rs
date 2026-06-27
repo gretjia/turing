@@ -219,6 +219,7 @@ fn handoff_generate_writes_real_projection_hashes() {
         "turing approval preview",
         "turing approval sign",
         "hardware-future route fails closed",
+        "projection snapshot write",
         "scope/budget/provenance/replay",
         "turing replay --verify",
         "Known Risks",

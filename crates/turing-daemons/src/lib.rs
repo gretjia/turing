@@ -237,6 +237,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("projection.build") if runtime.contract.role == "turing-viewd" => {
             projection_build_response(request, id)
         }
+        Some("projection.snapshot.write") if runtime.contract.role == "turing-viewd" => {
+            projection_snapshot_write_response(runtime, request, id)
+        }
         Some("daemon.shutdown") => json!({
             "jsonrpc": "2.0",
             "id": id,
@@ -971,6 +974,94 @@ fn projection_build_response(request: &Value, id: Value) -> Value {
         }),
         Err(error) => jsonrpc_error(id, -32000, format!("projection build failed: {error}")),
     }
+}
+
+fn projection_snapshot_write_response(
+    runtime: &DaemonRuntime,
+    request: &Value,
+    id: Value,
+) -> Value {
+    let Some(project_root) = &runtime.project_root else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "projection.snapshot.write requires --project".to_string(),
+        );
+    };
+    let project_root = match std::fs::canonicalize(project_root) {
+        Ok(path) => path,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
+        }
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let Some(events) = params.get("events") else {
+        return invalid_params(id, "events array is required");
+    };
+    let events: Vec<ProjectionEvent> = match serde_json::from_value(events.clone()) {
+        Ok(events) => events,
+        Err(error) => return invalid_params(id, format!("invalid projection events: {error}")),
+    };
+    let projection =
+        match ProjectionBuilder::from_source(ProjectionSource::MicroTape(events)).build() {
+            Ok(projection) => projection,
+            Err(error) => {
+                return jsonrpc_error(id, -32000, format!("projection build failed: {error}"));
+            }
+        };
+    let state_dir = project_root.join(".turingos");
+    if let Err(error) = std::fs::create_dir_all(&state_dir) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot create {}: {error}", state_dir.display()),
+        );
+    }
+    let snapshot_path = state_dir.join("projection.json");
+    let snapshot = json!({
+        "schema_id": "projection_snapshot.v1",
+        "source": projection.source,
+        "event_count": projection.event_count,
+        "market_event_count": projection.market_event_count,
+        "pput_event_count": projection.pput_event_count,
+        "can_write_truth": projection.can_write_truth,
+        "projection_hash": projection.projection_hash,
+    });
+    let text = match serde_json::to_string(&snapshot) {
+        Ok(text) => text,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("projection snapshot serialization failed: {error}"),
+            );
+        }
+    };
+    if let Err(error) = std::fs::write(&snapshot_path, text) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot write {}: {error}", snapshot_path.display()),
+        );
+    }
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "schema_id": "projection_snapshot.v1",
+            "source": snapshot["source"],
+            "event_count": snapshot["event_count"],
+            "market_event_count": snapshot["market_event_count"],
+            "pput_event_count": snapshot["pput_event_count"],
+            "can_write_truth": snapshot["can_write_truth"],
+            "projection_hash": snapshot["projection_hash"],
+            "snapshot_path": snapshot_path.to_string_lossy(),
+        }
+    })
 }
 
 fn parse_predicate_checks(params: &Value) -> Result<Vec<PredicateCheck>, String> {
