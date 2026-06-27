@@ -169,6 +169,45 @@ fn global_excluded(spec: &Value) -> Vec<String> {
 }
 
 #[test]
+fn canonical_codec_acceptance_profile_rejects_forbidden_values() {
+    let raw = r#"{"z":"local","a":1,"nested":{"b":2}}"#;
+    let value = jcs::parse_strict(raw).expect("strict integer/ASCII-key JSON parses");
+    let canonical = jcs::canonicalize(&value).expect("canonical bytes");
+
+    assert_eq!(
+        canonical,
+        br#"{"a":1,"nested":{"b":2},"z":"local"}"#,
+        "canonical bytes must be deterministic and key-sorted"
+    );
+    assert!(
+        !canonical.ends_with(b"\n"),
+        "canonical bytes must not carry a trailing newline"
+    );
+
+    assert!(
+        matches!(
+            jcs::parse_strict(r#"{"a":1,"a":2}"#),
+            Err(JcsError::DuplicateKey(_))
+        ),
+        "duplicate load-bearing keys must fail closed"
+    );
+    assert!(
+        matches!(
+            jcs::parse_strict(r#"{"n":1.0}"#),
+            Err(JcsError::NonIntegerNumber(_))
+        ),
+        "floats must fail closed"
+    );
+    assert!(
+        matches!(
+            jcs::parse_strict(r#"{"not_ascii_键":1}"#),
+            Err(JcsError::NonAsciiKey(_))
+        ),
+        "non-ASCII load-bearing keys must fail closed"
+    );
+}
+
+#[test]
 fn all_seven_canonical_vectors_match_oracle() {
     let spec = load_spec();
     let glob = global_excluded(&spec);
