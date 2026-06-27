@@ -852,6 +852,7 @@ pub struct ExecutionReceipt {
 pub enum WorkerRunError {
     Profile(WorkerProfileError),
     ReceiptHash(String),
+    HiddenWorkerPromptMarker(String),
 }
 
 impl std::fmt::Display for WorkerRunError {
@@ -859,6 +860,9 @@ impl std::fmt::Display for WorkerRunError {
         match self {
             WorkerRunError::Profile(e) => write!(f, "worker profile error: {e}"),
             WorkerRunError::ReceiptHash(e) => write!(f, "receipt hash error: {e}"),
+            WorkerRunError::HiddenWorkerPromptMarker(marker) => {
+                write!(f, "worker prompt contains hidden marker {marker:?}")
+            }
         }
     }
 }
@@ -939,6 +943,159 @@ impl ManualCopyPasteWorker {
             completion.done_json.as_deref(),
         )
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GrokHeadlessConfig {
+    pub binary: String,
+    pub output_format: String,
+    pub reasoning_effort: String,
+    pub effort: String,
+}
+
+impl Default for GrokHeadlessConfig {
+    fn default() -> Self {
+        GrokHeadlessConfig {
+            binary: "grok".to_string(),
+            output_format: "json".to_string(),
+            reasoning_effort: "low".to_string(),
+            effort: "low".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GrokHeadlessRequest {
+    pub capsule_id: String,
+    pub worktree: String,
+    pub visible_capsule: String,
+    pub model: String,
+    pub max_turns: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GrokHeadlessCommandPlan {
+    pub argv: Vec<String>,
+    pub prompt: String,
+    pub prompt_hash: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GrokHeadlessWorker {
+    profile: WorkerProfile,
+    config: GrokHeadlessConfig,
+}
+
+impl GrokHeadlessWorker {
+    #[must_use]
+    pub fn worker_id_for(model: &str) -> String {
+        let value = json!({
+            "schema_id": "worker_identity_seed.v1",
+            "provider": "grok",
+            "kind": "CommandTemplate",
+            "model": model,
+            "thinking_mode": "off_via_low_reasoning_no_plan",
+        });
+        let bytes = jcs::canonicalize(&value).expect("worker identity seed is canonical JSON");
+        format!("worker:sha256:{}", jcs::sha256_hex(&bytes))
+    }
+
+    pub fn try_new(worker_id: impl Into<String>) -> Result<Self, WorkerRunError> {
+        Self::try_new_with_config(worker_id, GrokHeadlessConfig::default())
+    }
+
+    pub fn try_new_with_config(
+        worker_id: impl Into<String>,
+        config: GrokHeadlessConfig,
+    ) -> Result<Self, WorkerRunError> {
+        let profile = WorkerProfile::vendor_bundle(
+            worker_id,
+            WorkerKind::CommandTemplate,
+            vec![DispatchPurpose::PrimaryExecution],
+            vec!["code_edit".to_string(), "test_run".to_string()],
+            FailureDomain {
+                provider: "grok".to_string(),
+                auth_surface: AuthSurface::LocalCli,
+                network_required: true,
+            },
+        )?;
+        Ok(GrokHeadlessWorker { profile, config })
+    }
+
+    #[must_use]
+    pub fn profile(&self) -> &WorkerProfile {
+        &self.profile
+    }
+
+    pub fn command_plan(
+        &self,
+        request: GrokHeadlessRequest,
+    ) -> Result<GrokHeadlessCommandPlan, WorkerRunError> {
+        reject_hidden_worker_prompt_markers(&request.visible_capsule)?;
+        let prompt = build_grok_visible_prompt(&request);
+        let prompt_hash = hash_str(&prompt);
+        let argv = vec![
+            self.config.binary.clone(),
+            "-p".to_string(),
+            prompt.clone(),
+            "--cwd".to_string(),
+            request.worktree,
+            "--output-format".to_string(),
+            self.config.output_format.clone(),
+            "--model".to_string(),
+            request.model,
+            "--always-approve".to_string(),
+            "--disable-web-search".to_string(),
+            "--no-plan".to_string(),
+            "--no-memory".to_string(),
+            "--no-subagents".to_string(),
+            "--reasoning-effort".to_string(),
+            self.config.reasoning_effort.clone(),
+            "--effort".to_string(),
+            self.config.effort.clone(),
+            "--max-turns".to_string(),
+            request.max_turns.to_string(),
+            "--verbatim".to_string(),
+        ];
+        Ok(GrokHeadlessCommandPlan {
+            argv,
+            prompt,
+            prompt_hash,
+        })
+    }
+}
+
+fn reject_hidden_worker_prompt_markers(prompt: &str) -> Result<(), WorkerRunError> {
+    let lower = prompt.to_ascii_lowercase();
+    for marker in [
+        "hidden predicate",
+        "hidden predicates",
+        "pput",
+        "heldout",
+        "golden path",
+        "raw failure log",
+        "metric file",
+    ] {
+        if lower.contains(marker) {
+            return Err(WorkerRunError::HiddenWorkerPromptMarker(marker.to_string()));
+        }
+    }
+    Ok(())
+}
+
+fn build_grok_visible_prompt(request: &GrokHeadlessRequest) -> String {
+    format!(
+        concat!(
+            "You are a TuringOS headless Macro Worker.\n",
+            "Capsule: {capsule_id}\n",
+            "Do not output chain-of-thought, private scratchpads, or model deliberation.\n",
+            "TuringOS Micro Tape records the external progress trace; report only observable edits, commands, and results.\n",
+            "Use only the visible capsule below.\n\n",
+            "{visible_capsule}\n"
+        ),
+        capsule_id = request.capsule_id,
+        visible_capsule = request.visible_capsule
+    )
 }
 
 fn try_full_local_profile(
