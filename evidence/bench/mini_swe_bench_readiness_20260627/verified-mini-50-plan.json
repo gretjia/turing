@@ -1,0 +1,3869 @@
+{
+  "benchmark": "swe_bench_verified_mini",
+  "created_at": "2026-06-27T10:23:51Z",
+  "dry_run": true,
+  "experiment_design": {
+    "arms": [
+      "direct_grok_baseline",
+      "turingos_grok_worker"
+    ],
+    "assignment": "paired_within_task",
+    "exclusion_policy": "no_post_hoc_exclusions",
+    "minimum_real_tasks": 50,
+    "multiple_runs_policy": "report_all_runs_no_best_of_n_unless_preregistered",
+    "pre_registered_before_execution": true,
+    "primary_metric": {
+      "name": "resolved_by_predicate",
+      "truth_source": "micro_tape_predicate_replay",
+      "type": "paired_binary"
+    },
+    "randomization_seed": 20260627,
+    "schema_id": "MiniSweBenchExperimentDesign.v1",
+    "secondary_metrics": [
+      "cost_per_resolved_task",
+      "wall_time_ms",
+      "retry_count",
+      "failure_class_distribution",
+      "replay_pass_rate",
+      "invalid_accepted_head_attempts"
+    ],
+    "statistical_tests": [
+      {
+        "applies_to": "paired_binary_resolution",
+        "name": "mcnemar_exact"
+      },
+      {
+        "applies_to": "paired_differences",
+        "confidence": "0.95",
+        "name": "paired_bootstrap_ci"
+      }
+    ],
+    "statistical_unit": "swe_bench_instance"
+  },
+  "meta_ai": {
+    "accepted_head_authority": false,
+    "api_key_env": "DEEPSEEK_API_KEY",
+    "authority": "none",
+    "base_url": "https://api.deepseek.com/v1",
+    "credential_material": "env_only_not_serialized",
+    "model": "deepseek-v4-pro",
+    "provider": "deepseek",
+    "schema_id": "MetaAIProvider.v1"
+  },
+  "model": "grok-composer-2.5-fast",
+  "runs": [
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11790/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:696bbb9a99eff487df0ef2dfd14d18cd9709d51a4e3ed0435ae7e5f845a23662",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "b1d6b35e146aea83b171c1b921178bbaae2795ed",
+        "instance_id": "django__django-11790",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11790/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:af4f984f468c075a6a91dc088edc54bc019ddaa34b7a194404f2ab020d2b5b86",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "b1d6b35e146aea83b171c1b921178bbaae2795ed",
+        "instance_id": "django__django-11790",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11815/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:537e5f1b27cae06c02a5ce7218a21c38327bc863ed460724ec0b2149b7b95627",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e02f67ef2d03d48128e7a118bf75f0418e24e8ac",
+        "instance_id": "django__django-11815",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11815/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:645772fe6a1917db847d59fc39f9235bcbfa1c5ac4d5b27bc511e9420eaa9aad",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e02f67ef2d03d48128e7a118bf75f0418e24e8ac",
+        "instance_id": "django__django-11815",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11848/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:ef26a41fd9229eb872e84091448a9a56f31b3bf9f311e6521b465b32ba7e1a8a",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f0adf3b9b7a19cdee05368ff0c0c2d087f011180",
+        "instance_id": "django__django-11848",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11848/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:e9c8e903ffbc417a7e0a586a1267af22e81aa0e0028c00e2bb62f0bbb6228968",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f0adf3b9b7a19cdee05368ff0c0c2d087f011180",
+        "instance_id": "django__django-11848",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11880/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:207342855878d08a7925f8f0e87f13dad4deb69c4a38d7f19b62fc1f171cd85c",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "06909fe084f87a65459a83bd69d7cdbe4fce9a7c",
+        "instance_id": "django__django-11880",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11880/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:252ca1f07412dfe6a5a00b96c7ae31fc9eab2750875bce79d9eb1f9782604648",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "06909fe084f87a65459a83bd69d7cdbe4fce9a7c",
+        "instance_id": "django__django-11880",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11885/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:4c1d8589a735c8b009ac689c011a48ee39a5503310d628fff74509c017223f60",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "04ac9b45a34440fa447feb6ae934687aacbfc5f4",
+        "instance_id": "django__django-11885",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11885/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:badb2bbad32e33addc5fe6396791769a81b2041166b121d18488a033aa8bd747",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "04ac9b45a34440fa447feb6ae934687aacbfc5f4",
+        "instance_id": "django__django-11885",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11951/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:bd6d65f8784828c35eece02f43ae6267bdd76129f74173bd7bfd9c4e975a4778",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "312049091288dbba2299de8d07ea3e3311ed7238",
+        "instance_id": "django__django-11951",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11951/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:293895257107d29b7deeef391b8074b045268fc98e96c7f26642fa5f6c2569aa",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "312049091288dbba2299de8d07ea3e3311ed7238",
+        "instance_id": "django__django-11951",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11964/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:20c9b17a37a2ab76fd9d9a0d35c36191416046056d5d33767ac191be02d8aedf",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "fc2b1cc926e34041953738e58fa6ad3053059b22",
+        "instance_id": "django__django-11964",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11964/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:f00b67e0f6941492523824fdc3ebf909a2009139e26a3b8729277d85439abfd5",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "fc2b1cc926e34041953738e58fa6ad3053059b22",
+        "instance_id": "django__django-11964",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11999/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:e456a08ebe16b2f153be8efd3e405615c213332f7b9e1976222a48ddee91b90f",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "84633905273fc916e3d17883810d9969c03f73c2",
+        "instance_id": "django__django-11999",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-11999/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:ea0b2545b25fa55b017e7aeaf83a52edc37de906c4c47c706581f907dd560cd3",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "84633905273fc916e3d17883810d9969c03f73c2",
+        "instance_id": "django__django-11999",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12039/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:16e0520bd5c8d62415043b503185b2b9066c63f22be24f85dae29d12f8f3dddd",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "58c1acb1d6054dfec29d0f30b1033bae6ef62aec",
+        "instance_id": "django__django-12039",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12039/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:40bde694639a655255eb01085b0f6502433a0dac6a29531fda44c56e86b9686d",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "58c1acb1d6054dfec29d0f30b1033bae6ef62aec",
+        "instance_id": "django__django-12039",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12050/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:c0903f230c227a942a963a9814f0997c5e1646c2aec76dd358c4c824852edcfb",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "b93a0e34d9b9b99d41103782b7e7aeabf47517e3",
+        "instance_id": "django__django-12050",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12050/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d627c912613b430ab0ddd15f133c01212307c7dec9c8562b03232f41add69da5",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "b93a0e34d9b9b99d41103782b7e7aeabf47517e3",
+        "instance_id": "django__django-12050",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12143/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:a83d589cb86c089c2c72a51c9e1ca7a3bba8386052aeec1a73931920c6cc705b",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5573a54d409bb98b5c5acdb308310bed02d392c2",
+        "instance_id": "django__django-12143",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12143/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:7057455e2d3f079bae81b1eb1c9c10ab22689d23b0c63e9ce9bcb52432528e1f",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5573a54d409bb98b5c5acdb308310bed02d392c2",
+        "instance_id": "django__django-12143",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12155/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d1bf84b7487d800b309f8dc648f2198ff12d7e80a85fe7b05543ca9dd9cf83e2",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e8fcdaad5c428878d0a5d6ba820d957013f75595",
+        "instance_id": "django__django-12155",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12155/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:9fd6851325d0426ede24cb855ef7e3a820f02ac52b886be3399c9488d3ec7c27",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e8fcdaad5c428878d0a5d6ba820d957013f75595",
+        "instance_id": "django__django-12155",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12193/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:99f2818eb6bbe299806c1417177df97b1b606ce8a0678cfe9579712c82c5878f",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "3fb7c12158a2402f0f80824f6778112071235803",
+        "instance_id": "django__django-12193",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12193/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:9570d20c735139da25a3b25ff31560a49c46101acf551cc9c2433665f86d6eb3",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "3fb7c12158a2402f0f80824f6778112071235803",
+        "instance_id": "django__django-12193",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12209/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:40241bce47968ef25e101fdb9b0cb522ae9aa75f3d8795a34b86ae3952132076",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5a68f024987e6d16c2626a31bf653a2edddea579",
+        "instance_id": "django__django-12209",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12209/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:2401c5f604c07c35bc3dec6fb7f641ace9d2006994df87e6499ff8d900e7f4e8",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5a68f024987e6d16c2626a31bf653a2edddea579",
+        "instance_id": "django__django-12209",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12262/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:0dbd8299d9773686d201175dc4b4654d5105b83018856b1a6cb4c20f402efc22",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "69331bb851c34f05bc77e9fc24020fe6908b9cd5",
+        "instance_id": "django__django-12262",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12262/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:cb80d06cea5326f778ea55ab2766c9595c87ac768dcfb0147032c13ba66ac2f7",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "69331bb851c34f05bc77e9fc24020fe6908b9cd5",
+        "instance_id": "django__django-12262",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12273/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:509f16d85bdb17b7eca558d0162d0388a1f096497fcd5d2c161ab9a6465dfa27",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "927c903f3cd25c817c21738328b53991c035b415",
+        "instance_id": "django__django-12273",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12273/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:c333b7c8060311a40ed0cebcd7db93a1489076e0d39875a60122715c015b8b38",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "927c903f3cd25c817c21738328b53991c035b415",
+        "instance_id": "django__django-12273",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12276/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:cfb9869a53f1c18d8a9c01f3df38dcfe7471ebfd2d2f4aa3923d6fc05fd6ccf6",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "53d8646f799de7f92ab9defe9dc56c6125448102",
+        "instance_id": "django__django-12276",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12276/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:5316e31a39f6643268f5a37b2fe2c1115a1983228ba92ed8f90ebec415c05c3e",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "53d8646f799de7f92ab9defe9dc56c6125448102",
+        "instance_id": "django__django-12276",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12304/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:16e4385dbb84a9834fbb958da8588bcd373de5ae8bc0c5c54d778e0c1ef34274",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "4c1b401e8250f9f520b3c7dc369554477ce8b15a",
+        "instance_id": "django__django-12304",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12304/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:b2fec9791b880bb56a6e8e20223e22d4143cb4104789e8a1689649ba6c3c4af7",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "4c1b401e8250f9f520b3c7dc369554477ce8b15a",
+        "instance_id": "django__django-12304",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12308/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:5b79059753f98810a0c045362acb9c531905551f306a84b18b2f62ff17686d7d",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "2e0f04507b17362239ba49830d26fec504d46978",
+        "instance_id": "django__django-12308",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12308/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:8929b313165ce873e40c54404028c760f26744ce9a5114e310e39faa2801e255",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "2e0f04507b17362239ba49830d26fec504d46978",
+        "instance_id": "django__django-12308",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12325/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:56d656ee99083a500908d1ca2431a8e1262cbb424e4fada29d0ec871a1de36b2",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "29c126bb349526b5f1cd78facbe9f25906f18563",
+        "instance_id": "django__django-12325",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12325/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:048ac67801a997660e482da239c601819afa19e6e7485b9fcf0edd21ef0d6c5d",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "29c126bb349526b5f1cd78facbe9f25906f18563",
+        "instance_id": "django__django-12325",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12406/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:7ffb32878cadbc6e076d26f6f28093f67405ba96c2cd1fa5c324c277d1453363",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "335c9c94acf263901fb023404408880245b0c4b4",
+        "instance_id": "django__django-12406",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12406/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:fa3a025af9f11a77649481f957e7ed0052a6bfce822f46c6f681e38f986be538",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "335c9c94acf263901fb023404408880245b0c4b4",
+        "instance_id": "django__django-12406",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12708/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d054bc397a211901f96a26ffa40e4fe05adeca48d8ebaad1e083f83f9248e450",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "447980e72ac01da1594dd3373a03ba40b7ee6f80",
+        "instance_id": "django__django-12708",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12708/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:1c44989fdf133437f15e04ad66ec4d330fba895d5eca4ccfa5b763d7de1c3653",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "447980e72ac01da1594dd3373a03ba40b7ee6f80",
+        "instance_id": "django__django-12708",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12713/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:2e5b6e4714c1af355db9bd1512eb7d913cf0946ba078a178cedbfdd940519295",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5b884d45ac5b76234eca614d90c83b347294c332",
+        "instance_id": "django__django-12713",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12713/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:47e5ad84217da1ecae2330a4865acddbffc3dced76e538a0d4e026ad0ac760a6",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5b884d45ac5b76234eca614d90c83b347294c332",
+        "instance_id": "django__django-12713",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12774/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:1a43cbd86983d3942bb355ae142ea88d9f2e71b2c9285081b0f291228e89d9a0",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "67f9d076cfc1858b94f9ed6d1a5ce2327dcc8d0d",
+        "instance_id": "django__django-12774",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-12774/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:b9aaddbd7ad742d1d8d76e376a3d2a5142dd3c826028c9e7d88eca86020c145f",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "67f9d076cfc1858b94f9ed6d1a5ce2327dcc8d0d",
+        "instance_id": "django__django-12774",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-9296/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d2d55fde4bc2300b514d828993d525efecc51c90720c54a6d89a6979660f36a9",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "84322a29ce9b0940335f8ab3d60e55192bef1e50",
+        "instance_id": "django__django-9296",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/django__django-9296/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:956748d74c175015d9b1706ad59a6d4b760805db26d298a39d8bf698b3b418e0",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "84322a29ce9b0940335f8ab3d60e55192bef1e50",
+        "instance_id": "django__django-9296",
+        "repo": "django/django"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10323/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:5dc74417b1a363b615d6a7fe97c0067db72d6a4fa4f16a0447c378a764c7f15c",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "31eba1a76dd485dc633cae48227b46879eda5df4",
+        "instance_id": "sphinx-doc__sphinx-10323",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10323/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:57f7751d6476df7fed7697121a40e6114a1eb4b50781f6ad2df8a0239266fef9",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "31eba1a76dd485dc633cae48227b46879eda5df4",
+        "instance_id": "sphinx-doc__sphinx-10323",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10435/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d71fd59a0bf4b28547862ff64c915be1396d6317ee9e41b5d10d8533c6b955c4",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f1061c012e214f16fd8790dec3c283d787e3daa8",
+        "instance_id": "sphinx-doc__sphinx-10435",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10435/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:b05851cdd06bd9ea07ba80b43fcd9be5c83c57a49d6d613789e75db49c67a85a",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f1061c012e214f16fd8790dec3c283d787e3daa8",
+        "instance_id": "sphinx-doc__sphinx-10435",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10466/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:2509bf643802f8f8b4a1c53af18417939a7661e22771d9cfa01f80fe835d55a8",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "cab2d93076d0cca7c53fac885f927dde3e2a5fec",
+        "instance_id": "sphinx-doc__sphinx-10466",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10466/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:debc919dc2ca313992541e0a925721e5c1e6dee30173c4ab52d8627b51c6719d",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "cab2d93076d0cca7c53fac885f927dde3e2a5fec",
+        "instance_id": "sphinx-doc__sphinx-10466",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10673/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:27422c12da309737b510820806356a8661a8d5b17d241408392733a48ec0d595",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f35d2a6cc726f97d0e859ca7a0e1729f7da8a6c8",
+        "instance_id": "sphinx-doc__sphinx-10673",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-10673/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:13e2f31ec97b75c0de29ead940f192f21c839e0a3a5cdcac1793f0c33357d4f5",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f35d2a6cc726f97d0e859ca7a0e1729f7da8a6c8",
+        "instance_id": "sphinx-doc__sphinx-10673",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-11510/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:f657938f9635c8481673ece62254bb4cd9f3605ef6759a53a02c5a0d97c5f14b",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "6cb783c0024a873722952a67ebb9f41771c8eb6d",
+        "instance_id": "sphinx-doc__sphinx-11510",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-11510/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:b5e4a3742e84f50b6a78b5a7a5b5ee6ecf40a71a195798d98820f7000b0aa2e5",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "6cb783c0024a873722952a67ebb9f41771c8eb6d",
+        "instance_id": "sphinx-doc__sphinx-11510",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7590/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:4feced311b392b2d830f5806d8d204ac5ddfc6900c9ab21208d60467370f7c06",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "2e506c5ab457cba743bb47eb5b8c8eb9dd51d23d",
+        "instance_id": "sphinx-doc__sphinx-7590",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7590/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:ec9d7371556c70fb8749fe47625c81996caef23ea6334fe5e4a86c28c138138e",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "2e506c5ab457cba743bb47eb5b8c8eb9dd51d23d",
+        "instance_id": "sphinx-doc__sphinx-7590",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7748/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:38ab2ac53696c35f7a499295fc9a16288d1b950c23e76babff8c5cb47e70a3a6",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "9988d5ce267bf0df4791770b469431b1fb00dcdd",
+        "instance_id": "sphinx-doc__sphinx-7748",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7748/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:19a4bd8c684ecb31f2e3bf185b9277f46afec0a77bdb0f3026965643e76bbe05",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "9988d5ce267bf0df4791770b469431b1fb00dcdd",
+        "instance_id": "sphinx-doc__sphinx-7748",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7757/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:cb5b7290a046247a8353462ce31b4ca7a990ba7ae08f64189ca31cd24a8cd5c3",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "212fd67b9f0b4fae6a7c3501fdf1a9a5b2801329",
+        "instance_id": "sphinx-doc__sphinx-7757",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7757/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:35d817317a1f1fc9d5fcc6ed1f84b3233856d4331591580f1e507787d2344ba9",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "212fd67b9f0b4fae6a7c3501fdf1a9a5b2801329",
+        "instance_id": "sphinx-doc__sphinx-7757",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7985/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:56c99444096cfc617fad6f2ceb5dca0d60fb28d48b36f6d6ca772a432c0d498a",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f30284ef926ebaf04b176f21b421e2dffc679792",
+        "instance_id": "sphinx-doc__sphinx-7985",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-7985/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d50d74a97cec94a769a126d81eb0766d9af6f6d14a7cba91a14504e3040ccde2",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f30284ef926ebaf04b176f21b421e2dffc679792",
+        "instance_id": "sphinx-doc__sphinx-7985",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8035/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:64c7e325bc6351aa4b955b93ed51ff492fa1f3fe367f4ccc75b334dbc8866525",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5e6da19f0e44a0ae83944fb6ce18f18f781e1a6e",
+        "instance_id": "sphinx-doc__sphinx-8035",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8035/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:8fcb751a375d9d704cecbb9eeaffc775ef608322c0ef743061a70fcea83db8fc",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "5e6da19f0e44a0ae83944fb6ce18f18f781e1a6e",
+        "instance_id": "sphinx-doc__sphinx-8035",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8056/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:5a17f4697a312752cfe68fed17700f18cd688ee7afd0227aba19d57099b54007",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e188d56ed1248dead58f3f8018c0e9a3f99193f7",
+        "instance_id": "sphinx-doc__sphinx-8056",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8056/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:295967459d74e2043af3391198b1d221167ede05c24879e4b891875ef404cd6f",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e188d56ed1248dead58f3f8018c0e9a3f99193f7",
+        "instance_id": "sphinx-doc__sphinx-8056",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8265/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:50d85c52a1f66352bce4d3200cb8501060083a8ac1f729d7e2b7fa38064d0e5a",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "b428cd2404675475a5c3dc2a2b0790ba57676202",
+        "instance_id": "sphinx-doc__sphinx-8265",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8265/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:8af11e6a3bad8d3589378524a6cb3c97f7a1b2c1641e0c98bccf24b7ec599cdc",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "b428cd2404675475a5c3dc2a2b0790ba57676202",
+        "instance_id": "sphinx-doc__sphinx-8265",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8269/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:4a0e9e50bd2d373b0e6ef326714a63830afc0375f1a8e44ede8a110980b99e8e",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "1e2ccd8f0eca0870cf6f8fce6934e2da8eba9b72",
+        "instance_id": "sphinx-doc__sphinx-8269",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8269/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:585a043acda3374fbea6528493f6b10fa3d0e84a66d4126de19bd881b8822d96",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "1e2ccd8f0eca0870cf6f8fce6934e2da8eba9b72",
+        "instance_id": "sphinx-doc__sphinx-8269",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8475/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:3aca1e4cb437593d9ee43455583fcac96000249311b5deeb27ef1cbd25260614",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "3ea1ec84cc610f7a9f4f6b354e264565254923ff",
+        "instance_id": "sphinx-doc__sphinx-8475",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8475/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:2a5364f344207f2f0b364c18a6aacfad13e8303455d98fa9675fcb0ac3092354",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "3ea1ec84cc610f7a9f4f6b354e264565254923ff",
+        "instance_id": "sphinx-doc__sphinx-8475",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8548/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:05d44dfc8009abc496e76d03950e420d7bb43cdea807819325d4f130bbdb1df7",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "dd1615c59dc6fff633e27dbb3861f2d27e1fb976",
+        "instance_id": "sphinx-doc__sphinx-8548",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8548/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:85328ecfb198ba900aeb2eec97c9edccdb2629aa55cf0504a31cf84bd294292e",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "dd1615c59dc6fff633e27dbb3861f2d27e1fb976",
+        "instance_id": "sphinx-doc__sphinx-8548",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8551/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:fc8be951d35a9b96a5798e807b25e8bf96993057dbd151a34dd2f9242912096b",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "57ed10c68057c96491acbd3e62254ccfaf9e3861",
+        "instance_id": "sphinx-doc__sphinx-8551",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8551/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:4a073854f2fb6d952a63e3942a8751e1eb91978588ce3a86ead7c9814788c26b",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "57ed10c68057c96491acbd3e62254ccfaf9e3861",
+        "instance_id": "sphinx-doc__sphinx-8551",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8638/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:b27e8b08946addfa8006765c89340a545dfbd17e70456821064430dd16e616b6",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "4b452338f914d4f6b54704222d70ae8a746e3db5",
+        "instance_id": "sphinx-doc__sphinx-8638",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8638/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d7e66172cd91712a4088ac33d70c84cb2e21df35815abc0b911c53a4acec7e53",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "4b452338f914d4f6b54704222d70ae8a746e3db5",
+        "instance_id": "sphinx-doc__sphinx-8638",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8721/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:5acef94ebf763a6c59b7b6b638d27298a123c6beeaac250bd1ff14731cd0ba66",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "82ef497a8c88f0f6e50d84520e7276bfbf65025d",
+        "instance_id": "sphinx-doc__sphinx-8721",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-8721/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:ea730a1376e7b14b669d8fe18d7159effaf5f34fe6ca92cefd2ff55972b12e00",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "82ef497a8c88f0f6e50d84520e7276bfbf65025d",
+        "instance_id": "sphinx-doc__sphinx-8721",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9229/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:0dc91820538d36fc5db1cd1b65ddf1116f9165ececf504396626e16c5e00019d",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "876fa81e0a038cda466925b85ccf6c5452e0f685",
+        "instance_id": "sphinx-doc__sphinx-9229",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9229/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:b9b7b75e2aedf5ce651fd01676f52a9303908d6e9edb7f4e4d4d09c780dd6069",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "876fa81e0a038cda466925b85ccf6c5452e0f685",
+        "instance_id": "sphinx-doc__sphinx-9229",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9230/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:775f9b4a8f01df776baa381af688a9fb31156e527d7aa50b934515cc90b80e75",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "567ff22716ac258b9edd2c1711d766b440ac0b11",
+        "instance_id": "sphinx-doc__sphinx-9230",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9230/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:6a218a37dd50587823ad77fa182bf8fd3799424642103b4762d785b61f364d0d",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "567ff22716ac258b9edd2c1711d766b440ac0b11",
+        "instance_id": "sphinx-doc__sphinx-9230",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9281/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:2e3af9a15419e1cc4593950db54996ea9fa0e7ec753c97c10c27c82701c63d5b",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "8ec06e9a1bd862cd713b9db748e039ccc7b3e15b",
+        "instance_id": "sphinx-doc__sphinx-9281",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9281/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:2463cbeba061c9fd0859cb6f70e3e8e358b91418547a44b27995fb6aa01c46de",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "8ec06e9a1bd862cd713b9db748e039ccc7b3e15b",
+        "instance_id": "sphinx-doc__sphinx-9281",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9320/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:efe485daba3cbcbb0ef35907c40f31d390514f18239335442827e4e9a250667e",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e05cef574b8f23ab1b57f57e7da6dee509a4e230",
+        "instance_id": "sphinx-doc__sphinx-9320",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9320/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:515769e78660b0971938d4438ea0ba67e51375eff6226de0f4c9c22abe173cbc",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "e05cef574b8f23ab1b57f57e7da6dee509a4e230",
+        "instance_id": "sphinx-doc__sphinx-9320",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9367/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:46de7e282bd4d8c5a40f5f8c43edb4433a2e5319c5f4aa856d2f1ec5975e5675",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "6918e69600810a4664e53653d6ff0290c3c4a788",
+        "instance_id": "sphinx-doc__sphinx-9367",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9367/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:d4beb6858022c1d4adc87cc7179feaeff97fe023f8c2168ee1c4926bf8448be6",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "6918e69600810a4664e53653d6ff0290c3c4a788",
+        "instance_id": "sphinx-doc__sphinx-9367",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9461/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:12d6ad05648049f81851b51b08cd91c058f24e3515d2105d1786a34d4cee0a04",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "939c7bb7ff7c53a4d27df067cea637540f0e1dad",
+        "instance_id": "sphinx-doc__sphinx-9461",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9461/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:0cc3dba88e6006713dcc5cc5573ce7720ebff9f1a27f7e56c7a6af640ef75e27",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "939c7bb7ff7c53a4d27df067cea637540f0e1dad",
+        "instance_id": "sphinx-doc__sphinx-9461",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9698/turingos_grok_worker",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:9e7d3795f9d5884fc110bca6da5f0515bfb8a537ff29f89fec3a2433628985cb",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "turingos_grok_worker",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f050a7775dfc9000f55d023d36d925a8d02ccfa8",
+        "instance_id": "sphinx-doc__sphinx-9698",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    },
+    {
+      "grok_command": {
+        "argv": [
+          "grok",
+          "-p",
+          "<visible_capsule_prompt>",
+          "--cwd",
+          "/tmp/turingos-mini-swe-bench-full/sphinx-doc__sphinx-9698/direct_grok_baseline",
+          "--output-format",
+          "plain",
+          "--model",
+          "grok-composer-2.5-fast",
+          "--always-approve",
+          "--disable-web-search",
+          "--no-plan",
+          "--no-memory",
+          "--no-subagents",
+          "--max-turns",
+          "20",
+          "--verbatim"
+        ],
+        "prompt_hash": "sha256:8ecd3b9e93bf859762b34358150ad3db5aee9a786ecea5c3b567476fd247a2b3",
+        "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output"
+      },
+      "mode": "direct_grok_baseline",
+      "not_run": [],
+      "schema_id": "MiniSweBenchGrokRunPlan.v1",
+      "status": "PLANNED",
+      "task": {
+        "base_commit": "f050a7775dfc9000f55d023d36d925a8d02ccfa8",
+        "instance_id": "sphinx-doc__sphinx-9698",
+        "repo": "sphinx-doc/sphinx"
+      },
+      "turingos_truth_guard": {
+        "accepted_head_policy": "predicate_only",
+        "microtape_as_external_trace": true
+      }
+    }
+  ],
+  "schema_id": "MiniSweBenchGrokHeadlessRun.v1",
+  "thinking_contract": "grok_no_plan_no_memory_no_subagents_plain_output",
+  "truth_guard": {
+    "accepted_head_policy": "predicate_only",
+    "forbidden_acceptance_signals": [
+      "exit_code_0",
+      "ci_green",
+      "grok_self_report",
+      "official_benchmark_result"
+    ],
+    "microtape_as_external_trace": true
+  },
+  "worker_id": "worker:sha256:6d4a3fe0d0cf488e08cae91925a69e5b5e4e66d565a157bc35aecc68e952afc0"
+}

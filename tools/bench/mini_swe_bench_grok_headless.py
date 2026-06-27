@@ -42,7 +42,7 @@ def worker_id_for(model: str) -> str:
         "provider": "grok",
         "kind": "CommandTemplate",
         "model": model,
-        "thinking_mode": "off_via_low_reasoning_no_plan",
+        "thinking_mode": "no_plan_no_memory_no_subagents_plain_output",
     }
     canonical = json.dumps(seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return "worker:sha256:" + hashlib.sha256(canonical).hexdigest()

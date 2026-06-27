@@ -949,17 +949,13 @@ impl ManualCopyPasteWorker {
 pub struct GrokHeadlessConfig {
     pub binary: String,
     pub output_format: String,
-    pub reasoning_effort: String,
-    pub effort: String,
 }
 
 impl Default for GrokHeadlessConfig {
     fn default() -> Self {
         GrokHeadlessConfig {
             binary: "grok".to_string(),
-            output_format: "json".to_string(),
-            reasoning_effort: "low".to_string(),
-            effort: "low".to_string(),
+            output_format: "plain".to_string(),
         }
     }
 }
@@ -994,7 +990,7 @@ impl GrokHeadlessWorker {
             "provider": "grok",
             "kind": "CommandTemplate",
             "model": model,
-            "thinking_mode": "off_via_low_reasoning_no_plan",
+            "thinking_mode": "no_plan_no_memory_no_subagents_plain_output",
         });
         let bytes = jcs::canonicalize(&value).expect("worker identity seed is canonical JSON");
         format!("worker:sha256:{}", jcs::sha256_hex(&bytes))
@@ -1049,10 +1045,6 @@ impl GrokHeadlessWorker {
             "--no-plan".to_string(),
             "--no-memory".to_string(),
             "--no-subagents".to_string(),
-            "--reasoning-effort".to_string(),
-            self.config.reasoning_effort.clone(),
-            "--effort".to_string(),
-            self.config.effort.clone(),
             "--max-turns".to_string(),
             request.max_turns.to_string(),
             "--verbatim".to_string(),

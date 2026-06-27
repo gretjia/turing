@@ -9,10 +9,11 @@ Grok is a Macro worker, not a Micro authority.
 
 - Worker id is content-addressed: `worker:sha256:<64 lowercase hex>`.
 - Grok sees only the visible capsule.
-- Grok runs headless with planning/memory/subagents disabled.
-- The current Grok CLI exposes `--reasoning-effort`, not a literal `--thinking off`.
-  TuringOS maps "thinking off" to the strict headless contract:
-  `--reasoning-effort low --effort low --no-plan --no-memory --no-subagents`.
+- Grok runs headless with planning, memory, and subagents disabled.
+- The current `grok-composer-2.5-fast` CLI path rejects `--reasoning-effort`
+  and `--effort`, and JSON output exposes a `thought` field. TuringOS maps
+  "thinking off" to the strict headless contract:
+  `--output-format plain --no-plan --no-memory --no-subagents`.
 - TuringOS Micro Tape is the external progress trace.
 - Do not ask Grok to output chain-of-thought, private scratchpads, or hidden reasoning.
 - Exit code, CI green, Grok self-report, and official benchmark labels cannot move

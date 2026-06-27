@@ -7,6 +7,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 HARNESS = REPO / "tools" / "bench" / "mini_swe_bench_grok_headless.py"
 AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_plan.py"
+SUBSTRATE_AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_substrate_coverage.py"
 SMOKE = REPO / "tools" / "bench" / "smoke_mini_swe_bench_grok_headless.sh"
 
 
@@ -279,3 +280,152 @@ def test_benchmark_smoke_script_runs_harness_and_auditor(tmp_path):
     audit = json.loads((tmp_path / "audit.json").read_text(encoding="utf-8"))
     assert audit["verdict"] == "PASS"
     assert (tmp_path / "plan.json").exists()
+
+
+def test_substrate_coverage_auditor_rejects_missing_modules(tmp_path):
+    coverage = tmp_path / "coverage.json"
+    out = tmp_path / "audit.json"
+    coverage.write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "run_id": "coverage_missing",
+                "sample_size": 50,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-00001",
+                        "module_calls": {
+                            "M0_law_goal_harness": 1,
+                            "M6_worker_profiles": 1,
+                        },
+                        "process_calls": {
+                            "grok_cli": 1,
+                        },
+                        "event_calls": {
+                            "WorkCapsuleBuilt": 1,
+                        },
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_AUDITOR),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 1
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "FAIL"
+    missing = {finding["id"] for finding in packet["blocking_findings"]}
+    assert "missing_module_M2_micro_git_tape" in missing
+    assert "missing_process_turingd" in missing
+    assert "missing_event_CandidateAccepted_or_FailureNode" in missing
+
+
+def test_substrate_coverage_auditor_accepts_all_required_modules(tmp_path):
+    coverage = tmp_path / "coverage.json"
+    out = tmp_path / "audit.json"
+    module_calls = {
+        module_id: 1
+        for module_id in [
+            "M0_law_goal_harness",
+            "M1_canonical_codec",
+            "M2_micro_git_tape",
+            "M3_event_registry",
+            "M4_single_loop",
+            "M5_goal_module_atom_capsule",
+            "M6_worker_profiles",
+            "M7_executor_broker",
+            "M8_macro_observer",
+            "M9_predicate_kernel",
+            "M10_evidence_approval",
+            "M11_failure_memory",
+            "M12_market_substrate",
+            "M13_marketrouter_shadow",
+            "M14_pput_accounting",
+            "M15_projection",
+            "M16_integration_queue",
+            "M17_e2e_handoff",
+        ]
+    }
+    process_calls = {
+        process: 1
+        for process in [
+            "turingd",
+            "turing-execd",
+            "turing-mcp",
+            "turing-marketd",
+            "turing-pputd",
+            "turing-viewd",
+            "grok_cli",
+        ]
+    }
+    event_calls = {
+        event: 1
+        for event in [
+            "GoalStateProposed",
+            "WorkCapsuleBuilt",
+            "MarketCreated",
+            "BudgetAllocated",
+            "WorkerReceiptImported",
+            "MacroObservationImported",
+            "CandidateAccepted",
+            "FailureNode",
+            "MarketSettled",
+            "PPUTAccounted",
+            "ReplayVerified",
+        ]
+    }
+    coverage.write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "run_id": "coverage_full",
+                "sample_size": 50,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-00001",
+                        "module_calls": module_calls,
+                        "process_calls": process_calls,
+                        "event_calls": event_calls,
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_AUDITOR),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "PASS"
+    assert packet["scientific_status"] == "SUBSTRATE_COVERAGE_READY"

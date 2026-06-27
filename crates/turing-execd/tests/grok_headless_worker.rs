@@ -11,7 +11,7 @@ fn grok_worker_id_is_content_addressed_hash() {
 }
 
 #[test]
-fn grok_headless_command_forces_no_planning_and_minimal_reasoning() {
+fn grok_headless_command_forces_plain_output_no_planning_memory_or_subagents() {
     let worker = GrokHeadlessWorker::try_new(GrokHeadlessWorker::worker_id_for("grok-code-fast-1"))
         .expect("valid grok worker");
 
@@ -47,14 +47,10 @@ fn grok_headless_command_forces_no_planning_and_minimal_reasoning() {
     assert!(
         plan.argv
             .windows(2)
-            .any(|w| w == ["--output-format", "json"])
+            .any(|w| w == ["--output-format", "plain"])
     );
-    assert!(
-        plan.argv
-            .windows(2)
-            .any(|w| w == ["--reasoning-effort", "low"])
-    );
-    assert!(plan.argv.windows(2).any(|w| w == ["--effort", "low"]));
+    assert!(!plan.argv.contains(&"--reasoning-effort".to_string()));
+    assert!(!plan.argv.contains(&"--effort".to_string()));
     assert!(plan.argv.windows(2).any(|w| w == ["--max-turns", "8"]));
     assert!(plan.argv.contains(&"--always-approve".to_string()));
     assert!(plan.argv.contains(&"--disable-web-search".to_string()));
