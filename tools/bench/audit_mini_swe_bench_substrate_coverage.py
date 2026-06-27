@@ -37,15 +37,16 @@ REQUIRED_MODULES = [
     "M17_e2e_handoff",
 ]
 
-REQUIRED_PROCESSES = [
+BASE_REQUIRED_PROCESSES = [
     "turingd",
     "turing-execd",
     "turing-mcp",
     "turing-marketd",
     "turing-pputd",
     "turing-viewd",
-    "grok_cli",
 ]
+
+REAL_WORKER_PROCESSES = {"grok_cli"}
 
 REQUIRED_EVENTS = [
     "GoalStateProposed",
@@ -56,7 +57,7 @@ REQUIRED_EVENTS = [
     "MacroObservationImported",
     "MarketSettled",
     "PPUTAccounted",
-    "ReplayVerified",
+    "PredicateEvaluated",
 ]
 
 
@@ -102,7 +103,12 @@ def aggregate_counts(runs: list[Any], field: str) -> dict[str, int]:
     return counts
 
 
-def audit_coverage(coverage: dict[str, Any], min_sample_size: int) -> dict[str, Any]:
+def audit_coverage(
+    coverage: dict[str, Any],
+    min_sample_size: int,
+    worker_process: str,
+    meta_ai_review: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     blocking: list[dict[str, str]] = []
     warnings: list[dict[str, str]] = []
 
@@ -136,7 +142,8 @@ def audit_coverage(coverage: dict[str, Any], min_sample_size: int) -> dict[str, 
                 )
             )
 
-    for process in REQUIRED_PROCESSES:
+    required_processes = [*BASE_REQUIRED_PROCESSES, worker_process]
+    for process in required_processes:
         if positive_count(process_counts, process) <= 0:
             blocking.append(
                 finding(
@@ -165,8 +172,43 @@ def audit_coverage(coverage: dict[str, Any], min_sample_size: int) -> dict[str, 
             )
         )
 
+    meta_ai_status: dict[str, Any] | None = None
+    if meta_ai_review is not None:
+        meta_ai_status = {
+            "provider": meta_ai_review.get("provider"),
+            "model": meta_ai_review.get("model"),
+            "status": meta_ai_review.get("status"),
+            "authority": meta_ai_review.get("authority"),
+            "accepted_head_authority": meta_ai_review.get("accepted_head_authority"),
+            "credential_material": meta_ai_review.get("credential_material"),
+            "review_verdict": (
+                meta_ai_review.get("review", {}).get("verdict")
+                if isinstance(meta_ai_review.get("review"), dict)
+                else None
+            ),
+        }
+        if meta_ai_review.get("provider") != "deepseek":
+            blocking.append(finding("meta_ai_provider", "MetaAI provider must be deepseek"))
+        if meta_ai_review.get("model") != "deepseek-v4-pro":
+            blocking.append(finding("meta_ai_model", "MetaAI model must be deepseek-v4-pro"))
+        if meta_ai_review.get("status") != "PASS":
+            blocking.append(finding("meta_ai_not_run", "MetaAI review must run successfully"))
+        if meta_ai_review.get("authority") != "none" or meta_ai_review.get("accepted_head_authority") is not False:
+            blocking.append(finding("meta_ai_authority", "MetaAI must have no Micro head authority"))
+        if meta_ai_review.get("credential_material") != "env_only_not_serialized":
+            blocking.append(finding("meta_ai_credentials", "MetaAI credentials must be env-only and unserialized"))
+        if not isinstance(meta_ai_review.get("review"), dict):
+            blocking.append(finding("meta_ai_review_missing", "MetaAI review object is required"))
+
     verdict = "FAIL" if blocking else "PASS"
-    status = "SUBSTRATE_COVERAGE_READY" if verdict == "PASS" else "SUBSTRATE_COVERAGE_BLOCKED"
+    if verdict == "FAIL":
+        status = "SUBSTRATE_COVERAGE_BLOCKED"
+    elif meta_ai_review is not None and worker_process in REAL_WORKER_PROCESSES:
+        status = "SUBSTRATE_COVERAGE_READY_WITH_META_AI"
+    elif worker_process in REAL_WORKER_PROCESSES:
+        status = "SUBSTRATE_COVERAGE_READY"
+    else:
+        status = "SUBSTRATE_INSTRUMENTATION_ONLY_NOT_REAL_WORKER"
     return {
         "schema_id": "MiniSweBenchSubstrateCoverageAudit.v1",
         "verdict": verdict,
@@ -176,6 +218,8 @@ def audit_coverage(coverage: dict[str, Any], min_sample_size: int) -> dict[str, 
         "module_counts": module_counts,
         "process_counts": process_counts,
         "event_counts": event_counts,
+        "required_worker_process": worker_process,
+        "meta_ai": meta_ai_status,
         "blocking_findings": blocking,
         "warnings": warnings,
         "auditor_independence": {
@@ -198,9 +242,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--coverage", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--min-sample-size", type=int, default=50)
+    parser.add_argument("--worker-process", default="grok_cli")
+    parser.add_argument("--meta-ai-review")
     args = parser.parse_args(argv)
 
-    packet = audit_coverage(load_json(Path(args.coverage)), args.min_sample_size)
+    meta_ai_review = load_json(Path(args.meta_ai_review)) if args.meta_ai_review else None
+    packet = audit_coverage(
+        load_json(Path(args.coverage)),
+        args.min_sample_size,
+        args.worker_process,
+        meta_ai_review,
+    )
     write_json(Path(args.out), packet)
     return 0 if packet["verdict"] == "PASS" else 1
 

@@ -41,6 +41,70 @@ fn turingd_serves_jsonrpc_health_and_read_only_heads() {
 }
 
 #[test]
+fn turingd_bootstraps_genesis_only_on_empty_micro_tape() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+
+    let socket = dir.path().join("turingd-bootstrap-genesis.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let bootstrapped = rpc_params(
+        &socket,
+        "project.bootstrap_genesis",
+        json!({
+            "writer_id": "writer:bootstrap",
+            "constitution_digest": digest('9')
+        }),
+    );
+    let event_id = bootstrapped["result"]["event_id"]
+        .as_str()
+        .expect("event id")
+        .to_string();
+    assert!(event_id.starts_with("mu:"));
+    assert_eq!(
+        bootstrapped["result"]["event_type"],
+        "SystemConstitutionAccepted"
+    );
+    assert_eq!(bootstrapped["result"]["accepted_head_moved"], true);
+    assert_eq!(bootstrapped["result"]["head_set"]["tape_tip"], event_id);
+    assert_eq!(bootstrapped["result"]["head_set"]["accepted_head"], event_id);
+
+    let second = rpc_params(
+        &socket,
+        "project.bootstrap_genesis",
+        json!({
+            "writer_id": "writer:bootstrap",
+            "constitution_digest": digest('9')
+        }),
+    );
+    assert_eq!(second["error"]["code"], -32000);
+    assert!(
+        second["error"]["message"]
+            .as_str()
+            .expect("error message")
+            .contains("already bootstrapped")
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
+#[test]
 fn turingd_reads_real_micro_tape_heads_from_configured_repo() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");

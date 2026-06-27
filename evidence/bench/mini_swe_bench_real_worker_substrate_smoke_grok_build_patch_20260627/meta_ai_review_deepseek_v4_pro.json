@@ -1,0 +1,23 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "base_url": "https://api.deepseek.com/v1",
+  "context_hash": "sha256:8e96ff6026961ac3a4e6a75ce2760b54bd6769ba8c63c2fe308fea291cd44f11",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:a371ac86cfef16b843d3ce076089cd6aca35e861aa20eb22a095f3c708bd0475",
+  "request_hash": "sha256:7c6bd212a81b218ef0c99c4a8167792529a689cd96e906c0ed855cad54a3321f",
+  "review": {
+    "benchmark_claim_allowed": false,
+    "findings": "Worker exited with code 1 (max turns) but produced a patch. Substrate coverage is PASS. Truth-boundary: worker_exit_code should not be a success signal; benchmark claim not allowed due to incomplete execution.",
+    "next_required_gate": "worker_turn_adjustment",
+    "schema_id": "MetaAIReviewContext.v1",
+    "substrate_complete": true,
+    "verdict": "WARN"
+  },
+  "review_content_hash": "sha256:cfdea9519588d9eef6cbbd9d49089d1bfc4940a244bd1612273c70e8398ae925",
+  "schema_id": "DeepSeekMetaAIReviewRun.v1",
+  "status": "PASS"
+}

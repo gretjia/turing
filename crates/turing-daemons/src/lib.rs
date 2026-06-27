@@ -260,6 +260,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("event.append_preserve") if runtime.contract.role == "turingd" => {
             append_preserve_response(runtime, request, id)
         }
+        Some("project.bootstrap_genesis") if runtime.contract.role == "turingd" => {
+            project_bootstrap_genesis_response(runtime, request, id)
+        }
         Some("candidate.verify_write") if runtime.contract.role == "turingd" => {
             candidate_verify_write_response(runtime, request, id)
         }
@@ -387,6 +390,73 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             "head_effect": "PRESERVE",
             "accepted_head_moved": accepted_head_moved,
             "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+fn project_bootstrap_genesis_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "project.bootstrap_genesis requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(writer_id) => writer_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let constitution_digest = match required_digest(params, "constitution_digest") {
+        Ok(digest) => digest,
+        Err(message) => return invalid_params(id, message),
+    };
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    match tape.head_set_guarded() {
+        Ok(None) => {}
+        Ok(Some(_)) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                "micro tape already bootstrapped".to_string(),
+            );
+        }
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot read micro tape heads: {error}"));
+        }
+    }
+    let receipt = match tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            writer_id,
+            json!({"constitution_digest": constitution_digest}),
+        )
+        .predicate_pass(),
+    ) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "SystemConstitutionAccepted",
+            "event_id": receipt.event_id,
+            "head_effect": "ADVANCE",
+            "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,

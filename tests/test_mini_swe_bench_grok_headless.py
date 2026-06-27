@@ -8,6 +8,8 @@ REPO = Path(__file__).resolve().parents[1]
 HARNESS = REPO / "tools" / "bench" / "mini_swe_bench_grok_headless.py"
 AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_plan.py"
 SUBSTRATE_AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_substrate_coverage.py"
+SUBSTRATE_SMOKE = REPO / "tools" / "bench" / "run_mini_swe_bench_substrate_smoke.py"
+META_REVIEW = REPO / "tools" / "bench" / "run_deepseek_meta_review.py"
 SMOKE = REPO / "tools" / "bench" / "smoke_mini_swe_bench_grok_headless.sh"
 
 
@@ -387,7 +389,7 @@ def test_substrate_coverage_auditor_accepts_all_required_modules(tmp_path):
             "FailureNode",
             "MarketSettled",
             "PPUTAccounted",
-            "ReplayVerified",
+            "PredicateEvaluated",
         ]
     }
     coverage.write_text(
@@ -429,3 +431,200 @@ def test_substrate_coverage_auditor_accepts_all_required_modules(tmp_path):
     packet = json.loads(out.read_text(encoding="utf-8"))
     assert packet["verdict"] == "PASS"
     assert packet["scientific_status"] == "SUBSTRATE_COVERAGE_READY"
+
+
+def test_substrate_coverage_auditor_accepts_real_meta_ai_review(tmp_path):
+    coverage = tmp_path / "coverage.json"
+    meta = tmp_path / "meta.json"
+    out = tmp_path / "audit.json"
+    modules = [
+        "M0_law_goal_harness",
+        "M1_canonical_codec",
+        "M2_micro_git_tape",
+        "M3_event_registry",
+        "M4_single_loop",
+        "M5_goal_module_atom_capsule",
+        "M6_worker_profiles",
+        "M7_executor_broker",
+        "M8_macro_observer",
+        "M9_predicate_kernel",
+        "M10_evidence_approval",
+        "M11_failure_memory",
+        "M12_market_substrate",
+        "M13_marketrouter_shadow",
+        "M14_pput_accounting",
+        "M15_projection",
+        "M16_integration_queue",
+        "M17_e2e_handoff",
+    ]
+    coverage.write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "run_id": "coverage_full_meta",
+                "sample_size": 1,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-11790",
+                        "module_calls": {module: 1 for module in modules},
+                        "process_calls": {
+                            "turingd": 1,
+                            "turing-execd": 1,
+                            "turing-mcp": 1,
+                            "turing-marketd": 1,
+                            "turing-pputd": 1,
+                            "turing-viewd": 1,
+                            "grok_cli": 1,
+                        },
+                        "event_calls": {
+                            "GoalStateProposed": 1,
+                            "WorkCapsuleBuilt": 1,
+                            "MarketCreated": 1,
+                            "BudgetAllocated": 1,
+                            "WorkerReceiptImported": 1,
+                            "MacroObservationImported": 1,
+                            "FailureNode": 1,
+                            "MarketSettled": 1,
+                            "PPUTAccounted": 1,
+                            "PredicateEvaluated": 1,
+                        },
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    meta.write_text(
+        json.dumps(
+            {
+                "schema_id": "DeepSeekMetaAIReviewRun.v1",
+                "provider": "deepseek",
+                "model": "deepseek-v4-pro",
+                "status": "PASS",
+                "authority": "none",
+                "accepted_head_authority": False,
+                "credential_material": "env_only_not_serialized",
+                "review": {"verdict": "WARN"},
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_AUDITOR),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out),
+            "--min-sample-size",
+            "1",
+            "--worker-process",
+            "grok_cli",
+            "--meta-ai-review",
+            str(meta),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "PASS"
+    assert packet["scientific_status"] == "SUBSTRATE_COVERAGE_READY_WITH_META_AI"
+    assert packet["meta_ai"]["review_verdict"] == "WARN"
+
+
+def test_substrate_smoke_runner_fake_worker_outputs_full_coverage(tmp_path):
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "django__django-11790",
+                "repo": "django/django",
+                "base_commit": "main",
+                "problem_statement": "Real SWE-bench shaped task fixture.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "run"
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_SMOKE),
+            "--tasks-jsonl",
+            str(tasks),
+            "--out-dir",
+            str(out_dir),
+            "--worker-mode",
+            "fake",
+            "--limit",
+            "1",
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    coverage = json.loads((out_dir / "substrate_coverage.json").read_text(encoding="utf-8"))
+    assert coverage["schema_id"] == "MiniSweBenchSubstrateCoverage.v1"
+    assert coverage["sample_size"] == 1
+    assert coverage["turingos_arm_runs"][0]["instance_id"] == "django__django-11790"
+
+    audit = json.loads((out_dir / "substrate_coverage_audit.json").read_text(encoding="utf-8"))
+    assert audit["verdict"] == "PASS"
+    assert audit["scientific_status"] == "SUBSTRATE_INSTRUMENTATION_ONLY_NOT_REAL_WORKER"
+    summary = json.loads((out_dir / "substrate_smoke_result.json").read_text(encoding="utf-8"))
+    assert summary["scientific_status"] == "SUBSTRATE_INSTRUMENTATION_ONLY_NOT_REAL_WORKER"
+
+
+def test_meta_ai_review_missing_key_is_not_run_and_does_not_serialize_secret(tmp_path, monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    evidence = tmp_path / "evidence"
+    evidence.mkdir()
+    (evidence / "substrate_coverage_audit.json").write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverageAudit.v1",
+                "verdict": "PASS",
+                "scientific_status": "SUBSTRATE_COVERAGE_READY",
+                "blocking_findings": [],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "meta.json"
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(META_REVIEW),
+            "--evidence-dir",
+            str(evidence),
+            "--out",
+            str(out),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 2
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["status"] == "NOT_RUN"
+    assert packet["credential_material"] == "env_only_not_serialized"
+    assert "DEEPSEEK_API_KEY" in packet["missing_env"]
+    assert "sk-" not in out.read_text(encoding="utf-8")

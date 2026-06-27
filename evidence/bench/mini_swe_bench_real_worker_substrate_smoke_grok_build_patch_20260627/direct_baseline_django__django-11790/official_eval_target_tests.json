@@ -1,0 +1,25 @@
+{
+  "schema_id": "DirectGrokBaselineOfficialTargetTestCheck.v1",
+  "instance_id": "django__django-11790",
+  "base_commit": "b1d6b35e146aea83b171c1b921178bbaae2795ed",
+  "worker_patch": "direct_baseline_django__django-11790/diff.patch",
+  "test_patch_source": "/tmp/turingos-swebench-data/verified-mini-50.jsonl",
+  "environment": {
+    "venv": "/tmp/turingos-django-11790-venv",
+    "eval_worktree": "/tmp/turingos-django-11790-direct-eval"
+  },
+  "target_tests": [
+    "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+    "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+  ],
+  "result": "PASS",
+  "observed": {
+    "tests_run": 2,
+    "failures": 0,
+    "errors": 0
+  },
+  "benchmark_claim": {
+    "significant_lead_claim_allowed": false,
+    "reason": "one paired smoke task is not statistically meaningful and both arms pass target tests"
+  }
+}
