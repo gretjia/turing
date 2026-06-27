@@ -632,7 +632,7 @@ fn candidate_verify_write_response(runtime: &DaemonRuntime, request: &Value, id:
         Ok(checks) => checks,
         Err(message) => return invalid_params(id, message),
     };
-    let checks = enforce_candidate_predicate_pack(checks);
+    let checks = enforce_candidate_predicate_pack(checks, &candidate_payload);
 
     let report = match PredicateKernel.run("CandidateAccepted", checks) {
         Ok(report) => report,
@@ -950,7 +950,10 @@ fn parse_predicate_checks(params: &Value) -> Result<Vec<PredicateCheck>, String>
         .collect()
 }
 
-fn enforce_candidate_predicate_pack(mut checks: Vec<PredicateCheck>) -> Vec<PredicateCheck> {
+fn enforce_candidate_predicate_pack(
+    mut checks: Vec<PredicateCheck>,
+    candidate_payload: &Value,
+) -> Vec<PredicateCheck> {
     for required in ["capsule_contract", "macro_anchor"] {
         if !checks.iter().any(|check| check.check_id == required) {
             checks.push(PredicateCheck::fail(
@@ -958,6 +961,16 @@ fn enforce_candidate_predicate_pack(mut checks: Vec<PredicateCheck>) -> Vec<Pred
                 "PREDICATE_PACK_MISSING_REQUIRED_CHECK",
             ));
         }
+    }
+    let macro_anchor_ok = candidate_payload
+        .get("macro_anchor_id")
+        .and_then(Value::as_str)
+        .is_some_and(|id| id.starts_with("macro:"));
+    if !macro_anchor_ok {
+        checks.push(PredicateCheck::fail(
+            "macro_anchor",
+            "MACRO_ANCHOR_ID_MUST_USE_MACRO_PREFIX",
+        ));
     }
     checks
 }
