@@ -361,6 +361,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-projection"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "turing-contracts",
+]
+
+[[package]]
 name = "turing-replay"
 version = "0.0.0"
 dependencies = [
