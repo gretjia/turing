@@ -283,6 +283,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-economy"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "turing-contracts",
+]
+
+[[package]]
 name = "turing-evidence"
 version = "0.0.0"
 dependencies = [

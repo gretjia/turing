@@ -1,0 +1,13 @@
+[package]
+name = "turing-economy"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+turing-contracts = { path = "../turing-contracts" }
+serde = { version = "=1.0.228", features = ["derive"] }
+
+[lints]
+workspace = true
