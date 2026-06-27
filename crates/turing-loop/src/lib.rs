@@ -353,3 +353,156 @@ pub mod tick {
         })
     }
 }
+
+pub mod capsule {
+    use serde_json::{Value, json};
+    use turing_contracts::jcs;
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct WorkCapsuleId(String);
+
+    impl WorkCapsuleId {
+        #[must_use]
+        pub fn new(id: impl Into<String>) -> Self {
+            WorkCapsuleId(id.into())
+        }
+
+        #[must_use]
+        pub fn as_str(&self) -> &str {
+            &self.0
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct CapsuleDraft {
+        pub capsule_id: WorkCapsuleId,
+        pub atom_id: String,
+        pub task: String,
+        pub allowed_files: Vec<String>,
+        pub acceptance_commands: Vec<String>,
+        pub private_contract: PrivateMicroContract,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct PrivateMicroContract {
+        pub hidden_predicates: Vec<String>,
+        pub pput_formula: String,
+        pub heldout_ids: Vec<String>,
+        pub raw_failure_logs: Vec<String>,
+        pub budget_policy: Value,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct VisibleCapsule {
+        pub capsule_id: WorkCapsuleId,
+        pub atom_id: String,
+        pub task: String,
+        pub allowed_files: Vec<String>,
+        pub acceptance_commands: Vec<String>,
+        pub private_contract_hash: String,
+    }
+
+    impl VisibleCapsule {
+        #[must_use]
+        pub fn render_for_worker(&self) -> String {
+            let mut out = String::new();
+            out.push_str("capsule_id: ");
+            out.push_str(self.capsule_id.as_str());
+            out.push('\n');
+            out.push_str("atom_id: ");
+            out.push_str(&self.atom_id);
+            out.push('\n');
+            out.push_str("task: ");
+            out.push_str(&self.task);
+            out.push('\n');
+            out.push_str("allowed_files:\n");
+            for file in &self.allowed_files {
+                out.push_str("- ");
+                out.push_str(file);
+                out.push('\n');
+            }
+            out.push_str("acceptance_commands:\n");
+            for command in &self.acceptance_commands {
+                out.push_str("- ");
+                out.push_str(command);
+                out.push('\n');
+            }
+            out.push_str("private_contract_hash: ");
+            out.push_str(&self.private_contract_hash);
+            out.push('\n');
+            out
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct CompiledCapsule {
+        pub visible_capsule: VisibleCapsule,
+        pub private_contract: PrivateMicroContract,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum CapsuleError {
+        EmptyCapsuleId,
+        EmptyTask,
+        MissingAcceptanceCommand,
+        Canonicalization(String),
+    }
+
+    impl std::fmt::Display for CapsuleError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                CapsuleError::EmptyCapsuleId => write!(f, "capsule_id must not be empty"),
+                CapsuleError::EmptyTask => write!(f, "capsule task must not be empty"),
+                CapsuleError::MissingAcceptanceCommand => {
+                    write!(f, "visible capsule must include an acceptance command")
+                }
+                CapsuleError::Canonicalization(e) => {
+                    write!(f, "private contract hash canonicalization failed: {e}")
+                }
+            }
+        }
+    }
+
+    impl std::error::Error for CapsuleError {}
+
+    pub fn compile_visible_capsule(draft: CapsuleDraft) -> Result<CompiledCapsule, CapsuleError> {
+        if draft.capsule_id.as_str().trim().is_empty() {
+            return Err(CapsuleError::EmptyCapsuleId);
+        }
+        if draft.task.trim().is_empty() {
+            return Err(CapsuleError::EmptyTask);
+        }
+        if draft.acceptance_commands.is_empty() {
+            return Err(CapsuleError::MissingAcceptanceCommand);
+        }
+
+        let private_contract_hash = private_contract_hash(&draft.private_contract)?;
+        let visible_capsule = VisibleCapsule {
+            capsule_id: draft.capsule_id,
+            atom_id: draft.atom_id,
+            task: draft.task,
+            allowed_files: draft.allowed_files,
+            acceptance_commands: draft.acceptance_commands,
+            private_contract_hash,
+        };
+
+        Ok(CompiledCapsule {
+            visible_capsule,
+            private_contract: draft.private_contract,
+        })
+    }
+
+    fn private_contract_hash(contract: &PrivateMicroContract) -> Result<String, CapsuleError> {
+        let value = json!({
+            "schema_id": "private_micro_contract.v1",
+            "hidden_predicates": contract.hidden_predicates,
+            "pput_formula": contract.pput_formula,
+            "heldout_ids": contract.heldout_ids,
+            "raw_failure_logs": contract.raw_failure_logs,
+            "budget_policy": contract.budget_policy,
+        });
+        let bytes =
+            jcs::canonicalize(&value).map_err(|e| CapsuleError::Canonicalization(e.to_string()))?;
+        Ok(format!("sha256:{}", jcs::sha256_hex(&bytes)))
+    }
+}
