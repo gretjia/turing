@@ -68,6 +68,50 @@ The packet contains:
 - truth guard
 - thinking contract
 - DeepSeek MetaAI provider contract, without credential material
+- pre-registered experiment design
+
+## Clean Auditor
+
+Before any real model run, audit the dry-run packet with the independent clean
+auditor. The auditor reads only the JSON plan and does not import the benchmark
+harness.
+
+```bash
+python3 tools/bench/audit_mini_swe_bench_plan.py \
+  --plan evidence/bench/mini_swe_bench_grok_headless_plan.json \
+  --out evidence/bench/mini_swe_bench_grok_headless_plan_audit.json \
+  --min-tasks 50
+```
+
+The auditor blocks real execution unless the plan has:
+
+- paired within-task design: direct Grok baseline vs TuringOS + Grok worker
+- minimum real sample size of 50 tasks
+- pre-registered primary metric: predicate-resolved paired binary progress
+- McNemar exact test for paired binary resolution
+- 95% paired bootstrap confidence interval for paired differences
+- no post-hoc exclusions
+- no best-of-N reporting unless pre-registered
+- predicate-only accepted-head policy
+- no serialized API-key-shaped credential material
+- MetaAI marked as non-authority
+
+For smoke only, use `--allow-smoke --min-tasks 1`. A smoke PASS proves the
+harness is runnable; it does not prove statistical power.
+
+## Smoke Test
+
+Run the smoke gate before preparing real tasks:
+
+```bash
+bash tools/bench/smoke_mini_swe_bench_grok_headless.sh /tmp/turingos-mini-swe-bench-smoke
+```
+
+The smoke gate creates a one-task fixture, generates a dry-run plan, audits it
+with `--allow-smoke`, checks for API-key-shaped leakage, and writes:
+
+- `/tmp/turingos-mini-swe-bench-smoke/plan.json`
+- `/tmp/turingos-mini-swe-bench-smoke/audit.json`
 
 ## No PASS No HALT
 

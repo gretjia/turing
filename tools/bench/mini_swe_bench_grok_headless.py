@@ -23,6 +23,7 @@ DEFAULT_META_PROVIDER = "deepseek"
 DEFAULT_META_MODEL = "deepseek-v4-pro"
 DEFAULT_META_BASE_URL = "https://api.deepseek.com/v1"
 DEFAULT_META_API_KEY_ENV = "DEEPSEEK_API_KEY"
+DEFAULT_RANDOMIZATION_SEED = 20260627
 FORBIDDEN_ACCEPTANCE_SIGNALS = [
     "exit_code_0",
     "ci_green",
@@ -63,6 +64,52 @@ def meta_ai_provider(
         "authority": "none",
         "accepted_head_authority": False,
     }
+
+
+def experiment_design(randomization_seed: int) -> dict[str, Any]:
+    return {
+        "schema_id": "MiniSweBenchExperimentDesign.v1",
+        "assignment": "paired_within_task",
+        "arms": ["direct_grok_baseline", "turingos_grok_worker"],
+        "statistical_unit": "swe_bench_instance",
+        "minimum_real_tasks": 50,
+        "randomization_seed": randomization_seed,
+        "pre_registered_before_execution": True,
+        "primary_metric": {
+            "name": "resolved_by_predicate",
+            "type": "paired_binary",
+            "truth_source": "micro_tape_predicate_replay",
+        },
+        "secondary_metrics": [
+            "cost_per_resolved_task",
+            "wall_time_ms",
+            "retry_count",
+            "failure_class_distribution",
+            "replay_pass_rate",
+            "invalid_accepted_head_attempts",
+        ],
+        "statistical_tests": [
+            {
+                "name": "mcnemar_exact",
+                "applies_to": "paired_binary_resolution",
+            },
+            {
+                "name": "paired_bootstrap_ci",
+                "confidence": "0.95",
+                "applies_to": "paired_differences",
+            },
+        ],
+        "multiple_runs_policy": "report_all_runs_no_best_of_n_unless_preregistered",
+        "exclusion_policy": "no_post_hoc_exclusions",
+    }
+
+
+def arm_order_for_task(instance_id: str, randomization_seed: int) -> list[str]:
+    arms = ["direct_grok_baseline", "turingos_grok_worker"]
+    digest = hashlib.sha256(f"{randomization_seed}:{instance_id}".encode("utf-8")).digest()
+    if digest[0] % 2 == 1:
+        arms.reverse()
+    return arms
 
 
 def grok_worker_argv(cwd: str, prompt: str, model: str, max_turns: int) -> list[str]:
@@ -180,35 +227,28 @@ def build_packet(
     meta_model: str,
     meta_base_url: str,
     meta_api_key_env: str,
+    randomization_seed: int,
 ) -> dict[str, Any]:
     runs: list[dict[str, Any]] = []
     for task in tasks:
-        runs.append(
-            run_plan_for_task(
-                task,
-                "direct_grok_baseline",
-                work_root,
-                model,
-                max_turns,
-                dry_run,
+        for mode in arm_order_for_task(task["instance_id"], randomization_seed):
+            runs.append(
+                run_plan_for_task(
+                    task,
+                    mode,
+                    work_root,
+                    model,
+                    max_turns,
+                    dry_run,
+                )
             )
-        )
-        runs.append(
-            run_plan_for_task(
-                task,
-                "turingos_grok_worker",
-                work_root,
-                model,
-                max_turns,
-                dry_run,
-            )
-        )
     return {
         "schema_id": "MiniSweBenchGrokHeadlessRun.v1",
         "benchmark": "swe_bench_verified_mini",
         "created_at": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "model": model,
         "worker_id": worker_id_for(model),
+        "experiment_design": experiment_design(randomization_seed),
         "meta_ai": meta_ai_provider(
             provider=meta_provider,
             model=meta_model,
@@ -247,6 +287,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--meta-model", default=DEFAULT_META_MODEL)
     parser.add_argument("--meta-base-url", default=DEFAULT_META_BASE_URL)
     parser.add_argument("--meta-api-key-env", default=DEFAULT_META_API_KEY_ENV)
+    parser.add_argument("--randomization-seed", type=int, default=DEFAULT_RANDOMIZATION_SEED)
     args = parser.parse_args(argv)
 
     tasks_path = Path(args.tasks_jsonl)
@@ -268,6 +309,7 @@ def main(argv: list[str] | None = None) -> int:
         meta_model=args.meta_model,
         meta_base_url=args.meta_base_url,
         meta_api_key_env=args.meta_api_key_env,
+        randomization_seed=args.randomization_seed,
     )
     write_json(Path(args.out), packet)
     if not args.dry_run:
