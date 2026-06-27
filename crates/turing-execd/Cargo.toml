@@ -1,0 +1,11 @@
+[package]
+name = "turing-execd"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+
+[lints]
+workspace = true
