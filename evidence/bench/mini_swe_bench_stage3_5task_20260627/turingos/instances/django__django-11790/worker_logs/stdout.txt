@@ -1,0 +1,20 @@
+**Patch left in worktree (1-line change to restore `maxlength` on the rendered widget for `AuthenticationForm.username`):**
+
+```diff
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index a0cfed0995..e323f26ec7 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -192,6 +192,7 @@ class AuthenticationForm(forms.Form):
+         # Set the max length and label for the "username" field.
+         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+         self.fields['username'].max_length = self.username_field.max_length or 254
++        self.fields['username'].widget.attrs['maxlength'] = str(self.fields['username'].max_length)
+         if self.fields['username'].label is None:
+             self.fields['username'].label = capfirst(self.username_field.verbose_name)
+ 
+```
+
+(The root cause is that `CharField` (and `UsernameField`) only injects `maxlength` via `widget_attrs()` + `Field.__init__` mutation at field construction time (see the pre-#27515 version of the `max_length=254` default). The runtime `.max_length` assignment in `AuthenticationForm.__init__` (post-`deepcopy` of `base_fields`) was never reflected on the widget.)
+
+Verified via direct execution (default + simulated `max_length=None` -> 254 cases) + relevant `AuthenticationFormTest` cases (all still pass). No other files inspected or touched.

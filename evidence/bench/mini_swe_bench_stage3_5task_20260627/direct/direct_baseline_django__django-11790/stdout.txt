@@ -1,0 +1,11 @@
+**Patch applied to fix the issue (smallest change): added the missing `maxlength` propagation to the widget attrs in `AuthenticationForm.__init__` (after the regression from the dynamic `max_length` handling in 5ceaf14686ce626404afb6a5fbd3d8286410bf13).**
+
+Verified via direct execution that the `username` field now renders `maxlength` (e.g. `maxlength="150"` for the default `User` model) and the value is present in `widget.attrs`:
+
+```html
+<input type="text" name="username" ... maxlength="150" ...>
+```
+
+(The root cause was that `UsernameField`/`CharField` only merge `widget_attrs()` (which emits `maxlength` based on `self.max_length`) + add validators *at* `Field.__init__` time; the post-`super().__init__()` assignment only updated the Python `field.max_length` value.)
+
+No other files were modified. (See [django/contrib/auth/forms.py](/tmp/turingos_direct_grok_baseline_stage3/1db4aab875e88203/django/contrib/auth/forms.py).)

@@ -1,0 +1,28 @@
+**Patch applied to worktree (django/utils/http.py only).**
+
+Existing tests pass (`utils_tests.test_http.HttpDateProcessingTests` and full module), including RFC850 2-digit case ('94' -> 1994), asctime 4-digit low year ('0037' -> 2037), etc. New 2-digit year logic now follows the RFC 7231 rule (compare vs. `current_year`, rollover only for >50y in the future to most recent matching past yy) using a minimal diff.
+
+`git diff` (the only change):
+```diff
+diff --git a/django/utils/http.py b/django/utils/http.py
+index 572cfb4347..fd7b27811a 100644
+--- a/django/utils/http.py
++++ b/django/utils/http.py
+@@ -176,10 +176,10 @@ def parse_http_date(date):
+     try:
+         year = int(m.group('year'))
+         if year < 100:
+-            if year < 70:
+-                year += 2000
+-            else:
+-                year += 1900
++            current_year = datetime.datetime.utcnow().year
++            year += current_year - (current_year % 100)
++            if year > current_year + 50:
++                year -= 100
+         month = MONTHS.index(m.group('mon').lower()) + 1
+         day = int(m.group('day'))
+         hour = int(m.group('hour'))
+```
+
+(Verified via direct execution of `parse_http_date` for boundary cases too; no other files touched.)

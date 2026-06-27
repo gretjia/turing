@@ -1,0 +1,5 @@
+**Edited `django/utils/http.py` (minimal change to two-digit year handling in `parse_http_date`).**
+
+- The candidate patch now exists in the worktree (verified via `git diff`; relevant tests pass). 
+
+(The change replaces the fixed 70/1900+2000 pivot with RFC 7231-compliant logic: compute the current-century equivalent for YY<100, then subtract 100 years *only* if the result is >50 years in the future from "now". This is a one-location, no-import, no-test-edit edit and preserves all prior behavior for the cases in the test suite + existing call sites.)
