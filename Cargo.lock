@@ -291,6 +291,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-loop"
+version = "0.0.0"
+dependencies = [
+ "serde_json",
+ "tempfile",
+ "turing-contracts",
+ "turing-git-tape",
+ "turing-replay",
+]
+
+[[package]]
 name = "turing-predicate"
 version = "0.0.0"
 dependencies = [

@@ -1,0 +1,18 @@
+[package]
+name = "turing-loop"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+turing-contracts = { path = "../turing-contracts" }
+turing-git-tape = { path = "../turing-git-tape" }
+turing-replay = { path = "../turing-replay" }
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+
+[lints]
+workspace = true
