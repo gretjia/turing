@@ -145,7 +145,8 @@ pub fn apply(
             EventClass::Proposal
             | EventClass::Observation
             | EventClass::Receipt
-            | EventClass::Failure => {}
+            | EventClass::Failure
+            | EventClass::Economy => {}
         }
     }
 

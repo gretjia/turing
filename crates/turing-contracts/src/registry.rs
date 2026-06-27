@@ -1,4 +1,4 @@
-//! Embedded event registry — the closed 46-event table, parsed once.
+//! Embedded event registry — the closed Phase-0 table plus additive Agent Economy events.
 //!
 //! The ratified registry JSON (`pack/04_registries/event_registry_v5_3_1.json`) is
 //! compiled into the binary with [`include_str!`] and parsed a single time behind a
@@ -7,8 +7,8 @@
 //! writer-trusted** (constitution Art. 0.4; `event_registry_v5_3_1.json:53`).
 //!
 //! The `unknown_event_policy` is `REJECT`: a lookup for an event name outside the closed
-//! 46 returns `None`, and the append admission turns that into an `UNKNOWN_EVENT_TYPE`
-//! rejection.
+//! registry returns `None`, and the append admission turns that into an
+//! `UNKNOWN_EVENT_TYPE` rejection.
 
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
@@ -34,6 +34,8 @@ pub enum EventClass {
     Receipt,
     /// PRESERVE; only `tape_tip` moves (the 5 FAILURE events).
     Failure,
+    /// PRESERVE; only `tape_tip` moves (additive market / wallet / PPUT events).
+    Economy,
 }
 
 impl EventClass {
@@ -45,10 +47,20 @@ impl EventClass {
             "OBSERVATION" => EventClass::Observation,
             "RECEIPT" => EventClass::Receipt,
             "FAILURE" => EventClass::Failure,
+            "ECONOMY" => EventClass::Economy,
             _ => return None,
         })
     }
 }
+
+/// Original Phase-0 Greenfield registry cardinality.
+pub const BASELINE_EVENT_COUNT: usize = 46;
+
+/// Additive Agent Economy events introduced by the Greenfield v1.0 upgrade.
+pub const ECONOMY_EVENT_COUNT: usize = 15;
+
+/// Total closed registry cardinality after additive economy events.
+pub const TOTAL_EVENT_COUNT: usize = BASELINE_EVENT_COUNT + ECONOMY_EVENT_COUNT;
 
 /// Which sovereign ref a class targets (the registry `target_ref` column).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -156,7 +168,7 @@ pub fn registry(event_type: &str) -> Option<RegistryRow> {
     table().get(event_type).copied()
 }
 
-/// The total number of registered events (must be 46).
+/// The total number of registered events.
 #[must_use]
 pub fn registered_event_count() -> usize {
     table().len()
@@ -166,9 +178,9 @@ pub fn registered_event_count() -> usize {
 /// (the table is a `BTreeMap` keyed by `canonical_name`).
 ///
 /// This is the registry-derived enumeration consumers fold over when a law must hold for
-/// **all 46** events (the head-effect ref laws SG-15/SG-16): it yields exactly the names
-/// parsed from the ratified `event_registry_v5_3_1.json`, so a sweep over it can never be a
-/// hand-maintained subset that drifts from the pack. Pair each name with [`registry`] to
+/// all closed events (the head-effect ref laws SG-15/SG-16 and additive economy laws): it
+/// yields exactly the names parsed from the registry JSON, so a sweep over it can never be
+/// a hand-maintained subset that drifts from the pack. Pair each name with [`registry`] to
 /// read its registry-derived row.
 pub fn event_names() -> impl Iterator<Item = &'static str> {
     table().keys().map(String::as_str)
@@ -180,13 +192,13 @@ mod tests {
     use crate::envelope::HeadEffect;
 
     #[test]
-    fn the_full_closed_46_event_set_is_loaded_from_the_pack() {
+    fn the_full_closed_event_set_is_loaded_from_the_pack() {
         // Proves the embedded `include_str!` of the ratified registry is fully parsed —
         // not a hand-maintained subset that mirrors a test's expectations.
         assert_eq!(
             registered_event_count(),
-            46,
-            "the closed registry has 46 events"
+            TOTAL_EVENT_COUNT,
+            "the closed registry has baseline plus additive economy events"
         );
     }
 
@@ -229,7 +241,7 @@ mod tests {
         // miss an event or include a phantom one.
         let names: Vec<&str> = event_names().collect();
         assert_eq!(names.len(), registered_event_count());
-        assert_eq!(names.len(), 46);
+        assert_eq!(names.len(), TOTAL_EVENT_COUNT);
         for n in &names {
             assert!(registry(n).is_some(), "enumerated name {n:?} must resolve");
         }
@@ -239,5 +251,10 @@ mod tests {
             .filter(|n| registry(n).unwrap().class == EventClass::Authorization)
             .count();
         assert_eq!(auth, 8);
+        let economy = names
+            .iter()
+            .filter(|n| registry(n).unwrap().class == EventClass::Economy)
+            .count();
+        assert_eq!(economy, ECONOMY_EVENT_COUNT);
     }
 }

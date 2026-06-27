@@ -1,10 +1,10 @@
 use turing_contracts::envelope::HeadEffect;
-use turing_contracts::registry::{EventClass, TargetRef};
+use turing_contracts::registry::{self, EventClass, TargetRef};
 use turing_predicate::{event_registry_closed_world, registered_event_count, registered_event_names};
 
 #[test]
 fn event_registry_closed_world_rejects_unknown_events() {
-    assert_eq!(registered_event_count(), 46);
+    assert_eq!(registered_event_count(), registry::TOTAL_EVENT_COUNT);
 
     let accepted = event_registry_closed_world("SystemConstitutionAccepted")
         .expect("known sovereign accept event resolves");
@@ -30,7 +30,7 @@ fn event_registry_closed_world_rejects_unknown_events() {
 #[test]
 fn event_registry_closed_world_enumerates_only_resolvable_events() {
     let names: Vec<&str> = registered_event_names().collect();
-    assert_eq!(names.len(), 46);
+    assert_eq!(names.len(), registry::TOTAL_EVENT_COUNT);
     assert_eq!(names.len(), registered_event_count());
 
     for name in names {
@@ -38,5 +38,39 @@ fn event_registry_closed_world_enumerates_only_resolvable_events() {
             event_registry_closed_world(name).is_ok(),
             "registered name {name:?} must resolve"
         );
+    }
+}
+
+#[test]
+fn economy_events_preserve_only() {
+    let economy_names: Vec<&str> = registered_event_names()
+        .filter(|name| event_registry_closed_world(name).unwrap().class == EventClass::Economy)
+        .collect();
+    assert_eq!(economy_names.len(), registry::ECONOMY_EVENT_COUNT);
+
+    for name in economy_names {
+        let row = event_registry_closed_world(name).expect("economy event resolves");
+        assert_eq!(row.class, EventClass::Economy, "{name} is ECONOMY");
+        assert_eq!(row.head_effect, HeadEffect::Preserve, "{name} is PRESERVE");
+        assert_eq!(row.target_ref, TargetRef::TapeTip, "{name} targets tape_tip");
+    }
+
+    for expected in [
+        "MarketCreated",
+        "PositionMinted",
+        "AMMSwapExecuted",
+        "AgentBidSubmitted",
+        "MarketSettled",
+        "RewardDistributed",
+        "CostEvent",
+        "BranchCostEvent",
+        "ToolStdoutCostEvent",
+        "PPUTAccounted",
+    ] {
+        let row = event_registry_closed_world(expected)
+            .unwrap_or_else(|_| panic!("expected economy event {expected}"));
+        assert_eq!(row.class, EventClass::Economy);
+        assert_eq!(row.head_effect, HeadEffect::Preserve);
+        assert_eq!(row.target_ref, TargetRef::TapeTip);
     }
 }

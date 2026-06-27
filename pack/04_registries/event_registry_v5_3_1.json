@@ -6,15 +6,16 @@
   "lineage": "Human-ratified Phase-0 exact 20 ADVANCE set plus a v5.3.1 closed reconstruction of the 26 PRESERVE names; this file is the v5.3.1 authoritative registry. The missing original registry artifact is not silently impersonated.",
   "registry_name_set_sha256": "3a7dd31316a15be381c69591821564fd6ef51faf24be4c474fe9712dc0671183",
   "counts": {
-    "total": 46,
+    "total": 61,
     "advance": 20,
-    "preserve": 26,
+    "preserve": 41,
     "sovereign_accept": 12,
     "authorization": 8,
     "proposal": 6,
     "observation": 9,
     "receipt": 6,
-    "failure": 5
+    "failure": 5,
+    "economy": 15
   },
   "unknown_event_policy": "REJECT",
   "append_only_by_name": true,
@@ -525,6 +526,171 @@
       "payload_schema_id": "outside_governance_observed.v1",
       "ordinal": 5,
       "status": "FROZEN_V5_3_1"
+    },
+    {
+      "canonical_name": "MarketCreated",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "market_created.v1",
+      "ordinal": 1,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "MarketLiquidityAdded",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "market_liquidity_added.v1",
+      "ordinal": 2,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "PositionMinted",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "position_minted.v1",
+      "ordinal": 3,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "AgentBidSubmitted",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "agent_bid_submitted.v1",
+      "ordinal": 4,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "AMMSwapExecuted",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "amm_swap_executed.v1",
+      "ordinal": 5,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "BudgetAllocated",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "budget_allocated.v1",
+      "ordinal": 6,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "MarketPriceBroadcast",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "market_price_broadcast.v1",
+      "ordinal": 7,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "MarketSettled",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "market_settled.v1",
+      "ordinal": 8,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "RewardDistributed",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "reward_distributed.v1",
+      "ordinal": 9,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "CostEvent",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "cost_event.v1",
+      "ordinal": 10,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "BranchCostEvent",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "branch_cost_event.v1",
+      "ordinal": 11,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "ToolStdoutCostEvent",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "tool_stdout_cost_event.v1",
+      "ordinal": 12,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "PPUTProposalRecord",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "pput_proposal_record.v1",
+      "ordinal": 13,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "PPUTAccounted",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "pput_accounted.v1",
+      "ordinal": 14,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "HeldoutGuardViolation",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "heldout_guard_violation.v1",
+      "ordinal": 15,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
     }
   ]
 }

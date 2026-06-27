@@ -89,8 +89,8 @@ fn only_authorization_advance_pass_advances_authorization_head_over_all_46_event
     let names: Vec<String> = registry::event_names().map(str::to_owned).collect();
     assert_eq!(
         names.len(),
-        46,
-        "the exhaustive sweep must cover the full closed 46-event registry"
+        registry::TOTAL_EVENT_COUNT,
+        "the exhaustive sweep must cover the full closed registry"
     );
     assert_eq!(
         names.len(),

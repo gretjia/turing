@@ -154,8 +154,8 @@ fn admission_a4_holds_for_every_event_in_the_real_registry() {
     let names: Vec<String> = registry::event_names().map(str::to_owned).collect();
     assert_eq!(
         names.len(),
-        46,
-        "the sweep covers the full closed 46-event registry"
+        registry::TOTAL_EVENT_COUNT,
+        "the sweep covers the full closed registry"
     );
 
     let mut advance_seen = 0usize;
@@ -188,8 +188,9 @@ fn admission_a4_holds_for_every_event_in_the_real_registry() {
     // Registry self-consistency sanity (the 20/26 ADVANCE/PRESERVE split).
     assert_eq!(advance_seen, 20, "20 ADVANCE events in the closed registry");
     assert_eq!(
-        preserve_seen, 26,
-        "26 PRESERVE events in the closed registry"
+        preserve_seen,
+        26 + registry::ECONOMY_EVENT_COUNT,
+        "baseline PRESERVE events plus additive economy events in the closed registry"
     );
 }
 
