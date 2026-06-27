@@ -7,6 +7,10 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use serde_json::{Value, json};
+use turing_approval::{
+    ApprovalCard, ApprovalPayload, DisplayCopy, OsKeyringSigningBackend,
+    SignatureRoute as ApprovalSignatureRoute, SigningBackend,
+};
 use turing_contracts::envelope::HeadEffect;
 use turing_contracts::envelope::PredicateProduct;
 use turing_contracts::failure::{FailureClass, FailureNodePayload};
@@ -154,6 +158,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("candidate.verify_write") if runtime.contract.role == "turingd" => {
             candidate_verify_write_response(runtime, request, id)
         }
+        Some("approval.authorize_atom") if runtime.contract.role == "turingd" => {
+            approval_authorize_atom_response(runtime, request, id)
+        }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
         }
@@ -251,6 +258,95 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             "head_effect": "PRESERVE",
             "accepted_head_moved": accepted_head_moved,
             "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "approval.authorize_atom requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let key_id = match required_str(params, "key_id") {
+        Ok(key_id) => key_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let payload = match params.get("payload").map(parse_approval_payload) {
+        Some(Ok(payload)) => payload,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "payload object is required"),
+    };
+    let display_copy = match params.get("display_copy").map(parse_display_copy) {
+        Some(Ok(display_copy)) => display_copy,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "display_copy object is required"),
+    };
+    let card = ApprovalCard::new(payload, display_copy);
+    let surfaces = match card.byte_surfaces() {
+        Ok(surfaces) => surfaces,
+        Err(error) => return invalid_params(id, format!("invalid approval card: {error}")),
+    };
+    let signer = OsKeyringSigningBackend::new(key_id);
+    let signature = match signer.sign(&card) {
+        Ok(signature) => signature,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("approval signing failed: {error}"));
+        }
+    };
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    let receipt = match tape.append(
+        AppendRequest::new(
+            "AtomAuthorized",
+            "writer:approval",
+            json!({
+                "approval_id": card.payload().approval_id,
+                "subject_id": card.payload().subject_id,
+                "action": card.payload().action,
+                "risk_class": card.payload().risk_class,
+                "evidence_digests": card.payload().evidence_digests,
+                "visible_card_hash": surfaces.visible_card_hash,
+                "signed_payload_hash": signature.signed_payload_hash,
+                "signature": signature.signature,
+                "signature_route": approval_signature_route_str(signature.signature_route),
+                "key_id": signature.key_id,
+                "authority_epoch": signature.authority_epoch,
+            }),
+        )
+        .predicate_pass(),
+    ) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "AtomAuthorized",
+            "event_id": receipt.event_id,
+            "authorization_head_moved": matches!(receipt.head_moved, HeadMoved::AuthorizationHead),
+            "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
+            "visible_card_hash": surfaces.visible_card_hash,
+            "signed_payload_hash": signature.signed_payload_hash,
+            "signature_route": approval_signature_route_str(signature.signature_route),
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,
@@ -551,6 +647,34 @@ fn parse_failure_payload(value: &Value) -> Result<FailureNodePayload, String> {
     ))
 }
 
+fn parse_approval_payload(value: &Value) -> Result<ApprovalPayload, String> {
+    let signature_route = parse_approval_signature_route(&required_str(value, "signature_route")?)?;
+    if signature_route != ApprovalSignatureRoute::OsKeyring {
+        return Err("approval.authorize_atom requires signature_route OsKeyring".to_string());
+    }
+    let action = required_str(value, "action")?;
+    if action != "atom_authorize" {
+        return Err("approval.authorize_atom requires action atom_authorize".to_string());
+    }
+    Ok(ApprovalPayload {
+        schema_id: required_str(value, "schema_id")?,
+        approval_id: required_str(value, "approval_id")?,
+        authority_epoch: required_u64(value, "authority_epoch")?,
+        action,
+        subject_id: required_str(value, "subject_id")?,
+        evidence_digests: required_digest_array(value, "evidence_digests")?,
+        risk_class: required_str(value, "risk_class")?,
+        signature_route,
+    })
+}
+
+fn parse_display_copy(value: &Value) -> Result<DisplayCopy, String> {
+    Ok(DisplayCopy {
+        title_zh: required_str(value, "title_zh")?,
+        body_en: required_str(value, "body_en")?,
+    })
+}
+
 fn parse_grant(value: &Value) -> Result<CapabilityGrant, String> {
     let budget = value
         .get("budget")
@@ -626,6 +750,23 @@ fn parse_signature_route(raw: &str) -> Result<SignatureRoute, String> {
         "OsKeyring" => Ok(SignatureRoute::OsKeyring),
         "HardwareFuture" => Ok(SignatureRoute::HardwareFuture),
         other => Err(format!("unknown signature route {other:?}")),
+    }
+}
+
+fn parse_approval_signature_route(raw: &str) -> Result<ApprovalSignatureRoute, String> {
+    match raw {
+        "None" => Ok(ApprovalSignatureRoute::None),
+        "OsKeyring" => Ok(ApprovalSignatureRoute::OsKeyring),
+        "HardwareFuture" => Ok(ApprovalSignatureRoute::HardwareFuture),
+        other => Err(format!("unknown approval signature route {other:?}")),
+    }
+}
+
+fn approval_signature_route_str(route: ApprovalSignatureRoute) -> &'static str {
+    match route {
+        ApprovalSignatureRoute::None => "None",
+        ApprovalSignatureRoute::OsKeyring => "OsKeyring",
+        ApprovalSignatureRoute::HardwareFuture => "HardwareFuture",
     }
 }
 
@@ -733,6 +874,29 @@ fn required_digest(value: &Value, key: &str) -> Result<String, String> {
         return Err(format!("{key} must be sha256:<64 hex>"));
     }
     Ok(digest)
+}
+
+fn required_digest_array(value: &Value, key: &str) -> Result<Vec<String>, String> {
+    let array = value
+        .get(key)
+        .and_then(Value::as_array)
+        .ok_or_else(|| format!("{key} array is required"))?;
+    array
+        .iter()
+        .enumerate()
+        .map(|(index, item)| {
+            let digest = item
+                .as_str()
+                .ok_or_else(|| format!("{key}[{index}] must be a string"))?;
+            let Some(hex) = digest.strip_prefix("sha256:") else {
+                return Err(format!("{key}[{index}] must be sha256:<64 hex>"));
+            };
+            if hex.len() != 64 || !hex.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+                return Err(format!("{key}[{index}] must be sha256:<64 hex>"));
+            }
+            Ok(digest.to_string())
+        })
+        .collect()
 }
 
 fn predicate_product_str(product: PredicateProduct) -> &'static str {
