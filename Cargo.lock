@@ -293,6 +293,10 @@ dependencies = [
 [[package]]
 name = "turing-daemons"
 version = "0.0.0"
+dependencies = [
+ "serde_json",
+ "tempfile",
+]
 
 [[package]]
 name = "turing-economy"

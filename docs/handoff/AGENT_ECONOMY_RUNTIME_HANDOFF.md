@@ -33,11 +33,14 @@ turing-marketd --check
 turing-pputd --check
 turing-viewd --check
 turing-mcp --check
+turingd --serve --socket /tmp/turingd.sock
 ```
 
 ## Known Risks
 
 - Generated evidence is from a temporary private-local qualification Tape.
-- Daemon boundary binaries exist and report process contracts, but long-running socket/RPC
-  services for turingd, marketd, pputd, viewd, and mcp remain pending.
+- `turingd` has a minimal Unix socket JSON-RPC health/read-only heads surface; full
+  persistent project heads, append routes, predicate routing, and approval APIs remain pending.
+- Daemon boundary binaries exist for marketd, pputd, viewd, mcp, and execd, but their
+  long-running socket/RPC services remain pending.
 - Operator project persistence and installed binary wiring remain pending.
