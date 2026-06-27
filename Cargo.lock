@@ -314,6 +314,7 @@ dependencies = [
 name = "turing-predicate"
 version = "0.0.0"
 dependencies = [
+ "serde_json",
  "turing-contracts",
 ]
 
