@@ -163,8 +163,8 @@ turing-mcp --check
   predicate packs and hardware/human approval UX remain pending.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
-  budget suggestion, prompt shielding, and disposable projection building. Broader project-scoped
-  sidecar persistence remains pending.
+  budget suggestion, prompt shielding, disposable projection building, and read-only project
+  status. Broader project-scoped mutable sidecar services remain pending.
 "#,
         tape_tip = report.tape_tip,
         authorization_head = authorization_head,

@@ -265,12 +265,75 @@ fn mcp_lists_read_only_resources_and_typed_commands_without_truth() {
     shutdown(socket, child);
 }
 
+#[test]
+fn sidecars_read_project_status_without_truth_authority() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let project = dir.path().join("project");
+    std::fs::create_dir(&project).expect("create project dir");
+    let state_dir = project.join(".turingos");
+    std::fs::create_dir(&state_dir).expect("create state dir");
+    let project_root = std::fs::canonicalize(&project).expect("canonical project");
+    std::fs::write(
+        state_dir.join("project.json"),
+        json!({
+            "schema_id": "operator_project.v1",
+            "project_root": project_root.to_str().expect("UTF-8 project path"),
+            "truth_source": "micro_tape",
+            "can_write_micro_truth": false,
+            "credential_material_included": false
+        })
+        .to_string(),
+    )
+    .expect("write project metadata");
+
+    for name in [
+        "turing-execd",
+        "turing-marketd",
+        "turing-mcp",
+        "turing-pputd",
+        "turing-viewd",
+    ] {
+        let socket = dir.path().join(format!("{name}.sock"));
+        let mut child = spawn_daemon_with_project(name, &socket, &project);
+        wait_for_socket(&socket, &mut child);
+
+        let status = rpc(&socket, "project.status", Value::Null);
+        assert_eq!(status["result"]["role"], name);
+        assert_eq!(status["result"]["schema_id"], "operator_project.v1");
+        assert_eq!(
+            status["result"]["project_root"],
+            project_root.to_str().expect("UTF-8 canonical project path")
+        );
+        assert_eq!(status["result"]["truth_source"], "micro_tape");
+        assert_eq!(status["result"]["can_write_micro_truth"], false);
+        assert_eq!(status["result"]["credential_material_included"], false);
+        assert_eq!(status["result"]["can_move_accepted_head"], false);
+        assert!(status["result"].get("credential_hash").is_none());
+        assert!(status["result"].get("credential_scope_hash").is_none());
+
+        shutdown(socket, child);
+    }
+}
+
 fn spawn_daemon(name: &str, socket: &Path) -> Child {
     Command::new(bin(name))
         .args([
             "--serve",
             "--socket",
             socket.to_str().expect("UTF-8 socket path"),
+        ])
+        .spawn()
+        .expect("spawn daemon")
+}
+
+fn spawn_daemon_with_project(name: &str, socket: &Path, project: &Path) -> Child {
+    Command::new(bin(name))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--project",
+            project.to_str().expect("UTF-8 project path"),
         ])
         .spawn()
         .expect("spawn daemon")

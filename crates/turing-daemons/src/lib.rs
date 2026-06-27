@@ -200,9 +200,7 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
         Some("heads.read") => read_heads_response(runtime, id),
-        Some("project.status") if runtime.contract.role == "turingd" => {
-            project_status_response(runtime, id)
-        }
+        Some("project.status") => project_status_response(runtime, id),
         Some("event.append_preserve") if runtime.contract.role == "turingd" => {
             append_preserve_response(runtime, request, id)
         }
@@ -1350,6 +1348,7 @@ fn project_status_response(runtime: &DaemonRuntime, id: Value) -> Value {
         "jsonrpc": "2.0",
         "id": id,
         "result": {
+            "role": runtime.contract.role,
             "schema_id": schema_id,
             "source": "operator_project_metadata",
             "project_root": canonical_root,
@@ -1357,6 +1356,7 @@ fn project_status_response(runtime: &DaemonRuntime, id: Value) -> Value {
             "truth_source": truth_source,
             "can_write_micro_truth": can_write_micro_truth,
             "credential_material_included": credential_material_included,
+            "can_move_accepted_head": runtime.contract.can_move_accepted_head,
         }
     })
 }
