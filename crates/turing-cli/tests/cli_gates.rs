@@ -46,6 +46,32 @@ fn unknown_command_fails_closed() {
 }
 
 #[test]
+fn boot_project_writes_private_local_project_metadata() {
+    let dir = tempfile::tempdir().expect("temp dir");
+
+    let output = turing()
+        .args([
+            "boot",
+            "--project",
+            dir.path().to_str().expect("UTF-8 temp path"),
+        ])
+        .output()
+        .expect("run boot project");
+
+    assert!(output.status.success(), "boot failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("boot: wrote"));
+
+    let metadata_path = dir.path().join(".turingos").join("project.json");
+    let text = std::fs::read_to_string(metadata_path).expect("project metadata");
+    assert!(text.contains(r#""schema_id":"operator_project.v1""#));
+    assert!(text.contains(r#""project_root":"#));
+    assert!(text.contains(r#""truth_source":"micro_tape""#));
+    assert!(text.contains(r#""credential_material_included":false"#));
+    assert!(text.contains(r#""can_write_micro_truth":false"#));
+}
+
+#[test]
 fn handoff_generate_writes_real_projection_hashes() {
     let dir = tempfile::tempdir().expect("temp dir");
     let output_path = dir.path().join("handoff.md");

@@ -48,4 +48,4 @@ turingd --serve --socket /tmp/turingd.sock
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, and disposable projection building. Full persistent project
   services remain pending.
-- Operator project persistence and installed binary wiring remain pending.
+- Installed binary wiring remains pending.

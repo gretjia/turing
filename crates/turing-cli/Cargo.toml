@@ -10,6 +10,7 @@ name = "turing"
 path = "src/main.rs"
 
 [dependencies]
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
 turing-qualification = { path = "../turing-qualification" }
 
 [dev-dependencies]

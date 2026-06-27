@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::process::ExitCode;
 
+use serde_json::json;
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
 fn main() -> ExitCode {
@@ -21,6 +22,7 @@ fn main() -> ExitCode {
 
 fn dispatch(args: &[&str]) -> Result<String, String> {
     match args {
+        ["boot", "--project", project] => boot_project(project),
         ["replay", "--verify"] => {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("replay verify failed: {error}"))?;
@@ -73,10 +75,31 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         }
         ["handoff", "generate", "--output", output] => generate_handoff(output),
         _ => Err(format!(
-            "unknown turing command: {:?}. supported: replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
+            "unknown turing command: {:?}. supported: boot --project <path> | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
             args
         )),
     }
+}
+
+fn boot_project(project: &str) -> Result<String, String> {
+    let project_root = std::fs::canonicalize(project)
+        .map_err(|error| format!("failed to resolve project path {project:?}: {error}"))?;
+    let state_dir = project_root.join(".turingos");
+    std::fs::create_dir_all(&state_dir)
+        .map_err(|error| format!("failed to create {}: {error}", state_dir.display()))?;
+    let metadata_path = state_dir.join("project.json");
+    let metadata = json!({
+        "schema_id": "operator_project.v1",
+        "project_root": project_root.to_string_lossy(),
+        "truth_source": "micro_tape",
+        "can_write_micro_truth": false,
+        "credential_material_included": false,
+    });
+    let text = serde_json::to_string(&metadata)
+        .map_err(|error| format!("failed to serialize project metadata: {error}"))?;
+    std::fs::write(&metadata_path, text)
+        .map_err(|error| format!("failed to write {}: {error}", metadata_path.display()))?;
+    Ok(format!("boot: wrote {}", metadata_path.display()))
 }
 
 fn generate_handoff(output: &str) -> Result<String, String> {
@@ -141,7 +164,7 @@ turing-mcp --check
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, and disposable projection building. Full persistent project
   services remain pending.
-- Operator project persistence and installed binary wiring remain pending.
+- Installed binary wiring remains pending.
 "#,
         tape_tip = report.tape_tip,
         authorization_head = authorization_head,
