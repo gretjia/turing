@@ -632,6 +632,7 @@ fn candidate_verify_write_response(runtime: &DaemonRuntime, request: &Value, id:
         Ok(checks) => checks,
         Err(message) => return invalid_params(id, message),
     };
+    let checks = enforce_candidate_predicate_pack(checks);
 
     let report = match PredicateKernel.run("CandidateAccepted", checks) {
         Ok(report) => report,
@@ -947,6 +948,18 @@ fn parse_predicate_checks(params: &Value) -> Result<Vec<PredicateCheck>, String>
             }
         })
         .collect()
+}
+
+fn enforce_candidate_predicate_pack(mut checks: Vec<PredicateCheck>) -> Vec<PredicateCheck> {
+    for required in ["capsule_contract", "macro_anchor"] {
+        if !checks.iter().any(|check| check.check_id == required) {
+            checks.push(PredicateCheck::fail(
+                required,
+                "PREDICATE_PACK_MISSING_REQUIRED_CHECK",
+            ));
+        }
+    }
+    checks
 }
 
 fn parse_failure_payload(value: &Value) -> Result<FailureNodePayload, String> {
