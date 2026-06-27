@@ -208,6 +208,34 @@ fn canonical_codec_acceptance_profile_rejects_forbidden_values() {
 }
 
 #[test]
+fn ascii_key_linter_rejects_keys_but_allows_localized_values() {
+    let localized_value = r#"{"human_summary":"中文说明","schema_id":"demo.v1"}"#;
+    let parsed = jcs::parse_strict(localized_value)
+        .expect("non-ASCII human-facing values are allowed");
+    let canonical = String::from_utf8(jcs::canonicalize(&parsed).expect("canonical bytes"))
+        .expect("canonical JSON remains UTF-8");
+    assert!(
+        canonical.contains("中文说明"),
+        "localized values must remain representable outside load-bearing keys"
+    );
+
+    let top_level_key = r#"{"中文_key":"bad","schema_id":"demo.v1"}"#;
+    assert!(
+        matches!(
+            jcs::parse_strict(top_level_key),
+            Err(JcsError::NonAsciiKey(_))
+        ),
+        "top-level non-ASCII load-bearing keys must fail closed"
+    );
+
+    let nested_key = r#"{"schema_id":"demo.v1","nested":{"中文_key":"bad"}}"#;
+    assert!(
+        matches!(jcs::parse_strict(nested_key), Err(JcsError::NonAsciiKey(_))),
+        "nested non-ASCII load-bearing keys must fail closed"
+    );
+}
+
+#[test]
 fn all_seven_canonical_vectors_match_oracle() {
     let spec = load_spec();
     let glob = global_excluded(&spec);
