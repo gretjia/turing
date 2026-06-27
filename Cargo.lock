@@ -273,6 +273,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-cli"
+version = "0.0.0"
+dependencies = [
+ "turing-qualification",
+]
+
+[[package]]
 name = "turing-contracts"
 version = "0.0.0"
 dependencies = [

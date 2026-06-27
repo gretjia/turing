@@ -1,0 +1,16 @@
+[package]
+name = "turing-cli"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[[bin]]
+name = "turing"
+path = "src/main.rs"
+
+[dependencies]
+turing-qualification = { path = "../turing-qualification" }
+
+[lints]
+workspace = true

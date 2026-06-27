@@ -40,9 +40,15 @@ Current executable commands:
 cargo test --workspace
 bash demo/demo_agent_economy_e2e.sh
 bash demo/demo_rescue_agent_economy.sh
+cargo run -p turing-cli -- replay --verify
+cargo run -p turing-cli -- market replay --verify
+cargo run -p turing-cli -- pput replay --verify
+cargo run -p turing-cli -- audit invariants
+cargo run -p turing-cli -- audit market
+cargo run -p turing-cli -- audit pput
 ```
 
-Required future CLI parity commands:
+CLI parity commands exposed by the `turing` binary target:
 
 ```bash
 turing replay --verify
@@ -61,7 +67,7 @@ turing audit pput
 
 ## Known Risks
 
-- The real `turing` CLI commands listed above are not implemented as user-facing binaries.
+- The `turing` CLI exists as a Rust binary target, but packaging/install wiring is not done.
 - `turingd`, `turing-marketd`, `turing-pputd`, `turing-viewd`, and `turing-mcp` are not yet
   wired as long-running daemons.
 - Market projection hash, wallet projection hash, and PPUT projection hash are verified
