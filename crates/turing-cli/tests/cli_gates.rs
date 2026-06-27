@@ -102,6 +102,7 @@ fn handoff_generate_writes_real_projection_hashes() {
         "wallet projection hash: sha256:",
         "PPUT projection hash: sha256:",
         "cargo test --workspace",
+        "scripts/install-local.sh",
         "turing replay --verify",
         "Known Risks",
     ] {

@@ -138,6 +138,7 @@ Status: generated private-local qualification handoff.
 cargo test --workspace
 bash demo/demo_agent_economy_e2e.sh
 bash demo/demo_rescue_agent_economy.sh
+scripts/install-local.sh --prefix /tmp/turingos-local --profile debug
 turing replay --verify
 turing market replay --verify
 turing pput replay --verify
@@ -164,7 +165,6 @@ turing-mcp --check
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, and disposable projection building. Broader project-scoped
   sidecar persistence remains pending.
-- Installed binary wiring remains pending.
 "#,
         tape_tip = report.tape_tip,
         authorization_head = authorization_head,
