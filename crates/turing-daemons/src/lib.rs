@@ -166,6 +166,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("goal.submit") if runtime.contract.role == "turingd" => {
             goal_submit_response(runtime, request, id)
         }
+        Some("capsule.approve") if runtime.contract.role == "turingd" => {
+            capsule_approve_response(runtime, request, id)
+        }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
         }
@@ -338,6 +341,99 @@ fn goal_submit_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> 
     })
 }
 
+fn capsule_approve_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "capsule.approve requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let key_id = match required_str(params, "key_id") {
+        Ok(key_id) => key_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let payload = match params.get("payload").map(|payload| {
+        parse_approval_payload_for_action(payload, "capsule_approve", "capsule.approve")
+    }) {
+        Some(Ok(payload)) => payload,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "payload object is required"),
+    };
+    let display_copy = match params.get("display_copy").map(parse_display_copy) {
+        Some(Ok(display_copy)) => display_copy,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "display_copy object is required"),
+    };
+    let card = ApprovalCard::new(payload, display_copy);
+    let surfaces = match card.byte_surfaces() {
+        Ok(surfaces) => surfaces,
+        Err(error) => return invalid_params(id, format!("invalid approval card: {error}")),
+    };
+    let signer = OsKeyringSigningBackend::new(key_id);
+    let signature = match signer.sign(&card) {
+        Ok(signature) => signature,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("approval signing failed: {error}"));
+        }
+    };
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    let capsule_id = card.payload().subject_id.clone();
+    let receipt = match tape.append(
+        AppendRequest::new(
+            "WorkerDispatchAuthorized",
+            "writer:approval",
+            json!({
+                "approval_id": card.payload().approval_id,
+                "capsule_id": capsule_id,
+                "action": card.payload().action,
+                "risk_class": card.payload().risk_class,
+                "evidence_digests": card.payload().evidence_digests,
+                "visible_card_hash": surfaces.visible_card_hash,
+                "signed_payload_hash": signature.signed_payload_hash,
+                "signature": signature.signature,
+                "signature_route": approval_signature_route_str(signature.signature_route),
+                "key_id": signature.key_id,
+                "authority_epoch": signature.authority_epoch,
+            }),
+        )
+        .predicate_pass(),
+    ) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "WorkerDispatchAuthorized",
+            "event_id": receipt.event_id,
+            "capsule_id": capsule_id,
+            "authorization_head_moved": matches!(receipt.head_moved, HeadMoved::AuthorizationHead),
+            "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
+            "visible_card_hash": surfaces.visible_card_hash,
+            "signed_payload_hash": signature.signed_payload_hash,
+            "signature_route": approval_signature_route_str(signature.signature_route),
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
 fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
     let Some(repo) = &runtime.micro_git else {
         return jsonrpc_error(
@@ -354,7 +450,9 @@ fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id
         Ok(key_id) => key_id,
         Err(message) => return invalid_params(id, message),
     };
-    let payload = match params.get("payload").map(parse_approval_payload) {
+    let payload = match params.get("payload").map(|payload| {
+        parse_approval_payload_for_action(payload, "atom_authorize", "approval.authorize_atom")
+    }) {
         Some(Ok(payload)) => payload,
         Some(Err(message)) => return invalid_params(id, message),
         None => return invalid_params(id, "payload object is required"),
@@ -726,14 +824,18 @@ fn parse_goal_state(value: &Value) -> Result<GoalState, String> {
     Ok(goal)
 }
 
-fn parse_approval_payload(value: &Value) -> Result<ApprovalPayload, String> {
+fn parse_approval_payload_for_action(
+    value: &Value,
+    expected_action: &str,
+    method_name: &str,
+) -> Result<ApprovalPayload, String> {
     let signature_route = parse_approval_signature_route(&required_str(value, "signature_route")?)?;
     if signature_route != ApprovalSignatureRoute::OsKeyring {
-        return Err("approval.authorize_atom requires signature_route OsKeyring".to_string());
+        return Err(format!("{method_name} requires signature_route OsKeyring"));
     }
     let action = required_str(value, "action")?;
-    if action != "atom_authorize" {
-        return Err("approval.authorize_atom requires action atom_authorize".to_string());
+    if action != expected_action {
+        return Err(format!("{method_name} requires action {expected_action}"));
     }
     Ok(ApprovalPayload {
         schema_id: required_str(value, "schema_id")?,

@@ -484,6 +484,86 @@ fn turingd_goal_submit_validates_goal_state_before_append() {
     assert!(status.success(), "turingd shutdown failed: {status}");
 }
 
+#[test]
+fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"0".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+
+    let socket = dir.path().join("turingd-capsule-approve.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let approved = rpc_params(
+        &socket,
+        "capsule.approve",
+        json!({
+            "key_id": "operator-local-key",
+            "payload": {
+                "schema_id": "approval_payload.v2",
+                "approval_id": "ap_capsule_rpc",
+                "authority_epoch": 0,
+                "action": "capsule_approve",
+                "subject_id": "wc_rpc",
+                "evidence_digests": [digest('d')],
+                "risk_class": "P2",
+                "signature_route": "OsKeyring"
+            },
+            "display_copy": {
+                "title_zh": "批准 Capsule",
+                "body_en": "Authorize capsule dispatch."
+            }
+        }),
+    );
+    let event_id = approved["result"]["event_id"]
+        .as_str()
+        .expect("authorization event id")
+        .to_string();
+    assert_eq!(approved["result"]["event_type"], "WorkerDispatchAuthorized");
+    assert_eq!(approved["result"]["capsule_id"], "wc_rpc");
+    assert_eq!(approved["result"]["authorization_head_moved"], true);
+    assert_eq!(approved["result"]["accepted_head_moved"], false);
+    assert_eq!(
+        approved["result"]["head_set"]["authorization_head"],
+        event_id
+    );
+    assert_eq!(
+        approved["result"]["head_set"]["accepted_head"],
+        genesis.event_id
+    );
+    assert_eq!(
+        approved["result"]["visible_card_hash"],
+        approved["result"]["signed_payload_hash"]
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
 fn rpc(socket: &Path, method: &str) -> Value {
     let mut stream = UnixStream::connect(socket).expect("connect to turingd socket");
     writeln!(stream, r#"{{"jsonrpc":"2.0","id":1,"method":"{method}"}}"#).expect("write request");
