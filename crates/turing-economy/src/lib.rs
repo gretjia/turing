@@ -362,6 +362,147 @@ impl WalletProjection {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MarketRouterMode {
+    Shadow,
+    AssistedFuture,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CandidateRoute {
+    pub route_id: String,
+    pub market_id: String,
+    pub expected_failure_domain: String,
+    pub requested_tokens: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PriceSignal {
+    pub market_id: String,
+    pub yes_price: String,
+    pub no_price: String,
+    pub truth_status: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BudgetSuggestion {
+    pub schema_id: String,
+    pub mode: MarketRouterMode,
+    pub route_id: String,
+    pub market_id: String,
+    pub price_signal_hash: String,
+    pub pput_prior_hash: String,
+    pub diversity_policy_hash: String,
+    pub max_tokens: u64,
+    pub emits_authorization: bool,
+    pub can_move_accepted_head: bool,
+    pub head_effect: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MarketRouter {
+    mode: MarketRouterMode,
+}
+
+impl MarketRouter {
+    #[must_use]
+    pub fn new(mode: MarketRouterMode) -> Self {
+        MarketRouter { mode }
+    }
+
+    pub fn suggest(
+        &self,
+        routes: &[CandidateRoute],
+        signals: &[PriceSignal],
+        price_signal_hash: &str,
+        pput_prior_hash: &str,
+    ) -> Result<BudgetSuggestion, EconomyError> {
+        validate_digest(price_signal_hash)?;
+        validate_digest(pput_prior_hash)?;
+        if routes.is_empty() {
+            return Err(EconomyError::NoCandidateRoutes);
+        }
+
+        let mut best: Option<(&CandidateRoute, DecimalAmount)> = None;
+        for route in routes {
+            let yes_price = signals
+                .iter()
+                .find(|signal| {
+                    signal.market_id == route.market_id
+                        && signal.truth_status == "statistical_signal_only"
+                })
+                .map(|signal| DecimalAmount::parse_non_negative(&signal.yes_price))
+                .transpose()?
+                .unwrap_or_default();
+            if best
+                .as_ref()
+                .is_none_or(|(_, best_price)| yes_price > *best_price)
+            {
+                best = Some((route, yes_price));
+            }
+        }
+        let route = best
+            .map(|(route, _)| route)
+            .ok_or(EconomyError::NoCandidateRoutes)?;
+        Ok(BudgetSuggestion {
+            schema_id: "budget_allocated.v1".to_string(),
+            mode: self.mode,
+            route_id: route.route_id.clone(),
+            market_id: route.market_id.clone(),
+            price_signal_hash: price_signal_hash.to_string(),
+            pput_prior_hash: pput_prior_hash.to_string(),
+            diversity_policy_hash:
+                "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                    .to_string(),
+            max_tokens: route.requested_tokens,
+            emits_authorization: false,
+            can_move_accepted_head: false,
+            head_effect: "PRESERVE".to_string(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PriceBroadcast {
+    pub schema_id: String,
+    pub market_id: String,
+    pub yes_price: String,
+    pub no_price: String,
+    pub price_signal_hash: String,
+    pub truth_status: String,
+    pub head_effect: String,
+}
+
+impl PriceBroadcast {
+    pub fn new(
+        market_id: impl Into<String>,
+        yes_price: &str,
+        no_price: &str,
+        price_signal_hash: &str,
+    ) -> Result<Self, EconomyError> {
+        validate_digest(price_signal_hash)?;
+        let yes_price = DecimalAmount::parse_non_negative(yes_price)?;
+        let no_price = DecimalAmount::parse_non_negative(no_price)?;
+        Ok(PriceBroadcast {
+            schema_id: "market_price_broadcast.v1".to_string(),
+            market_id: market_id.into(),
+            yes_price: yes_price.to_decimal_string(),
+            no_price: no_price.to_decimal_string(),
+            price_signal_hash: price_signal_hash.to_string(),
+            truth_status: "statistical_signal_only".to_string(),
+            head_effect: "PRESERVE".to_string(),
+        })
+    }
+
+    #[must_use]
+    pub fn worker_visible_summary(&self) -> String {
+        format!(
+            "Market {} broadcasts YES price {} and NO price {} as a statistical signal.",
+            self.market_id, self.yes_price, self.no_price
+        )
+    }
+}
+
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 struct WalletInternal {
     coin: DecimalAmount,
@@ -525,10 +666,12 @@ impl std::ops::Neg for DecimalAmount {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EconomyError {
     InvalidDecimalString(String),
+    InvalidDigest(String),
     ZeroPool,
     ZeroPay,
     DivisionByZero,
     UnknownMarket(String),
+    NoCandidateRoutes,
     InvalidMicroEventId(String),
     InvalidSettlementResult(String),
 }
@@ -539,10 +682,12 @@ impl std::fmt::Display for EconomyError {
             EconomyError::InvalidDecimalString(value) => {
                 write!(f, "invalid decimal_string {value:?}")
             }
+            EconomyError::InvalidDigest(digest) => write!(f, "invalid digest {digest:?}"),
             EconomyError::ZeroPool => write!(f, "AMM pools must be non-zero"),
             EconomyError::ZeroPay => write!(f, "AMM pay_coin must be non-zero"),
             EconomyError::DivisionByZero => write!(f, "division by zero"),
             EconomyError::UnknownMarket(market_id) => write!(f, "unknown market {market_id:?}"),
+            EconomyError::NoCandidateRoutes => write!(f, "no candidate routes available"),
             EconomyError::InvalidMicroEventId(id) => write!(f, "invalid Micro event id {id:?}"),
             EconomyError::InvalidSettlementResult(result) => {
                 write!(f, "invalid settlement result {result:?}")
@@ -552,3 +697,13 @@ impl std::fmt::Display for EconomyError {
 }
 
 impl std::error::Error for EconomyError {}
+
+fn validate_digest(value: &str) -> Result<(), EconomyError> {
+    let rest = value
+        .strip_prefix("sha256:")
+        .ok_or_else(|| EconomyError::InvalidDigest(value.to_string()))?;
+    if rest.len() != 64 || !rest.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return Err(EconomyError::InvalidDigest(value.to_string()));
+    }
+    Ok(())
+}
