@@ -7,12 +7,14 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use serde_json::{Value, json};
+use turing_contracts::envelope::HeadEffect;
+use turing_contracts::registry;
 use turing_economy::{CandidateRoute, MarketRouter, MarketRouterMode, PriceSignal};
 use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
     SignatureRoute, ToolRequest,
 };
-use turing_git_tape::append::Append;
+use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
 use turing_pput::WorkerPromptShield;
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
@@ -143,6 +145,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
         Some("heads.read") => read_heads_response(runtime, id),
+        Some("event.append_preserve") if runtime.contract.role == "turingd" => {
+            append_preserve_response(runtime, request, id)
+        }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
         }
@@ -182,6 +187,71 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
     }
+}
+
+fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "event.append_preserve requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let event_type = match required_str(params, "event_type") {
+        Ok(event_type) => event_type,
+        Err(message) => return invalid_params(id, message),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(writer_id) => writer_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let payload = match params.get("payload") {
+        Some(payload) => payload.clone(),
+        None => return invalid_params(id, "payload is required"),
+    };
+    let Some(row) = registry::registry(&event_type) else {
+        return jsonrpc_error(id, -32000, format!("unknown event_type {event_type:?}"));
+    };
+    if row.head_effect != HeadEffect::Preserve {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("event_type {event_type:?} is not a PRESERVE event"),
+        );
+    }
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    let receipt =
+        match tape.append(AppendRequest::new(&event_type, writer_id, payload).predicate_pass()) {
+            Ok(receipt) => receipt,
+            Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+        };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": event_type,
+            "event_id": receipt.event_id,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
 }
 
 fn grant_authorize_response(request: &Value, id: Value) -> Value {

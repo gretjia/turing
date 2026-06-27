@@ -110,9 +110,108 @@ fn turingd_reads_real_micro_tape_heads_from_configured_repo() {
     assert!(status.success(), "turingd shutdown failed: {status}");
 }
 
+#[test]
+fn turingd_appends_preserve_events_without_moving_accepted_head() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"c".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+
+    let socket = dir.path().join("turingd-append-preserve.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let appended = rpc_params(
+        &socket,
+        "event.append_preserve",
+        json!({
+            "event_type": "GoalStateProposed",
+            "writer_id": "writer:goal",
+            "payload": {
+                "goal_id": "goal_rpc",
+                "intent": "append preserve event through turingd"
+            }
+        }),
+    );
+    let event_id = appended["result"]["event_id"]
+        .as_str()
+        .expect("event id")
+        .to_string();
+    assert!(event_id.starts_with("mu:"));
+    assert_eq!(appended["result"]["event_type"], "GoalStateProposed");
+    assert_eq!(appended["result"]["head_effect"], "PRESERVE");
+    assert_eq!(appended["result"]["accepted_head_moved"], false);
+    assert_eq!(appended["result"]["head_set"]["tape_tip"], event_id);
+    assert_eq!(
+        appended["result"]["head_set"]["accepted_head"],
+        genesis.event_id
+    );
+
+    let denied = rpc_params(
+        &socket,
+        "event.append_preserve",
+        json!({
+            "event_type": "CandidateAccepted",
+            "writer_id": "writer:accept",
+            "payload": {
+                "candidate_id": "cand_forbidden"
+            }
+        }),
+    );
+    assert_eq!(denied["error"]["code"], -32000);
+    assert!(
+        denied["error"]["message"]
+            .as_str()
+            .expect("error message")
+            .contains("not a PRESERVE event")
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
 fn rpc(socket: &Path, method: &str) -> Value {
     let mut stream = UnixStream::connect(socket).expect("connect to turingd socket");
     writeln!(stream, r#"{{"jsonrpc":"2.0","id":1,"method":"{method}"}}"#).expect("write request");
+    let mut line = String::new();
+    BufReader::new(stream)
+        .read_line(&mut line)
+        .expect("read response");
+    serde_json::from_str(&line).expect("JSON-RPC response")
+}
+
+fn rpc_params(socket: &Path, method: &str, params: Value) -> Value {
+    let mut stream = UnixStream::connect(socket).expect("connect to turingd socket");
+    let request = json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": method,
+        "params": params,
+    });
+    writeln!(stream, "{request}").expect("write request");
     let mut line = String::new();
     BufReader::new(stream)
         .read_line(&mut line)
