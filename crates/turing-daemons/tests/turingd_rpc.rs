@@ -807,6 +807,78 @@ fn turingd_verify_write_accepts_derived_predicate_pack_without_checks() {
 }
 
 #[test]
+fn turingd_verify_write_rejects_extra_truthy_candidate_fields() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"b".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+    append_work_capsule(&tape, "wc_rpc");
+    append_worker_receipt(&tape, "wc_rpc", "rcp_pack");
+    append_macro_observation(&tape, "wc_rpc", "macro:diff_rpc");
+
+    let socket = dir.path().join("turingd-extra-fields.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let rejected = rpc_params(
+        &socket,
+        "candidate.verify_write",
+        json!({
+            "writer_id": "writer:predicate",
+            "candidate_payload": {
+                "candidate_id": "cand_truthy_payload",
+                "capsule_id": "wc_rpc",
+                "macro_anchor_id": "macro:diff_rpc",
+                "worker_receipt_id": "rcp_pack",
+                "ci_green": true,
+                "price_truth": true,
+                "accepted": true
+            }
+        }),
+    );
+
+    assert_eq!(rejected["error"]["code"], -32000);
+    assert!(
+        rejected["error"]["message"]
+            .as_str()
+            .expect("error message")
+            .contains("unexpected candidate_payload field")
+    );
+    let heads = Append::open(&repo)
+        .expect("reopen tape")
+        .head_set_guarded()
+        .expect("head set")
+        .expect("heads exist");
+    assert_eq!(heads.accepted_head, genesis.event_id);
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
+#[test]
 fn turingd_authorizes_atom_with_approval_card_without_accepting() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");
@@ -826,7 +898,6 @@ fn turingd_authorizes_atom_with_approval_card_without_accepting() {
 
     let socket = dir.path().join("turingd-approval.sock");
     let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
-        .env("TURINGOS_APPROVAL_IN_MEMORY_KEYRING", "1")
         .args([
             "--serve",
             "--socket",
@@ -852,7 +923,7 @@ fn turingd_authorizes_atom_with_approval_card_without_accepting() {
                 "subject_id": "atom_rpc",
                 "evidence_digests": [digest('c')],
                 "risk_class": "P2",
-                "signature_route": "OsKeyring"
+                "signature_route": "InMemoryTest"
             },
             "display_copy": {
                 "title_zh": "批准 Atom",
@@ -879,7 +950,19 @@ fn turingd_authorizes_atom_with_approval_card_without_accepting() {
         approved["result"]["visible_card_hash"],
         approved["result"]["signed_payload_hash"]
     );
-    assert_eq!(approved["result"]["signature_route"], "OsKeyring");
+    assert_eq!(approved["result"]["signature_route"], "InMemoryTest");
+    assert!(
+        approved["result"]["public_key_fingerprint"]
+            .as_str()
+            .expect("public key fingerprint")
+            .starts_with("sha256:")
+    );
+    assert!(
+        approved["result"]["verifying_key"]
+            .as_str()
+            .expect("verifying key")
+            .starts_with("ed25519-pub:")
+    );
 
     let shutdown = rpc(&socket, "daemon.shutdown");
     assert_eq!(shutdown["result"]["shutdown"], true);
@@ -1016,7 +1099,6 @@ fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
 
     let socket = dir.path().join("turingd-capsule-approve.sock");
     let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
-        .env("TURINGOS_APPROVAL_IN_MEMORY_KEYRING", "1")
         .args([
             "--serve",
             "--socket",
@@ -1042,7 +1124,7 @@ fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
                 "subject_id": "wc_rpc",
                 "evidence_digests": [digest('d')],
                 "risk_class": "P2",
-                "signature_route": "OsKeyring"
+                "signature_route": "InMemoryTest"
             },
             "display_copy": {
                 "title_zh": "批准 Capsule",
@@ -1069,6 +1151,19 @@ fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
     assert_eq!(
         approved["result"]["visible_card_hash"],
         approved["result"]["signed_payload_hash"]
+    );
+    assert_eq!(approved["result"]["signature_route"], "InMemoryTest");
+    assert!(
+        approved["result"]["public_key_fingerprint"]
+            .as_str()
+            .expect("public key fingerprint")
+            .starts_with("sha256:")
+    );
+    assert!(
+        approved["result"]["verifying_key"]
+            .as_str()
+            .expect("verifying key")
+            .starts_with("ed25519-pub:")
     );
 
     let shutdown = rpc(&socket, "daemon.shutdown");
@@ -1195,7 +1290,7 @@ fn append_worker_receipt(tape: &Append, capsule_id: &str, receipt_id: &str) {
             json!({
                 "receipt_id": receipt_id,
                 "capsule_id": capsule_id,
-                "worker_id": "worker_fake",
+                "worker_id": "worker:sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
                 "exit_code": 0,
                 "stdout_hash": digest('1'),
                 "stderr_hash": digest('2'),

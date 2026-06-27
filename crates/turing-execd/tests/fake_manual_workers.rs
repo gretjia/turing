@@ -8,7 +8,9 @@ fn fake_worker_receipt_full_provenance() {
         grant_id: "grant_demo".to_string(),
     };
 
-    let fake = FakeWorker::new("worker_fake");
+    let fake = FakeWorker::new(
+        "worker:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    );
     assert_eq!(fake.profile().kind, WorkerKind::Fake);
     assert_eq!(fake.profile().provenance, Provenance::Full);
 
@@ -19,7 +21,10 @@ fn fake_worker_receipt_full_provenance() {
     assert_eq!(receipt, same_receipt);
     assert_eq!(receipt.schema_id, "execution_receipt.v1");
     assert_eq!(receipt.capsule_id, "wc_demo");
-    assert_eq!(receipt.worker_id, "worker_fake");
+    assert_eq!(
+        receipt.worker_id,
+        "worker:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    );
     assert_eq!(receipt.exit_code, Some(0));
     assert_eq!(receipt.timeout_class, "none");
     assert!(receipt.stdout_hash.starts_with("sha256:"));
@@ -28,7 +33,9 @@ fn fake_worker_receipt_full_provenance() {
     assert!(receipt.credential_material_absent);
     assert!(!receipt.micro_refs_moved);
 
-    let manual = ManualCopyPasteWorker::new("worker_manual");
+    let manual = ManualCopyPasteWorker::new(
+        "worker:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    );
     assert_eq!(manual.profile().kind, WorkerKind::Manual);
     assert_eq!(manual.profile().provenance, Provenance::Full);
     let manual_receipt = manual
@@ -42,7 +49,10 @@ fn fake_worker_receipt_full_provenance() {
             },
         )
         .expect("manual receipt");
-    assert_eq!(manual_receipt.worker_id, "worker_manual");
+    assert_eq!(
+        manual_receipt.worker_id,
+        "worker:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    );
     assert_eq!(manual_receipt.provenance, Provenance::Full);
     assert!(manual_receipt.diff_hash.unwrap().starts_with("sha256:"));
     assert!(

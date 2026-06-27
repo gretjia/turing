@@ -6,7 +6,7 @@ use turing_execd::workers::{
 #[test]
 fn worker_profile_no_backup_no_worker_role() {
     let vendor = WorkerProfile::vendor_bundle(
-        "worker_codex_cli",
+        "worker:sha256:1111111111111111111111111111111111111111111111111111111111111111",
         WorkerKind::CommandTemplate,
         vec![DispatchPurpose::PrimaryExecution],
         vec!["code_edit".to_string(), "test_run".to_string()],
@@ -57,5 +57,28 @@ fn worker_profile_no_backup_no_worker_role() {
             None,
         ),
         Err(WorkerProfileError::MissingFailureDomain)
+    );
+}
+
+#[test]
+fn worker_profile_requires_hash_worker_id() {
+    let failure_domain = FailureDomain {
+        provider: "local".to_string(),
+        auth_surface: AuthSurface::None,
+        network_required: false,
+    };
+
+    assert_eq!(
+        WorkerProfile::new(
+            "worker_fake",
+            WorkerKind::Fake,
+            Provenance::Full,
+            vec![DispatchPurpose::OfflineBootstrap],
+            vec!["test_run".to_string()],
+            Some(failure_domain),
+        ),
+        Err(WorkerProfileError::InvalidWorkerId(
+            "worker_fake".to_string()
+        ))
     );
 }

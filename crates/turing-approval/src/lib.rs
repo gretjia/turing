@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::{Mutex, OnceLock};
 
-use ed25519_dalek::{Signature, Signer, SigningKey, Verifier};
+use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use rand_core::OsRng;
 use serde::{Deserialize, Serialize};
 use turing_contracts::jcs::{self, JcsError};
@@ -26,6 +26,7 @@ pub enum SignatureRoute {
     None,
     OsKeyring,
     LocalFileDev,
+    InMemoryTest,
     HardwareFuture,
 }
 
@@ -123,6 +124,8 @@ pub struct SignatureEnvelope {
     pub key_id: String,
     pub authority_epoch: u64,
     pub signature_route: SignatureRoute,
+    pub public_key_fingerprint: String,
+    pub verifying_key: String,
     pub signed_payload_hash: String,
     pub signature: String,
 }
@@ -153,31 +156,15 @@ pub struct OsKeyringSigningBackend {
 impl OsKeyringSigningBackend {
     #[must_use]
     pub fn new(key_id: impl Into<String>) -> Self {
-        let provider = if std::env::var_os("TURINGOS_APPROVAL_IN_MEMORY_KEYRING").as_deref()
-            == Some(std::ffi::OsStr::new("1"))
-        {
-            OsKeyringProvider::InMemory
-        } else {
-            OsKeyringProvider::Platform
-        };
         OsKeyringSigningBackend {
             key_id: key_id.into(),
-            provider,
-        }
-    }
-
-    #[must_use]
-    pub fn new_in_memory_for_tests(key_id: impl Into<String>) -> Self {
-        OsKeyringSigningBackend {
-            key_id: key_id.into(),
-            provider: OsKeyringProvider::InMemory,
+            provider: OsKeyringProvider::Platform,
         }
     }
 
     fn load_or_create_signing_key(&self) -> Result<SigningKey, SigningError> {
         match self.provider {
             OsKeyringProvider::Platform => self.load_or_create_platform_key(),
-            OsKeyringProvider::InMemory => Ok(in_memory_os_keyring_key(&self.key_id)),
         }
     }
 
@@ -203,7 +190,40 @@ impl OsKeyringSigningBackend {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum OsKeyringProvider {
     Platform,
-    InMemory,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InMemoryTestSigningBackend {
+    key_id: String,
+    can_sign: bool,
+}
+
+impl InMemoryTestSigningBackend {
+    #[must_use]
+    pub fn new(key_id: impl Into<String>) -> Self {
+        InMemoryTestSigningBackend {
+            key_id: key_id.into(),
+            can_sign: true,
+        }
+    }
+
+    #[must_use]
+    pub fn verifier(key_id: impl Into<String>) -> Self {
+        InMemoryTestSigningBackend {
+            key_id: key_id.into(),
+            can_sign: false,
+        }
+    }
+
+    fn signing_key(&self) -> Result<SigningKey, SigningError> {
+        if self.can_sign {
+            Ok(in_memory_test_key(&self.key_id))
+        } else {
+            Err(SigningError::TestSigningKeyUnavailable {
+                key_id: self.key_id.clone(),
+            })
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -352,15 +372,15 @@ impl LocalFileSigningBackend {
     }
 }
 
-fn in_memory_os_keyring() -> &'static Mutex<BTreeMap<String, SigningKey>> {
+fn in_memory_test_keyring() -> &'static Mutex<BTreeMap<String, SigningKey>> {
     static KEYRING: OnceLock<Mutex<BTreeMap<String, SigningKey>>> = OnceLock::new();
     KEYRING.get_or_init(|| Mutex::new(BTreeMap::new()))
 }
 
-fn in_memory_os_keyring_key(key_id: &str) -> SigningKey {
-    let mut keyring = in_memory_os_keyring()
+fn in_memory_test_key(key_id: &str) -> SigningKey {
+    let mut keyring = in_memory_test_keyring()
         .lock()
-        .expect("in-memory OS keyring mutex poisoned");
+        .expect("in-memory test keyring mutex poisoned");
     keyring
         .entry(key_id.to_string())
         .or_insert_with(|| {
@@ -483,14 +503,14 @@ impl SigningBackend for OsKeyringSigningBackend {
         let bytes = card.canonical_bytes()?;
         let signing_key = self.load_or_create_signing_key()?;
         let signature = signing_key.sign(&bytes);
-        Ok(SignatureEnvelope {
-            schema_id: "approval_signature.v1".to_string(),
-            key_id: self.key_id.clone(),
-            authority_epoch: card.payload.authority_epoch,
-            signature_route: SignatureRoute::OsKeyring,
-            signed_payload_hash: digest(&bytes),
-            signature: encode_signature(&signature),
-        })
+        Ok(signature_envelope(
+            &self.key_id,
+            card.payload.authority_epoch,
+            SignatureRoute::OsKeyring,
+            &bytes,
+            &signing_key,
+            &signature,
+        ))
     }
 
     fn verify(
@@ -498,31 +518,50 @@ impl SigningBackend for OsKeyringSigningBackend {
         card: &ApprovalCard,
         signature: &SignatureEnvelope,
     ) -> Result<(), SigningError> {
-        if signature.signature_route != SignatureRoute::OsKeyring {
+        verify_signature_with_public_key(card, signature, SignatureRoute::OsKeyring, &self.key_id)
+    }
+}
+
+impl SigningBackend for InMemoryTestSigningBackend {
+    fn key_id(&self) -> &str {
+        &self.key_id
+    }
+
+    fn route(&self) -> SignatureRoute {
+        SignatureRoute::InMemoryTest
+    }
+
+    fn sign(&self, card: &ApprovalCard) -> Result<SignatureEnvelope, SigningError> {
+        if card.payload.signature_route != SignatureRoute::InMemoryTest {
             return Err(SigningError::RouteMismatch {
-                expected: SignatureRoute::OsKeyring,
-                observed: signature.signature_route,
-            });
-        }
-        if signature.key_id != self.key_id {
-            return Err(SigningError::SignatureVerificationFailed {
-                key_id: signature.key_id.clone(),
+                expected: card.payload.signature_route,
+                observed: SignatureRoute::InMemoryTest,
             });
         }
         let bytes = card.canonical_bytes()?;
-        if signature.signed_payload_hash != digest(&bytes) {
-            return Err(SigningError::SignatureVerificationFailed {
-                key_id: self.key_id.clone(),
-            });
-        }
-        let signing_key = self.load_or_create_signing_key()?;
-        let verifying_key = signing_key.verifying_key();
-        let ed25519_signature = decode_signature(&signature.signature)?;
-        verifying_key
-            .verify(&bytes, &ed25519_signature)
-            .map_err(|_| SigningError::SignatureVerificationFailed {
-                key_id: self.key_id.clone(),
-            })
+        let signing_key = self.signing_key()?;
+        let signature = signing_key.sign(&bytes);
+        Ok(signature_envelope(
+            &self.key_id,
+            card.payload.authority_epoch,
+            SignatureRoute::InMemoryTest,
+            &bytes,
+            &signing_key,
+            &signature,
+        ))
+    }
+
+    fn verify(
+        &self,
+        card: &ApprovalCard,
+        signature: &SignatureEnvelope,
+    ) -> Result<(), SigningError> {
+        verify_signature_with_public_key(
+            card,
+            signature,
+            SignatureRoute::InMemoryTest,
+            &self.key_id,
+        )
     }
 }
 
@@ -549,14 +588,14 @@ impl SigningBackend for LocalFileSigningBackend {
         let bytes = card.canonical_bytes()?;
         let signing_key = self.load_or_create_signing_key()?;
         let signature = signing_key.sign(&bytes);
-        Ok(SignatureEnvelope {
-            schema_id: "approval_signature.v1".to_string(),
-            key_id: self.key_id.clone(),
-            authority_epoch: card.payload.authority_epoch,
-            signature_route: SignatureRoute::LocalFileDev,
-            signed_payload_hash: digest(&bytes),
-            signature: encode_signature(&signature),
-        })
+        Ok(signature_envelope(
+            &self.key_id,
+            card.payload.authority_epoch,
+            SignatureRoute::LocalFileDev,
+            &bytes,
+            &signing_key,
+            &signature,
+        ))
     }
 
     fn verify(
@@ -564,31 +603,12 @@ impl SigningBackend for LocalFileSigningBackend {
         card: &ApprovalCard,
         signature: &SignatureEnvelope,
     ) -> Result<(), SigningError> {
-        if signature.signature_route != SignatureRoute::LocalFileDev {
-            return Err(SigningError::RouteMismatch {
-                expected: SignatureRoute::LocalFileDev,
-                observed: signature.signature_route,
-            });
-        }
-        if signature.key_id != self.key_id {
-            return Err(SigningError::SignatureVerificationFailed {
-                key_id: signature.key_id.clone(),
-            });
-        }
-        let bytes = card.canonical_bytes()?;
-        if signature.signed_payload_hash != digest(&bytes) {
-            return Err(SigningError::SignatureVerificationFailed {
-                key_id: self.key_id.clone(),
-            });
-        }
-        let signing_key = self.load_or_create_signing_key()?;
-        let verifying_key = signing_key.verifying_key();
-        let ed25519_signature = decode_signature(&signature.signature)?;
-        verifying_key
-            .verify(&bytes, &ed25519_signature)
-            .map_err(|_| SigningError::SignatureVerificationFailed {
-                key_id: self.key_id.clone(),
-            })
+        verify_signature_with_public_key(
+            card,
+            signature,
+            SignatureRoute::LocalFileDev,
+            &self.key_id,
+        )
     }
 }
 
@@ -685,6 +705,9 @@ pub enum SigningError {
     SignatureVerificationFailed {
         key_id: String,
     },
+    TestSigningKeyUnavailable {
+        key_id: String,
+    },
     HardwareBackendUnavailable {
         slot_id: String,
     },
@@ -715,6 +738,9 @@ impl std::fmt::Display for SigningError {
             SigningError::SignatureVerificationFailed { key_id } => {
                 write!(f, "signature verification failed for key_id {key_id:?}")
             }
+            SigningError::TestSigningKeyUnavailable { key_id } => {
+                write!(f, "in-memory test signing key {key_id:?} is verifier-only")
+            }
             SigningError::HardwareBackendUnavailable { slot_id } => {
                 write!(
                     f,
@@ -735,6 +761,90 @@ impl From<ApprovalError> for SigningError {
 
 fn digest(bytes: &[u8]) -> String {
     format!("sha256:{}", jcs::sha256_hex(bytes))
+}
+
+fn signature_envelope(
+    key_id: &str,
+    authority_epoch: u64,
+    signature_route: SignatureRoute,
+    signed_bytes: &[u8],
+    signing_key: &SigningKey,
+    signature: &Signature,
+) -> SignatureEnvelope {
+    let verifying_key = signing_key.verifying_key();
+    SignatureEnvelope {
+        schema_id: "approval_signature.v1".to_string(),
+        key_id: key_id.to_string(),
+        authority_epoch,
+        signature_route,
+        public_key_fingerprint: public_key_fingerprint(&verifying_key),
+        verifying_key: encode_verifying_key(&verifying_key),
+        signed_payload_hash: digest(signed_bytes),
+        signature: encode_signature(signature),
+    }
+}
+
+fn verify_signature_with_public_key(
+    card: &ApprovalCard,
+    signature: &SignatureEnvelope,
+    expected_route: SignatureRoute,
+    expected_key_id: &str,
+) -> Result<(), SigningError> {
+    if signature.schema_id != "approval_signature.v1" {
+        return Err(SigningError::SignatureVerificationFailed {
+            key_id: signature.key_id.clone(),
+        });
+    }
+    if signature.signature_route != expected_route {
+        return Err(SigningError::RouteMismatch {
+            expected: expected_route,
+            observed: signature.signature_route,
+        });
+    }
+    if signature.key_id != expected_key_id {
+        return Err(SigningError::SignatureVerificationFailed {
+            key_id: signature.key_id.clone(),
+        });
+    }
+    let bytes = card.canonical_bytes()?;
+    if signature.signed_payload_hash != digest(&bytes) {
+        return Err(SigningError::SignatureVerificationFailed {
+            key_id: expected_key_id.to_string(),
+        });
+    }
+    let verifying_key = decode_verifying_key(&signature.verifying_key)?;
+    if signature.public_key_fingerprint != public_key_fingerprint(&verifying_key) {
+        return Err(SigningError::SignatureVerificationFailed {
+            key_id: expected_key_id.to_string(),
+        });
+    }
+    let ed25519_signature = decode_signature(&signature.signature)?;
+    verifying_key
+        .verify(&bytes, &ed25519_signature)
+        .map_err(|_| SigningError::SignatureVerificationFailed {
+            key_id: expected_key_id.to_string(),
+        })
+}
+
+fn public_key_fingerprint(verifying_key: &VerifyingKey) -> String {
+    digest(&verifying_key.to_bytes())
+}
+
+fn encode_verifying_key(verifying_key: &VerifyingKey) -> String {
+    format!("ed25519-pub:{}", hex::encode(verifying_key.to_bytes()))
+}
+
+fn decode_verifying_key(raw: &str) -> Result<VerifyingKey, SigningError> {
+    let hex = raw
+        .strip_prefix("ed25519-pub:")
+        .ok_or_else(|| SigningError::SignatureInvalidEncoding(raw.to_string()))?;
+    let bytes = hex::decode(hex)
+        .map_err(|error| SigningError::SignatureInvalidEncoding(error.to_string()))?;
+    let bytes: [u8; 32] = bytes.try_into().map_err(|_| {
+        SigningError::SignatureInvalidEncoding("verifying key must be 32 bytes".into())
+    })?;
+    VerifyingKey::from_bytes(&bytes)
+        .map_err(|error| SigningError::SignatureInvalidEncoding(error.to_string()))
 }
 
 fn encode_signature(signature: &Signature) -> String {

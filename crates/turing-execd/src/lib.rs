@@ -87,8 +87,12 @@ pub mod workers {
                 return Err(WorkerProfileError::MissingDispatchPurpose);
             }
             let failure_domain = failure_domain.ok_or(WorkerProfileError::MissingFailureDomain)?;
+            let worker_id = worker_id.into();
+            if !super::is_hash_worker_id(&worker_id) {
+                return Err(WorkerProfileError::InvalidWorkerId(worker_id));
+            }
             Ok(WorkerProfile {
-                worker_id: worker_id.into(),
+                worker_id,
                 kind,
                 provenance,
                 dispatch_purpose,
@@ -131,6 +135,7 @@ pub mod workers {
     pub enum WorkerProfileError {
         MissingDispatchPurpose,
         MissingFailureDomain,
+        InvalidWorkerId(String),
         ForbiddenBackupTerm(String),
         ForbiddenWorkerRoleTerm(String),
         UnknownDispatchPurpose(String),
@@ -145,6 +150,10 @@ pub mod workers {
                 WorkerProfileError::MissingFailureDomain => {
                     write!(f, "WorkerProfile failure_domain is required")
                 }
+                WorkerProfileError::InvalidWorkerId(worker_id) => write!(
+                    f,
+                    "WorkerProfile worker_id must match worker:sha256:<64 lowercase hex>, got {worker_id:?}"
+                ),
                 WorkerProfileError::ForbiddenBackupTerm(term) => {
                     write!(f, "WorkerProfile forbids backup wording: {term:?}")
                 }
@@ -159,6 +168,16 @@ pub mod workers {
     }
 
     impl std::error::Error for WorkerProfileError {}
+}
+
+fn is_hash_worker_id(worker_id: &str) -> bool {
+    let Some(hex) = worker_id.strip_prefix("worker:sha256:") else {
+        return false;
+    };
+    hex.len() == 64
+        && hex
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
 }
 
 pub mod capability {
@@ -860,8 +879,12 @@ pub struct FakeWorker {
 impl FakeWorker {
     #[must_use]
     pub fn new(worker_id: impl Into<String>) -> Self {
-        let profile = full_local_profile(worker_id, WorkerKind::Fake, "fake");
-        FakeWorker { profile }
+        Self::try_new(worker_id).expect("built-in FULL local fake worker profile is valid")
+    }
+
+    pub fn try_new(worker_id: impl Into<String>) -> Result<Self, WorkerRunError> {
+        let profile = try_full_local_profile(worker_id, WorkerKind::Fake, "fake")?;
+        Ok(FakeWorker { profile })
     }
 
     #[must_use]
@@ -889,8 +912,12 @@ pub struct ManualCopyPasteWorker {
 impl ManualCopyPasteWorker {
     #[must_use]
     pub fn new(worker_id: impl Into<String>) -> Self {
-        let profile = full_local_profile(worker_id, WorkerKind::Manual, "manual");
-        ManualCopyPasteWorker { profile }
+        Self::try_new(worker_id).expect("built-in FULL local manual worker profile is valid")
+    }
+
+    pub fn try_new(worker_id: impl Into<String>) -> Result<Self, WorkerRunError> {
+        let profile = try_full_local_profile(worker_id, WorkerKind::Manual, "manual")?;
+        Ok(ManualCopyPasteWorker { profile })
     }
 
     #[must_use]
@@ -914,11 +941,11 @@ impl ManualCopyPasteWorker {
     }
 }
 
-fn full_local_profile(
+fn try_full_local_profile(
     worker_id: impl Into<String>,
     kind: WorkerKind,
     provider: &str,
-) -> WorkerProfile {
+) -> Result<WorkerProfile, WorkerProfileError> {
     WorkerProfile::new(
         worker_id,
         kind,
@@ -931,7 +958,6 @@ fn full_local_profile(
             network_required: false,
         }),
     )
-    .expect("built-in FULL local worker profile is valid")
 }
 
 fn build_receipt(

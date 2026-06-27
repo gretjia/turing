@@ -166,7 +166,9 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         "route_fake_worker",
     );
 
-    let worker = FakeWorker::new("worker_fake");
+    let worker = FakeWorker::new(
+        "worker:sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    );
     let receipt = worker.run(WorkerRunRequest {
         capsule_id: "wc_hello_cli".to_string(),
         grant_id: "grant_hello_cli".to_string(),
@@ -259,7 +261,7 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         "run_hello",
         "problem_hello",
         Split::Dogfood,
-        "worker_fake",
+        "worker:sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
         "branch_failed",
         "wc_hello_cli",
         4,
@@ -273,7 +275,7 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         "run_hello",
         "problem_hello",
         Split::Dogfood,
-        "worker_fake",
+        "worker:sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
         "branch_gold",
         "wc_hello_cli",
         3,

@@ -110,9 +110,8 @@ fn approval_preview_renders_human_card_without_writing_truth() {
 }
 
 #[test]
-fn approval_sign_emits_os_keyring_signature_without_writing_truth() {
+fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth() {
     let output = turing()
-        .env("TURINGOS_APPROVAL_IN_MEMORY_KEYRING", "1")
         .args([
             "approval",
             "sign",
@@ -131,7 +130,7 @@ fn approval_sign_emits_os_keyring_signature_without_writing_truth() {
             "--evidence-digest",
             "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
             "--signature-route",
-            "os-keyring",
+            "in-memory-test",
         ])
         .output()
         .expect("run approval sign");
@@ -141,8 +140,10 @@ fn approval_sign_emits_os_keyring_signature_without_writing_truth() {
     assert!(stdout.contains("approval signature:"));
     assert!(stdout.contains("approval_id=ap_cli_sign"));
     assert!(stdout.contains("key_id=operator-local-key"));
-    assert!(stdout.contains("signature_route=OsKeyring"));
+    assert!(stdout.contains("signature_route=InMemoryTest"));
     assert!(stdout.contains("signed_payload_hash=sha256:"));
+    assert!(stdout.contains("public_key_fingerprint=sha256:"));
+    assert!(stdout.contains("verifying_key=ed25519-pub:"));
     assert!(stdout.contains("signature=ed25519:"));
     assert!(stdout.contains("writes_micro_truth=false"));
     assert!(!stdout.contains("plaintext"));

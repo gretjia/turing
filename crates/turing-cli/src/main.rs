@@ -4,7 +4,7 @@ use std::process::ExitCode;
 use serde_json::json;
 use turing_approval::{
     APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, DisplayCopy, HardwareSigningBackend,
-    OsKeyringSigningBackend, SignatureRoute, SigningBackend,
+    InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute, SigningBackend,
 };
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
@@ -195,6 +195,7 @@ fn approval_sign(
     )?;
     let signature = match card.payload().signature_route {
         SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id).sign(&card),
+        SignatureRoute::InMemoryTest => InMemoryTestSigningBackend::new(key_id).sign(&card),
         SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id).sign(&card),
         SignatureRoute::LocalFileDev => {
             return Err("approval sign does not expose local-file dev signing".to_string());
@@ -208,6 +209,9 @@ fn approval_sign(
         SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id)
             .verify(&card, &signature)
             .map_err(|error| format!("approval verification failed: {error}"))?,
+        SignatureRoute::InMemoryTest => InMemoryTestSigningBackend::verifier(key_id)
+            .verify(&card, &signature)
+            .map_err(|error| format!("approval verification failed: {error}"))?,
         SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id)
             .verify(&card, &signature)
             .map_err(|error| format!("approval verification failed: {error}"))?,
@@ -215,12 +219,14 @@ fn approval_sign(
         SignatureRoute::None => unreachable!(),
     }
     Ok(format!(
-        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} signed_payload_hash={} signature={} writes_micro_truth=false",
+        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} signed_payload_hash={} public_key_fingerprint={} verifying_key={} signature={} writes_micro_truth=false",
         approval_id,
         signature.key_id,
         signature.authority_epoch,
         signature.signature_route,
         signature.signed_payload_hash,
+        signature.public_key_fingerprint,
+        signature.verifying_key,
         signature.signature,
     ))
 }
@@ -261,6 +267,7 @@ fn parse_signature_route(value: &str) -> Result<SignatureRoute, String> {
         "none" => Ok(SignatureRoute::None),
         "os-keyring" => Ok(SignatureRoute::OsKeyring),
         "local-file-dev" => Ok(SignatureRoute::LocalFileDev),
+        "in-memory-test" => Ok(SignatureRoute::InMemoryTest),
         "hardware-future" => Ok(SignatureRoute::HardwareFuture),
         other => Err(format!("unknown signature route {other:?}")),
     }

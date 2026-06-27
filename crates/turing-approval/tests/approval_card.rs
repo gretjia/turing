@@ -1,6 +1,6 @@
 use turing_approval::{
-    ApprovalCard, ApprovalPayload, DisplayCopy, HardwareSigningBackend, LocalFileSigningBackend,
-    OsKeyringSigningBackend, SignatureRoute, SigningBackend, SigningError,
+    ApprovalCard, ApprovalPayload, DisplayCopy, HardwareSigningBackend, InMemoryTestSigningBackend,
+    LocalFileSigningBackend, OsKeyringSigningBackend, SignatureRoute, SigningBackend, SigningError,
 };
 
 fn approval_payload() -> ApprovalPayload {
@@ -60,7 +60,7 @@ fn approval_bytes_four_way_identity() {
 #[test]
 fn signing_backend_has_no_plaintext_default_and_hardware_slot() {
     let card = ApprovalCard::new(
-        approval_payload(),
+        approval_payload_with_route(SignatureRoute::InMemoryTest),
         DisplayCopy {
             title_zh: "批准".to_string(),
             body_en: "Approve.".to_string(),
@@ -69,14 +69,17 @@ fn signing_backend_has_no_plaintext_default_and_hardware_slot() {
 
     let os = OsKeyringSigningBackend::new("operator-local-key");
     assert!(!os.exports_plaintext_key());
+    assert_eq!(os.route(), SignatureRoute::OsKeyring);
 
-    let os = OsKeyringSigningBackend::new_in_memory_for_tests("operator-local-key");
-    let signature = os
+    let test_backend = InMemoryTestSigningBackend::new("operator-local-key");
+    let signature = test_backend
         .sign(&card)
-        .expect("in-memory OS keyring test signature envelope");
+        .expect("explicit in-memory test signature envelope");
     assert_eq!(signature.key_id, "operator-local-key");
     assert_eq!(signature.authority_epoch, 7);
-    assert_eq!(signature.signature_route, SignatureRoute::OsKeyring);
+    assert_eq!(signature.signature_route, SignatureRoute::InMemoryTest);
+    assert!(signature.verifying_key.starts_with("ed25519-pub:"));
+    assert!(signature.public_key_fingerprint.starts_with("sha256:"));
     assert!(signature.signature.starts_with("ed25519:"));
 
     let hardware = HardwareSigningBackend::slot("future-hsm-slot-0");
@@ -90,15 +93,15 @@ fn signing_backend_has_no_plaintext_default_and_hardware_slot() {
 #[test]
 fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() {
     let card = ApprovalCard::new(
-        approval_payload(),
+        approval_payload_with_route(SignatureRoute::InMemoryTest),
         DisplayCopy {
             title_zh: "批准".to_string(),
             body_en: "Approve.".to_string(),
         },
     );
 
-    let os = OsKeyringSigningBackend::new_in_memory_for_tests("operator-local-key");
-    let signature = os.sign(&card).expect("signature envelope");
+    let signer = InMemoryTestSigningBackend::new("operator-local-key");
+    let signature = signer.sign(&card).expect("signature envelope");
     let surfaces = card.byte_surfaces().expect("canonical surfaces");
 
     let recomputable = format!(
@@ -107,9 +110,13 @@ fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() 
         "operator-local-key"
     );
     assert_ne!(signature.signature, recomputable);
-    os.verify(&card, &signature).expect("signature verifies");
+    let verifier_without_private_key = InMemoryTestSigningBackend::verifier("operator-local-key");
+    verifier_without_private_key
+        .verify(&card, &signature)
+        .expect("signature verifies from envelope public key");
 
     let mut tampered_payload = approval_payload();
+    tampered_payload.signature_route = SignatureRoute::InMemoryTest;
     tampered_payload.risk_class = "P3".to_string();
     let tampered = ApprovalCard::new(
         tampered_payload,
@@ -118,11 +125,15 @@ fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() 
             body_en: "Approve.".to_string(),
         },
     );
-    assert!(os.verify(&tampered, &signature).is_err());
+    assert!(
+        verifier_without_private_key
+            .verify(&tampered, &signature)
+            .is_err()
+    );
 }
 
 #[test]
-fn local_file_signing_backend_is_explicit_plaintext_dev_backend() {
+fn local_file_signature_verifies_without_private_seed_after_signing() {
     let dir = tempfile::tempdir().expect("temp dir");
     let card = ApprovalCard::new(
         approval_payload_with_route(SignatureRoute::LocalFileDev),
@@ -136,9 +147,6 @@ fn local_file_signing_backend_is_explicit_plaintext_dev_backend() {
     assert!(local.exports_plaintext_key());
     let signature = local.sign(&card).expect("local file dev signature");
     assert_eq!(signature.signature_route, SignatureRoute::LocalFileDev);
-    local
-        .verify(&card, &signature)
-        .expect("local file signature verifies");
 
     let entries: Vec<_> = std::fs::read_dir(dir.path())
         .expect("read local file key dir")
@@ -148,4 +156,18 @@ fn local_file_signing_backend_is_explicit_plaintext_dev_backend() {
     let key_record =
         std::fs::read_to_string(entries[0].path()).expect("local file key record is readable");
     assert!(key_record.contains("signing_key_hex"));
+
+    std::fs::remove_file(entries[0].path()).expect("delete private dev seed before verification");
+    let clean_verifier =
+        LocalFileSigningBackend::with_key_store_dir("operator-local-key", dir.path());
+    clean_verifier
+        .verify(&card, &signature)
+        .expect("verification uses public key from signature envelope, not private seed");
+    assert!(
+        std::fs::read_dir(dir.path())
+            .expect("read dir after verification")
+            .next()
+            .is_none(),
+        "verification must not recreate private key material"
+    );
 }

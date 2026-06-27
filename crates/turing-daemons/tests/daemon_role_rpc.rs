@@ -763,7 +763,7 @@ fn execd_dispatches_fake_worker_without_head_authority() {
         "dispatch.request",
         json!({
             "worker_kind": "Fake",
-            "worker_id": "worker_fake_rpc",
+            "worker_id": "worker:sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
             "capsule_id": "wc_rpc",
             "grant_id": "grant_rpc"
         }),
@@ -772,7 +772,10 @@ fn execd_dispatches_fake_worker_without_head_authority() {
     assert_eq!(dispatched["result"]["receipt_type"], "WorkerDispatched");
     assert_eq!(dispatched["result"]["schema_id"], "execution_receipt.v1");
     assert_eq!(dispatched["result"]["capsule_id"], "wc_rpc");
-    assert_eq!(dispatched["result"]["worker_id"], "worker_fake_rpc");
+    assert_eq!(
+        dispatched["result"]["worker_id"],
+        "worker:sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    );
     assert_eq!(dispatched["result"]["grant_id"], "grant_rpc");
     assert_eq!(dispatched["result"]["exit_code"], 0);
     assert_eq!(dispatched["result"]["credential_material_absent"], true);

@@ -14,8 +14,9 @@ use nix::sys::socket::{getsockopt, sockopt::PeerCredentials};
 use nix::unistd::Uid;
 use serde_json::{Value, json};
 use turing_approval::{
-    ApprovalCard, ApprovalPayload, DisplayCopy, OsKeyringSigningBackend,
-    SignatureRoute as ApprovalSignatureRoute, SigningBackend,
+    ApprovalCard, ApprovalPayload, DisplayCopy, InMemoryTestSigningBackend,
+    OsKeyringSigningBackend, SignatureEnvelope, SignatureRoute as ApprovalSignatureRoute,
+    SigningBackend, SigningError,
 };
 use turing_contracts::envelope::{HeadEffect, MicroEventEnvelope, PredicateProduct};
 use turing_contracts::failure::{FailureClass, FailureNodePayload};
@@ -571,16 +572,12 @@ fn capsule_approve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
         Ok(surfaces) => surfaces,
         Err(error) => return invalid_params(id, format!("invalid approval card: {error}")),
     };
-    let signer = OsKeyringSigningBackend::new(key_id);
-    let signature = match signer.sign(&card) {
+    let signature = match sign_and_verify_approval(&key_id, &card) {
         Ok(signature) => signature,
         Err(error) => {
             return jsonrpc_error(id, -32000, format!("approval signing failed: {error}"));
         }
     };
-    if let Err(error) = signer.verify(&card, &signature) {
-        return jsonrpc_error(id, -32000, format!("approval verification failed: {error}"));
-    }
 
     let tape = match Append::open(repo) {
         Ok(tape) => tape,
@@ -603,6 +600,8 @@ fn capsule_approve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
                 "signed_payload_hash": signature.signed_payload_hash,
                 "signature": signature.signature,
                 "signature_route": approval_signature_route_str(signature.signature_route),
+                "public_key_fingerprint": signature.public_key_fingerprint,
+                "verifying_key": signature.verifying_key,
                 "key_id": signature.key_id,
                 "authority_epoch": signature.authority_epoch,
             }),
@@ -625,6 +624,8 @@ fn capsule_approve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             "visible_card_hash": surfaces.visible_card_hash,
             "signed_payload_hash": signature.signed_payload_hash,
             "signature_route": approval_signature_route_str(signature.signature_route),
+            "public_key_fingerprint": signature.public_key_fingerprint,
+            "verifying_key": signature.verifying_key,
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,
@@ -667,16 +668,12 @@ fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id
         Ok(surfaces) => surfaces,
         Err(error) => return invalid_params(id, format!("invalid approval card: {error}")),
     };
-    let signer = OsKeyringSigningBackend::new(key_id);
-    let signature = match signer.sign(&card) {
+    let signature = match sign_and_verify_approval(&key_id, &card) {
         Ok(signature) => signature,
         Err(error) => {
             return jsonrpc_error(id, -32000, format!("approval signing failed: {error}"));
         }
     };
-    if let Err(error) = signer.verify(&card, &signature) {
-        return jsonrpc_error(id, -32000, format!("approval verification failed: {error}"));
-    }
 
     let tape = match Append::open(repo) {
         Ok(tape) => tape,
@@ -698,6 +695,8 @@ fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id
                 "signed_payload_hash": signature.signed_payload_hash,
                 "signature": signature.signature,
                 "signature_route": approval_signature_route_str(signature.signature_route),
+                "public_key_fingerprint": signature.public_key_fingerprint,
+                "verifying_key": signature.verifying_key,
                 "key_id": signature.key_id,
                 "authority_epoch": signature.authority_epoch,
             }),
@@ -719,6 +718,8 @@ fn approval_authorize_atom_response(runtime: &DaemonRuntime, request: &Value, id
             "visible_card_hash": surfaces.visible_card_hash,
             "signed_payload_hash": signature.signed_payload_hash,
             "signature_route": approval_signature_route_str(signature.signature_route),
+            "public_key_fingerprint": signature.public_key_fingerprint,
+            "verifying_key": signature.verifying_key,
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,
@@ -888,7 +889,10 @@ fn dispatch_request_response(request: &Value, id: Value) -> Value {
         Err(message) => return invalid_params(id, message),
     };
 
-    let worker = FakeWorker::new(worker_id);
+    let worker = match FakeWorker::try_new(worker_id) {
+        Ok(worker) => worker,
+        Err(error) => return invalid_params(id, error.to_string()),
+    };
     let receipt = match worker.run(WorkerRunRequest {
         capsule_id,
         grant_id,
@@ -1491,6 +1495,22 @@ fn derive_candidate_predicate_checks(
     repo: &Path,
     candidate_payload: &Value,
 ) -> Result<Vec<PredicateCheck>, String> {
+    let candidate_object = candidate_payload
+        .as_object()
+        .ok_or_else(|| "candidate_payload must be an object".to_string())?;
+    for key in candidate_object.keys() {
+        if !matches!(
+            key.as_str(),
+            "candidate_id"
+                | "capsule_id"
+                | "macro_anchor_id"
+                | "macro_anchor"
+                | "worker_receipt_id"
+        ) {
+            return Err(format!("unexpected candidate_payload field {key:?}"));
+        }
+    }
+
     let tape = Append::open(repo).map_err(|error| error.to_string())?;
     let heads = tape
         .head_set_guarded()
@@ -1576,6 +1596,30 @@ fn derive_candidate_predicate_checks(
     Ok(checks)
 }
 
+fn sign_and_verify_approval(
+    key_id: &str,
+    card: &ApprovalCard,
+) -> Result<SignatureEnvelope, SigningError> {
+    match card.payload().signature_route {
+        ApprovalSignatureRoute::OsKeyring => {
+            let signer = OsKeyringSigningBackend::new(key_id);
+            let signature = signer.sign(card)?;
+            signer.verify(card, &signature)?;
+            Ok(signature)
+        }
+        ApprovalSignatureRoute::InMemoryTest => {
+            let signer = InMemoryTestSigningBackend::new(key_id);
+            let signature = signer.sign(card)?;
+            InMemoryTestSigningBackend::verifier(key_id).verify(card, &signature)?;
+            Ok(signature)
+        }
+        other => Err(SigningError::RouteMismatch {
+            expected: ApprovalSignatureRoute::OsKeyring,
+            observed: other,
+        }),
+    }
+}
+
 fn tape_has_payload_field(
     envelopes: &[(String, MicroEventEnvelope)],
     event_types: &[&str],
@@ -1626,8 +1670,13 @@ fn parse_approval_payload_for_action(
     method_name: &str,
 ) -> Result<ApprovalPayload, String> {
     let signature_route = parse_approval_signature_route(&required_str(value, "signature_route")?)?;
-    if signature_route != ApprovalSignatureRoute::OsKeyring {
-        return Err(format!("{method_name} requires signature_route OsKeyring"));
+    if !matches!(
+        signature_route,
+        ApprovalSignatureRoute::OsKeyring | ApprovalSignatureRoute::InMemoryTest
+    ) {
+        return Err(format!(
+            "{method_name} requires signature_route OsKeyring or InMemoryTest"
+        ));
     }
     let action = required_str(value, "action")?;
     if action != expected_action {
@@ -1735,6 +1784,7 @@ fn parse_approval_signature_route(raw: &str) -> Result<ApprovalSignatureRoute, S
         "None" => Ok(ApprovalSignatureRoute::None),
         "OsKeyring" => Ok(ApprovalSignatureRoute::OsKeyring),
         "LocalFileDev" => Ok(ApprovalSignatureRoute::LocalFileDev),
+        "InMemoryTest" => Ok(ApprovalSignatureRoute::InMemoryTest),
         "HardwareFuture" => Ok(ApprovalSignatureRoute::HardwareFuture),
         other => Err(format!("unknown approval signature route {other:?}")),
     }
@@ -1745,6 +1795,7 @@ fn approval_signature_route_str(route: ApprovalSignatureRoute) -> &'static str {
         ApprovalSignatureRoute::None => "None",
         ApprovalSignatureRoute::OsKeyring => "OsKeyring",
         ApprovalSignatureRoute::LocalFileDev => "LocalFileDev",
+        ApprovalSignatureRoute::InMemoryTest => "InMemoryTest",
         ApprovalSignatureRoute::HardwareFuture => "HardwareFuture",
     }
 }
