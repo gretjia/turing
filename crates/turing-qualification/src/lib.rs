@@ -7,7 +7,11 @@ use serde::Serialize;
 use serde_json::{Value, json};
 
 use turing_contracts::failure::FailureClass;
-use turing_economy::{EconomyEvent, MarketReplay, MarketRouter, MarketRouterMode, PriceSignal};
+use turing_contracts::jcs;
+use turing_economy::{
+    EconomyEvent, MarketReplay, MarketRouter, MarketRouterMode, PriceSignal, RewardDistributed,
+    WalletProjection,
+};
 use turing_execd::{FakeWorker, WorkerRunRequest};
 use turing_failure::{BroadcastReducer, FailureTapeEvent, MemoryReducer};
 use turing_git_tape::append::{Append, AppendRequest, CommittedReceipt};
@@ -26,6 +30,7 @@ pub type DemoResult<T> = Result<T, Box<dyn Error>>;
 pub struct NewProjectDemoReport {
     pub micro_git_exists: bool,
     pub tape_tip: String,
+    pub authorization_head: Option<String>,
     pub accepted_head: String,
     pub candidate_accepted_event_id: String,
     pub market_settled_event_id: String,
@@ -38,6 +43,9 @@ pub struct NewProjectDemoReport {
     pub market_projection_status: String,
     pub pput_progress: u8,
     pub projection_rebuild_hash: String,
+    pub market_projection_hash: String,
+    pub wallet_projection_hash: String,
+    pub pput_projection_hash: String,
     pub no_pput_prompt_leakage: bool,
 }
 
@@ -105,6 +113,16 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         &market_created,
         "MarketCreated",
         "mkt_hello_cli",
+    );
+
+    let position_minted = EconomyEvent::position_minted("mkt_hello_cli", "agent_fake", "10")?;
+    let position_minted_receipt =
+        append_pass(&tape, "PositionMinted", economy_payload(&position_minted)?)?;
+    record(
+        &mut events,
+        &position_minted_receipt,
+        "PositionMinted",
+        "agent_fake",
     );
 
     let price_signal = PriceSignal {
@@ -221,6 +239,22 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         "mkt_hello_cli",
     );
 
+    let reward = EconomyEvent::RewardDistributed(RewardDistributed {
+        schema_id: "reward_distributed.v1".to_string(),
+        market_id: "mkt_hello_cli".to_string(),
+        agent_id: "agent_fake".to_string(),
+        reward_coin: "2".to_string(),
+        slash_coin: "0".to_string(),
+        reason: "PREDICATE_SETTLEMENT".to_string(),
+    });
+    let reward_receipt = append_pass(&tape, "RewardDistributed", economy_payload(&reward)?)?;
+    record(
+        &mut events,
+        &reward_receipt,
+        "RewardDistributed",
+        "agent_fake",
+    );
+
     let cost_failed = CostEvent::new(
         "run_hello",
         "problem_hello",
@@ -269,7 +303,9 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
     record(&mut events, &pput_event, "PPUTAccounted", "run_hello");
 
     let reconstruction = replay_tape(repo, &pput_event.event_id)?;
-    let market_replay = MarketReplay::from_tape_events(&[market, settlement])?;
+    let market_replay = MarketReplay::from_tape_events(&[market.clone(), settlement.clone()])?;
+    let wallet_projection =
+        WalletProjection::from_tape_events(&[position_minted.clone(), reward.clone()])?;
     let pput_projection = PputProjection::from_tape_events(&[cost_failed, cost_gold])?;
     assert_eq!(pput_projection.source, "micro_tape_only");
 
@@ -281,6 +317,7 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
     Ok(NewProjectDemoReport {
         micro_git_exists: git_dir_exists(repo),
         tape_tip: reconstruction.head_set().tape_tip.clone(),
+        authorization_head: reconstruction.head_set().authorization_head.clone(),
         accepted_head: reconstruction.head_set().accepted_head.clone(),
         candidate_accepted_event_id: accept.receipt.event_id,
         market_settled_event_id: market_settled.event_id,
@@ -293,6 +330,9 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         market_projection_status: market_replay.markets["mkt_hello_cli"].status.clone(),
         pput_progress,
         projection_rebuild_hash: rebuilt.projection_hash,
+        market_projection_hash: market_projection_hash(&market_replay)?,
+        wallet_projection_hash: wallet_projection_hash(&wallet_projection)?,
+        pput_projection_hash: pput_projection_hash(&pput_projection)?,
         no_pput_prompt_leakage: WorkerPromptShield::validate(
             "Implement the visible capsule and report pass/fail.",
         )
@@ -411,4 +451,57 @@ fn count_type(
     _event_type: &str,
 ) -> usize {
     count
+}
+
+fn market_projection_hash(replay: &MarketReplay) -> DemoResult<String> {
+    let mut markets = serde_json::Map::new();
+    for (market_id, market) in &replay.markets {
+        markets.insert(
+            market_id.clone(),
+            json!({
+                "pool_y": market.pool_y,
+                "pool_n": market.pool_n,
+                "status": market.status,
+                "settlement_result": market.settlement_result,
+            }),
+        );
+    }
+    hash_json(&json!({
+        "schema_id": "market_projection.v1",
+        "source": replay.source,
+        "markets": markets,
+    }))
+}
+
+fn wallet_projection_hash(projection: &WalletProjection) -> DemoResult<String> {
+    let mut wallets = serde_json::Map::new();
+    for (agent_id, wallet) in &projection.wallets {
+        wallets.insert(
+            agent_id.clone(),
+            json!({
+                "coin_balance": wallet.coin_balance,
+                "yes_positions": wallet.yes_positions,
+                "no_positions": wallet.no_positions,
+            }),
+        );
+    }
+    hash_json(&json!({
+        "schema_id": "wallet_projection.v1",
+        "source": projection.source,
+        "wallets": wallets,
+    }))
+}
+
+fn pput_projection_hash(projection: &PputProjection) -> DemoResult<String> {
+    hash_json(&json!({
+        "schema_id": "pput_projection.v1",
+        "source": projection.source,
+        "total_tokens": projection.total_tokens,
+        "total_wall_time_ms": projection.total_wall_time_ms,
+    }))
+}
+
+fn hash_json(value: &Value) -> DemoResult<String> {
+    let bytes = jcs::canonicalize(value)?;
+    Ok(format!("sha256:{}", jcs::sha256_hex(&bytes)))
 }

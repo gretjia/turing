@@ -1,56 +1,26 @@
 # Agent Economy Runtime Handoff
 
-Status: qualification checkpoint, not full product completion.
-
-This handoff records the current Greenfield Rust substrate state for
-`TuringOS_Agent_Economy_Runtime_Greenfield_v1_0`. The implementation currently has
-native SHA-256 Micro Tape, replay, Single Loop tick, worker receipts, macro anchors,
-predicate gates, evidence/approval, failure memory, Agent Economy substrate,
-MarketRouter shadow mode, hidden PPUT accounting, disposable projection, integration
-queue gates, and two local e2e qualification demos.
+Status: generated private-local qualification handoff.
 
 ## Head Evidence
 
-The e2e qualification runner creates a fresh private-local Micro Tape and verifies:
-
-- `tape_tip`: reconstructed from the final appended Micro event in the demo Tape.
-- `authorization_head`: preserved unless an authorization event is appended.
-- `accepted_head`: advances only on `CandidateAccepted` after predicate PASS.
-
-The runner also verifies that `MarketSettled` is `PRESERVE` and does not become
-`accepted_head`.
+- tape_tip: mu:379179ede423a704251f1b8cbbcc792cdb5a1e2d5fdc0146cd8b80cedceaa398
+- authorization_head: null
+- accepted_head: mu:715540582923297095fda491b8e1c8b20d267ea1bb4c90824cfe911c7eefdb6b
 
 ## Projection Evidence
 
-- market projection hash: required final handoff field; current code verifies market
-  replay from Tape through `turing-economy::MarketReplay`.
-- wallet projection hash: required final handoff field; current code verifies wallet
-  replay from Tape through `turing-economy::WalletProjection` unit coverage.
-- PPUT projection hash: required final handoff field; current code verifies PPUT replay
-  from Tape through `turing-pput::PputProjection`.
-- disposable projection hash: verified by
-  `turing-qualification::run_new_project_agent_economy_demo()` via
-  `projection_rebuild_hash`.
+- market projection hash: sha256:b8530aabc6f28de2d0c6276dfcd4e0aafad1f1ed9670ebcdbcb2f24d2ca1365e
+- wallet projection hash: sha256:829db7d6d2995a04a5c6824b9cecdd78257639240bc67d121a3f1604a098dd1a
+- PPUT projection hash: sha256:dea7a1f755e46c6c2ba4b9516c0a1d01cd62066274d1db4863f95a3bc576f40a
+- disposable projection hash: sha256:190e94d7940a03ab9383d70b3b5acdfd436851717b3ea6e90902c5a92cb550e5
 
 ## Replay And Audit Commands
-
-Current executable commands:
 
 ```bash
 cargo test --workspace
 bash demo/demo_agent_economy_e2e.sh
 bash demo/demo_rescue_agent_economy.sh
-cargo run -p turing-cli -- replay --verify
-cargo run -p turing-cli -- market replay --verify
-cargo run -p turing-cli -- pput replay --verify
-cargo run -p turing-cli -- audit invariants
-cargo run -p turing-cli -- audit market
-cargo run -p turing-cli -- audit pput
-```
-
-CLI parity commands exposed by the `turing` binary target:
-
-```bash
 turing replay --verify
 turing market replay --verify
 turing pput replay --verify
@@ -59,21 +29,8 @@ turing audit market
 turing audit pput
 ```
 
-## Current Coverage
-
-- New-project e2e: `bash demo/demo_agent_economy_e2e.sh`
-- Rescue-project e2e: `bash demo/demo_rescue_agent_economy.sh`
-- Full Rust workspace: `cargo test --workspace`
-
 ## Known Risks
 
-- The `turing` CLI exists as a Rust binary target, but packaging/install wiring is not done.
-- `turingd`, `turing-marketd`, `turing-pputd`, `turing-viewd`, and `turing-mcp` are not yet
-  wired as long-running daemons.
-- Market projection hash, wallet projection hash, and PPUT projection hash are verified
-  through Rust projection/replay APIs but not yet emitted as persistent handoff fields by
-  a CLI generator.
-- Demo tapes are temporary private-local qualification tapes; a persistent operator
-  project handoff still needs a concrete project data directory and stable Micro refs.
-- The final halt condition is not satisfied until CLI replay/audit commands, daemon wiring,
-  persistent handoff generation, and full product shell are complete.
+- Generated evidence is from a temporary private-local qualification Tape.
+- Long-running daemon packaging for turingd, marketd, pputd, viewd, and mcp remains pending.
+- Operator project persistence and installed binary wiring remain pending.

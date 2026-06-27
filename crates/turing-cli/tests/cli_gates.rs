@@ -44,3 +44,45 @@ fn unknown_command_fails_closed() {
     let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
     assert!(stderr.contains("unknown turing command"));
 }
+
+#[test]
+fn handoff_generate_writes_real_projection_hashes() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let output_path = dir.path().join("handoff.md");
+
+    let output = turing()
+        .args([
+            "handoff",
+            "generate",
+            "--output",
+            output_path.to_str().expect("UTF-8 temp path"),
+        ])
+        .output()
+        .expect("run handoff generate");
+
+    assert!(
+        output.status.success(),
+        "handoff generate failed: {output:?}"
+    );
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("handoff: wrote"));
+
+    let text = std::fs::read_to_string(&output_path).expect("handoff file");
+    for label in [
+        "tape_tip: mu:",
+        "authorization_head:",
+        "accepted_head: mu:",
+        "market projection hash: sha256:",
+        "wallet projection hash: sha256:",
+        "PPUT projection hash: sha256:",
+        "cargo test --workspace",
+        "turing replay --verify",
+        "Known Risks",
+    ] {
+        assert!(text.contains(label), "generated handoff missing {label:?}");
+    }
+    assert!(
+        !text.contains("required final handoff field"),
+        "generated handoff must replace placeholder language"
+    );
+}

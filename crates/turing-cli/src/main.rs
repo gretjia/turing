@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::process::ExitCode;
 
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
@@ -70,9 +71,72 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
                 report.pput_progress, report.no_pput_prompt_leakage
             ))
         }
+        ["handoff", "generate", "--output", output] => generate_handoff(output),
         _ => Err(format!(
-            "unknown turing command: {:?}. supported: replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput",
+            "unknown turing command: {:?}. supported: replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
             args
         )),
     }
+}
+
+fn generate_handoff(output: &str) -> Result<String, String> {
+    let report = run_new_project_agent_economy_demo()
+        .map_err(|error| format!("handoff qualification failed: {error}"))?;
+    let path = Path::new(output);
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)
+            .map_err(|error| format!("failed to create handoff directory: {error}"))?;
+    }
+    let authorization_head = report
+        .authorization_head
+        .clone()
+        .unwrap_or_else(|| "null".to_string());
+    let text = format!(
+        r#"# Agent Economy Runtime Handoff
+
+Status: generated private-local qualification handoff.
+
+## Head Evidence
+
+- tape_tip: {tape_tip}
+- authorization_head: {authorization_head}
+- accepted_head: {accepted_head}
+
+## Projection Evidence
+
+- market projection hash: {market_projection_hash}
+- wallet projection hash: {wallet_projection_hash}
+- PPUT projection hash: {pput_projection_hash}
+- disposable projection hash: {projection_rebuild_hash}
+
+## Replay And Audit Commands
+
+```bash
+cargo test --workspace
+bash demo/demo_agent_economy_e2e.sh
+bash demo/demo_rescue_agent_economy.sh
+turing replay --verify
+turing market replay --verify
+turing pput replay --verify
+turing audit invariants
+turing audit market
+turing audit pput
+```
+
+## Known Risks
+
+- Generated evidence is from a temporary private-local qualification Tape.
+- Long-running daemon packaging for turingd, marketd, pputd, viewd, and mcp remains pending.
+- Operator project persistence and installed binary wiring remain pending.
+"#,
+        tape_tip = report.tape_tip,
+        authorization_head = authorization_head,
+        accepted_head = report.accepted_head,
+        market_projection_hash = report.market_projection_hash,
+        wallet_projection_hash = report.wallet_projection_hash,
+        pput_projection_hash = report.pput_projection_hash,
+        projection_rebuild_hash = report.projection_rebuild_hash,
+    );
+    std::fs::write(path, text).map_err(|error| format!("failed to write handoff: {error}"))?;
+    Ok(format!("handoff: wrote {}", path.display()))
 }
