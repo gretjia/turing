@@ -1000,7 +1000,15 @@ fn enforce_candidate_predicate_pack(
     mut checks: Vec<PredicateCheck>,
     candidate_payload: &Value,
 ) -> Vec<PredicateCheck> {
-    for required in ["capsule_contract", "macro_anchor", "worker_receipt"] {
+    for required in [
+        "capsule_contract",
+        "macro_anchor",
+        "worker_receipt",
+        "scope.allowed",
+        "budget.within_limit",
+        "provenance.checked",
+        "replay.ready",
+    ] {
         if !checks.iter().any(|check| check.check_id == required) {
             checks.push(PredicateCheck::fail(
                 required,

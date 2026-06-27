@@ -292,7 +292,11 @@ fn turingd_verify_write_routes_predicate_pass_and_fail() {
             "checks": [
                 {"check_id": "capsule_contract", "passed": true},
                 {"check_id": "macro_anchor", "passed": true},
-                {"check_id": "worker_receipt", "passed": true}
+                {"check_id": "worker_receipt", "passed": true},
+                {"check_id": "scope.allowed", "passed": true},
+                {"check_id": "budget.within_limit", "passed": true},
+                {"check_id": "provenance.checked", "passed": true},
+                {"check_id": "replay.ready", "passed": true}
             ],
             "failure": {
                 "candidate_digest": digest('e'),
@@ -583,6 +587,95 @@ fn turingd_verify_write_rejects_missing_worker_receipt() {
             .iter()
             .any(|value| value == "worker_receipt")
     );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
+#[test]
+fn turingd_verify_write_rejects_missing_scope_budget_provenance_replay_checks() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"b".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+
+    let socket = dir.path().join("turingd-expanded-pack.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let rejected = rpc_params(
+        &socket,
+        "candidate.verify_write",
+        json!({
+            "writer_id": "writer:predicate",
+            "candidate_payload": {
+                "candidate_id": "cand_missing_expanded_pack",
+                "capsule_id": "wc_rpc",
+                "macro_anchor_id": "macro:diff_rpc",
+                "worker_receipt_id": "rcp_pack"
+            },
+            "checks": [
+                {"check_id": "capsule_contract", "passed": true},
+                {"check_id": "macro_anchor", "passed": true},
+                {"check_id": "worker_receipt", "passed": true}
+            ],
+            "failure": {
+                "candidate_digest": digest('b'),
+                "observation_digest": digest('c'),
+                "detail": "expanded predicate pack checks missing"
+            }
+        }),
+    );
+
+    let event_id = rejected["result"]["event_id"]
+        .as_str()
+        .expect("failure event id")
+        .to_string();
+    assert_eq!(rejected["result"]["write_event_type"], "FailureNode");
+    assert_eq!(rejected["result"]["predicate_product"], "FAIL");
+    assert_eq!(rejected["result"]["accepted_head_moved"], false);
+    assert_eq!(rejected["result"]["head_set"]["tape_tip"], event_id);
+    assert_eq!(
+        rejected["result"]["head_set"]["accepted_head"],
+        genesis.event_id
+    );
+    let failed = rejected["result"]["failed_predicates"]
+        .as_array()
+        .expect("failed predicates");
+    for required in [
+        "scope.allowed",
+        "budget.within_limit",
+        "provenance.checked",
+        "replay.ready",
+    ] {
+        assert!(
+            failed.iter().any(|value| value == required),
+            "missing failed predicate {required}"
+        );
+    }
 
     let shutdown = rpc(&socket, "daemon.shutdown");
     assert_eq!(shutdown["result"]["shutdown"], true);
