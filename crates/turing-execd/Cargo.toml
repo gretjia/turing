@@ -9,5 +9,8 @@ publish = false
 turing-contracts = { path = "../turing-contracts" }
 serde_json = { version = "=1.0.150", features = ["preserve_order"] }
 
+[dev-dependencies]
+tempfile = "=3.27.0"
+
 [lints]
 workspace = true

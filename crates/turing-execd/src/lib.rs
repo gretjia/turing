@@ -520,6 +520,150 @@ pub mod process {
     }
 }
 
+pub mod macro_worktree {
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct MacroWorktreeManager {
+        repo_root: PathBuf,
+        worktrees_root: PathBuf,
+    }
+
+    impl MacroWorktreeManager {
+        #[must_use]
+        pub fn new(repo_root: impl AsRef<Path>, worktrees_root: impl AsRef<Path>) -> Self {
+            MacroWorktreeManager {
+                repo_root: repo_root.as_ref().to_path_buf(),
+                worktrees_root: worktrees_root.as_ref().to_path_buf(),
+            }
+        }
+
+        pub fn create_for_capsule(
+            &self,
+            capsule_id: &str,
+        ) -> Result<MacroWorktree, MacroWorktreeError> {
+            let safe_capsule_id = safe_capsule_id(capsule_id)?;
+            let path = self.worktrees_root.join(&safe_capsule_id);
+            if path == self.repo_root {
+                return Err(MacroWorktreeError::NotIsolated(path));
+            }
+            std::fs::create_dir_all(&self.worktrees_root)
+                .map_err(MacroWorktreeError::CreateWorktreeRoot)?;
+
+            let branch = format!("turingos/{safe_capsule_id}");
+            run_git(
+                &self.repo_root,
+                &[
+                    "worktree",
+                    "add",
+                    "-B",
+                    &branch,
+                    path.to_str()
+                        .ok_or_else(|| MacroWorktreeError::NonUtf8Path(path.clone()))?,
+                    "HEAD",
+                ],
+            )?;
+
+            Ok(MacroWorktree {
+                capsule_id: safe_capsule_id,
+                path,
+                branch,
+            })
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct MacroWorktree {
+        pub capsule_id: String,
+        pub path: PathBuf,
+        pub branch: String,
+    }
+
+    impl MacroWorktree {
+        #[must_use]
+        pub fn is_isolated_from(&self, repo_root: &Path) -> bool {
+            self.path != repo_root
+        }
+    }
+
+    #[derive(Debug)]
+    pub enum MacroWorktreeError {
+        EmptyCapsuleId,
+        UnsafeCapsuleId(String),
+        NotIsolated(PathBuf),
+        NonUtf8Path(PathBuf),
+        CreateWorktreeRoot(std::io::Error),
+        Git { args: Vec<String>, stderr: String },
+    }
+
+    impl std::fmt::Display for MacroWorktreeError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                MacroWorktreeError::EmptyCapsuleId => write!(f, "capsule_id must not be empty"),
+                MacroWorktreeError::UnsafeCapsuleId(id) => {
+                    write!(f, "unsafe capsule_id for worktree path: {id:?}")
+                }
+                MacroWorktreeError::NotIsolated(path) => {
+                    write!(f, "worktree path {path:?} is not isolated from repo root")
+                }
+                MacroWorktreeError::NonUtf8Path(path) => write!(f, "non-UTF-8 path {path:?}"),
+                MacroWorktreeError::CreateWorktreeRoot(e) => {
+                    write!(f, "failed to create worktree root: {e}")
+                }
+                MacroWorktreeError::Git { args, stderr } => {
+                    write!(f, "git {args:?} failed: {}", stderr.trim())
+                }
+            }
+        }
+    }
+
+    impl std::error::Error for MacroWorktreeError {
+        fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+            match self {
+                MacroWorktreeError::CreateWorktreeRoot(e) => Some(e),
+                _ => None,
+            }
+        }
+    }
+
+    fn safe_capsule_id(capsule_id: &str) -> Result<String, MacroWorktreeError> {
+        if capsule_id.is_empty() {
+            return Err(MacroWorktreeError::EmptyCapsuleId);
+        }
+        let safe = capsule_id
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-');
+        if !safe {
+            return Err(MacroWorktreeError::UnsafeCapsuleId(capsule_id.to_string()));
+        }
+        Ok(capsule_id.to_string())
+    }
+
+    fn run_git(repo: &Path, args: &[&str]) -> Result<(), MacroWorktreeError> {
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .args(args)
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .env("GIT_TERMINAL_PROMPT", "0")
+            .output()
+            .map_err(|e| MacroWorktreeError::Git {
+                args: args.iter().map(|a| (*a).to_string()).collect(),
+                stderr: e.to_string(),
+            })?;
+        if output.status.success() {
+            Ok(())
+        } else {
+            Err(MacroWorktreeError::Git {
+                args: args.iter().map(|a| (*a).to_string()).collect(),
+                stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
+            })
+        }
+    }
+}
+
 use serde_json::json;
 use turing_contracts::jcs;
 use workers::{
