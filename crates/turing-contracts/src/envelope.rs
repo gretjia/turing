@@ -98,6 +98,25 @@ pub struct MicroEventEnvelope {
 /// The const `schema_id` for the committed envelope body.
 pub const ENVELOPE_SCHEMA_ID: &str = "micro_event_envelope.v1";
 
+const ENVELOPE_REQUIRED_FIELDS: &[&str] = &[
+    "schema_id",
+    "event_type",
+    "writer_id",
+    "authority_epoch",
+    "sequence",
+    "prev_tape_tip",
+    "authorization_head_before",
+    "accepted_head_before",
+    "head_effect",
+    "event_schema_id",
+    "predicate_product",
+    "reason_digest",
+    "verified",
+    "content_digest",
+    "payload_hash",
+    "payload",
+];
+
 impl MicroEventEnvelope {
     /// The canonical `turingos.jcs.v1` bytes of this envelope — exactly what a Git
     /// commit stores as the event body. Sorted keys, no whitespace, integers only.
@@ -121,6 +140,20 @@ impl MicroEventEnvelope {
         }
         if obj.contains_key("head_set_after") {
             return Err(JcsError::ForbiddenPayloadField("head_set_after".into()));
+        }
+        for field in ENVELOPE_REQUIRED_FIELDS {
+            if !obj.contains_key(*field) {
+                return Err(JcsError::Malformed(format!(
+                    "envelope shape: missing required field {field:?}"
+                )));
+            }
+        }
+        if obj.len() != ENVELOPE_REQUIRED_FIELDS.len() {
+            return Err(JcsError::Malformed(format!(
+                "envelope shape: expected exactly {} fields, got {}",
+                ENVELOPE_REQUIRED_FIELDS.len(),
+                obj.len()
+            )));
         }
         let env: MicroEventEnvelope = serde_json::from_value(value.clone())
             .map_err(|e| JcsError::Malformed(format!("envelope shape: {e}")))?;

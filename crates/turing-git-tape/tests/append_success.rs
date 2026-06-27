@@ -147,6 +147,65 @@ fn assert_payload_digest(body: &Value) {
     );
 }
 
+#[test]
+fn append_envelope_requires_seven_fields() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path();
+    git::init_sha256(repo).expect("init sha256 repo");
+
+    let tape = Append::open(repo).expect("open the Tape over a fresh sha256 repo");
+    let rcpt = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"a".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("genesis append succeeds");
+
+    let body = read_committed_body(repo, &rcpt.event_id);
+    let obj = body.as_object().expect("committed body is an object");
+    let required_append_fields = [
+        "writer_id",
+        "authority_epoch",
+        "prev_tape_tip",
+        "accepted_head_before",
+        "head_effect",
+        "event_schema_id",
+        "payload_hash",
+    ];
+
+    for field in required_append_fields {
+        assert!(
+            obj.contains_key(field),
+            "append envelope must carry required field {field}"
+        );
+
+        let mut tampered = body.clone();
+        tampered
+            .as_object_mut()
+            .expect("body object")
+            .remove(field);
+        assert!(
+            turing_contracts::envelope::MicroEventEnvelope::from_jcs_value(&tampered).is_err(),
+            "missing required append field {field} must fail closed"
+        );
+    }
+
+    assert_eq!(body["writer_id"], json!("writer:genesis"));
+    assert_eq!(body["authority_epoch"], json!(0));
+    assert_eq!(body["prev_tape_tip"], Value::Null);
+    assert_eq!(body["accepted_head_before"], Value::Null);
+    assert_eq!(body["head_effect"], json!("ADVANCE"));
+    assert_eq!(
+        body["event_schema_id"],
+        json!("system_constitution_accepted.v1")
+    );
+    assert_payload_digest(&body);
+}
+
 /// Assert the commit named by `event_id` is non-merge: zero parents for genesis,
 /// exactly one otherwise, and that single parent equals `expected_parent` (a `mu:` id,
 /// or `None` for the root commit).
