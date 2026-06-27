@@ -276,6 +276,10 @@ dependencies = [
 [[package]]
 name = "turing-execd"
 version = "0.0.0"
+dependencies = [
+ "serde_json",
+ "turing-contracts",
+]
 
 [[package]]
 name = "turing-git-tape"
