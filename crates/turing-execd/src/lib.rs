@@ -664,6 +664,126 @@ pub mod macro_worktree {
     }
 }
 
+pub mod macro_anchor {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum MacroAnchorKind {
+        Diff,
+        Branch,
+        Pr,
+        Ci,
+        TuringDone,
+    }
+
+    impl MacroAnchorKind {
+        #[must_use]
+        pub fn as_str(self) -> &'static str {
+            match self {
+                MacroAnchorKind::Diff => "diff",
+                MacroAnchorKind::Branch => "branch",
+                MacroAnchorKind::Pr => "pr",
+                MacroAnchorKind::Ci => "ci",
+                MacroAnchorKind::TuringDone => "turing_done",
+            }
+        }
+
+        fn parse(raw: &str) -> Result<Self, MacroAnchorError> {
+            match raw {
+                "diff" => Ok(MacroAnchorKind::Diff),
+                "branch" => Ok(MacroAnchorKind::Branch),
+                "pr" => Ok(MacroAnchorKind::Pr),
+                "ci" => Ok(MacroAnchorKind::Ci),
+                "turing_done" => Ok(MacroAnchorKind::TuringDone),
+                other => Err(MacroAnchorError::UnknownKind(other.to_string())),
+            }
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct MacroAnchor {
+        raw: String,
+        kind: MacroAnchorKind,
+    }
+
+    impl MacroAnchor {
+        pub fn new(kind: MacroAnchorKind, object: &str) -> Result<Self, MacroAnchorError> {
+            if object.is_empty() {
+                return Err(MacroAnchorError::EmptyObject);
+            }
+            if object.starts_with("mu:") {
+                return Err(MacroAnchorError::MicroIdentityRejected);
+            }
+            MacroAnchor::parse(&format!("macro:{}:{object}", kind.as_str()))
+        }
+
+        pub fn parse(raw: &str) -> Result<Self, MacroAnchorError> {
+            if raw.starts_with("mu:") {
+                return Err(MacroAnchorError::MicroIdentityRejected);
+            }
+            let rest = raw
+                .strip_prefix("macro:")
+                .ok_or_else(|| MacroAnchorError::MissingMacroPrefix(raw.to_string()))?;
+            let (kind_raw, object) = rest
+                .split_once(':')
+                .ok_or_else(|| MacroAnchorError::Malformed(raw.to_string()))?;
+            if object.is_empty() {
+                return Err(MacroAnchorError::EmptyObject);
+            }
+            if object.starts_with("mu:") {
+                return Err(MacroAnchorError::MicroIdentityRejected);
+            }
+            let kind = MacroAnchorKind::parse(kind_raw)?;
+            Ok(MacroAnchor {
+                raw: raw.to_string(),
+                kind,
+            })
+        }
+
+        #[must_use]
+        pub fn as_str(&self) -> &str {
+            &self.raw
+        }
+
+        #[must_use]
+        pub fn kind(&self) -> MacroAnchorKind {
+            self.kind
+        }
+
+        #[must_use]
+        pub fn is_micro_identity(&self) -> bool {
+            self.raw.starts_with("mu:")
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum MacroAnchorError {
+        MicroIdentityRejected,
+        MissingMacroPrefix(String),
+        UnknownKind(String),
+        EmptyObject,
+        Malformed(String),
+    }
+
+    impl std::fmt::Display for MacroAnchorError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                MacroAnchorError::MicroIdentityRejected => {
+                    write!(f, "macro anchor cannot be a Micro mu: identity")
+                }
+                MacroAnchorError::MissingMacroPrefix(raw) => {
+                    write!(f, "macro anchor {raw:?} must start with macro:")
+                }
+                MacroAnchorError::UnknownKind(kind) => {
+                    write!(f, "unknown macro anchor kind {kind:?}")
+                }
+                MacroAnchorError::EmptyObject => write!(f, "macro anchor object must not be empty"),
+                MacroAnchorError::Malformed(raw) => write!(f, "malformed macro anchor {raw:?}"),
+            }
+        }
+    }
+
+    impl std::error::Error for MacroAnchorError {}
+}
+
 use serde_json::json;
 use turing_contracts::jcs;
 use workers::{
