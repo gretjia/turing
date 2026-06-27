@@ -32,6 +32,7 @@ path = "src/bin/turing-viewd.rs"
 [dependencies]
 serde_json = { version = "=1.0.150", features = ["preserve_order"] }
 turing-economy = { path = "../turing-economy" }
+turing-execd = { path = "../turing-execd" }
 turing-git-tape = { path = "../turing-git-tape" }
 turing-pput = { path = "../turing-pput" }
 turing-projection = { path = "../turing-projection" }

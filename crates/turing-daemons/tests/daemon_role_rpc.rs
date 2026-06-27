@@ -136,6 +136,97 @@ fn viewd_builds_disposable_projection_without_truth_write() {
     shutdown(socket, child);
 }
 
+#[test]
+fn execd_authorizes_scoped_grants_without_head_authority() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let socket = dir.path().join("execd.sock");
+    let mut child = spawn_daemon("turing-execd", &socket);
+    wait_for_socket(&socket, &mut child);
+
+    let allowed = rpc(
+        &socket,
+        "grant.authorize",
+        json!({
+            "grant": grant_json(),
+            "request": {
+                "tool": "read_file",
+                "path": "src/main.rs",
+                "action": "FileRead",
+                "mutates": false,
+                "requested_tool_call_index": 1,
+                "mutated_files_after": 0,
+                "needs_network": false
+            }
+        }),
+    );
+    assert_eq!(allowed["result"]["authorized"], true);
+    assert_eq!(allowed["result"]["can_move_accepted_head"], false);
+    assert_eq!(allowed["result"]["receipt_type"], "ToolCallAuthorized");
+
+    let denied = rpc(
+        &socket,
+        "grant.authorize",
+        json!({
+            "grant": grant_json(),
+            "request": {
+                "tool": "read_file",
+                "path": "secrets/token.txt",
+                "action": "FileRead",
+                "mutates": false,
+                "requested_tool_call_index": 1,
+                "mutated_files_after": 0,
+                "needs_network": false
+            }
+        }),
+    );
+    assert_eq!(denied["result"]["authorized"], false);
+    assert_eq!(denied["result"]["can_move_accepted_head"], false);
+    assert_eq!(denied["result"]["receipt_type"], "ToolCallDenied");
+    assert!(
+        denied["result"]["denial"]
+            .as_str()
+            .expect("denial")
+            .contains("outside allowed scope")
+    );
+
+    shutdown(socket, child);
+}
+
+#[test]
+fn mcp_lists_read_only_resources_and_typed_commands_without_truth() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let socket = dir.path().join("mcp.sock");
+    let mut child = spawn_daemon("turing-mcp", &socket);
+    wait_for_socket(&socket, &mut child);
+
+    let response = rpc(&socket, "mcp.resources.list", Value::Null);
+    assert_eq!(response["result"]["can_write_truth"], false);
+    assert_eq!(response["result"]["credential_material_included"], false);
+    assert!(
+        response["result"]["read_only_resources"]
+            .as_array()
+            .expect("resources")
+            .iter()
+            .any(|value| value == "heads.read")
+    );
+    assert!(
+        response["result"]["typed_commands"]
+            .as_array()
+            .expect("commands")
+            .iter()
+            .any(|value| value == "capsule.approve")
+    );
+    assert!(
+        response["result"]["typed_commands"]
+            .as_array()
+            .expect("commands")
+            .iter()
+            .all(|value| value != "move-accepted-head")
+    );
+
+    shutdown(socket, child);
+}
+
 fn spawn_daemon(name: &str, socket: &Path) -> Child {
     Command::new(bin(name))
         .args([
@@ -149,7 +240,9 @@ fn spawn_daemon(name: &str, socket: &Path) -> Child {
 
 fn bin(name: &str) -> &'static str {
     match name {
+        "turing-execd" => env!("CARGO_BIN_EXE_turing-execd"),
         "turing-marketd" => env!("CARGO_BIN_EXE_turing-marketd"),
+        "turing-mcp" => env!("CARGO_BIN_EXE_turing-mcp"),
         "turing-pputd" => env!("CARGO_BIN_EXE_turing-pputd"),
         "turing-viewd" => env!("CARGO_BIN_EXE_turing-viewd"),
         other => panic!("unknown test binary {other}"),
@@ -196,4 +289,33 @@ fn wait_for_socket(socket: &Path, child: &mut Child) {
 
 fn digest(ch: char) -> String {
     format!("sha256:{}", ch.to_string().repeat(64))
+}
+
+fn grant_json() -> Value {
+    json!({
+        "grant_id": "grant_demo",
+        "capsule_id": "wc_demo",
+        "agent_id": "agent_demo",
+        "market_id": null,
+        "budget": {
+            "max_tokens": 100,
+            "max_wall_time_ms": 1000,
+            "max_tool_calls": 2,
+            "max_mutated_files": 1
+        },
+        "scope": {
+            "allowed_paths": ["src"],
+            "forbidden_paths": ["src/secrets"],
+            "allowed_tools": ["read_file"],
+            "network": "Denied"
+        },
+        "risk": {
+            "risk_class": "P3",
+            "human_before_dispatch": false,
+            "human_before_accept": true,
+            "human_before_merge": true
+        },
+        "authorization_event": null,
+        "signature_route": "None"
+    })
 }

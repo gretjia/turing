@@ -41,8 +41,8 @@ turingd --serve --socket /tmp/turingd.sock
 - Generated evidence is from a temporary private-local qualification Tape.
 - `turingd` has Unix socket JSON-RPC health/read-only heads, including configured
   `--micro-git` head reads; append routes, predicate routing, and approval APIs remain pending.
-- `turing-marketd`, `turing-pputd`, and `turing-viewd` have minimal sidecar RPCs for
-  shadow budget suggestion, prompt shielding, and disposable projection building. Full
-  persistent project services remain pending.
-- `turing-execd` and `turing-mcp` still expose only boundary checks in this handoff.
+- `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
+  minimal sidecar RPCs for grant authorization, resource manifests, shadow budget suggestion,
+  prompt shielding, and disposable projection building. Full persistent project services remain
+  pending.
 - Operator project persistence and installed binary wiring remain pending.

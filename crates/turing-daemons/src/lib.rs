@@ -8,6 +8,10 @@ use std::process::ExitCode;
 
 use serde_json::{Value, json};
 use turing_economy::{CandidateRoute, MarketRouter, MarketRouterMode, PriceSignal};
+use turing_execd::capability::{
+    ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
+    SignatureRoute, ToolRequest,
+};
 use turing_git_tape::append::Append;
 use turing_pput::WorkerPromptShield;
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
@@ -139,6 +143,12 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
         Some("heads.read") => read_heads_response(runtime, id),
+        Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
+            grant_authorize_response(request, id)
+        }
+        Some("mcp.resources.list") if runtime.contract.role == "turing-mcp" => {
+            mcp_resources_list_response(id)
+        }
         Some("market.shadow.suggest") if runtime.contract.role == "turing-marketd" => {
             market_shadow_suggest_response(request, id)
         }
@@ -172,6 +182,71 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
     }
+}
+
+fn grant_authorize_response(request: &Value, id: Value) -> Value {
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let grant = match params.get("grant").map(parse_grant) {
+        Some(Ok(grant)) => grant,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "grant object is required"),
+    };
+    let tool_request = match params.get("request").map(parse_tool_request) {
+        Some(Ok(request)) => request,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "request object is required"),
+    };
+
+    match grant.authorize(&tool_request) {
+        Ok(()) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "authorized": true,
+                "receipt_type": "ToolCallAuthorized",
+                "can_move_accepted_head": false,
+                "head_effect": "PRESERVE",
+            }
+        }),
+        Err(error) => json!({
+            "jsonrpc": "2.0",
+            "id": id,
+            "result": {
+                "authorized": false,
+                "receipt_type": "ToolCallDenied",
+                "denial": error.to_string(),
+                "can_move_accepted_head": false,
+                "head_effect": "PRESERVE",
+            }
+        }),
+    }
+}
+
+fn mcp_resources_list_response(id: Value) -> Value {
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "schema_id": "mcp_resource_manifest.v1",
+            "read_only_resources": [
+                "heads.read",
+                "projection.build",
+                "market.shadow.suggest",
+                "pput.prompt.validate"
+            ],
+            "typed_commands": [
+                "goal.submit",
+                "capsule.approve",
+                "capsule.reject",
+                "dispatch.request"
+            ],
+            "can_write_truth": false,
+            "credential_material_included": false,
+        }
+    })
 }
 
 fn market_shadow_suggest_response(request: &Value, id: Value) -> Value {
@@ -281,6 +356,94 @@ fn projection_build_response(request: &Value, id: Value) -> Value {
     }
 }
 
+fn parse_grant(value: &Value) -> Result<CapabilityGrant, String> {
+    let budget = value
+        .get("budget")
+        .ok_or_else(|| "grant.budget object is required".to_string())?;
+    let scope = value
+        .get("scope")
+        .ok_or_else(|| "grant.scope object is required".to_string())?;
+    let risk = value
+        .get("risk")
+        .ok_or_else(|| "grant.risk object is required".to_string())?;
+
+    Ok(CapabilityGrant {
+        grant_id: required_str(value, "grant_id")?,
+        capsule_id: required_str(value, "capsule_id")?,
+        agent_id: required_str(value, "agent_id")?,
+        market_id: optional_str(value, "market_id")?,
+        budget: Budget {
+            max_tokens: required_u64(budget, "max_tokens")?,
+            max_wall_time_ms: required_u64(budget, "max_wall_time_ms")?,
+            max_tool_calls: required_u64(budget, "max_tool_calls")?,
+            max_mutated_files: required_u64(budget, "max_mutated_files")?,
+        },
+        scope: CapabilityScope {
+            allowed_paths: required_string_array(scope, "allowed_paths")?,
+            forbidden_paths: required_string_array(scope, "forbidden_paths")?,
+            allowed_tools: required_string_array(scope, "allowed_tools")?,
+            network: parse_network(&required_str(scope, "network")?)?,
+        },
+        risk: Risk {
+            risk_class: parse_risk_class(&required_str(risk, "risk_class")?)?,
+            human_before_dispatch: required_bool(risk, "human_before_dispatch")?,
+            human_before_accept: required_bool(risk, "human_before_accept")?,
+            human_before_merge: required_bool(risk, "human_before_merge")?,
+        },
+        authorization_event: optional_str(value, "authorization_event")?,
+        signature_route: parse_signature_route(&required_str(value, "signature_route")?)?,
+    })
+}
+
+fn parse_tool_request(value: &Value) -> Result<ToolRequest, String> {
+    Ok(ToolRequest {
+        tool: required_str(value, "tool")?,
+        path: optional_str(value, "path")?,
+        action: parse_action_class(&required_str(value, "action")?)?,
+        mutates: required_bool(value, "mutates")?,
+        requested_tool_call_index: required_u64(value, "requested_tool_call_index")?,
+        mutated_files_after: required_u64(value, "mutated_files_after")?,
+        needs_network: required_bool(value, "needs_network")?,
+    })
+}
+
+fn parse_network(raw: &str) -> Result<NetworkScope, String> {
+    match raw {
+        "Denied" => Ok(NetworkScope::Denied),
+        "Allowlist" => Ok(NetworkScope::Allowlist),
+        other => Err(format!("unknown network scope {other:?}")),
+    }
+}
+
+fn parse_risk_class(raw: &str) -> Result<RiskClass, String> {
+    match raw {
+        "P0" => Ok(RiskClass::P0),
+        "P1" => Ok(RiskClass::P1),
+        "P2" => Ok(RiskClass::P2),
+        "P3" => Ok(RiskClass::P3),
+        other => Err(format!("unknown risk class {other:?}")),
+    }
+}
+
+fn parse_signature_route(raw: &str) -> Result<SignatureRoute, String> {
+    match raw {
+        "None" => Ok(SignatureRoute::None),
+        "OsKeyring" => Ok(SignatureRoute::OsKeyring),
+        "HardwareFuture" => Ok(SignatureRoute::HardwareFuture),
+        other => Err(format!("unknown signature route {other:?}")),
+    }
+}
+
+fn parse_action_class(raw: &str) -> Result<ActionClass, String> {
+    match raw {
+        "FileRead" => Ok(ActionClass::FileRead),
+        "FileWrite" => Ok(ActionClass::FileWrite),
+        "Command" => Ok(ActionClass::Command),
+        "IrreversibleMacro" => Ok(ActionClass::IrreversibleMacro),
+        other => Err(format!("unknown action class {other:?}")),
+    }
+}
+
 fn parse_routes(params: &Value) -> Result<Vec<CandidateRoute>, String> {
     let routes = params
         .get("routes")
@@ -364,6 +527,36 @@ fn read_heads_response(runtime: &DaemonRuntime, id: Value) -> Value {
         }),
         Err(error) => jsonrpc_error(id, -32000, format!("cannot read coherent heads: {error}")),
     }
+}
+
+fn required_bool(value: &Value, key: &str) -> Result<bool, String> {
+    value
+        .get(key)
+        .and_then(Value::as_bool)
+        .ok_or_else(|| format!("{key} boolean is required"))
+}
+
+fn optional_str(value: &Value, key: &str) -> Result<Option<String>, String> {
+    match value.get(key) {
+        Some(Value::Null) | None => Ok(None),
+        Some(Value::String(raw)) => Ok(Some(raw.clone())),
+        Some(_) => Err(format!("{key} string or null is required")),
+    }
+}
+
+fn required_string_array(value: &Value, key: &str) -> Result<Vec<String>, String> {
+    let array = value
+        .get(key)
+        .and_then(Value::as_array)
+        .ok_or_else(|| format!("{key} array is required"))?;
+    array
+        .iter()
+        .map(|item| {
+            item.as_str()
+                .map(ToString::to_string)
+                .ok_or_else(|| format!("{key} items must be strings"))
+        })
+        .collect()
 }
 
 fn required_str(value: &Value, key: &str) -> Result<String, String> {
