@@ -2,6 +2,9 @@ use std::path::Path;
 use std::process::ExitCode;
 
 use serde_json::json;
+use turing_approval::{
+    APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, DisplayCopy, SignatureRoute,
+};
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
 fn main() -> ExitCode {
@@ -74,10 +77,90 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             ))
         }
         ["handoff", "generate", "--output", output] => generate_handoff(output),
+        [
+            "approval",
+            "preview",
+            "--approval-id",
+            approval_id,
+            "--authority-epoch",
+            authority_epoch,
+            "--action",
+            action,
+            "--subject",
+            subject,
+            "--risk",
+            risk,
+            "--evidence-digest",
+            evidence_digest,
+            "--signature-route",
+            signature_route,
+        ] => approval_preview(
+            approval_id,
+            authority_epoch,
+            action,
+            subject,
+            risk,
+            evidence_digest,
+            signature_route,
+        ),
         _ => Err(format!(
-            "unknown turing command: {:?}. supported: boot --project <path> | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
+            "unknown turing command: {:?}. supported: boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
             args
         )),
+    }
+}
+
+fn approval_preview(
+    approval_id: &str,
+    authority_epoch: &str,
+    action: &str,
+    subject: &str,
+    risk: &str,
+    evidence_digest: &str,
+    signature_route: &str,
+) -> Result<String, String> {
+    let authority_epoch = authority_epoch
+        .parse::<u64>()
+        .map_err(|error| format!("invalid authority epoch {authority_epoch:?}: {error}"))?;
+    let signature_route = parse_signature_route(signature_route)?;
+    let card = ApprovalCard::new(
+        ApprovalPayload {
+            schema_id: APPROVAL_PAYLOAD_SCHEMA_ID.to_string(),
+            approval_id: approval_id.to_string(),
+            authority_epoch,
+            action: action.to_string(),
+            subject_id: subject.to_string(),
+            evidence_digests: vec![evidence_digest.to_string()],
+            risk_class: risk.to_string(),
+            signature_route,
+        },
+        DisplayCopy {
+            title_zh: "主权授权预览".to_string(),
+            body_en: "Review this approval card before signing or dispatch.".to_string(),
+        },
+    );
+    let surfaces = card
+        .byte_surfaces()
+        .map_err(|error| format!("invalid approval card: {error}"))?;
+    Ok(format!(
+        "approval preview: approval_id={} action={} subject={} risk={} authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
+        approval_id,
+        action,
+        subject,
+        risk,
+        authority_epoch,
+        signature_route,
+        surfaces.visible_card_hash,
+        surfaces.visible_card_hash,
+    ))
+}
+
+fn parse_signature_route(value: &str) -> Result<SignatureRoute, String> {
+    match value {
+        "none" => Ok(SignatureRoute::None),
+        "os-keyring" => Ok(SignatureRoute::OsKeyring),
+        "hardware-future" => Ok(SignatureRoute::HardwareFuture),
+        other => Err(format!("unknown signature route {other:?}")),
     }
 }
 
@@ -139,6 +222,7 @@ cargo test --workspace
 bash demo/demo_agent_economy_e2e.sh
 bash demo/demo_rescue_agent_economy.sh
 scripts/install-local.sh --prefix /tmp/turingos-local --profile debug
+turing approval preview --approval-id ap_preview --authority-epoch 1 --action capsule_approve --subject wc_latest --risk P2 --evidence-digest sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --signature-route none
 turing replay --verify
 turing market replay --verify
 turing pput replay --verify
@@ -160,8 +244,8 @@ turing-mcp --check
   reads, goal submission, capsule dispatch approval/rejection, preserve-only append,
   predicate-routed candidate verify/write with an expanded CandidateAccepted predicate pack
   covering capsule/macro/worker/scope/budget/provenance/replay, minimal OS-keyring atom
-  authorization, and read-only persistent project status. Hardware/human approval UX remains
-  pending.
+  authorization, read-only ApprovalCard preview UX, and read-only persistent project status.
+  Hardware signing UX remains pending.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
   budget suggestion, prompt shielding, disposable projection building, and read-only project
