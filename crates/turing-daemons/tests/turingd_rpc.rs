@@ -111,6 +111,60 @@ fn turingd_reads_real_micro_tape_heads_from_configured_repo() {
 }
 
 #[test]
+fn turingd_project_status_reads_boot_metadata_without_truth_authority() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let project = dir.path().join("project");
+    std::fs::create_dir(&project).expect("create project dir");
+    let state_dir = project.join(".turingos");
+    std::fs::create_dir(&state_dir).expect("create state dir");
+    let project_root = std::fs::canonicalize(&project).expect("canonical project");
+    std::fs::write(
+        state_dir.join("project.json"),
+        json!({
+            "schema_id": "operator_project.v1",
+            "project_root": project_root.to_str().expect("UTF-8 project path"),
+            "truth_source": "micro_tape",
+            "can_write_micro_truth": false,
+            "credential_material_included": false
+        })
+        .to_string(),
+    )
+    .expect("write project metadata");
+
+    let socket = dir.path().join("turingd-project-status.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--project",
+            project.to_str().expect("UTF-8 project path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let status = rpc(&socket, "project.status");
+    assert_eq!(status["result"]["schema_id"], "operator_project.v1");
+    assert_eq!(status["result"]["source"], "operator_project_metadata");
+    assert_eq!(
+        status["result"]["project_root"],
+        project_root.to_str().expect("UTF-8 canonical project path")
+    );
+    assert_eq!(status["result"]["truth_source"], "micro_tape");
+    assert_eq!(status["result"]["can_write_micro_truth"], false);
+    assert_eq!(status["result"]["credential_material_included"], false);
+    assert!(status["result"].get("credential_hash").is_none());
+    assert!(status["result"].get("credential_scope_hash").is_none());
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
+#[test]
 fn turingd_appends_preserve_events_without_moving_accepted_head() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");

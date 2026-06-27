@@ -158,12 +158,12 @@ turing-mcp --check
 - `turingd` has Unix socket JSON-RPC health/read-only heads, configured `--micro-git` head
   reads, goal submission, capsule dispatch approval/rejection, preserve-only append,
   predicate-routed candidate verify/write with a baseline CandidateAccepted predicate pack, and
-  minimal OS-keyring atom authorization; additional predicate packs and hardware/human approval UX
-  remain pending.
+  minimal OS-keyring atom authorization, and read-only persistent project status; additional
+  predicate packs and hardware/human approval UX remain pending.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, fake worker dispatch, resource manifests, shadow
-  budget suggestion, prompt shielding, and disposable projection building. Full persistent project
-  services remain pending.
+  budget suggestion, prompt shielding, and disposable projection building. Broader project-scoped
+  sidecar persistence remains pending.
 - Installed binary wiring remains pending.
 "#,
         tape_tip = report.tape_tip,

@@ -48,6 +48,7 @@ impl DaemonContract {
 struct DaemonRuntime {
     contract: DaemonContract,
     micro_git: Option<PathBuf>,
+    project_root: Option<PathBuf>,
 }
 
 pub fn run_daemon(contract: DaemonContract) -> ExitCode {
@@ -57,6 +58,7 @@ pub fn run_daemon(contract: DaemonContract) -> ExitCode {
             let runtime = DaemonRuntime {
                 contract,
                 micro_git: None,
+                project_root: None,
             };
             match serve_unix_socket(runtime, socket) {
                 Ok(()) => ExitCode::SUCCESS,
@@ -74,6 +76,49 @@ pub fn run_daemon(contract: DaemonContract) -> ExitCode {
             let runtime = DaemonRuntime {
                 contract,
                 micro_git: Some(PathBuf::from(micro_git)),
+                project_root: None,
+            };
+            match serve_unix_socket(runtime, socket) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(error) => {
+                    eprintln!("{} serve failed: {error}", contract.role);
+                    ExitCode::from(2)
+                }
+            }
+        }
+        [serve, socket_flag, socket, project_flag, project]
+            if serve == "--serve" && socket_flag == "--socket" && project_flag == "--project" =>
+        {
+            let runtime = DaemonRuntime {
+                contract,
+                micro_git: None,
+                project_root: Some(PathBuf::from(project)),
+            };
+            match serve_unix_socket(runtime, socket) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(error) => {
+                    eprintln!("{} serve failed: {error}", contract.role);
+                    ExitCode::from(2)
+                }
+            }
+        }
+        [
+            serve,
+            socket_flag,
+            socket,
+            micro_git_flag,
+            micro_git,
+            project_flag,
+            project,
+        ] if serve == "--serve"
+            && socket_flag == "--socket"
+            && micro_git_flag == "--micro-git"
+            && project_flag == "--project" =>
+        {
+            let runtime = DaemonRuntime {
+                contract,
+                micro_git: Some(PathBuf::from(micro_git)),
+                project_root: Some(PathBuf::from(project)),
             };
             match serve_unix_socket(runtime, socket) {
                 Ok(()) => ExitCode::SUCCESS,
@@ -155,6 +200,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
             }
         }),
         Some("heads.read") => read_heads_response(runtime, id),
+        Some("project.status") if runtime.contract.role == "turingd" => {
+            project_status_response(runtime, id)
+        }
         Some("event.append_preserve") if runtime.contract.role == "turingd" => {
             append_preserve_response(runtime, request, id)
         }
@@ -1225,6 +1273,92 @@ fn read_heads_response(runtime: &DaemonRuntime, id: Value) -> Value {
         }),
         Err(error) => jsonrpc_error(id, -32000, format!("cannot read coherent heads: {error}")),
     }
+}
+
+fn project_status_response(runtime: &DaemonRuntime, id: Value) -> Value {
+    let Some(project_root) = &runtime.project_root else {
+        return jsonrpc_error(id, -32000, "project.status requires --project".to_string());
+    };
+    let project_root = match std::fs::canonicalize(project_root) {
+        Ok(path) => path,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
+        }
+    };
+    let metadata_path = project_root.join(".turingos").join("project.json");
+    let text = match std::fs::read_to_string(&metadata_path) {
+        Ok(text) => text,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("cannot read {}: {error}", metadata_path.display()),
+            );
+        }
+    };
+    let metadata: Value = match serde_json::from_str(&text) {
+        Ok(metadata) => metadata,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("invalid project metadata JSON: {error}"),
+            );
+        }
+    };
+    let schema_id = match required_str(&metadata, "schema_id") {
+        Ok(value) => value,
+        Err(message) => return jsonrpc_error(id, -32000, message),
+    };
+    let declared_root = match required_str(&metadata, "project_root") {
+        Ok(value) => value,
+        Err(message) => return jsonrpc_error(id, -32000, message),
+    };
+    let truth_source = match required_str(&metadata, "truth_source") {
+        Ok(value) => value,
+        Err(message) => return jsonrpc_error(id, -32000, message),
+    };
+    let can_write_micro_truth = match required_bool(&metadata, "can_write_micro_truth") {
+        Ok(value) => value,
+        Err(message) => return jsonrpc_error(id, -32000, message),
+    };
+    let credential_material_included =
+        match required_bool(&metadata, "credential_material_included") {
+            Ok(value) => value,
+            Err(message) => return jsonrpc_error(id, -32000, message),
+        };
+    let canonical_root = project_root.to_string_lossy().to_string();
+    if schema_id != "operator_project.v1" {
+        return jsonrpc_error(id, -32000, format!("unsupported schema_id {schema_id:?}"));
+    }
+    if declared_root != canonical_root {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "project metadata root does not match --project".to_string(),
+        );
+    }
+    if truth_source != "micro_tape" || can_write_micro_truth || credential_material_included {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "project metadata violates private-local authority boundary".to_string(),
+        );
+    }
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "schema_id": schema_id,
+            "source": "operator_project_metadata",
+            "project_root": canonical_root,
+            "metadata_path": metadata_path.to_string_lossy(),
+            "truth_source": truth_source,
+            "can_write_micro_truth": can_write_micro_truth,
+            "credential_material_included": credential_material_included,
+        }
+    })
 }
 
 fn required_digest(value: &Value, key: &str) -> Result<String, String> {
