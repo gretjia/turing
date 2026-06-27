@@ -407,6 +407,17 @@
       "status": "FROZEN_V5_3_1"
     },
     {
+      "canonical_name": "OfficialEvaluatorEvidenceImported",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "official_evaluator_evidence_imported.v1",
+      "ordinal": 10,
+      "status": "ADDITIVE_BENCHMARK_V1"
+    },
+    {
       "canonical_name": "WorkerDispatched",
       "event_class": "RECEIPT",
       "head_effect": "PRESERVE",

@@ -189,8 +189,8 @@ fn admission_a4_holds_for_every_event_in_the_real_registry() {
     assert_eq!(advance_seen, 20, "20 ADVANCE events in the closed registry");
     assert_eq!(
         preserve_seen,
-        26 + registry::ECONOMY_EVENT_COUNT,
-        "baseline PRESERVE events plus additive economy events in the closed registry"
+        26 + registry::ECONOMY_EVENT_COUNT + registry::BENCHMARK_EVENT_COUNT,
+        "baseline PRESERVE events plus additive economy and benchmark events in the closed registry"
     );
 }
 

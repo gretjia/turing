@@ -1,0 +1,190 @@
+{
+  "final_loop": {
+    "direct": {
+      "pass": 4,
+      "total": 5,
+      "worker_attempts": 5
+    },
+    "turingos": {
+      "pass": 5,
+      "total": 5,
+      "worker_attempts": 7
+    }
+  },
+  "first_pass": {
+    "direct": {
+      "pass": 4,
+      "total": 5
+    },
+    "turingos": {
+      "pass": 3,
+      "total": 5
+    }
+  },
+  "mini_recovery": {
+    "direct": {
+      "pass": 1,
+      "total": 2
+    },
+    "turingos": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "paired_task_results": [
+    {
+      "attempts": [
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": false,
+            "candidate_event_id": "mu:28277a1c70296b5acc78014c2918553075ad2f2536bcb77788a30aa1011e0474",
+            "candidate_write_event_type": "FailureNode",
+            "official_evidence_event_id": "mu:95c9e225a96f4d0118b9a799ed074e358045b938cf8f1163d7919f5799228978",
+            "predicate_product": "FAIL"
+          },
+          "result": "FAIL",
+          "stage": "initial"
+        },
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": true,
+            "candidate_event_id": "mu:77352e4c9eefa073dff9dc8d738bfa30938534aea6ed03fe4b4e0e5a656f0c4b",
+            "candidate_write_event_type": "CandidateAccepted",
+            "official_evidence_event_id": "mu:23135dbeea07c531a17cbbee797e25142f035868281e2f1317e7ab0da1ef9931",
+            "predicate_product": "PASS"
+          },
+          "result": "PASS",
+          "stage": "mini_recovery"
+        }
+      ],
+      "direct_result": "PASS",
+      "final_micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:77352e4c9eefa073dff9dc8d738bfa30938534aea6ed03fe4b4e0e5a656f0c4b",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:23135dbeea07c531a17cbbee797e25142f035868281e2f1317e7ab0da1ef9931",
+        "predicate_product": "PASS"
+      },
+      "instance_id": "django__django-11790",
+      "turingos_final_result": "PASS"
+    },
+    {
+      "attempts": [
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": false,
+            "candidate_event_id": "mu:f1cf9baf1ad9b1994a38aab050f1b823bbabe4cb23ef8cf6bacc70ea52baeb5c",
+            "candidate_write_event_type": "FailureNode",
+            "official_evidence_event_id": "mu:5a7231e53ff4a0409c5a5c02d5ed0825d72621a71f51b3c9665d7b10d22ec2ca",
+            "predicate_product": "FAIL"
+          },
+          "result": "FAIL",
+          "stage": "initial"
+        },
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": true,
+            "candidate_event_id": "mu:17795330adc4f8796c38eb6e3fe5d13f777d7ab2b4b58fe63e5aea1278a6834f",
+            "candidate_write_event_type": "CandidateAccepted",
+            "official_evidence_event_id": "mu:3dbda49d04069d54bf27fab7ba03adfc85569848a6e2329ac60edcd6f66b9665",
+            "predicate_product": "PASS"
+          },
+          "result": "PASS",
+          "stage": "mini_recovery"
+        }
+      ],
+      "direct_result": "FAIL",
+      "final_micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:17795330adc4f8796c38eb6e3fe5d13f777d7ab2b4b58fe63e5aea1278a6834f",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:3dbda49d04069d54bf27fab7ba03adfc85569848a6e2329ac60edcd6f66b9665",
+        "predicate_product": "PASS"
+      },
+      "instance_id": "django__django-11815",
+      "turingos_final_result": "PASS"
+    },
+    {
+      "attempts": [
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": true,
+            "candidate_event_id": "mu:1742ac5f3afb001ad7620b30b195fd1004060310859befa56aba610f5d6d3bf2",
+            "candidate_write_event_type": "CandidateAccepted",
+            "official_evidence_event_id": "mu:3a6fb31cdb6193067b33a7dc73a534f5fb3c40db9689847594fcd6b7a208ebec",
+            "predicate_product": "PASS"
+          },
+          "result": "PASS",
+          "stage": "initial"
+        }
+      ],
+      "direct_result": "PASS",
+      "final_micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:1742ac5f3afb001ad7620b30b195fd1004060310859befa56aba610f5d6d3bf2",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:3a6fb31cdb6193067b33a7dc73a534f5fb3c40db9689847594fcd6b7a208ebec",
+        "predicate_product": "PASS"
+      },
+      "instance_id": "django__django-11848",
+      "turingos_final_result": "PASS"
+    },
+    {
+      "attempts": [
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": true,
+            "candidate_event_id": "mu:f5d6e791571c1080cf6b08edc34bbef19d313ab49ca3c388d0d83fea4661fba3",
+            "candidate_write_event_type": "CandidateAccepted",
+            "official_evidence_event_id": "mu:a52002626e4162ad2173b836c2f13c81bb376096caf3f11d94442eba4c544de9",
+            "predicate_product": "PASS"
+          },
+          "result": "PASS",
+          "stage": "initial"
+        }
+      ],
+      "direct_result": "PASS",
+      "final_micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:f5d6e791571c1080cf6b08edc34bbef19d313ab49ca3c388d0d83fea4661fba3",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:a52002626e4162ad2173b836c2f13c81bb376096caf3f11d94442eba4c544de9",
+        "predicate_product": "PASS"
+      },
+      "instance_id": "django__django-11880",
+      "turingos_final_result": "PASS"
+    },
+    {
+      "attempts": [
+        {
+          "micro_tape_import": {
+            "accepted_head_moved": true,
+            "candidate_event_id": "mu:c57f898e4b5b1da67575381b747bbe5619958feb5540d58a5e576f6869bba6f6",
+            "candidate_write_event_type": "CandidateAccepted",
+            "official_evidence_event_id": "mu:ce0b844847603f569f8bd6b572a10313eefdd33196bba174e04a24013690b7ec",
+            "predicate_product": "PASS"
+          },
+          "result": "PASS",
+          "stage": "initial"
+        }
+      ],
+      "direct_result": "PASS",
+      "final_micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:c57f898e4b5b1da67575381b747bbe5619958feb5540d58a5e576f6869bba6f6",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:ce0b844847603f569f8bd6b572a10313eefdd33196bba174e04a24013690b7ec",
+        "predicate_product": "PASS"
+      },
+      "instance_id": "django__django-11885",
+      "turingos_final_result": "PASS"
+    }
+  ],
+  "sample_size": 5,
+  "schema_id": "MiniSweBenchGateALoopEval.v1",
+  "statistical_claim": "none_smoke_only_n_equals_5_not_statistically_significant",
+  "stop_rule": "do_not_scale_to_8_10_50_until_gate_a_review_accepts_loop_result",
+  "task_set": "first_5_rows_of_verified-mini-50.jsonl",
+  "truth_source": "official_evaluator_evidence_imported_to_micro_tape_for_turingos",
+  "worker_model": "grok-build"
+}

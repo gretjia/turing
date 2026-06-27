@@ -61,6 +61,10 @@ def build_review_payload(evidence_dir: Path) -> tuple[str, dict[str, Any]]:
     patch_eval_path = evidence_dir / "patch_eval" / "patch_eval_summary.json"
     if patch_eval_path.exists():
         patch_eval = load_json(patch_eval_path)
+    loop_eval = None
+    loop_eval_path = evidence_dir / "loop_eval_summary.json"
+    if loop_eval_path.exists():
+        loop_eval = load_json(loop_eval_path)
 
     def worker_summary(run: dict[str, Any]) -> dict[str, Any]:
         worker_logs = substrate_dir / "instances" / str(run.get("instance_id", "")) / "worker_logs"
@@ -90,6 +94,7 @@ def build_review_payload(evidence_dir: Path) -> tuple[str, dict[str, Any]]:
         "turingos_worker_stderr_excerpt": read_optional(first_worker_logs / "stderr.txt", limit=2000),
         "direct_baseline_results": direct_results,
         "patch_eval_summary": patch_eval,
+        "loop_eval_summary": loop_eval,
         "truth_boundary": {
             "meta_ai_authority": "none",
             "accepted_head_policy": "predicate_only",

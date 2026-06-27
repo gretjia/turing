@@ -1,0 +1,23 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "base_url": "https://api.deepseek.com/v1",
+  "context_hash": "sha256:5eb189e75a004f109fa6310e716c5147fc43ec2a0e74acfe2a12e53b988a37ff",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:143f7e8289b70494c32e8f412932ea3fb0c05ee4bdffa15b476a48542f2a1418",
+  "request_hash": "sha256:f648fd363c1d0c39259b7eae30d179826eeccda2bbaaea325e3e45341c80ccf6",
+  "review": {
+    "benchmark_claim_allowed": true,
+    "findings": "The TuringOS worker with loop recovery achieved 5/5 pass on the 5-task mini SWE-bench smoke, outperforming direct baseline (4/5). Substrate completeness verified by coverage audit. No truth-boundary violations detected. Small sample size precludes statistical significance.",
+    "next_required_gate": "scale_to_8_10_50",
+    "schema_id": "MiniSweBenchGateAAudit.v1",
+    "substrate_complete": true,
+    "verdict": "PASS"
+  },
+  "review_content_hash": "sha256:0692a3bca3286bd29690b4c759a12b05454a216b5a8cc7034fa2bb3d28679c5b",
+  "schema_id": "DeepSeekMetaAIReviewRun.v1",
+  "status": "PASS"
+}

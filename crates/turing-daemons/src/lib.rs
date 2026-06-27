@@ -399,7 +399,11 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
     })
 }
 
-fn project_bootstrap_genesis_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+fn project_bootstrap_genesis_response(
+    runtime: &DaemonRuntime,
+    request: &Value,
+    id: Value,
+) -> Value {
     let Some(repo) = &runtime.micro_git else {
         return jsonrpc_error(
             id,
@@ -428,11 +432,7 @@ fn project_bootstrap_genesis_response(runtime: &DaemonRuntime, request: &Value, 
     match tape.head_set_guarded() {
         Ok(None) => {}
         Ok(Some(_)) => {
-            return jsonrpc_error(
-                id,
-                -32000,
-                "micro tape already bootstrapped".to_string(),
-            );
+            return jsonrpc_error(id, -32000, "micro tape already bootstrapped".to_string());
         }
         Err(error) => {
             return jsonrpc_error(id, -32000, format!("cannot read micro tape heads: {error}"));
@@ -1575,6 +1575,7 @@ fn derive_candidate_predicate_checks(
                 | "macro_anchor_id"
                 | "macro_anchor"
                 | "worker_receipt_id"
+                | "official_evaluator_evidence_id"
         ) {
             return Err(format!("unexpected candidate_payload field {key:?}"));
         }
@@ -1599,6 +1600,9 @@ fn derive_candidate_predicate_checks(
         .and_then(Value::as_str);
     let worker_receipt_id = candidate_payload
         .get("worker_receipt_id")
+        .and_then(Value::as_str);
+    let official_evaluator_evidence_id = candidate_payload
+        .get("official_evaluator_evidence_id")
         .and_then(Value::as_str);
     let capsule_on_tape = capsule_id.is_some_and(|id| {
         tape_has_payload_field(
@@ -1627,6 +1631,23 @@ fn derive_candidate_predicate_checks(
         }
         _ => false,
     };
+    let official_evaluator_evidence_on_tape = match (
+        official_evaluator_evidence_id,
+        capsule_id,
+        macro_anchor_id,
+        worker_receipt_id,
+    ) {
+        (Some(evidence_id), Some(capsule_id), Some(macro_anchor_id), Some(worker_receipt_id)) => {
+            tape_has_official_evaluator_evidence(
+                &envelopes,
+                evidence_id,
+                capsule_id,
+                macro_anchor_id,
+                worker_receipt_id,
+            )
+        }
+        _ => false,
+    };
 
     let checks = vec![
         if candidate_id.is_some() && capsule_id.is_some() && capsule_on_tape {
@@ -1643,6 +1664,14 @@ fn derive_candidate_predicate_checks(
             PredicateCheck::pass("worker_receipt")
         } else {
             PredicateCheck::fail("worker_receipt", "WORKER_RECEIPT_NOT_ON_TAPE")
+        },
+        if official_evaluator_evidence_on_tape {
+            PredicateCheck::pass("official_evaluator_evidence")
+        } else {
+            PredicateCheck::fail(
+                "official_evaluator_evidence",
+                "OFFICIAL_EVALUATOR_EVIDENCE_NOT_ON_TAPE",
+            )
         },
         if candidate_id.is_some() && capsule_id.is_some() && capsule_on_tape {
             PredicateCheck::pass("scope.allowed")
@@ -1707,6 +1736,36 @@ fn tape_has_worker_receipt(
         envelope.event_type == "WorkerReceiptImported"
             && envelope.payload.get("receipt_id").and_then(Value::as_str) == Some(receipt_id)
             && envelope.payload.get("capsule_id").and_then(Value::as_str) == Some(capsule_id)
+    })
+}
+
+fn tape_has_official_evaluator_evidence(
+    envelopes: &[(String, MicroEventEnvelope)],
+    evidence_id: &str,
+    capsule_id: &str,
+    macro_anchor_id: &str,
+    worker_receipt_id: &str,
+) -> bool {
+    envelopes.iter().any(|(_, envelope)| {
+        envelope.event_type == "OfficialEvaluatorEvidenceImported"
+            && envelope.payload.get("evidence_id").and_then(Value::as_str) == Some(evidence_id)
+            && envelope.payload.get("capsule_id").and_then(Value::as_str) == Some(capsule_id)
+            && envelope
+                .payload
+                .get("macro_anchor_id")
+                .and_then(Value::as_str)
+                == Some(macro_anchor_id)
+            && envelope
+                .payload
+                .get("worker_receipt_id")
+                .and_then(Value::as_str)
+                == Some(worker_receipt_id)
+            && envelope.payload.get("result").and_then(Value::as_str) == Some("PASS")
+            && envelope
+                .payload
+                .get("forbidden_test_edit_detected")
+                .and_then(Value::as_bool)
+                == Some(false)
     })
 }
 

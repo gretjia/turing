@@ -1,0 +1,18 @@
+**Patch applied** (1-line minimal change in [django/contrib/auth/forms.py](/tmp/turingos_substrate_worktrees/61f2592dd5c31ce6/django/contrib/auth/forms.py)):
+
+```diff
+         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+         self.fields['username'].max_length = self.username_field.max_length or 254
++        self.fields['username'].widget.attrs['maxlength'] = self.fields['username'].max_length
+         if self.fields['username'].label is None:
+             self.fields['username'].label = capfirst(self.username_field.verbose_name)
+```
+
+(The `maxlength` value is assigned as the raw runtime integer per the noted constraint; no other files were inspected or touched, and no test/benchmark files were edited.)
+
+Verification (via direct execution against current `AuthenticationForm` + `AbstractUser`):
+- `field.max_length` = 150 (int)
+- `widget.attrs` now includes `'maxlength': 150` (int)
+- Rendered widget: `maxlength="150"` present (and other attrs preserved)
+
+Worktree left with the change (see `git diff`).

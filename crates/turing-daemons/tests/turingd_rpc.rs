@@ -80,7 +80,10 @@ fn turingd_bootstraps_genesis_only_on_empty_micro_tape() {
     );
     assert_eq!(bootstrapped["result"]["accepted_head_moved"], true);
     assert_eq!(bootstrapped["result"]["head_set"]["tape_tip"], event_id);
-    assert_eq!(bootstrapped["result"]["head_set"]["accepted_head"], event_id);
+    assert_eq!(
+        bootstrapped["result"]["head_set"]["accepted_head"],
+        event_id
+    );
 
     let second = rpc_params(
         &socket,
@@ -331,6 +334,15 @@ fn turingd_verify_write_routes_predicate_pass_and_fail() {
     append_worker_receipt(&tape, "wc_rpc", "rcp_pass");
     append_worker_receipt(&tape, "wc_rpc", "rcp_fail");
     append_macro_observation(&tape, "wc_rpc", "macro:diff_rpc");
+    append_official_evaluator_evidence(
+        &tape,
+        "ev_official_pass",
+        "wc_rpc",
+        "macro:diff_rpc",
+        "rcp_pass",
+        "PASS",
+        false,
+    );
 
     let socket = dir.path().join("turingd-verify-write.sock");
     let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
@@ -355,7 +367,8 @@ fn turingd_verify_write_routes_predicate_pass_and_fail() {
                 "candidate_id": "cand_pass",
                 "capsule_id": "wc_rpc",
                 "macro_anchor_id": "macro:diff_rpc",
-                "worker_receipt_id": "rcp_pass"
+                "worker_receipt_id": "rcp_pass",
+                "official_evaluator_evidence_id": "ev_official_pass"
             },
             "failure": {
                 "candidate_digest": digest('e'),
@@ -806,6 +819,86 @@ fn turingd_verify_write_rejects_missing_worker_receipt() {
 }
 
 #[test]
+fn turingd_verify_write_requires_official_evaluator_evidence_before_accept() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"8".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+    append_work_capsule(&tape, "wc_rpc");
+    append_worker_receipt(&tape, "wc_rpc", "rcp_no_official_eval");
+    append_macro_observation(&tape, "wc_rpc", "macro:diff_rpc");
+
+    let socket = dir.path().join("turingd-missing-official-eval.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let rejected = rpc_params(
+        &socket,
+        "candidate.verify_write",
+        json!({
+            "writer_id": "writer:predicate",
+            "candidate_payload": {
+                "candidate_id": "cand_missing_official_eval",
+                "capsule_id": "wc_rpc",
+                "macro_anchor_id": "macro:diff_rpc",
+                "worker_receipt_id": "rcp_no_official_eval"
+            },
+            "failure": {
+                "candidate_digest": digest('8'),
+                "observation_digest": digest('9'),
+                "detail": "official evaluator evidence is absent from tape"
+            }
+        }),
+    );
+
+    let event_id = rejected["result"]["event_id"]
+        .as_str()
+        .expect("failure event id")
+        .to_string();
+    assert_eq!(rejected["result"]["write_event_type"], "FailureNode");
+    assert_eq!(rejected["result"]["predicate_product"], "FAIL");
+    assert_eq!(rejected["result"]["accepted_head_moved"], false);
+    assert_eq!(rejected["result"]["head_set"]["tape_tip"], event_id);
+    assert_eq!(
+        rejected["result"]["head_set"]["accepted_head"],
+        genesis.event_id
+    );
+    assert!(
+        rejected["result"]["failed_predicates"]
+            .as_array()
+            .expect("failed predicates")
+            .iter()
+            .any(|value| value == "official_evaluator_evidence")
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
+#[test]
 fn turingd_verify_write_accepts_derived_predicate_pack_without_checks() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");
@@ -825,6 +918,15 @@ fn turingd_verify_write_accepts_derived_predicate_pack_without_checks() {
     append_work_capsule(&tape, "wc_rpc");
     append_worker_receipt(&tape, "wc_rpc", "rcp_pack");
     append_macro_observation(&tape, "wc_rpc", "macro:diff_rpc");
+    append_official_evaluator_evidence(
+        &tape,
+        "ev_official_pack",
+        "wc_rpc",
+        "macro:diff_rpc",
+        "rcp_pack",
+        "PASS",
+        false,
+    );
 
     let socket = dir.path().join("turingd-expanded-pack.sock");
     let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
@@ -849,7 +951,8 @@ fn turingd_verify_write_accepts_derived_predicate_pack_without_checks() {
                 "candidate_id": "cand_derived_pack",
                 "capsule_id": "wc_rpc",
                 "macro_anchor_id": "macro:diff_rpc",
-                "worker_receipt_id": "rcp_pack"
+                "worker_receipt_id": "rcp_pack",
+                "official_evaluator_evidence_id": "ev_official_pack"
             }
         }),
     );
@@ -1348,6 +1451,45 @@ fn append_macro_observation(tape: &Append, capsule_id: &str, macro_id: &str) {
         .predicate_pass(),
     )
     .expect("append macro observation");
+}
+
+fn append_official_evaluator_evidence(
+    tape: &Append,
+    evidence_id: &str,
+    capsule_id: &str,
+    macro_anchor_id: &str,
+    worker_receipt_id: &str,
+    result: &str,
+    forbidden_test_edit_detected: bool,
+) {
+    tape.append(
+        AppendRequest::new(
+            "OfficialEvaluatorEvidenceImported",
+            "writer:test-official-evaluator",
+            json!({
+                "schema_id": "official_evaluator_evidence_imported.v1",
+                "event_type": "OfficialEvaluatorEvidenceImported",
+                "evidence_id": evidence_id,
+                "instance_id": "django__django-11790",
+                "capsule_id": capsule_id,
+                "macro_anchor_id": macro_anchor_id,
+                "worker_receipt_id": worker_receipt_id,
+                "candidate_patch_hash": digest('4'),
+                "test_patch_hash": digest('5'),
+                "apply_candidate_result": "PASS",
+                "apply_test_patch_result": "PASS",
+                "target_test_exit_code": 0,
+                "target_test_result": result,
+                "result": result,
+                "failure_class": serde_json::Value::Null,
+                "forbidden_test_edit_detected": forbidden_test_edit_detected,
+                "forbidden_test_edit_paths": [],
+                "truth_source": "official_evaluator_macro_evidence"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append official evaluator evidence");
 }
 
 fn wait_for_socket(socket: &Path, child: &mut Child) {

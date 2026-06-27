@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -697,3 +698,199 @@ def test_django_fail_to_pass_labels_convert_to_runtests_labels():
         "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
         "already.runnable.Label",
     ]
+
+
+def test_gate_a_capsule_prompt_injects_scope_and_broadcast_rules():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    task = {
+        "instance_id": "django__django-11815",
+        "repo": "django/django",
+        "base_commit": "abc123",
+        "problem_statement": "Fix the migration writer regression.",
+    }
+
+    prompt = runner.visible_grok_prompt(
+        task,
+        "wc_django__django-11815",
+        broadcast_rules=[
+            {
+                "rule_id": "br_scope_test_edit",
+                "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+                "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+            }
+        ],
+    )
+
+    assert "Do not edit benchmark/official test files" in prompt
+    assert "SCOPE_VIOLATION_TEST_EDIT" in prompt
+    assert "hidden predicate" not in prompt.lower()
+    assert "pput" not in prompt.lower()
+
+
+def test_gate_a_grant_forbids_swe_bench_test_file_mutations():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+
+    grant = runner.grant_json(
+        "wc_django__django-11815",
+        "mkt_django__django-11815",
+        "worker:sha256:" + "1" * 64,
+    )
+
+    forbidden = set(grant["scope"]["forbidden_paths"])
+    assert "tests/**" in forbidden
+    assert "*/tests/**" in forbidden
+    assert "test_*.py" in forbidden
+    assert "*_test.py" in forbidden
+
+
+def test_gate_a_evaluator_payload_detects_test_edits_and_is_micro_tape_importable():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    task = {
+        "instance_id": "django__django-11815",
+        "test_patch": "diff --git a/tests/example.py b/tests/example.py\n",
+        "FAIL_TO_PASS": ["tests.example.TestCase.test_regression"],
+    }
+    patch_text = (
+        "diff --git a/tests/migrations/test_writer.py b/tests/migrations/test_writer.py\n"
+        "--- a/tests/migrations/test_writer.py\n"
+        "+++ b/tests/migrations/test_writer.py\n"
+        "@@\n"
+        "-old\n"
+        "+new\n"
+    )
+
+    payload = evaluator.official_evaluator_evidence_payload(
+        task=task,
+        arm="turingos",
+        candidate_patch_text=patch_text,
+        apply_candidate_result={"status": "PASS", "exit_code": 0, "stdout": "", "stderr": ""},
+        apply_test_patch_result={"status": "FAIL", "exit_code": 1, "stdout": "", "stderr": "conflict"},
+        target_test_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        capsule_id="wc_django__django-11815",
+        macro_anchor_id="macro:diff:django__django-11815",
+        worker_receipt_id="rcp_pack",
+    )
+
+    assert payload["schema_id"] == "official_evaluator_evidence_imported.v1"
+    assert payload["event_type"] == "OfficialEvaluatorEvidenceImported"
+    assert payload["evidence_id"].startswith("ev_official_")
+    assert payload["instance_id"] == "django__django-11815"
+    assert payload["capsule_id"] == "wc_django__django-11815"
+    assert payload["macro_anchor_id"] == "macro:diff:django__django-11815"
+    assert payload["worker_receipt_id"] == "rcp_pack"
+    assert payload["candidate_patch_hash"] == "sha256:" + hashlib.sha256(patch_text.encode()).hexdigest()
+    assert payload["test_patch_hash"].startswith("sha256:")
+    assert payload["result"] == "FAIL"
+    assert payload["failure_class"] == "SCOPE_VIOLATION_TEST_EDIT"
+    assert payload["forbidden_test_edit_detected"] is True
+    assert payload["forbidden_test_edit_paths"] == ["tests/migrations/test_writer.py"]
+    assert payload["truth_source"] == "official_evaluator_macro_evidence"
+
+
+def test_gate_a_evaluator_builds_candidate_payload_from_evidence_and_substrate_refs():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-11790",
+        "capsule_id": "wc_django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "worker_receipt_id": "rcp_abc",
+    }
+    evidence_payload = {
+        "evidence_id": "ev_official_deadbeef",
+        "result": "PASS",
+    }
+
+    candidate_payload = evaluator.candidate_payload_from_official_evidence(
+        substrate_run,
+        evidence_payload,
+    )
+
+    assert candidate_payload == {
+        "candidate_id": "cand_django__django-11790",
+        "capsule_id": "wc_django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "worker_receipt_id": "rcp_abc",
+        "official_evaluator_evidence_id": "ev_official_deadbeef",
+    }
+
+
+def test_gate_a_failure_evidence_reduces_to_abstract_broadcast_rule():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    evidence_payload = {
+        "evidence_id": "ev_official_scope",
+        "instance_id": "django__django-11815",
+        "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+        "stderr_hash": "sha256:" + "a" * 64,
+        "stdout_hash": "sha256:" + "b" * 64,
+    }
+
+    rule = evaluator.broadcast_rule_from_evidence(evidence_payload)
+
+    assert rule == {
+        "rule_id": "br_ev_official_scope",
+        "source_evidence_id": "ev_official_scope",
+        "source_instance_id": "django__django-11815",
+        "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+        "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+    }
+    assert "stderr" not in json.dumps(rule).lower()
+    assert "stdout" not in json.dumps(rule).lower()
+
+
+def test_gate_a_worker_stop_contract_distinguishes_nonzero_patch_pass():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+
+    assert (
+        runner.classify_worker_stop(
+            exit_code=1,
+            stderr="Max turns reached",
+            diff_text="diff --git a/django/forms.py b/django/forms.py\n",
+            official_eval_result="PASS",
+        )
+        == "PATCH_PASS_WITH_WORKER_NONZERO"
+    )
+    assert (
+        runner.classify_worker_stop(
+            exit_code=1,
+            stderr="Max turns reached",
+            diff_text="diff --git a/django/forms.py b/django/forms.py\n",
+            official_eval_result="FAIL",
+        )
+        == "MAX_TURNS_WITH_PATCH"
+    )
+    assert (
+        runner.classify_worker_stop(
+            exit_code=0,
+            stderr="",
+            diff_text="",
+            official_eval_result="FAIL",
+        )
+        == "MAX_TURNS_NO_PATCH"
+    )
+
+
+def test_gate_a_pput_prompt_validation_uses_actual_visible_prompt_bytes(tmp_path):
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    log_dir = tmp_path / "worker_logs"
+    log_dir.mkdir()
+    prompt = "visible capsule without hidden scoring formula\n"
+    (log_dir / "visible_prompt.txt").write_text(prompt, encoding="utf-8")
+
+    request = runner.pput_prompt_validation_request(log_dir)
+
+    assert request["prompt"] == prompt
+    assert request["prompt_hash"] == "sha256:" + hashlib.sha256(prompt.encode()).hexdigest()
+    assert request["source"] == "actual_visible_prompt_txt"
+
+
+def test_gate_a_micro_import_socket_path_stays_below_unix_limit(tmp_path):
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    long_runtime_root = tmp_path / ("deep_" + "x" * 140)
+
+    socket_path = evaluator.micro_import_socket_path(
+        long_runtime_root,
+        "django__django-11885",
+    )
+
+    assert str(socket_path).startswith("/tmp/")
+    assert len(str(socket_path)) < 100

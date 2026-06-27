@@ -44,6 +44,7 @@ REQUIRED_MODULES = [
     "M16_integration_queue",
     "M17_e2e_handoff",
 ]
+SWEBENCH_FORBIDDEN_PATHS = ["secrets", "tests/**", "*/tests/**", "test_*.py", "*_test.py"]
 
 
 def digest_text(text: str) -> str:
@@ -70,6 +71,16 @@ def read_tasks(path: Path, limit: int) -> list[dict[str, Any]]:
     if not tasks:
         raise ValueError("no tasks loaded")
     return tasks
+
+
+def read_broadcast_rules(path: Path | None) -> list[dict[str, Any]]:
+    if path is None:
+        return []
+    packet = json.loads(path.read_text(encoding="utf-8"))
+    rules = packet.get("rules", packet if isinstance(packet, list) else [])
+    if not isinstance(rules, list):
+        raise ValueError("broadcast rules file must contain a rules list")
+    return [rule for rule in rules if isinstance(rule, dict)]
 
 
 def run_cmd(argv: list[str], *, cwd: Path | None = None, timeout: int = 120) -> subprocess.CompletedProcess[str]:
@@ -257,7 +268,19 @@ def checkout_task(task: dict[str, Any], worktree: Path) -> None:
         raise RuntimeError(f"git checkout failed for {task['instance_id']}:\n{checkout.stderr}")
 
 
-def visible_grok_prompt(task: dict[str, Any], capsule_id: str) -> str:
+def visible_grok_prompt(
+    task: dict[str, Any],
+    capsule_id: str,
+    broadcast_rules: list[dict[str, Any]] | None = None,
+) -> str:
+    broadcast_section = ""
+    if broadcast_rules:
+        lines = ["Known failures to avoid:"]
+        for rule in broadcast_rules:
+            lines.append(
+                f"- {rule['failure_class']}: {rule['guidance']} (source rule {rule['rule_id']})"
+            )
+        broadcast_section = "\n".join(lines) + "\n"
     return (
         "You are a TuringOS worker operating on a SWE-bench task.\n"
         "Do not output private chain-of-thought or hidden scratchpads.\n"
@@ -265,8 +288,10 @@ def visible_grok_prompt(task: dict[str, Any], capsule_id: str) -> str:
         "Acceptance is predicate-only; exit code, CI, self-report, price, and benchmark labels are not truth.\n"
         "Do not request or use credentials.\n"
         "Your job is to make the smallest plausible code patch in the checked-out worktree.\n"
+        "Do not edit benchmark/official test files unless this capsule explicitly allows test changes.\n"
         "Avoid long investigation narratives. Inspect only the files needed, edit them, and stop when a candidate patch exists.\n"
         "If you cannot safely patch, leave the worktree unchanged and say why.\n"
+        f"{broadcast_section}"
         f"Capsule: {capsule_id}\n"
         f"Instance: {task['instance_id']}\n"
         f"Repo: {task['repo']}\n"
@@ -275,6 +300,36 @@ def visible_grok_prompt(task: dict[str, Any], capsule_id: str) -> str:
         f"{task['problem_statement']}\n"
         "Edit the checked-out repository only. When done, leave the patch in the worktree.\n"
     )
+
+
+def classify_worker_stop(
+    *,
+    exit_code: int,
+    stderr: str,
+    diff_text: str,
+    official_eval_result: str | None,
+) -> str:
+    has_patch = bool(diff_text.strip())
+    if official_eval_result == "PASS" and exit_code != 0 and has_patch:
+        return "PATCH_PASS_WITH_WORKER_NONZERO"
+    if official_eval_result == "FAIL" and exit_code == 0 and has_patch:
+        return "PATCH_FAIL_WITH_EXIT_ZERO"
+    if "max turns" in stderr.lower() and has_patch:
+        return "MAX_TURNS_WITH_PATCH"
+    if not has_patch:
+        return "MAX_TURNS_NO_PATCH"
+    if exit_code != 0:
+        return "MAX_TURNS_WITH_PATCH"
+    return "PATCH_FAIL_WITH_EXIT_ZERO" if official_eval_result == "FAIL" else "PATCH_PRESENT_EXIT_ZERO"
+
+
+def pput_prompt_validation_request(log_dir: Path) -> dict[str, Any]:
+    prompt = (log_dir / "visible_prompt.txt").read_text(encoding="utf-8")
+    return {
+        "prompt": prompt,
+        "prompt_hash": digest_text(prompt),
+        "source": "actual_visible_prompt_txt",
+    }
 
 
 def redacted_grok_argv(argv: list[str]) -> list[str]:
@@ -294,6 +349,7 @@ def run_grok_worker(
     max_turns: int,
     timeout_s: int,
     capsule_id: str,
+    broadcast_rules: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if shutil.which("grok") is None:
         raise RuntimeError("grok CLI is missing; real-worker substrate smoke cannot run")
@@ -303,7 +359,7 @@ def run_grok_worker(
         f"{instance_dir}:{task['instance_id']}:{model}".encode("utf-8")
     ).hexdigest()[:16]
     checkout_task(task, worktree)
-    prompt = visible_grok_prompt(task, capsule_id)
+    prompt = visible_grok_prompt(task, capsule_id, broadcast_rules=broadcast_rules)
     worktree_abs = worktree.resolve()
     argv = [
         "grok",
@@ -392,7 +448,7 @@ def grant_json(capsule_id: str, market_id: str, worker_id: str) -> dict[str, Any
         },
         "scope": {
             "allowed_paths": ["."],
-            "forbidden_paths": ["secrets"],
+            "forbidden_paths": SWEBENCH_FORBIDDEN_PATHS,
             "allowed_tools": ["read_file", "run_command"],
             "network": "Denied",
         },
@@ -415,6 +471,7 @@ def run_substrate_task(
     model: str,
     max_turns: int,
     worker_timeout_s: int,
+    broadcast_rules: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     instance_dir = out_dir / "instances" / task["instance_id"]
     project = instance_dir / "project"
@@ -593,6 +650,7 @@ def run_substrate_task(
                     max_turns,
                     worker_timeout_s,
                     capsule_id,
+                    broadcast_rules=broadcast_rules,
                 )
         mark_module("M6_worker_profiles")
         mark_module("M7_executor_broker")
@@ -632,13 +690,14 @@ def run_substrate_task(
         mark_event(macro, "MacroObservationImported")
         mark_module("M8_macro_observer")
 
+        candidate_id = "cand_" + task["instance_id"]
         accepted = rpc(
             turingd.socket_path,
             "candidate.verify_write",
             {
                 "writer_id": "writer:predicate",
                 "candidate_payload": {
-                    "candidate_id": "cand_" + hashlib.sha256(task["instance_id"].encode("utf-8")).hexdigest() + "_" + "x" * 70,
+                    "candidate_id": candidate_id,
                     "capsule_id": capsule_id,
                     "macro_anchor_id": macro_id,
                     "worker_receipt_id": worker_result["receipt_id"],
@@ -777,7 +836,16 @@ def run_substrate_task(
 
         with Daemon("turing-pputd", bin_dir, runtime / "pputd.sock", micro_git=micro_git, project=project) as pputd:
             increment(process_calls, "turing-pputd")
-            rpc(pputd.socket_path, "pput.prompt.validate", {"prompt": "Implement visible capsule and report pass or fail."})
+            if worker_result.get("log_dir"):
+                prompt_request = pput_prompt_validation_request(Path(worker_result["log_dir"]))
+            else:
+                prompt = visible_grok_prompt(task, capsule_id, broadcast_rules=broadcast_rules)
+                prompt_request = {
+                    "prompt": prompt,
+                    "prompt_hash": digest_text(prompt),
+                    "source": "fake_worker_visible_prompt",
+                }
+            rpc(pputd.socket_path, "pput.prompt.validate", prompt_request)
             rpc(pputd.socket_path, "pput.snapshot.write", {})
 
         with Daemon("turing-viewd", bin_dir, runtime / "viewd.sock", micro_git=micro_git, project=project) as viewd:
@@ -806,6 +874,13 @@ def run_substrate_task(
         "instance_id": task["instance_id"],
         "worker_mode": worker_mode,
         "worker_id": worker_id,
+        "capsule_id": capsule_id,
+        "candidate_id": candidate_id,
+        "macro_anchor_id": macro_id,
+        "worker_receipt_id": worker_result["receipt_id"],
+        "patch_hash": worker_result["patch_hash"],
+        "broadcast_rules_injected": broadcast_rules or [],
+        "broadcast_rules_emitted": [],
         "worker_exit_code": worker_result["exit_code"],
         "worker_log_dir": worker_result["log_dir"],
         "worker_worktree": worker_result["worktree"],
@@ -835,6 +910,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--worker-timeout-s", type=int, default=1200)
     parser.add_argument("--daemon-bin-dir", default=str(REPO / "target" / "debug"))
+    parser.add_argument("--broadcast-rules-file")
     args = parser.parse_args(argv)
 
     out_dir = Path(args.out_dir)
@@ -842,9 +918,13 @@ def main(argv: list[str] | None = None) -> int:
     bin_dir = Path(args.daemon_bin_dir)
     ensure_binaries(bin_dir)
     tasks = read_tasks(Path(args.tasks_jsonl), args.limit)
+    active_broadcast_rules = read_broadcast_rules(
+        Path(args.broadcast_rules_file) if args.broadcast_rules_file else None
+    )
 
-    runs = [
-        run_substrate_task(
+    runs = []
+    for task in tasks:
+        run = run_substrate_task(
             task,
             out_dir,
             bin_dir,
@@ -852,9 +932,10 @@ def main(argv: list[str] | None = None) -> int:
             args.model,
             args.max_turns,
             args.worker_timeout_s,
+            broadcast_rules=active_broadcast_rules,
         )
-        for task in tasks
-    ]
+        runs.append(run)
+        active_broadcast_rules.extend(run.get("broadcast_rules_emitted", []))
     coverage = {
         "schema_id": "MiniSweBenchSubstrateCoverage.v1",
         "run_id": "substrate_smoke",

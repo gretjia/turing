@@ -59,8 +59,12 @@ pub const BASELINE_EVENT_COUNT: usize = 46;
 /// Additive Agent Economy events introduced by the Greenfield v1.0 upgrade.
 pub const ECONOMY_EVENT_COUNT: usize = 15;
 
-/// Total closed registry cardinality after additive economy events.
-pub const TOTAL_EVENT_COUNT: usize = BASELINE_EVENT_COUNT + ECONOMY_EVENT_COUNT;
+/// Additive benchmark evidence events introduced by the mini-SWE-bench Gate A loop.
+pub const BENCHMARK_EVENT_COUNT: usize = 1;
+
+/// Total closed registry cardinality after additive economy and benchmark events.
+pub const TOTAL_EVENT_COUNT: usize =
+    BASELINE_EVENT_COUNT + ECONOMY_EVENT_COUNT + BENCHMARK_EVENT_COUNT;
 
 /// Which sovereign ref a class targets (the registry `target_ref` column).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -198,7 +202,7 @@ mod tests {
         assert_eq!(
             registered_event_count(),
             TOTAL_EVENT_COUNT,
-            "the closed registry has baseline plus additive economy events"
+            "the closed registry has baseline plus additive economy and benchmark events"
         );
     }
 
@@ -226,6 +230,15 @@ mod tests {
         let predicate_free = registry("PredicateEvaluated").unwrap();
         assert!(!predicate_free.predicate_required);
         assert_eq!(predicate_free.head_effect, HeadEffect::Preserve);
+
+        let official_evaluator = registry("OfficialEvaluatorEvidenceImported").unwrap();
+        assert_eq!(official_evaluator.class, EventClass::Observation);
+        assert_eq!(official_evaluator.head_effect, HeadEffect::Preserve);
+        assert_eq!(official_evaluator.target_ref, TargetRef::TapeTip);
+        assert_eq!(
+            official_evaluator.payload_schema_id,
+            "official_evaluator_evidence_imported.v1"
+        );
     }
 
     #[test]
