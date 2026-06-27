@@ -375,6 +375,115 @@ fn turingd_authorizes_atom_with_approval_card_without_accepting() {
     assert!(status.success(), "turingd shutdown failed: {status}");
 }
 
+#[test]
+fn turingd_goal_submit_validates_goal_state_before_append() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"f".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+
+    let socket = dir.path().join("turingd-goal-submit.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let rejected = rpc_params(
+        &socket,
+        "goal.submit",
+        json!({
+            "writer_id": "writer:goal",
+            "goal": {
+                "schema_id": "goal_state.v1",
+                "goal_id": "goal_bad_rpc",
+                "objective": "ship from prose only",
+                "must_haves": [
+                    {
+                        "text": "make it good",
+                        "machine_checks": []
+                    }
+                ],
+                "anti_goals": []
+            }
+        }),
+    );
+    assert_eq!(rejected["error"]["code"], -32602);
+    assert!(
+        rejected["error"]["message"]
+            .as_str()
+            .expect("validation message")
+            .contains("lacks a predicate or PCP check")
+    );
+
+    let submitted = rpc_params(
+        &socket,
+        "goal.submit",
+        json!({
+            "writer_id": "writer:goal",
+            "goal": {
+                "schema_id": "goal_state.v1",
+                "goal_id": "goal_rpc",
+                "objective": "bootstrap a replayable runtime",
+                "must_haves": [
+                    {
+                        "text": "replay passes",
+                        "machine_checks": [
+                            {
+                                "kind": "PREDICATE",
+                                "predicate_id": "predicate.replay.verify"
+                            }
+                        ]
+                    }
+                ],
+                "anti_goals": ["do not expose PPUT to Worker prompts"]
+            }
+        }),
+    );
+    let event_id = submitted["result"]["event_id"]
+        .as_str()
+        .expect("goal event id")
+        .to_string();
+    assert_eq!(submitted["result"]["event_type"], "GoalStateProposed");
+    assert_eq!(submitted["result"]["goal_id"], "goal_rpc");
+    assert_eq!(submitted["result"]["head_effect"], "PRESERVE");
+    assert_eq!(submitted["result"]["accepted_head_moved"], false);
+    assert!(
+        submitted["result"]["goal_digest"]
+            .as_str()
+            .expect("goal digest")
+            .starts_with("sha256:")
+    );
+    assert_eq!(submitted["result"]["head_set"]["tape_tip"], event_id);
+    assert_eq!(
+        submitted["result"]["head_set"]["accepted_head"],
+        genesis.event_id
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
 fn rpc(socket: &Path, method: &str) -> Value {
     let mut stream = UnixStream::connect(socket).expect("connect to turingd socket");
     writeln!(stream, r#"{{"jsonrpc":"2.0","id":1,"method":"{method}"}}"#).expect("write request");

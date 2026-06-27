@@ -14,6 +14,8 @@ use turing_approval::{
 use turing_contracts::envelope::HeadEffect;
 use turing_contracts::envelope::PredicateProduct;
 use turing_contracts::failure::{FailureClass, FailureNodePayload};
+use turing_contracts::goal::GoalState;
+use turing_contracts::jcs;
 use turing_contracts::registry;
 use turing_economy::{CandidateRoute, MarketRouter, MarketRouterMode, PriceSignal};
 use turing_execd::capability::{
@@ -161,6 +163,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("approval.authorize_atom") if runtime.contract.role == "turingd" => {
             approval_authorize_atom_response(runtime, request, id)
         }
+        Some("goal.submit") if runtime.contract.role == "turingd" => {
+            goal_submit_response(runtime, request, id)
+        }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
         }
@@ -258,6 +263,72 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             "head_effect": "PRESERVE",
             "accepted_head_moved": accepted_head_moved,
             "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+fn goal_submit_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "goal.submit requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(writer_id) => writer_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let goal = match params.get("goal").map(parse_goal_state) {
+        Some(Ok(goal)) => goal,
+        Some(Err(message)) => return invalid_params(id, message),
+        None => return invalid_params(id, "goal object is required"),
+    };
+    let goal_id = goal.goal_id.clone();
+    let goal_bytes = match goal.to_jcs_bytes() {
+        Ok(bytes) => bytes,
+        Err(error) => return invalid_params(id, format!("goal canonicalization failed: {error}")),
+    };
+    let goal_digest = format!("sha256:{}", jcs::sha256_hex(&goal_bytes));
+    let goal_value = serde_json::to_value(&goal).expect("GoalState serializes to JSON");
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    let receipt = match tape.append(
+        AppendRequest::new(
+            "GoalStateProposed",
+            writer_id,
+            json!({
+                "goal_state": goal_value,
+                "goal_digest": goal_digest,
+                "submitted_via": "goal.submit",
+            }),
+        )
+        .predicate_pass(),
+    ) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "GoalStateProposed",
+            "event_id": receipt.event_id,
+            "goal_id": goal_id,
+            "goal_digest": goal_digest,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,
@@ -645,6 +716,14 @@ fn parse_failure_payload(value: &Value) -> Result<FailureNodePayload, String> {
         observation_digest,
         detail,
     ))
+}
+
+fn parse_goal_state(value: &Value) -> Result<GoalState, String> {
+    let goal: GoalState = serde_json::from_value(value.clone())
+        .map_err(|error| format!("invalid GoalState JSON: {error}"))?;
+    goal.validate()
+        .map_err(|error| format!("invalid GoalState: {error}"))?;
+    Ok(goal)
 }
 
 fn parse_approval_payload(value: &Value) -> Result<ApprovalPayload, String> {
