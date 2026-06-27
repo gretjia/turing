@@ -564,6 +564,74 @@ fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
     assert!(status.success(), "turingd shutdown failed: {status}");
 }
 
+#[test]
+fn turingd_capsule_reject_appends_failure_without_moving_heads() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    git::init_sha256(&repo).expect("init micro git");
+    let tape = Append::open(&repo).expect("open tape");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:genesis",
+                json!({"constitution_digest": "sha256:".to_string() + &"1".repeat(64)}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append genesis");
+
+    let socket = dir.path().join("turingd-capsule-reject.sock");
+    let mut child = Command::new(env!("CARGO_BIN_EXE_turingd"))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            repo.to_str().expect("UTF-8 repo path"),
+        ])
+        .spawn()
+        .expect("spawn turingd");
+
+    wait_for_socket(&socket, &mut child);
+
+    let rejected = rpc_params(
+        &socket,
+        "capsule.reject",
+        json!({
+            "writer_id": "writer:operator",
+            "capsule_id": "wc_rejected",
+            "capsule_digest": digest('1'),
+            "observation_digest": digest('2'),
+            "detail": "operator rejected the proposed dispatch"
+        }),
+    );
+    let event_id = rejected["result"]["event_id"]
+        .as_str()
+        .expect("failure event id")
+        .to_string();
+    assert_eq!(rejected["result"]["event_type"], "FailureNode");
+    assert_eq!(rejected["result"]["capsule_id"], "wc_rejected");
+    assert_eq!(rejected["result"]["failure_class"], "STEER_REJECTED");
+    assert_eq!(rejected["result"]["authorization_head_moved"], false);
+    assert_eq!(rejected["result"]["accepted_head_moved"], false);
+    assert_eq!(rejected["result"]["head_set"]["tape_tip"], event_id);
+    assert_eq!(
+        rejected["result"]["head_set"]["authorization_head"],
+        Value::Null
+    );
+    assert_eq!(
+        rejected["result"]["head_set"]["accepted_head"],
+        genesis.event_id
+    );
+
+    let shutdown = rpc(&socket, "daemon.shutdown");
+    assert_eq!(shutdown["result"]["shutdown"], true);
+    let status = child.wait().expect("wait for turingd");
+    assert!(status.success(), "turingd shutdown failed: {status}");
+}
+
 fn rpc(socket: &Path, method: &str) -> Value {
     let mut stream = UnixStream::connect(socket).expect("connect to turingd socket");
     writeln!(stream, r#"{{"jsonrpc":"2.0","id":1,"method":"{method}"}}"#).expect("write request");

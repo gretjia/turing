@@ -169,6 +169,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("capsule.approve") if runtime.contract.role == "turingd" => {
             capsule_approve_response(runtime, request, id)
         }
+        Some("capsule.reject") if runtime.contract.role == "turingd" => {
+            capsule_reject_response(runtime, request, id)
+        }
         Some("grant.authorize") if runtime.contract.role == "turing-execd" => {
             grant_authorize_response(request, id)
         }
@@ -331,6 +334,82 @@ fn goal_submit_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> 
             "goal_id": goal_id,
             "goal_digest": goal_digest,
             "head_effect": "PRESERVE",
+            "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+fn capsule_reject_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "capsule.reject requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(writer_id) => writer_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let capsule_id = match required_str(params, "capsule_id") {
+        Ok(capsule_id) => capsule_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let capsule_digest = match required_digest(params, "capsule_digest") {
+        Ok(digest) => digest,
+        Err(message) => return invalid_params(id, message),
+    };
+    let observation_digest = match required_digest(params, "observation_digest") {
+        Ok(digest) => digest,
+        Err(message) => return invalid_params(id, message),
+    };
+    let detail = match optional_str(params, "detail") {
+        Ok(detail) => detail,
+        Err(message) => return invalid_params(id, message),
+    };
+    let failure = FailureNodePayload::new(
+        FailureClass::SteerRejected,
+        capsule_digest,
+        observation_digest,
+        detail,
+    );
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    let receipt = match tape.append(
+        AppendRequest::new(
+            "FailureNode",
+            writer_id,
+            serde_json::to_value(&failure).expect("FailureNodePayload serializes"),
+        )
+        .predicate_fail(),
+    ) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "FailureNode",
+            "event_id": receipt.event_id,
+            "capsule_id": capsule_id,
+            "failure_class": FailureClass::SteerRejected.as_registry_str(),
+            "authorization_head_moved": matches!(receipt.head_moved, HeadMoved::AuthorizationHead),
             "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,

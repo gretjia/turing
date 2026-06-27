@@ -133,9 +133,9 @@ turing-mcp --check
 
 - Generated evidence is from a temporary private-local qualification Tape.
 - `turingd` has Unix socket JSON-RPC health/read-only heads, configured `--micro-git` head
-  reads, goal submission, capsule dispatch approval, preserve-only append, predicate-routed
-  candidate verify/write, and minimal OS-keyring atom authorization; richer predicate packs and
-  hardware/human approval UX remain pending.
+  reads, goal submission, capsule dispatch approval/rejection, preserve-only append,
+  predicate-routed candidate verify/write, and minimal OS-keyring atom authorization; richer
+  predicate packs and hardware/human approval UX remain pending.
 - `turing-execd`, `turing-mcp`, `turing-marketd`, `turing-pputd`, and `turing-viewd` have
   minimal sidecar RPCs for grant authorization, resource manifests, shadow budget suggestion,
   prompt shielding, and disposable projection building. Full persistent project services remain
