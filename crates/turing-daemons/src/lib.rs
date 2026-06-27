@@ -14,9 +14,8 @@ use nix::sys::socket::{getsockopt, sockopt::PeerCredentials};
 use nix::unistd::Uid;
 use serde_json::{Value, json};
 use turing_approval::{
-    ApprovalCard, ApprovalPayload, DisplayCopy, InMemoryTestSigningBackend,
-    OsKeyringSigningBackend, SignatureEnvelope, SignatureRoute as ApprovalSignatureRoute,
-    SigningBackend, SigningError,
+    ApprovalCard, ApprovalPayload, AuthorityKeySet, DisplayCopy, OsKeyringSigningBackend,
+    SignatureEnvelope, SignatureRoute as ApprovalSignatureRoute, SigningBackend, SigningError,
 };
 use turing_contracts::envelope::{HeadEffect, MicroEventEnvelope, PredicateProduct};
 use turing_contracts::failure::{FailureClass, FailureNodePayload};
@@ -1604,13 +1603,10 @@ fn sign_and_verify_approval(
         ApprovalSignatureRoute::OsKeyring => {
             let signer = OsKeyringSigningBackend::new(key_id);
             let signature = signer.sign(card)?;
-            signer.verify(card, &signature)?;
-            Ok(signature)
-        }
-        ApprovalSignatureRoute::InMemoryTest => {
-            let signer = InMemoryTestSigningBackend::new(key_id);
-            let signature = signer.sign(card)?;
-            InMemoryTestSigningBackend::verifier(key_id).verify(card, &signature)?;
+            let trusted_keys = AuthorityKeySet::from_record(
+                signer.authority_key_record(card.payload().authority_epoch)?,
+            );
+            signer.verify(card, &signature, &trusted_keys)?;
             Ok(signature)
         }
         other => Err(SigningError::RouteMismatch {
@@ -1670,13 +1666,8 @@ fn parse_approval_payload_for_action(
     method_name: &str,
 ) -> Result<ApprovalPayload, String> {
     let signature_route = parse_approval_signature_route(&required_str(value, "signature_route")?)?;
-    if !matches!(
-        signature_route,
-        ApprovalSignatureRoute::OsKeyring | ApprovalSignatureRoute::InMemoryTest
-    ) {
-        return Err(format!(
-            "{method_name} requires signature_route OsKeyring or InMemoryTest"
-        ));
+    if signature_route != ApprovalSignatureRoute::OsKeyring {
+        return Err(format!("{method_name} requires signature_route OsKeyring"));
     }
     let action = required_str(value, "action")?;
     if action != expected_action {

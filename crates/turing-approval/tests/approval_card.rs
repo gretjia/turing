@@ -1,6 +1,7 @@
 use turing_approval::{
-    ApprovalCard, ApprovalPayload, DisplayCopy, HardwareSigningBackend, InMemoryTestSigningBackend,
-    LocalFileSigningBackend, OsKeyringSigningBackend, SignatureRoute, SigningBackend, SigningError,
+    ApprovalCard, ApprovalPayload, AuthorityKeySet, DisplayCopy, HardwareSigningBackend,
+    InMemoryTestSigningBackend, LocalFileSigningBackend, OsKeyringSigningBackend, SignatureRoute,
+    SigningBackend, SigningError,
 };
 
 fn approval_payload() -> ApprovalPayload {
@@ -102,6 +103,11 @@ fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() 
 
     let signer = InMemoryTestSigningBackend::new("operator-local-key");
     let signature = signer.sign(&card).expect("signature envelope");
+    let trusted_keys = AuthorityKeySet::from_record(
+        signer
+            .authority_key_record(card.payload().authority_epoch)
+            .expect("trusted authority key record"),
+    );
     let surfaces = card.byte_surfaces().expect("canonical surfaces");
 
     let recomputable = format!(
@@ -112,8 +118,8 @@ fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() 
     assert_ne!(signature.signature, recomputable);
     let verifier_without_private_key = InMemoryTestSigningBackend::verifier("operator-local-key");
     verifier_without_private_key
-        .verify(&card, &signature)
-        .expect("signature verifies from envelope public key");
+        .verify(&card, &signature, &trusted_keys)
+        .expect("signature verifies from trusted key registry");
 
     let mut tampered_payload = approval_payload();
     tampered_payload.signature_route = SignatureRoute::InMemoryTest;
@@ -127,7 +133,7 @@ fn os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes() 
     );
     assert!(
         verifier_without_private_key
-            .verify(&tampered, &signature)
+            .verify(&tampered, &signature, &trusted_keys)
             .is_err()
     );
 }
@@ -146,6 +152,11 @@ fn local_file_signature_verifies_without_private_seed_after_signing() {
     let local = LocalFileSigningBackend::with_key_store_dir("operator-local-key", dir.path());
     assert!(local.exports_plaintext_key());
     let signature = local.sign(&card).expect("local file dev signature");
+    let trusted_keys = AuthorityKeySet::from_record(
+        local
+            .authority_key_record(card.payload().authority_epoch)
+            .expect("trusted local file dev key record"),
+    );
     assert_eq!(signature.signature_route, SignatureRoute::LocalFileDev);
 
     let entries: Vec<_> = std::fs::read_dir(dir.path())
@@ -161,13 +172,73 @@ fn local_file_signature_verifies_without_private_seed_after_signing() {
     let clean_verifier =
         LocalFileSigningBackend::with_key_store_dir("operator-local-key", dir.path());
     clean_verifier
-        .verify(&card, &signature)
-        .expect("verification uses public key from signature envelope, not private seed");
+        .verify(&card, &signature, &trusted_keys)
+        .expect("verification uses trusted key registry, not private seed");
     assert!(
         std::fs::read_dir(dir.path())
             .expect("read dir after verification")
             .next()
             .is_none(),
         "verification must not recreate private key material"
+    );
+}
+
+#[test]
+fn forged_public_key_with_same_key_id_is_rejected_by_trusted_key_registry() {
+    let trusted_dir = tempfile::tempdir().expect("trusted key dir");
+    let attacker_dir = tempfile::tempdir().expect("attacker key dir");
+    let card = ApprovalCard::new(
+        approval_payload_with_route(SignatureRoute::LocalFileDev),
+        DisplayCopy {
+            title_zh: "批准".to_string(),
+            body_en: "Approve.".to_string(),
+        },
+    );
+
+    let trusted_signer =
+        LocalFileSigningBackend::with_key_store_dir("operator-local-key", trusted_dir.path());
+    let trusted_keys = AuthorityKeySet::from_record(
+        trusted_signer
+            .authority_key_record(card.payload().authority_epoch)
+            .expect("trusted authority key record"),
+    );
+
+    let attacker_signer =
+        LocalFileSigningBackend::with_key_store_dir("operator-local-key", attacker_dir.path());
+    let forged_signature = attacker_signer
+        .sign(&card)
+        .expect("attacker can make a mathematically valid signature");
+
+    assert!(
+        trusted_signer
+            .verify(&card, &forged_signature, &trusted_keys)
+            .is_err(),
+        "same key_id plus envelope-provided public key must not establish authority"
+    );
+}
+
+#[test]
+fn signature_authority_epoch_must_match_signed_payload_epoch() {
+    let card = ApprovalCard::new(
+        approval_payload_with_route(SignatureRoute::InMemoryTest),
+        DisplayCopy {
+            title_zh: "批准".to_string(),
+            body_en: "Approve.".to_string(),
+        },
+    );
+    let signer = InMemoryTestSigningBackend::new("operator-local-key");
+    let mut signature = signer.sign(&card).expect("signature envelope");
+    let trusted_keys = AuthorityKeySet::from_record(
+        signer
+            .authority_key_record(card.payload().authority_epoch)
+            .expect("trusted authority key record"),
+    );
+    signature.authority_epoch += 1;
+
+    assert!(
+        InMemoryTestSigningBackend::verifier("operator-local-key")
+            .verify(&card, &signature, &trusted_keys)
+            .is_err(),
+        "envelope authority_epoch must match the signed ApprovalPayload epoch"
     );
 }

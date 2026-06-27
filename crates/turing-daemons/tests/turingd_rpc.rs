@@ -879,7 +879,7 @@ fn turingd_verify_write_rejects_extra_truthy_candidate_fields() {
 }
 
 #[test]
-fn turingd_authorizes_atom_with_approval_card_without_accepting() {
+fn turingd_rejects_in_memory_test_atom_authorization_without_moving_authorization_head() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");
     std::fs::create_dir(&repo).expect("create micro git dir");
@@ -910,7 +910,7 @@ fn turingd_authorizes_atom_with_approval_card_without_accepting() {
 
     wait_for_socket(&socket, &mut child);
 
-    let approved = rpc_params(
+    let rejected = rpc_params(
         &socket,
         "approval.authorize_atom",
         json!({
@@ -931,38 +931,21 @@ fn turingd_authorizes_atom_with_approval_card_without_accepting() {
             }
         }),
     );
-    let event_id = approved["result"]["event_id"]
-        .as_str()
-        .expect("authorization event id")
-        .to_string();
-    assert_eq!(approved["result"]["event_type"], "AtomAuthorized");
-    assert_eq!(approved["result"]["authorization_head_moved"], true);
-    assert_eq!(approved["result"]["accepted_head_moved"], false);
-    assert_eq!(
-        approved["result"]["head_set"]["authorization_head"],
-        event_id
-    );
-    assert_eq!(
-        approved["result"]["head_set"]["accepted_head"],
-        genesis.event_id
-    );
-    assert_eq!(
-        approved["result"]["visible_card_hash"],
-        approved["result"]["signed_payload_hash"]
-    );
-    assert_eq!(approved["result"]["signature_route"], "InMemoryTest");
+
+    assert_eq!(rejected["error"]["code"], -32602);
     assert!(
-        approved["result"]["public_key_fingerprint"]
+        rejected["error"]["message"]
             .as_str()
-            .expect("public key fingerprint")
-            .starts_with("sha256:")
+            .expect("error message")
+            .contains("requires signature_route OsKeyring")
     );
-    assert!(
-        approved["result"]["verifying_key"]
-            .as_str()
-            .expect("verifying key")
-            .starts_with("ed25519-pub:")
-    );
+    let heads = Append::open(&repo)
+        .expect("reopen tape")
+        .head_set_guarded()
+        .expect("head set")
+        .expect("heads exist");
+    assert_eq!(heads.authorization_head, None);
+    assert_eq!(heads.accepted_head, genesis.event_id);
 
     let shutdown = rpc(&socket, "daemon.shutdown");
     assert_eq!(shutdown["result"]["shutdown"], true);
@@ -1080,7 +1063,7 @@ fn turingd_goal_submit_validates_goal_state_before_append() {
 }
 
 #[test]
-fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
+fn turingd_rejects_in_memory_test_capsule_approval_without_moving_authorization_head() {
     let dir = tempfile::tempdir().expect("temp dir");
     let repo = dir.path().join("micro.git");
     std::fs::create_dir(&repo).expect("create micro git dir");
@@ -1111,7 +1094,7 @@ fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
 
     wait_for_socket(&socket, &mut child);
 
-    let approved = rpc_params(
+    let rejected = rpc_params(
         &socket,
         "capsule.approve",
         json!({
@@ -1132,39 +1115,21 @@ fn turingd_capsule_approve_authorizes_dispatch_without_accepting() {
             }
         }),
     );
-    let event_id = approved["result"]["event_id"]
-        .as_str()
-        .expect("authorization event id")
-        .to_string();
-    assert_eq!(approved["result"]["event_type"], "WorkerDispatchAuthorized");
-    assert_eq!(approved["result"]["capsule_id"], "wc_rpc");
-    assert_eq!(approved["result"]["authorization_head_moved"], true);
-    assert_eq!(approved["result"]["accepted_head_moved"], false);
-    assert_eq!(
-        approved["result"]["head_set"]["authorization_head"],
-        event_id
-    );
-    assert_eq!(
-        approved["result"]["head_set"]["accepted_head"],
-        genesis.event_id
-    );
-    assert_eq!(
-        approved["result"]["visible_card_hash"],
-        approved["result"]["signed_payload_hash"]
-    );
-    assert_eq!(approved["result"]["signature_route"], "InMemoryTest");
+
+    assert_eq!(rejected["error"]["code"], -32602);
     assert!(
-        approved["result"]["public_key_fingerprint"]
+        rejected["error"]["message"]
             .as_str()
-            .expect("public key fingerprint")
-            .starts_with("sha256:")
+            .expect("error message")
+            .contains("requires signature_route OsKeyring")
     );
-    assert!(
-        approved["result"]["verifying_key"]
-            .as_str()
-            .expect("verifying key")
-            .starts_with("ed25519-pub:")
-    );
+    let heads = Append::open(&repo)
+        .expect("reopen tape")
+        .head_set_guarded()
+        .expect("head set")
+        .expect("heads exist");
+    assert_eq!(heads.authorization_head, None);
+    assert_eq!(heads.accepted_head, genesis.event_id);
 
     let shutdown = rpc(&socket, "daemon.shutdown");
     assert_eq!(shutdown["result"]["shutdown"], true);

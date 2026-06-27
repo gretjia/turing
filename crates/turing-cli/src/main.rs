@@ -3,8 +3,9 @@ use std::process::ExitCode;
 
 use serde_json::json;
 use turing_approval::{
-    APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, DisplayCopy, HardwareSigningBackend,
-    InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute, SigningBackend,
+    APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, AuthorityKeySet, DisplayCopy,
+    HardwareSigningBackend, InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute,
+    SigningBackend,
 };
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
@@ -193,27 +194,50 @@ fn approval_sign(
         evidence_digest,
         signature_route,
     )?;
-    let signature = match card.payload().signature_route {
-        SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id).sign(&card),
-        SignatureRoute::InMemoryTest => InMemoryTestSigningBackend::new(key_id).sign(&card),
-        SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id).sign(&card),
+    let (signature, trusted_keys) = match card.payload().signature_route {
+        SignatureRoute::OsKeyring => {
+            let signer = OsKeyringSigningBackend::new(key_id);
+            let signature = signer.sign(&card);
+            let trusted_keys = signer
+                .authority_key_record(card.payload().authority_epoch)
+                .map(AuthorityKeySet::from_record);
+            (signature, trusted_keys)
+        }
+        SignatureRoute::InMemoryTest => {
+            let signer = InMemoryTestSigningBackend::new(key_id);
+            let signature = signer.sign(&card);
+            let trusted_keys = signer
+                .authority_key_record(card.payload().authority_epoch)
+                .map(AuthorityKeySet::from_record);
+            (signature, trusted_keys)
+        }
+        SignatureRoute::HardwareFuture => {
+            let signer = HardwareSigningBackend::slot(key_id);
+            let signature = signer.sign(&card);
+            let trusted_keys = signer
+                .authority_key_record(card.payload().authority_epoch)
+                .map(AuthorityKeySet::from_record);
+            (signature, trusted_keys)
+        }
         SignatureRoute::LocalFileDev => {
             return Err("approval sign does not expose local-file dev signing".to_string());
         }
         SignatureRoute::None => {
             return Err("approval sign requires a signing route, got none".to_string());
         }
-    }
-    .map_err(|error| format!("approval signing failed: {error}"))?;
+    };
+    let signature = signature.map_err(|error| format!("approval signing failed: {error}"))?;
+    let trusted_keys =
+        trusted_keys.map_err(|error| format!("approval authority key lookup failed: {error}"))?;
     match card.payload().signature_route {
         SignatureRoute::OsKeyring => OsKeyringSigningBackend::new(key_id)
-            .verify(&card, &signature)
+            .verify(&card, &signature, &trusted_keys)
             .map_err(|error| format!("approval verification failed: {error}"))?,
         SignatureRoute::InMemoryTest => InMemoryTestSigningBackend::verifier(key_id)
-            .verify(&card, &signature)
+            .verify(&card, &signature, &trusted_keys)
             .map_err(|error| format!("approval verification failed: {error}"))?,
         SignatureRoute::HardwareFuture => HardwareSigningBackend::slot(key_id)
-            .verify(&card, &signature)
+            .verify(&card, &signature, &trusted_keys)
             .map_err(|error| format!("approval verification failed: {error}"))?,
         SignatureRoute::LocalFileDev => unreachable!(),
         SignatureRoute::None => unreachable!(),

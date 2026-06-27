@@ -130,6 +130,54 @@ pub struct SignatureEnvelope {
     pub signature: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AuthorityKeyRecord {
+    pub schema_id: String,
+    pub key_id: String,
+    pub authority_epoch: u64,
+    pub signature_route: SignatureRoute,
+    pub public_key_fingerprint: String,
+    pub verifying_key: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct AuthorityKeySet {
+    records: BTreeMap<String, AuthorityKeyRecord>,
+}
+
+impl AuthorityKeySet {
+    #[must_use]
+    pub fn from_record(record: AuthorityKeyRecord) -> Self {
+        let mut set = AuthorityKeySet::default();
+        set.insert(record);
+        set
+    }
+
+    pub fn insert(&mut self, record: AuthorityKeyRecord) {
+        self.records.insert(
+            authority_key_lookup_key(
+                &record.key_id,
+                record.authority_epoch,
+                record.signature_route,
+            ),
+            record,
+        );
+    }
+
+    fn get(
+        &self,
+        key_id: &str,
+        authority_epoch: u64,
+        signature_route: SignatureRoute,
+    ) -> Option<&AuthorityKeyRecord> {
+        self.records.get(&authority_key_lookup_key(
+            key_id,
+            authority_epoch,
+            signature_route,
+        ))
+    }
+}
+
 pub trait SigningBackend {
     fn key_id(&self) -> &str;
     fn route(&self) -> SignatureRoute;
@@ -140,10 +188,16 @@ pub trait SigningBackend {
 
     fn sign(&self, card: &ApprovalCard) -> Result<SignatureEnvelope, SigningError>;
 
+    fn authority_key_record(
+        &self,
+        authority_epoch: u64,
+    ) -> Result<AuthorityKeyRecord, SigningError>;
+
     fn verify(
         &self,
         card: &ApprovalCard,
         signature: &SignatureEnvelope,
+        trusted_keys: &AuthorityKeySet,
     ) -> Result<(), SigningError>;
 }
 
@@ -513,12 +567,26 @@ impl SigningBackend for OsKeyringSigningBackend {
         ))
     }
 
+    fn authority_key_record(
+        &self,
+        authority_epoch: u64,
+    ) -> Result<AuthorityKeyRecord, SigningError> {
+        let signing_key = self.load_or_create_signing_key()?;
+        Ok(authority_key_record(
+            &self.key_id,
+            authority_epoch,
+            SignatureRoute::OsKeyring,
+            &signing_key,
+        ))
+    }
+
     fn verify(
         &self,
         card: &ApprovalCard,
         signature: &SignatureEnvelope,
+        trusted_keys: &AuthorityKeySet,
     ) -> Result<(), SigningError> {
-        verify_signature_with_public_key(card, signature, SignatureRoute::OsKeyring, &self.key_id)
+        verify_signature_with_authority_keys(card, signature, trusted_keys, &self.key_id)
     }
 }
 
@@ -551,17 +619,26 @@ impl SigningBackend for InMemoryTestSigningBackend {
         ))
     }
 
+    fn authority_key_record(
+        &self,
+        authority_epoch: u64,
+    ) -> Result<AuthorityKeyRecord, SigningError> {
+        let signing_key = self.signing_key()?;
+        Ok(authority_key_record(
+            &self.key_id,
+            authority_epoch,
+            SignatureRoute::InMemoryTest,
+            &signing_key,
+        ))
+    }
+
     fn verify(
         &self,
         card: &ApprovalCard,
         signature: &SignatureEnvelope,
+        trusted_keys: &AuthorityKeySet,
     ) -> Result<(), SigningError> {
-        verify_signature_with_public_key(
-            card,
-            signature,
-            SignatureRoute::InMemoryTest,
-            &self.key_id,
-        )
+        verify_signature_with_authority_keys(card, signature, trusted_keys, &self.key_id)
     }
 }
 
@@ -598,17 +675,26 @@ impl SigningBackend for LocalFileSigningBackend {
         ))
     }
 
+    fn authority_key_record(
+        &self,
+        authority_epoch: u64,
+    ) -> Result<AuthorityKeyRecord, SigningError> {
+        let signing_key = self.load_or_create_signing_key()?;
+        Ok(authority_key_record(
+            &self.key_id,
+            authority_epoch,
+            SignatureRoute::LocalFileDev,
+            &signing_key,
+        ))
+    }
+
     fn verify(
         &self,
         card: &ApprovalCard,
         signature: &SignatureEnvelope,
+        trusted_keys: &AuthorityKeySet,
     ) -> Result<(), SigningError> {
-        verify_signature_with_public_key(
-            card,
-            signature,
-            SignatureRoute::LocalFileDev,
-            &self.key_id,
-        )
+        verify_signature_with_authority_keys(card, signature, trusted_keys, &self.key_id)
     }
 }
 
@@ -641,10 +727,20 @@ impl SigningBackend for HardwareSigningBackend {
         })
     }
 
+    fn authority_key_record(
+        &self,
+        _authority_epoch: u64,
+    ) -> Result<AuthorityKeyRecord, SigningError> {
+        Err(SigningError::HardwareBackendUnavailable {
+            slot_id: self.slot_id.clone(),
+        })
+    }
+
     fn verify(
         &self,
         _card: &ApprovalCard,
         _signature: &SignatureEnvelope,
+        _trusted_keys: &AuthorityKeySet,
     ) -> Result<(), SigningError> {
         Err(SigningError::HardwareBackendUnavailable {
             slot_id: self.slot_id.clone(),
@@ -705,6 +801,11 @@ pub enum SigningError {
     SignatureVerificationFailed {
         key_id: String,
     },
+    AuthorityKeyNotTrusted {
+        key_id: String,
+        authority_epoch: u64,
+        signature_route: SignatureRoute,
+    },
     TestSigningKeyUnavailable {
         key_id: String,
     },
@@ -738,6 +839,14 @@ impl std::fmt::Display for SigningError {
             SigningError::SignatureVerificationFailed { key_id } => {
                 write!(f, "signature verification failed for key_id {key_id:?}")
             }
+            SigningError::AuthorityKeyNotTrusted {
+                key_id,
+                authority_epoch,
+                signature_route,
+            } => write!(
+                f,
+                "authority key is not trusted for key_id {key_id:?}, authority_epoch {authority_epoch}, route {signature_route:?}"
+            ),
             SigningError::TestSigningKeyUnavailable { key_id } => {
                 write!(f, "in-memory test signing key {key_id:?} is verifier-only")
             }
@@ -763,6 +872,31 @@ fn digest(bytes: &[u8]) -> String {
     format!("sha256:{}", jcs::sha256_hex(bytes))
 }
 
+fn authority_key_lookup_key(
+    key_id: &str,
+    authority_epoch: u64,
+    signature_route: SignatureRoute,
+) -> String {
+    format!("{key_id}\n{authority_epoch}\n{signature_route:?}")
+}
+
+fn authority_key_record(
+    key_id: &str,
+    authority_epoch: u64,
+    signature_route: SignatureRoute,
+    signing_key: &SigningKey,
+) -> AuthorityKeyRecord {
+    let verifying_key = signing_key.verifying_key();
+    AuthorityKeyRecord {
+        schema_id: "authority_key_record.v1".to_string(),
+        key_id: key_id.to_string(),
+        authority_epoch,
+        signature_route,
+        public_key_fingerprint: public_key_fingerprint(&verifying_key),
+        verifying_key: encode_verifying_key(&verifying_key),
+    }
+}
+
 fn signature_envelope(
     key_id: &str,
     authority_epoch: u64,
@@ -784,10 +918,10 @@ fn signature_envelope(
     }
 }
 
-fn verify_signature_with_public_key(
+pub fn verify_signature_with_authority_keys(
     card: &ApprovalCard,
     signature: &SignatureEnvelope,
-    expected_route: SignatureRoute,
+    trusted_keys: &AuthorityKeySet,
     expected_key_id: &str,
 ) -> Result<(), SigningError> {
     if signature.schema_id != "approval_signature.v1" {
@@ -795,15 +929,20 @@ fn verify_signature_with_public_key(
             key_id: signature.key_id.clone(),
         });
     }
-    if signature.signature_route != expected_route {
-        return Err(SigningError::RouteMismatch {
-            expected: expected_route,
-            observed: signature.signature_route,
-        });
-    }
     if signature.key_id != expected_key_id {
         return Err(SigningError::SignatureVerificationFailed {
             key_id: signature.key_id.clone(),
+        });
+    }
+    if signature.authority_epoch != card.payload().authority_epoch {
+        return Err(SigningError::SignatureVerificationFailed {
+            key_id: expected_key_id.to_string(),
+        });
+    }
+    if signature.signature_route != card.payload().signature_route {
+        return Err(SigningError::RouteMismatch {
+            expected: card.payload().signature_route,
+            observed: signature.signature_route,
         });
     }
     let bytes = card.canonical_bytes()?;
@@ -812,8 +951,30 @@ fn verify_signature_with_public_key(
             key_id: expected_key_id.to_string(),
         });
     }
-    let verifying_key = decode_verifying_key(&signature.verifying_key)?;
-    if signature.public_key_fingerprint != public_key_fingerprint(&verifying_key) {
+    let Some(record) = trusted_keys.get(
+        &signature.key_id,
+        signature.authority_epoch,
+        signature.signature_route,
+    ) else {
+        return Err(SigningError::AuthorityKeyNotTrusted {
+            key_id: signature.key_id.clone(),
+            authority_epoch: signature.authority_epoch,
+            signature_route: signature.signature_route,
+        });
+    };
+    if record.schema_id != "authority_key_record.v1"
+        || record.key_id != signature.key_id
+        || record.authority_epoch != signature.authority_epoch
+        || record.signature_route != signature.signature_route
+        || record.public_key_fingerprint != signature.public_key_fingerprint
+        || record.verifying_key != signature.verifying_key
+    {
+        return Err(SigningError::SignatureVerificationFailed {
+            key_id: expected_key_id.to_string(),
+        });
+    }
+    let verifying_key = decode_verifying_key(&record.verifying_key)?;
+    if record.public_key_fingerprint != public_key_fingerprint(&verifying_key) {
         return Err(SigningError::SignatureVerificationFailed {
             key_id: expected_key_id.to_string(),
         });
