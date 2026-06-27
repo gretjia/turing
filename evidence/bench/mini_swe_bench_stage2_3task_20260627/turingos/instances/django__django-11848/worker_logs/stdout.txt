@@ -1,0 +1,28 @@
+**Patch created and left in the worktree** (only [django/utils/http.py](/tmp/turingos_substrate_worktrees_stage2/d3c3c674819ca7f5/django/utils/http.py) was edited).
+
+```diff
+diff --git a/django/utils/http.py b/django/utils/http.py
+index 572cfb4347..a683a4dd88 100644
+--- a/django/utils/http.py
++++ b/django/utils/http.py
+@@ -176,10 +176,10 @@ def parse_http_date(date):
+     try:
+         year = int(m.group('year'))
+         if year < 100:
+-            if year < 70:
+-                year += 2000
+-            else:
+-                year += 1900
++            current_year = datetime.datetime.utcnow().year
++            year += current_year // 100 * 100
++            if year > current_year + 50:
++                year -= 100
+         month = MONTHS.index(m.group('mon').lower()) + 1
+         day = int(m.group('day'))
+         hour = int(m.group('hour'))
+```
+
+Relevant tests (covering RFC850 two-digit years, the year<100 branch, etc.) pass with the change:
+- `python3 tests/runtests.py utils_tests.test_http.HttpDateProcessingTests -v 2` (and equivalent) → 5/5 passed.
+
+The change is the minimal replacement of the hardcoded cutoff (per the RFC 7231 rule quoted in the task) using the current year for the >50yr-future rollback. (No other files were modified.)

@@ -1,0 +1,5 @@
+**The worktree has been successfully edited with a candidate patch for django__django-11790 (see `git diff`).** 
+
+(The minimal change ensures `maxlength` is populated on the widget (for HTML rendering of `AuthenticationForm.username`) at the same time the post-`__init__` `max_length` override from the user model's `USERNAME_FIELD` (or default) is applied. This addresses the root cause of the regression from 5ceaf14686 without side effects on field subclassing, custom user models, `IntegerField` username overrides, validators, or any existing tests.) 
+
+No other files were modified.

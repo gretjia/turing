@@ -42,21 +42,29 @@ def read_optional(path: Path, limit: int = 6000) -> str:
 
 
 def build_review_payload(evidence_dir: Path) -> tuple[str, dict[str, Any]]:
-    coverage_audit = load_json(evidence_dir / "substrate_coverage_audit.json")
-    coverage = load_json(evidence_dir / "substrate_coverage.json")
-    smoke = load_json(evidence_dir / "substrate_smoke_result.json")
-    run = coverage.get("turingos_arm_runs", [{}])[0]
-    if not isinstance(run, dict):
-        run = {}
+    substrate_dir = evidence_dir
+    if not (substrate_dir / "substrate_coverage.json").exists() and (evidence_dir / "turingos" / "substrate_coverage.json").exists():
+        substrate_dir = evidence_dir / "turingos"
+    coverage_audit = load_json(substrate_dir / "substrate_coverage_audit.json")
+    coverage = load_json(substrate_dir / "substrate_coverage.json")
+    smoke = load_json(substrate_dir / "substrate_smoke_result.json")
+    runs = [run for run in coverage.get("turingos_arm_runs", []) if isinstance(run, dict)]
+    first_run = runs[0] if runs else {}
+    direct_roots = [evidence_dir / "direct", evidence_dir]
+    direct_results = []
+    for direct_root in direct_roots:
+        if not direct_root.exists():
+            continue
+        for result_path in sorted(direct_root.glob("direct_baseline_*/result.json")):
+            direct_results.append(load_json(result_path))
+    patch_eval = None
+    patch_eval_path = evidence_dir / "patch_eval" / "patch_eval_summary.json"
+    if patch_eval_path.exists():
+        patch_eval = load_json(patch_eval_path)
 
-    worker_logs = evidence_dir / "instances" / str(run.get("instance_id", "")) / "worker_logs"
-    direct = evidence_dir / "direct_baseline_django__django-11790"
-    context = {
-        "schema_id": "MetaAIReviewContext.v1",
-        "evidence_dir": str(evidence_dir),
-        "substrate_smoke_result": smoke,
-        "substrate_coverage_audit": coverage_audit,
-        "turingos_worker": {
+    def worker_summary(run: dict[str, Any]) -> dict[str, Any]:
+        worker_logs = substrate_dir / "instances" / str(run.get("instance_id", "")) / "worker_logs"
+        return {
             "instance_id": run.get("instance_id"),
             "worker_mode": run.get("worker_mode"),
             "worker_id": run.get("worker_id"),
@@ -64,14 +72,24 @@ def build_review_payload(evidence_dir: Path) -> tuple[str, dict[str, Any]]:
             "predicate_write_event_type": run.get("predicate_write_event_type"),
             "process_calls": run.get("process_calls"),
             "event_calls": run.get("event_calls"),
-        },
-        "turingos_patch_hash": sha256_text(read_optional(worker_logs / "diff.patch", limit=100000)),
-        "turingos_patch_excerpt": read_optional(worker_logs / "diff.patch"),
-        "turingos_worker_stdout_excerpt": read_optional(worker_logs / "stdout.txt", limit=2000),
-        "turingos_worker_stderr_excerpt": read_optional(worker_logs / "stderr.txt", limit=2000),
-        "direct_baseline_result": load_json(direct / "result.json") if (direct / "result.json").exists() else None,
-        "direct_baseline_patch_hash": sha256_text(read_optional(direct / "diff.patch", limit=100000)),
-        "direct_baseline_patch_excerpt": read_optional(direct / "diff.patch"),
+            "patch_hash": sha256_text(read_optional(worker_logs / "diff.patch", limit=100000)),
+            "patch_excerpt": read_optional(worker_logs / "diff.patch"),
+            "stderr_excerpt": read_optional(worker_logs / "stderr.txt", limit=2000),
+        }
+
+    first_worker_logs = substrate_dir / "instances" / str(first_run.get("instance_id", "")) / "worker_logs"
+    context = {
+        "schema_id": "MetaAIReviewContext.v1",
+        "evidence_dir": str(evidence_dir),
+        "substrate_smoke_result": smoke,
+        "substrate_coverage_audit": coverage_audit,
+        "turingos_workers": [worker_summary(run) for run in runs],
+        "turingos_patch_hash": sha256_text(read_optional(first_worker_logs / "diff.patch", limit=100000)),
+        "turingos_patch_excerpt": read_optional(first_worker_logs / "diff.patch"),
+        "turingos_worker_stdout_excerpt": read_optional(first_worker_logs / "stdout.txt", limit=2000),
+        "turingos_worker_stderr_excerpt": read_optional(first_worker_logs / "stderr.txt", limit=2000),
+        "direct_baseline_results": direct_results,
+        "patch_eval_summary": patch_eval,
         "truth_boundary": {
             "meta_ai_authority": "none",
             "accepted_head_policy": "predicate_only",

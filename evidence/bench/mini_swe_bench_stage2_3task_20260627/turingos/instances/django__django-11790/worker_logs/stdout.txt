@@ -1,0 +1,29 @@
+**Patch applied** (only [django/contrib/auth/forms.py](/tmp/turingos_substrate_worktrees_stage2/ab5ec833857dd459/django/contrib/auth/forms.py) touched):
+
+```diff
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index a0cfed0995..b4fb55c1b4 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -191,7 +191,9 @@ class AuthenticationForm(forms.Form):
+
+         # Set the max length and label for the "username" field.
+         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+-        self.fields['username'].max_length = self.username_field.max_length or 254
++        username_max_length = self.username_field.max_length or 254
++        self.fields['username'].max_length = username_max_length
++        self.fields['username'].widget.attrs['maxlength'] = username_max_length
+         if self.fields['username'].label is None:
+             self.fields['username'].label = capfirst(self.username_field.verbose_name)
+```
+
+(The root cause was the post-`super().__init__()` `max_length` assignment in `AuthenticationForm.__init__` (from the #27515 regression); `CharField` (and `UsernameField.widget_attrs`) bakes `'maxlength'` into `widget.attrs` only at field construction time.)
+
+Verification (manual repro + relevant tests):
+- `AuthenticationForm()['username']` now renders with `maxlength="..."` (pulled from `UserModel.USERNAME_FIELD` or default 254).
+- Subclass overrides (e.g. `username = CharField(max_length=75)`) now also get the correct baked-in attr.
+- `auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_*` pass. 
+
+Worktree left with this minimal patch.(The old background `git log` was just noise from an early timeout; it only showed the known regression commit 5ceaf14686 we already addressed. No action needed.)
+
+Patch remains in the worktree (verified + tests green). Task complete.

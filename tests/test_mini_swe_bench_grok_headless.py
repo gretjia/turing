@@ -10,11 +10,21 @@ AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_plan.py"
 SUBSTRATE_AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_substrate_coverage.py"
 SUBSTRATE_SMOKE = REPO / "tools" / "bench" / "run_mini_swe_bench_substrate_smoke.py"
 META_REVIEW = REPO / "tools" / "bench" / "run_deepseek_meta_review.py"
+DIRECT_BASELINE = REPO / "tools" / "bench" / "run_direct_grok_baseline_smoke.py"
+PATCH_EVAL = REPO / "tools" / "bench" / "evaluate_django_swe_bench_patches.py"
 SMOKE = REPO / "tools" / "bench" / "smoke_mini_swe_bench_grok_headless.sh"
 
 
 def load_harness():
     spec = importlib.util.spec_from_file_location("mini_swe_bench_grok_headless", HARNESS)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_module(path: Path, module_name: str):
+    spec = importlib.util.spec_from_file_location(module_name, path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -628,3 +638,62 @@ def test_meta_ai_review_missing_key_is_not_run_and_does_not_serialize_secret(tmp
     assert packet["credential_material"] == "env_only_not_serialized"
     assert "DEEPSEEK_API_KEY" in packet["missing_env"]
     assert "sk-" not in out.read_text(encoding="utf-8")
+
+
+def test_direct_baseline_dry_run_writes_redacted_commands(tmp_path):
+    tasks = tmp_path / "tasks.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "django__django-11790",
+                "repo": "django/django",
+                "base_commit": "b1d6b35e146aea83b171c1b921178bbaae2795ed",
+                "problem_statement": "Fix the failing regression.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "baseline"
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(DIRECT_BASELINE),
+            "--tasks-jsonl",
+            str(tasks),
+            "--out-dir",
+            str(out_dir),
+            "--limit",
+            "1",
+            "--dry-run",
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    summary = json.loads((out_dir / "direct_baseline_summary.json").read_text(encoding="utf-8"))
+    assert summary["sample_size"] == 1
+    command = json.loads(
+        (out_dir / "direct_baseline_django__django-11790" / "command.json").read_text(encoding="utf-8")
+    )
+    assert "<direct_baseline_prompt>" in command["argv"]
+    assert "Fix the failing regression" not in json.dumps(command)
+
+
+def test_django_fail_to_pass_labels_convert_to_runtests_labels():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    labels = evaluator.django_test_labels(
+        [
+            "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+            "already.runnable.Label",
+        ]
+    )
+
+    assert labels == [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "already.runnable.Label",
+    ]
