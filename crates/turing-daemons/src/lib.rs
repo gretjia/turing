@@ -17,7 +17,10 @@ use turing_contracts::failure::{FailureClass, FailureNodePayload};
 use turing_contracts::goal::GoalState;
 use turing_contracts::jcs;
 use turing_contracts::registry;
-use turing_economy::{CandidateRoute, MarketRouter, MarketRouterMode, PriceSignal};
+use turing_economy::{
+    AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay, MarketRouter,
+    MarketRouterMode, MarketSettled, PositionMinted, PriceSignal, RewardDistributed,
+};
 use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
     SignatureRoute, ToolRequest,
@@ -230,6 +233,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         }
         Some("market.shadow.suggest") if runtime.contract.role == "turing-marketd" => {
             market_shadow_suggest_response(request, id)
+        }
+        Some("market.snapshot.write") if runtime.contract.role == "turing-marketd" => {
+            market_snapshot_write_response(runtime, request, id)
         }
         Some("pput.prompt.validate") if runtime.contract.role == "turing-pputd" => {
             pput_prompt_validate_response(request, id)
@@ -922,6 +928,119 @@ fn market_shadow_suggest_response(request: &Value, id: Value) -> Value {
     }
 }
 
+fn market_snapshot_write_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(project_root) = &runtime.project_root else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "market.snapshot.write requires --project".to_string(),
+        );
+    };
+    let project_root = match std::fs::canonicalize(project_root) {
+        Ok(path) => path,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot resolve project root: {error}"));
+        }
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let events = match parse_economy_events(params) {
+        Ok(events) => events,
+        Err(message) => return invalid_params(id, message),
+    };
+    let replay = match MarketReplay::from_tape_events(&events) {
+        Ok(replay) => replay,
+        Err(error) => return jsonrpc_error(id, -32000, format!("market replay failed: {error}")),
+    };
+
+    let state_dir = project_root.join(".turingos");
+    if let Err(error) = std::fs::create_dir_all(&state_dir) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot create {}: {error}", state_dir.display()),
+        );
+    }
+    let snapshot_path = state_dir.join("market_projection.json");
+    let mut markets = serde_json::Map::new();
+    for (market_id, market) in &replay.markets {
+        markets.insert(
+            market_id.clone(),
+            json!({
+                "market_id": market.market_id,
+                "pool_y": market.pool_y,
+                "pool_n": market.pool_n,
+                "status": market.status,
+                "settlement_result": market.settlement_result,
+            }),
+        );
+    }
+    let mut snapshot = json!({
+        "schema_id": "market_projection_snapshot.v1",
+        "source": replay.source,
+        "market_count": replay.markets.len(),
+        "markets": markets,
+        "price_not_truth": true,
+        "truth_source": "micro_tape",
+        "emits_authorization": false,
+        "can_move_accepted_head": false,
+        "head_effect": "PRESERVE",
+    });
+    let preimage = match jcs::canonicalize(&snapshot) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("market projection canonicalization failed: {error}"),
+            );
+        }
+    };
+    let market_projection_hash = format!("sha256:{}", jcs::sha256_hex(&preimage));
+    snapshot
+        .as_object_mut()
+        .expect("snapshot is object")
+        .insert(
+            "market_projection_hash".to_string(),
+            Value::String(market_projection_hash.clone()),
+        );
+    let text = match serde_json::to_string(&snapshot) {
+        Ok(text) => text,
+        Err(error) => {
+            return jsonrpc_error(
+                id,
+                -32000,
+                format!("market snapshot serialization failed: {error}"),
+            );
+        }
+    };
+    if let Err(error) = std::fs::write(&snapshot_path, text) {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!("cannot write {}: {error}", snapshot_path.display()),
+        );
+    }
+
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "schema_id": "market_projection_snapshot.v1",
+            "source": snapshot["source"],
+            "market_count": snapshot["market_count"],
+            "price_not_truth": snapshot["price_not_truth"],
+            "emits_authorization": snapshot["emits_authorization"],
+            "can_move_accepted_head": snapshot["can_move_accepted_head"],
+            "head_effect": snapshot["head_effect"],
+            "market_projection_hash": market_projection_hash,
+            "snapshot_path": snapshot_path.to_string_lossy(),
+        }
+    })
+}
+
 fn pput_prompt_validate_response(request: &Value, id: Value) -> Value {
     let params = match request.get("params") {
         Some(params) => params,
@@ -1303,6 +1422,39 @@ fn parse_routes(params: &Value) -> Result<Vec<CandidateRoute>, String> {
             })
         })
         .collect()
+}
+
+fn parse_economy_events(params: &Value) -> Result<Vec<EconomyEvent>, String> {
+    let events = params
+        .get("events")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "events array is required".to_string())?;
+    events.iter().map(parse_economy_event).collect()
+}
+
+fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
+    let Some(event_type) = value.get("event_type").and_then(Value::as_str) else {
+        return serde_json::from_value(value.clone())
+            .map_err(|error| format!("invalid economy event: {error}"));
+    };
+    match event_type {
+        "MarketCreated" => serde_json::from_value::<MarketCreated>(value.clone())
+            .map(EconomyEvent::MarketCreated)
+            .map_err(|error| format!("invalid MarketCreated: {error}")),
+        "PositionMinted" => serde_json::from_value::<PositionMinted>(value.clone())
+            .map(EconomyEvent::PositionMinted)
+            .map_err(|error| format!("invalid PositionMinted: {error}")),
+        "AMMSwapExecuted" => serde_json::from_value::<AmmSwapExecuted>(value.clone())
+            .map(EconomyEvent::AmmSwapExecuted)
+            .map_err(|error| format!("invalid AMMSwapExecuted: {error}")),
+        "MarketSettled" => serde_json::from_value::<MarketSettled>(value.clone())
+            .map(EconomyEvent::MarketSettled)
+            .map_err(|error| format!("invalid MarketSettled: {error}")),
+        "RewardDistributed" => serde_json::from_value::<RewardDistributed>(value.clone())
+            .map(EconomyEvent::RewardDistributed)
+            .map_err(|error| format!("invalid RewardDistributed: {error}")),
+        other => Err(format!("unknown economy event_type {other:?}")),
+    }
 }
 
 fn parse_signals(params: &Value) -> Result<Vec<PriceSignal>, String> {

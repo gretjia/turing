@@ -21,6 +21,8 @@ fn final_handoff_references_heads_replay_market_pput_and_risks() {
         "turing replay --verify",
         "turing audit market",
         "turing audit pput",
+        "market projection",
+        "price_not_truth=true",
         "Known Risks",
     ] {
         assert!(text.contains(required), "handoff missing {required:?}");

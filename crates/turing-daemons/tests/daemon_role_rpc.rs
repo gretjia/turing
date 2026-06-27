@@ -63,6 +63,93 @@ fn marketd_serves_shadow_suggestions_without_authority() {
 }
 
 #[test]
+fn marketd_writes_project_scoped_market_snapshot_without_truth_authority() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let project = dir.path().join("project");
+    std::fs::create_dir(&project).expect("create project dir");
+    let state_dir = project.join(".turingos");
+    std::fs::create_dir(&state_dir).expect("create state dir");
+    let project_root = std::fs::canonicalize(&project).expect("canonical project");
+    std::fs::write(
+        state_dir.join("project.json"),
+        json!({
+            "schema_id": "operator_project.v1",
+            "project_root": project_root.to_str().expect("UTF-8 project path"),
+            "truth_source": "micro_tape",
+            "can_write_micro_truth": false,
+            "credential_material_included": false
+        })
+        .to_string(),
+    )
+    .expect("write project metadata");
+
+    let socket = dir.path().join("marketd-snapshot.sock");
+    let mut child = spawn_daemon_with_project("turing-marketd", &socket, &project);
+    wait_for_socket(&socket, &mut child);
+
+    let response = rpc(
+        &socket,
+        "market.snapshot.write",
+        json!({
+            "events": [
+                {
+                    "event_type": "MarketCreated",
+                    "schema_id": "market_created.v1",
+                    "head_effect": "PRESERVE",
+                    "market_id": "mkt_snapshot",
+                    "initial_pool_y": "100",
+                    "initial_pool_n": "100",
+                    "k": "10000",
+                    "truth_status": "statistical_signal_only"
+                },
+                {
+                    "event_type": "MarketSettled",
+                    "schema_id": "market_settled.v1",
+                    "market_id": "mkt_snapshot",
+                    "result": "YES",
+                    "settlement_event_id": format!("mu:{}", "e".repeat(64)),
+                    "price_not_truth_ack": true
+                }
+            ]
+        }),
+    );
+
+    assert_eq!(
+        response["result"]["schema_id"],
+        "market_projection_snapshot.v1"
+    );
+    assert_eq!(response["result"]["source"], "micro_tape_only");
+    assert_eq!(response["result"]["market_count"], 1);
+    assert_eq!(response["result"]["price_not_truth"], true);
+    assert_eq!(response["result"]["emits_authorization"], false);
+    assert_eq!(response["result"]["can_move_accepted_head"], false);
+    assert_eq!(
+        response["result"]["snapshot_path"],
+        state_dir
+            .join("market_projection.json")
+            .to_str()
+            .expect("UTF-8 snapshot path")
+    );
+    assert!(
+        response["result"]["market_projection_hash"]
+            .as_str()
+            .expect("market projection hash")
+            .starts_with("sha256:")
+    );
+
+    let snapshot =
+        std::fs::read_to_string(state_dir.join("market_projection.json")).expect("market snapshot");
+    assert!(snapshot.contains(r#""schema_id":"market_projection_snapshot.v1""#));
+    assert!(snapshot.contains(r#""price_not_truth":true"#));
+    assert!(snapshot.contains(r#""can_move_accepted_head":false"#));
+    assert!(snapshot.contains(r#""mkt_snapshot""#));
+    assert!(!snapshot.contains(r#""accepted_head""#));
+    assert!(!snapshot.contains("authorization_event"));
+
+    shutdown(socket, child);
+}
+
+#[test]
 fn pputd_serves_hidden_prompt_shield() {
     let dir = tempfile::tempdir().expect("temp dir");
     let socket = dir.path().join("pputd.sock");
