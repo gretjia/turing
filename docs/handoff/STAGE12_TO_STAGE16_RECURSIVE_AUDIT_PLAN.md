@@ -302,6 +302,13 @@ Acceptance:
 - no hidden HITL;
 - no secrets.
 
+Full-score claim gate:
+
+- `stage16_replay_campaign_pass` is not the same as a full-score claim.
+- `stage16_full_pass_claim_allowed` requires `unsolved_count == 0`.
+- if `unsolved_count > 0`, Stage16 can only claim sealed campaign replay PASS and must open Stage16R unsolved repair loop;
+- any full-score or "SWE-bench all pass" claim with `unsolved_count > 0` is OVERCLAIM.
+
 Release blockers:
 
 - any missing bundle;

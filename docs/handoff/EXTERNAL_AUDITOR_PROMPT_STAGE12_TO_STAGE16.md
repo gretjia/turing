@@ -143,6 +143,9 @@ Stage16 — Full SWE-bench sealed campaign
 - Confirm every instance has a bundle.
 - Confirm solved iff official PASS -> CandidateAccepted -> final PPUT progress=1.
 - Confirm unsolved/incomplete paths include terminal PPUTAccounted(progress=0) with a terminal failure/budget event id.
+- Confirm `stage16_replay_campaign_pass` is not represented as a full-score claim.
+- Confirm `stage16_full_pass_claim_allowed` is true only if `unsolved_count == 0`.
+- If `unsolved_count > 0`, any "full SWE-bench pass" or full-score claim is OVERCLAIM and `release_next_stage` must be NO for that claim scope.
 - Confirm all cost/time/branches/tool outputs derive from tape.
 - Confirm replay auditor reconstructs accepted_head, golden path, VPPUT, final patch digest, market settlement, and failure-memory lineage.
 - Confirm loop_eval_summary.json is not truth.

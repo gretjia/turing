@@ -464,6 +464,13 @@ Required files:
 - aggregate claims include confidence intervals only where statistically valid;
 - no loop summary, dashboard, projection, CI result, or worker self-report is truth.
 
+Full-score claim gate:
+
+- `stage16_replay_campaign_pass` means the full sealed campaign is replayable and honest.
+- `stage16_full_pass_claim_allowed` is true only when `unsolved_count == 0`.
+- If `unsolved_count > 0`, Stage16 may PASS only as a sealed replay campaign and must set `stage16_full_pass_claim_allowed=false`.
+- If `unsolved_count > 0`, open `Stage16R` as an unsolved-repair loop instead of claiming full SWE-bench score.
+
 ### Recovery Loop
 
 - Missing bundle: stop aggregate report and regenerate export.
@@ -472,10 +479,25 @@ Required files:
 - Any cost gap: import missing cost evidence and rerun strict audit.
 - Any hidden HITL: mark campaign invalid for no-HITL claim; rerun sealed campaign only after controller fix.
 - Any overclaim: correct report scope and rerun independent audit.
+- Any full-score claim with `unsolved_count > 0`: mark OVERCLAIM, set `stage16_full_pass_claim_allowed=false`, and open `Stage16R`.
 
 ### Final Release Gate
 
 Stage16 is complete only after an external exact-SHA auditor can fetch GitHub evidence, verify bundle digests, replay or reason through MicroTape, and return `PASS` for Stage16 scope. If the external auditor cannot fetch bundles, the campaign may be artifact-coherent but is not externally released.
+
+## Stage16R — Unsolved Repair Loop
+
+Stage16R is not a new release stage after Stage16. It is the Stage16 recovery loop used when the sealed campaign is replayable but has unsolved instances.
+
+Loop:
+
+1. reduce unsolved terminal `FailureNode` and budget-exhausted events;
+2. activate or revise tools, predicates, capsules, or broadcast rules from tape-derived evidence;
+3. rerun only unsolved instances under the same no-HITL, MicroTape, authorization, market, and VPPUT rules;
+4. append fresh evidence without rewriting the original Stage16 campaign bundles;
+5. repeat until `unsolved_count == 0` or a declared budget terminal is reached.
+
+Full-score claim remains forbidden until `unsolved_count == 0` on replayable exact-SHA evidence.
 
 ## Independent Recursive Audit Pattern
 
