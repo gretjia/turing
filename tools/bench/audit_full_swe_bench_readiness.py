@@ -149,6 +149,7 @@ def audit_full_swe_bench_readiness(
     phase_f_root: Path,
     repair_loop_root: Path,
     full_manifest_root: Path,
+    stage16r_real_root: Path | None = None,
 ) -> dict[str, Any]:
     blockers: list[str] = []
     problems: list[str] = []
@@ -170,7 +171,17 @@ def audit_full_swe_bench_readiness(
             problems.append(f"Phase F must not allow {key}")
 
     repair_status = repair.get("status")
-    if repair_status == "BLOCKED" or repair.get("replayable_repair_bundle_count") == 0:
+    stage16r_real = (
+        load_optional_json(stage16r_real_root / "stage16r_real_evaluator_summary.json")
+        if stage16r_real_root is not None
+        else {}
+    )
+    stage16r_real_count = stage16r_real.get("fresh_real_evaluator_bundle_count")
+    stage16r_remaining = stage16r_real.get("remaining_repair_count")
+    has_stage16r_real_bundles = isinstance(stage16r_real_count, int) and stage16r_real_count > 0
+    if has_stage16r_real_bundles and stage16r_remaining != 0:
+        blockers.append("remaining_stage16r_real_repairs_required")
+    elif repair_status == "BLOCKED" or repair.get("replayable_repair_bundle_count") == 0:
         blockers.append("fresh_stage16r_real_evaluator_bundles_required")
     if repair.get("release_next_phase_g") is True:
         problems.append("repair-loop structural check must not release Phase G")
@@ -190,7 +201,9 @@ def audit_full_swe_bench_readiness(
     else:
         status = "READY"
 
-    if "fresh_stage16r_real_evaluator_bundles_required" in blockers:
+    if "remaining_stage16r_real_repairs_required" in blockers:
+        next_loop = "retry_remaining_stage16r_real_targets"
+    elif "fresh_stage16r_real_evaluator_bundles_required" in blockers:
         next_loop = "stage16r_real_evaluator_bundle_loop"
     elif "phase_f_evaluator_proof_pass_required" in blockers:
         next_loop = "rerun_phase_f_evaluator_proof"
@@ -220,6 +233,14 @@ def audit_full_swe_bench_readiness(
             "release_next_phase_g": repair.get("release_next_phase_g"),
             "phase_f_evaluator_proof_required": repair.get("phase_f_evaluator_proof_required"),
         },
+        "stage16r_real": {
+            "root": str(stage16r_real_root) if stage16r_real_root is not None else None,
+            "status": stage16r_real.get("status"),
+            "fresh_real_evaluator_bundle_count": stage16r_real_count,
+            "official_pass_count": stage16r_real.get("official_pass_count"),
+            "remaining_repair_count": stage16r_remaining,
+            "strict_microtape_status": stage16r_real.get("strict_microtape_status"),
+        },
         "full_manifest": {
             "root": str(full_manifest_root),
             "status": manifest_status,
@@ -235,12 +256,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--phase-f-root", required=True)
     parser.add_argument("--repair-loop-root", required=True)
     parser.add_argument("--full-manifest-root", required=True)
+    parser.add_argument("--stage16r-real-root")
     parser.add_argument("--out", required=True)
     args = parser.parse_args(argv)
     report = audit_full_swe_bench_readiness(
         phase_f_root=Path(args.phase_f_root),
         repair_loop_root=Path(args.repair_loop_root),
         full_manifest_root=Path(args.full_manifest_root),
+        stage16r_real_root=Path(args.stage16r_real_root) if args.stage16r_real_root else None,
     )
     write_json(Path(args.out), report)
     return 0 if report["status"] in {"READY", "BLOCKED"} else 1

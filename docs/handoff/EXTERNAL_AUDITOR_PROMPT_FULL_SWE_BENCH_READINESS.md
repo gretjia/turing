@@ -18,7 +18,7 @@ Expected current verdict:
 ```text
 full_swe_bench_readiness_status: BLOCKED
 release_phase_g: NO
-next_loop: stage16r_real_evaluator_bundle_loop
+next_loop: retry_remaining_stage16r_real_targets
 overclaim_detected: NO
 safe_to_publish_as_readiness_blocker: YES
 ```
@@ -27,8 +27,8 @@ Audit questions:
 
 1. Does the readiness audit block full SWE-bench launch while Phase F evaluator
    proof is PARTIAL?
-2. Does it block while the Phase F repair loop is BLOCKED and the seven
-   Stage16R targets lack replayable unified diffs?
+2. Does it block while the Stage16R-real evaluator loop is PARTIAL, with only
+   2/7 targets repaired?
 3. Does it prevent repair-loop structural PASS from directly releasing Phase G?
 4. Does it require a full dataset manifest with `selection_policy=ALL`, no
    exclusions, frozen task IDs, dataset digest, and harness digest before

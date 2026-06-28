@@ -1,8 +1,8 @@
 {
   "blockers": [
-    "fresh_stage16r_real_evaluator_bundles_required",
     "full_dataset_manifest_freeze_required",
-    "phase_f_evaluator_proof_pass_required"
+    "phase_f_evaluator_proof_pass_required",
+    "remaining_stage16r_real_repairs_required"
   ],
   "full_manifest": {
     "missing_files": [
@@ -15,7 +15,7 @@
     "status": "MISSING"
   },
   "full_swe_bench_ready": false,
-  "next_loop": "stage16r_real_evaluator_bundle_loop",
+  "next_loop": "retry_remaining_stage16r_real_targets",
   "phase_f": {
     "official_evaluator_executable_replay": false,
     "release_next_phase_g": false,
@@ -32,5 +32,13 @@
     "status": "BLOCKED"
   },
   "schema_id": "FullSweBenchReadinessAudit.v1",
+  "stage16r_real": {
+    "fresh_real_evaluator_bundle_count": 7,
+    "official_pass_count": 2,
+    "remaining_repair_count": 5,
+    "root": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628",
+    "status": "PARTIAL",
+    "strict_microtape_status": "PASS"
+  },
   "status": "BLOCKED"
 }

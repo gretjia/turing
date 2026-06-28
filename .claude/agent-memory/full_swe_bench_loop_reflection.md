@@ -30,6 +30,7 @@ Current truth:
 ```text
 Phase F evaluator proof: PARTIAL
 Phase F repair loop: BLOCKED
+Stage16R real evaluator loop: PARTIAL, 2/7 repaired
 Full SWE-bench readiness: BLOCKED
 Full SWE-bench campaign: NOT STARTED
 Full SWE-bench score claim: FORBIDDEN
@@ -38,20 +39,19 @@ Full SWE-bench score claim: FORBIDDEN
 Next required action:
 
 ```text
-Generate fresh Stage16R-real evaluator bundles for the 7 repair targets:
+Retry the remaining Stage16R-real repair targets:
 - django__django-11790
-- django__django-11815
 - django__django-11964
 - django__django-12209
 - django__django-12273
 - django__django-12308
-- django__django-12325
 ```
 
-Those bundles must be worker-derived and must include unified candidate diffs,
-official test patches, apply logs, official evaluator command, stdout/stderr
-digests, environment/harness/dataset descriptors, fresh MicroTape evidence, and
-bundle SHA. Old Stage16R bundles must remain immutable.
+The first Stage16R-real loop produced seven fresh bundles and strict MicroTape
+PASS, but only `django__django-11815` and `django__django-12325` reached
+official PASS and `CandidateAccepted`. The remaining targets must be retried
+with narrower capsules/failure-memory guidance. Old Stage16R bundles must remain
+immutable.
 
 ## Self-Improvement Rules
 

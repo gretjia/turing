@@ -35,8 +35,8 @@ As of the Phase F repair-loop hardening, full SWE-bench is not ready to start.
 The correct next loop is:
 
 ```text
-fresh Stage16R-real evaluator bundles
--> rerun Phase F evaluator proof
+retry remaining Stage16R-real repair targets
+-> rerun Phase F evaluator proof after all 7 repair targets pass
 -> freeze full dataset manifest
 -> readiness audit READY
 -> start full SWE-bench sharded sealed campaign

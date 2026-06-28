@@ -1,0 +1,7 @@
+# Generated benchmark evidence preserves byte-level raw logs and patch artifacts.
+# Do not make `git diff --check` rewrite or reject those evidence bytes.
+evidence/bench/**/worker_logs/*.patch -whitespace
+evidence/bench/**/worker_logs/*.txt -whitespace
+evidence/bench/**/worker_logs/visible_prompt.txt -whitespace
+evidence/bench/**/patch_eval/**/*.patch -whitespace
+evidence/bench/**/patch_eval/**/*.txt -whitespace

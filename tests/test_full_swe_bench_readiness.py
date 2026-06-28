@@ -6,6 +6,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 PHASE_F_ROOT = REPO / "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628"
 PHASE_F_REPAIR_ROOT = REPO / "evidence/bench/swe_bench_phase_f_repair_loop_20260628"
+STAGE16R_REAL_ROOT = REPO / "evidence/bench/swe_bench_stage16r_real_evaluator_20260628"
 
 
 def load_module(name: str, path: Path):
@@ -81,6 +82,28 @@ def test_current_phase_f_blocks_full_swe_bench_readiness():
     assert "fresh_stage16r_real_evaluator_bundles_required" in report["blockers"]
     assert "phase_f_evaluator_proof_pass_required" in report["blockers"]
     assert report["next_loop"] == "stage16r_real_evaluator_bundle_loop"
+
+
+def test_stage16r_real_partial_routes_to_remaining_repair_loop():
+    auditor = load_module(
+        "full_readiness_auditor",
+        REPO / "tools/bench/audit_full_swe_bench_readiness.py",
+    )
+
+    report = auditor.audit_full_swe_bench_readiness(
+        phase_f_root=PHASE_F_ROOT,
+        repair_loop_root=PHASE_F_REPAIR_ROOT,
+        full_manifest_root=REPO / "evidence/bench/swe_bench_full_manifest_20260628",
+        stage16r_real_root=STAGE16R_REAL_ROOT,
+    )
+
+    assert report["status"] == "BLOCKED"
+    assert report["stage16r_real"]["status"] == "PARTIAL"
+    assert report["stage16r_real"]["official_pass_count"] == 2
+    assert report["stage16r_real"]["remaining_repair_count"] == 5
+    assert "remaining_stage16r_real_repairs_required" in report["blockers"]
+    assert "fresh_stage16r_real_evaluator_bundles_required" not in report["blockers"]
+    assert report["next_loop"] == "retry_remaining_stage16r_real_targets"
 
 
 def test_phase_f_pass_still_blocks_without_full_manifest_freeze(tmp_path):

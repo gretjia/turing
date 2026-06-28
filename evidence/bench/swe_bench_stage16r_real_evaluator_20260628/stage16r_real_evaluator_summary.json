@@ -1,0 +1,92 @@
+{
+  "accepted_final_progress_one": "PASS",
+  "accepted_head_authority": "PASS",
+  "authorization_head": "PASS",
+  "failed_progress_zero": "PASS",
+  "fresh_real_evaluator_bundle_count": 7,
+  "full_dataset_claim_allowed": false,
+  "full_swe_bench_score_claim_allowed": false,
+  "leaderboard_equivalence_claim_allowed": false,
+  "next_loop": "retry_remaining_stage16r_real_targets",
+  "official_pass_count": 2,
+  "phase_f_evaluator_proof_ready": false,
+  "release_phase_f": false,
+  "release_phase_g": false,
+  "remaining_repair_count": 5,
+  "repair_target_count": 7,
+  "runs": [
+    {
+      "accepted_head_moved": false,
+      "candidate_write_event_type": "FailureNode",
+      "instance_id": "django__django-11790",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-11790/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:349d923efc850a0fbd5a38a64724d190bfed86ed575ab94114664ca2824c01e0",
+      "official_result": "FAIL",
+      "worker_patch_bytes": 0,
+      "worker_patch_is_unified_diff": false
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-11815",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-11815/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:27fbcdc40022032a683754798565921dd2f9af39794f498dcb585e045d1cd1d8",
+      "official_result": "PASS",
+      "worker_patch_bytes": 734,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": false,
+      "candidate_write_event_type": "FailureNode",
+      "instance_id": "django__django-11964",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-11964/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:40e732db5615ea3fa9864c1cfe45e53440ff97d5a817bf7e24764630aa8066b8",
+      "official_result": "FAIL",
+      "worker_patch_bytes": 0,
+      "worker_patch_is_unified_diff": false
+    },
+    {
+      "accepted_head_moved": false,
+      "candidate_write_event_type": "FailureNode",
+      "instance_id": "django__django-12209",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-12209/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:f06b6f0c07d7e2dbb391dd5dc2eb8e63e9cf176b780a93ad2e0258b761105de4",
+      "official_result": "FAIL",
+      "worker_patch_bytes": 0,
+      "worker_patch_is_unified_diff": false
+    },
+    {
+      "accepted_head_moved": false,
+      "candidate_write_event_type": "FailureNode",
+      "instance_id": "django__django-12273",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-12273/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:d524d8119d6b4a9e77629f2657bf254589fabac050883db18d23453fb4cca3c5",
+      "official_result": "FAIL",
+      "worker_patch_bytes": 0,
+      "worker_patch_is_unified_diff": false
+    },
+    {
+      "accepted_head_moved": false,
+      "candidate_write_event_type": "FailureNode",
+      "instance_id": "django__django-12308",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-12308/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:7457b5976d9b001645a5a3139fb5ca5a2aa7ab1461b70c0467a34fd2a51891ea",
+      "official_result": "FAIL",
+      "worker_patch_bytes": 609,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-12325",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628/turingos/instances/django__django-12325/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:dc7746e2244c59662bc764f0b4921ab88ae833953b284a81ecda135563350f48",
+      "official_result": "PASS",
+      "worker_patch_bytes": 629,
+      "worker_patch_is_unified_diff": true
+    }
+  ],
+  "schema_id": "Stage16RRealEvaluatorLoopSummary.v1",
+  "status": "PARTIAL",
+  "strict_microtape_status": "PASS"
+}

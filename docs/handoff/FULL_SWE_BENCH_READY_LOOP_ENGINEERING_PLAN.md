@@ -26,8 +26,9 @@ PhaseFRepairLoop(BLOCKED)
 ```text
 phase_f_evaluator_proof: PARTIAL
 phase_f_repair_loop: BLOCKED
+stage16r_real_evaluator_loop: PARTIAL, 2/7 repaired
 full_swe_bench_readiness: BLOCKED
-next_loop: stage16r_real_evaluator_bundle_loop
+next_loop: retry_remaining_stage16r_real_targets
 ```
 
 ## Loop Controller
@@ -43,6 +44,11 @@ while True:
     if audit.next_loop == "stage16r_real_evaluator_bundle_loop":
         run_fresh_stage16r_real_evaluator_bundles()
         rerun_phase_f_evaluator_proof()
+        continue
+
+    if audit.next_loop == "retry_remaining_stage16r_real_targets":
+        retry_remaining_stage16r_real_targets()
+        rerun_phase_f_evaluator_proof_when_all_repaired()
         continue
 
     if audit.next_loop == "rerun_phase_f_evaluator_proof":
