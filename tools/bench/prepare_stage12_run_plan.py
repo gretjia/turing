@@ -88,6 +88,7 @@ def stage12_a03_command(root: Path) -> list[str]:
         "required",
         "--authority-provider",
         "test-local",
+        "--stage12-real-loop",
         "--tasks-jsonl",
         relative_to_repo(root / "tasks_20.jsonl"),
         "--out-dir",
@@ -111,9 +112,30 @@ def strict_audit_command(root: Path) -> list[str]:
         "--strict-terminal-market",
         "--require-authorization-head",
         "--coverage",
-        relative_to_repo(root / "turingos" / "substrate_coverage.json"),
+        relative_to_repo(root / "substrate_coverage.json"),
         "--out-dir",
         relative_to_repo(root / "micro_tape_audit_strict"),
+    ]
+
+
+def stage12_evaluator_command(root: Path) -> list[str]:
+    return [
+        "python3",
+        "tools/bench/evaluate_django_swe_bench_patches.py",
+        "--tasks-jsonl",
+        relative_to_repo(root / "tasks_20.jsonl"),
+        "--limit",
+        "20",
+        "--turingos-dir",
+        relative_to_repo(root),
+        "--direct-dir",
+        relative_to_repo(root / "direct_baseline"),
+        "--out",
+        relative_to_repo(root / "patch_eval"),
+        "--substrate-coverage",
+        relative_to_repo(root / "substrate_coverage.json"),
+        "--import-turingos-evidence",
+        "--stage12-loop-until-pass",
     ]
 
 
@@ -194,6 +216,7 @@ def prepare_run_plan(root: Path | str, *, source_jsonl: Path | None = None) -> d
         ),
         "old_stage_evidence_immutable": task["old_stage_evidence_immutable"],
         "stage12_a03_command_template": stage12_a03_command(root),
+        "stage12_evaluator_command_template": stage12_evaluator_command(root),
         "strict_audit_command_template": strict_audit_command(root),
     }
     write_json(plan_path, plan)

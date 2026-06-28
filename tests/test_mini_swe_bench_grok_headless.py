@@ -825,11 +825,83 @@ def test_evaluator_refreshes_micro_tape_bundle_after_terminal_import(tmp_path):
         + "\n",
         encoding="utf-8",
     )
-    evaluator.write_refreshed_substrate_coverage(coverage, {run["instance_id"]: run})
+    evaluator.write_refreshed_substrate_coverage(
+        coverage,
+        {run["instance_id"]: run},
+        stage12_loop_until_pass=True,
+    )
     coverage_packet = json.loads(coverage.read_text(encoding="utf-8"))
     coverage_run = coverage_packet["turingos_arm_runs"][0]
     assert coverage_run["micro_tape_bundle_sha256"] == refreshed["micro_tape_bundle_sha256"]
     assert coverage_run["micro_tape_bundle_refreshed_after_eval"] is True
+    assert coverage_packet["run_id"] == "stage12_20task_loop_until_pass"
+    assert coverage_packet["scientific_status"] == "STAGE12_20TASK_SCALE_PROTOCOL_EVIDENCE_NOT_STATISTICAL_CLAIM"
+
+
+def test_stage12_loop_metadata_records_failed_attempt_before_terminal_accept():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-12039",
+        "capsule_id": "wc_django__django-12039",
+        "macro_anchor_id": "macro:diff:django__django-12039",
+        "worker_receipt_id": "rcp_12039",
+        "authorization_head": "mu:" + "1" * 64,
+        "stage12_first_attempt": {
+            "official_evidence_event_id": "mu:" + "3" * 64,
+            "failure_event_id": "mu:" + "2" * 64,
+            "failure_certificate_event_id": "mu:" + "5" * 64,
+            "retry_authorization_event_id": "mu:" + "6" * 64,
+        },
+    }
+
+    loop = evaluator.stage12_loop_until_pass_metadata(
+        substrate_run=substrate_run,
+        terminal_import={
+            "candidate_event_id": "mu:" + "4" * 64,
+            "candidate_write_event_type": "CandidateAccepted",
+            "accepted_head_moved": True,
+        },
+    )
+
+    assert loop["attempts_total"] == 2
+    assert loop["failed_attempts_before_accept"] == 1
+    assert loop["accepted_attempt_index"] == 2
+    assert loop["budget_exhausted"] is False
+    assert loop["first_failure_event_id"] == "mu:" + "2" * 64
+    assert loop["failure_certificate_event_id"] == "mu:" + "5" * 64
+    assert loop["terminal_candidate_accepted_event_id"] == "mu:" + "4" * 64
+    assert loop["accepted_head"] == "mu:" + "4" * 64
+    assert loop["retry_policy_event_id"] == "mu:" + "6" * 64
+    assert loop["verified_from_micro_tape_bundle_only"] is True
+
+
+def test_stage12_loop_metadata_records_budget_exhausted_without_accept():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-12050",
+        "authorization_head": "mu:" + "a" * 64,
+        "stage12_first_attempt": {
+            "official_evidence_event_id": "mu:" + "c" * 64,
+            "failure_event_id": "mu:" + "b" * 64,
+            "retry_authorization_event_id": "mu:" + "e" * 64,
+        },
+    }
+
+    loop = evaluator.stage12_loop_until_pass_metadata(
+        substrate_run=substrate_run,
+        terminal_import={
+            "candidate_event_id": "mu:" + "d" * 64,
+            "candidate_write_event_type": "FailureNode",
+            "accepted_head_moved": False,
+        },
+    )
+
+    assert loop["attempts_total"] == 2
+    assert loop["failed_attempts_before_accept"] == 1
+    assert loop["accepted_attempt_index"] is None
+    assert loop["budget_exhausted"] is True
+    assert loop["terminal_candidate_accepted_event_id"] is None
+    assert loop["accepted_head"] is None
 
 
 def test_gate_a_capsule_prompt_injects_scope_and_broadcast_rules():

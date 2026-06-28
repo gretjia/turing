@@ -52,10 +52,13 @@ assert plan["status"] == "READY_FOR_STAGE12_A03"
 assert plan["a02_does_not_run_workers"] is True
 assert plan["expected_bundle_count_after_a03"] == 20
 assert plan["stage12_a03_requires_runner_atom"] is True
-assert "--loop-until-pass" not in plan["stage12_a03_command_template"]
 assert "--loop-until-pass-fixture" not in plan["stage12_a03_command_template"]
+assert "--stage12-real-loop" in plan["stage12_a03_command_template"]
 assert "--authority-provider" in plan["stage12_a03_command_template"]
 assert "test-local" in plan["stage12_a03_command_template"]
+assert "--import-turingos-evidence" in plan["stage12_evaluator_command_template"]
+assert "--stage12-loop-until-pass" in plan["stage12_evaluator_command_template"]
+assert "substrate_coverage.json" in plan["strict_audit_command_template"]
 assert plan["authority_provider"] == "test-local"
 assert plan["fallback_to_auto_authorization"] is False
 assert len(tasks) == 20

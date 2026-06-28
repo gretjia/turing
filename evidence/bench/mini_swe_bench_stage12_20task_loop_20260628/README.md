@@ -4,7 +4,7 @@ Scope: contract and runner-plan freeze only for Stage12 Real 20-task Loop-until-
 
 This evidence root does not contain Stage12 bundles. It freezes the 20-task manifest, budget profile, no-HITL policy, claim boundary, acceptance commands, exact `tasks_20.jsonl`, and Stage12-A03 command templates before any Stage12 worker run.
 
-Stage12-A03 now has an explicit release auditor and a test-scope authority bridge. The bridge is selected only by `--authority-provider test-local` together with `--authorization-mode required`; it directly appends benchmark-scope AUTHORIZATION events to MicroTape and does not loosen production `turingd` approval RPCs, which still require OsKeyring.
+Stage12-A03 now has an explicit release auditor, a test-scope authority bridge, a runner command that must run with `--stage12-real-loop`, and an evaluator import command that must run with `--stage12-loop-until-pass`. The bridge is selected only by `--authority-provider test-local` together with `--authorization-mode required`; it directly appends benchmark-scope AUTHORIZATION events to MicroTape and does not loosen production `turingd` approval RPCs, which still require OsKeyring.
 
 `audit_stage12_release.py` is the local Stage12 release gate. It recomputes strict MicroTape audit from the same coverage bundle paths, compares supplied strict-audit bundle hashes against the recomputed hashes, rejects relabeled fixture payload markers inside the bundle itself, and rejects any fewer-than-20, manual-intervention, or non-PASS strict evidence.
 
@@ -83,10 +83,13 @@ assert plan["status"] == "READY_FOR_STAGE12_A03"
 assert plan["a02_does_not_run_workers"] is True
 assert plan["expected_bundle_count_after_a03"] == 20
 assert plan["stage12_a03_requires_runner_atom"] is True
-assert "--loop-until-pass" not in plan["stage12_a03_command_template"]
 assert "--loop-until-pass-fixture" not in plan["stage12_a03_command_template"]
+assert "--stage12-real-loop" in plan["stage12_a03_command_template"]
 assert "--authority-provider" in plan["stage12_a03_command_template"]
 assert "test-local" in plan["stage12_a03_command_template"]
+assert "--import-turingos-evidence" in plan["stage12_evaluator_command_template"]
+assert "--stage12-loop-until-pass" in plan["stage12_evaluator_command_template"]
+assert "substrate_coverage.json" in plan["strict_audit_command_template"]
 assert plan["authority_provider"] == "test-local"
 assert plan["fallback_to_auto_authorization"] is False
 assert len(tasks) == 20
@@ -101,4 +104,4 @@ git diff --check
 
 ## Next Atom
 
-Stage12-A03 may run the Stage12 worker path from `stage12_run_plan.json`. It must not change the task list without producing a new Stage12-A01 contract and audit trail. Stage12 release requires `audit_stage12_release.py` PASS after strict MicroTape audit PASS; fixture, partial, or fewer-than-20 output cannot release Stage13.
+Stage12-A03 may run the Stage12 worker path from `stage12_run_plan.json`, then must run `stage12_evaluator_command_template` before strict audit so the bundle contains the first failed official evidence branch, terminal official evidence, terminal market/reward, final PPUT, and `loop_until_pass` metadata. It must not change the task list without producing a new Stage12-A01 contract and audit trail. Stage12 release requires `audit_stage12_release.py` PASS after strict MicroTape audit PASS; fixture, partial, or fewer-than-20 output cannot release Stage13.

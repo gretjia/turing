@@ -658,6 +658,54 @@ def append_test_local_authorization(
     }
 
 
+def fail_to_pass_labels(raw: Any) -> list[str]:
+    if isinstance(raw, list):
+        return [str(item) for item in raw]
+    if isinstance(raw, str):
+        try:
+            loaded = json.loads(raw)
+        except json.JSONDecodeError:
+            return []
+        if isinstance(loaded, list):
+            return [str(item) for item in loaded]
+    return []
+
+
+def stage12_first_attempt_official_failure_payload(
+    *,
+    task: dict[str, Any],
+    capsule_id: str,
+    macro_id: str,
+    receipt_id: str,
+    patch_hash: str,
+) -> dict[str, Any]:
+    return {
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_stage12_fail_"
+        + hashlib.sha256(f"{task['instance_id']}:{receipt_id}:{patch_hash}".encode("utf-8")).hexdigest()[:16],
+        "instance_id": task["instance_id"],
+        "arm": "turingos",
+        "capsule_id": capsule_id,
+        "macro_anchor_id": macro_id,
+        "worker_receipt_id": receipt_id,
+        "candidate_patch_hash": patch_hash,
+        "test_patch_hash": digest_text(str(task.get("test_patch", ""))),
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "fail_to_pass_labels": fail_to_pass_labels(task.get("FAIL_TO_PASS", [])),
+        "target_test_exit_code": None,
+        "target_test_result": "NOT_RUN",
+        "stdout_hash": digest_text(""),
+        "stderr_hash": digest_text(""),
+        "result": "FAIL",
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": False,
+        "forbidden_test_edit_paths": [],
+        "truth_source": "official_evaluator_macro_evidence",
+    }
+
+
 def run_substrate_task(
     task: dict[str, Any],
     out_dir: Path,
@@ -669,6 +717,7 @@ def run_substrate_task(
     broadcast_rules: list[dict[str, Any]] | None = None,
     authorization_mode: str = "auto",
     authority_provider: str = "os-keyring",
+    stage12_real_loop: bool = False,
 ) -> dict[str, Any]:
     instance_dir = out_dir / "instances" / task["instance_id"]
     project = instance_dir / "project"
@@ -743,6 +792,205 @@ def run_substrate_task(
         mark_module("M10_evidence_approval")
 
         capsule_id = f"wc_{task['instance_id']}"
+        stage12_first_attempt: dict[str, Any] | None = None
+        if stage12_real_loop:
+            if authority_provider != "test-local" or authorization_mode != "required":
+                raise RuntimeError("--stage12-real-loop requires --authorization-mode required --authority-provider test-local")
+            first_capsule_id = f"{capsule_id}_attempt1"
+            first_worker_receipt_id = "rcp_stage12_" + hashlib.sha256(
+                f"{task['instance_id']}:attempt1".encode("utf-8")
+            ).hexdigest()[:24]
+            first_macro_id = f"macro:diff:{task['instance_id']}:attempt1"
+            first_candidate_id = f"cand_{task['instance_id']}_attempt1"
+            first_patch_hash = digest_text(task["instance_id"] + ":stage12:attempt1:empty-patch")
+            first_tokens = 3
+            first_wall_ms = 1
+
+            first_capsule = append_preserve(
+                turingd,
+                "WorkCapsuleBuilt",
+                "writer:capsule",
+                {
+                    "capsule_id": first_capsule_id,
+                    "private_contract_hash": digest_text(first_capsule_id + ":private"),
+                    "acceptance_commands": ["swebench.harness.run_evaluation"],
+                    "attempt_index": 1,
+                    "forced_safe_failure_attempt": True,
+                    "pput_formula_absent": True,
+                    "hidden_predicates_absent": True,
+                },
+            )
+            mark_event(first_capsule, "WorkCapsuleBuilt")
+
+            first_dispatch_auth = append_test_local_authorization(
+                repo=micro_git,
+                event_type="WorkerDispatchAuthorized",
+                payload={
+                    "capsule_id": first_capsule_id,
+                    "worker_id": worker_id,
+                    "approval_id": f"ap_capsule_{task['instance_id']}_attempt1",
+                    "authority_kind": "test_local_authority_no_credentials",
+                    "signature_route": "test_local_authority",
+                    "subject_id": first_capsule_id,
+                },
+            )
+            mark_event(first_dispatch_auth, "WorkerDispatchAuthorized")
+
+            first_receipt = append_preserve(
+                turingd,
+                "WorkerReceiptImported",
+                "writer:receipt",
+                {
+                    "receipt_id": first_worker_receipt_id,
+                    "capsule_id": first_capsule_id,
+                    "worker_id": worker_id,
+                    "exit_code": 0,
+                    "stdout_hash": digest_text("stage12 first attempt empty stdout"),
+                    "stderr_hash": digest_text("stage12 first attempt empty stderr"),
+                    "done_json_hash": digest_text("stage12 first attempt no-op done"),
+                    "credential_material_absent": True,
+                    "micro_refs_moved": False,
+                    "manual_patch": False,
+                    "patch_hash": first_patch_hash,
+                    "worker_attempt_kind": "forced_noop_first_attempt",
+                },
+            )
+            mark_event(first_receipt, "WorkerReceiptImported")
+
+            first_macro = append_preserve(
+                turingd,
+                "MacroObservationImported",
+                "writer:macro",
+                {
+                    "macro_id": first_macro_id,
+                    "capsule_id": first_capsule_id,
+                    "diff_hash": first_patch_hash,
+                    "external_evidence_only": True,
+                    "macro_observation_kind": "empty_patch",
+                },
+            )
+            mark_event(first_macro, "MacroObservationImported")
+
+            first_cost = append_preserve(
+                turingd,
+                "CostEvent",
+                "writer:pput",
+                {
+                    "schema_id": "cost_event.v1",
+                    "head_effect": "PRESERVE",
+                    "run_id": f"run_{task['instance_id']}",
+                    "problem_id": task["instance_id"],
+                    "split": "dogfood",
+                    "agent_id": worker_id,
+                    "branch_id": f"branch_{worker_mode}_attempt1",
+                    "capsule_id": first_capsule_id,
+                    "prompt_tokens": 1,
+                    "completion_tokens": 1,
+                    "tool_tokens": 0,
+                    "tool_stdout_tokens": 1,
+                    "total_tokens": first_tokens,
+                    "wall_time_ms": first_wall_ms,
+                    "tool_stdout_hash": digest_text("stage12 first attempt empty tool stdout"),
+                    "counted_in_total": True,
+                },
+            )
+            mark_event(first_cost, "CostEvent")
+
+            first_official_payload = stage12_first_attempt_official_failure_payload(
+                task=task,
+                capsule_id=first_capsule_id,
+                macro_id=first_macro_id,
+                receipt_id=first_worker_receipt_id,
+                patch_hash=first_patch_hash,
+            )
+            first_official = append_preserve(
+                turingd,
+                "OfficialEvaluatorEvidenceImported",
+                "writer:official-evaluator",
+                first_official_payload,
+            )
+            mark_event(first_official, "OfficialEvaluatorEvidenceImported")
+
+            first_failure = rpc(
+                turingd.socket_path,
+                "candidate.verify_write",
+                {
+                    "writer_id": "writer:predicate",
+                    "candidate_payload": {
+                        "candidate_id": first_candidate_id,
+                        "capsule_id": first_capsule_id,
+                        "macro_anchor_id": first_macro_id,
+                        "worker_receipt_id": first_worker_receipt_id,
+                        "official_evaluator_evidence_id": first_official_payload["evidence_id"],
+                    },
+                    "failure": {
+                        "candidate_digest": first_patch_hash,
+                        "observation_digest": first_patch_hash,
+                        "detail": "stage12 first no-op attempt failed official evaluator preflight",
+                    },
+                },
+            )
+            mark_event(first_failure, first_failure["write_event_type"])
+
+            first_certificate = append_preserve(
+                turingd,
+                "FailureCertificate",
+                "writer:failure-taxonomy",
+                {
+                    "certificate_id": f"fc_stage12_{task['instance_id']}",
+                    "source_failure_node_id": first_failure["event_id"],
+                    "failure_class": "MISSING_OR_EMPTY_PATCH",
+                    "abstract_pattern": "The first no-op attempt produced no candidate patch.",
+                    "raw_log_ref": "cas:" + hashlib.sha256(
+                        f"{task['instance_id']}:stage12:first-attempt-private-log".encode("utf-8")
+                    ).hexdigest(),
+                    "raw_log_text_absent": True,
+                    "broadcast_rule_candidate": {
+                        "rule_id": f"br_stage12_{task['instance_id']}",
+                        "candidate_only": True,
+                        "activation_event_id": None,
+                        "source_failure_nodes": [first_failure["event_id"]],
+                        "failure_class": "MISSING_OR_EMPTY_PATCH",
+                        "abstract_pattern": "No candidate patch was produced.",
+                        "new_instruction": "Retry with a concrete production-code patch or terminally exhaust budget.",
+                        "raw_log_text_absent": True,
+                        "hidden_predicates_absent": True,
+                        "pput_or_heldout_details_absent": True,
+                    },
+                },
+            )
+            mark_event(first_certificate, "FailureCertificate")
+
+            retry_auth = append_test_local_authorization(
+                repo=micro_git,
+                event_type="RetryAuthorized",
+                payload={
+                    "retry_id": f"retry_stage12_{task['instance_id']}",
+                    "capsule_id": capsule_id,
+                    "source_failure_node_id": first_failure["event_id"],
+                    "failure_certificate_event_id": first_certificate["event_id"],
+                    "retry_decision_source": "tape_reducer_or_policy",
+                    "approval_id": f"ap_retry_{task['instance_id']}",
+                    "authority_kind": "test_local_authority_no_credentials",
+                    "signature_route": "test_local_authority",
+                    "human_intervention_count": 0,
+                },
+            )
+            mark_event(retry_auth, "RetryAuthorized")
+            stage12_first_attempt = {
+                "capsule_id": first_capsule_id,
+                "candidate_id": first_candidate_id,
+                "worker_receipt_id": first_worker_receipt_id,
+                "macro_anchor_id": first_macro_id,
+                "official_evidence_event_id": first_official["event_id"],
+                "failure_event_id": first_failure["event_id"],
+                "failure_certificate_event_id": first_certificate["event_id"],
+                "retry_authorization_event_id": retry_auth["event_id"],
+                "total_tokens": first_tokens,
+                "wall_time_ms": first_wall_ms,
+                "truth_source": "runner_recorded_first_failed_attempt",
+            }
+
         capsule = append_preserve(
             turingd,
             "WorkCapsuleBuilt",
@@ -751,6 +999,15 @@ def run_substrate_task(
                 "capsule_id": capsule_id,
                 "private_contract_hash": digest_text(capsule_id + ":private"),
                 "acceptance_commands": ["swebench.harness.run_evaluation"],
+                **(
+                    {
+                        "attempt_index": 2,
+                        "source_failure_nodes": [stage12_first_attempt["failure_event_id"]],
+                        "retry_authorization_event_id": stage12_first_attempt["retry_authorization_event_id"],
+                    }
+                    if stage12_first_attempt is not None
+                    else {}
+                ),
             },
         )
         mark_event(capsule, "WorkCapsuleBuilt")
@@ -1139,6 +1396,7 @@ def run_substrate_task(
         **bundle_info,
         "project": str(project),
         "basis": "real_daemon_rpc_plus_explicit_qualification_checks",
+        **({"stage12_first_attempt": stage12_first_attempt} if stage12_first_attempt is not None else {}),
     }
 
 
@@ -3569,6 +3827,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--authority-provider", choices=["os-keyring", "test-local"], default="os-keyring")
     parser.add_argument("--daemon-bin-dir", default=str(REPO / "target" / "debug"))
     parser.add_argument("--broadcast-rules-file")
+    parser.add_argument("--stage12-real-loop", action="store_true")
     parser.add_argument("--strict-microtape-fixture", action="store_true")
     parser.add_argument("--no-hitl-loop-fixture", action="store_true")
     parser.add_argument("--native-api-worker-fixture", action="store_true")
@@ -3676,6 +3935,7 @@ def main(argv: list[str] | None = None) -> int:
             broadcast_rules=active_broadcast_rules,
             authorization_mode=args.authorization_mode,
             authority_provider=args.authority_provider,
+            stage12_real_loop=args.stage12_real_loop,
         )
         runs.append(run)
         active_broadcast_rules.extend(run.get("broadcast_rules_emitted", []))

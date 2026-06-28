@@ -73,13 +73,20 @@ def test_stage12_run_plan_writes_tasks_and_runner_plan(tmp_path):
     assert plan["expected_bundle_count_after_a03"] == 20
     assert plan["stage12_a03_requires_runner_atom"] is True
     command = plan["stage12_a03_command_template"]
-    assert "--loop-until-pass" not in command
     assert "--loop-until-pass-fixture" not in command
+    assert "--stage12-real-loop" in command
     assert "--tasks-jsonl" in command
     assert "--authorization-mode" in command
     assert "required" in command
     assert "--authority-provider" in command
     assert "test-local" in command
+    evaluator_command = plan["stage12_evaluator_command_template"]
+    assert "--import-turingos-evidence" in evaluator_command
+    assert "--stage12-loop-until-pass" in evaluator_command
+    assert "--substrate-coverage" in evaluator_command
+    strict_command = plan["strict_audit_command_template"]
+    assert "stage12/turingos/substrate_coverage.json" not in " ".join(strict_command)
+    assert str(root / "substrate_coverage.json") in " ".join(strict_command)
     assert not list(root.rglob("micro_tape.bundle"))
 
 

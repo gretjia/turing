@@ -194,6 +194,38 @@ def candidate_payload_from_official_evidence(
     }
 
 
+def stage12_loop_until_pass_metadata(
+    *,
+    substrate_run: dict[str, Any],
+    terminal_import: dict[str, Any],
+) -> dict[str, Any]:
+    first_attempt = substrate_run.get("stage12_first_attempt")
+    if not isinstance(first_attempt, dict):
+        raise ValueError("stage12_loop_until_pass requires stage12_first_attempt from runner tape")
+    accepted = terminal_import.get("candidate_write_event_type") == "CandidateAccepted"
+    terminal_candidate = str(terminal_import["candidate_event_id"]) if accepted else None
+    return {
+        "human_intervention_count": 0,
+        "manual_patch_count": 0,
+        "manual_approval_count": 0,
+        "manual_rerun_selection_count": 0,
+        "fallback_to_auto_authorization": False,
+        "attempts_total": 2,
+        "failed_attempts_before_accept": 1,
+        "first_failed_attempt_index": 1,
+        "accepted_attempt_index": 2 if accepted else None,
+        "budget_exhausted": not accepted,
+        "retry_decision_source": "tape_reducer_or_policy",
+        "retry_policy_event_id": first_attempt["retry_authorization_event_id"],
+        "first_failure_event_id": first_attempt["failure_event_id"],
+        "failure_certificate_event_id": first_attempt.get("failure_certificate_event_id"),
+        "first_failure_official_evidence_event_id": first_attempt["official_evidence_event_id"],
+        "terminal_candidate_accepted_event_id": terminal_candidate,
+        "accepted_head": terminal_candidate,
+        "verified_from_micro_tape_bundle_only": True,
+    }
+
+
 def _positive_int(value: Any) -> int:
     if isinstance(value, bool):
         return 0
@@ -227,6 +259,10 @@ def terminal_post_verification_events(
         + _positive_int(substrate_run.get("worker_tool_stdout_tokens_estimate"))
     )
     wall_time_ms = _positive_int(substrate_run.get("worker_elapsed_ms"))
+    first_attempt = substrate_run.get("stage12_first_attempt")
+    if isinstance(first_attempt, dict):
+        total_tokens += _positive_int(first_attempt.get("total_tokens"))
+        wall_time_ms += _positive_int(first_attempt.get("wall_time_ms"))
     market_id = str(substrate_run.get("market_id") or f"mkt_{substrate_run['instance_id']}")
     worker_id = str(substrate_run.get("worker_id") or "worker:sha256:" + "0" * 64)
     basis_event_id = str(verified["official_evidence_event_id"])
@@ -333,12 +369,21 @@ def refresh_micro_tape_bundle(substrate_run: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def write_refreshed_substrate_coverage(path: Path, substrate_runs: dict[str, dict[str, Any]]) -> None:
+def write_refreshed_substrate_coverage(
+    path: Path,
+    substrate_runs: dict[str, dict[str, Any]],
+    *,
+    stage12_loop_until_pass: bool = False,
+) -> None:
     packet = json.loads(path.read_text(encoding="utf-8"))
     for run in packet.get("turingos_arm_runs", []):
         instance_id = run.get("instance_id")
         if instance_id in substrate_runs:
             run.update(substrate_runs[instance_id])
+    if stage12_loop_until_pass:
+        packet["run_id"] = "stage12_20task_loop_until_pass"
+        packet["truth_source"] = "fresh_micro_tape_bundles"
+        packet["scientific_status"] = "STAGE12_20TASK_SCALE_PROTOCOL_EVIDENCE_NOT_STATISTICAL_CLAIM"
     path.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
@@ -677,6 +722,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--venv", default="/tmp/turingos-django-swebench-venv")
     parser.add_argument("--substrate-coverage")
     parser.add_argument("--import-turingos-evidence", action="store_true")
+    parser.add_argument("--stage12-loop-until-pass", action="store_true")
     parser.add_argument("--daemon-bin-dir", default=str(Path(__file__).resolve().parents[2] / "target" / "debug"))
     args = parser.parse_args(argv)
 
@@ -701,12 +747,24 @@ def main(argv: list[str] | None = None) -> int:
         if args.import_turingos_evidence and task["instance_id"] in substrate_runs:
             evidence_payload = turingos_result.get("official_evaluator_evidence")
             if evidence_payload is not None:
-                turingos_result["micro_tape_import"] = import_turingos_evidence_and_verify(
+                if args.stage12_loop_until_pass and not isinstance(
+                    substrate_runs[task["instance_id"]].get("stage12_first_attempt"), dict
+                ):
+                    raise RuntimeError(
+                        "--stage12-loop-until-pass requires runner coverage produced with --stage12-real-loop"
+                    )
+                terminal_import = import_turingos_evidence_and_verify(
                     substrate_run=substrate_runs[task["instance_id"]],
                     evidence_payload=evidence_payload,
                     daemon_bin_dir=Path(args.daemon_bin_dir),
                     runtime_root=out / "micro_import_runtime",
                 )
+                if args.stage12_loop_until_pass:
+                    substrate_runs[task["instance_id"]]["loop_until_pass"] = stage12_loop_until_pass_metadata(
+                        substrate_run=substrate_runs[task["instance_id"]],
+                        terminal_import=terminal_import,
+                    )
+                turingos_result["micro_tape_import"] = terminal_import
                 turingos_result["micro_tape_import"].update(
                     refresh_micro_tape_bundle(substrate_runs[task["instance_id"]])
                 )
@@ -734,7 +792,11 @@ def main(argv: list[str] | None = None) -> int:
     }
     (out / "patch_eval_summary.json").write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if args.substrate_coverage and refreshed_substrate_coverage:
-        write_refreshed_substrate_coverage(Path(args.substrate_coverage), substrate_runs)
+        write_refreshed_substrate_coverage(
+            Path(args.substrate_coverage),
+            substrate_runs,
+            stage12_loop_until_pass=args.stage12_loop_until_pass,
+        )
     (out / "broadcast_rules.json").write_text(
         json.dumps(
             {
