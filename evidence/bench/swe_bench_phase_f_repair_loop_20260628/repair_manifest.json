@@ -1,0 +1,75 @@
+{
+  "created_from_commit": "f3c6fb64259b689d37fc8ce8bd831aa808736037",
+  "dataset_gold_patch_use_allowed": false,
+  "loop_decision": "blocked_until_fresh_stage16r_real_evaluator_bundles",
+  "old_microtape_immutable": true,
+  "repair_target_count": 7,
+  "repair_targets": [
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-11790",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-11790/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-11790/official_test.patch"
+    },
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-11815",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-11815/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-11815/official_test.patch"
+    },
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-11964",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-11964/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-11964/official_test.patch"
+    },
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-12209",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12209/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12209/official_test.patch"
+    },
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-12273",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12273/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12273/official_test.patch"
+    },
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-12308",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12308/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12308/official_test.patch"
+    },
+    {
+      "candidate_source": "worker_derived_patch_required",
+      "instance_id": "django__django-12325",
+      "old_microtape_immutable": true,
+      "repair_strategy": "supersede_not_rewrite",
+      "required_next_action": "fresh_stage16r_real_evaluator_bundle",
+      "source_phase_f_candidate_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12325/candidate.patch",
+      "source_phase_f_test_patch_path": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628/patch_artifacts/django__django-12325/official_test.patch"
+    }
+  ],
+  "schema_id": "PhaseFRepairLoopManifest.v1",
+  "source_phase_f_release_next_phase_g": false,
+  "source_phase_f_status": "PARTIAL"
+}
