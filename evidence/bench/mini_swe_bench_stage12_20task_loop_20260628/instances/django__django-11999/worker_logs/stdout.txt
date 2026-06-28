@@ -1,0 +1,27 @@
+**Patch applied** (smallest change to restore override of `get_FOO_display()`):
+
+```diff
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index ee45bb941e..411a7c4e40 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -763,8 +763,9 @@ class Field(RegisterLookupMixin):
+             if not getattr(cls, self.attname, None):
+                 setattr(cls, self.attname, self.descriptor_class(self))
+         if self.choices is not None:
+-            setattr(cls, 'get_%s_display' % self.name,
+-                    partialmethod(cls._get_FIELD_display, field=self))
++            if not getattr(cls, 'get_%s_display' % self.name, None):
++                setattr(cls, 'get_%s_display' % self.name,
++                        partialmethod(cls._get_FIELD_display, field=self))
+ 
+     def get_filter_kwargs_for_object(self, obj):
+         """
+```
+
+- Only edited [django/db/models/fields/__init__.py](/tmp/turingos_substrate_worktrees/1bb3b396db4696e0/django/db/models/fields/__init__.py) (mirrors the adjacent `attname` guard + `contribute_to_class` logic).
+- Unconditional `setattr` (introduced for `partialmethod`) was overriding user methods defined in the class body (or inherited manual overrides from abstract bases).
+- The guard ensures the auto-generated version is only installed when nothing is already present (via `__dict__` or MRO).
+- Verified via direct execution (override now returns user value; default choice lookup still works; no test files touched).
+
+Worktree left with the patch as-is.

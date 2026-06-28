@@ -1,72 +1,69 @@
-# Stage12-A01/A02 Acceptance Commands
+# Stage12 Release Acceptance Commands
 
-Run these commands from the repository root.
-
-`audit_stage12_release.py` recomputes strict MicroTape audit from the same coverage bundle paths and rejects stale strict summaries, relabeled fixture payloads, fewer-than-20 output, and manual intervention.
+Run these commands from the repository root to reproduce the Stage12 local release gate. These commands audit the post-run evidence packet; the earlier A01/A02 pre-run contract checks remain in git history and in the frozen contract files.
 
 ```bash
-python3 -m py_compile tools/bench/validate_stage12_contract.py
 python3 -m py_compile \
   tools/bench/prepare_stage12_run_plan.py \
   tools/bench/validate_stage12_contract.py \
-  tools/bench/audit_stage12_release.py
+  tools/bench/audit_stage12_release.py \
+  tools/bench/audit_micro_tape_decision_dag.py \
+  tools/bench/run_mini_swe_bench_substrate_smoke.py \
+  tools/bench/evaluate_django_swe_bench_patches.py
 
 pytest \
   tests/test_stage12_contract.py \
   tests/test_stage12_run_plan.py \
   tests/test_stage12_release_audit.py \
   tests/test_stage12_test_local_authority.py \
+  tests/test_mini_swe_bench_grok_headless.py::test_evaluator_refreshes_micro_tape_bundle_after_terminal_import \
+  tests/test_mini_swe_bench_grok_headless.py::test_stage12_loop_metadata_records_failed_attempt_before_terminal_accept \
+  tests/test_mini_swe_bench_grok_headless.py::test_stage12_loop_metadata_records_budget_exhausted_without_accept \
   -q
 
-python3 tools/bench/validate_stage12_contract.py \
-  --root evidence/bench/mini_swe_bench_stage12_20task_loop_20260628
+python3 tools/bench/audit_micro_tape_decision_dag.py \
+  --strict-vpput \
+  --strict-terminal-market \
+  --require-authorization-head \
+  --coverage evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/substrate_coverage.json \
+  --out-dir /tmp/turingos_stage12_external_strict_audit
 
-python3 tools/bench/prepare_stage12_run_plan.py \
-  --root evidence/bench/mini_swe_bench_stage12_20task_loop_20260628
-
-python3 - <<'PY'
-import json
-from pathlib import Path
-root = Path("evidence/bench/mini_swe_bench_stage12_20task_loop_20260628")
-task = json.loads((root / "task_manifest.json").read_text())
-loop = json.loads((root / "loop_manifest.json").read_text())
-assert task["task_count"] == 20
-assert len(task["instance_ids"]) == 20
-assert len(set(task["instance_ids"])) == 20
-assert task["frozen_before_run"] is True
-assert loop["authorization_mode"] == "required"
-assert loop["stage_release_policy"]["dry_run_can_release"] is False
-assert loop["stage_release_policy"]["static_only_external_review_can_release"] is False
-print("STAGE12_A01_CONTRACT_FROZEN")
-PY
+python3 tools/bench/audit_stage12_release.py \
+  --root evidence/bench/mini_swe_bench_stage12_20task_loop_20260628 \
+  --coverage evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/substrate_coverage.json \
+  --strict-audit /tmp/turingos_stage12_external_strict_audit/micro_tape_decision_dag_audit.json \
+  --out /tmp/turingos_stage12_external_release_audit.json
 
 python3 - <<'PY'
 import json
 from pathlib import Path
 root = Path("evidence/bench/mini_swe_bench_stage12_20task_loop_20260628")
-report = json.loads((root / "stage12_a02_report.json").read_text())
-plan = json.loads((root / "stage12_run_plan.json").read_text())
-tasks = [json.loads(line) for line in (root / "tasks_20.jsonl").read_text().splitlines()]
-assert report["status"] == "PASS"
-assert plan["status"] == "READY_FOR_STAGE12_A03"
-assert plan["a02_does_not_run_workers"] is True
-assert plan["expected_bundle_count_after_a03"] == 20
-assert plan["stage12_a03_requires_runner_atom"] is True
-assert "--loop-until-pass-fixture" not in plan["stage12_a03_command_template"]
-assert "--stage12-real-loop" in plan["stage12_a03_command_template"]
-assert "--authority-provider" in plan["stage12_a03_command_template"]
-assert "test-local" in plan["stage12_a03_command_template"]
-assert "--import-turingos-evidence" in plan["stage12_evaluator_command_template"]
-assert "--stage12-loop-until-pass" in plan["stage12_evaluator_command_template"]
-assert "substrate_coverage.json" in plan["strict_audit_command_template"]
-assert plan["authority_provider"] == "test-local"
-assert plan["fallback_to_auto_authorization"] is False
-assert len(tasks) == 20
-assert [row["instance_id"] for row in tasks] == plan["instance_ids"]
-for forbidden in ("micro_tape.bundle", "micro.git", "substrate_coverage.json"):
-    assert not list(root.rglob(forbidden)), forbidden
-print("STAGE12_A02_RUN_PLAN_FROZEN")
+strict = json.loads((root / "micro_tape_audit_strict/micro_tape_decision_dag_audit.json").read_text())
+release = json.loads((root / "stage12_release_audit.json").read_text())
+assert release["status"] == "PASS"
+assert release["run_count"] == 20
+assert release["solved_count"] == 13
+assert release["unsolved_count"] == 7
+assert release["problems"] == []
+summary = strict["status_summary"]
+for key in [
+    "overall",
+    "replay_structural_integrity",
+    "git_topology",
+    "registry_head_effect",
+    "accepted_head_authority",
+    "authorization_head",
+    "cost_conservation_all_branches",
+    "vpput_accounting",
+    "economic_timing",
+    "market_accounting_correctness",
+    "constitutional_protocol_audit",
+]:
+    assert summary[key] == "PASS", (key, summary[key])
+print("STAGE12_RELEASE_PACKET_PASS")
 PY
 
 git diff --check
 ```
+
+Expected release audit result: `PASS`, `run_count=20`, `solved_count=13`, `unsolved_count=7`, `problems=[]`.

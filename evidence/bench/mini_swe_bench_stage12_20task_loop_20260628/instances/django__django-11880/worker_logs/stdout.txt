@@ -1,0 +1,12 @@
+**Patch applied** (1-line addition in [django/forms/fields.py](/tmp/turingos_substrate_worktrees/ddf7326a6804a513/django/forms/fields.py)):
+
+```diff
+     result = copy.copy(self)
+     memo[id(self)] = result
+     result.widget = copy.deepcopy(self.widget, memo)
++    result.error_messages = copy.deepcopy(self.error_messages, memo)
+     result.validators = self.validators[:]
+     return result
+```
+
+Only `django/forms/fields.py` was inspected/edited (no test files, no other files). The change is the smallest fix that ensures `error_messages` (the dict and its message values) are isolated on deepcopy, matching the behavior for `widget` (and subclass overrides that call `super()`). Diff and runtime isolation verified in the worktree; patch remains.

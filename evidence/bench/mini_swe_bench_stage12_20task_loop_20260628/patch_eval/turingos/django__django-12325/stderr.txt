@@ -1,0 +1,87 @@
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/unittest/case.py", line 57, in testPartExecutor
+    yield
+  File "/usr/lib/python3.11/unittest/case.py", line 623, in run
+    self._callTestMethod(testMethod)
+  File "/usr/lib/python3.11/unittest/case.py", line 579, in _callTestMethod
+    if method() is not None:
+       ^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/tests/invalid_models_tests/test_relative_fields.py", line 1298, in test_clash_parent_link
+    class Child(Parent):
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/db/models/base.py", line 322, in __new__
+    new_class._prepare()
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/db/models/base.py", line 335, in _prepare
+    opts._prepare(cls)
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/db/models/options.py", line 255, in _prepare
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Add parent_link=True to invalid_models_tests.Child.other_parent.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 335, in _run_subsuite
+    result = runner.run(subsuite)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 282, in run
+    test(result)
+  File "/usr/lib/python3.11/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/unittest/suite.py", line 122, in run
+    test(result)
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/testcases.py", line 239, in __call__
+    self._setup_and_call(result)
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/testcases.py", line 271, in _setup_and_call
+    super().__call__(result)
+  File "/usr/lib/python3.11/unittest/case.py", line 678, in __call__
+    return self.run(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/unittest/case.py", line 622, in run
+    with outcome.testPartExecutor(self):
+  File "/usr/lib/python3.11/contextlib.py", line 155, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/usr/lib/python3.11/unittest/case.py", line 74, in testPartExecutor
+    _addError(self.result, test_case, exc_info)
+  File "/usr/lib/python3.11/unittest/case.py", line 99, in _addError
+    result.addError(test, exc_info)
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 223, in addError
+    self.check_picklable(test, err)
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 156, in check_picklable
+    self._confirm_picklable(err)
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 130, in _confirm_picklable
+    pickle.loads(pickle.dumps(obj))
+                 ^^^^^^^^^^^^^^^^^
+TypeError: cannot pickle 'traceback' object
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/tests/runtests.py", line 565, in <module>
+    failures = django_tests(
+               ^^^^^^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/tests/runtests.py", line 307, in django_tests
+    failures = test_runner.run_tests(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 699, in run_tests
+    result = self.run_suite(suite)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 641, in run_suite
+    return runner.run(suite)
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/unittest/runner.py", line 217, in run
+    test(result)
+  File "/usr/lib/python3.11/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/turingos_django_patch_eval/turingos_django__django-12325/django/test/runner.py", line 399, in run
+    subsuite_index, events = test_results.next(timeout=0.1)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/multiprocessing/pool.py", line 873, in next
+    raise value
+TypeError: cannot pickle 'traceback' object

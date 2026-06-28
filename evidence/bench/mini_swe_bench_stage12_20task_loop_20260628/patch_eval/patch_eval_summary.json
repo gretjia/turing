@@ -1,0 +1,2008 @@
+{
+  "broadcast_rules": [
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_ee281425992f8286",
+      "source_evidence_id": "ev_official_ee281425992f8286",
+      "source_instance_id": "django__django-11790"
+    },
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_ec9f996542768842",
+      "source_evidence_id": "ev_official_ec9f996542768842",
+      "source_instance_id": "django__django-11815"
+    },
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_b00a2bd62fddaece",
+      "source_evidence_id": "ev_official_b00a2bd62fddaece",
+      "source_instance_id": "django__django-12209"
+    },
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_0b073f9b1211ed2a",
+      "source_evidence_id": "ev_official_0b073f9b1211ed2a",
+      "source_instance_id": "django__django-12273"
+    },
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_655931f524a8dd9e",
+      "source_evidence_id": "ev_official_655931f524a8dd9e",
+      "source_instance_id": "django__django-12308"
+    },
+    {
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "guidance": "Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise.",
+      "rule_id": "br_ev_official_591261e0ee74fb1b",
+      "source_evidence_id": "ev_official_591261e0ee74fb1b",
+      "source_instance_id": "django__django-12325"
+    }
+  ],
+  "by_arm": {
+    "direct": {
+      "pass": 0,
+      "total": 20
+    },
+    "turingos": {
+      "pass": 13,
+      "total": 20
+    }
+  },
+  "results": [
+    {
+      "arm": "turingos",
+      "exit_code": 1,
+      "instance_id": "django__django-11790",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:c331577034eac11fb3bc3ed5cb650c83b3ee728dc592fddd82327ffcba9b8bad",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11790/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:ed0e3eafcc8224ddf8416efa141b25d9cf10cacadca90d1d546ce377e222e70c",
+        "official_evidence_event_id": "mu:9d05f7691eac3c6df254d897091a001f61b5b8c8378d5530f1ca2e4a333f9074",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:ed358ec9802b6cf9f2f5293faf2598fdc8128817d07275c2c03957eccf25b005",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:1ff6d68f11141c07536aa337c23beda0555c88978eea2334c2c5515d9bae86ee",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:2f9e2832a2490d5f09455b848423c0600fda1e0959df63d93c60f95c6fad74eb",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:7be44fb1704b5631cb284706f4f914b929646a2be8d2c6d97a1ebe07bada8ab4",
+        "capsule_id": "wc_django__django-11790",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_ee281425992f8286",
+        "fail_to_pass_labels": [
+          "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+          "test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest)"
+        ],
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:0aa6b5902d2bc3612f340d4f50a63d902b96d9b8d2db0acf6ecc9e5adea1c2de",
+        "stdout_hash": "sha256:e90aafda4a4308322c9e341b42197cb27384b5f5b6b9a44ee3e995cc740c5efa",
+        "target_test_exit_code": 1,
+        "target_test_result": "FAIL",
+        "test_patch_hash": "sha256:b4fdde454b6adea97827dd0a5dcee9e79125173863025c7a8db3ff7ea88a8ec9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_19c16eb9f5afd7460fdd5edfb4325eec"
+      },
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11790/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11790/stdout.txt",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11790",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_2e2e6a1d13d44c01",
+        "fail_to_pass_labels": [
+          "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+          "test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11790",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:b4fdde454b6adea97827dd0a5dcee9e79125173863025c7a8db3ff7ea88a8ec9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 1,
+      "instance_id": "django__django-11815",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:94a743bd033e682714df7c6357f62ad3ba75269c9d572f8a4f6b42653d8406ef",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11815/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:003b61a4e135bcdcba0173e9925fbb6fd7c55da62a427a835371a871923e0dcb",
+        "official_evidence_event_id": "mu:66e9ed4ae8106ebf43d25d92ac24d015bfd16c57b3edac96e6ffa2b524a90d0d",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:c2deb2d68abb79a9a12475af7f43193ba9333047e1199c52252b94a1ead29b12",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:24a4287a190fea8de344c9fcca7f19320d21f2a069b1bd66dc5077bd5459112a",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:a71f848b48900205c89a9baba9b6852c9a92f96f875213c6ed0c7abf9532ff89",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:3a5260087f928c9aa22fb11e4d01acaf4a5dfddad140b74448df49ed2bd48f9f",
+        "capsule_id": "wc_django__django-11815",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_ec9f996542768842",
+        "fail_to_pass_labels": [
+          "test_serialize_class_based_validators (migrations.test_writer.WriterTests)",
+          "test_serialize_enums (migrations.test_writer.WriterTests)"
+        ],
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11815",
+        "macro_anchor_id": "macro:diff:django__django-11815",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:b69488e45f16e2aa5de82d06bcc4efb8b52d40f7b2ab44a6357a77b8e62ad73d",
+        "stdout_hash": "sha256:075982073d2aa5d808ad6ebbe4084ccbc3f5a5c95e739b00b8418f6f7c0bf3ed",
+        "target_test_exit_code": 1,
+        "target_test_result": "FAIL",
+        "test_patch_hash": "sha256:c9a8c36ea2d687650d9de75b177205a53391276cbf2ee4854eb10551cf38e3d4",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_b98bd09cdc13eee9d77e876ff7780efe"
+      },
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11815/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11815/stdout.txt",
+      "target_tests": [
+        "migrations.test_writer.WriterTests.test_serialize_class_based_validators",
+        "migrations.test_writer.WriterTests.test_serialize_enums"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11815",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_dda48dfdeb7e971f",
+        "fail_to_pass_labels": [
+          "test_serialize_class_based_validators (migrations.test_writer.WriterTests)",
+          "test_serialize_enums (migrations.test_writer.WriterTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11815",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:c9a8c36ea2d687650d9de75b177205a53391276cbf2ee4854eb10551cf38e3d4",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11848",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:abe46a9222b777eeaafc8006fee4a5bfd68c9e78d0a2902eab1809fd094e16b4",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11848/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:dc9d2ea3ff5386e7d693753609f2d25501ca253d26e78e2450470067a3f94833",
+        "official_evidence_event_id": "mu:7b57f886a9803342311f73e307268fb5ffa3171bbe460667cd2bdc50663ae099",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:62c53d302e084eb1e8a59685700e02492c7e8087a83771191a62535afaf93ce2",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:3d43313b91d77c33af6cef7639950961510d08a33e20d8bf719cc6366e6d3ef3",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:349bc7177791ab561eb7245c2e62cbde5080fe007ac093536ef0bfad19af6295",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:f04c2b7fcda69294ae9b878e2d7a0f24a42e6940d1c1183a23da1aa97c2e78e1",
+        "capsule_id": "wc_django__django-11848",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_afbda30fd0e58a87",
+        "fail_to_pass_labels": [
+          "test_parsing_rfc850 (utils_tests.test_http.HttpDateProcessingTests)",
+          "test_parsing_year_less_than_70 (utils_tests.test_http.HttpDateProcessingTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11848",
+        "macro_anchor_id": "macro:diff:django__django-11848",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:0d3a035e11298ac55369cc0d856e7a3a91768e8924da00e90ed8a598b564388d",
+        "stdout_hash": "sha256:7d6f5392813714b3c7c10d50af8dcfc3c12b1d695297e70132731c1f9bc9b85d",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:3dbca91b189998fea502160f1320e09e559afe8877753a7b746b1d3513905bcd",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_eddf8a10e207eded25a8c8c0bf1b8a34"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11848/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11848/stdout.txt",
+      "target_tests": [
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_rfc850",
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_year_less_than_70"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11848",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_0add625966ce4d7c",
+        "fail_to_pass_labels": [
+          "test_parsing_rfc850 (utils_tests.test_http.HttpDateProcessingTests)",
+          "test_parsing_year_less_than_70 (utils_tests.test_http.HttpDateProcessingTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11848",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:3dbca91b189998fea502160f1320e09e559afe8877753a7b746b1d3513905bcd",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11880",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:d55d867eed2e49aa857b17e28ed317f8caa143be6cd173e97c1f09ed712c27e5",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11880/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:9e0d900db8adccd78cc0510f4d88c688ba28d01e5a87ea317509d0862b6e94cd",
+        "official_evidence_event_id": "mu:e70ec278d2dd98f0d18847c6d3b0826432d863e95b54c6faa0efaac11228996c",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:cd86becf300b584710aa7479f84ae34c1b83427f644c918b1cb0b76e977fb9c1",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:1a248de9f6902d62713f1e05a7c603a54d7c9c7bef9a4c4f1fec86f61a55cd54",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:0d5930303a50ec6b5d9feeb60c1e971ce229e5e436a9c76b2700150e4fdc4d72",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:ca05eec3eb386b0fc23a410e444c26143e55f5ed671e0b3e9621dcf4b6440df5",
+        "capsule_id": "wc_django__django-11880",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_8142f979919e5f3f",
+        "fail_to_pass_labels": [
+          "test_field_deep_copy_error_messages (forms_tests.tests.test_forms.FormsTestCase)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11880",
+        "macro_anchor_id": "macro:diff:django__django-11880",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:288f5428df702ce912a4fa0242315baf057d8ba875eb6b523029aa207d4f1dc8",
+        "stdout_hash": "sha256:51b98163dafc1220eeb9254815a5624e889756616779bc1d451e0c5ca116af11",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:927d6c80fea772e54a8da05abef6645e3d0f8187fec708a8ba66b59e73efd710",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_05b694e26d6217eb20e2c3c70e03091e"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11880/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11880/stdout.txt",
+      "target_tests": [
+        "forms_tests.tests.test_forms.FormsTestCase.test_field_deep_copy_error_messages"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11880",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_95f0e2c34678c160",
+        "fail_to_pass_labels": [
+          "test_field_deep_copy_error_messages (forms_tests.tests.test_forms.FormsTestCase)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11880",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:927d6c80fea772e54a8da05abef6645e3d0f8187fec708a8ba66b59e73efd710",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11885",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:8890f7021de81a2b8799027d5f4e7bc14fb8eea0ab585776f349736d2166eff1",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11885/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:cc4d9833dfdb02d58074fb8eab3e5aa81bbb42e85ae444958bee6d00296fd2fe",
+        "official_evidence_event_id": "mu:de7184f261658c0a83119dfc1c9d38d8bc41c7e5bac268f12dab0e4e027990fc",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:41553d76cc169443739e500cba5e577649be806559cb66db9e78e1c6936fcfba",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:82f17f39fb57636720d3d67a9035a0738e901b6d581e343037d1c069741d741a",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:c8eded78596dbe48ff86cd88b486d63bf190afcc1053f61032e6800533bd3c33",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:714cdc13aff215216d6eb3ff8a2550420b36c4efbd395158cfa59de875566bd5",
+        "capsule_id": "wc_django__django-11885",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_5902cf16aafc710c",
+        "fail_to_pass_labels": [
+          "test_fast_delete_combined_relationships (delete.tests.FastDeleteTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11885",
+        "macro_anchor_id": "macro:diff:django__django-11885",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:970251761f9beb8991480de6fef9157bb25921eb1edd068f49f53ca59d2a1dfe",
+        "stdout_hash": "sha256:cafcd4595cc82d88be8a54a08962a3bc920214e749b2387acf82f0234e40b14e",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:5f60c281419f91c9fc2500b83cf1c48b47a26673c5f5030039a99ea6dd9e9a26",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_c44fcbd4698d12861095619e062a4a1e"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11885/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11885/stdout.txt",
+      "target_tests": [
+        "delete.tests.FastDeleteTests.test_fast_delete_combined_relationships"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11885",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_ce66823c63fd15a6",
+        "fail_to_pass_labels": [
+          "test_fast_delete_combined_relationships (delete.tests.FastDeleteTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11885",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:5f60c281419f91c9fc2500b83cf1c48b47a26673c5f5030039a99ea6dd9e9a26",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11951",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:3a02bce693e3d95ae81e19b05b79a2836699ad8dfa4ac5fd1a8f4e45da61ad73",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11951/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:5759d06287a37614238776feed880d487d59c1f063a69a72312df02bc021dd11",
+        "official_evidence_event_id": "mu:34c27e5ba1f0eb0b84fe01e41e7720f4d8e22db8b684382518bbb16d913ae8ea",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:67bc87b36254a8cf40746cf808dded64735f9d9473496221c22f75a4c3153fda",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:2bfa7561c833a2c25fc48620190a645289d9a7bb699a5757686906052d45bed8",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:a1b3f62cca1dc87b4f8ec8be630bcac6fbfbd91f5e62b41b2eb9d0f0f4ffdc06",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:3cc0b623a4393acf23f2426804f91ba7a471b940d928d93b072d6163d0cffd86",
+        "capsule_id": "wc_django__django-11951",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_3dadb44235ff8fb9",
+        "fail_to_pass_labels": [
+          "test_explicit_batch_size_respects_max_batch_size (bulk_create.tests.BulkCreateTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11951",
+        "macro_anchor_id": "macro:diff:django__django-11951",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:83f549146aca576d9017a1577c3481ef4b2b36e24ca4efd23eadf9e3d0df743b",
+        "stdout_hash": "sha256:f9cc247bc8c41cb61955d8cde771e7c1daeaa9bcf788b47d3eadbf214cdef11d",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:bbcad4a96c52f370a99b02f9e260011c726c7a198b46882253f069b90cc9256b",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_92870ed7abc2099856d5ab95829dcc21"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11951/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11951/stdout.txt",
+      "target_tests": [
+        "bulk_create.tests.BulkCreateTests.test_explicit_batch_size_respects_max_batch_size"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11951",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_d0ea0d4a2f42667e",
+        "fail_to_pass_labels": [
+          "test_explicit_batch_size_respects_max_batch_size (bulk_create.tests.BulkCreateTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11951",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:bbcad4a96c52f370a99b02f9e260011c726c7a198b46882253f069b90cc9256b",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "instance_id": "django__django-11964",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:a30c50d131d1cd37412e937ded32cabe864068640ca17d4a831a3612cc283b6e",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11964/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:05a538e22401c03b7be88d56df889057e762c4360122dbe72ef0955dd2f1e07e",
+        "official_evidence_event_id": "mu:28649ce0004ed2e6a65ad39a473d0b726b6d2ebf276fff17fe632cb14d0533aa",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:70f51558bb2b7907beebd42c4eab233224434c03c6b69e6baf7d58a387ad7ef2",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:b3e352dc09504752fc1dcbac7beba93f56b209ac68c5f7d314c066159c74b6e3",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:e99db1cd05f6fbc006b155ce240d85974c8df7a40faadf53962eecd645bad4f1",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": "wc_django__django-11964",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_c34f9d307a3173fe",
+        "fail_to_pass_labels": [
+          "test_str (model_enums.tests.ChoicesTests)",
+          "test_textchoices (model_enums.tests.ChoicesTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11964",
+        "macro_anchor_id": "macro:diff:django__django-11964",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:567a38d6bcec680b14ef2ff97defdaa0853f53523fc54d382e81899debe499bd",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_ffd3e653f880577fabfd1359e0c16a5c"
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11964",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_b5c55709c35d19c4",
+        "fail_to_pass_labels": [
+          "test_str (model_enums.tests.ChoicesTests)",
+          "test_textchoices (model_enums.tests.ChoicesTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11964",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:567a38d6bcec680b14ef2ff97defdaa0853f53523fc54d382e81899debe499bd",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11999",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:14cae4c96140cd705c1999da3ac01e236d3b05d2c0e4e41cb944a4eac190ba60",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-11999/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:673f3cd7b3d79f27118d6e82cf770ba5922c886d6b9db0ac8e94551d36227a82",
+        "official_evidence_event_id": "mu:855220b0b4246c81df0459cb01ce9bfc8e10f17674a1cafa1f77080ff113c8d0",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:3582deac5333593b658645d2ca71a5e29d21e151b0925ac37445a02afd78d47f",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:1383770a487290065a741c5c987166603d5dc7ec06863a256a405c7b495f82c5",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:46754a2ef504bc2ee63e9fbc47731558c05c1f8f911eb0ec933e97f4dd411c5d",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:b0ffc6f10a2a3fe12936bcc944d8943c617644e061786ea353397189bf3fcff2",
+        "capsule_id": "wc_django__django-11999",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_e46fbad91d7ef255",
+        "fail_to_pass_labels": [
+          "test_overriding_FIELD_display (model_fields.tests.GetFieldDisplayTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11999",
+        "macro_anchor_id": "macro:diff:django__django-11999",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:bae13c8e642aa81bfa5337dbe9012b76ad7ead07bd8755829608f6d202fdc364",
+        "stdout_hash": "sha256:c1f9da2c43c09f2ad9fd661590a1324ac7f617c6c7f6f7843340222b8cf8b442",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:35c1b2d9a343fd1ccbb8e49f7374b9f5264dad8ba00676758fda955508c20279",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_e863272c5c52aa53506870eddb427162"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11999/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-11999/stdout.txt",
+      "target_tests": [
+        "model_fields.tests.GetFieldDisplayTests.test_overriding_FIELD_display"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11999",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_6ca51c6005445662",
+        "fail_to_pass_labels": [
+          "test_overriding_FIELD_display (model_fields.tests.GetFieldDisplayTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11999",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:35c1b2d9a343fd1ccbb8e49f7374b9f5264dad8ba00676758fda955508c20279",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12039",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:80cba4b9f877bfeec46d368d08920a8b31ef890043f46296e856bbe64a91a74d",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12039/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:279d86592806981b6100695f2f08f4c910d8e0758401e1838df732ffaa382708",
+        "official_evidence_event_id": "mu:c3d0190c55ad078f4804f2c57a6c434982afee5258adc57c4e942a8c5e499a15",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:1b401bb8caeda3b7e8d8c19aad3c2adbf9aa253e19f68fabe50091f6eeeed654",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:2171dd9a2ee619779a6f0ca33ea5d2e3aec3652d0f530caa13f3405f27c20246",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:82de23e86e829e37271449f052579f8dbb7f2f2bcd5bc330bf311d24715edb7b",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:290cfe52be3ccab9c134d3e8dc0385dbc7106f424d3cecfec709a64d2579b0e2",
+        "capsule_id": "wc_django__django-12039",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_4b3166c1774ac21c",
+        "fail_to_pass_labels": [
+          "test_descending_columns_list_sql (indexes.tests.SchemaIndexesTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12039",
+        "macro_anchor_id": "macro:diff:django__django-12039",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:3ec5aa05fd996f66b283eff5d3ddb4d840236067e2171a9be48133e0587e9053",
+        "stdout_hash": "sha256:92ab2bdc632d465a648a5987a3a5e7af1194e7f38e6d4430c91cd22c9d70e377",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:d3ca1167e75c713b109de4d1dcfe46467993d1a7046c8edf09d4ff83c4306c78",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_ac5c21173901a5f30ff45bfea2762c1f"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12039/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12039/stdout.txt",
+      "target_tests": [
+        "indexes.tests.SchemaIndexesTests.test_descending_columns_list_sql"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12039",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_bc3a8052fce07fff",
+        "fail_to_pass_labels": [
+          "test_descending_columns_list_sql (indexes.tests.SchemaIndexesTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12039",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:d3ca1167e75c713b109de4d1dcfe46467993d1a7046c8edf09d4ff83c4306c78",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12050",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:af0e4c13b860468df5dd2eda79066e1909e0f788646b2f22a209d475386596c2",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12050/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:e91ba77544481d6bb349540ce09c73741db13e6071491eefb45414a45255c48c",
+        "official_evidence_event_id": "mu:e2848383adf7b1e50c888a567d36f4706c9cf67e3c1df0adc1d6cbef8d2481a4",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:7d1d455da452bd65bc9111085ca7893abbd40797f1a198a6bc2314aa2dde3d80",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:e3119808ef19fe8b58a6ef2b20fd1b9294275b73a3fb430474ccb4ef37cfd5e2",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:1411484a8649a181b89d9d2b1b9dd0f5a2b6cf225f3401ed2cb37d65c3ad5dfa",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:08af6e22fa66b28c47c3cd61192637cdcf2fca544718dc4d48f8f01fb469e63f",
+        "capsule_id": "wc_django__django-12050",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_21b36aeaf8e52a68",
+        "fail_to_pass_labels": [
+          "test_iterable_lookup_value (queries.test_query.TestQuery)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12050",
+        "macro_anchor_id": "macro:diff:django__django-12050",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:dc39e9c84b074e4672bfa8c9046248af544d56277c22f916daaad8635c2913f1",
+        "stdout_hash": "sha256:f87c9ee0f02efcc08c2506204f85b2f94250f86f7bae46b5d07a346f68cdb85a",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:36cd158c41c8ebae20e7efc4fb92c9cd36dcad4e4f3c5a973cbf3402b667e3ed",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_9b349c44318d7b0b7b27938c32a9d480"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12050/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12050/stdout.txt",
+      "target_tests": [
+        "queries.test_query.TestQuery.test_iterable_lookup_value"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12050",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_8e15a64d4eaf09d3",
+        "fail_to_pass_labels": [
+          "test_iterable_lookup_value (queries.test_query.TestQuery)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12050",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:36cd158c41c8ebae20e7efc4fb92c9cd36dcad4e4f3c5a973cbf3402b667e3ed",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12143",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:63dddedca991ff900cc7bb4de83f5c0b2c593dacd7e7bfde07387472dc1ff682",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12143/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:8b1051c73cfd1d2c25648323e6cc9018b3fe072efcfd26e1ccbdc82ef6ea32d9",
+        "official_evidence_event_id": "mu:92d378c9fc43cfb303a340d683fc77525e1ec59a456880754fcca4fffba210b8",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:8bb68b0afccf0a6bd5987b095922d5067277bb0399bc2addb703c75319686402",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:308e28923c00b43ffefe01155e5e361e3c1b5a8b2b90c6b25df61a690692a2dc",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:142d4dfa0047241a6fc5110b1656d8dbe9a1a1a108989c27c8c25931f4b01015",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:132af8d75e205ae5c96c051b2742ccff32effacca2144d04f1ada26456c162c1",
+        "capsule_id": "wc_django__django-12143",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_1907eecb98c3f483",
+        "fail_to_pass_labels": [
+          "test_get_list_editable_queryset_with_regex_chars_in_prefix (admin_changelist.tests.ChangeListTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12143",
+        "macro_anchor_id": "macro:diff:django__django-12143",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:08d8ba6ae72170b41bdb814f57f8ce61b65d9cc67bfd63402df766942c93912e",
+        "stdout_hash": "sha256:07beb424b54daebc339a5f831461d08675141b78a3d3ee9633dc0a3038225a44",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:b3fc27d2d82cabb21053f0abb76d8dc1284c3fc2f82284be059f316dd2c86101",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_f1c63ff12f66ac49ba12dc1a065f30dd"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12143/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12143/stdout.txt",
+      "target_tests": [
+        "admin_changelist.tests.ChangeListTests.test_get_list_editable_queryset_with_regex_chars_in_prefix"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12143",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_4e9eecb5e400df74",
+        "fail_to_pass_labels": [
+          "test_get_list_editable_queryset_with_regex_chars_in_prefix (admin_changelist.tests.ChangeListTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12143",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:b3fc27d2d82cabb21053f0abb76d8dc1284c3fc2f82284be059f316dd2c86101",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12155",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:1d7fbe7d94ef24e7c9530feeb0b37a01c94e632f03dcde6e1d5504405cf91b8f",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12155/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:24c7e673dee7b04ed483d008e19003e322b28a0bde31b7cfa2341c3a2af9e4ec",
+        "official_evidence_event_id": "mu:73f7b2eda1ed64597cd8ed2f95c58ed5c44ad0a49edc6f587a0d56ec0a23fd0f",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:6a3db462c9ef518395e94b024e65e678839d1e7749c95797bed4657968ead3cc",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:55a377d5d5a6ecee79050c1f4c54c5ccf8576324e9cf1014573ff47bbb013080",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:891ef6b3f17a4cafb15fd335f440bbfff06b4a0a183393778f1e9148050c1baf",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:11f03c5b4a6c948d47db139f12901365b976e113194c3cb8f638cb97e72bc208",
+        "capsule_id": "wc_django__django-12155",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_6076ca3454616b28",
+        "fail_to_pass_labels": [
+          "test_parse_rst_with_docstring_no_leading_line_feed (admin_docs.test_utils.TestUtils)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12155",
+        "macro_anchor_id": "macro:diff:django__django-12155",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:ed813a5fe085f26974623758234e774d6f9d9debf45030edfeb1f677e901c07b",
+        "stdout_hash": "sha256:f9ade632330589a142f7330dc845f701a87a9cf9136ddebf87157a71ec272001",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:544dde367f892a84033a80d5a775198f533906bf89b4649b25f1cdf7f27d7edd",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_f74d762fea227c00ad631be8b4a2560d"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12155/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12155/stdout.txt",
+      "target_tests": [
+        "admin_docs.test_utils.TestUtils.test_parse_rst_with_docstring_no_leading_line_feed"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12155",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_6d84b297d1572df9",
+        "fail_to_pass_labels": [
+          "test_parse_rst_with_docstring_no_leading_line_feed (admin_docs.test_utils.TestUtils)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12155",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:544dde367f892a84033a80d5a775198f533906bf89b4649b25f1cdf7f27d7edd",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12193",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:958fb0045a7d6e23dd0c18a41059d82230e378a21b66675a1520393f74b1b5d0",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12193/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:ae2eea3d2d77034e21d2ad76002f88a0960944998c387d715706b5cbcb62e40c",
+        "official_evidence_event_id": "mu:204a44f283e1900e9d8c18ae437bc0866a7a23e9c7d2cbf85d4f249626ec2a9f",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:b3c4bee4e5de040038fc92f33762b227a780c86bfed49abdae51654ff2792370",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:a600886ef312d9aa87c8da5eeca215fcb31816543b4df28ad250349b6675ebfc",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:b3e49f4c09cd97a590c12991eb72e6943f0619cd9211f7587af0155249945287",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:9edefb29296067bfe51490057340c3f2470aba65ea3503180eacfc6d37a94e3b",
+        "capsule_id": "wc_django__django-12193",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_574b2db1cd7e8bf8",
+        "fail_to_pass_labels": [
+          "test_get_context_does_not_mutate_attrs (forms_tests.widget_tests.test_checkboxinput.CheckboxInputTest)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12193",
+        "macro_anchor_id": "macro:diff:django__django-12193",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:b87d844537d297f53938a439ddb0adbd854d18177892d9407742dcd18be2e423",
+        "stdout_hash": "sha256:ce007017ae23413cfbf61b332c8372ccc77bb3d3abcd6afe60db48e433f0329f",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:781058d7f8f286b614e122216ed9128a98217b184a108be29410005aa6ad07dc",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_bde0f947c5ec19280a527f7d2d7fb222"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12193/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12193/stdout.txt",
+      "target_tests": [
+        "forms_tests.widget_tests.test_checkboxinput.CheckboxInputTest.test_get_context_does_not_mutate_attrs"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12193",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_46ac8308bd141e1d",
+        "fail_to_pass_labels": [
+          "test_get_context_does_not_mutate_attrs (forms_tests.widget_tests.test_checkboxinput.CheckboxInputTest)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12193",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:781058d7f8f286b614e122216ed9128a98217b184a108be29410005aa6ad07dc",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 1,
+      "instance_id": "django__django-12209",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:5d45cd71482731c3f683e563ab341ab13e75a44cbb33ae50389013c7af803c44",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12209/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:1da56c0f64ba147c4311792960a3ef1acd6e25ff3878c36f137409969e29beb4",
+        "official_evidence_event_id": "mu:473524c3cb3ca53460154819c3da70cc359c66b1e7383abea7bd1aea5793fd7d",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:08ef63e557c41e5648dbe0b8e523ffba38ea95a045ec89f557e51315c476d5a9",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:f2b404ffe2460c677f1eed6ce1cf44a63e3de31e3c841d956e58bbc064378751",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:55cf47f31b72dc37b1eae7542816bfa5520825e5796dff11c3699842149e9fb2",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:df8f465b30959cd9e3db78ed54b529602b63f6af29892ee82c9e91436bf66be4",
+        "capsule_id": "wc_django__django-12209",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_b00a2bd62fddaece",
+        "fail_to_pass_labels": [
+          "partial(func, *args, **keywords) - new function with partial application"
+        ],
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12209",
+        "macro_anchor_id": "macro:diff:django__django-12209",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:55fb33a5b011f91dc38bab2aa74a0904033e93cb9c4d6adfe020d0d2496f7e81",
+        "stdout_hash": "sha256:e1718dd7f1dc2a6dfd58b9583e7ebd12f908e3c495da4e34b942c6a8a1b60063",
+        "target_test_exit_code": 1,
+        "target_test_result": "FAIL",
+        "test_patch_hash": "sha256:c09c26d8204ac57f2d3e7d6da1e798788a72fb15f281aae812fa25e4c64c3d92",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_9bf737c8a4caeb8578ee369ad34696be"
+      },
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12209/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12209/stdout.txt",
+      "target_tests": [
+        "partial(func, *args, **keywords) - new function with partial application"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12209",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_0c351d70290e9e18",
+        "fail_to_pass_labels": [
+          "partial(func, *args, **keywords) - new function with partial application"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12209",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:c09c26d8204ac57f2d3e7d6da1e798788a72fb15f281aae812fa25e4c64c3d92",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12262",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:3dc7491e8c8193173e70c1f957f2c6556df5e86e4f019f83f412aadf22f51590",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12262/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:641c005468dae643256330357b95b1f3c7641084bd2fa1eb6817bdf646959e25",
+        "official_evidence_event_id": "mu:d3369565fffc74b82e463f0de969cf1f4d82f716fafd1639f95452e177fa1295",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:ce32da09c1f1f487504f922c19668b3ad974cd12a8da3edb000efedc7bd37849",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:a732bc9572f0c5900305b17c0560b1153d11922c557a959c99199a6e2b2fc667",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:ec9b2f6fe7e32de363e4ffc89d98d559fd4baa2c757cd44efb57284601d095da",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:5d88778dfe971e8c88543474dd42e6ee648088f0144f667161a1dcce6dfd49e6",
+        "capsule_id": "wc_django__django-12262",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_331b19fc14bc5340",
+        "fail_to_pass_labels": [
+          "test_inclusion_tag_errors (template_tests.test_custom.InclusionTagTests)",
+          "test_inclusion_tags (template_tests.test_custom.InclusionTagTests)",
+          "test_simple_tag_errors (template_tests.test_custom.SimpleTagTests)",
+          "test_simple_tags (template_tests.test_custom.SimpleTagTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12262",
+        "macro_anchor_id": "macro:diff:django__django-12262",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:69e1e3873ee4e4bcae200eb0cf9908fb95c14216ecaefc94167993e697af3dfe",
+        "stdout_hash": "sha256:bab43f218168c646134d3e2bc319ae0beada3bca3bbfbdbde5c8aa50d2fd436f",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:769a15faf523189f8c37917ff3c002c381f0e5a517c481020ea71abe5ee58cf9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_9466d8c3f00ecf61f8d39ac8f6464e57"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12262/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12262/stdout.txt",
+      "target_tests": [
+        "template_tests.test_custom.InclusionTagTests.test_inclusion_tag_errors",
+        "template_tests.test_custom.InclusionTagTests.test_inclusion_tags",
+        "template_tests.test_custom.SimpleTagTests.test_simple_tag_errors",
+        "template_tests.test_custom.SimpleTagTests.test_simple_tags"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12262",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_28caaefc6e083530",
+        "fail_to_pass_labels": [
+          "test_inclusion_tag_errors (template_tests.test_custom.InclusionTagTests)",
+          "test_inclusion_tags (template_tests.test_custom.InclusionTagTests)",
+          "test_simple_tag_errors (template_tests.test_custom.SimpleTagTests)",
+          "test_simple_tags (template_tests.test_custom.SimpleTagTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12262",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:769a15faf523189f8c37917ff3c002c381f0e5a517c481020ea71abe5ee58cf9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 1,
+      "instance_id": "django__django-12273",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:cce66e152ccd5b1581e8030f0b55a1fe3a4d7696674e7b30a2f87f7a5d4231d5",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12273/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:03e13537a96357b04cd6e567756f8e38d137cd5f350e1c3161807d8c6be9e8ce",
+        "official_evidence_event_id": "mu:f6c41ae922c38353ea12139db6aaaf89b5ec28f8d749e7dadfe781bdb1743cb0",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:42046646daaf91e6bb614643b94d49aba646897f241df5f8caae9f7dce3e110c",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:3a445f798fa76d04a33426fcf395780119580c72ddc3d89096dd9c7847c7da79",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:3b126b2530583edc000a535af01d8084252b3f2ebf2189177dec549e04b6cab8",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:ecdbfcccd9b59cde83166c9c6c9064a03233c389802a89b76aa92d90170bc390",
+        "capsule_id": "wc_django__django-12273",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_0b073f9b1211ed2a",
+        "fail_to_pass_labels": [
+          "test_create_new_instance_with_pk_equals_none (model_inheritance_regress.tests.ModelInheritanceTest)",
+          "test_create_new_instance_with_pk_equals_none_multi_inheritance (model_inheritance_regress.tests.ModelInheritanceTest)"
+        ],
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12273",
+        "macro_anchor_id": "macro:diff:django__django-12273",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:0c6e6760951de5c4cdff579d78ee28ac8a64c12e8b34cd68f5bf47ac663ab8ee",
+        "stdout_hash": "sha256:f5997c143d04b33821c934882c24cadf39e0834687a5930438ea8f3507c59c0c",
+        "target_test_exit_code": 1,
+        "target_test_result": "FAIL",
+        "test_patch_hash": "sha256:8cf833b24d109bf63ffbe44bf48957dc959629c5a1adbd6615b5b259a898ff5c",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_5c3dc7685a7961b5a11ad5794cca1b3c"
+      },
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12273/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12273/stdout.txt",
+      "target_tests": [
+        "model_inheritance_regress.tests.ModelInheritanceTest.test_create_new_instance_with_pk_equals_none",
+        "model_inheritance_regress.tests.ModelInheritanceTest.test_create_new_instance_with_pk_equals_none_multi_inheritance"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12273",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_8cf87b7c17cac668",
+        "fail_to_pass_labels": [
+          "test_create_new_instance_with_pk_equals_none (model_inheritance_regress.tests.ModelInheritanceTest)",
+          "test_create_new_instance_with_pk_equals_none_multi_inheritance (model_inheritance_regress.tests.ModelInheritanceTest)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12273",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:8cf833b24d109bf63ffbe44bf48957dc959629c5a1adbd6615b5b259a898ff5c",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12276",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:6fc028cf6e0d2f28a5f9b636f179e362b207d0a0c70ea14fb2545f54b50e8708",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12276/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:e4ab0bd0fcf24211df270f164c78ca2e808253a6ec9b5b766d573b1b2b6156b3",
+        "official_evidence_event_id": "mu:62faeae3998eb853327a57693be73e57d1d56794a060d4d4488478361e560c3c",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:6b0abca6f8366d68c43d83b874cf0e0581e1f08fb4a0f1a1c3f55230c4f642ce",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:f0979c26c4bfe3d8f9fb70b9f4f1c50bb8a783adfce48abf922610fde1d4f2f0",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:4cc47de7235da2e8e717c05376baa31769d75e79456952a5e549c9b11c796a82",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:923d3fa3e3e53af0ca997c847694d70a5a95120b8e72e09912b1ca443b1cb5fa",
+        "capsule_id": "wc_django__django-12276",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_bbff288ea135c93e",
+        "fail_to_pass_labels": [
+          "test_use_required_attribute (forms_tests.widget_tests.test_fileinput.FileInputTest)",
+          "test_filefield_with_fileinput_required (forms_tests.tests.test_forms.FormsTestCase)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12276",
+        "macro_anchor_id": "macro:diff:django__django-12276",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:0f0622357166a69d4a1c1e3a4935958aab625ce1f9673d04b82a5a30559c8b5f",
+        "stdout_hash": "sha256:1fa939c7e9c1ad945a640b5757f44c16f5925e9dd475b6e52697b0cd0c91628e",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:2fc58c9be084c71940eced0e5e00c316870858c079b671c7c95aa0c314356389",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_2faf548db6a3ddb93f911e48139eb184"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12276/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12276/stdout.txt",
+      "target_tests": [
+        "forms_tests.widget_tests.test_fileinput.FileInputTest.test_use_required_attribute",
+        "forms_tests.tests.test_forms.FormsTestCase.test_filefield_with_fileinput_required"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12276",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_8664e8d2cb399c84",
+        "fail_to_pass_labels": [
+          "test_use_required_attribute (forms_tests.widget_tests.test_fileinput.FileInputTest)",
+          "test_filefield_with_fileinput_required (forms_tests.tests.test_forms.FormsTestCase)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12276",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:2fc58c9be084c71940eced0e5e00c316870858c079b671c7c95aa0c314356389",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-12304",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:79991c82fe1a400af2a96d7970eabf692012573906c1da378cef1886ec7ad006",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12304/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:4f317d1c5fe8ae6f25fadacc8dd1d978cc2e35dad702bcdea9dec9156181d094",
+        "official_evidence_event_id": "mu:bf62b11f896cc27e6f2ff0ad2b0524c7265f8cfcc52ac6a294b2c654036c42ff",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:ff693a82497877c619b4598c908992158e7fef57502818976824ffc51799c3ab",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:9eb6d7b5bca8e4e47fe12476ffca5fe0d5d5628a3f67a8df3356ed7a1320f6ee",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:63f003f98dd2fd9dfe9abca38db69afe137e235d6d10fc07a853060bd3356f47",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:8e3340f2426a362468b601013b708d53dfdcfb75457b56dbeb3b7d5d3a9caeed",
+        "capsule_id": "wc_django__django-12304",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_fee697a981190a61",
+        "fail_to_pass_labels": [
+          "test_templates (model_enums.tests.ChoicesTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12304",
+        "macro_anchor_id": "macro:diff:django__django-12304",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:94fac52090bcd6ad33253110ff07887bd00c63d51c757339d894101f9b9e08fa",
+        "stdout_hash": "sha256:03c9680382585b6dc9a11dd6cbf1f886a34eca980e5c5100ea9f8dba4177e1b2",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:89842411b8be0ef66d82a36a04e7407fad136fd86cc10784994f0a7c2269b716",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_17087ef0ff3043a0a510fda46f8fa2e9"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12304/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12304/stdout.txt",
+      "target_tests": [
+        "model_enums.tests.ChoicesTests.test_templates"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12304",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_4fa2ea74667925c7",
+        "fail_to_pass_labels": [
+          "test_templates (model_enums.tests.ChoicesTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12304",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:89842411b8be0ef66d82a36a04e7407fad136fd86cc10784994f0a7c2269b716",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 1,
+      "instance_id": "django__django-12308",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:8f3156d25e09edff91567a8656ab8682175b707468225e1820554197d8c7b6f6",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12308/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:e3938cdc0493c12a36719a155e937b1ec1d499715c75e93222124094df814e4e",
+        "official_evidence_event_id": "mu:f74a4c8d44a11e4d8aa6b623af1a44b0bee2cf4293e58f86fc3c17057d27648d",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:ab6752eca3c5fc34cbb798a34b3bf374842fc006ac67d68ab6be2c0cc9ad286e",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:bcb5e4d3926e3ac362c8e64ef958c534db49609ac7bc9c015e4edd49ebf7559f",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:7cf4738fce0f95fecf3a44a4ecf2571ed76d59ee510d6cf67bb02fa01bf63175",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:49690bfc70068bd404bb120d5945504ee8c033d4fbbfac271da24ab2ea6f26ca",
+        "capsule_id": "wc_django__django-12308",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_655931f524a8dd9e",
+        "fail_to_pass_labels": [
+          "test_json_display_for_field (admin_utils.tests.UtilsTests)",
+          "test_label_for_field (admin_utils.tests.UtilsTests)"
+        ],
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12308",
+        "macro_anchor_id": "macro:diff:django__django-12308",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:9f0cfdbf78e960453c684fc25b5799431ed72e3935b9aac813c363aea99ccde0",
+        "stdout_hash": "sha256:09cac50a08e1a3e97b617e81b52785defec14219cf3e8c307e425eb9d3b99232",
+        "target_test_exit_code": 1,
+        "target_test_result": "FAIL",
+        "test_patch_hash": "sha256:9a617028004b9c64a3642113b1fb22c454112107820925ac39cfa5172c07780f",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_361046322d3e64f3c6eb96ca90f75c34"
+      },
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12308/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12308/stdout.txt",
+      "target_tests": [
+        "admin_utils.tests.UtilsTests.test_json_display_for_field",
+        "admin_utils.tests.UtilsTests.test_label_for_field"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12308",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_1e4b280d6c5c9e26",
+        "fail_to_pass_labels": [
+          "test_json_display_for_field (admin_utils.tests.UtilsTests)",
+          "test_label_for_field (admin_utils.tests.UtilsTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12308",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:9a617028004b9c64a3642113b1fb22c454112107820925ac39cfa5172c07780f",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 1,
+      "instance_id": "django__django-12325",
+      "micro_tape_import": {
+        "accepted_head_moved": false,
+        "candidate_event_id": "mu:a678cb15b14f646aa1ce6640fe2a890e1107864a0a65dd0db50a49462040daa0",
+        "candidate_write_event_type": "FailureNode",
+        "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/instances/django__django-12325/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:64cab12debba8b17a8a6c50ba51f4a10458bbf18cfc401365bfe8f01f6f443db",
+        "official_evidence_event_id": "mu:cd03ecc6a51657778de03093fdac69c8e8642b2c79e8a1cbacbe5c5de4b5fbad",
+        "predicate_product": "FAIL",
+        "terminal_events": [
+          {
+            "event_id": "mu:e2901a79a9959f2d30e42684f2c1b81d0067213f4a2fb7170d48e3355caba83f",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:361f0cbf42ff28cd10d13a2543c3d08a8b835983617ec79ed5a33a0e61ab5a85",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:929410534d50e4826c764d8c2f337744a0e4332d3af56b41a664fe9d1b1a2111",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:36d79041c892c0e3be1790753436bb5595162700c98b81bd22883368ab9a2278",
+        "capsule_id": "wc_django__django-12325",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_591261e0ee74fb1b",
+        "fail_to_pass_labels": [
+          "test_clash_parent_link (invalid_models_tests.test_relative_fields.ComplexClashTests)",
+          "test_onetoone_with_parent_model (invalid_models_tests.test_models.OtherModelTests)"
+        ],
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12325",
+        "macro_anchor_id": "macro:diff:django__django-12325",
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:af3581a82a01217242ac4c34f0f3a5c3d15fbc6982db415fe5b36c71776e7a36",
+        "stdout_hash": "sha256:0aba8359a8da6d2330e61dcf7de2dd1353c9099e0dad06aabb83b87916a0fc0e",
+        "target_test_exit_code": 1,
+        "target_test_result": "FAIL",
+        "test_patch_hash": "sha256:90884d00181ceeb30fb0b84b8a77961e6ad444209a9e3e3b35b27f8698fbc2ee",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_c05a3bcedec46c523875b68ab4df5289"
+      },
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12325/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/patch_eval/turingos/django__django-12325/stdout.txt",
+      "target_tests": [
+        "invalid_models_tests.test_relative_fields.ComplexClashTests.test_clash_parent_link",
+        "invalid_models_tests.test_models.OtherModelTests.test_onetoone_with_parent_model"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-12325",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_212104331c051471",
+        "fail_to_pass_labels": [
+          "test_clash_parent_link (invalid_models_tests.test_relative_fields.ComplexClashTests)",
+          "test_onetoone_with_parent_model (invalid_models_tests.test_models.OtherModelTests)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-12325",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:90884d00181ceeb30fb0b84b8a77961e6ad444209a9e3e3b35b27f8698fbc2ee",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    }
+  ],
+  "sample_size": 20,
+  "schema_id": "DjangoSweBenchPatchEval.v1",
+  "statistical_claim": "none_smoke_only"
+}

@@ -1,0 +1,19 @@
+**Patch left in worktree (via minimal edit to root cause):**
+
+```diff
+diff --git a/django/forms/widgets.py b/django/forms/widgets.py
+index 6fe220bea7..0b25787ebc 100644
+--- a/django/forms/widgets.py
++++ b/django/forms/widgets.py
+@@ -522,8 +522,7 @@ class CheckboxInput(Input):
+
+     def get_context(self, name, value, attrs):
+         if self.check_test(value):
+-            if attrs is None:
+-                attrs = {}
++            attrs = {} if attrs is None else attrs.copy()
+             attrs['checked'] = True
+         return super().get_context(name, value, attrs)
+```
+
+(Only [django/forms/widgets.py](/tmp/turingos_substrate_worktrees/b0897e479eff58ab/django/forms/widgets.py) was inspected+edited; no test/benchmark files touched; stopped at candidate patch.)

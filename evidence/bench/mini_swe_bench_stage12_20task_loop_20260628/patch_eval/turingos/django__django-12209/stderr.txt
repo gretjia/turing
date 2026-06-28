@@ -1,0 +1,17 @@
+partial(func, *args, **keywords) - new function with partial application (unittest.loader._FailedTest.partial(func, *args, **keywords) - new function with partial application) ... ERROR
+
+======================================================================
+ERROR: partial(func, *args, **keywords) - new function with partial application (unittest.loader._FailedTest.partial(func, *args, **keywords) - new function with partial application)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: partial(func, *args, **keywords) - new function with partial application
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'partial(func, *args, **keywords) - new function with partial application'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

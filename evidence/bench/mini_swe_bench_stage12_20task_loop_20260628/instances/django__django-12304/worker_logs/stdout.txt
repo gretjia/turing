@@ -1,0 +1,5 @@
+**Patch complete** (only [django/db/models/enums.py](/tmp/turingos_substrate_worktrees/ceb349a099bbe43e/django/db/models/enums.py) edited; 3-line minimal diff). 
+
+The `do_not_call_in_templates = True` sentinel (set post-definition on the `Choices` base to avoid becoming an `Enum` member and breaking `IntegerChoices`/`TextChoices` inheritance) is now inherited by `TextChoices`/`IntegerChoices` user subclasses. This prevents the template engine (django/template/base.py:852) from attempting a no-arg `()` call on the classes (which requires a value arg for `Enum` construction) while leaving the classes and their members fully usable for lookups/comparisons/etc. in templates.
+
+Verified via direct execution (imports + template rendering of `YearInSchool.FRESHMAN` style cases succeed with no `TypeError` or `string_if_invalid`). Worktree left with the change.
