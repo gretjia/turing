@@ -1,0 +1,38 @@
+{
+  "abstract_pattern": "Retry with a production-code-only patch that satisfies the official target tests.",
+  "broadcast_rule_event_id": "mu:05687ad0830093285eef0697caffb94bba8484a2e0edc161f9acc378df9aa12e",
+  "broadcast_rule_reduced_from_tape": true,
+  "failure_class": "OFFICIAL_EVAL_FAIL",
+  "hidden_predicates_absent_from_visible_capsule": true,
+  "injected_into_capsule_id": "wc_stage8_3ca4462c9852c1a6_attempt2",
+  "missing": [],
+  "problems": [],
+  "raw_log_refs_present_only_as_private_evidence": true,
+  "raw_log_text_absent_from_visible_capsule": true,
+  "run_count": 1,
+  "runs": [
+    {
+      "abstract_pattern": "Retry with a production-code-only patch that satisfies the official target tests.",
+      "broadcast_rule_event_id": "mu:05687ad0830093285eef0697caffb94bba8484a2e0edc161f9acc378df9aa12e",
+      "broadcast_rule_reduced_from_tape": true,
+      "failure_class": "OFFICIAL_EVAL_FAIL",
+      "hidden_predicates_absent_from_visible_capsule": true,
+      "injected_into_capsule_id": "wc_stage8_3ca4462c9852c1a6_attempt2",
+      "instance_id": "django__django-12039",
+      "missing": [],
+      "problems": [],
+      "raw_log_refs_present_only_as_private_evidence": true,
+      "raw_log_text_absent_from_visible_capsule": true,
+      "source_failure_nodes": [
+        "mu:1a72efcf70b4346431ffca6b2abf08871600e0066004359bf2e38c056bc3ed03"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "schema_id": "FailureMemoryAudit.v1",
+  "source_failure_nodes": [
+    "mu:1a72efcf70b4346431ffca6b2abf08871600e0066004359bf2e38c056bc3ed03"
+  ],
+  "status": "PASS",
+  "truth_source": "micro_tape_bundle_plus_coverage_refs"
+}

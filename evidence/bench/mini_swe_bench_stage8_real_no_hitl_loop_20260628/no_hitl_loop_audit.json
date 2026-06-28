@@ -1,0 +1,43 @@
+{
+  "accepted_head": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+  "broadcast_rule_event_id": "mu:05687ad0830093285eef0697caffb94bba8484a2e0edc161f9acc378df9aa12e",
+  "fallback_to_auto_authorization": false,
+  "first_failure_event_id": "mu:1a72efcf70b4346431ffca6b2abf08871600e0066004359bf2e38c056bc3ed03",
+  "human_intervention_count": 0,
+  "manual_approval_count": 0,
+  "manual_patch_count": 0,
+  "manual_rerun_selection_count": 0,
+  "missing": [],
+  "problems": [],
+  "retry_decision_source": "tape_reducer_or_policy",
+  "retry_policy_event_id": "mu:3cc056d939a1fea9dc1f978233bc45b519660faa26fba5edd71020ce1f6f2f38",
+  "run_count": 1,
+  "runs": [
+    {
+      "accepted_head": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+      "broadcast_rule_event_id": "mu:05687ad0830093285eef0697caffb94bba8484a2e0edc161f9acc378df9aa12e",
+      "event_count": 29,
+      "fallback_to_auto_authorization": false,
+      "first_failure_event_id": "mu:1a72efcf70b4346431ffca6b2abf08871600e0066004359bf2e38c056bc3ed03",
+      "human_intervention_count": 0,
+      "instance_id": "django__django-12039",
+      "manual_approval_count": 0,
+      "manual_patch_count": 0,
+      "manual_rerun_selection_count": 0,
+      "missing": [],
+      "problems": [],
+      "retry_decision_source": "tape_reducer_or_policy",
+      "retry_policy_event_id": "mu:3cc056d939a1fea9dc1f978233bc45b519660faa26fba5edd71020ce1f6f2f38",
+      "second_attempt_capsule_event_id": "mu:95b51c51a080cb38f624bdf5b776d88d9305b67ee1dd025024d6f4ae59e01998",
+      "status": "PASS",
+      "terminal_candidate_accepted_event_id": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+      "verified_from_micro_tape_bundle_only": true
+    }
+  ],
+  "schema_id": "NoHitlLoopAudit.v1",
+  "second_attempt_capsule_event_id": "mu:95b51c51a080cb38f624bdf5b776d88d9305b67ee1dd025024d6f4ae59e01998",
+  "status": "PASS",
+  "terminal_candidate_accepted_event_id": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+  "truth_source": "micro_tape_bundle_plus_coverage_refs",
+  "verified_from_micro_tape_bundle_only": true
+}
