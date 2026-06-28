@@ -1,0 +1,2018 @@
+{
+  "aggregate": {
+    "bundle_count": 2,
+    "event_count": 60,
+    "event_counts": {
+      "AtomAuthorized": 2,
+      "BudgetAllocated": 2,
+      "CandidateAccepted": 1,
+      "CostEvent": 2,
+      "FailureNode": 1,
+      "GoalStateProposed": 2,
+      "MacroObservationImported": 2,
+      "MarketCreated": 2,
+      "MarketSettled": 2,
+      "OfficialEvaluatorEvidenceImported": 2,
+      "PPUTAccounted": 2,
+      "PositionMinted": 2,
+      "PredicateEvaluated": 2,
+      "RewardDistributed": 2,
+      "SystemConstitutionAccepted": 2,
+      "ToolActionAuthorized": 13,
+      "ToolReceiptAppended": 13,
+      "WorkCapsuleBuilt": 2,
+      "WorkerDispatchAuthorized": 2,
+      "WorkerReceiptImported": 2
+    },
+    "finding_counts": {
+      "official_evidence_precedes_accept": 1
+    }
+  },
+  "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
+  "event_registry": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+  "runs": [
+    {
+      "actual_refs": {
+        "accepted_head": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+        "authorization_head": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e",
+        "tape_tip": "mu:ba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4"
+      },
+      "bundle": "evidence/bench/mini_swe_bench_stage13_native_api_worker_hardening_20260628/turingos/instances/django__django-12039/micro_tape.bundle",
+      "bundle_hash": "sha256:0044db5afb946f22eaa5b8c713152aaac16ecf80fc15b6bb6fc38e2ca5e02b47",
+      "bundle_verify_output": "The bundle contains these 5 refs:\nba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4 refs/heads/master\ncae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407 refs/turingos/accepted_head\nf280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e refs/turingos/authorization_head\nba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4 refs/turingos/tape_tip\nba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4 HEAD\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "PASS",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:133b2ba12c63c7f80fc90ca3c36763698e08bdb096f75eff66ab10dae9cfea8e",
+          "kind": "tape_parent",
+          "to": "mu:9b4f025517b28f47cd59fdf9d48a5220fc8779882f97ccee1365461774aa3e1f"
+        },
+        {
+          "from": "mu:9b4f025517b28f47cd59fdf9d48a5220fc8779882f97ccee1365461774aa3e1f",
+          "kind": "tape_parent",
+          "to": "mu:6899efedf01ea012dbf535bfbdf574247e93a336ca6dc64fe57c846b0d67f010"
+        },
+        {
+          "from": "mu:6899efedf01ea012dbf535bfbdf574247e93a336ca6dc64fe57c846b0d67f010",
+          "kind": "tape_parent",
+          "to": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "tape_parent",
+          "to": "mu:3b4f890ccf9d7c50889172352ad6d8489bc9d0e10e14d2c05e4cfae3a547970d"
+        },
+        {
+          "from": "mu:3b4f890ccf9d7c50889172352ad6d8489bc9d0e10e14d2c05e4cfae3a547970d",
+          "kind": "tape_parent",
+          "to": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5"
+        },
+        {
+          "from": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5",
+          "kind": "tape_parent",
+          "to": "mu:3adf6cdfcabc3acc9cdd580a92ef511606e35f78349c107db5e6f38ce977d7d4"
+        },
+        {
+          "from": "mu:3adf6cdfcabc3acc9cdd580a92ef511606e35f78349c107db5e6f38ce977d7d4",
+          "kind": "tape_parent",
+          "to": "mu:27b9703187b2c90d822ca9ea58e50d653f8641695804388b323f406b993205fb"
+        },
+        {
+          "from": "mu:27b9703187b2c90d822ca9ea58e50d653f8641695804388b323f406b993205fb",
+          "kind": "tape_parent",
+          "to": "mu:6726cbea0eba2314f0476447ec52ca8d97b50bfcc2a9a38da23ae1a016eafc97"
+        },
+        {
+          "from": "mu:6726cbea0eba2314f0476447ec52ca8d97b50bfcc2a9a38da23ae1a016eafc97",
+          "kind": "tape_parent",
+          "to": "mu:bf5353680055f06bb50cfbc95e337f7eff80b39641afe273d634ad5f5c75ecd2"
+        },
+        {
+          "from": "mu:bf5353680055f06bb50cfbc95e337f7eff80b39641afe273d634ad5f5c75ecd2",
+          "kind": "tape_parent",
+          "to": "mu:c76ee99607ce385866c51dc629bb5f8552690642f6dbff20dd9501d5023ce2b6"
+        },
+        {
+          "from": "mu:c76ee99607ce385866c51dc629bb5f8552690642f6dbff20dd9501d5023ce2b6",
+          "kind": "tape_parent",
+          "to": "mu:7655e414ee4b103640cc990bdef0e54164c0a1447651c9ddd8b44a8ef288bfda"
+        },
+        {
+          "from": "mu:7655e414ee4b103640cc990bdef0e54164c0a1447651c9ddd8b44a8ef288bfda",
+          "kind": "tape_parent",
+          "to": "mu:8f66c2ce7f326570c0f287452d8cbcbde7766c8818a2a27958dfa6de77045116"
+        },
+        {
+          "from": "mu:8f66c2ce7f326570c0f287452d8cbcbde7766c8818a2a27958dfa6de77045116",
+          "kind": "tape_parent",
+          "to": "mu:92a490902acdad179fc063feb218412b0ec2041fb7362d38cb5ec29c53c9f92a"
+        },
+        {
+          "from": "mu:92a490902acdad179fc063feb218412b0ec2041fb7362d38cb5ec29c53c9f92a",
+          "kind": "tape_parent",
+          "to": "mu:b07eebb8235fac8a0bbe73ce6c68d71fb96987b4a1dd669e76c05fb80ef694c4"
+        },
+        {
+          "from": "mu:b07eebb8235fac8a0bbe73ce6c68d71fb96987b4a1dd669e76c05fb80ef694c4",
+          "kind": "tape_parent",
+          "to": "mu:e1d7ac5920ab636c08c39b24fee470c234d2dc9881016c5a56c70e4bbc10789c"
+        },
+        {
+          "from": "mu:e1d7ac5920ab636c08c39b24fee470c234d2dc9881016c5a56c70e4bbc10789c",
+          "kind": "tape_parent",
+          "to": "mu:2d2697a895229da31955d363492e7c8cf5aa563288659e2e714b3a9acfb6ccb2"
+        },
+        {
+          "from": "mu:2d2697a895229da31955d363492e7c8cf5aa563288659e2e714b3a9acfb6ccb2",
+          "kind": "tape_parent",
+          "to": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e"
+        },
+        {
+          "from": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e",
+          "kind": "tape_parent",
+          "to": "mu:8f0d1c3d56e5d90a65ed3889e6fc1c0c636f5eb6aec2f122bb0964731f3ab07f"
+        },
+        {
+          "from": "mu:8f0d1c3d56e5d90a65ed3889e6fc1c0c636f5eb6aec2f122bb0964731f3ab07f",
+          "kind": "tape_parent",
+          "to": "mu:f0834c4a9e836aae20f8cc204bdb57463c8de415e0069015fce5367f553f4d0c"
+        },
+        {
+          "from": "mu:f0834c4a9e836aae20f8cc204bdb57463c8de415e0069015fce5367f553f4d0c",
+          "kind": "tape_parent",
+          "to": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2"
+        },
+        {
+          "from": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2",
+          "kind": "tape_parent",
+          "to": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df"
+        },
+        {
+          "from": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df",
+          "kind": "tape_parent",
+          "to": "mu:ed90858928f857632e15286193555216c5e8adea885db6af897412e33d3c7eb5"
+        },
+        {
+          "from": "mu:ed90858928f857632e15286193555216c5e8adea885db6af897412e33d3c7eb5",
+          "kind": "tape_parent",
+          "to": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379"
+        },
+        {
+          "from": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "kind": "tape_parent",
+          "to": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407"
+        },
+        {
+          "from": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "kind": "tape_parent",
+          "to": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d"
+        },
+        {
+          "from": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d",
+          "kind": "tape_parent",
+          "to": "mu:2246614e9fd879929d32bfd57ed887590612d195cdff61913b2123a78d00a83f"
+        },
+        {
+          "from": "mu:2246614e9fd879929d32bfd57ed887590612d195cdff61913b2123a78d00a83f",
+          "kind": "tape_parent",
+          "to": "mu:832de7faf8e4c1e2c5d8c30bbc1efc95e9bfc8bec3ab7472341eab5f4f9b7e99"
+        },
+        {
+          "from": "mu:832de7faf8e4c1e2c5d8c30bbc1efc95e9bfc8bec3ab7472341eab5f4f9b7e99",
+          "kind": "tape_parent",
+          "to": "mu:ba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6"
+        },
+        {
+          "from": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5",
+          "kind": "market_ref",
+          "to": "mu:3adf6cdfcabc3acc9cdd580a92ef511606e35f78349c107db5e6f38ce977d7d4"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:27b9703187b2c90d822ca9ea58e50d653f8641695804388b323f406b993205fb"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:6726cbea0eba2314f0476447ec52ca8d97b50bfcc2a9a38da23ae1a016eafc97"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:bf5353680055f06bb50cfbc95e337f7eff80b39641afe273d634ad5f5c75ecd2"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:c76ee99607ce385866c51dc629bb5f8552690642f6dbff20dd9501d5023ce2b6"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:7655e414ee4b103640cc990bdef0e54164c0a1447651c9ddd8b44a8ef288bfda"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:8f66c2ce7f326570c0f287452d8cbcbde7766c8818a2a27958dfa6de77045116"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:92a490902acdad179fc063feb218412b0ec2041fb7362d38cb5ec29c53c9f92a"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:b07eebb8235fac8a0bbe73ce6c68d71fb96987b4a1dd669e76c05fb80ef694c4"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:e1d7ac5920ab636c08c39b24fee470c234d2dc9881016c5a56c70e4bbc10789c"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:2d2697a895229da31955d363492e7c8cf5aa563288659e2e714b3a9acfb6ccb2"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:8f0d1c3d56e5d90a65ed3889e6fc1c0c636f5eb6aec2f122bb0964731f3ab07f"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:f0834c4a9e836aae20f8cc204bdb57463c8de415e0069015fce5367f553f4d0c"
+        },
+        {
+          "from": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5",
+          "kind": "market_ref",
+          "to": "mu:f0834c4a9e836aae20f8cc204bdb57463c8de415e0069015fce5367f553f4d0c"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:ed90858928f857632e15286193555216c5e8adea885db6af897412e33d3c7eb5"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379"
+        },
+        {
+          "from": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2",
+          "kind": "receipt_ref",
+          "to": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379"
+        },
+        {
+          "from": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df",
+          "kind": "macro_ref",
+          "to": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379"
+        },
+        {
+          "from": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "kind": "capsule_ref",
+          "to": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407"
+        },
+        {
+          "from": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2",
+          "kind": "receipt_ref",
+          "to": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407"
+        },
+        {
+          "from": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df",
+          "kind": "macro_ref",
+          "to": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407"
+        },
+        {
+          "from": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407"
+        },
+        {
+          "from": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5",
+          "kind": "market_ref",
+          "to": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d"
+        },
+        {
+          "from": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d"
+        },
+        {
+          "from": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "kind": "terminal_event_id",
+          "to": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d"
+        },
+        {
+          "from": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5",
+          "kind": "market_ref",
+          "to": "mu:2246614e9fd879929d32bfd57ed887590612d195cdff61913b2123a78d00a83f"
+        },
+        {
+          "from": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d",
+          "kind": "settlement_event_id",
+          "to": "mu:2246614e9fd879929d32bfd57ed887590612d195cdff61913b2123a78d00a83f"
+        },
+        {
+          "from": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "kind": "basis_event_id",
+          "to": "mu:832de7faf8e4c1e2c5d8c30bbc1efc95e9bfc8bec3ab7472341eab5f4f9b7e99"
+        },
+        {
+          "from": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "kind": "terminal_event_id",
+          "to": "mu:832de7faf8e4c1e2c5d8c30bbc1efc95e9bfc8bec3ab7472341eab5f4f9b7e99"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+        "authorization_head": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e",
+        "tape_tip": "mu:ba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4"
+      },
+      "event_count": 29,
+      "event_counts": {
+        "AtomAuthorized": 1,
+        "BudgetAllocated": 1,
+        "CandidateAccepted": 1,
+        "CostEvent": 1,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 1,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "ToolActionAuthorized": 6,
+        "ToolReceiptAppended": 6,
+        "WorkCapsuleBuilt": 1,
+        "WorkerDispatchAuthorized": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:133b2ba12c63c7f80fc90ca3c36763698e08bdb096f75eff66ab10dae9cfea8e",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:133b2ba12c63",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "133b2ba",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:9b4f025517b28f47cd59fdf9d48a5220fc8779882f97ccee1365461774aa3e1f",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:9b4f025517b2",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "9b4f025",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:6899efedf01ea012dbf535bfbdf574247e93a336ca6dc64fe57c846b0d67f010",
+          "event_type": "AtomAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "2:AtomAuthorized:6899efedf01e",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "6899efe",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:59c216042a1b9f4e045185a61785250e3724c9d3b852a20ae1af5357d2dba3a6",
+          "event_type": "WorkerDispatchAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "3:WorkerDispatchAuthorized:59c216042a1b",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "59c2160",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:3b4f890ccf9d7c50889172352ad6d8489bc9d0e10e14d2c05e4cfae3a547970d",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "4:WorkCapsuleBuilt:3b4f890ccf9d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "3b4f890",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:765cb7bba9c0a5a8412d01a9d4813f6c1e2cedddba58b1874227da281747bfc5",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_3ca4462c9852c1a6",
+          "node_id": "5:MarketCreated:765cb7bba9c0",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "765cb7b",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:3adf6cdfcabc3acc9cdd580a92ef511606e35f78349c107db5e6f38ce977d7d4",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_3ca4462c9852c1a6",
+          "node_id": "6:PositionMinted:3adf6cdfcabc",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "3adf6cd",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:27b9703187b2c90d822ca9ea58e50d653f8641695804388b323f406b993205fb",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "7:ToolActionAuthorized:27b9703187b2",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "27b9703",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:6726cbea0eba2314f0476447ec52ca8d97b50bfcc2a9a38da23ae1a016eafc97",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:ToolReceiptAppended:6726cbea0eba",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "6726cbe",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:bf5353680055f06bb50cfbc95e337f7eff80b39641afe273d634ad5f5c75ecd2",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "9:ToolActionAuthorized:bf5353680055",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "bf53536",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:c76ee99607ce385866c51dc629bb5f8552690642f6dbff20dd9501d5023ce2b6",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:ToolReceiptAppended:c76ee99607ce",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "c76ee99",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:7655e414ee4b103640cc990bdef0e54164c0a1447651c9ddd8b44a8ef288bfda",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "11:ToolActionAuthorized:7655e414ee4b",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "7655e41",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:8f66c2ce7f326570c0f287452d8cbcbde7766c8818a2a27958dfa6de77045116",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:ToolReceiptAppended:8f66c2ce7f32",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 12,
+          "short_id": "8f66c2c",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:92a490902acdad179fc063feb218412b0ec2041fb7362d38cb5ec29c53c9f92a",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "13:ToolActionAuthorized:92a490902acd",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 13,
+          "short_id": "92a4909",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:b07eebb8235fac8a0bbe73ce6c68d71fb96987b4a1dd669e76c05fb80ef694c4",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:ToolReceiptAppended:b07eebb8235f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 14,
+          "short_id": "b07eebb",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:e1d7ac5920ab636c08c39b24fee470c234d2dc9881016c5a56c70e4bbc10789c",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "15:ToolActionAuthorized:e1d7ac5920ab",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "e1d7ac5",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:2d2697a895229da31955d363492e7c8cf5aa563288659e2e714b3a9acfb6ccb2",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "16:ToolReceiptAppended:2d2697a89522",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 16,
+          "short_id": "2d2697a",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "17:ToolActionAuthorized:f280de76e986",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 17,
+          "short_id": "f280de7",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:8f0d1c3d56e5d90a65ed3889e6fc1c0c636f5eb6aec2f122bb0964731f3ab07f",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:ToolReceiptAppended:8f0d1c3d56e5",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 18,
+          "short_id": "8f0d1c3",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:f0834c4a9e836aae20f8cc204bdb57463c8de415e0069015fce5367f553f4d0c",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_3ca4462c9852c1a6",
+          "node_id": "19:BudgetAllocated:f0834c4a9e83",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "f0834c4",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "20:WorkerReceiptImported:8bc04744d7d6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 20,
+          "short_id": "8bc0474",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "21:MacroObservationImported:bdaeb1cff835",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 21,
+          "short_id": "bdaeb1c",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:ed90858928f857632e15286193555216c5e8adea885db6af897412e33d3c7eb5",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "22:CostEvent:ed90858928f8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 22,
+          "short_id": "ed90858",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "23:OfficialEvaluatorEvidenceImported:94379d05db35",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 23,
+          "short_id": "94379d0",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "24:CandidateAccepted:cae4b247c28d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 24,
+          "short_id": "cae4b24",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "capsule_id": null,
+          "event_id": "mu:d60a8dc99c9692701edf19dfc7f6f567d5f67881161eaa376b7ac4dce9d25c7d",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_3ca4462c9852c1a6",
+          "node_id": "25:MarketSettled:d60a8dc99c96",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "YES",
+          "sequence": 25,
+          "short_id": "d60a8dc",
+          "terminal_event_id": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:2246614e9fd879929d32bfd57ed887590612d195cdff61913b2123a78d00a83f",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_3ca4462c9852c1a6",
+          "node_id": "26:RewardDistributed:2246614e9fd8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 26,
+          "short_id": "2246614",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "capsule_id": null,
+          "event_id": "mu:832de7faf8e4c1e2c5d8c30bbc1efc95e9bfc8bec3ab7472341eab5f4f9b7e99",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "27:PPUTAccounted:832de7faf8e4",
+          "predicate_product": "PASS",
+          "progress": 1,
+          "result": null,
+          "sequence": 27,
+          "short_id": "832de7f",
+          "terminal_event_id": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:ba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "28:PredicateEvaluated:ba4b0b159c70",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 28,
+          "short_id": "ba4b0b1",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        }
+      ],
+      "execution_findings": [
+        {
+          "detail": "CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.",
+          "finding": "official_evidence_precedes_accept",
+          "severity": "INFO"
+        }
+      ],
+      "first_candidate_accepted": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+      "git_evidence": {
+        "git_fsck_strict_stderr": "",
+        "git_fsck_strict_stdout": "",
+        "object_format": "sha256"
+      },
+      "golden_path": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:9b4f025517b28f47cd59fdf9d48a5220fc8779882f97ccee1365461774aa3e1f",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:9b4f025517b2",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "9b4f025",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:3b4f890ccf9d7c50889172352ad6d8489bc9d0e10e14d2c05e4cfae3a547970d",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "4:WorkCapsuleBuilt:3b4f890ccf9d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "3b4f890",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:8bc04744d7d6050781c46625431a63a67f9618c044ddfe4d4029ab07d4c4d4e2",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "20:WorkerReceiptImported:8bc04744d7d6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 20,
+          "short_id": "8bc0474",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:bdaeb1cff835c8042814786a675d4c541d275fd61e05702c1ef4e989919c86df",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "21:MacroObservationImported:bdaeb1cff835",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 21,
+          "short_id": "bdaeb1c",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:94379d05db35ac0f40e53656e740001cd2c15647cb830e706c4b14331fe91379",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "23:OfficialEvaluatorEvidenceImported:94379d05db35",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 23,
+          "short_id": "94379d0",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+          "event_id": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "24:CandidateAccepted:cae4b247c28d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 24,
+          "short_id": "cae4b24",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        }
+      ],
+      "golden_path_basis": "terminal_accepted_head",
+      "path_class": "accepted_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407"
+    },
+    {
+      "actual_refs": {
+        "accepted_head": "mu:5f513416dc68bc4da51a6b2af979d90e8f2e9ba85b0b2ef36b3e5606c13d85cf",
+        "authorization_head": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5",
+        "tape_tip": "mu:2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12"
+      },
+      "bundle": "evidence/bench/mini_swe_bench_stage13_native_api_worker_hardening_20260628/turingos/instances/django__django-12050/micro_tape.bundle",
+      "bundle_hash": "sha256:9f64731b45c18a5bb04f983d7484fbdfe91c7fb34abdb3283b853adb011d7ce5",
+      "bundle_verify_output": "The bundle contains these 5 refs:\n2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12 refs/heads/master\n5f513416dc68bc4da51a6b2af979d90e8f2e9ba85b0b2ef36b3e5606c13d85cf refs/turingos/accepted_head\n57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5 refs/turingos/authorization_head\n2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12 refs/turingos/tape_tip\n2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12 HEAD\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "PASS",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:5f513416dc68bc4da51a6b2af979d90e8f2e9ba85b0b2ef36b3e5606c13d85cf",
+          "kind": "tape_parent",
+          "to": "mu:cfa4bb0303ed4c441b0f90953bd23887ebec2dce633719012d6dc0ce8540ed08"
+        },
+        {
+          "from": "mu:cfa4bb0303ed4c441b0f90953bd23887ebec2dce633719012d6dc0ce8540ed08",
+          "kind": "tape_parent",
+          "to": "mu:7e2c594b77ec5c22bc643a2d9e74485a446169830fc2a7e01c3768a6a95d1332"
+        },
+        {
+          "from": "mu:7e2c594b77ec5c22bc643a2d9e74485a446169830fc2a7e01c3768a6a95d1332",
+          "kind": "tape_parent",
+          "to": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "tape_parent",
+          "to": "mu:032938e4562faee5d5abe8998388b80f8895ee06bcc0a68c9566b8e627f8ceea"
+        },
+        {
+          "from": "mu:032938e4562faee5d5abe8998388b80f8895ee06bcc0a68c9566b8e627f8ceea",
+          "kind": "tape_parent",
+          "to": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56"
+        },
+        {
+          "from": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56",
+          "kind": "tape_parent",
+          "to": "mu:c27b016f318c400409aee90f6777318a3aadafd0d7a76a84a17d81f4890e3c94"
+        },
+        {
+          "from": "mu:c27b016f318c400409aee90f6777318a3aadafd0d7a76a84a17d81f4890e3c94",
+          "kind": "tape_parent",
+          "to": "mu:323f4b74928209b8b67fcab240bf6ad65447143b7476d35f7ff4ea4612c69e25"
+        },
+        {
+          "from": "mu:323f4b74928209b8b67fcab240bf6ad65447143b7476d35f7ff4ea4612c69e25",
+          "kind": "tape_parent",
+          "to": "mu:5219eefbdbd004908212e86b5241b4d67badf36869764032949c2ed3af0d9fef"
+        },
+        {
+          "from": "mu:5219eefbdbd004908212e86b5241b4d67badf36869764032949c2ed3af0d9fef",
+          "kind": "tape_parent",
+          "to": "mu:a876b39aa5e779c728489eb3188307fcd12ec1434d2555eaec2bc34bff241b38"
+        },
+        {
+          "from": "mu:a876b39aa5e779c728489eb3188307fcd12ec1434d2555eaec2bc34bff241b38",
+          "kind": "tape_parent",
+          "to": "mu:5ccdd3b42d757ef261fa79656b9504660a53d2814204e5fd5ec442d54f3af0f2"
+        },
+        {
+          "from": "mu:5ccdd3b42d757ef261fa79656b9504660a53d2814204e5fd5ec442d54f3af0f2",
+          "kind": "tape_parent",
+          "to": "mu:a5cd16db7c3efb7d569293527aaf3adc34f2976688e1b717c2a1ac4dd5a4829c"
+        },
+        {
+          "from": "mu:a5cd16db7c3efb7d569293527aaf3adc34f2976688e1b717c2a1ac4dd5a4829c",
+          "kind": "tape_parent",
+          "to": "mu:48f60cd3c7b5fb68b54f26e01b8e1b391bacad174c092bde9c628ae7b786c1c7"
+        },
+        {
+          "from": "mu:48f60cd3c7b5fb68b54f26e01b8e1b391bacad174c092bde9c628ae7b786c1c7",
+          "kind": "tape_parent",
+          "to": "mu:73610f839566c7f86febd593d298d089a54f44a150c8a1dfce0a0d775b002904"
+        },
+        {
+          "from": "mu:73610f839566c7f86febd593d298d089a54f44a150c8a1dfce0a0d775b002904",
+          "kind": "tape_parent",
+          "to": "mu:4876c3c2dce316b4ed6c75b59bf4cb0edadd1340701e92b38ffcdb688e672f68"
+        },
+        {
+          "from": "mu:4876c3c2dce316b4ed6c75b59bf4cb0edadd1340701e92b38ffcdb688e672f68",
+          "kind": "tape_parent",
+          "to": "mu:55ab7888bae6d2a9da3354a6285b1846fc0ff2c55fa6e9e6c6b76e6e604a3a42"
+        },
+        {
+          "from": "mu:55ab7888bae6d2a9da3354a6285b1846fc0ff2c55fa6e9e6c6b76e6e604a3a42",
+          "kind": "tape_parent",
+          "to": "mu:4bec675e6e875a07f8deb206260e7d3afad1e8b09b7fc01f53dd6b872a5e8d44"
+        },
+        {
+          "from": "mu:4bec675e6e875a07f8deb206260e7d3afad1e8b09b7fc01f53dd6b872a5e8d44",
+          "kind": "tape_parent",
+          "to": "mu:4f4893f674a61b576c40bacbd7def09ce0c58447e62e9ab3718d4f7f2206a26d"
+        },
+        {
+          "from": "mu:4f4893f674a61b576c40bacbd7def09ce0c58447e62e9ab3718d4f7f2206a26d",
+          "kind": "tape_parent",
+          "to": "mu:5290ef8fa57c435e645b0b55449128a498e5ad232860fdfb1cf76b1f9c52bf83"
+        },
+        {
+          "from": "mu:5290ef8fa57c435e645b0b55449128a498e5ad232860fdfb1cf76b1f9c52bf83",
+          "kind": "tape_parent",
+          "to": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5"
+        },
+        {
+          "from": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5",
+          "kind": "tape_parent",
+          "to": "mu:747de58ec66f23a69897e4e6e8d848c9a33ba180a3f2f6d2e354597c6f8a1a1f"
+        },
+        {
+          "from": "mu:747de58ec66f23a69897e4e6e8d848c9a33ba180a3f2f6d2e354597c6f8a1a1f",
+          "kind": "tape_parent",
+          "to": "mu:406616f0adfa233b4baf1b32df1618e627f81d898ca1580a3798c0d2d1437834"
+        },
+        {
+          "from": "mu:406616f0adfa233b4baf1b32df1618e627f81d898ca1580a3798c0d2d1437834",
+          "kind": "tape_parent",
+          "to": "mu:02548f028bb605d4a292b875d43c880f4c1a4de0d06d1698a6d07e17b834e5b5"
+        },
+        {
+          "from": "mu:02548f028bb605d4a292b875d43c880f4c1a4de0d06d1698a6d07e17b834e5b5",
+          "kind": "tape_parent",
+          "to": "mu:40cb272c3c4b5682523514e26379cfc0d3f45e56f94f1281b9301fcd90d37539"
+        },
+        {
+          "from": "mu:40cb272c3c4b5682523514e26379cfc0d3f45e56f94f1281b9301fcd90d37539",
+          "kind": "tape_parent",
+          "to": "mu:d3ed33734c3f0df6f4a2db7bf4c6bdb6eccebe4b28c7f592c12f37c99784c404"
+        },
+        {
+          "from": "mu:d3ed33734c3f0df6f4a2db7bf4c6bdb6eccebe4b28c7f592c12f37c99784c404",
+          "kind": "tape_parent",
+          "to": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a"
+        },
+        {
+          "from": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "kind": "tape_parent",
+          "to": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb"
+        },
+        {
+          "from": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb",
+          "kind": "tape_parent",
+          "to": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec"
+        },
+        {
+          "from": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec",
+          "kind": "tape_parent",
+          "to": "mu:ab64c2b32e3bfa74b027425aecaeb25e3fd3ab41ec4a302c46b39a5ea0d93c0d"
+        },
+        {
+          "from": "mu:ab64c2b32e3bfa74b027425aecaeb25e3fd3ab41ec4a302c46b39a5ea0d93c0d",
+          "kind": "tape_parent",
+          "to": "mu:95168af73b0401c2dd364b0338605196ac3e99e9e3bd6de188e2aab32c29b3fd"
+        },
+        {
+          "from": "mu:95168af73b0401c2dd364b0338605196ac3e99e9e3bd6de188e2aab32c29b3fd",
+          "kind": "tape_parent",
+          "to": "mu:2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03"
+        },
+        {
+          "from": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56",
+          "kind": "market_ref",
+          "to": "mu:c27b016f318c400409aee90f6777318a3aadafd0d7a76a84a17d81f4890e3c94"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:323f4b74928209b8b67fcab240bf6ad65447143b7476d35f7ff4ea4612c69e25"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:5219eefbdbd004908212e86b5241b4d67badf36869764032949c2ed3af0d9fef"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:a876b39aa5e779c728489eb3188307fcd12ec1434d2555eaec2bc34bff241b38"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:5ccdd3b42d757ef261fa79656b9504660a53d2814204e5fd5ec442d54f3af0f2"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:a5cd16db7c3efb7d569293527aaf3adc34f2976688e1b717c2a1ac4dd5a4829c"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:48f60cd3c7b5fb68b54f26e01b8e1b391bacad174c092bde9c628ae7b786c1c7"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:73610f839566c7f86febd593d298d089a54f44a150c8a1dfce0a0d775b002904"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:4876c3c2dce316b4ed6c75b59bf4cb0edadd1340701e92b38ffcdb688e672f68"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:55ab7888bae6d2a9da3354a6285b1846fc0ff2c55fa6e9e6c6b76e6e604a3a42"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:4bec675e6e875a07f8deb206260e7d3afad1e8b09b7fc01f53dd6b872a5e8d44"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:4f4893f674a61b576c40bacbd7def09ce0c58447e62e9ab3718d4f7f2206a26d"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:5290ef8fa57c435e645b0b55449128a498e5ad232860fdfb1cf76b1f9c52bf83"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:747de58ec66f23a69897e4e6e8d848c9a33ba180a3f2f6d2e354597c6f8a1a1f"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:406616f0adfa233b4baf1b32df1618e627f81d898ca1580a3798c0d2d1437834"
+        },
+        {
+          "from": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56",
+          "kind": "market_ref",
+          "to": "mu:406616f0adfa233b4baf1b32df1618e627f81d898ca1580a3798c0d2d1437834"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:02548f028bb605d4a292b875d43c880f4c1a4de0d06d1698a6d07e17b834e5b5"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:40cb272c3c4b5682523514e26379cfc0d3f45e56f94f1281b9301fcd90d37539"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:d3ed33734c3f0df6f4a2db7bf4c6bdb6eccebe4b28c7f592c12f37c99784c404"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a"
+        },
+        {
+          "from": "mu:02548f028bb605d4a292b875d43c880f4c1a4de0d06d1698a6d07e17b834e5b5",
+          "kind": "receipt_ref",
+          "to": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a"
+        },
+        {
+          "from": "mu:40cb272c3c4b5682523514e26379cfc0d3f45e56f94f1281b9301fcd90d37539",
+          "kind": "macro_ref",
+          "to": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a"
+        },
+        {
+          "from": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "kind": "capsule_ref",
+          "to": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb"
+        },
+        {
+          "from": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb"
+        },
+        {
+          "from": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56",
+          "kind": "market_ref",
+          "to": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec"
+        },
+        {
+          "from": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec"
+        },
+        {
+          "from": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb",
+          "kind": "terminal_event_id",
+          "to": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec"
+        },
+        {
+          "from": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56",
+          "kind": "market_ref",
+          "to": "mu:ab64c2b32e3bfa74b027425aecaeb25e3fd3ab41ec4a302c46b39a5ea0d93c0d"
+        },
+        {
+          "from": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec",
+          "kind": "settlement_event_id",
+          "to": "mu:ab64c2b32e3bfa74b027425aecaeb25e3fd3ab41ec4a302c46b39a5ea0d93c0d"
+        },
+        {
+          "from": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "kind": "basis_event_id",
+          "to": "mu:95168af73b0401c2dd364b0338605196ac3e99e9e3bd6de188e2aab32c29b3fd"
+        },
+        {
+          "from": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb",
+          "kind": "terminal_event_id",
+          "to": "mu:95168af73b0401c2dd364b0338605196ac3e99e9e3bd6de188e2aab32c29b3fd"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:5f513416dc68bc4da51a6b2af979d90e8f2e9ba85b0b2ef36b3e5606c13d85cf",
+        "authorization_head": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5",
+        "tape_tip": "mu:2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12"
+      },
+      "event_count": 31,
+      "event_counts": {
+        "AtomAuthorized": 1,
+        "BudgetAllocated": 1,
+        "CostEvent": 1,
+        "FailureNode": 1,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 1,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "ToolActionAuthorized": 7,
+        "ToolReceiptAppended": 7,
+        "WorkCapsuleBuilt": 1,
+        "WorkerDispatchAuthorized": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:5f513416dc68bc4da51a6b2af979d90e8f2e9ba85b0b2ef36b3e5606c13d85cf",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:5f513416dc68",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "5f51341",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:cfa4bb0303ed4c441b0f90953bd23887ebec2dce633719012d6dc0ce8540ed08",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:cfa4bb0303ed",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "cfa4bb0",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:7e2c594b77ec5c22bc643a2d9e74485a446169830fc2a7e01c3768a6a95d1332",
+          "event_type": "AtomAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "2:AtomAuthorized:7e2c594b77ec",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "7e2c594",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:f53e5d5e6ddbb9feb25cdb49f5008958167920bd1895a2eab70dd8a5f7ee4e03",
+          "event_type": "WorkerDispatchAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "3:WorkerDispatchAuthorized:f53e5d5e6ddb",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "f53e5d5",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:032938e4562faee5d5abe8998388b80f8895ee06bcc0a68c9566b8e627f8ceea",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "4:WorkCapsuleBuilt:032938e4562f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "032938e",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:2366f33e9ea6c661612f1056b6d762046adae1b5f5e882ece942ba27d9d82f56",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_8c367ffa892da4c2",
+          "node_id": "5:MarketCreated:2366f33e9ea6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "2366f33",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:c27b016f318c400409aee90f6777318a3aadafd0d7a76a84a17d81f4890e3c94",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_8c367ffa892da4c2",
+          "node_id": "6:PositionMinted:c27b016f318c",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "c27b016",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:323f4b74928209b8b67fcab240bf6ad65447143b7476d35f7ff4ea4612c69e25",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "7:ToolActionAuthorized:323f4b749282",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "323f4b7",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:5219eefbdbd004908212e86b5241b4d67badf36869764032949c2ed3af0d9fef",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:ToolReceiptAppended:5219eefbdbd0",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "5219eef",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:a876b39aa5e779c728489eb3188307fcd12ec1434d2555eaec2bc34bff241b38",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "9:ToolActionAuthorized:a876b39aa5e7",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "a876b39",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:5ccdd3b42d757ef261fa79656b9504660a53d2814204e5fd5ec442d54f3af0f2",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:ToolReceiptAppended:5ccdd3b42d75",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "5ccdd3b",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:a5cd16db7c3efb7d569293527aaf3adc34f2976688e1b717c2a1ac4dd5a4829c",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "11:ToolActionAuthorized:a5cd16db7c3e",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "a5cd16d",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:48f60cd3c7b5fb68b54f26e01b8e1b391bacad174c092bde9c628ae7b786c1c7",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:ToolReceiptAppended:48f60cd3c7b5",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 12,
+          "short_id": "48f60cd",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:73610f839566c7f86febd593d298d089a54f44a150c8a1dfce0a0d775b002904",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "13:ToolActionAuthorized:73610f839566",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 13,
+          "short_id": "73610f8",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:4876c3c2dce316b4ed6c75b59bf4cb0edadd1340701e92b38ffcdb688e672f68",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:ToolReceiptAppended:4876c3c2dce3",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 14,
+          "short_id": "4876c3c",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:55ab7888bae6d2a9da3354a6285b1846fc0ff2c55fa6e9e6c6b76e6e604a3a42",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "15:ToolActionAuthorized:55ab7888bae6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "55ab788",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:4bec675e6e875a07f8deb206260e7d3afad1e8b09b7fc01f53dd6b872a5e8d44",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "16:ToolReceiptAppended:4bec675e6e87",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 16,
+          "short_id": "4bec675",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:4f4893f674a61b576c40bacbd7def09ce0c58447e62e9ab3718d4f7f2206a26d",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "17:ToolActionAuthorized:4f4893f674a6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 17,
+          "short_id": "4f4893f",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:5290ef8fa57c435e645b0b55449128a498e5ad232860fdfb1cf76b1f9c52bf83",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:ToolReceiptAppended:5290ef8fa57c",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 18,
+          "short_id": "5290ef8",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5",
+          "event_type": "ToolActionAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:ToolActionAuthorized:57d13a297f28",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "57d13a2",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:747de58ec66f23a69897e4e6e8d848c9a33ba180a3f2f6d2e354597c6f8a1a1f",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "20:ToolReceiptAppended:747de58ec66f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 20,
+          "short_id": "747de58",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:406616f0adfa233b4baf1b32df1618e627f81d898ca1580a3798c0d2d1437834",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_8c367ffa892da4c2",
+          "node_id": "21:BudgetAllocated:406616f0adfa",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 21,
+          "short_id": "406616f",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:02548f028bb605d4a292b875d43c880f4c1a4de0d06d1698a6d07e17b834e5b5",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "22:WorkerReceiptImported:02548f028bb6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 22,
+          "short_id": "02548f0",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:40cb272c3c4b5682523514e26379cfc0d3f45e56f94f1281b9301fcd90d37539",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "23:MacroObservationImported:40cb272c3c4b",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 23,
+          "short_id": "40cb272",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:d3ed33734c3f0df6f4a2db7bf4c6bdb6eccebe4b28c7f592c12f37c99784c404",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "24:CostEvent:d3ed33734c3f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 24,
+          "short_id": "d3ed337",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": "PATCH_APPLIES_BUT_WRONG",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "25:OfficialEvaluatorEvidenceImported:4861ba2710ac",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "FAIL",
+          "sequence": 25,
+          "short_id": "4861ba2",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage13_8c367ffa892da4c2",
+          "event_id": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb",
+          "event_type": "FailureNode",
+          "failure_class": "PATCH_APPLIES_BUT_WRONG",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "26:FailureNode:167a32515639",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": null,
+          "sequence": 26,
+          "short_id": "167a325",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "capsule_id": null,
+          "event_id": "mu:7d179a06742885456856d61cf08bd72f186ba506597a178ed2b788c8c9ac4aec",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_8c367ffa892da4c2",
+          "node_id": "27:MarketSettled:7d179a067428",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "NO",
+          "sequence": 27,
+          "short_id": "7d179a0",
+          "terminal_event_id": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:ab64c2b32e3bfa74b027425aecaeb25e3fd3ab41ec4a302c46b39a5ea0d93c0d",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage13_8c367ffa892da4c2",
+          "node_id": "28:RewardDistributed:ab64c2b32e3b",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 28,
+          "short_id": "ab64c2b",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:4861ba2710ac439503e3ad42c90728cf9bf7a1c07ec5905e3ef8081570d2da6a",
+          "capsule_id": null,
+          "event_id": "mu:95168af73b0401c2dd364b0338605196ac3e99e9e3bd6de188e2aab32c29b3fd",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "29:PPUTAccounted:95168af73b04",
+          "predicate_product": "PASS",
+          "progress": 0,
+          "result": null,
+          "sequence": 29,
+          "short_id": "95168af",
+          "terminal_event_id": "mu:167a325156394d0e95a8018622a0baee0d3786fb854305041cfd6791dda920bb",
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "30:PredicateEvaluated:2093d806c34f",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 30,
+          "short_id": "2093d80",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        }
+      ],
+      "execution_findings": [],
+      "first_candidate_accepted": null,
+      "git_evidence": {
+        "git_fsck_strict_stderr": "",
+        "git_fsck_strict_stdout": "",
+        "object_format": "sha256"
+      },
+      "golden_path": [],
+      "golden_path_basis": null,
+      "path_class": "failed_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "terminal_candidate_accepted": null
+    }
+  ],
+  "schema_id": "MicroTapeDecisionDagAudit.v2",
+  "status_summary": {
+    "accepted_final_progress_one": "PASS",
+    "accepted_head_authority": "PASS",
+    "authorization_head": "PASS",
+    "basic_ref_reconstruction": "PASS",
+    "bundle_accessibility": "PASS",
+    "bundle_integrity": "PASS",
+    "canonical_payload_hash": "PASS",
+    "constitutional_protocol_audit": "PASS",
+    "cost_conservation_all_branches": "PASS",
+    "decision_dag_completeness": "PASS",
+    "economic_timing": "PASS",
+    "failed_progress_zero": "PASS",
+    "git_topology": "PASS",
+    "market_accounting_correctness": "PASS",
+    "overall": "PASS",
+    "ref_reconstruction": "PASS",
+    "registry_head_effect": "PASS",
+    "replay_structural_integrity": "PASS",
+    "terminal_golden_path_anchors_to_accepted_head": "PASS",
+    "vpput_accounting": "PASS"
+  },
+  "strict_findings": [],
+  "truth_source": "micro_tape_bundle_only",
+  "verdict": "PASS"
+}

@@ -2846,6 +2846,580 @@ def generate_stage9_native_api_worker_fixture(out_dir: Path, tasks: list[dict[st
     return manifest
 
 
+def stage13_visible_prompt(instance_id: str) -> str:
+    return "\n".join(
+        [
+            f"Instance: {instance_id}",
+            "Use only the native API tools granted in the capsule.",
+            "Keep edits inside the production-code scope.",
+            "Every action is recorded as a receipt for replay.",
+            "Report a patch candidate only after running the requested checks.",
+        ]
+    ) + "\n"
+
+
+def stage13_tool_plan(expected_result: str) -> list[dict[str, Any]]:
+    if expected_result == "PASS":
+        return [
+            {"tool": "list_dir", "status": "SUCCESS", "path": "django/db/backends", "tokens": (8, 8, 4, 4)},
+            {"tool": "read_file", "status": "SUCCESS", "path": "django/db/backends/ddl_references.py", "tokens": (10, 10, 5, 5)},
+            {"tool": "grep", "status": "SUCCESS", "path": "django/db/backends", "tokens": (8, 8, 4, 4)},
+            {"tool": "apply_patch", "status": "SUCCESS", "path": "django/db/backends/ddl_references.py", "mutates": True, "tokens": (14, 12, 8, 6)},
+            {"tool": "write_file", "status": "SUCCESS", "path": "django/db/backends/ddl_references.py", "mutates": True, "tokens": (10, 8, 6, 4)},
+            {"tool": "run_command", "status": "SUCCESS", "path": ".", "exit_code": 0, "tokens": (16, 14, 10, 8)},
+        ]
+    return [
+        {"tool": "list_dir", "status": "SUCCESS", "path": "django/db/backends", "tokens": (6, 6, 4, 3)},
+        {"tool": "read_file", "status": "SUCCESS", "path": "django/db/backends/ddl_references.py", "tokens": (8, 8, 4, 4)},
+        {
+            "tool": "grep",
+            "status": "FAILED",
+            "path": "django/db/backends",
+            "exit_code": 1,
+            "error_class": "GREP_NO_MATCH",
+            "negative_control": "GREP_NO_MATCH",
+            "tokens": (6, 4, 3, 2),
+        },
+        {
+            "tool": "apply_patch",
+            "status": "FAILED",
+            "path": "django/db/backends/ddl_references.py",
+            "exit_code": 1,
+            "error_class": "APPLY_PATCH_CONFLICT",
+            "negative_control": "APPLY_PATCH_CONFLICT",
+            "mutates": True,
+            "tokens": (8, 6, 5, 3),
+        },
+        {
+            "tool": "write_file",
+            "status": "DENIED",
+            "path": "tests/forbidden_stage13_test.py",
+            "exit_code": 126,
+            "error_class": "FORBIDDEN_PATH_MUTATION",
+            "negative_control": "FORBIDDEN_PATH_MUTATION",
+            "mutates": True,
+            "tokens": (5, 3, 2, 2),
+        },
+        {
+            "tool": "run_command",
+            "status": "FAILED",
+            "path": ".",
+            "exit_code": 1,
+            "error_class": "RUN_COMMAND_NONZERO",
+            "negative_control": "RUN_COMMAND_NONZERO",
+            "tokens": (7, 5, 4, 3),
+        },
+        {
+            "tool": "run_command",
+            "status": "TIMEOUT",
+            "path": ".",
+            "exit_code": 124,
+            "error_class": "RUN_COMMAND_TIMEOUT",
+            "negative_control": "RUN_COMMAND_TIMEOUT",
+            "tokens": (6, 4, 4, 2),
+        },
+    ]
+
+
+def build_stage13_native_api_worker_bundle(out_dir: Path, task: dict[str, Any], expected_result: str) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "turingos" / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage13 git init failed:\n{init.stderr}")
+
+    prompt_path = instance_dir / "visible_prompt.txt"
+    prompt_path.write_text(stage13_visible_prompt(instance_id), encoding="utf-8")
+
+    state = stage6_base_state()
+    short = hashlib.sha256(instance_id.encode("utf-8")).hexdigest()[:16]
+    worker_id = "worker:sha256:" + hashlib.sha256(f"stage13:{instance_id}:native-api".encode("utf-8")).hexdigest()
+    atom_id = f"atom_stage13_{short}"
+    capsule_id = f"wc_stage13_{short}"
+    market_id = f"mkt_stage13_{short}"
+    receipt_id = f"rcp_stage13_{short}"
+    macro_id = f"macro:diff:stage13:{short}"
+    evidence_id = f"ev_stage13_{short}"
+    candidate_id = f"cand_stage13_{short}"
+    run_id = f"run_stage13_{short}"
+    tool_plan = stage13_tool_plan(expected_result)
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage13 constitution")}, "writer:bootstrap")
+    append(
+        "GoalStateProposed",
+        {
+            "goal_id": f"goal_stage13_{short}",
+            "objective": f"Stage13 Native API Worker hardening for {instance_id}",
+            "task_source": "swe_bench_shaped_native_api_worker_hardening",
+        },
+        "writer:goal",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": atom_id,
+            "approval_id": f"ap_atom_stage13_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_stage13_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkCapsuleBuilt",
+        {
+            "capsule_id": capsule_id,
+            "private_contract_hash": digest_text(capsule_id + ":private"),
+            "visible_prompt_hash": digest_bytes(prompt_path.read_bytes()),
+            "acceptance_commands": ["stage13.native_api.eval"],
+            "allowed_files": ["django/**"],
+            "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+            "worker_kind": "NativeApiWorker",
+            "allowed_tools": NATIVE_API_TOOLS,
+            "pput_formula_absent": True,
+            "heldout_ids_absent": True,
+            "hidden_predicates_absent": True,
+            "raw_failure_logs_absent": True,
+        },
+        "writer:capsule",
+    )
+    append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    append(
+        "PositionMinted",
+        {
+            "schema_id": "position_minted.v1",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "coin_in": "1",
+            "yes_out": "1",
+            "no_out": "1",
+            "invariant": "coin_in == yes_out == no_out",
+        },
+        "writer:market",
+    )
+
+    attempted_actions: list[dict[str, Any]] = []
+    tool_receipt_ids: list[str] = []
+    tool_token_totals = {field: 0 for field in ["prompt_tokens", "completion_tokens", "tool_tokens", "tool_stdout_tokens"]}
+
+    for index, action in enumerate(tool_plan, start=1):
+        attempt_id = f"ta_stage13_{short}_{index}"
+        tool = action["tool"]
+        prompt_tokens, completion_tokens, tool_tokens, tool_stdout_tokens = action["tokens"]
+        expected_action = {
+            "attempt_id": attempt_id,
+            "tool": tool,
+            "expected_status": action["status"],
+            "negative_control": action.get("negative_control"),
+        }
+        attempted_actions.append(expected_action)
+        append(
+            "ToolActionAuthorized",
+            {
+                "tool_action_id": attempt_id,
+                "capsule_id": capsule_id,
+                "worker_id": worker_id,
+                "tool": tool,
+                "path": action["path"],
+                "authority_kind": "test_local_authority_no_credentials",
+                "signature_route": "test_local_authority",
+            },
+            "writer:test-local-authority",
+        )
+        receipt = append(
+            "ToolReceiptAppended",
+            {
+                "schema_id": "tool_receipt_appended.v1",
+                "receipt_id": f"tr_stage13_{short}_{index}",
+                "attempt_id": attempt_id,
+                "capsule_id": capsule_id,
+                "worker_id": worker_id,
+                "tool": tool,
+                "status": action["status"],
+                "exit_code": int(action.get("exit_code", 0)),
+                "error_class": action.get("error_class"),
+                "negative_control": action.get("negative_control"),
+                "stdout_hash": digest_text(f"{instance_id}:{attempt_id}:stdout:{action['status']}"),
+                "stderr_hash": digest_text(f"{instance_id}:{attempt_id}:stderr:{action['status']}"),
+                "path": action["path"],
+                "mutates": bool(action.get("mutates", False)),
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "tool_tokens": tool_tokens,
+                "tool_stdout_tokens": tool_stdout_tokens,
+                "counted_in_cost": True,
+                "credential_material_absent": True,
+            },
+            "writer:native-api-worker",
+        )
+        tool_receipt_ids.append(receipt["event_id"])
+        tool_token_totals["prompt_tokens"] += prompt_tokens
+        tool_token_totals["completion_tokens"] += completion_tokens
+        tool_token_totals["tool_tokens"] += tool_tokens
+        tool_token_totals["tool_stdout_tokens"] += tool_stdout_tokens
+
+    total_tokens = sum(tool_token_totals.values())
+    wall_ms = 260 if expected_result == "PASS" else 190
+    append(
+        "BudgetAllocated",
+        {
+            "market_id": market_id,
+            "branch_id": f"branch_stage13_{short}",
+            "capsule_id": capsule_id,
+            "allocation_reason": {
+                "price_signal_hash": digest_text("stage13 price"),
+                "pput_prior_hash": digest_text("stage13 pput"),
+                "diversity_policy_hash": digest_text("stage13 diversity"),
+            },
+            "max_tokens": total_tokens,
+            "max_wall_time_ms": wall_ms,
+        },
+        "writer:market",
+    )
+
+    patch_hash = digest_text(f"{instance_id}:stage13:{expected_result}:patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_id,
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "exit_code": 0 if expected_result == "PASS" else 1,
+            "stdout_hash": digest_text(instance_id + ":stage13:worker-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage13:worker-stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage13:done"),
+            "credential_material_absent": True,
+            "micro_refs_moved": False,
+            "patch_hash": patch_hash,
+            "tool_receipt_event_ids": tool_receipt_ids,
+            "assembled_from_tool_receipts": True,
+        },
+        "writer:receipt",
+    )
+    append(
+        "MacroObservationImported",
+        {
+            "macro_id": macro_id,
+            "capsule_id": capsule_id,
+            "diff_hash": patch_hash,
+            "external_evidence_only": True,
+        },
+        "writer:macro",
+    )
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": f"branch_stage13_{short}",
+            "capsule_id": capsule_id,
+            **tool_token_totals,
+            "total_tokens": total_tokens,
+            "wall_time_ms": wall_ms,
+            "tool_stdout_hash": digest_text(instance_id + ":stage13:tool-stdout"),
+            "tool_receipt_event_ids": sorted(tool_receipt_ids),
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_id,
+            "instance_id": instance_id,
+            "capsule_id": capsule_id,
+            "macro_anchor_id": macro_id,
+            "worker_receipt_id": receipt_id,
+            "candidate_patch_hash": patch_hash,
+            "test_patch_hash": digest_text(instance_id + ":stage13:test-patch"),
+            "apply_candidate_result": "PASS" if expected_result == "PASS" else "FAIL",
+            "apply_test_patch_result": "PASS",
+            "fail_to_pass_labels": [],
+            "target_test_exit_code": 0 if expected_result == "PASS" else 1,
+            "target_test_result": expected_result,
+            "stdout_hash": digest_text(instance_id + ":stage13:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage13:official-stderr"),
+            "result": expected_result,
+            "failure_class": None if expected_result == "PASS" else "PATCH_APPLIES_BUT_WRONG",
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage13_deterministic_official_tool_receipt_fixture",
+        },
+        "writer:official-evaluator",
+        name="official",
+    )
+    if expected_result == "PASS":
+        terminal = append(
+            "CandidateAccepted",
+            {
+                "candidate_id": candidate_id,
+                "capsule_id": capsule_id,
+                "macro_anchor_id": macro_id,
+                "worker_receipt_id": receipt_id,
+                "official_evaluator_evidence_id": evidence_id,
+            },
+            "writer:predicate",
+            name="terminal",
+        )
+        market_result = "YES"
+        reward = "1"
+        slash = "0"
+        progress = 1
+    else:
+        terminal = append(
+            "FailureNode",
+            {
+                "capsule_id": capsule_id,
+                "candidate_id": candidate_id,
+                "failure_class": "PATCH_APPLIES_BUT_WRONG",
+                "detail": "Native API Worker hardening captured failed, denied, and timeout tool receipts.",
+                "official_evaluator_evidence_id": evidence_id,
+                "failed_tool_receipt_event_ids": tool_receipt_ids,
+            },
+            "writer:predicate",
+            product="NOT_RUN",
+            name="terminal",
+        )
+        market_result = "NO"
+        reward = "0"
+        slash = "1"
+        progress = 0
+
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": market_result,
+            "settlement_basis_event_id": official["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": terminal["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    append(
+        "RewardDistributed",
+        {
+            "schema_id": "reward_distributed.v1",
+            "event_type": "RewardDistributed",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "reward_coin": reward,
+            "slash_coin": slash,
+            "reason": "PREDICATE_SETTLEMENT" if progress == 1 else "TOOL_RECEIPT_FAILURE",
+            "settlement_event_id": settlement["event_id"],
+        },
+        "writer:market",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": progress == 1,
+            "verified": progress == 1,
+            "accounting_stage": "final",
+            "basis_event_id": official["event_id"],
+            "terminal_event_id": terminal["event_id"],
+            "golden_path_token_count": total_tokens if progress == 1 else 0,
+            "total_run_token_count": total_tokens,
+            "total_wall_time_ms": wall_ms,
+            "progress": progress,
+            "vpput_raw": stage6_vpput(progress, total_tokens, wall_ms),
+            "failed_branch_count": 0 if progress == 1 else 1,
+            "tool_receipt_event_ids": sorted(tool_receipt_ids),
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    append(
+        "PredicateEvaluated",
+        {
+            "predicate_id": "predicate.stage13.native_api.replay",
+            "result": "PASS",
+            "source_tape_tip": state["tape_tip"],
+            "replay_hash": digest_text("stage13 replay:" + instance_id),
+        },
+        "writer:replay",
+        product="NOT_RUN",
+    )
+
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage13 bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+    return {
+        "instance_id": instance_id,
+        "expected_result": expected_result,
+        "authorization_mode": "required",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "worker_id": worker_id,
+        "capsule_id": capsule_id,
+        "candidate_id": candidate_id,
+        "market_id": market_id,
+        "native_api_worker": {
+            "worker_kind": "NativeApiWorker",
+            "expected_tools": NATIVE_API_TOOLS,
+            "expected_attempted_actions": attempted_actions,
+            "tool_receipt_event_ids": tool_receipt_ids,
+            "worker_receipt_id": receipt_id,
+            "worker_receipts_assembled_from_tool_receipts": True,
+            "failed_tool_receipt_event_ids": [] if expected_result == "PASS" else tool_receipt_ids,
+            "visible_prompt_path": str(prompt_path),
+            "visible_prompt_hash": digest_bytes(prompt_path.read_bytes()),
+            "prompt_leak_scan": "PASS",
+        },
+        "basis": "stage13_native_api_worker_receipt_hardening",
+    }
+
+
+def generate_stage13_native_api_worker_hardening_fixture(out_dir: Path, tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    runs = []
+    for index, task in enumerate(tasks):
+        expected = str(task.get("stage13_expected_result") or ("PASS" if index == 0 else "FAIL")).upper()
+        if expected not in {"PASS", "FAIL"}:
+            raise ValueError(f"stage13_expected_result must be PASS or FAIL for {task['instance_id']}")
+        runs.append(build_stage13_native_api_worker_bundle(out_dir, task, expected))
+    manifest = {
+        "schema_id": "Stage13NativeApiWorkerHardeningManifest.v1",
+        "run_id": "stage13_native_api_worker_hardening",
+        "truth_source": "fresh_micro_tape_bundles",
+        "scientific_status": "NATIVE_API_WORKER_RECEIPT_HARDENING_NOT_SOLVE_RATE",
+        "sample_size": len(runs),
+        "turingos_arm_runs": runs,
+    }
+    turingos_dir = out_dir / "turingos"
+    write_json(turingos_dir / "substrate_coverage.json", manifest)
+    write_json(out_dir / "worker_manifest.json", manifest)
+    write_json(out_dir / "bundle_manifest.json", manifest)
+    bundle_lines = [f"{run['micro_tape_bundle_sha256']}  {run['micro_tape_bundle']}" for run in runs]
+    (out_dir / "bundle_sha256s.txt").write_text("\n".join(bundle_lines) + "\n", encoding="utf-8")
+    lineage = [
+        "# Stage13 Tool Call Lineage",
+        "",
+        "Each Native API Worker receipt is assembled from `ToolReceiptAppended` event IDs.",
+        "",
+    ]
+    for run in runs:
+        lineage.append(f"## {run['instance_id']}")
+        for action, receipt_id in zip(
+            run["native_api_worker"]["expected_attempted_actions"],
+            run["native_api_worker"]["tool_receipt_event_ids"],
+        ):
+            lineage.append(
+                f"- `{action['attempt_id']}` `{action['tool']}` `{action['expected_status']}` -> `{receipt_id}`"
+            )
+        lineage.append("")
+    (out_dir / "tool_call_lineage.md").write_text("\n".join(lineage), encoding="utf-8")
+    return manifest
+
+
+def run_stage13_release_audits(out_dir: Path) -> None:
+    coverage = out_dir / "turingos" / "substrate_coverage.json"
+    commands = [
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_micro_tape_decision_dag.py"),
+            "--strict-vpput",
+            "--strict-terminal-market",
+            "--require-authorization-head",
+            "--coverage",
+            str(coverage),
+            "--out-dir",
+            str(out_dir / "micro_tape_audit_strict"),
+        ],
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_native_api_worker.py"),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out_dir / "native_api_worker_audit.json"),
+        ],
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_tool_receipt_conservation.py"),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out_dir / "tool_receipt_conservation_audit.json"),
+        ],
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_prompt_leakage.py"),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out_dir / "prompt_leakage_audit.json"),
+        ],
+    ]
+    for command in commands:
+        result = run_cmd(command, cwd=REPO, timeout=300)
+        if result.returncode != 0:
+            raise RuntimeError(
+                "Stage13 release audit failed:\n"
+                + " ".join(command)
+                + "\nSTDOUT:\n"
+                + result.stdout
+                + "\nSTDERR:\n"
+                + result.stderr
+            )
+
+
 def build_stage10_failure_taxonomy_bundle(out_dir: Path, task: dict[str, Any], failure_class: str) -> dict[str, Any]:
     auditor = load_micro_tape_auditor()
     registry = auditor.load_event_registry()
@@ -3831,6 +4405,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strict-microtape-fixture", action="store_true")
     parser.add_argument("--no-hitl-loop-fixture", action="store_true")
     parser.add_argument("--native-api-worker-fixture", action="store_true")
+    parser.add_argument("--native-api-worker-hardening", action="store_true")
     parser.add_argument("--failure-taxonomy-fixture", action="store_true")
     parser.add_argument("--loop-until-pass-fixture", action="store_true")
     args = parser.parse_args(argv)
@@ -3883,6 +4458,21 @@ def main(argv: list[str] | None = None) -> int:
             "worker_process": "stage9_native_api_worker_fixture",
             "auditor_exit_code": 0,
             "scientific_status": "NATIVE_API_WORKER_TOOL_RECEIPT_FIXTURE_NOT_SOLVE_RATE",
+            "sample_size": manifest["sample_size"],
+        }
+        write_json(out_dir / "substrate_smoke_result.json", summary)
+        return 0
+    if args.native_api_worker_hardening:
+        if args.authorization_mode != "required":
+            parser.error("--native-api-worker-hardening requires --authorization-mode required")
+        manifest = generate_stage13_native_api_worker_hardening_fixture(out_dir, tasks)
+        run_stage13_release_audits(out_dir)
+        summary = {
+            "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+            "coverage": str(out_dir / "turingos" / "substrate_coverage.json"),
+            "worker_process": "stage13_native_api_worker_hardening",
+            "auditor_exit_code": 0,
+            "scientific_status": "NATIVE_API_WORKER_RECEIPT_HARDENING_NOT_SOLVE_RATE",
             "sample_size": manifest["sample_size"],
         }
         write_json(out_dir / "substrate_smoke_result.json", summary)

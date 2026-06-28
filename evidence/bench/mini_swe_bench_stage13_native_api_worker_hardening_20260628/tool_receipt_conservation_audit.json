@@ -1,0 +1,47 @@
+{
+  "all_attempted_actions_receipted": true,
+  "failed_actions_receipted": true,
+  "negative_controls_covered": true,
+  "negative_controls_seen": [
+    "APPLY_PATCH_CONFLICT",
+    "FORBIDDEN_PATH_MUTATION",
+    "GREP_NO_MATCH",
+    "RUN_COMMAND_NONZERO",
+    "RUN_COMMAND_TIMEOUT"
+  ],
+  "problems": [],
+  "run_count": 2,
+  "runs": [
+    {
+      "attempted_action_count": 6,
+      "expected_result": "PASS",
+      "failed_tool_receipt_count": 0,
+      "instance_id": "django__django-12039",
+      "negative_controls_seen": [],
+      "problems": [],
+      "status": "PASS",
+      "tool_receipt_count": 6
+    },
+    {
+      "attempted_action_count": 7,
+      "expected_result": "FAIL",
+      "failed_tool_receipt_count": 5,
+      "instance_id": "django__django-12050",
+      "negative_controls_seen": [
+        "APPLY_PATCH_CONFLICT",
+        "FORBIDDEN_PATH_MUTATION",
+        "GREP_NO_MATCH",
+        "RUN_COMMAND_NONZERO",
+        "RUN_COMMAND_TIMEOUT"
+      ],
+      "problems": [],
+      "status": "PASS",
+      "tool_receipt_count": 7
+    }
+  ],
+  "schema_id": "ToolReceiptConservationAudit.v1",
+  "status": "PASS",
+  "tool_cost_conservation": true,
+  "truth_source": "micro_tape_bundle_plus_coverage_expected_actions",
+  "worker_receipts_trace_to_tool_receipts": true
+}

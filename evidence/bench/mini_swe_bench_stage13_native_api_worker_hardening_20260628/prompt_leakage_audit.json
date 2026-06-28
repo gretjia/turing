@@ -1,0 +1,25 @@
+{
+  "actual_visible_prompt_bytes_scanned": true,
+  "forbidden_marker_policy": "internal denylist; marker literals omitted from evidence to avoid credential-marker artifacts",
+  "problems": [],
+  "run_count": 2,
+  "runs": [
+    {
+      "capsule_count": 1,
+      "instance_id": "django__django-12039",
+      "problems": [],
+      "status": "PASS",
+      "visible_prompt_scanned": true
+    },
+    {
+      "capsule_count": 1,
+      "instance_id": "django__django-12050",
+      "problems": [],
+      "status": "PASS",
+      "visible_prompt_scanned": true
+    }
+  ],
+  "schema_id": "PromptLeakageAudit.v1",
+  "status": "PASS",
+  "truth_source": "actual_visible_prompt_files_plus_micro_tape_capsules"
+}

@@ -1,0 +1,180 @@
+{
+  "run_id": "stage13_native_api_worker_hardening",
+  "sample_size": 2,
+  "schema_id": "Stage13NativeApiWorkerHardeningManifest.v1",
+  "scientific_status": "NATIVE_API_WORKER_RECEIPT_HARDENING_NOT_SOLVE_RATE",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:cae4b247c28d9202bbf647452522d0a35c3549188beb37337892126b53333407",
+      "authorization_head": "mu:f280de76e986f7c37a3025c8802f84aed86fa675bf147007d365e72b219c719e",
+      "authorization_mode": "required",
+      "basis": "stage13_native_api_worker_receipt_hardening",
+      "candidate_id": "cand_stage13_3ca4462c9852c1a6",
+      "capsule_id": "wc_stage13_3ca4462c9852c1a6",
+      "expected_result": "PASS",
+      "instance_id": "django__django-12039",
+      "market_id": "mkt_stage13_3ca4462c9852c1a6",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage13_native_api_worker_hardening_20260628/turingos/instances/django__django-12039/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:0044db5afb946f22eaa5b8c713152aaac16ecf80fc15b6bb6fc38e2ca5e02b47",
+      "native_api_worker": {
+        "expected_attempted_actions": [
+          {
+            "attempt_id": "ta_stage13_3ca4462c9852c1a6_1",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "list_dir"
+          },
+          {
+            "attempt_id": "ta_stage13_3ca4462c9852c1a6_2",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "read_file"
+          },
+          {
+            "attempt_id": "ta_stage13_3ca4462c9852c1a6_3",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "grep"
+          },
+          {
+            "attempt_id": "ta_stage13_3ca4462c9852c1a6_4",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "apply_patch"
+          },
+          {
+            "attempt_id": "ta_stage13_3ca4462c9852c1a6_5",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "write_file"
+          },
+          {
+            "attempt_id": "ta_stage13_3ca4462c9852c1a6_6",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "run_command"
+          }
+        ],
+        "expected_tools": [
+          "read_file",
+          "list_dir",
+          "grep",
+          "apply_patch",
+          "write_file",
+          "run_command"
+        ],
+        "failed_tool_receipt_event_ids": [],
+        "prompt_leak_scan": "PASS",
+        "tool_receipt_event_ids": [
+          "mu:6726cbea0eba2314f0476447ec52ca8d97b50bfcc2a9a38da23ae1a016eafc97",
+          "mu:c76ee99607ce385866c51dc629bb5f8552690642f6dbff20dd9501d5023ce2b6",
+          "mu:8f66c2ce7f326570c0f287452d8cbcbde7766c8818a2a27958dfa6de77045116",
+          "mu:b07eebb8235fac8a0bbe73ce6c68d71fb96987b4a1dd669e76c05fb80ef694c4",
+          "mu:2d2697a895229da31955d363492e7c8cf5aa563288659e2e714b3a9acfb6ccb2",
+          "mu:8f0d1c3d56e5d90a65ed3889e6fc1c0c636f5eb6aec2f122bb0964731f3ab07f"
+        ],
+        "visible_prompt_hash": "sha256:2674cc05dc8fd9985c93bdb4355b8999dbe7ec927419b42deb6243aad0e229c7",
+        "visible_prompt_path": "evidence/bench/mini_swe_bench_stage13_native_api_worker_hardening_20260628/turingos/instances/django__django-12039/visible_prompt.txt",
+        "worker_kind": "NativeApiWorker",
+        "worker_receipt_id": "rcp_stage13_3ca4462c9852c1a6",
+        "worker_receipts_assembled_from_tool_receipts": true
+      },
+      "tape_tip": "mu:ba4b0b159c702316449b7ea223b0625e6418199cdc09b51758f52feda44ea0b4",
+      "worker_id": "worker:sha256:642c3d4caf472c3d51e80f65558d6d629cd9459471861eec2ce5d081cd139b82"
+    },
+    {
+      "accepted_head": "mu:5f513416dc68bc4da51a6b2af979d90e8f2e9ba85b0b2ef36b3e5606c13d85cf",
+      "authorization_head": "mu:57d13a297f28fe3fd684f401fc1c8bd5bbefa4c24ac61f974c4e7911da3580d5",
+      "authorization_mode": "required",
+      "basis": "stage13_native_api_worker_receipt_hardening",
+      "candidate_id": "cand_stage13_8c367ffa892da4c2",
+      "capsule_id": "wc_stage13_8c367ffa892da4c2",
+      "expected_result": "FAIL",
+      "instance_id": "django__django-12050",
+      "market_id": "mkt_stage13_8c367ffa892da4c2",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage13_native_api_worker_hardening_20260628/turingos/instances/django__django-12050/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:9f64731b45c18a5bb04f983d7484fbdfe91c7fb34abdb3283b853adb011d7ce5",
+      "native_api_worker": {
+        "expected_attempted_actions": [
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_1",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "list_dir"
+          },
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_2",
+            "expected_status": "SUCCESS",
+            "negative_control": null,
+            "tool": "read_file"
+          },
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_3",
+            "expected_status": "FAILED",
+            "negative_control": "GREP_NO_MATCH",
+            "tool": "grep"
+          },
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_4",
+            "expected_status": "FAILED",
+            "negative_control": "APPLY_PATCH_CONFLICT",
+            "tool": "apply_patch"
+          },
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_5",
+            "expected_status": "DENIED",
+            "negative_control": "FORBIDDEN_PATH_MUTATION",
+            "tool": "write_file"
+          },
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_6",
+            "expected_status": "FAILED",
+            "negative_control": "RUN_COMMAND_NONZERO",
+            "tool": "run_command"
+          },
+          {
+            "attempt_id": "ta_stage13_8c367ffa892da4c2_7",
+            "expected_status": "TIMEOUT",
+            "negative_control": "RUN_COMMAND_TIMEOUT",
+            "tool": "run_command"
+          }
+        ],
+        "expected_tools": [
+          "read_file",
+          "list_dir",
+          "grep",
+          "apply_patch",
+          "write_file",
+          "run_command"
+        ],
+        "failed_tool_receipt_event_ids": [
+          "mu:5219eefbdbd004908212e86b5241b4d67badf36869764032949c2ed3af0d9fef",
+          "mu:5ccdd3b42d757ef261fa79656b9504660a53d2814204e5fd5ec442d54f3af0f2",
+          "mu:48f60cd3c7b5fb68b54f26e01b8e1b391bacad174c092bde9c628ae7b786c1c7",
+          "mu:4876c3c2dce316b4ed6c75b59bf4cb0edadd1340701e92b38ffcdb688e672f68",
+          "mu:4bec675e6e875a07f8deb206260e7d3afad1e8b09b7fc01f53dd6b872a5e8d44",
+          "mu:5290ef8fa57c435e645b0b55449128a498e5ad232860fdfb1cf76b1f9c52bf83",
+          "mu:747de58ec66f23a69897e4e6e8d848c9a33ba180a3f2f6d2e354597c6f8a1a1f"
+        ],
+        "prompt_leak_scan": "PASS",
+        "tool_receipt_event_ids": [
+          "mu:5219eefbdbd004908212e86b5241b4d67badf36869764032949c2ed3af0d9fef",
+          "mu:5ccdd3b42d757ef261fa79656b9504660a53d2814204e5fd5ec442d54f3af0f2",
+          "mu:48f60cd3c7b5fb68b54f26e01b8e1b391bacad174c092bde9c628ae7b786c1c7",
+          "mu:4876c3c2dce316b4ed6c75b59bf4cb0edadd1340701e92b38ffcdb688e672f68",
+          "mu:4bec675e6e875a07f8deb206260e7d3afad1e8b09b7fc01f53dd6b872a5e8d44",
+          "mu:5290ef8fa57c435e645b0b55449128a498e5ad232860fdfb1cf76b1f9c52bf83",
+          "mu:747de58ec66f23a69897e4e6e8d848c9a33ba180a3f2f6d2e354597c6f8a1a1f"
+        ],
+        "visible_prompt_hash": "sha256:c2ad8fb672fc7aa1a195d46a705e232d09f9f401459ebb9e562c52d34eec3fed",
+        "visible_prompt_path": "evidence/bench/mini_swe_bench_stage13_native_api_worker_hardening_20260628/turingos/instances/django__django-12050/visible_prompt.txt",
+        "worker_kind": "NativeApiWorker",
+        "worker_receipt_id": "rcp_stage13_8c367ffa892da4c2",
+        "worker_receipts_assembled_from_tool_receipts": true
+      },
+      "tape_tip": "mu:2093d806c34fb02e4bd7d21ab8532a291211945fbb6b15d6e3decc422ccd5a12",
+      "worker_id": "worker:sha256:c3c5eaad249febc35821d8a4775ccffaf5ac19949900d127e7801011f18015d1"
+    }
+  ]
+}
