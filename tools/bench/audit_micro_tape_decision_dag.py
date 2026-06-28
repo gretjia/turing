@@ -717,6 +717,55 @@ def terminal_golden_path_status(events: list[dict[str, Any]], actual_accepted_he
     return "FAIL"
 
 
+def positive_int(value: Any) -> int:
+    if isinstance(value, bool):
+        return 0
+    if isinstance(value, int) and value >= 0:
+        return value
+    return 0
+
+
+def cost_conservation_status(events: list[dict[str, Any]]) -> str:
+    final_pputs = [
+        event
+        for event in events
+        if event.get("event_type") == "PPUTAccounted"
+        and isinstance(event.get("payload"), dict)
+        and event["payload"].get("accounting_stage") == "final"
+    ]
+    if not final_pputs:
+        return "NOT_TESTED"
+
+    cost_events = [
+        event
+        for event in events
+        if event.get("event_type") == "CostEvent" and isinstance(event.get("payload"), dict)
+    ]
+    if not cost_events:
+        return "FAIL"
+
+    for pput in final_pputs:
+        payload = pput["payload"]
+        run_id = payload.get("run_id")
+        problem_id = payload.get("problem_id")
+        matching = []
+        for event in cost_events:
+            cost_payload = event["payload"]
+            if run_id is not None and cost_payload.get("run_id") == run_id:
+                matching.append(cost_payload)
+            elif problem_id is not None and cost_payload.get("problem_id") == problem_id:
+                matching.append(cost_payload)
+        if not matching:
+            return "FAIL"
+        token_total = sum(positive_int(item.get("total_tokens")) for item in matching)
+        wall_total = sum(positive_int(item.get("wall_time_ms")) for item in matching)
+        if payload.get("total_run_token_count") != token_total:
+            return "FAIL"
+        if payload.get("total_wall_time_ms") != wall_total:
+            return "FAIL"
+    return "PASS"
+
+
 def vpput_statuses(findings: list[dict[str, Any]], events: list[dict[str, Any]], actual_accepted_head: str | None) -> dict[str, str]:
     failed_progress = "FAIL" if any(f["finding"] == "failed_run_has_nonzero_pput_progress" for f in findings) else "PASS"
     accepted_final = "PASS"
@@ -726,10 +775,18 @@ def vpput_statuses(findings: list[dict[str, Any]], events: list[dict[str, Any]],
             if any(f["finding"] == "pput_final_accounting_missing_after_accept" for f in findings)
             else "PASS"
         )
-    vpput = "FAIL" if failed_progress == "FAIL" else "WARN" if accepted_final == "WARN" else "PASS"
+    cost_conservation = cost_conservation_status(events)
+    vpput = (
+        "FAIL"
+        if failed_progress == "FAIL" or cost_conservation == "FAIL"
+        else "WARN"
+        if accepted_final == "WARN" or cost_conservation in {"WARN", "NOT_TESTED"}
+        else "PASS"
+    )
     return {
         "failed_progress_zero": failed_progress,
         "accepted_final_progress_one": accepted_final,
+        "cost_conservation_all_branches": cost_conservation,
         "vpput_accounting": vpput,
     }
 
@@ -816,6 +873,7 @@ def aggregate_status(runs: list[dict[str, Any]]) -> dict[str, str]:
         "terminal_golden_path_anchors_to_accepted_head",
         "failed_progress_zero",
         "accepted_final_progress_one",
+        "cost_conservation_all_branches",
         "vpput_accounting",
     ]
     summary = {key: worst_status([run["checks"].get(key, "NOT_TESTED") for run in runs]) for key in keys}

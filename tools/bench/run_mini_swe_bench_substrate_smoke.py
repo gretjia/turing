@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import shutil
@@ -24,6 +25,7 @@ from typing import Any
 
 REPO = Path(__file__).resolve().parents[2]
 AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_substrate_coverage.py"
+MICRO_TAPE_AUDITOR = REPO / "tools" / "bench" / "audit_micro_tape_decision_dag.py"
 REQUIRED_MODULES = [
     "M0_law_goal_harness",
     "M1_canonical_codec",
@@ -958,6 +960,481 @@ def write_json(path: Path, packet: dict[str, Any]) -> None:
     path.write_text(json.dumps(packet, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def load_micro_tape_auditor() -> Any:
+    spec = importlib.util.spec_from_file_location("audit_micro_tape_decision_dag", MICRO_TAPE_AUDITOR)
+    module = importlib.util.module_from_spec(spec)
+    if spec.loader is None:
+        raise RuntimeError(f"cannot load {MICRO_TAPE_AUDITOR}")
+    spec.loader.exec_module(module)
+    return module
+
+
+def commit_stage6_event(repo: Path, event: dict[str, Any]) -> str:
+    (repo / "event").write_text(json.dumps(event, sort_keys=True) + "\n", encoding="utf-8")
+    run_cmd(["git", "add", "event"], cwd=repo)
+    proc = run_cmd(
+        [
+            "git",
+            "-c",
+            "user.name=TuringOS Stage6",
+            "-c",
+            "user.email=stage6@example.invalid",
+            "commit",
+            "-m",
+            "turingos stage6 micro event",
+        ],
+        cwd=repo,
+        timeout=120,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"stage6 git commit failed:\n{proc.stderr}")
+    oid = run_cmd(["git", "rev-parse", "HEAD"], cwd=repo, timeout=120)
+    if oid.returncode != 0:
+        raise RuntimeError(f"stage6 rev-parse failed:\n{oid.stderr}")
+    return oid.stdout.strip()
+
+
+def append_stage6_event(
+    *,
+    repo: Path,
+    state: dict[str, Any],
+    registry: dict[str, dict[str, Any]],
+    canonical_payload_digest: Any,
+    event_type: str,
+    payload: dict[str, Any],
+    writer_id: str,
+    product: str | None = None,
+    name: str | None = None,
+) -> dict[str, Any]:
+    row = registry[event_type]
+    predicate_product = product
+    if predicate_product is None:
+        predicate_product = "PASS" if row["predicate_required"] else "NOT_RUN"
+    payload_hash = canonical_payload_digest(payload)
+    event = {
+        "accepted_head_before": state["accepted_head"],
+        "authority_epoch": state["authority_epoch"],
+        "authorization_head_before": state["authorization_head"],
+        "content_digest": payload_hash,
+        "event_schema_id": row["payload_schema_id"],
+        "event_type": event_type,
+        "head_effect": row["head_effect"],
+        "payload": payload,
+        "payload_hash": payload_hash,
+        "predicate_product": predicate_product,
+        "prev_tape_tip": state["tape_tip"],
+        "schema_id": "micro_event_envelope.v1",
+        "sequence": state["sequence"],
+        "verified": predicate_product == "PASS",
+        "writer_id": writer_id,
+    }
+    oid = commit_stage6_event(repo, event)
+    event_id = "mu:" + oid
+    run_cmd(["git", "update-ref", "refs/turingos/tape_tip", oid], cwd=repo)
+    if row["event_class"] == "SOVEREIGN_ACCEPT" and predicate_product == "PASS":
+        run_cmd(["git", "update-ref", "refs/turingos/accepted_head", oid], cwd=repo)
+        state["accepted_head"] = event_id
+    if row["event_class"] == "AUTHORIZATION" and predicate_product == "PASS":
+        run_cmd(["git", "update-ref", "refs/turingos/authorization_head", oid], cwd=repo)
+        state["authorization_head"] = event_id
+    state["tape_tip"] = event_id
+    state["sequence"] += 1
+    state["events"].append({"event_type": event_type, "event_id": event_id, "payload": payload})
+    if name is not None:
+        state["event_ids"][name] = event_id
+    return {"event_type": event_type, "event_id": event_id, "payload": payload}
+
+
+def stage6_base_state() -> dict[str, Any]:
+    return {
+        "accepted_head": None,
+        "authorization_head": None,
+        "authority_epoch": 0,
+        "event_ids": {},
+        "events": [],
+        "sequence": 0,
+        "tape_tip": None,
+    }
+
+
+def stage6_vpput(progress: int, total_tokens: int, wall_time_ms: int) -> str:
+    if progress != 1 or total_tokens <= 0 or wall_time_ms <= 0:
+        return "0"
+    numerator = 1
+    denominator = total_tokens * wall_time_ms
+    return f"{numerator}/{denominator}"
+
+
+def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: str) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage6 git init failed:\n{init.stderr}")
+
+    state = stage6_base_state()
+    worker_id = "worker:sha256:" + hashlib.sha256(f"stage6:{instance_id}:worker".encode("utf-8")).hexdigest()
+    capsule_id = f"wc_stage6_{hashlib.sha256(instance_id.encode('utf-8')).hexdigest()[:16]}"
+    atom_id = f"atom_stage6_{hashlib.sha256((instance_id + ':atom').encode('utf-8')).hexdigest()[:16]}"
+    market_id = f"mkt_stage6_{hashlib.sha256((instance_id + ':market').encode('utf-8')).hexdigest()[:16]}"
+    receipt_id = f"rcp_stage6_{hashlib.sha256((instance_id + ':receipt').encode('utf-8')).hexdigest()[:16]}"
+    macro_id = f"macro:diff:stage6:{hashlib.sha256(instance_id.encode('utf-8')).hexdigest()[:16]}"
+    evidence_id = f"ev_stage6_{hashlib.sha256((instance_id + ':official').encode('utf-8')).hexdigest()[:16]}"
+    candidate_id = f"cand_stage6_{hashlib.sha256((instance_id + ':candidate').encode('utf-8')).hexdigest()[:16]}"
+    total_tokens = 100
+    wall_time_ms = 50
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage6 constitution")}, "writer:bootstrap")
+    append(
+        "GoalStateProposed",
+        {
+            "goal_id": f"goal_{instance_id}",
+            "objective": f"Stage6 strict MicroTape protocol fixture for {instance_id}",
+            "task_source": "existing_repo_swe_bench_fixture",
+        },
+        "writer:goal",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": atom_id,
+            "approval_id": f"ap_atom_{instance_id}",
+            "signature_route": "BenchLocalDeterministicAuthority",
+            "authority_kind": "stage6_protocol_fixture_no_credentials",
+        },
+        "writer:bench-authority",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_{instance_id}",
+            "signature_route": "BenchLocalDeterministicAuthority",
+            "authority_kind": "stage6_protocol_fixture_no_credentials",
+        },
+        "writer:bench-authority",
+    )
+    append(
+        "WorkCapsuleBuilt",
+        {
+            "capsule_id": capsule_id,
+            "private_contract_hash": digest_text(capsule_id + ":private"),
+            "acceptance_commands": ["strict.stage6.protocol.fixture"],
+            "allowed_files": ["django/**"],
+            "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+        },
+        "writer:capsule",
+    )
+    append(
+        "EvidenceBound",
+        {
+            "evidence_id": f"ev_bound_{instance_id}",
+            "content_digest": digest_text(task["problem_statement"]),
+            "storage_digest": digest_text(task["repo"] + task["base_commit"]),
+            "required": True,
+        },
+        "writer:evidence",
+    )
+    append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    append(
+        "PositionMinted",
+        {
+            "schema_id": "position_minted.v1",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "coin_in": "1",
+            "yes_out": "1",
+            "no_out": "1",
+            "invariant": "coin_in == yes_out == no_out",
+        },
+        "writer:market",
+    )
+    append(
+        "BudgetAllocated",
+        {
+            "market_id": market_id,
+            "branch_id": "branch_stage6_fixture",
+            "capsule_id": capsule_id,
+            "allocation_reason": {
+                "price_signal_hash": digest_text("stage6 price"),
+                "pput_prior_hash": digest_text("stage6 pput"),
+                "diversity_policy_hash": digest_text("stage6 diversity"),
+            },
+            "max_tokens": total_tokens,
+            "max_wall_time_ms": wall_time_ms,
+        },
+        "writer:market",
+    )
+    patch_hash = digest_text(instance_id + ":" + expected_result + ":patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_id,
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "exit_code": 0 if expected_result == "PASS" else 1,
+            "stdout_hash": digest_text(instance_id + ":stdout"),
+            "stderr_hash": digest_text(instance_id + ":stderr"),
+            "done_json_hash": digest_text(instance_id + ":done"),
+            "credential_material_absent": True,
+            "micro_refs_moved": False,
+            "patch_hash": patch_hash,
+        },
+        "writer:receipt",
+    )
+    append(
+        "MacroObservationImported",
+        {
+            "macro_id": macro_id,
+            "capsule_id": capsule_id,
+            "diff_hash": patch_hash,
+            "external_evidence_only": True,
+        },
+        "writer:macro",
+    )
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": f"run_{instance_id}",
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": "branch_stage6_fixture",
+            "capsule_id": capsule_id,
+            "prompt_tokens": 40,
+            "completion_tokens": 40,
+            "tool_tokens": 10,
+            "tool_stdout_tokens": 10,
+            "total_tokens": total_tokens,
+            "wall_time_ms": wall_time_ms,
+            "tool_stdout_hash": digest_text(instance_id + ":tool-stdout"),
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": f"run_{instance_id}",
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": False,
+            "verified": False,
+            "accounting_stage": "progress",
+            "golden_path_token_count": 0,
+            "total_run_token_count": total_tokens,
+            "total_wall_time_ms": wall_time_ms,
+            "progress": 0,
+            "vpput_raw": "0",
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    official = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_id,
+            "instance_id": instance_id,
+            "capsule_id": capsule_id,
+            "macro_anchor_id": macro_id,
+            "worker_receipt_id": receipt_id,
+            "candidate_patch_hash": patch_hash,
+            "test_patch_hash": digest_text(instance_id + ":test-patch"),
+            "apply_candidate_result": expected_result,
+            "apply_test_patch_result": "PASS",
+            "fail_to_pass_labels": [],
+            "target_test_exit_code": 0 if expected_result == "PASS" else 1,
+            "target_test_result": expected_result,
+            "stdout_hash": digest_text(instance_id + ":official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":official-stderr"),
+            "result": expected_result,
+            "failure_class": None if expected_result == "PASS" else "OFFICIAL_EVAL_FAIL",
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage6_deterministic_official_fixture",
+        },
+        "writer:official-evaluator",
+        name="official",
+    )
+
+    if expected_result == "PASS":
+        terminal = append(
+            "CandidateAccepted",
+            {
+                "candidate_id": candidate_id,
+                "capsule_id": capsule_id,
+                "macro_anchor_id": macro_id,
+                "worker_receipt_id": receipt_id,
+                "official_evaluator_evidence_id": evidence_id,
+            },
+            "writer:predicate",
+            name="terminal",
+        )
+        market_result = "YES"
+        reward = "1"
+        slash = "0"
+        progress = 1
+    else:
+        terminal = append(
+            "FailureNode",
+            {
+                "capsule_id": capsule_id,
+                "candidate_id": candidate_id,
+                "failure_class": "OFFICIAL_EVAL_FAIL",
+                "detail": "stage6 deterministic failing fixture",
+                "official_evaluator_evidence_id": evidence_id,
+            },
+            "writer:predicate",
+            product="FAIL",
+            name="terminal",
+        )
+        market_result = "NO"
+        reward = "0"
+        slash = "1"
+        progress = 0
+
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": market_result,
+            "settlement_basis_event_id": official["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": terminal["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    append(
+        "RewardDistributed",
+        {
+            "schema_id": "reward_distributed.v1",
+            "event_type": "RewardDistributed",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "reward_coin": reward,
+            "slash_coin": slash,
+            "reason": "PREDICATE_SETTLEMENT" if progress == 1 else "BUDGET_EXHAUSTED",
+            "settlement_event_id": settlement["event_id"],
+        },
+        "writer:market",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": f"run_{instance_id}",
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": progress == 1,
+            "verified": progress == 1,
+            "accounting_stage": "final",
+            "basis_event_id": official["event_id"],
+            "terminal_event_id": terminal["event_id"],
+            "golden_path_token_count": total_tokens if progress == 1 else 0,
+            "total_run_token_count": total_tokens,
+            "total_wall_time_ms": wall_time_ms,
+            "progress": progress,
+            "vpput_raw": stage6_vpput(progress, total_tokens, wall_time_ms),
+            "failed_branch_count": 1 if progress == 0 else 0,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    append(
+        "PredicateEvaluated",
+        {
+            "predicate_id": "predicate.replay.verify",
+            "result": "PASS",
+            "source_tape_tip": state["tape_tip"],
+            "replay_hash": digest_text("stage6 replay:" + instance_id),
+        },
+        "writer:replay",
+        product="NOT_RUN",
+    )
+
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage6 bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+    return {
+        "instance_id": instance_id,
+        "expected_result": expected_result,
+        "authorization_mode": "required",
+        "authorization_head_expected": True,
+        "micro_git": "not_persisted_bundle_is_audit_artifact",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "worker_id": worker_id,
+        "capsule_id": capsule_id,
+        "candidate_id": candidate_id,
+        "market_id": market_id,
+        "basis": "stage6_strict_microtape_protocol_fixture",
+    }
+
+
+def generate_stage6_strict_microtape_fixtures(out_dir: Path, tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    runs: list[dict[str, Any]] = []
+    for index, task in enumerate(tasks):
+        expected = str(task.get("stage6_expected_result") or ("PASS" if index == 0 else "FAIL")).upper()
+        if expected not in {"PASS", "FAIL"}:
+            raise ValueError(f"stage6_expected_result must be PASS or FAIL for {task['instance_id']}")
+        runs.append(build_stage6_bundle(out_dir, task, expected))
+    manifest = {
+        "schema_id": "Stage6StrictMicroTapeFixtureManifest.v1",
+        "run_id": "stage6_strict_microtape",
+        "truth_source": "fresh_micro_tape_bundles",
+        "old_stage4_stage5_bundles": "intentionally_not_rewritten_legacy_partial",
+        "sample_size": len(runs),
+        "turingos_arm_runs": runs,
+    }
+    write_json(out_dir / "substrate_coverage.json", manifest)
+    write_json(out_dir / "bundle_manifest.json", manifest)
+    return manifest
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--tasks-jsonl", required=True)
@@ -970,13 +1447,29 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--authorization-mode", choices=["auto", "required", "off"], default="auto")
     parser.add_argument("--daemon-bin-dir", default=str(REPO / "target" / "debug"))
     parser.add_argument("--broadcast-rules-file")
+    parser.add_argument("--strict-microtape-fixture", action="store_true")
     args = parser.parse_args(argv)
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    tasks = read_tasks(Path(args.tasks_jsonl), args.limit)
+    if args.strict_microtape_fixture:
+        if args.authorization_mode != "required":
+            parser.error("--strict-microtape-fixture requires --authorization-mode required")
+        manifest = generate_stage6_strict_microtape_fixtures(out_dir, tasks)
+        summary = {
+            "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+            "coverage": str(out_dir / "substrate_coverage.json"),
+            "worker_process": "stage6_strict_fixture",
+            "auditor_exit_code": 0,
+            "scientific_status": "STRICT_MICROTAPE_PROTOCOL_FIXTURE_NOT_SOLVE_RATE",
+            "sample_size": manifest["sample_size"],
+        }
+        write_json(out_dir / "substrate_smoke_result.json", summary)
+        return 0
+
     bin_dir = Path(args.daemon_bin_dir)
     ensure_binaries(bin_dir)
-    tasks = read_tasks(Path(args.tasks_jsonl), args.limit)
     active_broadcast_rules = read_broadcast_rules(
         Path(args.broadcast_rules_file) if args.broadcast_rules_file else None
     )

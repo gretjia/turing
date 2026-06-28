@@ -16,6 +16,15 @@ def load_auditor():
     return module
 
 
+def load_substrate_runner():
+    path = REPO / "tools" / "bench" / "run_mini_swe_bench_substrate_smoke.py"
+    spec = importlib.util.spec_from_file_location("run_mini_swe_bench_substrate_smoke", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
 def run(cmd, cwd):
     subprocess.run(cmd, cwd=cwd, check=True, text=True, capture_output=True)
 
@@ -436,7 +445,16 @@ def test_terminal_market_reward_and_final_pput_clear_economic_warnings(tmp_path)
         {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "wc_terminal"}},
         {"event_type": "WorkerReceiptImported", "payload": {"capsule_id": "wc_terminal", "receipt_id": "rcp_terminal"}},
         {"event_type": "MacroObservationImported", "payload": {"capsule_id": "wc_terminal", "macro_id": "macro:terminal"}},
-        {"event_type": "CostEvent", "payload": {"capsule_id": "wc_terminal", "total_tokens": 10, "wall_time_ms": 5}},
+        {
+            "event_type": "CostEvent",
+            "payload": {
+                "capsule_id": "wc_terminal",
+                "run_id": "run_terminal",
+                "problem_id": "prob_terminal",
+                "total_tokens": 10,
+                "wall_time_ms": 5,
+            },
+        },
         {"event_type": "PPUTAccounted", "payload": {"capsule_id": "wc_terminal", "accounting_stage": "progress", "progress": 0, "vpput_raw": "0"}},
         {"event_type": "MarketCreated", "payload": {"market_id": "mkt_terminal", "capsule_id": "wc_terminal"}},
         {
@@ -480,8 +498,12 @@ def test_terminal_market_reward_and_final_pput_clear_economic_warnings(tmp_path)
             "event_type": "PPUTAccounted",
             "payload": lambda ctx: {
                 "capsule_id": "wc_terminal",
+                "run_id": "run_terminal",
+                "problem_id": "prob_terminal",
                 "accounting_stage": "final",
                 "progress": 1,
+                "total_run_token_count": 10,
+                "total_wall_time_ms": 5,
                 "vpput_raw": "0.02",
                 "basis_event_id": ctx["event_ids"]["official_terminal"],
                 "terminal_event_id": ctx["event_ids"]["accept_terminal"],
@@ -498,3 +520,104 @@ def test_terminal_market_reward_and_final_pput_clear_economic_warnings(tmp_path)
     assert run_report["checks"]["vpput_accounting"] == "PASS"
     assert run_report["checks"]["accepted_final_progress_one"] == "PASS"
     assert report["status_summary"]["economic_timing"] == "PASS"
+
+
+def test_stage6_strict_microtape_fixture_passes_all_strict_gates(tmp_path):
+    auditor = load_auditor()
+    runner = load_substrate_runner()
+    out_dir = tmp_path / "stage6"
+    tasks = [
+        {
+            "instance_id": "django__django-12039_stage6_accept",
+            "repo": "django/django",
+            "base_commit": "58c1acb1d6054dfec29d0f30b1033bae6ef62aec",
+            "problem_statement": "Use proper whitespace in CREATE INDEX statements.",
+            "stage6_expected_result": "PASS",
+        },
+        {
+            "instance_id": "django__django-11815_stage6_fail",
+            "repo": "django/django",
+            "base_commit": "e02f67ef2d03d48128e7a118bf75f0418e24e8ac",
+            "problem_statement": "Migrations use enum object value instead of name.",
+            "stage6_expected_result": "FAIL",
+        },
+    ]
+
+    manifest = runner.generate_stage6_strict_microtape_fixtures(out_dir, tasks)
+    bundles = [Path(item["micro_tape_bundle"]) for item in manifest["turingos_arm_runs"]]
+    report = auditor.audit_bundles(
+        bundles,
+        tmp_path / "audit_work",
+        strict_vpput=True,
+        strict_terminal_market=True,
+        require_authorization_head=True,
+    )
+
+    summary = report["status_summary"]
+    assert report["verdict"] == "PASS"
+    for key in [
+        "overall",
+        "replay_structural_integrity",
+        "bundle_accessibility",
+        "basic_ref_reconstruction",
+        "git_topology",
+        "canonical_payload_hash",
+        "registry_head_effect",
+        "accepted_head_authority",
+        "authorization_head",
+        "terminal_golden_path_anchors_to_accepted_head",
+        "failed_progress_zero",
+        "accepted_final_progress_one",
+        "cost_conservation_all_branches",
+        "vpput_accounting",
+        "economic_timing",
+        "market_accounting_correctness",
+        "constitutional_protocol_audit",
+    ]:
+        assert summary[key] == "PASS", key
+    assert {run["path_class"] for run in report["runs"]} == {"accepted_path", "failed_path"}
+    assert all(Path(item["micro_tape_bundle"]).exists() for item in manifest["turingos_arm_runs"])
+
+
+def test_final_pput_cost_conservation_mismatch_fails_vpput(tmp_path):
+    auditor = load_auditor()
+    specs = [
+        {
+            "event_type": "SystemConstitutionAccepted",
+            "payload": {"constitution_digest": "sha256:" + "1" * 64},
+        },
+        {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "wc_cost"}},
+        {"event_type": "CostEvent", "payload": {"run_id": "run_cost", "problem_id": "prob_cost", "total_tokens": 10, "wall_time_ms": 5}},
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "name": "official",
+            "payload": {"capsule_id": "wc_cost", "evidence_id": "ev_cost", "result": "PASS"},
+        },
+        {
+            "event_type": "CandidateAccepted",
+            "name": "accept",
+            "payload": {"candidate_id": "cand_cost", "capsule_id": "wc_cost", "official_evaluator_evidence_id": "ev_cost"},
+        },
+        {
+            "event_type": "PPUTAccounted",
+            "payload": lambda ctx: {
+                "run_id": "run_cost",
+                "problem_id": "prob_cost",
+                "accounting_stage": "final",
+                "progress": 1,
+                "total_run_token_count": 9,
+                "total_wall_time_ms": 5,
+                "vpput_raw": "1/45",
+                "basis_event_id": ctx["event_ids"]["official"],
+                "terminal_event_id": ctx["event_ids"]["accept"],
+            },
+        },
+    ]
+    bundle, _ = make_bundle_with_context(tmp_path, specs)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work", strict_vpput=True)
+    run_report = report["runs"][0]
+
+    assert run_report["checks"]["cost_conservation_all_branches"] == "FAIL"
+    assert run_report["checks"]["vpput_accounting"] == "FAIL"
+    assert report["verdict"] == "FAIL"

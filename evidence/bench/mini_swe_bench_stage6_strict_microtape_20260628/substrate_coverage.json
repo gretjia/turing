@@ -1,0 +1,43 @@
+{
+  "old_stage4_stage5_bundles": "intentionally_not_rewritten_legacy_partial",
+  "run_id": "stage6_strict_microtape",
+  "sample_size": 2,
+  "schema_id": "Stage6StrictMicroTapeFixtureManifest.v1",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:bb014b761dc075f7bb54135e30d26e2946b014956c5d2bd9ffb808360b8dd2b4",
+      "authorization_head": "mu:b5cf69202d069509683d49da030bda685b8995144d08d27e35eb395f8451a54f",
+      "authorization_head_expected": true,
+      "authorization_mode": "required",
+      "basis": "stage6_strict_microtape_protocol_fixture",
+      "candidate_id": "cand_stage6_4260b2c139708878",
+      "capsule_id": "wc_stage6_3ca4462c9852c1a6",
+      "expected_result": "PASS",
+      "instance_id": "django__django-12039",
+      "market_id": "mkt_stage6_c5f2f311e4b31b00",
+      "micro_git": "not_persisted_bundle_is_audit_artifact",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage6_strict_microtape_20260628/instances/django__django-12039/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:ca2403fb61b85a523836769071d0b3b978b885d838f5129b40ebc4c2677c1117",
+      "tape_tip": "mu:e1b4f9702841d1a3136c969d96c066229711b5c88c7bb1f993cb008b872887c3",
+      "worker_id": "worker:sha256:0600526521ce38fb1c98da6a034d02088ec11b98ca61ac0fa06f84c3caf8032e"
+    },
+    {
+      "accepted_head": "mu:239e2085a1cb5b55b396d626583eaabcbd9461499440c2c4aee0527b7538e158",
+      "authorization_head": "mu:8f5f95cbfae5cc1f9a57e46f970e03bfcdb4f21642ba20d83c728e88a1e729d5",
+      "authorization_head_expected": true,
+      "authorization_mode": "required",
+      "basis": "stage6_strict_microtape_protocol_fixture",
+      "candidate_id": "cand_stage6_c58f6d1e2bd7f2d0",
+      "capsule_id": "wc_stage6_8c367ffa892da4c2",
+      "expected_result": "FAIL",
+      "instance_id": "django__django-12050",
+      "market_id": "mkt_stage6_5f8de303bf695d8a",
+      "micro_git": "not_persisted_bundle_is_audit_artifact",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage6_strict_microtape_20260628/instances/django__django-12050/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:9547af44a94381360bac7bd6cf953ddc056612d8c73769bcb04cc6afd71e5c02",
+      "tape_tip": "mu:b8640e9a8f88f25580dfcd19c3108d7750e44392712442393be2f919f69ed408",
+      "worker_id": "worker:sha256:349c51f657cb58c5e4b235e546b0d470133e73dd277d8f746ce655b488ddd0c0"
+    }
+  ]
+}
