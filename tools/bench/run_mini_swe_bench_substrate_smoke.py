@@ -60,6 +60,47 @@ STAGE10_FAILURE_CLASSES = [
     "CONTEXT_MISSING",
     "PATCH_APPLIES_BUT_WRONG",
 ]
+STAGE11_LOOP_CASES = [
+    {
+        "case_id": "case_a",
+        "failure_class": "WRONG_FILE",
+        "observed_signals": {
+            "exit_code": 1,
+            "official_evaluator_result": "FAIL",
+            "diff_scope": "wrong_file",
+            "macro_observation_kind": "patch_wrong_file",
+            "test_log_digest": "sha256:" + "a" * 64,
+        },
+        "abstract_pattern": "The first attempt changed the wrong file surface.",
+        "guidance": "Retry with a production-code-only patch in the scoped Django module.",
+    },
+    {
+        "case_id": "case_b",
+        "failure_class": "CONTEXT_MISSING",
+        "observed_signals": {
+            "exit_code": 1,
+            "timeout_kind": "context_starved",
+            "official_evaluator_result": "FAIL",
+            "receipt_schema_status": "context_missing",
+            "test_log_digest": "sha256:" + "b" * 64,
+        },
+        "abstract_pattern": "The first attempt lacked the required implementation context.",
+        "guidance": "Retry with a smaller capsule that includes the relevant framework file and no extra context.",
+    },
+    {
+        "case_id": "case_c",
+        "failure_class": "SEMANTIC_FAIL",
+        "observed_signals": {
+            "exit_code": 1,
+            "official_evaluator_result": "FAIL",
+            "command_result": "semantic_mismatch",
+            "macro_observation_kind": "patch_applied_but_semantic_fail",
+            "test_log_digest": "sha256:" + "c" * 64,
+        },
+        "abstract_pattern": "The first attempt applied but did not satisfy target semantics.",
+        "guidance": "Retry with a narrower semantic patch and preserve the framework runtime type contract.",
+    },
+]
 
 
 def digest_text(text: str) -> str:
@@ -2730,9 +2771,659 @@ def generate_stage10_failure_taxonomy_fixture(out_dir: Path, tasks: list[dict[st
     return manifest
 
 
+def default_stage11_tasks() -> list[dict[str, Any]]:
+    return [
+        {
+            "instance_id": f"stage11_case_{index + 1}",
+            "repo": "django/django",
+            "base_commit": "58c1acb1d6054dfec29d0f30b1033bae6ef62aec",
+            "problem_statement": f"Stage11 loop-until-PASS fixture case {index + 1}",
+        }
+        for index in range(len(STAGE11_LOOP_CASES))
+    ]
+
+
+def stage11_case_for_index(index: int) -> dict[str, Any]:
+    return STAGE11_LOOP_CASES[index % len(STAGE11_LOOP_CASES)]
+
+
+def classify_stage11_observed_signals(signals: dict[str, Any]) -> str:
+    if signals.get("diff_scope") == "wrong_file":
+        return "WRONG_FILE"
+    if signals.get("timeout_kind") == "context_starved" or signals.get("receipt_schema_status") == "context_missing":
+        return "CONTEXT_MISSING"
+    if signals.get("official_evaluator_result") == "FAIL" and signals.get("command_result") == "semantic_mismatch":
+        return "SEMANTIC_FAIL"
+    raise ValueError(f"Stage11 observed signals do not imply a supported class: {signals}")
+
+
+def build_stage11_loop_until_pass_bundle(
+    out_dir: Path,
+    task: dict[str, Any],
+    case: dict[str, Any],
+    *,
+    force_budget_exhausted: bool = False,
+    omit_broadcast_consumption: bool = False,
+) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "turingos" / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage11 git init failed:\n{init.stderr}")
+
+    state = stage6_base_state()
+    short = hashlib.sha256(instance_id.encode("utf-8")).hexdigest()[:16]
+    worker_id = "worker:sha256:" + hashlib.sha256(f"stage11:{instance_id}:worker".encode("utf-8")).hexdigest()
+    atom_id = f"atom_stage11_{short}"
+    capsule_1 = f"wc_stage11_{short}_attempt1"
+    capsule_2 = f"wc_stage11_{short}_attempt2"
+    market_id = f"mkt_stage11_{short}"
+    receipt_1 = f"rcp_stage11_{short}_attempt1"
+    receipt_2 = f"rcp_stage11_{short}_attempt2"
+    macro_1 = f"macro:diff:stage11:{short}:attempt1"
+    macro_2 = f"macro:diff:stage11:{short}:attempt2"
+    evidence_fail = f"ev_stage11_{short}_fail"
+    evidence_pass = f"ev_stage11_{short}_pass"
+    candidate_id = f"cand_stage11_{short}"
+    run_id = f"run_stage11_{short}"
+    rule_id = f"br_stage11_{short}"
+    first_tokens = 180
+    second_tokens = 260
+    first_wall_ms = 90
+    second_wall_ms = 130
+    total_tokens = first_tokens + (0 if force_budget_exhausted else second_tokens)
+    total_wall_ms = first_wall_ms + (0 if force_budget_exhausted else second_wall_ms)
+
+    observed_signals = dict(case["observed_signals"])
+    failure_class = classify_stage11_observed_signals(observed_signals)
+    if failure_class != case["failure_class"]:
+        raise ValueError("Stage11 case failure_class must match observer-derived classifier output")
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage11 constitution")}, "writer:bootstrap")
+    append(
+        "GoalStateProposed",
+        {
+            "goal_id": f"goal_stage11_{short}",
+            "objective": "Stage11 loop-until-PASS protocol fixture",
+            "task_source": "swe_bench_shaped_loop_until_pass_fixture",
+        },
+        "writer:goal",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": atom_id,
+            "approval_id": f"ap_atom_stage11_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_1,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_stage11_{short}_attempt1",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkCapsuleBuilt",
+        {
+            "capsule_id": capsule_1,
+            "private_contract_hash": digest_text(capsule_1 + ":private"),
+            "acceptance_commands": ["stage11.official.eval"],
+            "allowed_files": ["django/**"],
+            "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+            "attempt_index": 1,
+            "pput_formula_absent": True,
+            "heldout_ids_absent": True,
+            "hidden_predicates_absent": True,
+        },
+        "writer:capsule",
+    )
+    append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    patch_fail = digest_text(instance_id + ":stage11:attempt1:patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_1,
+            "capsule_id": capsule_1,
+            "worker_id": worker_id,
+            "exit_code": observed_signals.get("exit_code", 1),
+            "stdout_hash": digest_text(instance_id + ":stage11:attempt1:stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage11:attempt1:stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage11:attempt1:done"),
+            "credential_material_absent": True,
+            "manual_patch": False,
+            "micro_refs_moved": False,
+            "patch_hash": patch_fail,
+            "observed_signals_hash": digest_text(json.dumps(observed_signals, sort_keys=True)),
+        },
+        "writer:receipt",
+    )
+    append(
+        "MacroObservationImported",
+        {
+            "macro_id": macro_1,
+            "capsule_id": capsule_1,
+            "diff_hash": patch_fail,
+            "external_evidence_only": True,
+            "macro_observation_kind": observed_signals.get("macro_observation_kind", "patch_failed"),
+        },
+        "writer:macro",
+    )
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": f"branch_stage11_{short}_attempt1",
+            "capsule_id": capsule_1,
+            "prompt_tokens": 80,
+            "completion_tokens": 60,
+            "tool_tokens": 20,
+            "tool_stdout_tokens": 20,
+            "total_tokens": first_tokens,
+            "wall_time_ms": first_wall_ms,
+            "tool_stdout_hash": digest_text(instance_id + ":stage11:attempt1:tool-stdout"),
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official_fail = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_fail,
+            "instance_id": instance_id,
+            "capsule_id": capsule_1,
+            "macro_anchor_id": macro_1,
+            "worker_receipt_id": receipt_1,
+            "candidate_patch_hash": patch_fail,
+            "test_patch_hash": digest_text(instance_id + ":stage11:test-patch"),
+            "apply_candidate_result": "PASS",
+            "apply_test_patch_result": "PASS",
+            "fail_to_pass_labels": [],
+            "target_test_exit_code": 1,
+            "target_test_result": "FAIL",
+            "stdout_hash": digest_text(instance_id + ":stage11:attempt1:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage11:attempt1:official-stderr"),
+            "result": "FAIL",
+            "failure_class": failure_class,
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage11_deterministic_official_fixture",
+        },
+        "writer:official-evaluator",
+        name="official_fail",
+    )
+    classifier_decision = {
+        "failure_class": failure_class,
+        "observer_derived_failure_class": True,
+        "classifier_inputs": observed_signals,
+        "classifier_input_sources": [
+            "WorkerReceiptImported.exit_code",
+            "OfficialEvaluatorEvidenceImported.result",
+            "MacroObservationImported.macro_observation_kind",
+        ],
+        "forbidden_classifier_inputs_absent": [
+            "scenario_label",
+            "fixture_name",
+            "instance_id_label",
+            "problem_title",
+            "expected_failure_class",
+        ],
+    }
+    failure = append(
+        "FailureNode",
+        {
+            "capsule_id": capsule_1,
+            "candidate_id": candidate_id,
+            "failure_class": failure_class,
+            "detail": "Stage11 first attempt failed and was classified from observer signals.",
+            "official_evaluator_evidence_id": evidence_fail,
+            "classifier_decision": classifier_decision,
+        },
+        "writer:predicate",
+        product="NOT_RUN",
+        name="first_failure",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": False,
+            "verified": False,
+            "accounting_stage": "progress",
+            "basis_event_id": official_fail["event_id"],
+            "terminal_event_id": failure["event_id"],
+            "golden_path_token_count": 0,
+            "total_run_token_count": first_tokens,
+            "total_wall_time_ms": first_wall_ms,
+            "progress": 0,
+            "vpput_raw": "0",
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    certificate = append(
+        "FailureCertificate",
+        {
+            "certificate_id": f"fc_stage11_{short}",
+            "source_failure_node_id": failure["event_id"],
+            "failure_class": failure_class,
+            "abstract_pattern": case["abstract_pattern"],
+            "classifier_decision_hash": digest_text(json.dumps(classifier_decision, sort_keys=True)),
+            "raw_log_ref": "cas:" + hashlib.sha256(f"{instance_id}:stage11:attempt1:private-log".encode("utf-8")).hexdigest(),
+            "raw_log_text_absent": True,
+            "broadcast_rule_candidate": {
+                "rule_id": rule_id,
+                "candidate_only": True,
+                "activation_event_id": None,
+                "source_failure_nodes": [failure["event_id"]],
+                "failure_class": failure_class,
+                "abstract_pattern": case["abstract_pattern"],
+                "new_instruction": case["guidance"],
+                "raw_log_text_absent": True,
+                "hidden_predicates_absent": True,
+                "pput_or_heldout_details_absent": True,
+            },
+        },
+        "writer:failure-taxonomy",
+        name="failure_certificate",
+    )
+    broadcast = append(
+        "BroadcastRuleActivated",
+        {
+            "rule_id": rule_id,
+            "source_failure_nodes": [failure["event_id"]],
+            "failure_certificate_event_id": certificate["event_id"],
+            "failure_class": failure_class,
+            "abstract_pattern": case["abstract_pattern"],
+            "new_instruction": case["guidance"],
+            "recipients": ["future_capsule"],
+            "hidden_details_removed": True,
+            "raw_log_refs": ["cas:" + hashlib.sha256(f"{instance_id}:stage11:attempt1:private-log".encode("utf-8")).hexdigest()],
+            "raw_log_refs_private_only": True,
+            "raw_log_text_absent": True,
+            "hidden_predicates_absent": True,
+            "pput_or_heldout_details_absent": True,
+        },
+        "writer:failure-memory",
+        name="broadcast",
+    )
+    retry = append(
+        "RetryAuthorized",
+        {
+            "retry_id": f"retry_stage11_{short}",
+            "capsule_id": capsule_2,
+            "source_failure_node_id": failure["event_id"],
+            "broadcast_rule_event_id": broadcast["event_id"],
+            "retry_decision_source": "tape_reducer_or_policy",
+            "approval_id": f"ap_retry_stage11_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+            "human_intervention_count": 0,
+        },
+        "writer:test-local-authority",
+        name="retry",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_2,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_stage11_{short}_attempt2",
+            "signature_route": "test_local_authority",
+            "authority_kind": "test_local_authority_no_credentials",
+            "retry_authorization_event_id": retry["event_id"],
+        },
+        "writer:test-local-authority",
+        name="dispatch_attempt2",
+    )
+    capsule_payload = {
+        "capsule_id": capsule_2,
+        "private_contract_hash": digest_text(capsule_2 + ":private"),
+        "acceptance_commands": ["stage11.official.eval"],
+        "allowed_files": ["django/**"],
+        "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+        "attempt_index": 2,
+        "source_failure_nodes": [failure["event_id"]],
+        "visible_known_failures_to_avoid": [case["guidance"]],
+        "raw_log_text_absent": True,
+        "hidden_predicates_absent": True,
+        "pput_or_heldout_details_absent": True,
+    }
+    if not omit_broadcast_consumption:
+        capsule_payload["consumed_broadcast_rule_ids"] = [rule_id]
+        capsule_payload["injected_broadcast_rule_ids"] = [rule_id]
+        capsule_payload["broadcast_rule_event_id"] = broadcast["event_id"]
+    append("WorkCapsuleBuilt", capsule_payload, "writer:capsule", name="capsule_attempt2")
+
+    terminal_event = failure
+    official_pass = None
+    if not force_budget_exhausted:
+        append(
+            "CostEvent",
+            {
+                "schema_id": "cost_event.v1",
+                "run_id": run_id,
+                "problem_id": instance_id,
+                "split": "dogfood",
+                "agent_id": worker_id,
+                "branch_id": f"branch_stage11_{short}_attempt2",
+                "capsule_id": capsule_2,
+                "prompt_tokens": 110,
+                "completion_tokens": 90,
+                "tool_tokens": 30,
+                "tool_stdout_tokens": 30,
+                "total_tokens": second_tokens,
+                "wall_time_ms": second_wall_ms,
+                "tool_stdout_hash": digest_text(instance_id + ":stage11:attempt2:tool-stdout"),
+                "counted_in_total": True,
+            },
+            "writer:pput",
+        )
+        patch_pass = digest_text(instance_id + ":stage11:attempt2:patch")
+        append(
+            "WorkerReceiptImported",
+            {
+                "receipt_id": receipt_2,
+                "capsule_id": capsule_2,
+                "worker_id": worker_id,
+                "exit_code": 0,
+                "stdout_hash": digest_text(instance_id + ":stage11:attempt2:stdout"),
+                "stderr_hash": digest_text(instance_id + ":stage11:attempt2:stderr"),
+                "done_json_hash": digest_text(instance_id + ":stage11:attempt2:done"),
+                "credential_material_absent": True,
+                "manual_patch": False,
+                "micro_refs_moved": False,
+                "patch_hash": patch_pass,
+                "consumed_broadcast_rule_event_id": broadcast["event_id"],
+            },
+            "writer:receipt",
+        )
+        append(
+            "MacroObservationImported",
+            {
+                "macro_id": macro_2,
+                "capsule_id": capsule_2,
+                "diff_hash": patch_pass,
+                "external_evidence_only": True,
+                "macro_observation_kind": "repair_patch",
+            },
+            "writer:macro",
+        )
+        official_pass = append(
+            "OfficialEvaluatorEvidenceImported",
+            {
+                "schema_id": "official_evaluator_evidence_imported.v1",
+                "evidence_id": evidence_pass,
+                "instance_id": instance_id,
+                "capsule_id": capsule_2,
+                "macro_anchor_id": macro_2,
+                "worker_receipt_id": receipt_2,
+                "candidate_patch_hash": patch_pass,
+                "test_patch_hash": digest_text(instance_id + ":stage11:test-patch"),
+                "apply_candidate_result": "PASS",
+                "apply_test_patch_result": "PASS",
+                "fail_to_pass_labels": [],
+                "target_test_exit_code": 0,
+                "target_test_result": "PASS",
+                "stdout_hash": digest_text(instance_id + ":stage11:attempt2:official-stdout"),
+                "stderr_hash": digest_text(instance_id + ":stage11:attempt2:official-stderr"),
+                "result": "PASS",
+                "failure_class": None,
+                "forbidden_test_edit_detected": False,
+                "forbidden_test_edit_paths": [],
+                "truth_source": "stage11_deterministic_official_fixture",
+            },
+            "writer:official-evaluator",
+            name="official_pass",
+        )
+        terminal_event = append(
+            "CandidateAccepted",
+            {
+                "candidate_id": candidate_id,
+                "capsule_id": capsule_2,
+                "macro_anchor_id": macro_2,
+                "worker_receipt_id": receipt_2,
+                "official_evaluator_evidence_id": evidence_pass,
+                "consumed_broadcast_rule_event_id": broadcast["event_id"],
+            },
+            "writer:predicate",
+            name="terminal",
+        )
+
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": "NO" if force_budget_exhausted else "YES",
+            "settlement_basis_event_id": official_fail["event_id"] if force_budget_exhausted else official_pass["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": terminal_event["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    append(
+        "RewardDistributed",
+        {
+            "schema_id": "reward_distributed.v1",
+            "event_type": "RewardDistributed",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "reward_coin": "0" if force_budget_exhausted else "1",
+            "slash_coin": "1" if force_budget_exhausted else "0",
+            "reason": "BUDGET_EXHAUSTED" if force_budget_exhausted else "PREDICATE_SETTLEMENT",
+            "settlement_event_id": settlement["event_id"],
+        },
+        "writer:market",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": not force_budget_exhausted,
+            "verified": not force_budget_exhausted,
+            "accounting_stage": "final",
+            "basis_event_id": official_fail["event_id"] if force_budget_exhausted else official_pass["event_id"],
+            "terminal_event_id": terminal_event["event_id"],
+            "golden_path_token_count": total_tokens if not force_budget_exhausted else 0,
+            "total_run_token_count": total_tokens,
+            "total_wall_time_ms": total_wall_ms,
+            "progress": 0 if force_budget_exhausted else 1,
+            "vpput_raw": stage6_vpput(0 if force_budget_exhausted else 1, total_tokens, total_wall_ms),
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    append(
+        "PredicateEvaluated",
+        {
+            "predicate_id": "predicate.stage11.loop_until_pass.replay",
+            "result": "PASS",
+            "source_tape_tip": state["tape_tip"],
+            "replay_hash": digest_text("stage11 replay:" + instance_id),
+        },
+        "writer:replay",
+        product="NOT_RUN",
+    )
+
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage11 bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+
+    loop = {
+        "status": "BUDGET_EXHAUSTED" if force_budget_exhausted else "PASS",
+        "human_intervention_count": 0,
+        "manual_patch_count": 0,
+        "manual_approval_count": 0,
+        "manual_rerun_selection_count": 0,
+        "fallback_to_auto_authorization": False,
+        "attempts_total": 2,
+        "failed_attempts_before_accept": 1,
+        "first_failed_attempt_index": 1,
+        "accepted_attempt_index": None if force_budget_exhausted else 2,
+        "budget_exhausted": force_budget_exhausted,
+        "retry_decision_source": "tape_reducer_or_policy",
+        "retry_policy_event_id": retry["event_id"],
+        "first_failure_event_id": failure["event_id"],
+        "failure_certificate_event_id": certificate["event_id"],
+        "broadcast_rule_activated_event_id": broadcast["event_id"],
+        "second_attempt_capsule_event_id": state["event_ids"]["capsule_attempt2"],
+        "terminal_candidate_accepted_event_id": None if force_budget_exhausted else terminal_event["event_id"],
+        "accepted_head": state["accepted_head"],
+        "verified_from_micro_tape_bundle_only": True,
+    }
+    failure_memory = {
+        "status": "PASS",
+        "source_failure_nodes": [failure["event_id"]],
+        "failure_class": failure_class,
+        "abstract_pattern": case["abstract_pattern"],
+        "activated_rule_event_id": broadcast["event_id"],
+        "injected_into_capsule_id": capsule_2,
+        "later_capsule_consumed_rule": not omit_broadcast_consumption,
+        "raw_log_refs_private_only": True,
+        "raw_log_text_absent_from_visible_capsule": True,
+        "hidden_predicates_absent_from_visible_capsule": True,
+        "pput_or_heldout_details_absent_from_visible_capsule": True,
+        "broadcast_rule_reduced_from_tape": True,
+    }
+    classifier_audit = {
+        "status": "PASS",
+        "failure_class": failure_class,
+        "classifier_inputs": observed_signals,
+        "observer_derived_failure_class": True,
+        "classifier_inputs_allowed_only": [
+            "exit_code",
+            "timeout_kind",
+            "official_evaluator_result",
+            "diff_scope",
+            "receipt_schema_status",
+            "command_result",
+            "macro_observation_kind",
+            "test_log_digest",
+        ],
+        "forbidden_classifier_inputs_absent": [
+            "scenario_label",
+            "fixture_name",
+            "instance_id_label",
+            "problem_title",
+            "expected_failure_class",
+        ],
+    }
+    return {
+        "instance_id": instance_id,
+        "expected_result": "BUDGET_EXHAUSTED" if force_budget_exhausted else "PASS",
+        "stage11_case_id": case["case_id"],
+        "authorization_mode": "required",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "worker_id": worker_id,
+        "capsule_id": capsule_2,
+        "candidate_id": candidate_id,
+        "market_id": market_id,
+        "loop_until_pass": loop,
+        "failure_memory_activation": failure_memory,
+        "real_classifier": classifier_audit,
+        "basis": "stage11_loop_until_pass_fixture",
+    }
+
+
+def generate_stage11_loop_until_pass_fixture(
+    out_dir: Path,
+    tasks: list[dict[str, Any]],
+    *,
+    force_budget_exhausted: bool = False,
+    omit_broadcast_consumption: bool = False,
+) -> dict[str, Any]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    runs = []
+    for index, task in enumerate(tasks):
+        case = stage11_case_for_index(index)
+        runs.append(
+            build_stage11_loop_until_pass_bundle(
+                out_dir,
+                task,
+                case,
+                force_budget_exhausted=force_budget_exhausted,
+                omit_broadcast_consumption=omit_broadcast_consumption,
+            )
+        )
+    manifest = {
+        "schema_id": "Stage11LoopUntilPassFixtureManifest.v1",
+        "run_id": "stage11_loop_until_pass",
+        "truth_source": "fresh_micro_tape_bundles",
+        "scientific_status": "LOOP_UNTIL_PASS_FIXTURE_NOT_SOLVE_RATE",
+        "sample_size": len(runs),
+        "turingos_arm_runs": runs,
+    }
+    turingos_dir = out_dir / "turingos"
+    write_json(turingos_dir / "substrate_coverage.json", manifest)
+    write_json(out_dir / "loop_manifest.json", manifest)
+    write_json(out_dir / "bundle_manifest.json", manifest)
+    bundle_lines = [f"{run['micro_tape_bundle_sha256']}  {run['micro_tape_bundle']}" for run in runs]
+    (out_dir / "bundle_sha256s.txt").write_text("\n".join(bundle_lines) + "\n", encoding="utf-8")
+    return manifest
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--tasks-jsonl", required=True)
+    parser.add_argument("--tasks-jsonl")
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--limit", type=int, default=1)
     parser.add_argument("--worker-mode", choices=["fake", "grok"], default="fake")
@@ -2746,11 +3437,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-hitl-loop-fixture", action="store_true")
     parser.add_argument("--native-api-worker-fixture", action="store_true")
     parser.add_argument("--failure-taxonomy-fixture", action="store_true")
+    parser.add_argument("--loop-until-pass-fixture", action="store_true")
     args = parser.parse_args(argv)
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    tasks = read_tasks(Path(args.tasks_jsonl), args.limit)
+    if args.loop_until_pass_fixture and not args.tasks_jsonl:
+        tasks = default_stage11_tasks()[: args.limit]
+    else:
+        if not args.tasks_jsonl:
+            parser.error("--tasks-jsonl is required unless --loop-until-pass-fixture is used")
+        tasks = read_tasks(Path(args.tasks_jsonl), args.limit)
     if args.strict_microtape_fixture:
         if args.authorization_mode != "required":
             parser.error("--strict-microtape-fixture requires --authorization-mode required")
@@ -2803,6 +3500,20 @@ def main(argv: list[str] | None = None) -> int:
             "worker_process": "stage10_failure_taxonomy_fixture",
             "auditor_exit_code": 0,
             "scientific_status": "FAILURE_TAXONOMY_FIXTURE_NOT_SOLVE_RATE",
+            "sample_size": manifest["sample_size"],
+        }
+        write_json(out_dir / "substrate_smoke_result.json", summary)
+        return 0
+    if args.loop_until_pass_fixture:
+        if args.authorization_mode != "required":
+            parser.error("--loop-until-pass-fixture requires --authorization-mode required")
+        manifest = generate_stage11_loop_until_pass_fixture(out_dir, tasks)
+        summary = {
+            "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+            "coverage": str(out_dir / "turingos" / "substrate_coverage.json"),
+            "worker_process": "stage11_loop_until_pass_fixture",
+            "auditor_exit_code": 0,
+            "scientific_status": "LOOP_UNTIL_PASS_FIXTURE_NOT_SOLVE_RATE",
             "sample_size": manifest["sample_size"],
         }
         write_json(out_dir / "substrate_smoke_result.json", summary)
