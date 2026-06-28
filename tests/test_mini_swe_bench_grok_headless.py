@@ -903,6 +903,92 @@ def test_gate_a_evaluator_builds_candidate_payload_from_evidence_and_substrate_r
     }
 
 
+def test_gate_a_terminal_post_verification_events_encode_market_and_final_pput():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-11790",
+        "worker_id": "worker:sha256:" + "1" * 64,
+        "market_id": "mkt_django__django-11790",
+        "capsule_id": "wc_django__django-11790",
+        "worker_prompt_tokens_estimate": 10,
+        "worker_completion_tokens_estimate": 5,
+        "worker_tool_stdout_tokens_estimate": 3,
+        "worker_elapsed_ms": 20,
+    }
+    evidence_payload = {
+        "evidence_id": "ev_official_pass",
+        "result": "PASS",
+    }
+    verified = {
+        "official_evidence_event_id": "mu:" + "a" * 64,
+        "candidate_event_id": "mu:" + "b" * 64,
+        "candidate_write_event_type": "CandidateAccepted",
+    }
+
+    events = evaluator.terminal_post_verification_events(
+        substrate_run=substrate_run,
+        evidence_payload=evidence_payload,
+        verified=verified,
+    )
+
+    assert [event["event_type"] for event in events] == [
+        "MarketSettled",
+        "RewardDistributed",
+        "PPUTAccounted",
+    ]
+    market = events[0]["payload"]
+    assert market["result"] == "YES"
+    assert market["settlement_basis_event_id"] == verified["official_evidence_event_id"]
+    assert market["terminal_event_id"] == verified["candidate_event_id"]
+    assert market["is_terminal"] is True
+    reward = events[1]["payload"]
+    assert reward["reward_coin"] == "1"
+    assert reward["slash_coin"] == "0"
+    pput = events[2]["payload"]
+    assert pput["accounting_stage"] == "final"
+    assert pput["progress"] == 1
+    assert pput["basis_event_id"] == verified["official_evidence_event_id"]
+    assert pput["terminal_event_id"] == verified["candidate_event_id"]
+    assert pput["total_run_token_count"] == 18
+    assert pput["total_wall_time_ms"] == 20
+    assert pput["vpput_raw"] != "0"
+
+
+def test_gate_a_terminal_post_verification_events_failed_run_progress_zero():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-11964",
+        "worker_id": "worker:sha256:" + "2" * 64,
+        "market_id": "mkt_django__django-11964",
+        "capsule_id": "wc_django__django-11964",
+        "worker_prompt_tokens_estimate": 10,
+        "worker_completion_tokens_estimate": 5,
+        "worker_tool_stdout_tokens_estimate": 3,
+        "worker_elapsed_ms": 20,
+    }
+    evidence_payload = {
+        "evidence_id": "ev_official_fail",
+        "result": "FAIL",
+    }
+    verified = {
+        "official_evidence_event_id": "mu:" + "a" * 64,
+        "candidate_event_id": "mu:" + "c" * 64,
+        "candidate_write_event_type": "FailureNode",
+    }
+
+    events = evaluator.terminal_post_verification_events(
+        substrate_run=substrate_run,
+        evidence_payload=evidence_payload,
+        verified=verified,
+    )
+
+    assert events[0]["payload"]["result"] == "NO"
+    assert events[1]["payload"]["reward_coin"] == "0"
+    assert events[1]["payload"]["slash_coin"] == "1"
+    assert events[2]["payload"]["progress"] == 0
+    assert events[2]["payload"]["vpput_raw"] == "0"
+
+
 def test_gate_a_failure_evidence_reduces_to_abstract_broadcast_rule():
     evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
     evidence_payload = {

@@ -18,6 +18,10 @@
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
 - `market_accounting_correctness`: `WARN`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `bundle_accessibility`: `PASS`
 - `basic_ref_reconstruction`: `PASS`
 - `replay_structural_integrity`: `PASS`
@@ -67,6 +71,10 @@
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -107,6 +115,7 @@ PATH_CLASS accepted_path
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-12050
@@ -130,6 +139,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -170,4 +183,5 @@ PATH_CLASS accepted_path
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.

@@ -25,7 +25,8 @@
       "market_settled_before_terminal_evidence": 11,
       "official_evidence_precedes_accept": 9,
       "pput_final_accounting_missing_after_accept": 9,
-      "reward_distributed_before_terminal_market_basis": 11
+      "reward_distributed_before_terminal_market_basis": 11,
+      "reward_without_terminal_market_settlement": 11
     }
   },
   "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
@@ -41,16 +42,20 @@
       "bundle_hash": "sha256:804c33c9000bd412052aa4e003d6f4fb6740d74cf35a7b62802e6c6798bd94a7",
       "bundle_verify_output": "The bundle contains these 2 refs:\n344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2 refs/turingos/accepted_head\ncba842066ce0c29649cf95e8aeefc2ecfe61653006cd83d04819196a2acf5945 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "PASS",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
       },
       "dag_edges": [
         {
@@ -554,17 +559,25 @@
           "detail": "RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.",
           "finding": "reward_distributed_before_terminal_market_basis",
           "severity": "WARN"
+        },
+        {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": null,
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
         "object_format": "sha256"
       },
       "golden_path": [],
+      "golden_path_basis": null,
       "path_class": "failed_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": null
     },
     {
       "actual_refs": {
@@ -576,16 +589,20 @@
       "bundle_hash": "sha256:b1415dab11f9856d8e2ef7ba9c4067a103c3cdf672bafc0eda0d83aee13c9f4c",
       "bundle_verify_output": "The bundle contains these 2 refs:\n457f67e58114de1e1eed41c7279b358996b2e62535da08ea5acbe08d02d34872 refs/turingos/accepted_head\n457f67e58114de1e1eed41c7279b358996b2e62535da08ea5acbe08d02d34872 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -1198,11 +1215,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:0872475fd7b594d66786a4f38e0eb3f1510a3dbadd28556169808379a2c1bb5d",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -1316,11 +1339,49 @@
           "short_id": "0872475",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11790",
+          "event_id": "mu:778fb92cbcc386871a4e6021b1d50d8847add01a2ceb6f22776fb587e9f2b686",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:778fb92cbcc3",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "778fb92",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11790",
+          "event_id": "mu:457f67e58114de1e1eed41c7279b358996b2e62535da08ea5acbe08d02d34872",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:457f67e58114",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "457f67e",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:457f67e58114de1e1eed41c7279b358996b2e62535da08ea5acbe08d02d34872"
     },
     {
       "actual_refs": {
@@ -1332,16 +1393,20 @@
       "bundle_hash": "sha256:f488034f71fdcfbaf7f0225ef651c225f855fe4d6b83a300038c9c6e55a14fb2",
       "bundle_verify_output": "The bundle contains these 2 refs:\n53dd6e3b01302885a6f3d36879f5e641867f13bd20a58cb61fce1eb528d973c5 refs/turingos/accepted_head\n53dd6e3b01302885a6f3d36879f5e641867f13bd20a58cb61fce1eb528d973c5 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -1954,11 +2019,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:0572e7664adf0739e7f1f25d31a91d22b7b6c60ea629fcc4f48c9f3434ed3fd9",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -2072,11 +2143,49 @@
           "short_id": "0572e76",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11815",
+          "event_id": "mu:419258a556a44988f8fcf313c6fc946b1f916e14db6330af0706e4d426147785",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:419258a556a4",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "419258a",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11815",
+          "event_id": "mu:53dd6e3b01302885a6f3d36879f5e641867f13bd20a58cb61fce1eb528d973c5",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:53dd6e3b0130",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "53dd6e3",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:53dd6e3b01302885a6f3d36879f5e641867f13bd20a58cb61fce1eb528d973c5"
     },
     {
       "actual_refs": {
@@ -2088,16 +2197,20 @@
       "bundle_hash": "sha256:2da0fe316b55ef6c99a9ac9b2e61b26837766e4bdd88507c325d42fc806e3375",
       "bundle_verify_output": "The bundle contains these 2 refs:\n671e0e609c7e8be3a37ef76720cbdc3b249f1c0d9e538c02c4a107b2a9bf1b40 refs/turingos/accepted_head\n671e0e609c7e8be3a37ef76720cbdc3b249f1c0d9e538c02c4a107b2a9bf1b40 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -2710,11 +2823,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:2ef469a37300c41b69945492f432db884025465d2b3566952eae64c1bd300e31",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -2828,11 +2947,49 @@
           "short_id": "2ef469a",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11848",
+          "event_id": "mu:a8106ef07897ed710a05356828d3c854526feb161f3804e90a3e021b6669b9cc",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:a8106ef07897",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "a8106ef",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11848",
+          "event_id": "mu:671e0e609c7e8be3a37ef76720cbdc3b249f1c0d9e538c02c4a107b2a9bf1b40",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:671e0e609c7e",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "671e0e6",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:671e0e609c7e8be3a37ef76720cbdc3b249f1c0d9e538c02c4a107b2a9bf1b40"
     },
     {
       "actual_refs": {
@@ -2844,16 +3001,20 @@
       "bundle_hash": "sha256:a6d1844e079b38fdf153f67c5b299024317d7d5d3ce2691828763b68aa2a60da",
       "bundle_verify_output": "The bundle contains these 2 refs:\n0d0478b8165f80e41cedb4c43d58761ef0a7ab0d791a517cc932126b3d842fe7 refs/turingos/accepted_head\n0d0478b8165f80e41cedb4c43d58761ef0a7ab0d791a517cc932126b3d842fe7 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -3466,11 +3627,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:bcc46b686c804c2e06f9bcee6c077591db4bf9b906299e04bc703d10fab72196",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -3584,11 +3751,49 @@
           "short_id": "bcc46b6",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11880",
+          "event_id": "mu:17398d1f4b0bb1a24fc03337d2cf7b98cb8f0c224f3b9480834229d403a6966d",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:17398d1f4b0b",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "17398d1",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11880",
+          "event_id": "mu:0d0478b8165f80e41cedb4c43d58761ef0a7ab0d791a517cc932126b3d842fe7",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:0d0478b8165f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "0d0478b",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:0d0478b8165f80e41cedb4c43d58761ef0a7ab0d791a517cc932126b3d842fe7"
     },
     {
       "actual_refs": {
@@ -3600,16 +3805,20 @@
       "bundle_hash": "sha256:6205209c0ed89c660bbfa42fcae88dc6ff1e3eb120eb0a373c4b45bdb6c4d3e2",
       "bundle_verify_output": "The bundle contains these 2 refs:\n3eb5b63787b0633ef86982c46717a9fb421df5954e458cd30d6d476d3226a4a7 refs/turingos/accepted_head\n3eb5b63787b0633ef86982c46717a9fb421df5954e458cd30d6d476d3226a4a7 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -4222,11 +4431,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:822619053b6a7bf6b9d2fd1a3eac892457008574a034028714ee6ca413b70dcc",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -4340,11 +4555,49 @@
           "short_id": "8226190",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11885",
+          "event_id": "mu:a9431590b3f5a67a5a6dc8f4ff7d389e21cb595bc255c89afb878a40b4341d9a",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:a9431590b3f5",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "a943159",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11885",
+          "event_id": "mu:3eb5b63787b0633ef86982c46717a9fb421df5954e458cd30d6d476d3226a4a7",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:3eb5b63787b0",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "3eb5b63",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:3eb5b63787b0633ef86982c46717a9fb421df5954e458cd30d6d476d3226a4a7"
     },
     {
       "actual_refs": {
@@ -4356,16 +4609,20 @@
       "bundle_hash": "sha256:4a9f6b5bc30b6d36920c46781ed603ecc8d258767365c39bfc7c4fc3986cc01e",
       "bundle_verify_output": "The bundle contains these 2 refs:\n18b58be6277b801fc63910c524ce08721af3d30c9ec99019413c88249039f42b refs/turingos/accepted_head\n18b58be6277b801fc63910c524ce08721af3d30c9ec99019413c88249039f42b refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -4978,11 +5235,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:d5a97b4f1e76566cf675164b2859bb933e52d68280e8c62815020c735bc0e0d0",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -5096,11 +5359,49 @@
           "short_id": "d5a97b4",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11951",
+          "event_id": "mu:c40ced7c71420d81a3e650487f8fbd3fc03937afac340f0f915f7603a8d04b85",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:c40ced7c7142",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "c40ced7",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11951",
+          "event_id": "mu:18b58be6277b801fc63910c524ce08721af3d30c9ec99019413c88249039f42b",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:18b58be6277b",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "18b58be",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:18b58be6277b801fc63910c524ce08721af3d30c9ec99019413c88249039f42b"
     },
     {
       "actual_refs": {
@@ -5112,16 +5413,20 @@
       "bundle_hash": "sha256:4433df9680286f48cd1d56384c4d579ce492b2f9752feb801a096f77dd087853",
       "bundle_verify_output": "The bundle contains these 2 refs:\n344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2 refs/turingos/accepted_head\na616e84ae23b4aa06a1d9e801f45389190c489663d5fcff5f182968046291ba5 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "PASS",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
       },
       "dag_edges": [
         {
@@ -5625,17 +5930,25 @@
           "detail": "RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.",
           "finding": "reward_distributed_before_terminal_market_basis",
           "severity": "WARN"
+        },
+        {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": null,
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
         "object_format": "sha256"
       },
       "golden_path": [],
+      "golden_path_basis": null,
       "path_class": "failed_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": null
     },
     {
       "actual_refs": {
@@ -5647,16 +5960,20 @@
       "bundle_hash": "sha256:c6f7fa5115749fc1e28c9ba32400baa44eb8d584fcbb69d670383d478a70011b",
       "bundle_verify_output": "The bundle contains these 2 refs:\n33f5b532bc6a8ce690b0b6459812991946b8ca9f5a62235efad1a71e46c25a0e refs/turingos/accepted_head\n33f5b532bc6a8ce690b0b6459812991946b8ca9f5a62235efad1a71e46c25a0e refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -6269,11 +6586,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:0db537d38d4411fcd6f95582049739109fb6f54c2256cedbfaa65d308cfd6058",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -6387,11 +6710,49 @@
           "short_id": "0db537d",
           "terminal_event_id": null,
           "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11999",
+          "event_id": "mu:5546dc80de8d436310162e7c93e2f4c7a338821db664c0a5745a9f3e9a2bfcf7",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:OfficialEvaluatorEvidenceImported:5546dc80de8d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 18,
+          "short_id": "5546dc8",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-11999",
+          "event_id": "mu:33f5b532bc6a8ce690b0b6459812991946b8ca9f5a62235efad1a71e46c25a0e",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "19:CandidateAccepted:33f5b532bc6a",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "33f5b53",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:33f5b532bc6a8ce690b0b6459812991946b8ca9f5a62235efad1a71e46c25a0e"
     },
     {
       "actual_refs": {
@@ -6403,16 +6764,20 @@
       "bundle_hash": "sha256:de061d0204e987f779caebfc98b72941f3b7fe4d7f30a1cbf259426c863a3030",
       "bundle_verify_output": "The bundle contains these 2 refs:\n7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224 refs/turingos/accepted_head\n7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -6944,11 +7309,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -7064,9 +7435,11 @@
           "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224"
     },
     {
       "actual_refs": {
@@ -7078,16 +7451,20 @@
       "bundle_hash": "sha256:6812ab9f027123474d50ce1ca964e36ca10f1f82d139919de0075f9d71b62a4e",
       "bundle_verify_output": "The bundle contains these 2 refs:\nc4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad refs/turingos/accepted_head\nc4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -7619,11 +7996,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:c4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -7739,13 +8122,16 @@
           "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:c4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad"
     }
   ],
   "schema_id": "MicroTapeDecisionDagAudit.v2",
   "status_summary": {
+    "accepted_final_progress_one": "WARN",
     "accepted_head_authority": "PASS",
     "authorization_head": "LEGACY_MISSING",
     "basic_ref_reconstruction": "PASS",
@@ -7755,13 +8141,17 @@
     "constitutional_protocol_audit": "PARTIAL",
     "decision_dag_completeness": "PASS",
     "economic_timing": "WARN",
+    "failed_progress_zero": "PASS",
     "git_topology": "PASS",
     "market_accounting_correctness": "WARN",
     "overall": "PARTIAL",
     "ref_reconstruction": "PASS",
     "registry_head_effect": "PASS",
-    "replay_structural_integrity": "PASS"
+    "replay_structural_integrity": "PASS",
+    "terminal_golden_path_anchors_to_accepted_head": "PASS",
+    "vpput_accounting": "WARN"
   },
+  "strict_findings": [],
   "truth_source": "micro_tape_bundle_only",
   "verdict": "PARTIAL"
 }

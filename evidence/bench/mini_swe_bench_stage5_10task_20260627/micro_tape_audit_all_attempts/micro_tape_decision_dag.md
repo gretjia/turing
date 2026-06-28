@@ -18,6 +18,10 @@
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
 - `market_accounting_correctness`: `WARN`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `bundle_accessibility`: `PASS`
 - `basic_ref_reconstruction`: `PASS`
 - `replay_structural_integrity`: `PASS`
@@ -67,6 +71,10 @@
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `PASS`
+- `vpput_accounting`: `PASS`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -101,6 +109,7 @@ _No accepted path: this run is failed or incomplete._
 
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 
 ### django__django-11790
 
@@ -123,6 +132,10 @@ _No accepted path: this run is failed or incomplete._
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -159,12 +172,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:cfabf497aec0` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:3cfcee4c1011` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:0872475fd7b5` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:778fb92cbcc3` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:457f67e58114` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-11815
@@ -188,6 +204,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -224,12 +244,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:b5666e8f4c7a` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:8979da6dee14` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:0572e7664adf` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:419258a556a4` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:53dd6e3b0130` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-11848
@@ -253,6 +276,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -289,12 +316,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:b8652355df70` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:4a5c904e23d6` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:2ef469a37300` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:a8106ef07897` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:671e0e609c7e` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-11880
@@ -318,6 +348,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -354,12 +388,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:28ed9ce03091` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:d5e037e30b31` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:bcc46b686c80` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:17398d1f4b0b` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:0d0478b8165f` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-11885
@@ -383,6 +420,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -419,12 +460,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:3e11c55b16a3` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:ffbdd3a34a35` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:822619053b6a` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:a9431590b3f5` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:3eb5b63787b0` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-11951
@@ -448,6 +492,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -484,12 +532,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:e86378031c8c` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:34a511ee4e87` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:d5a97b4f1e76` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:c40ced7c7142` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:18b58be6277b` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-11964
@@ -513,6 +564,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `PASS`
+- `vpput_accounting`: `PASS`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -547,6 +602,7 @@ _No accepted path: this run is failed or incomplete._
 
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 
 ### django__django-11999
 
@@ -569,6 +625,10 @@ _No accepted path: this run is failed or incomplete._
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -605,12 +665,15 @@ PATH_CLASS accepted_path
 4. `8:MacroObservationImported:0aa04be864a4` MacroObservationImported [PRESERVE/PASS]
 5. `16:OfficialEvaluatorEvidenceImported:15b83af47e3a` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
 6. `17:CandidateAccepted:0db537d38d44` CandidateAccepted [ADVANCE/PASS]
+7. `18:OfficialEvaluatorEvidenceImported:5546dc80de8d` OfficialEvaluatorEvidenceImported [PRESERVE/PASS]
+8. `19:CandidateAccepted:33f5b532bc6a` CandidateAccepted [ADVANCE/PASS]
 
 #### Execution Findings
 
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-12039
@@ -634,6 +697,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -674,6 +741,7 @@ PATH_CLASS accepted_path
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.
 
 ### django__django-12050
@@ -697,6 +765,10 @@ PATH_CLASS accepted_path
 - `git_topology`: `PASS`
 - `economic_timing`: `WARN`
 - `decision_dag_completeness`: `PASS`
+- `terminal_golden_path_anchors_to_accepted_head`: `PASS`
+- `failed_progress_zero`: `PASS`
+- `accepted_final_progress_one`: `WARN`
+- `vpput_accounting`: `WARN`
 - `market_accounting_correctness`: `WARN`
 
 #### Decision DAG
@@ -737,4 +809,5 @@ PATH_CLASS accepted_path
 - **INFO** `official_evidence_precedes_accept`: CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.
 - **WARN** `market_settled_before_terminal_evidence`: MarketSettled is replayable and preserve-only, but it occurred before terminal official evidence.
 - **WARN** `reward_distributed_before_terminal_market_basis`: RewardDistributed is replayable and preserve-only, but it occurred before terminal official evidence.
+- **WARN** `reward_without_terminal_market_settlement`: RewardDistributed must reference a terminal MarketSettled event.
 - **WARN** `pput_final_accounting_missing_after_accept`: Accepted run has no post-accept final PPUTAccounted progress=1 event.

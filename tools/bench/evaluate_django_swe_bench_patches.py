@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from decimal import Decimal, getcontext
 import hashlib
 import json
 import shutil
@@ -189,6 +190,97 @@ def candidate_payload_from_official_evidence(
     }
 
 
+def _positive_int(value: Any) -> int:
+    if isinstance(value, bool):
+        return 0
+    if isinstance(value, int) and value > 0:
+        return value
+    return 0
+
+
+def _vpput_decimal_string(progress: int, total_tokens: int, wall_time_ms: int) -> str:
+    if progress != 1 or total_tokens <= 0 or wall_time_ms <= 0:
+        return "0"
+    getcontext().prec = 50
+    value = Decimal(1) / (Decimal(total_tokens) * Decimal(wall_time_ms))
+    return format(value.normalize(), "f")
+
+
+def terminal_post_verification_events(
+    *,
+    substrate_run: dict[str, Any],
+    evidence_payload: dict[str, Any],
+    verified: dict[str, Any],
+) -> list[dict[str, Any]]:
+    passed = (
+        evidence_payload.get("result") == "PASS"
+        and verified.get("candidate_write_event_type") == "CandidateAccepted"
+    )
+    progress = 1 if passed else 0
+    total_tokens = (
+        _positive_int(substrate_run.get("worker_prompt_tokens_estimate"))
+        + _positive_int(substrate_run.get("worker_completion_tokens_estimate"))
+        + _positive_int(substrate_run.get("worker_tool_stdout_tokens_estimate"))
+    )
+    wall_time_ms = _positive_int(substrate_run.get("worker_elapsed_ms"))
+    market_id = str(substrate_run.get("market_id") or f"mkt_{substrate_run['instance_id']}")
+    worker_id = str(substrate_run.get("worker_id") or "worker:sha256:" + "0" * 64)
+    basis_event_id = str(verified["official_evidence_event_id"])
+    terminal_event_id = str(verified["candidate_event_id"])
+    return [
+        {
+            "event_type": "MarketSettled",
+            "writer_id": "writer:market",
+            "payload": {
+                "schema_id": "market_settled.v1",
+                "market_id": market_id,
+                "result": "YES" if passed else "NO",
+                "settlement_basis_event_id": basis_event_id,
+                "basis_kind": "official_eval",
+                "terminal_event_id": terminal_event_id,
+                "is_terminal": True,
+                "price_not_truth_ack": True,
+            },
+        },
+        {
+            "event_type": "RewardDistributed",
+            "writer_id": "writer:market",
+            "payload": {
+                "schema_id": "reward_distributed.v1",
+                "event_type": "RewardDistributed",
+                "market_id": market_id,
+                "agent_id": worker_id,
+                "reward_coin": "1" if passed else "0",
+                "slash_coin": "0" if passed else "1",
+                "reason": "PREDICATE_SETTLEMENT" if passed else "BUDGET_EXHAUSTED",
+            },
+        },
+        {
+            "event_type": "PPUTAccounted",
+            "writer_id": "writer:pput",
+            "payload": {
+                "schema_id": "pput_accounted.v1",
+                "head_effect": "PRESERVE",
+                "run_id": f"run_{substrate_run['instance_id']}",
+                "problem_id": substrate_run["instance_id"],
+                "split": "dogfood",
+                "solved": passed,
+                "verified": passed,
+                "accounting_stage": "final",
+                "basis_event_id": basis_event_id,
+                "terminal_event_id": terminal_event_id,
+                "golden_path_token_count": total_tokens if passed else 0,
+                "total_run_token_count": total_tokens,
+                "total_wall_time_ms": wall_time_ms,
+                "progress": progress,
+                "vpput_raw": _vpput_decimal_string(progress, total_tokens, wall_time_ms),
+                "failed_branch_count": 1,
+                "hidden_from_worker_prompt": True,
+            },
+        },
+    ]
+
+
 def broadcast_rule_from_evidence(evidence_payload: dict[str, Any]) -> dict[str, str] | None:
     failure_class = evidence_payload.get("failure_class")
     if failure_class is None:
@@ -296,12 +388,42 @@ def import_turingos_evidence_and_verify(
                 "detail": evidence_payload.get("failure_class") or "official evaluator did not pass",
             }
         verified = rpc(socket_path, "candidate.verify_write", verify_params)
+        terminal_events = []
+        for event in terminal_post_verification_events(
+            substrate_run=substrate_run,
+            evidence_payload=evidence_payload,
+            verified={
+                "official_evidence_event_id": imported["event_id"],
+                "candidate_event_id": verified["event_id"],
+                "candidate_write_event_type": verified["write_event_type"],
+            },
+        ):
+            payload = dict(event["payload"])
+            if event["event_type"] == "RewardDistributed" and terminal_events:
+                payload["settlement_event_id"] = terminal_events[-1]["event_id"]
+            appended = rpc(
+                socket_path,
+                "event.append_preserve",
+                {
+                    "event_type": event["event_type"],
+                    "writer_id": event["writer_id"],
+                    "payload": payload,
+                },
+            )
+            terminal_events.append(
+                {
+                    "event_type": event["event_type"],
+                    "event_id": appended["event_id"],
+                    "head_effect": appended.get("head_effect"),
+                }
+            )
         return {
             "official_evidence_event_id": imported["event_id"],
             "candidate_write_event_type": verified["write_event_type"],
             "candidate_event_id": verified["event_id"],
             "predicate_product": verified["predicate_product"],
             "accepted_head_moved": verified["accepted_head_moved"],
+            "terminal_events": terminal_events,
         }
     finally:
         try:

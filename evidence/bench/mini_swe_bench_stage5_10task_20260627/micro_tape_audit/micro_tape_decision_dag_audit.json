@@ -25,7 +25,8 @@
       "market_settled_before_terminal_evidence": 2,
       "official_evidence_precedes_accept": 2,
       "pput_final_accounting_missing_after_accept": 2,
-      "reward_distributed_before_terminal_market_basis": 2
+      "reward_distributed_before_terminal_market_basis": 2,
+      "reward_without_terminal_market_settlement": 2
     }
   },
   "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
@@ -41,16 +42,20 @@
       "bundle_hash": "sha256:de061d0204e987f779caebfc98b72941f3b7fe4d7f30a1cbf259426c863a3030",
       "bundle_verify_output": "The bundle contains these 2 refs:\n7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224 refs/turingos/accepted_head\n7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -582,11 +587,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -702,9 +713,11 @@
           "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:7a0726860fb58946a8f3731ae05754d77d6596c5b419f9926fea930d7313c224"
     },
     {
       "actual_refs": {
@@ -716,16 +729,20 @@
       "bundle_hash": "sha256:6812ab9f027123474d50ce1ca964e36ca10f1f82d139919de0075f9d71b62a4e",
       "bundle_verify_output": "The bundle contains these 2 refs:\nc4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad refs/turingos/accepted_head\nc4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
       "checks": {
+        "accepted_final_progress_one": "WARN",
         "accepted_head_authority": "PASS",
         "authorization_head": "LEGACY_MISSING",
         "bundle_integrity": "PASS",
         "canonical_payload_hash": "PASS",
         "decision_dag_completeness": "PASS",
         "economic_timing": "WARN",
+        "failed_progress_zero": "PASS",
         "git_topology": "PASS",
         "market_accounting_correctness": "WARN",
         "ref_reconstruction": "PASS",
-        "registry_head_effect": "PASS"
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "WARN"
       },
       "dag_edges": [
         {
@@ -1257,11 +1274,17 @@
           "severity": "WARN"
         },
         {
+          "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+          "finding": "reward_without_terminal_market_settlement",
+          "severity": "WARN"
+        },
+        {
           "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
           "finding": "pput_final_accounting_missing_after_accept",
           "severity": "WARN"
         }
       ],
+      "first_candidate_accepted": "mu:c4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad",
       "git_evidence": {
         "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
         "git_fsck_strict_stdout": "",
@@ -1377,13 +1400,16 @@
           "writer_id": "writer:predicate"
         }
       ],
+      "golden_path_basis": "terminal_accepted_head",
       "path_class": "accepted_path",
       "replay_problems": [],
-      "replay_valid": true
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:c4509a8280817848b9d51cf2dd676aea2c02725d95de6b0b0b1a6e6069b5a4ad"
     }
   ],
   "schema_id": "MicroTapeDecisionDagAudit.v2",
   "status_summary": {
+    "accepted_final_progress_one": "WARN",
     "accepted_head_authority": "PASS",
     "authorization_head": "LEGACY_MISSING",
     "basic_ref_reconstruction": "PASS",
@@ -1393,13 +1419,17 @@
     "constitutional_protocol_audit": "PARTIAL",
     "decision_dag_completeness": "PASS",
     "economic_timing": "WARN",
+    "failed_progress_zero": "PASS",
     "git_topology": "PASS",
     "market_accounting_correctness": "WARN",
     "overall": "PARTIAL",
     "ref_reconstruction": "PASS",
     "registry_head_effect": "PASS",
-    "replay_structural_integrity": "PASS"
+    "replay_structural_integrity": "PASS",
+    "terminal_golden_path_anchors_to_accepted_head": "PASS",
+    "vpput_accounting": "WARN"
   },
+  "strict_findings": [],
   "truth_source": "micro_tape_bundle_only",
   "verdict": "PARTIAL"
 }

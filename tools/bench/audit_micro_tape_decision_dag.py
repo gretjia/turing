@@ -486,7 +486,37 @@ def event_summary(event: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def path_class(events: list[dict[str, Any]]) -> str:
+def accepted_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        event
+        for event in events
+        if event.get("event_type") == "CandidateAccepted" and event.get("predicate_product") == "PASS"
+    ]
+
+
+def terminal_accepted_event(events: list[dict[str, Any]], actual_accepted_head: str | None) -> dict[str, Any] | None:
+    if actual_accepted_head is None:
+        return None
+    return next(
+        (
+            event
+            for event in events
+            if event["_event_id"] == actual_accepted_head
+            and event.get("event_type") == "CandidateAccepted"
+            and event.get("predicate_product") == "PASS"
+        ),
+        None,
+    )
+
+
+def first_candidate_accepted_event(events: list[dict[str, Any]]) -> dict[str, Any] | None:
+    matches = accepted_events(events)
+    if not matches:
+        return None
+    return min(matches, key=lambda event: int(event.get("sequence", 0)))
+
+
+def path_class(events: list[dict[str, Any]], actual_accepted_head: str | None = None) -> str:
     accepted = [
         event
         for event in events
@@ -507,21 +537,25 @@ def path_class(events: list[dict[str, Any]]) -> str:
         and event["payload"].get("result") == "FAIL"
     ]
     failures = [event for event in events if event.get("event_type") == "FailureNode"]
-    if accepted and official_pass and min(event["sequence"] for event in accepted) > min(event["sequence"] for event in official_pass):
+    terminal = terminal_accepted_event(events, actual_accepted_head)
+    terminal_seq = terminal.get("sequence") if terminal is not None else None
+    if (
+        terminal is not None
+        and isinstance(terminal_seq, int)
+        and official_pass
+        and terminal_seq > min(event["sequence"] for event in official_pass)
+    ):
         return "accepted_path"
     if not accepted and (official_fail or failures):
         return "failed_path"
     return "incomplete_path"
 
 
-def golden_path(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    if path_class(events) != "accepted_path":
+def golden_path(events: list[dict[str, Any]], actual_accepted_head: str | None) -> list[dict[str, Any]]:
+    terminal = terminal_accepted_event(events, actual_accepted_head)
+    if path_class(events, actual_accepted_head) != "accepted_path" or terminal is None:
         return []
-    accepted_seq = min(
-        int(event.get("sequence"))
-        for event in events
-        if event.get("event_type") == "CandidateAccepted" and event.get("predicate_product") == "PASS"
-    )
+    accepted_seq = int(terminal.get("sequence"))
     wanted = {
         "GoalStateProposed",
         "WorkCapsuleBuilt",
@@ -537,7 +571,7 @@ def golden_path(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def execution_findings(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def execution_findings(events: list[dict[str, Any]], actual_accepted_head: str | None) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     official_terminal_seq = [
         event.get("sequence")
@@ -553,11 +587,9 @@ def execution_findings(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         and isinstance(event.get("payload"), dict)
         and event["payload"].get("result") == "PASS"
     ]
-    accepted_seq = [
-        event.get("sequence")
-        for event in events
-        if event.get("event_type") == "CandidateAccepted" and event.get("predicate_product") == "PASS"
-    ]
+    terminal_accept = terminal_accepted_event(events, actual_accepted_head)
+    terminal_accept_seq = terminal_accept.get("sequence") if terminal_accept is not None else None
+    accepted_seq = [event.get("sequence") for event in accepted_events(events)]
     if official_pass_seq and accepted_seq and min(accepted_seq) > min(official_pass_seq):
         findings.append(
             {
@@ -567,8 +599,8 @@ def execution_findings(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             }
         )
 
-    terminal_seq = min(official_terminal_seq) if official_terminal_seq else None
-    if terminal_seq is not None:
+    official_terminal_min_seq = min(official_terminal_seq) if official_terminal_seq else None
+    if official_terminal_min_seq is not None:
         for event_type, finding in [
             ("MarketSettled", "market_settled_before_terminal_evidence"),
             ("RewardDistributed", "reward_distributed_before_terminal_market_basis"),
@@ -576,7 +608,9 @@ def execution_findings(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             early = [
                 event
                 for event in events
-                if event.get("event_type") == event_type and isinstance(event.get("sequence"), int) and event["sequence"] < terminal_seq
+                if event.get("event_type") == event_type
+                and isinstance(event.get("sequence"), int)
+                and event["sequence"] < official_terminal_min_seq
             ]
             if early:
                 findings.append(
@@ -587,15 +621,51 @@ def execution_findings(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     }
                 )
 
+    by_id = {event["_event_id"]: event for event in events}
+    terminal_market_settlements = set()
+    for event in events:
+        if event.get("event_type") != "MarketSettled":
+            continue
+        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+        if payload.get("is_terminal") is True and isinstance(event.get("sequence"), int):
+            basis = payload.get("settlement_basis_event_id")
+            terminal = payload.get("terminal_event_id")
+            if basis in by_id and (terminal in by_id or terminal is None):
+                terminal_market_settlements.add(event["_event_id"])
+            else:
+                findings.append(
+                    {
+                        "finding": "market_terminal_basis_unresolved",
+                        "severity": "WARN",
+                        "detail": "Terminal MarketSettled must reference tape-resolved settlement basis and terminal event ids.",
+                    }
+                )
+
+    for event in events:
+        if event.get("event_type") != "RewardDistributed":
+            continue
+        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+        settlement_event_id = payload.get("settlement_event_id")
+        if settlement_event_id not in terminal_market_settlements:
+            findings.append(
+                {
+                    "finding": "reward_without_terminal_market_settlement",
+                    "severity": "WARN",
+                    "detail": "RewardDistributed must reference a terminal MarketSettled event.",
+                }
+            )
+
     pput_events = [event for event in events if event.get("event_type") == "PPUTAccounted"]
-    if accepted_seq:
+    if terminal_accept is not None and isinstance(terminal_accept_seq, int):
         final_pput = [
             event
             for event in pput_events
             if isinstance(event.get("sequence"), int)
-            and event["sequence"] > min(accepted_seq)
+            and event["sequence"] > terminal_accept_seq
             and isinstance(event.get("payload"), dict)
             and event["payload"].get("progress") == 1
+            and event["payload"].get("accounting_stage") == "final"
+            and event["payload"].get("terminal_event_id") == actual_accepted_head
         ]
         if not final_pput:
             findings.append(
@@ -605,7 +675,7 @@ def execution_findings(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "detail": "Accepted run has no post-accept final PPUTAccounted progress=1 event.",
                 }
             )
-    elif path_class(events) == "failed_path":
+    elif path_class(events, actual_accepted_head) == "failed_path":
         for event in pput_events:
             payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
             if payload.get("progress") not in {None, 0}:
@@ -628,14 +698,40 @@ def check_economic_timing(findings: list[dict[str, Any]]) -> str:
     return "PASS"
 
 
-def check_decision_dag(events: list[dict[str, Any]], edges: list[dict[str, str]]) -> str:
-    cls = path_class(events)
+def check_decision_dag(events: list[dict[str, Any]], edges: list[dict[str, str]], actual_accepted_head: str | None) -> str:
+    cls = path_class(events, actual_accepted_head)
     if cls == "incomplete_path":
         return "WARN"
     if cls == "accepted_path":
         if not any(edge["kind"] == "official_evidence_to_accept" for edge in edges):
             return "WARN"
     return "PASS"
+
+
+def terminal_golden_path_status(events: list[dict[str, Any]], actual_accepted_head: str | None) -> str:
+    if path_class(events, actual_accepted_head) != "accepted_path":
+        return "PASS"
+    path = golden_path(events, actual_accepted_head)
+    if path and path[-1]["event_id"] == actual_accepted_head:
+        return "PASS"
+    return "FAIL"
+
+
+def vpput_statuses(findings: list[dict[str, Any]], events: list[dict[str, Any]], actual_accepted_head: str | None) -> dict[str, str]:
+    failed_progress = "FAIL" if any(f["finding"] == "failed_run_has_nonzero_pput_progress" for f in findings) else "PASS"
+    accepted_final = "PASS"
+    if path_class(events, actual_accepted_head) == "accepted_path":
+        accepted_final = (
+            "WARN"
+            if any(f["finding"] == "pput_final_accounting_missing_after_accept" for f in findings)
+            else "PASS"
+        )
+    vpput = "FAIL" if failed_progress == "FAIL" else "WARN" if accepted_final == "WARN" else "PASS"
+    return {
+        "failed_progress_zero": failed_progress,
+        "accepted_final_progress_one": accepted_final,
+        "vpput_accounting": vpput,
+    }
 
 
 def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -653,9 +749,11 @@ def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str,
     checks["git_topology"] = "PASS" if git_ok else "FAIL"
     event_counts = Counter(str(event.get("event_type")) for event in events)
     edges = build_dag_edges(events)
-    findings = execution_findings(events)
+    findings = execution_findings(events, actual_refs["accepted_head"])
     checks["economic_timing"] = check_economic_timing(findings)
-    checks["decision_dag_completeness"] = check_decision_dag(events, edges)
+    checks["decision_dag_completeness"] = check_decision_dag(events, edges, actual_refs["accepted_head"])
+    checks["terminal_golden_path_anchors_to_accepted_head"] = terminal_golden_path_status(events, actual_refs["accepted_head"])
+    checks.update(vpput_statuses(findings, events, actual_refs["accepted_head"]))
     if checks["economic_timing"] == "WARN":
         checks["market_accounting_correctness"] = "WARN" if any("market" in f["finding"] or "reward" in f["finding"] for f in findings) else "PASS"
     elif checks["economic_timing"] == "FAIL":
@@ -663,6 +761,8 @@ def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str,
     else:
         checks["market_accounting_correctness"] = "PASS"
 
+    first_accept = first_candidate_accepted_event(events)
+    terminal_accept = terminal_accepted_event(events, actual_refs["accepted_head"])
     replay_valid = chain_ok and git_ok and not any(checks.get(key) == "FAIL" for key in CRITICAL_REPLAY_CHECKS)
     return {
         "bundle": str(bundle),
@@ -672,14 +772,17 @@ def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str,
         "replay_valid": replay_valid,
         "replay_problems": git_problems + chain_problems,
         "checks": checks,
-        "path_class": path_class(events),
+        "path_class": path_class(events, actual_refs["accepted_head"]),
+        "first_candidate_accepted": first_accept["_event_id"] if first_accept is not None else None,
+        "terminal_candidate_accepted": terminal_accept["_event_id"] if terminal_accept is not None else None,
+        "golden_path_basis": "terminal_accepted_head" if terminal_accept is not None else None,
         "actual_refs": actual_refs,
         "derived_refs": derived_refs,
         "event_count": len(events),
         "event_counts": dict(sorted(event_counts.items())),
         "events": [event_summary(event) for event in events],
         "dag_edges": edges,
-        "golden_path": golden_path(events),
+        "golden_path": golden_path(events, actual_refs["accepted_head"]),
         "execution_findings": findings,
     }
 
@@ -710,6 +813,10 @@ def aggregate_status(runs: list[dict[str, Any]]) -> dict[str, str]:
         "economic_timing",
         "decision_dag_completeness",
         "market_accounting_correctness",
+        "terminal_golden_path_anchors_to_accepted_head",
+        "failed_progress_zero",
+        "accepted_final_progress_one",
+        "vpput_accounting",
     ]
     summary = {key: worst_status([run["checks"].get(key, "NOT_TESTED") for run in runs]) for key in keys}
     summary["bundle_accessibility"] = summary["bundle_integrity"]
@@ -722,7 +829,17 @@ def aggregate_status(runs: list[dict[str, Any]]) -> dict[str, str]:
         and summary["canonical_payload_hash"] == "PASS"
         else "FAIL"
     )
-    if any(summary[key] == "FAIL" for key in ["git_topology", "canonical_payload_hash", "ref_reconstruction", "registry_head_effect", "accepted_head_authority"]):
+    if any(
+        summary[key] == "FAIL"
+        for key in [
+            "git_topology",
+            "canonical_payload_hash",
+            "ref_reconstruction",
+            "registry_head_effect",
+            "accepted_head_authority",
+            "terminal_golden_path_anchors_to_accepted_head",
+        ]
+    ):
         summary["constitutional_protocol_audit"] = "FAIL"
     elif summary["authorization_head"] in {"LEGACY_MISSING", "NOT_TESTED"}:
         summary["constitutional_protocol_audit"] = "PARTIAL"
@@ -743,6 +860,9 @@ def audit_bundles(
     work_dir: Path,
     *,
     event_registry_path: Path | None = None,
+    strict_vpput: bool = False,
+    strict_terminal_market: bool = False,
+    require_authorization_head: bool = False,
 ) -> dict[str, Any]:
     work_dir.mkdir(parents=True, exist_ok=True)
     registry = load_event_registry(event_registry_path)
@@ -753,6 +873,30 @@ def audit_bundles(
         event_counts.update(run["event_counts"])
         finding_counts.update(finding["finding"] for finding in run["execution_findings"])
     status_summary = aggregate_status(runs)
+    strict_findings: list[dict[str, str]] = []
+    if strict_vpput and status_summary.get("vpput_accounting") != "PASS":
+        strict_findings.append(
+            {
+                "id": "strict_vpput",
+                "message": "strict VPPUT gate requires vpput_accounting PASS",
+            }
+        )
+    if strict_terminal_market and status_summary.get("market_accounting_correctness") != "PASS":
+        strict_findings.append(
+            {
+                "id": "strict_terminal_market",
+                "message": "strict terminal market gate requires market_accounting_correctness PASS",
+            }
+        )
+    if require_authorization_head and status_summary.get("authorization_head") != "PASS":
+        strict_findings.append(
+            {
+                "id": "require_authorization_head",
+                "message": "strict authorization gate requires authorization_head PASS",
+            }
+        )
+    if strict_findings:
+        status_summary["overall"] = "FAIL"
     return {
         "schema_id": "MicroTapeDecisionDagAudit.v2",
         "verdict": status_summary["overall"],
@@ -760,6 +904,7 @@ def audit_bundles(
         "event_registry": str((event_registry_path or DEFAULT_EVENT_REGISTRY_PATH).resolve()),
         "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
         "status_summary": status_summary,
+        "strict_findings": strict_findings,
         "aggregate": {
             "bundle_count": len(runs),
             "event_count": sum(run["event_count"] for run in runs),
@@ -917,6 +1062,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--coverage", help="Substrate coverage JSON containing micro_tape_bundle refs")
     parser.add_argument("--bundle", action="append", default=[], help="Micro Tape bundle path; repeatable")
     parser.add_argument("--event-registry", help="Closed event registry JSON; defaults to pack/04_registries/event_registry_v5_3_1.json")
+    parser.add_argument("--strict-vpput", action="store_true")
+    parser.add_argument("--strict-terminal-market", action="store_true")
+    parser.add_argument("--require-authorization-head", action="store_true")
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args(argv)
 
@@ -933,6 +1081,9 @@ def main(argv: list[str] | None = None) -> int:
             bundles,
             Path(temp),
             event_registry_path=Path(args.event_registry) if args.event_registry else None,
+            strict_vpput=args.strict_vpput,
+            strict_terminal_market=args.strict_terminal_market,
+            require_authorization_head=args.require_authorization_head,
         )
     write_json(out_dir / "micro_tape_decision_dag_audit.json", report)
     write_markdown(report, out_dir / "micro_tape_decision_dag.md")

@@ -55,7 +55,6 @@ REQUIRED_EVENTS = [
     "BudgetAllocated",
     "WorkerReceiptImported",
     "MacroObservationImported",
-    "MarketSettled",
     "PPUTAccounted",
     "PredicateEvaluated",
 ]

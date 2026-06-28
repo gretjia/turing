@@ -463,6 +463,52 @@ def grant_json(capsule_id: str, market_id: str, worker_id: str) -> dict[str, Any
     }
 
 
+def approval_request(
+    *,
+    approval_id: str,
+    action: str,
+    subject_id: str,
+    evidence_digest: str,
+    title_zh: str,
+    body_en: str,
+) -> dict[str, Any]:
+    return {
+        "key_id": "operator-local-key",
+        "payload": {
+            "schema_id": "approval_payload.v2",
+            "approval_id": approval_id,
+            "authority_epoch": 0,
+            "action": action,
+            "subject_id": subject_id,
+            "evidence_digests": [evidence_digest],
+            "risk_class": "P2",
+            "signature_route": "OsKeyring",
+        },
+        "display_copy": {
+            "title_zh": title_zh,
+            "body_en": body_en,
+        },
+    }
+
+
+def maybe_authorize(
+    turingd: Daemon,
+    method: str,
+    request: dict[str, Any],
+    *,
+    authorization_mode: str,
+) -> dict[str, Any] | None:
+    if authorization_mode == "off":
+        return None
+    try:
+        return rpc(turingd.socket_path, method, request)
+    except RuntimeError as error:
+        message = str(error)
+        if authorization_mode == "auto" and "OS keyring provider secret-tool unavailable" in message:
+            return None
+        raise
+
+
 def run_substrate_task(
     task: dict[str, Any],
     out_dir: Path,
@@ -472,6 +518,7 @@ def run_substrate_task(
     max_turns: int,
     worker_timeout_s: int,
     broadcast_rules: list[dict[str, Any]] | None = None,
+    authorization_mode: str = "auto",
 ) -> dict[str, Any]:
     instance_dir = out_dir / "instances" / task["instance_id"]
     project = instance_dir / "project"
@@ -512,6 +559,24 @@ def run_substrate_task(
         mark_event(goal, "GoalStateProposed")
         mark_module("M0_law_goal_harness")
 
+        atom_id = f"atom_{task['instance_id']}"
+        atom_auth = maybe_authorize(
+            turingd,
+            "approval.authorize_atom",
+            approval_request(
+                approval_id=f"ap_atom_{task['instance_id']}",
+                action="atom_authorize",
+                subject_id=atom_id,
+                evidence_digest=digest_text(task["instance_id"] + ":atom"),
+                title_zh="批准 Atom",
+                body_en="Authorize the benchmark atom dispatch path.",
+            ),
+            authorization_mode=authorization_mode,
+        )
+        if atom_auth is not None:
+            mark_event(atom_auth, "AtomAuthorized")
+        mark_module("M10_evidence_approval")
+
         capsule_id = f"wc_{task['instance_id']}"
         capsule = append_preserve(
             turingd,
@@ -525,6 +590,22 @@ def run_substrate_task(
         )
         mark_event(capsule, "WorkCapsuleBuilt")
         mark_module("M5_goal_module_atom_capsule")
+
+        dispatch_auth = maybe_authorize(
+            turingd,
+            "capsule.approve",
+            approval_request(
+                approval_id=f"ap_capsule_{task['instance_id']}",
+                action="capsule_approve",
+                subject_id=capsule_id,
+                evidence_digest=digest_text(capsule_id + ":dispatch"),
+                title_zh="批准 Capsule",
+                body_en="Authorize the benchmark work capsule dispatch.",
+            ),
+            authorization_mode=authorization_mode,
+        )
+        if dispatch_auth is not None:
+            mark_event(dispatch_auth, "WorkerDispatchAuthorized")
 
         evidence = append_preserve(
             turingd,
@@ -607,6 +688,8 @@ def run_substrate_task(
         with Daemon("turing-execd", bin_dir, runtime / "execd.sock") as execd:
             increment(process_calls, "turing-execd")
             grant = grant_json(capsule_id, market_id, worker_id)
+            if dispatch_auth is not None:
+                grant["authorization_event"] = dispatch_auth["event_id"]
             rpc(
                 execd.socket_path,
                 "grant.authorize",
@@ -712,8 +795,6 @@ def run_substrate_task(
         mark_event(accepted, accepted["write_event_type"])
         mark_module("M4_single_loop")
         mark_module("M9_predicate_kernel")
-        predicate_pass = accepted["write_event_type"] == "CandidateAccepted"
-
         failure = rpc(
             turingd.socket_path,
             "capsule.reject",
@@ -727,36 +808,6 @@ def run_substrate_task(
         )
         mark_event(failure, "FailureNode")
         mark_module("M11_failure_memory")
-
-        settlement = append_preserve(
-            turingd,
-            "MarketSettled",
-            "writer:market",
-            {
-                "schema_id": "market_settled.v1",
-                "market_id": market_id,
-                "result": "YES" if predicate_pass else "NO",
-                "settlement_event_id": accepted["event_id"],
-                "price_not_truth_ack": True,
-            },
-        )
-        mark_event(settlement, "MarketSettled")
-
-        reward = append_preserve(
-            turingd,
-            "RewardDistributed",
-            "writer:market",
-            {
-                "schema_id": "reward_distributed.v1",
-                "event_type": "RewardDistributed",
-                "market_id": market_id,
-                "agent_id": worker_id,
-                "reward_coin": "1" if predicate_pass else "0",
-                "slash_coin": "0" if predicate_pass else "1",
-                "reason": "PREDICATE_SETTLEMENT",
-            },
-        )
-        mark_event(reward, "RewardDistributed")
 
         cost = append_preserve(
             turingd,
@@ -795,16 +846,16 @@ def run_substrate_task(
                 "run_id": f"run_{task['instance_id']}",
                 "problem_id": task["instance_id"],
                 "split": "dogfood",
-                "solved": predicate_pass,
-                "verified": predicate_pass,
-                "golden_path_token_count": 0 if not predicate_pass else worker_result["prompt_tokens_estimate"]
-                + worker_result["completion_tokens_estimate"],
+                "solved": False,
+                "verified": False,
+                "accounting_stage": "progress",
+                "golden_path_token_count": 0,
                 "total_run_token_count": worker_result["prompt_tokens_estimate"]
                 + worker_result["completion_tokens_estimate"]
                 + worker_result["tool_stdout_tokens_estimate"],
                 "total_wall_time_ms": worker_result["elapsed_ms"],
-                "progress": 1 if predicate_pass else 0,
-                "vpput_raw": "0.0005" if predicate_pass else "0",
+                "progress": 0,
+                "vpput_raw": "0",
                 "failed_branch_count": 1,
                 "hidden_from_worker_prompt": True,
             },
@@ -874,6 +925,9 @@ def run_substrate_task(
         "instance_id": task["instance_id"],
         "worker_mode": worker_mode,
         "worker_id": worker_id,
+        "authorization_mode": authorization_mode,
+        "authorization_head_expected": authorization_mode == "required",
+        "market_id": market_id,
         "capsule_id": capsule_id,
         "candidate_id": candidate_id,
         "macro_anchor_id": macro_id,
@@ -882,6 +936,10 @@ def run_substrate_task(
         "broadcast_rules_injected": broadcast_rules or [],
         "broadcast_rules_emitted": [],
         "worker_exit_code": worker_result["exit_code"],
+        "worker_prompt_tokens_estimate": worker_result["prompt_tokens_estimate"],
+        "worker_completion_tokens_estimate": worker_result["completion_tokens_estimate"],
+        "worker_tool_stdout_tokens_estimate": worker_result["tool_stdout_tokens_estimate"],
+        "worker_elapsed_ms": worker_result["elapsed_ms"],
         "worker_log_dir": worker_result["log_dir"],
         "worker_worktree": worker_result["worktree"],
         "predicate_write_event_type": accepted["write_event_type"],
@@ -909,6 +967,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", default="grok-build")
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--worker-timeout-s", type=int, default=1200)
+    parser.add_argument("--authorization-mode", choices=["auto", "required", "off"], default="auto")
     parser.add_argument("--daemon-bin-dir", default=str(REPO / "target" / "debug"))
     parser.add_argument("--broadcast-rules-file")
     args = parser.parse_args(argv)
@@ -933,6 +992,7 @@ def main(argv: list[str] | None = None) -> int:
             args.max_turns,
             args.worker_timeout_s,
             broadcast_rules=active_broadcast_rules,
+            authorization_mode=args.authorization_mode,
         )
         runs.append(run)
         active_broadcast_rules.extend(run.get("broadcast_rules_emitted", []))

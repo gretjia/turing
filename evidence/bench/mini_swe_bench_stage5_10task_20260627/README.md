@@ -63,11 +63,28 @@ The protocol verifier intentionally downgrades the earlier broad MicroTape PASS.
 - registry_head_effect: `PASS`
 - accepted_head_authority: `PASS`
 - authorization_head: `LEGACY_MISSING`
+- terminal_golden_path_anchors_to_accepted_head: `PASS`
+- failed_progress_zero: `PASS`
+- accepted_final_progress_one: `WARN`
+- vpput_accounting: `WARN`
 - economic_timing: `WARN`
 - market_accounting_correctness: `WARN`
 - constitutional_protocol_audit: `PARTIAL`
 
-The warning is load-bearing: existing benchmark tapes settle market/reward and record progress PPUT before terminal official evaluator evidence / final accept. Failed runs correctly keep `progress = 0`; accepted runs need a terminal post-accept PPUT accounting event before capability-metric claims.
+The warning is load-bearing: existing benchmark tapes settle market/reward and record progress PPUT before terminal official evaluator evidence / final accept. Failed runs correctly keep `progress = 0`; accepted runs need a terminal post-accept PPUT accounting event before capability-metric claims. New runner/evaluator code now supports terminal post-verification market/reward/final-PPUT events; these old bundles remain PARTIAL because they predate that event order.
+
+Next strict gate command:
+
+```bash
+python3 tools/bench/audit_micro_tape_decision_dag.py \
+  --bundle <micro_tape.bundle> \
+  --strict-vpput \
+  --strict-terminal-market \
+  --require-authorization-head \
+  --out-dir <audit_out>
+```
+
+The existing Stage4/Stage5 bundles intentionally fail that strict command with `strict_vpput`, `strict_terminal_market`, and `require_authorization_head`. A new benchmark tape must pass it before claiming VPPUT/market/authorization closure.
 
 ## MetaAI Review
 

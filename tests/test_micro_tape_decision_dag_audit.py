@@ -123,6 +123,51 @@ def make_bundle(tmp_path, specs, *, break_git_parent_at=None):
     return bundle
 
 
+def make_bundle_with_context(tmp_path, specs, *, break_git_parent_at=None):
+    repo = tmp_path / f"repo_{len(list(tmp_path.iterdir()))}"
+    bundle = tmp_path / f"{repo.name}.bundle"
+    run(["git", "init", "--object-format=sha256", str(repo)], tmp_path)
+    accepted = None
+    authorization = None
+    prev = None
+    last_oid = None
+    context = {"events": [], "event_ids": {}}
+    for seq, spec in enumerate(specs):
+        payload = spec.get("payload", {})
+        if callable(payload):
+            payload = payload(context)
+        item = event(
+            seq,
+            spec["event_type"],
+            prev,
+            accepted,
+            payload,
+            head_effect=spec.get("head_effect"),
+            product=spec.get("product", "PASS"),
+        )
+        parent_mode = "none" if break_git_parent_at == seq else None
+        oid = commit_event(repo, item, parent=parent_mode)
+        event_id = "mu:" + oid
+        context["events"].append({"event_type": spec["event_type"], "event_id": event_id, "payload": payload})
+        if "name" in spec:
+            context["event_ids"][spec["name"]] = event_id
+        row = registry_row(spec["event_type"])
+        if row["event_class"] == "SOVEREIGN_ACCEPT" and item["predicate_product"] == "PASS":
+            accepted = event_id
+        if row["event_class"] == "AUTHORIZATION" and item["predicate_product"] == "PASS":
+            authorization = event_id
+        prev = event_id
+        last_oid = oid
+    assert last_oid is not None
+    run(["git", "update-ref", "refs/turingos/tape_tip", last_oid], repo)
+    if accepted:
+        run(["git", "update-ref", "refs/turingos/accepted_head", accepted.removeprefix("mu:")], repo)
+    if authorization:
+        run(["git", "update-ref", "refs/turingos/authorization_head", authorization.removeprefix("mu:")], repo)
+    run(["git", "bundle", "create", str(bundle), "--all"], repo)
+    return bundle, context
+
+
 def accepted_specs():
     return [
         {
@@ -291,6 +336,18 @@ def test_market_and_pput_timing_downgrade_overall_to_partial(tmp_path):
     assert "market_settled_before_terminal_evidence" in findings
     assert "pput_final_accounting_missing_after_accept" in findings
 
+    strict_report = auditor.audit_bundles(
+        [bundle],
+        tmp_path / "work_strict",
+        strict_vpput=True,
+        strict_terminal_market=True,
+        require_authorization_head=True,
+    )
+    assert strict_report["verdict"] == "FAIL"
+    assert "strict_vpput" in {item["id"] for item in strict_report["strict_findings"]}
+    assert "strict_terminal_market" in {item["id"] for item in strict_report["strict_findings"]}
+    assert "require_authorization_head" in {item["id"] for item in strict_report["strict_findings"]}
+
 
 def test_repeated_event_types_are_rendered_as_distinct_dag_nodes(tmp_path):
     auditor = load_auditor()
@@ -323,3 +380,121 @@ def test_git_parent_mismatch_fails_even_if_payload_prev_claims_ok(tmp_path):
     assert report["verdict"] == "FAIL"
     assert report["runs"][0]["checks"]["git_topology"] == "FAIL"
     assert any("commit parent count" in p or "commit parent" in p for p in report["runs"][0]["replay_problems"])
+
+
+def test_terminal_golden_path_uses_accepted_head_not_first_candidate_accept(tmp_path):
+    auditor = load_auditor()
+    specs = accepted_specs()
+    specs[4]["name"] = "official_first"
+    specs[5]["name"] = "accept_first"
+    specs.extend(
+        [
+            {
+                "event_type": "OfficialEvaluatorEvidenceImported",
+                "name": "official_terminal",
+                "payload": {
+                    "capsule_id": "wc_test",
+                    "evidence_id": "ev_official_terminal",
+                    "macro_anchor_id": "macro:diff:test",
+                    "result": "PASS",
+                    "worker_receipt_id": "rcp_test",
+                },
+            },
+            {
+                "event_type": "CandidateAccepted",
+                "name": "accept_terminal",
+                "payload": {
+                    "candidate_id": "cand_test_terminal",
+                    "capsule_id": "wc_test",
+                    "macro_anchor_id": "macro:diff:test",
+                    "official_evaluator_evidence_id": "ev_official_terminal",
+                    "worker_receipt_id": "rcp_test",
+                },
+            },
+        ]
+    )
+    bundle, context = make_bundle_with_context(tmp_path, specs)
+
+    run_report = auditor.audit_bundles([bundle], tmp_path / "work")["runs"][0]
+
+    assert context["event_ids"]["accept_first"] != context["event_ids"]["accept_terminal"]
+    assert run_report["actual_refs"]["accepted_head"] == context["event_ids"]["accept_terminal"]
+    assert run_report["first_candidate_accepted"] == context["event_ids"]["accept_first"]
+    assert run_report["terminal_candidate_accepted"] == context["event_ids"]["accept_terminal"]
+    assert run_report["golden_path_basis"] == "terminal_accepted_head"
+    assert run_report["golden_path"][-1]["event_id"] == context["event_ids"]["accept_terminal"]
+    assert run_report["checks"]["terminal_golden_path_anchors_to_accepted_head"] == "PASS"
+
+
+def test_terminal_market_reward_and_final_pput_clear_economic_warnings(tmp_path):
+    auditor = load_auditor()
+    specs = [
+        {
+            "event_type": "SystemConstitutionAccepted",
+            "payload": {"constitution_digest": "sha256:" + "1" * 64},
+        },
+        {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "wc_terminal"}},
+        {"event_type": "WorkerReceiptImported", "payload": {"capsule_id": "wc_terminal", "receipt_id": "rcp_terminal"}},
+        {"event_type": "MacroObservationImported", "payload": {"capsule_id": "wc_terminal", "macro_id": "macro:terminal"}},
+        {"event_type": "CostEvent", "payload": {"capsule_id": "wc_terminal", "total_tokens": 10, "wall_time_ms": 5}},
+        {"event_type": "PPUTAccounted", "payload": {"capsule_id": "wc_terminal", "accounting_stage": "progress", "progress": 0, "vpput_raw": "0"}},
+        {"event_type": "MarketCreated", "payload": {"market_id": "mkt_terminal", "capsule_id": "wc_terminal"}},
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "name": "official_terminal",
+            "payload": {"capsule_id": "wc_terminal", "evidence_id": "ev_terminal", "result": "PASS"},
+        },
+        {
+            "event_type": "CandidateAccepted",
+            "name": "accept_terminal",
+            "payload": {
+                "candidate_id": "cand_terminal",
+                "capsule_id": "wc_terminal",
+                "official_evaluator_evidence_id": "ev_terminal",
+            },
+        },
+        {
+            "event_type": "MarketSettled",
+            "name": "market_terminal",
+            "payload": lambda ctx: {
+                "market_id": "mkt_terminal",
+                "result": "YES",
+                "settlement_basis_event_id": ctx["event_ids"]["official_terminal"],
+                "terminal_event_id": ctx["event_ids"]["accept_terminal"],
+                "is_terminal": True,
+                "price_not_truth_ack": True,
+            },
+        },
+        {
+            "event_type": "RewardDistributed",
+            "payload": lambda ctx: {
+                "market_id": "mkt_terminal",
+                "agent_id": "worker:sha256:" + "1" * 64,
+                "reward_coin": "1",
+                "slash_coin": "0",
+                "reason": "PREDICATE_SETTLEMENT",
+                "settlement_event_id": ctx["event_ids"]["market_terminal"],
+            },
+        },
+        {
+            "event_type": "PPUTAccounted",
+            "payload": lambda ctx: {
+                "capsule_id": "wc_terminal",
+                "accounting_stage": "final",
+                "progress": 1,
+                "vpput_raw": "0.02",
+                "basis_event_id": ctx["event_ids"]["official_terminal"],
+                "terminal_event_id": ctx["event_ids"]["accept_terminal"],
+            },
+        },
+    ]
+    bundle, _ = make_bundle_with_context(tmp_path, specs)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work")
+    run_report = report["runs"][0]
+
+    assert run_report["checks"]["economic_timing"] == "PASS"
+    assert run_report["checks"]["market_accounting_correctness"] == "PASS"
+    assert run_report["checks"]["vpput_accounting"] == "PASS"
+    assert run_report["checks"]["accepted_final_progress_one"] == "PASS"
+    assert report["status_summary"]["economic_timing"] == "PASS"
