@@ -41,6 +41,9 @@ assert report["status"] == "PASS"
 assert plan["status"] == "READY_FOR_STAGE12_A03"
 assert plan["a02_does_not_run_workers"] is True
 assert plan["expected_bundle_count_after_a03"] == 20
+assert plan["stage12_a03_requires_runner_atom"] is True
+assert "--loop-until-pass" not in plan["stage12_a03_command_template"]
+assert "--loop-until-pass-fixture" not in plan["stage12_a03_command_template"]
 assert len(tasks) == 20
 assert [row["instance_id"] for row in tasks] == plan["instance_ids"]
 for forbidden in ("micro_tape.bundle", "micro.git", "substrate_coverage.json"):

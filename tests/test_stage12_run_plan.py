@@ -71,6 +71,13 @@ def test_stage12_run_plan_writes_tasks_and_runner_plan(tmp_path):
     assert plan["status"] == "READY_FOR_STAGE12_A03"
     assert plan["a02_does_not_run_workers"] is True
     assert plan["expected_bundle_count_after_a03"] == 20
+    assert plan["stage12_a03_requires_runner_atom"] is True
+    command = plan["stage12_a03_command_template"]
+    assert "--loop-until-pass" not in command
+    assert "--loop-until-pass-fixture" not in command
+    assert "--tasks-jsonl" in command
+    assert "--authorization-mode" in command
+    assert "required" in command
     assert not list(root.rglob("micro_tape.bundle"))
 
 

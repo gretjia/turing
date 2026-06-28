@@ -35,7 +35,6 @@
   "stage12_a03_command_template": [
     "python3",
     "tools/bench/run_mini_swe_bench_substrate_smoke.py",
-    "--loop-until-pass",
     "--authorization-mode",
     "required",
     "--tasks-jsonl",
@@ -43,8 +42,16 @@
     "--out-dir",
     "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628",
     "--limit",
-    "20"
+    "20",
+    "--worker-mode",
+    "grok",
+    "--model",
+    "grok-build",
+    "--max-turns",
+    "50"
   ],
+  "stage12_a03_requires_runner_atom": true,
+  "stage12_a03_runner_gap": "The current repository runner accepts the frozen tasks-jsonl and authorization-required substrate command shape. Stage12-A03 must implement or verify real loop-until-PASS release semantics before any Stage12 release claim.",
   "status": "READY_FOR_STAGE12_A03",
   "strict_audit_command_template": [
     "python3",

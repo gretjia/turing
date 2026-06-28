@@ -84,7 +84,6 @@ def stage12_a03_command(root: Path) -> list[str]:
     return [
         "python3",
         "tools/bench/run_mini_swe_bench_substrate_smoke.py",
-        "--loop-until-pass",
         "--authorization-mode",
         "required",
         "--tasks-jsonl",
@@ -93,6 +92,12 @@ def stage12_a03_command(root: Path) -> list[str]:
         relative_to_repo(root),
         "--limit",
         "20",
+        "--worker-mode",
+        "grok",
+        "--model",
+        "grok-build",
+        "--max-turns",
+        "50",
     ]
 
 
@@ -177,6 +182,12 @@ def prepare_run_plan(root: Path | str, *, source_jsonl: Path | None = None) -> d
         "a02_does_not_run_workers": True,
         "no_bundles_generated_by_a02": True,
         "expected_bundle_count_after_a03": 20,
+        "stage12_a03_requires_runner_atom": True,
+        "stage12_a03_runner_gap": (
+            "The current repository runner accepts the frozen tasks-jsonl and authorization-required "
+            "substrate command shape. Stage12-A03 must implement or verify real loop-until-PASS "
+            "release semantics before any Stage12 release claim."
+        ),
         "old_stage_evidence_immutable": task["old_stage_evidence_immutable"],
         "stage12_a03_command_template": stage12_a03_command(root),
         "strict_audit_command_template": strict_audit_command(root),
