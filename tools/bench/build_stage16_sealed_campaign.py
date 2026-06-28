@@ -131,6 +131,7 @@ def build_stage16_campaign(source_root: Path, out_dir: Path) -> dict[str, Any]:
         ]
     )
     auditor = load_stage16_auditor()
+    write_json(out_dir / "CLAIM_BOUNDARY.json", auditor.STAGE16_CLAIM_BOUNDARY)
     report = auditor.audit_stage16(out_dir)
     auditor.write_stage16_reports(out_dir, report)
     secret = scoped_secret_scan(out_dir)
@@ -148,9 +149,17 @@ def write_docs(out_dir: Path, report: dict[str, Any]) -> None:
     strict = "evidence/bench/swe_bench_stage16_full_sealed_20260628/micro_tape_audit_strict/micro_tape_decision_dag_audit.json"
     readme = f"""# Stage16 Sealed Campaign Replay Packet
 
+Artifact kind: `STAGE16_SHARD_SEALED_REPLAY`
+
 Scope: sealed replay campaign over the frozen Stage12 20-task Verified Mini shard.
 
 This is not a full SWE-bench score claim. `stage16_full_pass_claim_allowed` is `{str(report['stage16_full_pass_claim_allowed']).lower()}` because `unsolved_count` is `{report['unsolved_count']}`.
+
+Dataset boundary:
+- not_full_swe_bench_dataset: true
+- full_swe_bench_campaign_not_run: true
+- full_score_claim_allowed: false
+- next_required_stage: Stage16R
 
 Results:
 - run_count: {report['run_count']}

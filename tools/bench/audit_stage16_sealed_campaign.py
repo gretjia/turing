@@ -38,6 +38,15 @@ STRICT_REQUIRED_PASS = [
     "constitutional_protocol_audit",
 ]
 
+STAGE16_CLAIM_BOUNDARY = {
+    "stage16_artifact_kind": "STAGE16_SHARD_SEALED_REPLAY",
+    "dataset_scope": "frozen_stage12_20_task_verified_mini_shard",
+    "not_full_swe_bench_dataset": True,
+    "full_score_claim_allowed": False,
+    "full_swe_bench_campaign_not_run": True,
+    "next_required_stage": "Stage16R",
+}
+
 
 def load_micro_tape_auditor() -> Any:
     spec = importlib.util.spec_from_file_location("audit_micro_tape_decision_dag", MICRO_TAPE_AUDITOR)
@@ -92,6 +101,25 @@ def cost_total(events: list[dict[str, Any]]) -> int:
     return total
 
 
+def cost_sources(events: list[dict[str, Any]]) -> dict[str, Any]:
+    kinds: set[str] = set()
+    provider_reported = False
+    for event in events:
+        if event.get("event_type") != "CostEvent":
+            continue
+        event_payload = payload(event)
+        kind = event_payload.get("cost_source_kind")
+        if isinstance(kind, str):
+            kinds.add(kind)
+        if event_payload.get("provider_reported") is True:
+            provider_reported = True
+    return {
+        "cost_source_kind": sorted(kinds) or ["unspecified"],
+        "provider_reported": provider_reported,
+        "vpput_cost_completeness": "provider_reported" if provider_reported else "tape_conserved_estimated_tokens",
+    }
+
+
 def sha256_file(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -134,7 +162,9 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
     ]
     accepts = [event for event in events if event.get("event_type") == "CandidateAccepted"]
     final_pputs = final_pput_events(events)
+    final_pput_ids = [event["_event_id"] for event in final_pputs]
     total_cost = cost_total(events)
+    cost_source = cost_sources(events)
     solved = bool(accepts)
     terminal_accept = accepts[-1] if accepts else None
     terminal_event = terminal_accept
@@ -191,6 +221,8 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
 
     market_ok = True
     terminal_settlements: set[str] = set()
+    market_settled_event_ids: list[str] = []
+    reward_event_ids: list[str] = []
     for event in events:
         if event.get("event_type") != "MarketSettled":
             continue
@@ -208,9 +240,11 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
             problems.append("MarketSettled must occur after terminal accept/failure")
             market_ok = False
         terminal_settlements.add(event["_event_id"])
+        market_settled_event_ids.append(event["_event_id"])
     for event in events:
         if event.get("event_type") != "RewardDistributed":
             continue
+        reward_event_ids.append(event["_event_id"])
         settlement_id = payload(event).get("settlement_event_id")
         settlement = by_id.get(settlement_id)
         if settlement_id not in terminal_settlements or settlement is None:
@@ -220,7 +254,10 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
             problems.append("RewardDistributed must occur after terminal MarketSettled")
             market_ok = False
 
-    failure_memory_ok = any(event.get("event_type") == "FailureCertificate" for event in events)
+    failure_certificate_event_ids = [
+        event["_event_id"] for event in events if event.get("event_type") == "FailureCertificate"
+    ]
+    failure_memory_ok = bool(failure_certificate_event_ids)
     if not failure_memory_ok:
         problems.append("FailureCertificate lineage required")
 
@@ -235,7 +272,14 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
         "candidate_accepted_event_id": event_id(terminal_accept),
         "terminal_event_id": event_id(terminal_event),
         "total_cost_tokens": total_cost,
+        "cost_source_kind": cost_source["cost_source_kind"],
+        "provider_reported_cost": cost_source["provider_reported"],
+        "vpput_cost_completeness": cost_source["vpput_cost_completeness"],
         "final_pput_count": len(final_pputs),
+        "final_pput_event_ids": final_pput_ids,
+        "market_settled_event_ids": market_settled_event_ids,
+        "reward_event_ids": reward_event_ids,
+        "failure_certificate_event_ids": failure_certificate_event_ids,
         "market_terminal_ordering": market_ok,
         "failure_memory_lineage": failure_memory_ok,
         "no_hitl": not any(problem.endswith("must be 0") or "fallback_to_auto" in problem for problem in problems),
@@ -272,6 +316,14 @@ def audit_stage16(root: Path) -> dict[str, Any]:
     if not isinstance(strict_summary, dict):
         strict_summary = {}
     problems = strict_problems(strict_summary)
+    claim_path = root / "CLAIM_BOUNDARY.json"
+    if claim_path.exists():
+        claim = load_json(claim_path)
+        for key, value in STAGE16_CLAIM_BOUNDARY.items():
+            if claim.get(key) != value:
+                problems.append(f"CLAIM_BOUNDARY {key} must be {value!r}")
+    else:
+        problems.append("CLAIM_BOUNDARY.json missing")
 
     runs = coverage.get("turingos_arm_runs")
     if not isinstance(runs, list):
@@ -321,6 +373,7 @@ def audit_stage16(root: Path) -> dict[str, Any]:
 
 
 def write_stage16_reports(root: Path, report: dict[str, Any]) -> None:
+    write_json(root / "CLAIM_BOUNDARY.json", STAGE16_CLAIM_BOUNDARY)
     write_json(root / "stage16_aggregate_report.json", report)
     write_json(
         root / "stage16_vpput_report.json",
@@ -335,6 +388,10 @@ def write_stage16_reports(root: Path, report: dict[str, Any]) -> None:
                     "solved": run["solved"],
                     "total_cost_tokens": run["total_cost_tokens"],
                     "progress": 1 if run["solved"] else 0,
+                    "cost_source_kind": run["cost_source_kind"],
+                    "provider_reported_cost": run["provider_reported_cost"],
+                    "vpput_cost_completeness": run["vpput_cost_completeness"],
+                    "final_pput_event_ids": run["final_pput_event_ids"],
                 }
                 for run in report["runs"]
             ],
@@ -355,6 +412,16 @@ def write_stage16_reports(root: Path, report: dict[str, Any]) -> None:
             "schema_id": "Stage16MarketAudit.v1",
             "status": "PASS" if all(run["market_terminal_ordering"] for run in report["runs"]) else "FAIL",
             "terminal_ordering_checked": True,
+            "per_instance": [
+                {
+                    "instance_id": run["instance_id"],
+                    "terminal_event_id": run["terminal_event_id"],
+                    "market_settled_event_ids": run["market_settled_event_ids"],
+                    "reward_event_ids": run["reward_event_ids"],
+                    "final_pput_event_ids": run["final_pput_event_ids"],
+                }
+                for run in report["runs"]
+            ],
         },
     )
     write_json(
@@ -363,6 +430,14 @@ def write_stage16_reports(root: Path, report: dict[str, Any]) -> None:
             "schema_id": "Stage16FailureMemoryAudit.v1",
             "status": "PASS" if all(run["failure_memory_lineage"] for run in report["runs"]) else "FAIL",
             "lineage_checked_from_bundles": True,
+            "per_instance": [
+                {
+                    "instance_id": run["instance_id"],
+                    "terminal_event_id": run["terminal_event_id"],
+                    "failure_certificate_event_ids": run["failure_certificate_event_ids"],
+                }
+                for run in report["runs"]
+            ],
         },
     )
     write_json(
@@ -374,6 +449,14 @@ def write_stage16_reports(root: Path, report: dict[str, Any]) -> None:
             "manual_patch_count": 0,
             "manual_approval_count": 0,
             "fallback_to_auto_authorization": False,
+            "per_instance": [
+                {
+                    "instance_id": run["instance_id"],
+                    "no_hitl": run["no_hitl"],
+                    "terminal_event_id": run["terminal_event_id"],
+                }
+                for run in report["runs"]
+            ],
         },
     )
 

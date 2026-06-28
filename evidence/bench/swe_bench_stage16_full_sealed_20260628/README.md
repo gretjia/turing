@@ -1,8 +1,16 @@
 # Stage16 Sealed Campaign Replay Packet
 
+Artifact kind: `STAGE16_SHARD_SEALED_REPLAY`
+
 Scope: sealed replay campaign over the frozen Stage12 20-task Verified Mini shard.
 
 This is not a full SWE-bench score claim. `stage16_full_pass_claim_allowed` is `false` because `unsolved_count` is `7`.
+
+Dataset boundary:
+- not_full_swe_bench_dataset: true
+- full_swe_bench_campaign_not_run: true
+- full_score_claim_allowed: false
+- next_required_stage: Stage16R
 
 Results:
 - run_count: 20

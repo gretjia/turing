@@ -37,6 +37,15 @@ def sha256_text(text: str) -> str:
     return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def redacted_stream_evidence(text: str) -> dict[str, Any]:
+    data = text.encode("utf-8")
+    return {
+        "sha256": "sha256:" + hashlib.sha256(data).hexdigest(),
+        "byte_length": len(data),
+        "redacted": True,
+    }
+
+
 def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for key, value in pairs:
@@ -209,8 +218,9 @@ def validate_git_topology(git_dir: Path, events: list[dict[str, Any]], actual_re
     evidence: dict[str, Any] = {}
 
     fsck = run_git_maybe(["fsck", "--strict"], git_dir=git_dir)
-    evidence["git_fsck_strict_stdout"] = fsck.stdout.strip()
-    evidence["git_fsck_strict_stderr"] = fsck.stderr.strip()
+    evidence["git_fsck_strict_returncode"] = fsck.returncode
+    evidence["git_fsck_strict_stdout_digest"] = redacted_stream_evidence(fsck.stdout.strip())
+    evidence["git_fsck_strict_stderr_digest"] = redacted_stream_evidence(fsck.stderr.strip())
     if fsck.returncode != 0:
         problems.append("git fsck --strict failed")
 

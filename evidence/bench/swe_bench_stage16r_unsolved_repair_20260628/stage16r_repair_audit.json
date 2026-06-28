@@ -1,0 +1,82 @@
+{
+  "full_swe_bench_score_claim_allowed": false,
+  "problems": [],
+  "remaining_unsolved_count": 0,
+  "repaired_count": 7,
+  "runs": [
+    {
+      "candidate_accepted_event_id": "mu:5ae73113ab3a0f6ddd99b54aa40c2b1ab8c1c035f50ebbc8d262500ccbc273e2",
+      "event_count": 21,
+      "instance_id": "django__django-11790",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:c331577034eac11fb3bc3ed5cb650c83b3ee728dc592fddd82327ffcba9b8bad",
+      "status": "PASS",
+      "total_cost_tokens": 655
+    },
+    {
+      "candidate_accepted_event_id": "mu:71f0857710eb8222270f4a2ea80b3c356b77e343cbe54a4d3e731f23c2fe9505",
+      "event_count": 21,
+      "instance_id": "django__django-11815",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:94a743bd033e682714df7c6357f62ad3ba75269c9d572f8a4f6b42653d8406ef",
+      "status": "PASS",
+      "total_cost_tokens": 744
+    },
+    {
+      "candidate_accepted_event_id": "mu:e1322ab2e0d017c16891715e6c64fcf8b623b15d6fa6a324e73ef424d4c846ba",
+      "event_count": 21,
+      "instance_id": "django__django-11964",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:a30c50d131d1cd37412e937ded32cabe864068640ca17d4a831a3612cc283b6e",
+      "status": "PASS",
+      "total_cost_tokens": 654
+    },
+    {
+      "candidate_accepted_event_id": "mu:a71e8370f0bb9a31583e10352bbbcab1eb9772445a9f1df74bfda7f8704fe895",
+      "event_count": 21,
+      "instance_id": "django__django-12209",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:5d45cd71482731c3f683e563ab341ab13e75a44cbb33ae50389013c7af803c44",
+      "status": "PASS",
+      "total_cost_tokens": 694
+    },
+    {
+      "candidate_accepted_event_id": "mu:5764dd3d2b0042b032ce8b5f430ae1505fd2d4d4f37e73025ba7ec010abf0eb3",
+      "event_count": 21,
+      "instance_id": "django__django-12273",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:cce66e152ccd5b1581e8030f0b55a1fe3a4d7696674e7b30a2f87f7a5d4231d5",
+      "status": "PASS",
+      "total_cost_tokens": 762
+    },
+    {
+      "candidate_accepted_event_id": "mu:e228c4f9eb836012b7ca1e1a985a248ef7f01b1111a40ca5baa2495006eeb050",
+      "event_count": 21,
+      "instance_id": "django__django-12308",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:8f3156d25e09edff91567a8656ab8682175b707468225e1820554197d8c7b6f6",
+      "status": "PASS",
+      "total_cost_tokens": 762
+    },
+    {
+      "candidate_accepted_event_id": "mu:38a7975df9fd6943e9c2ae4efd06cf7ae84919d52d74537289bad30b907cbff9",
+      "event_count": 21,
+      "instance_id": "django__django-12325",
+      "problems": [],
+      "source_stage16_terminal_event_id": "mu:a678cb15b14f646aa1ce6640fe2a890e1107864a0a65dd0db50a49462040daa0",
+      "status": "PASS",
+      "total_cost_tokens": 848
+    }
+  ],
+  "schema_id": "Stage16RRepairAudit.v1",
+  "source_unsolved_count": 7,
+  "status": "PASS",
+  "twenty_task_shard_after_repair": {
+    "newly_repaired_count": 7,
+    "previous_solved_count": 13,
+    "run_count": 20,
+    "total_solved_count": 20,
+    "total_unsolved_count": 0,
+    "twenty_task_shard_full_pass_claim_allowed": true
+  }
+}
