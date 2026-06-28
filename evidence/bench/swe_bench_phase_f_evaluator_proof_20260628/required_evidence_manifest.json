@@ -1,0 +1,805 @@
+{
+  "required_evidence": [
+    {
+      "artifact_path": "patch_artifacts/django__django-11790/candidate.patch",
+      "candidate_accepted_event_id": "mu:5ae73113ab3a0f6ddd99b54aa40c2b1ab8c1c035f50ebbc8d262500ccbc273e2",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11790",
+      "official_evidence_event_id": "mu:a8e02e90dd557d6251f4a178cf48dc372d2faf1221c3ad722c1ad0bf54cc8093",
+      "required": true,
+      "sha256": "sha256:a482f36962549675dfff4b77e3e6426c31b4356d2e58fb62674e5c3525fe577c",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11790/official_test.patch",
+      "candidate_accepted_event_id": "mu:5ae73113ab3a0f6ddd99b54aa40c2b1ab8c1c035f50ebbc8d262500ccbc273e2",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11790",
+      "official_evidence_event_id": "mu:a8e02e90dd557d6251f4a178cf48dc372d2faf1221c3ad722c1ad0bf54cc8093",
+      "required": true,
+      "sha256": "sha256:6c1e7dc8ec63f6b3bc361152a26a45588bb110c700d53c0855692242b1808e9f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11790/stdout.txt",
+      "candidate_accepted_event_id": "mu:5ae73113ab3a0f6ddd99b54aa40c2b1ab8c1c035f50ebbc8d262500ccbc273e2",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11790",
+      "official_evidence_event_id": "mu:a8e02e90dd557d6251f4a178cf48dc372d2faf1221c3ad722c1ad0bf54cc8093",
+      "required": true,
+      "sha256": "sha256:1a583f77912949fa3de1df8e29a1b40d31ca462eb419c3ca0ca58dea6bc03541",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11790/stderr.txt",
+      "candidate_accepted_event_id": "mu:5ae73113ab3a0f6ddd99b54aa40c2b1ab8c1c035f50ebbc8d262500ccbc273e2",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11790",
+      "official_evidence_event_id": "mu:a8e02e90dd557d6251f4a178cf48dc372d2faf1221c3ad722c1ad0bf54cc8093",
+      "required": true,
+      "sha256": "sha256:18fd06932dd60c52602ae622dee8c442790734888675531255ad77b496a494cf",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11815/candidate.patch",
+      "candidate_accepted_event_id": "mu:71f0857710eb8222270f4a2ea80b3c356b77e343cbe54a4d3e731f23c2fe9505",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11815",
+      "official_evidence_event_id": "mu:320ec1a79a2c440b6244c25b38f526aa2d821ea1d6faaccd1ff36148645892d6",
+      "required": true,
+      "sha256": "sha256:f9e1cc05ad05af43d54475170741d5f4076a316cb49a0bd60e27f88267678d64",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11815/official_test.patch",
+      "candidate_accepted_event_id": "mu:71f0857710eb8222270f4a2ea80b3c356b77e343cbe54a4d3e731f23c2fe9505",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11815",
+      "official_evidence_event_id": "mu:320ec1a79a2c440b6244c25b38f526aa2d821ea1d6faaccd1ff36148645892d6",
+      "required": true,
+      "sha256": "sha256:cd41d98183eaf3cd6baeb3b30065d8e82d625843cc1de2d0282e7917f615ee7d",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11815/stdout.txt",
+      "candidate_accepted_event_id": "mu:71f0857710eb8222270f4a2ea80b3c356b77e343cbe54a4d3e731f23c2fe9505",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11815",
+      "official_evidence_event_id": "mu:320ec1a79a2c440b6244c25b38f526aa2d821ea1d6faaccd1ff36148645892d6",
+      "required": true,
+      "sha256": "sha256:f5da528fa16c71206076cbb33afd86f4f96b4fe93e1698d92fa53ddbed991771",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11815/stderr.txt",
+      "candidate_accepted_event_id": "mu:71f0857710eb8222270f4a2ea80b3c356b77e343cbe54a4d3e731f23c2fe9505",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11815",
+      "official_evidence_event_id": "mu:320ec1a79a2c440b6244c25b38f526aa2d821ea1d6faaccd1ff36148645892d6",
+      "required": true,
+      "sha256": "sha256:9d22a19d6b42734ac468bbb6341fbf0eb87640b0ce947ce630e7a528dc2b0959",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11848/candidate.patch",
+      "candidate_accepted_event_id": "mu:abe46a9222b777eeaafc8006fee4a5bfd68c9e78d0a2902eab1809fd094e16b4",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11848",
+      "official_evidence_event_id": "mu:7b57f886a9803342311f73e307268fb5ffa3171bbe460667cd2bdc50663ae099",
+      "required": true,
+      "sha256": "sha256:f04c2b7fcda69294ae9b878e2d7a0f24a42e6940d1c1183a23da1aa97c2e78e1",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11848/official_test.patch",
+      "candidate_accepted_event_id": "mu:abe46a9222b777eeaafc8006fee4a5bfd68c9e78d0a2902eab1809fd094e16b4",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11848",
+      "official_evidence_event_id": "mu:7b57f886a9803342311f73e307268fb5ffa3171bbe460667cd2bdc50663ae099",
+      "required": true,
+      "sha256": "sha256:3dbca91b189998fea502160f1320e09e559afe8877753a7b746b1d3513905bcd",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11848/stdout.txt",
+      "candidate_accepted_event_id": "mu:abe46a9222b777eeaafc8006fee4a5bfd68c9e78d0a2902eab1809fd094e16b4",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11848",
+      "official_evidence_event_id": "mu:7b57f886a9803342311f73e307268fb5ffa3171bbe460667cd2bdc50663ae099",
+      "required": true,
+      "sha256": "sha256:7d6f5392813714b3c7c10d50af8dcfc3c12b1d695297e70132731c1f9bc9b85d",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11848/stderr.txt",
+      "candidate_accepted_event_id": "mu:abe46a9222b777eeaafc8006fee4a5bfd68c9e78d0a2902eab1809fd094e16b4",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11848",
+      "official_evidence_event_id": "mu:7b57f886a9803342311f73e307268fb5ffa3171bbe460667cd2bdc50663ae099",
+      "required": true,
+      "sha256": "sha256:0d3a035e11298ac55369cc0d856e7a3a91768e8924da00e90ed8a598b564388d",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11880/candidate.patch",
+      "candidate_accepted_event_id": "mu:d55d867eed2e49aa857b17e28ed317f8caa143be6cd173e97c1f09ed712c27e5",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11880",
+      "official_evidence_event_id": "mu:e70ec278d2dd98f0d18847c6d3b0826432d863e95b54c6faa0efaac11228996c",
+      "required": true,
+      "sha256": "sha256:ca05eec3eb386b0fc23a410e444c26143e55f5ed671e0b3e9621dcf4b6440df5",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11880/official_test.patch",
+      "candidate_accepted_event_id": "mu:d55d867eed2e49aa857b17e28ed317f8caa143be6cd173e97c1f09ed712c27e5",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11880",
+      "official_evidence_event_id": "mu:e70ec278d2dd98f0d18847c6d3b0826432d863e95b54c6faa0efaac11228996c",
+      "required": true,
+      "sha256": "sha256:927d6c80fea772e54a8da05abef6645e3d0f8187fec708a8ba66b59e73efd710",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11880/stdout.txt",
+      "candidate_accepted_event_id": "mu:d55d867eed2e49aa857b17e28ed317f8caa143be6cd173e97c1f09ed712c27e5",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11880",
+      "official_evidence_event_id": "mu:e70ec278d2dd98f0d18847c6d3b0826432d863e95b54c6faa0efaac11228996c",
+      "required": true,
+      "sha256": "sha256:51b98163dafc1220eeb9254815a5624e889756616779bc1d451e0c5ca116af11",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11880/stderr.txt",
+      "candidate_accepted_event_id": "mu:d55d867eed2e49aa857b17e28ed317f8caa143be6cd173e97c1f09ed712c27e5",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11880",
+      "official_evidence_event_id": "mu:e70ec278d2dd98f0d18847c6d3b0826432d863e95b54c6faa0efaac11228996c",
+      "required": true,
+      "sha256": "sha256:288f5428df702ce912a4fa0242315baf057d8ba875eb6b523029aa207d4f1dc8",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11885/candidate.patch",
+      "candidate_accepted_event_id": "mu:8890f7021de81a2b8799027d5f4e7bc14fb8eea0ab585776f349736d2166eff1",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11885",
+      "official_evidence_event_id": "mu:de7184f261658c0a83119dfc1c9d38d8bc41c7e5bac268f12dab0e4e027990fc",
+      "required": true,
+      "sha256": "sha256:714cdc13aff215216d6eb3ff8a2550420b36c4efbd395158cfa59de875566bd5",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11885/official_test.patch",
+      "candidate_accepted_event_id": "mu:8890f7021de81a2b8799027d5f4e7bc14fb8eea0ab585776f349736d2166eff1",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11885",
+      "official_evidence_event_id": "mu:de7184f261658c0a83119dfc1c9d38d8bc41c7e5bac268f12dab0e4e027990fc",
+      "required": true,
+      "sha256": "sha256:5f60c281419f91c9fc2500b83cf1c48b47a26673c5f5030039a99ea6dd9e9a26",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11885/stdout.txt",
+      "candidate_accepted_event_id": "mu:8890f7021de81a2b8799027d5f4e7bc14fb8eea0ab585776f349736d2166eff1",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11885",
+      "official_evidence_event_id": "mu:de7184f261658c0a83119dfc1c9d38d8bc41c7e5bac268f12dab0e4e027990fc",
+      "required": true,
+      "sha256": "sha256:cafcd4595cc82d88be8a54a08962a3bc920214e749b2387acf82f0234e40b14e",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11885/stderr.txt",
+      "candidate_accepted_event_id": "mu:8890f7021de81a2b8799027d5f4e7bc14fb8eea0ab585776f349736d2166eff1",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11885",
+      "official_evidence_event_id": "mu:de7184f261658c0a83119dfc1c9d38d8bc41c7e5bac268f12dab0e4e027990fc",
+      "required": true,
+      "sha256": "sha256:970251761f9beb8991480de6fef9157bb25921eb1edd068f49f53ca59d2a1dfe",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11951/candidate.patch",
+      "candidate_accepted_event_id": "mu:3a02bce693e3d95ae81e19b05b79a2836699ad8dfa4ac5fd1a8f4e45da61ad73",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11951",
+      "official_evidence_event_id": "mu:34c27e5ba1f0eb0b84fe01e41e7720f4d8e22db8b684382518bbb16d913ae8ea",
+      "required": true,
+      "sha256": "sha256:3cc0b623a4393acf23f2426804f91ba7a471b940d928d93b072d6163d0cffd86",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11951/official_test.patch",
+      "candidate_accepted_event_id": "mu:3a02bce693e3d95ae81e19b05b79a2836699ad8dfa4ac5fd1a8f4e45da61ad73",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11951",
+      "official_evidence_event_id": "mu:34c27e5ba1f0eb0b84fe01e41e7720f4d8e22db8b684382518bbb16d913ae8ea",
+      "required": true,
+      "sha256": "sha256:bbcad4a96c52f370a99b02f9e260011c726c7a198b46882253f069b90cc9256b",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11951/stdout.txt",
+      "candidate_accepted_event_id": "mu:3a02bce693e3d95ae81e19b05b79a2836699ad8dfa4ac5fd1a8f4e45da61ad73",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11951",
+      "official_evidence_event_id": "mu:34c27e5ba1f0eb0b84fe01e41e7720f4d8e22db8b684382518bbb16d913ae8ea",
+      "required": true,
+      "sha256": "sha256:f9cc247bc8c41cb61955d8cde771e7c1daeaa9bcf788b47d3eadbf214cdef11d",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11951/stderr.txt",
+      "candidate_accepted_event_id": "mu:3a02bce693e3d95ae81e19b05b79a2836699ad8dfa4ac5fd1a8f4e45da61ad73",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11951",
+      "official_evidence_event_id": "mu:34c27e5ba1f0eb0b84fe01e41e7720f4d8e22db8b684382518bbb16d913ae8ea",
+      "required": true,
+      "sha256": "sha256:83f549146aca576d9017a1577c3481ef4b2b36e24ca4efd23eadf9e3d0df743b",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11964/candidate.patch",
+      "candidate_accepted_event_id": "mu:e1322ab2e0d017c16891715e6c64fcf8b623b15d6fa6a324e73ef424d4c846ba",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11964",
+      "official_evidence_event_id": "mu:67b0f6f82b958e18c87e1f26c51ee56bf4011aa79e4af780844ef4261aaa5396",
+      "required": true,
+      "sha256": "sha256:04ab09a86dd3daa1d07b10999c560b49f877ff4eb4a92ac39b1748ace9ddf3aa",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11964/official_test.patch",
+      "candidate_accepted_event_id": "mu:e1322ab2e0d017c16891715e6c64fcf8b623b15d6fa6a324e73ef424d4c846ba",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11964",
+      "official_evidence_event_id": "mu:67b0f6f82b958e18c87e1f26c51ee56bf4011aa79e4af780844ef4261aaa5396",
+      "required": true,
+      "sha256": "sha256:fe210209214f17ca69bcf46a804e410a49946f73e2a9840b0c74ae4ccfb26022",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11964/stdout.txt",
+      "candidate_accepted_event_id": "mu:e1322ab2e0d017c16891715e6c64fcf8b623b15d6fa6a324e73ef424d4c846ba",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11964",
+      "official_evidence_event_id": "mu:67b0f6f82b958e18c87e1f26c51ee56bf4011aa79e4af780844ef4261aaa5396",
+      "required": true,
+      "sha256": "sha256:d68aec1f50caf8f48064aaa3240f6200d50e3620c27ebdb7b7d57b37baab13f2",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11964/stderr.txt",
+      "candidate_accepted_event_id": "mu:e1322ab2e0d017c16891715e6c64fcf8b623b15d6fa6a324e73ef424d4c846ba",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11964",
+      "official_evidence_event_id": "mu:67b0f6f82b958e18c87e1f26c51ee56bf4011aa79e4af780844ef4261aaa5396",
+      "required": true,
+      "sha256": "sha256:f71f07caa020620beb91175148550d4c262b7dd268934c90c57fd1a6845156b9",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11999/candidate.patch",
+      "candidate_accepted_event_id": "mu:14cae4c96140cd705c1999da3ac01e236d3b05d2c0e4e41cb944a4eac190ba60",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-11999",
+      "official_evidence_event_id": "mu:855220b0b4246c81df0459cb01ce9bfc8e10f17674a1cafa1f77080ff113c8d0",
+      "required": true,
+      "sha256": "sha256:b0ffc6f10a2a3fe12936bcc944d8943c617644e061786ea353397189bf3fcff2",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-11999/official_test.patch",
+      "candidate_accepted_event_id": "mu:14cae4c96140cd705c1999da3ac01e236d3b05d2c0e4e41cb944a4eac190ba60",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-11999",
+      "official_evidence_event_id": "mu:855220b0b4246c81df0459cb01ce9bfc8e10f17674a1cafa1f77080ff113c8d0",
+      "required": true,
+      "sha256": "sha256:35c1b2d9a343fd1ccbb8e49f7374b9f5264dad8ba00676758fda955508c20279",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11999/stdout.txt",
+      "candidate_accepted_event_id": "mu:14cae4c96140cd705c1999da3ac01e236d3b05d2c0e4e41cb944a4eac190ba60",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-11999",
+      "official_evidence_event_id": "mu:855220b0b4246c81df0459cb01ce9bfc8e10f17674a1cafa1f77080ff113c8d0",
+      "required": true,
+      "sha256": "sha256:c1f9da2c43c09f2ad9fd661590a1324ac7f617c6c7f6f7843340222b8cf8b442",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-11999/stderr.txt",
+      "candidate_accepted_event_id": "mu:14cae4c96140cd705c1999da3ac01e236d3b05d2c0e4e41cb944a4eac190ba60",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-11999",
+      "official_evidence_event_id": "mu:855220b0b4246c81df0459cb01ce9bfc8e10f17674a1cafa1f77080ff113c8d0",
+      "required": true,
+      "sha256": "sha256:bae13c8e642aa81bfa5337dbe9012b76ad7ead07bd8755829608f6d202fdc364",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12039/candidate.patch",
+      "candidate_accepted_event_id": "mu:80cba4b9f877bfeec46d368d08920a8b31ef890043f46296e856bbe64a91a74d",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12039",
+      "official_evidence_event_id": "mu:c3d0190c55ad078f4804f2c57a6c434982afee5258adc57c4e942a8c5e499a15",
+      "required": true,
+      "sha256": "sha256:290cfe52be3ccab9c134d3e8dc0385dbc7106f424d3cecfec709a64d2579b0e2",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12039/official_test.patch",
+      "candidate_accepted_event_id": "mu:80cba4b9f877bfeec46d368d08920a8b31ef890043f46296e856bbe64a91a74d",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12039",
+      "official_evidence_event_id": "mu:c3d0190c55ad078f4804f2c57a6c434982afee5258adc57c4e942a8c5e499a15",
+      "required": true,
+      "sha256": "sha256:d3ca1167e75c713b109de4d1dcfe46467993d1a7046c8edf09d4ff83c4306c78",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12039/stdout.txt",
+      "candidate_accepted_event_id": "mu:80cba4b9f877bfeec46d368d08920a8b31ef890043f46296e856bbe64a91a74d",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12039",
+      "official_evidence_event_id": "mu:c3d0190c55ad078f4804f2c57a6c434982afee5258adc57c4e942a8c5e499a15",
+      "required": true,
+      "sha256": "sha256:92ab2bdc632d465a648a5987a3a5e7af1194e7f38e6d4430c91cd22c9d70e377",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12039/stderr.txt",
+      "candidate_accepted_event_id": "mu:80cba4b9f877bfeec46d368d08920a8b31ef890043f46296e856bbe64a91a74d",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12039",
+      "official_evidence_event_id": "mu:c3d0190c55ad078f4804f2c57a6c434982afee5258adc57c4e942a8c5e499a15",
+      "required": true,
+      "sha256": "sha256:3ec5aa05fd996f66b283eff5d3ddb4d840236067e2171a9be48133e0587e9053",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12050/candidate.patch",
+      "candidate_accepted_event_id": "mu:af0e4c13b860468df5dd2eda79066e1909e0f788646b2f22a209d475386596c2",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12050",
+      "official_evidence_event_id": "mu:e2848383adf7b1e50c888a567d36f4706c9cf67e3c1df0adc1d6cbef8d2481a4",
+      "required": true,
+      "sha256": "sha256:08af6e22fa66b28c47c3cd61192637cdcf2fca544718dc4d48f8f01fb469e63f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12050/official_test.patch",
+      "candidate_accepted_event_id": "mu:af0e4c13b860468df5dd2eda79066e1909e0f788646b2f22a209d475386596c2",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12050",
+      "official_evidence_event_id": "mu:e2848383adf7b1e50c888a567d36f4706c9cf67e3c1df0adc1d6cbef8d2481a4",
+      "required": true,
+      "sha256": "sha256:36cd158c41c8ebae20e7efc4fb92c9cd36dcad4e4f3c5a973cbf3402b667e3ed",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12050/stdout.txt",
+      "candidate_accepted_event_id": "mu:af0e4c13b860468df5dd2eda79066e1909e0f788646b2f22a209d475386596c2",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12050",
+      "official_evidence_event_id": "mu:e2848383adf7b1e50c888a567d36f4706c9cf67e3c1df0adc1d6cbef8d2481a4",
+      "required": true,
+      "sha256": "sha256:f87c9ee0f02efcc08c2506204f85b2f94250f86f7bae46b5d07a346f68cdb85a",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12050/stderr.txt",
+      "candidate_accepted_event_id": "mu:af0e4c13b860468df5dd2eda79066e1909e0f788646b2f22a209d475386596c2",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12050",
+      "official_evidence_event_id": "mu:e2848383adf7b1e50c888a567d36f4706c9cf67e3c1df0adc1d6cbef8d2481a4",
+      "required": true,
+      "sha256": "sha256:dc39e9c84b074e4672bfa8c9046248af544d56277c22f916daaad8635c2913f1",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12143/candidate.patch",
+      "candidate_accepted_event_id": "mu:63dddedca991ff900cc7bb4de83f5c0b2c593dacd7e7bfde07387472dc1ff682",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12143",
+      "official_evidence_event_id": "mu:92d378c9fc43cfb303a340d683fc77525e1ec59a456880754fcca4fffba210b8",
+      "required": true,
+      "sha256": "sha256:132af8d75e205ae5c96c051b2742ccff32effacca2144d04f1ada26456c162c1",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12143/official_test.patch",
+      "candidate_accepted_event_id": "mu:63dddedca991ff900cc7bb4de83f5c0b2c593dacd7e7bfde07387472dc1ff682",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12143",
+      "official_evidence_event_id": "mu:92d378c9fc43cfb303a340d683fc77525e1ec59a456880754fcca4fffba210b8",
+      "required": true,
+      "sha256": "sha256:b3fc27d2d82cabb21053f0abb76d8dc1284c3fc2f82284be059f316dd2c86101",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12143/stdout.txt",
+      "candidate_accepted_event_id": "mu:63dddedca991ff900cc7bb4de83f5c0b2c593dacd7e7bfde07387472dc1ff682",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12143",
+      "official_evidence_event_id": "mu:92d378c9fc43cfb303a340d683fc77525e1ec59a456880754fcca4fffba210b8",
+      "required": true,
+      "sha256": "sha256:07beb424b54daebc339a5f831461d08675141b78a3d3ee9633dc0a3038225a44",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12143/stderr.txt",
+      "candidate_accepted_event_id": "mu:63dddedca991ff900cc7bb4de83f5c0b2c593dacd7e7bfde07387472dc1ff682",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12143",
+      "official_evidence_event_id": "mu:92d378c9fc43cfb303a340d683fc77525e1ec59a456880754fcca4fffba210b8",
+      "required": true,
+      "sha256": "sha256:08d8ba6ae72170b41bdb814f57f8ce61b65d9cc67bfd63402df766942c93912e",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12155/candidate.patch",
+      "candidate_accepted_event_id": "mu:1d7fbe7d94ef24e7c9530feeb0b37a01c94e632f03dcde6e1d5504405cf91b8f",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12155",
+      "official_evidence_event_id": "mu:73f7b2eda1ed64597cd8ed2f95c58ed5c44ad0a49edc6f587a0d56ec0a23fd0f",
+      "required": true,
+      "sha256": "sha256:11f03c5b4a6c948d47db139f12901365b976e113194c3cb8f638cb97e72bc208",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12155/official_test.patch",
+      "candidate_accepted_event_id": "mu:1d7fbe7d94ef24e7c9530feeb0b37a01c94e632f03dcde6e1d5504405cf91b8f",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12155",
+      "official_evidence_event_id": "mu:73f7b2eda1ed64597cd8ed2f95c58ed5c44ad0a49edc6f587a0d56ec0a23fd0f",
+      "required": true,
+      "sha256": "sha256:544dde367f892a84033a80d5a775198f533906bf89b4649b25f1cdf7f27d7edd",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12155/stdout.txt",
+      "candidate_accepted_event_id": "mu:1d7fbe7d94ef24e7c9530feeb0b37a01c94e632f03dcde6e1d5504405cf91b8f",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12155",
+      "official_evidence_event_id": "mu:73f7b2eda1ed64597cd8ed2f95c58ed5c44ad0a49edc6f587a0d56ec0a23fd0f",
+      "required": true,
+      "sha256": "sha256:f9ade632330589a142f7330dc845f701a87a9cf9136ddebf87157a71ec272001",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12155/stderr.txt",
+      "candidate_accepted_event_id": "mu:1d7fbe7d94ef24e7c9530feeb0b37a01c94e632f03dcde6e1d5504405cf91b8f",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12155",
+      "official_evidence_event_id": "mu:73f7b2eda1ed64597cd8ed2f95c58ed5c44ad0a49edc6f587a0d56ec0a23fd0f",
+      "required": true,
+      "sha256": "sha256:ed813a5fe085f26974623758234e774d6f9d9debf45030edfeb1f677e901c07b",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12193/candidate.patch",
+      "candidate_accepted_event_id": "mu:958fb0045a7d6e23dd0c18a41059d82230e378a21b66675a1520393f74b1b5d0",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12193",
+      "official_evidence_event_id": "mu:204a44f283e1900e9d8c18ae437bc0866a7a23e9c7d2cbf85d4f249626ec2a9f",
+      "required": true,
+      "sha256": "sha256:9edefb29296067bfe51490057340c3f2470aba65ea3503180eacfc6d37a94e3b",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12193/official_test.patch",
+      "candidate_accepted_event_id": "mu:958fb0045a7d6e23dd0c18a41059d82230e378a21b66675a1520393f74b1b5d0",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12193",
+      "official_evidence_event_id": "mu:204a44f283e1900e9d8c18ae437bc0866a7a23e9c7d2cbf85d4f249626ec2a9f",
+      "required": true,
+      "sha256": "sha256:781058d7f8f286b614e122216ed9128a98217b184a108be29410005aa6ad07dc",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12193/stdout.txt",
+      "candidate_accepted_event_id": "mu:958fb0045a7d6e23dd0c18a41059d82230e378a21b66675a1520393f74b1b5d0",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12193",
+      "official_evidence_event_id": "mu:204a44f283e1900e9d8c18ae437bc0866a7a23e9c7d2cbf85d4f249626ec2a9f",
+      "required": true,
+      "sha256": "sha256:ce007017ae23413cfbf61b332c8372ccc77bb3d3abcd6afe60db48e433f0329f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12193/stderr.txt",
+      "candidate_accepted_event_id": "mu:958fb0045a7d6e23dd0c18a41059d82230e378a21b66675a1520393f74b1b5d0",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12193",
+      "official_evidence_event_id": "mu:204a44f283e1900e9d8c18ae437bc0866a7a23e9c7d2cbf85d4f249626ec2a9f",
+      "required": true,
+      "sha256": "sha256:b87d844537d297f53938a439ddb0adbd854d18177892d9407742dcd18be2e423",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12209/candidate.patch",
+      "candidate_accepted_event_id": "mu:a71e8370f0bb9a31583e10352bbbcab1eb9772445a9f1df74bfda7f8704fe895",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12209",
+      "official_evidence_event_id": "mu:f9031ce12d5c9642737a57533e8e8d52ade0717baebd6a544e3d5164aec36e05",
+      "required": true,
+      "sha256": "sha256:cad239e9f57a423b8d0e9970a9482385a165841bb003fd38829b97a04d465896",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12209/official_test.patch",
+      "candidate_accepted_event_id": "mu:a71e8370f0bb9a31583e10352bbbcab1eb9772445a9f1df74bfda7f8704fe895",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12209",
+      "official_evidence_event_id": "mu:f9031ce12d5c9642737a57533e8e8d52ade0717baebd6a544e3d5164aec36e05",
+      "required": true,
+      "sha256": "sha256:f11c14aad8e6ce88b206f510bbcca5288a41906b7b0952cc3ee815f128715e6b",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12209/stdout.txt",
+      "candidate_accepted_event_id": "mu:a71e8370f0bb9a31583e10352bbbcab1eb9772445a9f1df74bfda7f8704fe895",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12209",
+      "official_evidence_event_id": "mu:f9031ce12d5c9642737a57533e8e8d52ade0717baebd6a544e3d5164aec36e05",
+      "required": true,
+      "sha256": "sha256:c18daf626d48041ad55ae2c649d9bbf8249b099513eb9613417d43ecdc552125",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12209/stderr.txt",
+      "candidate_accepted_event_id": "mu:a71e8370f0bb9a31583e10352bbbcab1eb9772445a9f1df74bfda7f8704fe895",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12209",
+      "official_evidence_event_id": "mu:f9031ce12d5c9642737a57533e8e8d52ade0717baebd6a544e3d5164aec36e05",
+      "required": true,
+      "sha256": "sha256:c3f4b4e07c0447eb51a8a346142a93995d28c574a45c2212d06206899a1baa02",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12262/candidate.patch",
+      "candidate_accepted_event_id": "mu:3dc7491e8c8193173e70c1f957f2c6556df5e86e4f019f83f412aadf22f51590",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12262",
+      "official_evidence_event_id": "mu:d3369565fffc74b82e463f0de969cf1f4d82f716fafd1639f95452e177fa1295",
+      "required": true,
+      "sha256": "sha256:5d88778dfe971e8c88543474dd42e6ee648088f0144f667161a1dcce6dfd49e6",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12262/official_test.patch",
+      "candidate_accepted_event_id": "mu:3dc7491e8c8193173e70c1f957f2c6556df5e86e4f019f83f412aadf22f51590",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12262",
+      "official_evidence_event_id": "mu:d3369565fffc74b82e463f0de969cf1f4d82f716fafd1639f95452e177fa1295",
+      "required": true,
+      "sha256": "sha256:769a15faf523189f8c37917ff3c002c381f0e5a517c481020ea71abe5ee58cf9",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12262/stdout.txt",
+      "candidate_accepted_event_id": "mu:3dc7491e8c8193173e70c1f957f2c6556df5e86e4f019f83f412aadf22f51590",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12262",
+      "official_evidence_event_id": "mu:d3369565fffc74b82e463f0de969cf1f4d82f716fafd1639f95452e177fa1295",
+      "required": true,
+      "sha256": "sha256:bab43f218168c646134d3e2bc319ae0beada3bca3bbfbdbde5c8aa50d2fd436f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12262/stderr.txt",
+      "candidate_accepted_event_id": "mu:3dc7491e8c8193173e70c1f957f2c6556df5e86e4f019f83f412aadf22f51590",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12262",
+      "official_evidence_event_id": "mu:d3369565fffc74b82e463f0de969cf1f4d82f716fafd1639f95452e177fa1295",
+      "required": true,
+      "sha256": "sha256:69e1e3873ee4e4bcae200eb0cf9908fb95c14216ecaefc94167993e697af3dfe",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12273/candidate.patch",
+      "candidate_accepted_event_id": "mu:5764dd3d2b0042b032ce8b5f430ae1505fd2d4d4f37e73025ba7ec010abf0eb3",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12273",
+      "official_evidence_event_id": "mu:1b2e3f8b1727ade913b995e3964498612251fa10883c996ab3b9229816b0f56d",
+      "required": true,
+      "sha256": "sha256:5c2c679865f5963a92b008c7b01398d0917cb4280270ee68fe6cebfb5906aba3",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12273/official_test.patch",
+      "candidate_accepted_event_id": "mu:5764dd3d2b0042b032ce8b5f430ae1505fd2d4d4f37e73025ba7ec010abf0eb3",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12273",
+      "official_evidence_event_id": "mu:1b2e3f8b1727ade913b995e3964498612251fa10883c996ab3b9229816b0f56d",
+      "required": true,
+      "sha256": "sha256:a78a62c88a8cb99e2e85838744c1dd516c0214766db81f46e505192104f260e2",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12273/stdout.txt",
+      "candidate_accepted_event_id": "mu:5764dd3d2b0042b032ce8b5f430ae1505fd2d4d4f37e73025ba7ec010abf0eb3",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12273",
+      "official_evidence_event_id": "mu:1b2e3f8b1727ade913b995e3964498612251fa10883c996ab3b9229816b0f56d",
+      "required": true,
+      "sha256": "sha256:c2064f7c67af323b10c6e492af8d582b1150e972d2a636201caed9b4e5a4cb45",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12273/stderr.txt",
+      "candidate_accepted_event_id": "mu:5764dd3d2b0042b032ce8b5f430ae1505fd2d4d4f37e73025ba7ec010abf0eb3",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12273",
+      "official_evidence_event_id": "mu:1b2e3f8b1727ade913b995e3964498612251fa10883c996ab3b9229816b0f56d",
+      "required": true,
+      "sha256": "sha256:5d69d8ac2cd7c2f1e85dbe40bdac3573545dede4778fa8b40feaa8293899d621",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12276/candidate.patch",
+      "candidate_accepted_event_id": "mu:6fc028cf6e0d2f28a5f9b636f179e362b207d0a0c70ea14fb2545f54b50e8708",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12276",
+      "official_evidence_event_id": "mu:62faeae3998eb853327a57693be73e57d1d56794a060d4d4488478361e560c3c",
+      "required": true,
+      "sha256": "sha256:923d3fa3e3e53af0ca997c847694d70a5a95120b8e72e09912b1ca443b1cb5fa",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12276/official_test.patch",
+      "candidate_accepted_event_id": "mu:6fc028cf6e0d2f28a5f9b636f179e362b207d0a0c70ea14fb2545f54b50e8708",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12276",
+      "official_evidence_event_id": "mu:62faeae3998eb853327a57693be73e57d1d56794a060d4d4488478361e560c3c",
+      "required": true,
+      "sha256": "sha256:2fc58c9be084c71940eced0e5e00c316870858c079b671c7c95aa0c314356389",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12276/stdout.txt",
+      "candidate_accepted_event_id": "mu:6fc028cf6e0d2f28a5f9b636f179e362b207d0a0c70ea14fb2545f54b50e8708",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12276",
+      "official_evidence_event_id": "mu:62faeae3998eb853327a57693be73e57d1d56794a060d4d4488478361e560c3c",
+      "required": true,
+      "sha256": "sha256:1fa939c7e9c1ad945a640b5757f44c16f5925e9dd475b6e52697b0cd0c91628e",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12276/stderr.txt",
+      "candidate_accepted_event_id": "mu:6fc028cf6e0d2f28a5f9b636f179e362b207d0a0c70ea14fb2545f54b50e8708",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12276",
+      "official_evidence_event_id": "mu:62faeae3998eb853327a57693be73e57d1d56794a060d4d4488478361e560c3c",
+      "required": true,
+      "sha256": "sha256:0f0622357166a69d4a1c1e3a4935958aab625ce1f9673d04b82a5a30559c8b5f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12304/candidate.patch",
+      "candidate_accepted_event_id": "mu:79991c82fe1a400af2a96d7970eabf692012573906c1da378cef1886ec7ad006",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12304",
+      "official_evidence_event_id": "mu:bf62b11f896cc27e6f2ff0ad2b0524c7265f8cfcc52ac6a294b2c654036c42ff",
+      "required": true,
+      "sha256": "sha256:8e3340f2426a362468b601013b708d53dfdcfb75457b56dbeb3b7d5d3a9caeed",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12304/official_test.patch",
+      "candidate_accepted_event_id": "mu:79991c82fe1a400af2a96d7970eabf692012573906c1da378cef1886ec7ad006",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12304",
+      "official_evidence_event_id": "mu:bf62b11f896cc27e6f2ff0ad2b0524c7265f8cfcc52ac6a294b2c654036c42ff",
+      "required": true,
+      "sha256": "sha256:89842411b8be0ef66d82a36a04e7407fad136fd86cc10784994f0a7c2269b716",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12304/stdout.txt",
+      "candidate_accepted_event_id": "mu:79991c82fe1a400af2a96d7970eabf692012573906c1da378cef1886ec7ad006",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12304",
+      "official_evidence_event_id": "mu:bf62b11f896cc27e6f2ff0ad2b0524c7265f8cfcc52ac6a294b2c654036c42ff",
+      "required": true,
+      "sha256": "sha256:03c9680382585b6dc9a11dd6cbf1f886a34eca980e5c5100ea9f8dba4177e1b2",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12304/stderr.txt",
+      "candidate_accepted_event_id": "mu:79991c82fe1a400af2a96d7970eabf692012573906c1da378cef1886ec7ad006",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12304",
+      "official_evidence_event_id": "mu:bf62b11f896cc27e6f2ff0ad2b0524c7265f8cfcc52ac6a294b2c654036c42ff",
+      "required": true,
+      "sha256": "sha256:94fac52090bcd6ad33253110ff07887bd00c63d51c757339d894101f9b9e08fa",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12308/candidate.patch",
+      "candidate_accepted_event_id": "mu:e228c4f9eb836012b7ca1e1a985a248ef7f01b1111a40ca5baa2495006eeb050",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12308",
+      "official_evidence_event_id": "mu:e9ed36345bde1e9c6008af3f93986efa974ec712adb3b7d35cc300f4b6b2b58a",
+      "required": true,
+      "sha256": "sha256:d3e4643d26441fd392bc2b9e11cd83c988540baebf50b60adf62e6a6c335aabc",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12308/official_test.patch",
+      "candidate_accepted_event_id": "mu:e228c4f9eb836012b7ca1e1a985a248ef7f01b1111a40ca5baa2495006eeb050",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12308",
+      "official_evidence_event_id": "mu:e9ed36345bde1e9c6008af3f93986efa974ec712adb3b7d35cc300f4b6b2b58a",
+      "required": true,
+      "sha256": "sha256:8fc0ab1c7273c971f04055efdc80820f9e54aa0b608d875b7926e8820a6c9f27",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12308/stdout.txt",
+      "candidate_accepted_event_id": "mu:e228c4f9eb836012b7ca1e1a985a248ef7f01b1111a40ca5baa2495006eeb050",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12308",
+      "official_evidence_event_id": "mu:e9ed36345bde1e9c6008af3f93986efa974ec712adb3b7d35cc300f4b6b2b58a",
+      "required": true,
+      "sha256": "sha256:2f2c18923dc19cfb8a70a0bac9d7322048f3e3192050e2e9c5c74afeb84bcd7f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12308/stderr.txt",
+      "candidate_accepted_event_id": "mu:e228c4f9eb836012b7ca1e1a985a248ef7f01b1111a40ca5baa2495006eeb050",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12308",
+      "official_evidence_event_id": "mu:e9ed36345bde1e9c6008af3f93986efa974ec712adb3b7d35cc300f4b6b2b58a",
+      "required": true,
+      "sha256": "sha256:3b35fd32348110767aa57cb5850f9f18913f9880ef77037459f714bc846bca8f",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12325/candidate.patch",
+      "candidate_accepted_event_id": "mu:38a7975df9fd6943e9c2ae4efd06cf7ae84919d52d74537289bad30b907cbff9",
+      "evidence_kind": "candidate_patch",
+      "instance_id": "django__django-12325",
+      "official_evidence_event_id": "mu:482fd21d32a698cd4ff9a4df529e8b3e10bc10ab012be19cafbfff6166b0a5dd",
+      "required": true,
+      "sha256": "sha256:76a3b732330b4013f517e4dcc66e78f68f9a3f2c4de7bc91934a50bbb16ac4ea",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "patch_artifacts/django__django-12325/official_test.patch",
+      "candidate_accepted_event_id": "mu:38a7975df9fd6943e9c2ae4efd06cf7ae84919d52d74537289bad30b907cbff9",
+      "evidence_kind": "official_test_patch",
+      "instance_id": "django__django-12325",
+      "official_evidence_event_id": "mu:482fd21d32a698cd4ff9a4df529e8b3e10bc10ab012be19cafbfff6166b0a5dd",
+      "required": true,
+      "sha256": "sha256:4a8a856a5c387767706745fe734f696a913a217f7006b36c7763483e7d145ff4",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12325/stdout.txt",
+      "candidate_accepted_event_id": "mu:38a7975df9fd6943e9c2ae4efd06cf7ae84919d52d74537289bad30b907cbff9",
+      "evidence_kind": "evaluator_stdout",
+      "instance_id": "django__django-12325",
+      "official_evidence_event_id": "mu:482fd21d32a698cd4ff9a4df529e8b3e10bc10ab012be19cafbfff6166b0a5dd",
+      "required": true,
+      "sha256": "sha256:e706012b93fecc0921f0743fa8da817e2b95af55a91394e979837f6a29baf86d",
+      "storage": "public_artifact_file"
+    },
+    {
+      "artifact_path": "target_test_logs/django__django-12325/stderr.txt",
+      "candidate_accepted_event_id": "mu:38a7975df9fd6943e9c2ae4efd06cf7ae84919d52d74537289bad30b907cbff9",
+      "evidence_kind": "evaluator_stderr",
+      "instance_id": "django__django-12325",
+      "official_evidence_event_id": "mu:482fd21d32a698cd4ff9a4df529e8b3e10bc10ab012be19cafbfff6166b0a5dd",
+      "required": true,
+      "sha256": "sha256:3fda58fb0e4c4e5652eb045dfb696a7f14299b214b8fcf84111ca42f13db13fa",
+      "storage": "public_artifact_file"
+    }
+  ],
+  "schema_id": "PhaseFRequiredEvidenceManifest.v1"
+}
