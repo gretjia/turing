@@ -48,6 +48,18 @@ REQUIRED_MODULES = [
 ]
 SWEBENCH_FORBIDDEN_PATHS = ["secrets", "tests/**", "*/tests/**", "test_*.py", "*_test.py"]
 NATIVE_API_TOOLS = ["read_file", "list_dir", "grep", "apply_patch", "write_file", "run_command"]
+STAGE10_FAILURE_CLASSES = [
+    "INSTALL_FAIL",
+    "TEST_TIMEOUT",
+    "WRONG_FILE",
+    "NO_REPRO",
+    "OVERBROAD_PATCH",
+    "SEMANTIC_FAIL",
+    "FLAKY_ORACLE",
+    "DEPENDENCY_GAP",
+    "CONTEXT_MISSING",
+    "PATCH_APPLIES_BUT_WRONG",
+]
 
 
 def digest_text(text: str) -> str:
@@ -2400,6 +2412,324 @@ def generate_stage9_native_api_worker_fixture(out_dir: Path, tasks: list[dict[st
     return manifest
 
 
+def build_stage10_failure_taxonomy_bundle(out_dir: Path, task: dict[str, Any], failure_class: str) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "turingos" / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage10 git init failed:\n{init.stderr}")
+
+    state = stage6_base_state()
+    short = hashlib.sha256(instance_id.encode("utf-8")).hexdigest()[:16]
+    worker_id = "worker:sha256:" + hashlib.sha256(f"stage10:{instance_id}:worker".encode("utf-8")).hexdigest()
+    atom_id = f"atom_stage10_{short}"
+    capsule_id = f"wc_stage10_{short}"
+    market_id = f"mkt_stage10_{short}"
+    receipt_id = f"rcp_stage10_{short}"
+    macro_id = f"macro:diff:stage10:{short}"
+    evidence_id = f"ev_stage10_{short}"
+    candidate_id = f"cand_stage10_{short}"
+    run_id = f"run_stage10_{short}"
+    total_tokens = 120
+    wall_ms = 60
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage10 constitution")}, "writer:bootstrap")
+    append(
+        "GoalStateProposed",
+        {
+            "goal_id": f"goal_stage10_{short}",
+            "objective": f"Stage10 failure taxonomy fixture for {failure_class}",
+            "task_source": "swe_bench_shaped_failure_taxonomy_fixture",
+        },
+        "writer:goal",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": atom_id,
+            "approval_id": f"ap_atom_stage10_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_stage10_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkCapsuleBuilt",
+        {
+            "capsule_id": capsule_id,
+            "private_contract_hash": digest_text(capsule_id + ":private"),
+            "acceptance_commands": ["stage10.failure.taxonomy.eval"],
+            "allowed_files": ["django/**"],
+            "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+            "pput_formula_absent": True,
+            "heldout_ids_absent": True,
+            "hidden_predicates_absent": True,
+        },
+        "writer:capsule",
+    )
+    append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_id,
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "exit_code": 1,
+            "stdout_hash": digest_text(instance_id + ":stage10:stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage10:stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage10:done"),
+            "credential_material_absent": True,
+            "micro_refs_moved": False,
+            "patch_hash": digest_text(instance_id + ":stage10:patch"),
+        },
+        "writer:receipt",
+    )
+    append(
+        "MacroObservationImported",
+        {
+            "macro_id": macro_id,
+            "capsule_id": capsule_id,
+            "diff_hash": digest_text(instance_id + ":stage10:patch"),
+            "external_evidence_only": True,
+        },
+        "writer:macro",
+    )
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": f"branch_stage10_{short}",
+            "capsule_id": capsule_id,
+            "prompt_tokens": 40,
+            "completion_tokens": 40,
+            "tool_tokens": 20,
+            "tool_stdout_tokens": 20,
+            "total_tokens": total_tokens,
+            "wall_time_ms": wall_ms,
+            "tool_stdout_hash": digest_text(instance_id + ":stage10:tool-stdout"),
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_id,
+            "instance_id": instance_id,
+            "capsule_id": capsule_id,
+            "macro_anchor_id": macro_id,
+            "worker_receipt_id": receipt_id,
+            "candidate_patch_hash": digest_text(instance_id + ":stage10:patch"),
+            "test_patch_hash": digest_text(instance_id + ":stage10:test-patch"),
+            "apply_candidate_result": "FAIL",
+            "apply_test_patch_result": "PASS",
+            "fail_to_pass_labels": [],
+            "target_test_exit_code": 1,
+            "target_test_result": "FAIL",
+            "stdout_hash": digest_text(instance_id + ":stage10:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage10:official-stderr"),
+            "result": "FAIL",
+            "failure_class": failure_class,
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage10_deterministic_official_fixture",
+        },
+        "writer:official-evaluator",
+        name="official",
+    )
+    failure = append(
+        "FailureNode",
+        {
+            "capsule_id": capsule_id,
+            "candidate_id": candidate_id,
+            "failure_class": failure_class,
+            "detail": f"Stage10 deterministic failure classified as {failure_class}",
+            "official_evaluator_evidence_id": evidence_id,
+        },
+        "writer:predicate",
+        product="NOT_RUN",
+        name="failure",
+    )
+    append(
+        "FailureCertificate",
+        {
+            "certificate_id": f"fc_stage10_{short}",
+            "source_failure_node_id": failure["event_id"],
+            "failure_class": failure_class,
+            "abstract_pattern": f"Classified SWE-bench failure pattern: {failure_class}",
+            "raw_log_ref": "cas:" + hashlib.sha256(f"{instance_id}:stage10:raw-log".encode("utf-8")).hexdigest(),
+            "raw_log_text_absent": True,
+            "broadcast_rule_candidate": {
+                "rule_id": f"br_candidate_stage10_{short}",
+                "candidate_only": True,
+                "activation_event_id": None,
+                "source_failure_nodes": [failure["event_id"]],
+                "failure_class": failure_class,
+                "abstract_pattern": f"Classified SWE-bench failure pattern: {failure_class}",
+                "guidance": f"Handle {failure_class} with targeted repair before retry.",
+                "raw_log_text_absent": True,
+                "hidden_predicates_absent": True,
+            },
+        },
+        "writer:failure-taxonomy",
+    )
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": "NO",
+            "settlement_basis_event_id": official["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": failure["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    append(
+        "RewardDistributed",
+        {
+            "schema_id": "reward_distributed.v1",
+            "event_type": "RewardDistributed",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "reward_coin": "0",
+            "slash_coin": "1",
+            "reason": "BUDGET_EXHAUSTED",
+            "settlement_event_id": settlement["event_id"],
+        },
+        "writer:market",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": False,
+            "verified": False,
+            "accounting_stage": "final",
+            "basis_event_id": official["event_id"],
+            "terminal_event_id": failure["event_id"],
+            "golden_path_token_count": 0,
+            "total_run_token_count": total_tokens,
+            "total_wall_time_ms": wall_ms,
+            "progress": 0,
+            "vpput_raw": "0",
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    append(
+        "PredicateEvaluated",
+        {
+            "predicate_id": "predicate.stage10.failure_taxonomy.replay",
+            "result": "PASS",
+            "source_tape_tip": state["tape_tip"],
+            "replay_hash": digest_text("stage10 replay:" + instance_id),
+        },
+        "writer:replay",
+        product="NOT_RUN",
+    )
+
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage10 bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+    return {
+        "instance_id": instance_id,
+        "expected_result": "FAIL",
+        "stage10_failure_class": failure_class,
+        "authorization_mode": "required",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "worker_id": worker_id,
+        "capsule_id": capsule_id,
+        "candidate_id": candidate_id,
+        "market_id": market_id,
+        "basis": "stage10_failure_taxonomy_fixture",
+    }
+
+
+def generate_stage10_failure_taxonomy_fixture(out_dir: Path, tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    runs = []
+    for index, task in enumerate(tasks):
+        failure_class = str(task.get("stage10_failure_class") or STAGE10_FAILURE_CLASSES[index % len(STAGE10_FAILURE_CLASSES)]).upper()
+        if failure_class not in STAGE10_FAILURE_CLASSES:
+            raise ValueError(f"unsupported stage10_failure_class {failure_class!r}")
+        runs.append(build_stage10_failure_taxonomy_bundle(out_dir, task, failure_class))
+    manifest = {
+        "schema_id": "Stage10FailureTaxonomyFixtureManifest.v1",
+        "run_id": "stage10_failure_taxonomy",
+        "truth_source": "fresh_micro_tape_bundles",
+        "scientific_status": "FAILURE_TAXONOMY_FIXTURE_NOT_SOLVE_RATE",
+        "sample_size": len(runs),
+        "expected_classes": STAGE10_FAILURE_CLASSES,
+        "turingos_arm_runs": runs,
+    }
+    turingos_dir = out_dir / "turingos"
+    write_json(turingos_dir / "substrate_coverage.json", manifest)
+    write_json(out_dir / "taxonomy_manifest.json", manifest)
+    write_json(out_dir / "bundle_manifest.json", manifest)
+    bundle_lines = [f"{run['micro_tape_bundle_sha256']}  {run['micro_tape_bundle']}" for run in runs]
+    (out_dir / "bundle_sha256s.txt").write_text("\n".join(bundle_lines) + "\n", encoding="utf-8")
+    return manifest
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--tasks-jsonl", required=True)
@@ -2415,6 +2745,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strict-microtape-fixture", action="store_true")
     parser.add_argument("--no-hitl-loop-fixture", action="store_true")
     parser.add_argument("--native-api-worker-fixture", action="store_true")
+    parser.add_argument("--failure-taxonomy-fixture", action="store_true")
     args = parser.parse_args(argv)
 
     out_dir = Path(args.out_dir)
@@ -2458,6 +2789,20 @@ def main(argv: list[str] | None = None) -> int:
             "worker_process": "stage9_native_api_worker_fixture",
             "auditor_exit_code": 0,
             "scientific_status": "NATIVE_API_WORKER_TOOL_RECEIPT_FIXTURE_NOT_SOLVE_RATE",
+            "sample_size": manifest["sample_size"],
+        }
+        write_json(out_dir / "substrate_smoke_result.json", summary)
+        return 0
+    if args.failure_taxonomy_fixture:
+        if args.authorization_mode != "required":
+            parser.error("--failure-taxonomy-fixture requires --authorization-mode required")
+        manifest = generate_stage10_failure_taxonomy_fixture(out_dir, tasks)
+        summary = {
+            "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+            "coverage": str(out_dir / "turingos" / "substrate_coverage.json"),
+            "worker_process": "stage10_failure_taxonomy_fixture",
+            "auditor_exit_code": 0,
+            "scientific_status": "FAILURE_TAXONOMY_FIXTURE_NOT_SOLVE_RATE",
             "sample_size": manifest["sample_size"],
         }
         write_json(out_dir / "substrate_smoke_result.json", summary)

@@ -1,0 +1,147 @@
+{
+  "all_failures_have_broadcast_rule_candidate": true,
+  "all_failures_have_failure_node": true,
+  "broadcast_candidates_preserve_only": true,
+  "classes_seen": [
+    "CONTEXT_MISSING",
+    "DEPENDENCY_GAP",
+    "FLAKY_ORACLE",
+    "INSTALL_FAIL",
+    "NO_REPRO",
+    "OVERBROAD_PATCH",
+    "PATCH_APPLIES_BUT_WRONG",
+    "SEMANTIC_FAIL",
+    "TEST_TIMEOUT",
+    "WRONG_FILE"
+  ],
+  "expected_classes": [
+    "CONTEXT_MISSING",
+    "DEPENDENCY_GAP",
+    "FLAKY_ORACLE",
+    "INSTALL_FAIL",
+    "NO_REPRO",
+    "OVERBROAD_PATCH",
+    "PATCH_APPLIES_BUT_WRONG",
+    "SEMANTIC_FAIL",
+    "TEST_TIMEOUT",
+    "WRONG_FILE"
+  ],
+  "problems": [],
+  "raw_logs_not_broadcast": true,
+  "run_count": 10,
+  "runs": [
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "INSTALL_FAIL",
+      "failure_event_id": "mu:eaec86becd30f785987fdbf298d2a9bfd2c69730bae7d5816dae35967e689c6e",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_install_fail",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "TEST_TIMEOUT",
+      "failure_event_id": "mu:14e2c58702374e17b970b63a627a4af3c6e6110b0af5dee86628eba60fdc594c",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_test_timeout",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "WRONG_FILE",
+      "failure_event_id": "mu:a9debd0f382e16c2f381bbef1eabf565dcd732eef2a727dc591d5a039c4e9c8c",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_wrong_file",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "NO_REPRO",
+      "failure_event_id": "mu:9e50d7332c90692efa87a4b5ba7135af72794e24387f67ab91e8625b3028974e",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_no_repro",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "OVERBROAD_PATCH",
+      "failure_event_id": "mu:01b989e8320fd6d6d2a04340d589f244bf9d7eae7a7d391f6d83ba12bcb37704",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_overbroad_patch",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "SEMANTIC_FAIL",
+      "failure_event_id": "mu:917bf9805ca28942ff847ab11d116f8bccd70d6d862bfe41d5098fa6251b6bf9",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_semantic_fail",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "FLAKY_ORACLE",
+      "failure_event_id": "mu:34e157afe3b96a9390441e3e859d2e52a54dbac8494f8369373c2bd1feda6c21",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_flaky_oracle",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "DEPENDENCY_GAP",
+      "failure_event_id": "mu:d81cfd060ba1adeec3252fed38a3eda424cb89bb0bd7f23f450a8b0015e0fcb1",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_dependency_gap",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "CONTEXT_MISSING",
+      "failure_event_id": "mu:1e9dad63e20c1ca09b3172da5b21725bed6334e594d056bf4ebf32e20603dc7c",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_context_missing",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    },
+    {
+      "broadcast_candidate_preserve_only": true,
+      "failure_class": "PATCH_APPLIES_BUT_WRONG",
+      "failure_event_id": "mu:91a72659287ff34f45c13e4edfe79ef1cf253f6e3641e5bf33eb12e5e6623969",
+      "has_broadcast_rule_candidate": true,
+      "has_failure_node": true,
+      "instance_id": "stage10_patch_applies_but_wrong",
+      "problems": [],
+      "raw_logs_not_broadcast": true,
+      "status": "PASS"
+    }
+  ],
+  "schema_id": "FailureTaxonomyAudit.v1",
+  "status": "PASS",
+  "truth_source": "micro_tape_bundle_plus_coverage_refs"
+}
