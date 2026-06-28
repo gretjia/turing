@@ -1,0 +1,36 @@
+{
+  "blockers": [
+    "fresh_stage16r_real_evaluator_bundles_required",
+    "full_dataset_manifest_freeze_required",
+    "phase_f_evaluator_proof_pass_required"
+  ],
+  "full_manifest": {
+    "missing_files": [
+      "task_manifest.json",
+      "loop_manifest.json",
+      "CLAIM_BOUNDARY.json",
+      "full_campaign_acceptance_commands.md"
+    ],
+    "root": "evidence/bench/swe_bench_full_manifest_20260628",
+    "status": "MISSING"
+  },
+  "full_swe_bench_ready": false,
+  "next_loop": "stage16r_real_evaluator_bundle_loop",
+  "phase_f": {
+    "official_evaluator_executable_replay": false,
+    "release_next_phase_g": false,
+    "root": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628",
+    "status": "PARTIAL"
+  },
+  "problems": [],
+  "release_phase_g": false,
+  "repair_loop": {
+    "phase_f_evaluator_proof_required": true,
+    "release_next_phase_g": false,
+    "replayable_repair_bundle_count": 0,
+    "root": "evidence/bench/swe_bench_phase_f_repair_loop_20260628",
+    "status": "BLOCKED"
+  },
+  "schema_id": "FullSweBenchReadinessAudit.v1",
+  "status": "BLOCKED"
+}
