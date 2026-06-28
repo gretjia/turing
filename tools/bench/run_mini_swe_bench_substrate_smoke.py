@@ -3368,6 +3368,649 @@ def generate_stage13_native_api_worker_hardening_fixture(out_dir: Path, tasks: l
     return manifest
 
 
+def build_stage14_source_failure_bundle(out_dir: Path, task: dict[str, Any], index: int) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "turingos" / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage14 source git init failed:\n{init.stderr}")
+
+    state = stage6_base_state()
+    short = hashlib.sha256(instance_id.encode("utf-8")).hexdigest()[:16]
+    worker_id = "worker:sha256:" + hashlib.sha256(f"stage14:{instance_id}:source".encode("utf-8")).hexdigest()
+    atom_id = f"atom_stage14_{short}"
+    capsule_id = f"wc_stage14_{short}_source"
+    receipt_id = f"rcp_stage14_{short}_source"
+    macro_id = f"macro:diff:stage14:{short}:source"
+    evidence_id = f"ev_stage14_{short}_source"
+    candidate_id = f"cand_stage14_{short}_source"
+    market_id = f"mkt_stage14_{short}_source"
+    run_id = f"run_stage14_{short}_source"
+    tokens = 160 + index * 10
+    wall_ms = 80 + index * 5
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage14 constitution")}, "writer:bootstrap")
+    append(
+        "GoalStateProposed",
+        {
+            "goal_id": f"goal_stage14_{short}",
+            "objective": "Stage14 source failure for corpus memory",
+            "task_source": "stage14_corpus_failure_source",
+        },
+        "writer:goal",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": atom_id,
+            "approval_id": f"ap_atom_stage14_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_stage14_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkCapsuleBuilt",
+        {
+            "capsule_id": capsule_id,
+            "private_contract_hash": digest_text(capsule_id + ":private"),
+            "acceptance_commands": ["stage14.official.eval"],
+            "allowed_files": ["django/**"],
+            "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+            "pput_formula_absent": True,
+            "heldout_ids_absent": True,
+            "hidden_predicates_absent": True,
+            "raw_failure_logs_absent": True,
+        },
+        "writer:capsule",
+    )
+    append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    patch_hash = digest_text(instance_id + ":stage14:source:patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_id,
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "exit_code": 1,
+            "stdout_hash": digest_text(instance_id + ":stage14:source:stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage14:source:stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage14:source:done"),
+            "credential_material_absent": True,
+            "manual_patch": False,
+            "micro_refs_moved": False,
+            "patch_hash": patch_hash,
+        },
+        "writer:receipt",
+    )
+    append(
+        "MacroObservationImported",
+        {
+            "macro_id": macro_id,
+            "capsule_id": capsule_id,
+            "diff_hash": patch_hash,
+            "external_evidence_only": True,
+            "macro_observation_kind": "context_missing",
+        },
+        "writer:macro",
+    )
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": f"branch_stage14_{short}_source",
+            "capsule_id": capsule_id,
+            "prompt_tokens": tokens // 2,
+            "completion_tokens": tokens // 4,
+            "tool_tokens": tokens // 8,
+            "tool_stdout_tokens": tokens - (tokens // 2) - (tokens // 4) - (tokens // 8),
+            "total_tokens": tokens,
+            "wall_time_ms": wall_ms,
+            "tool_stdout_hash": digest_text(instance_id + ":stage14:source:tool-stdout"),
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_id,
+            "instance_id": instance_id,
+            "capsule_id": capsule_id,
+            "macro_anchor_id": macro_id,
+            "worker_receipt_id": receipt_id,
+            "candidate_patch_hash": patch_hash,
+            "test_patch_hash": digest_text(instance_id + ":stage14:test-patch"),
+            "apply_candidate_result": "PASS",
+            "apply_test_patch_result": "PASS",
+            "fail_to_pass_labels": [],
+            "target_test_exit_code": 1,
+            "target_test_result": "FAIL",
+            "stdout_hash": digest_text(instance_id + ":stage14:source:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage14:source:official-stderr"),
+            "result": "FAIL",
+            "failure_class": "CONTEXT_MISSING",
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage14_corpus_failure_memory_fixture",
+        },
+        "writer:official-evaluator",
+        name="official",
+    )
+    failure = append(
+        "FailureNode",
+        {
+            "capsule_id": capsule_id,
+            "candidate_id": candidate_id,
+            "failure_class": "CONTEXT_MISSING",
+            "detail": "Stage14 source branch lacked context and enters corpus failure memory.",
+            "official_evaluator_evidence_id": evidence_id,
+        },
+        "writer:predicate",
+        product="NOT_RUN",
+        name="failure",
+    )
+    certificate = append(
+        "FailureCertificate",
+        {
+            "certificate_id": f"fc_stage14_{short}",
+            "source_failure_node_id": failure["event_id"],
+            "failure_class": "CONTEXT_MISSING",
+            "abstract_pattern": "Repeated failures lacked the implementation context needed for a scoped repair.",
+            "raw_log_ref": "cas:" + hashlib.sha256(f"{instance_id}:stage14:private-log".encode("utf-8")).hexdigest(),
+            "raw_log_text_absent": True,
+        },
+        "writer:failure-taxonomy",
+        name="certificate",
+    )
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": "NO",
+            "settlement_basis_event_id": official["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": failure["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    append(
+        "RewardDistributed",
+        {
+            "schema_id": "reward_distributed.v1",
+            "event_type": "RewardDistributed",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "reward_coin": "0",
+            "slash_coin": "1",
+            "reason": "CORPUS_FAILURE_SOURCE",
+            "settlement_event_id": settlement["event_id"],
+        },
+        "writer:market",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": False,
+            "verified": False,
+            "accounting_stage": "final",
+            "basis_event_id": official["event_id"],
+            "terminal_event_id": failure["event_id"],
+            "golden_path_token_count": 0,
+            "total_run_token_count": tokens,
+            "total_wall_time_ms": wall_ms,
+            "progress": 0,
+            "vpput_raw": "0",
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage14 source bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+    return {
+        "instance_id": instance_id,
+        "expected_result": "FAIL",
+        "authorization_mode": "required",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "failure_node_id": failure["event_id"],
+        "failure_certificate_event_id": certificate["event_id"],
+        "failure_class": "CONTEXT_MISSING",
+        "basis": "stage14_corpus_failure_source",
+    }
+
+
+def build_stage14_consumer_bundle(out_dir: Path, task: dict[str, Any], source_failure_nodes: list[str]) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "turingos" / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage14 consumer git init failed:\n{init.stderr}")
+
+    state = stage6_base_state()
+    short = hashlib.sha256(instance_id.encode("utf-8")).hexdigest()[:16]
+    worker_id = "worker:sha256:" + hashlib.sha256(f"stage14:{instance_id}:consumer".encode("utf-8")).hexdigest()
+    atom_id = f"atom_stage14_{short}"
+    capsule_id = f"wc_stage14_{short}_consumer"
+    receipt_id = f"rcp_stage14_{short}_consumer"
+    macro_id = f"macro:diff:stage14:{short}:consumer"
+    evidence_id = f"ev_stage14_{short}_consumer"
+    candidate_id = f"cand_stage14_{short}_consumer"
+    market_id = f"mkt_stage14_{short}_consumer"
+    run_id = f"run_stage14_{short}_consumer"
+    rule_id = "br_stage14_context_missing_corpus"
+    tokens = 280
+    wall_ms = 140
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage14 constitution")}, "writer:bootstrap")
+    append(
+        "GoalStateProposed",
+        {
+            "goal_id": f"goal_stage14_{short}",
+            "objective": "Stage14 consume corpus failure memory",
+            "task_source": "stage14_corpus_failure_memory_consumer",
+        },
+        "writer:goal",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": atom_id,
+            "approval_id": f"ap_atom_stage14_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    broadcast = append(
+        "BroadcastRuleActivated",
+        {
+            "rule_id": rule_id,
+            "source_failure_nodes": source_failure_nodes,
+            "failure_class": "CONTEXT_MISSING",
+            "activation_threshold_met": True,
+            "activation_threshold": {"kind": "same_class_count", "min_source_failures": 3},
+            "abstract_pattern": "Repeated failures lacked the implementation context needed for a scoped repair.",
+            "new_instruction": "Before retrying similar repairs, shrink the capsule to the relevant framework file and include the missing context.",
+            "recipients": ["future_capsule"],
+            "hidden_details_removed": True,
+            "raw_log_refs": ["private_evidence_only"],
+            "raw_log_refs_private_only": True,
+            "raw_log_text_absent": True,
+            "hidden_predicates_absent": True,
+            "pput_or_heldout_details_absent": True,
+        },
+        "writer:failure-memory",
+        name="broadcast",
+    )
+    append(
+        "WorkerDispatchAuthorized",
+        {
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "approval_id": f"ap_dispatch_stage14_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    append(
+        "WorkCapsuleBuilt",
+        {
+            "capsule_id": capsule_id,
+            "private_contract_hash": digest_text(capsule_id + ":private"),
+            "acceptance_commands": ["stage14.official.eval"],
+            "allowed_files": ["django/**"],
+            "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+            "consumed_broadcast_rule_ids": [rule_id],
+            "injected_broadcast_rule_ids": [rule_id],
+            "broadcast_rule_event_id": broadcast["event_id"],
+            "source_failure_nodes": source_failure_nodes,
+            "visible_known_failures_to_avoid": [
+                "Before retrying similar repairs, shrink the capsule to the relevant framework file and include the missing context."
+            ],
+            "raw_log_text_absent": True,
+            "pput_formula_absent": True,
+            "heldout_ids_absent": True,
+            "hidden_predicates_absent": True,
+            "pput_or_heldout_details_absent": True,
+        },
+        "writer:capsule",
+        name="consumer_capsule",
+    )
+    append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    patch_hash = digest_text(instance_id + ":stage14:consumer:patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_id,
+            "capsule_id": capsule_id,
+            "worker_id": worker_id,
+            "exit_code": 0,
+            "stdout_hash": digest_text(instance_id + ":stage14:consumer:stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage14:consumer:stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage14:consumer:done"),
+            "credential_material_absent": True,
+            "manual_patch": False,
+            "micro_refs_moved": False,
+            "patch_hash": patch_hash,
+            "consumed_broadcast_rule_event_id": broadcast["event_id"],
+        },
+        "writer:receipt",
+    )
+    append(
+        "MacroObservationImported",
+        {
+            "macro_id": macro_id,
+            "capsule_id": capsule_id,
+            "diff_hash": patch_hash,
+            "external_evidence_only": True,
+            "macro_observation_kind": "repair_patch_with_corpus_memory",
+        },
+        "writer:macro",
+    )
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": f"branch_stage14_{short}_consumer",
+            "capsule_id": capsule_id,
+            "prompt_tokens": 120,
+            "completion_tokens": 90,
+            "tool_tokens": 40,
+            "tool_stdout_tokens": 30,
+            "total_tokens": tokens,
+            "wall_time_ms": wall_ms,
+            "tool_stdout_hash": digest_text(instance_id + ":stage14:consumer:tool-stdout"),
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_id,
+            "instance_id": instance_id,
+            "capsule_id": capsule_id,
+            "macro_anchor_id": macro_id,
+            "worker_receipt_id": receipt_id,
+            "candidate_patch_hash": patch_hash,
+            "test_patch_hash": digest_text(instance_id + ":stage14:test-patch"),
+            "apply_candidate_result": "PASS",
+            "apply_test_patch_result": "PASS",
+            "fail_to_pass_labels": [],
+            "target_test_exit_code": 0,
+            "target_test_result": "PASS",
+            "stdout_hash": digest_text(instance_id + ":stage14:consumer:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage14:consumer:official-stderr"),
+            "result": "PASS",
+            "failure_class": None,
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage14_corpus_failure_memory_fixture",
+        },
+        "writer:official-evaluator",
+        name="official",
+    )
+    terminal = append(
+        "CandidateAccepted",
+        {
+            "candidate_id": candidate_id,
+            "capsule_id": capsule_id,
+            "macro_anchor_id": macro_id,
+            "worker_receipt_id": receipt_id,
+            "official_evaluator_evidence_id": evidence_id,
+            "consumed_broadcast_rule_event_id": broadcast["event_id"],
+        },
+        "writer:predicate",
+        name="terminal",
+    )
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": "YES",
+            "settlement_basis_event_id": official["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": terminal["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    append(
+        "RewardDistributed",
+        {
+            "schema_id": "reward_distributed.v1",
+            "event_type": "RewardDistributed",
+            "market_id": market_id,
+            "agent_id": worker_id,
+            "reward_coin": "1",
+            "slash_coin": "0",
+            "reason": "CORPUS_MEMORY_CONSUMED_TERMINAL_PASS",
+            "settlement_event_id": settlement["event_id"],
+        },
+        "writer:market",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": True,
+            "verified": True,
+            "accounting_stage": "final",
+            "basis_event_id": official["event_id"],
+            "terminal_event_id": terminal["event_id"],
+            "golden_path_token_count": tokens,
+            "total_run_token_count": tokens,
+            "total_wall_time_ms": wall_ms,
+            "progress": 1,
+            "vpput_raw": stage6_vpput(1, tokens, wall_ms),
+            "failed_branch_count": 0,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage14 consumer bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+    return {
+        "instance_id": instance_id,
+        "expected_result": "PASS",
+        "authorization_mode": "required",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "activated_rule_event_id": broadcast["event_id"],
+        "consumer_capsule_id": capsule_id,
+        "rule_id": rule_id,
+        "basis": "stage14_corpus_failure_memory_consumer",
+    }
+
+
+def generate_stage14_corpus_failure_memory_fixture(out_dir: Path, tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    if len(tasks) < 4:
+        raise ValueError("Stage14 corpus failure memory fixture requires at least 4 tasks")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    source_runs = [build_stage14_source_failure_bundle(out_dir, task, index) for index, task in enumerate(tasks[:3], start=1)]
+    source_failure_nodes = [run["failure_node_id"] for run in source_runs]
+    consumer_run = build_stage14_consumer_bundle(out_dir, tasks[3], source_failure_nodes)
+    runs = source_runs + [consumer_run]
+    meta = {
+        "schema_id": "Stage14CorpusFailureMemory.v1",
+        "failure_class": "CONTEXT_MISSING",
+        "min_source_failures": 3,
+        "source_failure_nodes": source_failure_nodes,
+        "activated_rule_event_id": consumer_run["activated_rule_event_id"],
+        "consumer_capsule_id": consumer_run["consumer_capsule_id"],
+        "rule_id": consumer_run["rule_id"],
+        "efficacy": {
+            "pre_activation_failures": len(source_failure_nodes),
+            "post_activation_failures": 0,
+            "consumed_rule_attempts": 1,
+            "non_consumed_comparable_attempts": 0,
+            "sample_size": len(runs),
+            "causal_claim_allowed": False,
+            "claim": "Observed association only; no causal claim from fixture sample.",
+        },
+    }
+    manifest = {
+        "schema_id": "Stage14CorpusFailureMemoryFixtureManifest.v1",
+        "run_id": "stage14_corpus_failure_memory",
+        "truth_source": "fresh_micro_tape_bundles",
+        "scientific_status": "CORPUS_FAILURE_MEMORY_FIXTURE_NOT_SOLVE_RATE",
+        "sample_size": len(runs),
+        "corpus_failure_memory": meta,
+        "turingos_arm_runs": runs,
+    }
+    turingos_dir = out_dir / "turingos"
+    write_json(turingos_dir / "substrate_coverage.json", manifest)
+    write_json(out_dir / "memory_manifest.json", manifest)
+    write_json(out_dir / "bundle_manifest.json", manifest)
+    bundle_lines = [f"{run['micro_tape_bundle_sha256']}  {run['micro_tape_bundle']}" for run in runs]
+    (out_dir / "bundle_sha256s.txt").write_text("\n".join(bundle_lines) + "\n", encoding="utf-8")
+    return manifest
+
+
+def run_stage14_release_audits(out_dir: Path) -> None:
+    coverage = out_dir / "turingos" / "substrate_coverage.json"
+    commands = [
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_micro_tape_decision_dag.py"),
+            "--strict-vpput",
+            "--strict-terminal-market",
+            "--require-authorization-head",
+            "--coverage",
+            str(coverage),
+            "--out-dir",
+            str(out_dir / "micro_tape_audit_strict"),
+        ],
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_corpus_failure_memory.py"),
+            "--coverage",
+            str(coverage),
+            "--out-dir",
+            str(out_dir),
+        ],
+    ]
+    for command in commands:
+        result = run_cmd(command, cwd=REPO, timeout=300)
+        if result.returncode != 0:
+            raise RuntimeError(
+                "Stage14 release audit failed:\n"
+                + " ".join(command)
+                + "\nSTDOUT:\n"
+                + result.stdout
+                + "\nSTDERR:\n"
+                + result.stderr
+            )
+
+
 def run_stage13_release_audits(out_dir: Path) -> None:
     coverage = out_dir / "turingos" / "substrate_coverage.json"
     commands = [
@@ -4406,6 +5049,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-hitl-loop-fixture", action="store_true")
     parser.add_argument("--native-api-worker-fixture", action="store_true")
     parser.add_argument("--native-api-worker-hardening", action="store_true")
+    parser.add_argument("--corpus-failure-memory", action="store_true")
     parser.add_argument("--failure-taxonomy-fixture", action="store_true")
     parser.add_argument("--loop-until-pass-fixture", action="store_true")
     args = parser.parse_args(argv)
@@ -4473,6 +5117,21 @@ def main(argv: list[str] | None = None) -> int:
             "worker_process": "stage13_native_api_worker_hardening",
             "auditor_exit_code": 0,
             "scientific_status": "NATIVE_API_WORKER_RECEIPT_HARDENING_NOT_SOLVE_RATE",
+            "sample_size": manifest["sample_size"],
+        }
+        write_json(out_dir / "substrate_smoke_result.json", summary)
+        return 0
+    if args.corpus_failure_memory:
+        if args.authorization_mode != "required":
+            parser.error("--corpus-failure-memory requires --authorization-mode required")
+        manifest = generate_stage14_corpus_failure_memory_fixture(out_dir, tasks)
+        run_stage14_release_audits(out_dir)
+        summary = {
+            "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+            "coverage": str(out_dir / "turingos" / "substrate_coverage.json"),
+            "worker_process": "stage14_corpus_failure_memory",
+            "auditor_exit_code": 0,
+            "scientific_status": "CORPUS_FAILURE_MEMORY_FIXTURE_NOT_SOLVE_RATE",
             "sample_size": manifest["sample_size"],
         }
         write_json(out_dir / "substrate_smoke_result.json", summary)

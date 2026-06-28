@@ -1,0 +1,44 @@
+{
+  "activated_rule_event_id": "mu:3aa9b0258eef0d8be79105cf884047ebf6a36a7b4d80a1acf86fe218fac62928",
+  "broadcast_visibility": {
+    "activated_rule_event_id": "mu:3aa9b0258eef0d8be79105cf884047ebf6a36a7b4d80a1acf86fe218fac62928",
+    "consumer_capsule_id": "wc_stage14_014dd41fc09729f6_consumer",
+    "raw_logs_private": true,
+    "status": "PASS",
+    "truth_source": "micro_tape_bundles"
+  },
+  "consumer_capsule_id": "wc_stage14_014dd41fc09729f6_consumer",
+  "efficacy": {
+    "causal_claim_allowed": false,
+    "claim": "Observed association only; no causal claim from fixture sample.",
+    "consumed_rule_attempts": 1,
+    "non_consumed_comparable_attempts": 0,
+    "post_activation_failures": 0,
+    "pre_activation_failures": 3,
+    "sample_size": 4,
+    "status": "PASS",
+    "truth_source": "micro_tape_bundles_plus_stage14_metadata"
+  },
+  "failure_cluster": {
+    "failure_class": "CONTEXT_MISSING",
+    "min_source_failures": 3,
+    "source_failure_count": 3,
+    "source_failure_nodes": [
+      "mu:90081f5bedc48e5d2b516a2764b69e1fe2eeab6e7abde67bb4175a22931ac3b6",
+      "mu:aefffa0502b04bccf39f6879e7dac74a35e7c19741eb10744ea1ba8c90ef9f66",
+      "mu:7b46810f0139097e0b1b7e3aedd59c6bb22a1ea7c1823b5d91f28350caddc38b"
+    ],
+    "status": "PASS",
+    "truth_source": "micro_tape_bundles"
+  },
+  "later_capsule_consumed_rule": true,
+  "problems": [],
+  "schema_id": "Stage14CorpusFailureMemoryAudit.v1",
+  "source_failure_nodes": [
+    "mu:90081f5bedc48e5d2b516a2764b69e1fe2eeab6e7abde67bb4175a22931ac3b6",
+    "mu:aefffa0502b04bccf39f6879e7dac74a35e7c19741eb10744ea1ba8c90ef9f66",
+    "mu:7b46810f0139097e0b1b7e3aedd59c6bb22a1ea7c1823b5d91f28350caddc38b"
+  ],
+  "status": "PASS",
+  "truth_source": "micro_tape_bundles_plus_coverage_refs"
+}
