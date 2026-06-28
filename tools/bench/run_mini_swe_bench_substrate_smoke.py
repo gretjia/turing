@@ -254,6 +254,19 @@ def init_micro_git(path: Path) -> None:
         raise RuntimeError(f"git init sha256 failed: {proc.stderr}")
 
 
+def export_micro_tape_bundle(instance_dir: Path, micro_git: Path) -> dict[str, str]:
+    bundle = instance_dir / "micro_tape.bundle"
+    if bundle.exists():
+        bundle.unlink()
+    proc = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=micro_git, timeout=120)
+    if proc.returncode != 0:
+        raise RuntimeError(f"micro tape bundle create failed for {micro_git}:\n{proc.stderr}")
+    return {
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": digest_bytes(bundle.read_bytes()),
+    }
+
+
 def increment(mapping: dict[str, int], key: str, amount: int = 1) -> None:
     mapping[key] = mapping.get(key, 0) + amount
 
@@ -1087,6 +1100,8 @@ def run_substrate_task(
         raise RuntimeError(f"handoff generation failed:\n{handoff.stderr}")
     mark_module("M17_e2e_handoff")
 
+    bundle_info = export_micro_tape_bundle(instance_dir, micro_git)
+
     return {
         "instance_id": task["instance_id"],
         "worker_mode": worker_mode,
@@ -1121,6 +1136,7 @@ def run_substrate_task(
         "event_calls": event_calls,
         "receipt_count": len(receipts),
         "micro_git": str(micro_git),
+        **bundle_info,
         "project": str(project),
         "basis": "real_daemon_rpc_plus_explicit_qualification_checks",
     }

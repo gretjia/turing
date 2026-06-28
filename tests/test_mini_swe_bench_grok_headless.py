@@ -762,6 +762,76 @@ def test_django_fail_to_pass_labels_convert_to_runtests_labels():
     ]
 
 
+def test_evaluator_refreshes_micro_tape_bundle_after_terminal_import(tmp_path):
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    repo = tmp_path / "micro"
+    repo.mkdir()
+    subprocess.run(["git", "-C", str(repo), "init", "--object-format=sha256", "-q", "--", "."], check=True)
+    (repo / "event").write_text('{"event_type":"SystemConstitutionAccepted"}\n', encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "event"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "-c",
+            "user.name=TuringOS Test",
+            "-c",
+            "user.email=test@example.invalid",
+            "commit",
+            "-m",
+            "genesis",
+            "-q",
+        ],
+        check=True,
+    )
+    run = {
+        "instance_id": "django__django-stage12-refresh",
+        "micro_git": str(repo),
+        "micro_tape_bundle": str(tmp_path / "micro_tape.bundle"),
+    }
+    first = evaluator.refresh_micro_tape_bundle(run)
+
+    (repo / "event").write_text('{"event_type":"OfficialEvaluatorEvidenceImported"}\n', encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "event"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "-c",
+            "user.name=TuringOS Test",
+            "-c",
+            "user.email=test@example.invalid",
+            "commit",
+            "-m",
+            "official evidence",
+            "-q",
+        ],
+        check=True,
+    )
+
+    refreshed = evaluator.refresh_micro_tape_bundle(run)
+
+    assert Path(refreshed["micro_tape_bundle"]).exists()
+    assert refreshed["micro_tape_bundle"] == first["micro_tape_bundle"]
+    assert refreshed["micro_tape_bundle_sha256"].startswith("sha256:")
+    assert refreshed["micro_tape_bundle_sha256"] != first["micro_tape_bundle_sha256"]
+    assert run["micro_tape_bundle_refreshed_after_eval"] is True
+
+    coverage = tmp_path / "substrate_coverage.json"
+    coverage.write_text(
+        json.dumps({"schema_id": "coverage.v1", "turingos_arm_runs": [{"instance_id": run["instance_id"]}]})
+        + "\n",
+        encoding="utf-8",
+    )
+    evaluator.write_refreshed_substrate_coverage(coverage, {run["instance_id"]: run})
+    coverage_packet = json.loads(coverage.read_text(encoding="utf-8"))
+    coverage_run = coverage_packet["turingos_arm_runs"][0]
+    assert coverage_run["micro_tape_bundle_sha256"] == refreshed["micro_tape_bundle_sha256"]
+    assert coverage_run["micro_tape_bundle_refreshed_after_eval"] is True
+
+
 def test_gate_a_capsule_prompt_injects_scope_and_broadcast_rules():
     runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
     task = {

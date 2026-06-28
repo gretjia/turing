@@ -102,5 +102,8 @@ def test_cli_accepts_explicit_test_local_authority_for_required_mode(tmp_path):
     assert run["authority_provider"] == "test-local"
     assert run["fallback_to_auto_authorization"] is False
     assert run["authorization_head"].startswith("mu:")
+    assert run["micro_tape_bundle"].endswith("micro_tape.bundle")
+    assert Path(run["micro_tape_bundle"]).exists()
+    assert run["micro_tape_bundle_sha256"].startswith("sha256:")
     assert run["event_calls"]["AtomAuthorized"] == 1
     assert run["event_calls"]["WorkerDispatchAuthorized"] == 1

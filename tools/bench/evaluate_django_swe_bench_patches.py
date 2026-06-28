@@ -75,6 +75,10 @@ def digest_text(text: str) -> str:
     return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def digest_bytes(data: bytes) -> str:
+    return "sha256:" + hashlib.sha256(data).hexdigest()
+
+
 def is_forbidden_test_path(path: str) -> bool:
     normalized = path.lstrip("./")
     name = Path(normalized).name
@@ -308,6 +312,34 @@ def load_substrate_runs(path: Path | None) -> dict[str, dict[str, Any]]:
         return {}
     packet = json.loads(path.read_text(encoding="utf-8"))
     return {run["instance_id"]: run for run in packet.get("turingos_arm_runs", [])}
+
+
+def refresh_micro_tape_bundle(substrate_run: dict[str, Any]) -> dict[str, Any]:
+    micro_git = Path(substrate_run["micro_git"])
+    bundle = Path(substrate_run.get("micro_tape_bundle") or (micro_git.parent / "micro_tape.bundle"))
+    bundle.parent.mkdir(parents=True, exist_ok=True)
+    if bundle.exists():
+        bundle.unlink()
+    proc = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=micro_git, timeout=120)
+    if proc.returncode != 0:
+        raise RuntimeError(f"micro tape bundle refresh failed for {micro_git}:\n{proc.stderr}")
+    substrate_run["micro_tape_bundle"] = str(bundle)
+    substrate_run["micro_tape_bundle_sha256"] = digest_bytes(bundle.read_bytes())
+    substrate_run["micro_tape_bundle_refreshed_after_eval"] = True
+    return {
+        "micro_tape_bundle": substrate_run["micro_tape_bundle"],
+        "micro_tape_bundle_sha256": substrate_run["micro_tape_bundle_sha256"],
+        "micro_tape_bundle_refreshed_after_eval": True,
+    }
+
+
+def write_refreshed_substrate_coverage(path: Path, substrate_runs: dict[str, dict[str, Any]]) -> None:
+    packet = json.loads(path.read_text(encoding="utf-8"))
+    for run in packet.get("turingos_arm_runs", []):
+        instance_id = run.get("instance_id")
+        if instance_id in substrate_runs:
+            run.update(substrate_runs[instance_id])
+    path.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def micro_import_socket_path(runtime_root: Path, instance_id: str) -> Path:
@@ -653,6 +685,7 @@ def main(argv: list[str] | None = None) -> int:
     python = ensure_django_venv(Path(args.venv))
     tasks = read_tasks(Path(args.tasks_jsonl), args.limit)
     substrate_runs = load_substrate_runs(Path(args.substrate_coverage)) if args.substrate_coverage else {}
+    refreshed_substrate_coverage = False
     results = []
     broadcast_rules: list[dict[str, str]] = []
     for task in tasks:
@@ -674,6 +707,10 @@ def main(argv: list[str] | None = None) -> int:
                     daemon_bin_dir=Path(args.daemon_bin_dir),
                     runtime_root=out / "micro_import_runtime",
                 )
+                turingos_result["micro_tape_import"].update(
+                    refresh_micro_tape_bundle(substrate_runs[task["instance_id"]])
+                )
+                refreshed_substrate_coverage = True
         evidence_payload = turingos_result.get("official_evaluator_evidence")
         if isinstance(evidence_payload, dict):
             rule = broadcast_rule_from_evidence(evidence_payload)
@@ -696,6 +733,8 @@ def main(argv: list[str] | None = None) -> int:
         "statistical_claim": "none_smoke_only",
     }
     (out / "patch_eval_summary.json").write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if args.substrate_coverage and refreshed_substrate_coverage:
+        write_refreshed_substrate_coverage(Path(args.substrate_coverage), substrate_runs)
     (out / "broadcast_rules.json").write_text(
         json.dumps(
             {
