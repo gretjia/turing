@@ -1,0 +1,1567 @@
+{
+  "aggregate": {
+    "bundle_count": 2,
+    "event_count": 44,
+    "event_counts": {
+      "AtomAuthorized": 2,
+      "BudgetAllocated": 2,
+      "CandidateAccepted": 1,
+      "CostEvent": 2,
+      "FailureNode": 1,
+      "GoalStateProposed": 2,
+      "MacroObservationImported": 2,
+      "MarketCreated": 2,
+      "MarketSettled": 2,
+      "OfficialEvaluatorEvidenceImported": 2,
+      "PPUTAccounted": 2,
+      "PositionMinted": 2,
+      "PredicateEvaluated": 2,
+      "RewardDistributed": 2,
+      "SystemConstitutionAccepted": 2,
+      "ToolReceiptAppended": 10,
+      "WorkCapsuleBuilt": 2,
+      "WorkerDispatchAuthorized": 2,
+      "WorkerReceiptImported": 2
+    },
+    "finding_counts": {
+      "official_evidence_precedes_accept": 1
+    }
+  },
+  "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
+  "event_registry": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+  "runs": [
+    {
+      "actual_refs": {
+        "accepted_head": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+        "authorization_head": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+        "tape_tip": "mu:0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a"
+      },
+      "bundle": "evidence/bench/mini_swe_bench_stage9_native_api_worker_20260628/turingos/instances/django__django-12039/micro_tape.bundle",
+      "bundle_hash": "sha256:3afc40ea18d9ef050641cbffb8bed24f055d4eb2702140d03d5e5aff687f4ef1",
+      "bundle_verify_output": "The bundle contains these 5 refs:\n0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a refs/heads/master\n7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732 refs/turingos/accepted_head\naef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324 refs/turingos/authorization_head\n0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a refs/turingos/tape_tip\n0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a HEAD\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "PASS",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+          "kind": "tape_parent",
+          "to": "mu:1931559086e221a27590365647b02e1dd071188054650c5c1248e3c69dc4ff9c"
+        },
+        {
+          "from": "mu:1931559086e221a27590365647b02e1dd071188054650c5c1248e3c69dc4ff9c",
+          "kind": "tape_parent",
+          "to": "mu:c57e83515a6748965be4a67fbdb16255c338432727f20e9bf39b1a6ca55fd7d3"
+        },
+        {
+          "from": "mu:c57e83515a6748965be4a67fbdb16255c338432727f20e9bf39b1a6ca55fd7d3",
+          "kind": "tape_parent",
+          "to": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "tape_parent",
+          "to": "mu:44b07d975fd88b68a0f28b5e7a8126c468f512a72bc789af859e7591278b12b1"
+        },
+        {
+          "from": "mu:44b07d975fd88b68a0f28b5e7a8126c468f512a72bc789af859e7591278b12b1",
+          "kind": "tape_parent",
+          "to": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd"
+        },
+        {
+          "from": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd",
+          "kind": "tape_parent",
+          "to": "mu:0174cfb96dd8aeeb11b431207ff70c23cdf9cbcaf45ab8b7ea24de8d4cf31235"
+        },
+        {
+          "from": "mu:0174cfb96dd8aeeb11b431207ff70c23cdf9cbcaf45ab8b7ea24de8d4cf31235",
+          "kind": "tape_parent",
+          "to": "mu:b5ba8762d9320ee19d1730a4e43121cd950acf6c3b95054fbd14ef93ef5777d4"
+        },
+        {
+          "from": "mu:b5ba8762d9320ee19d1730a4e43121cd950acf6c3b95054fbd14ef93ef5777d4",
+          "kind": "tape_parent",
+          "to": "mu:f0d41dc46d9d8b2e4731240335f4f04241d3bd59f5cdd9a7da1764712d1a2b5f"
+        },
+        {
+          "from": "mu:f0d41dc46d9d8b2e4731240335f4f04241d3bd59f5cdd9a7da1764712d1a2b5f",
+          "kind": "tape_parent",
+          "to": "mu:35d0f9e6c87795dbee3fd983693ea6125c61b3250fa55c7fb40e369a0396a9e8"
+        },
+        {
+          "from": "mu:35d0f9e6c87795dbee3fd983693ea6125c61b3250fa55c7fb40e369a0396a9e8",
+          "kind": "tape_parent",
+          "to": "mu:e8a8487daf059196a3cf5569f5b2516f5d9bdc7b2694f94ae53214777a4c4231"
+        },
+        {
+          "from": "mu:e8a8487daf059196a3cf5569f5b2516f5d9bdc7b2694f94ae53214777a4c4231",
+          "kind": "tape_parent",
+          "to": "mu:382caaa7e5b0e24d12f5eb61046bd37c647aef323183cd943c6ec47854e04434"
+        },
+        {
+          "from": "mu:382caaa7e5b0e24d12f5eb61046bd37c647aef323183cd943c6ec47854e04434",
+          "kind": "tape_parent",
+          "to": "mu:15ddae465c3c78853ff0759e144365fd1e3df03defdec415a075e5f44b0a52f6"
+        },
+        {
+          "from": "mu:15ddae465c3c78853ff0759e144365fd1e3df03defdec415a075e5f44b0a52f6",
+          "kind": "tape_parent",
+          "to": "mu:bb874d7404cbf4991fb394da72049a95b52effa255a386fe7fd3d6492bf9bb62"
+        },
+        {
+          "from": "mu:bb874d7404cbf4991fb394da72049a95b52effa255a386fe7fd3d6492bf9bb62",
+          "kind": "tape_parent",
+          "to": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8"
+        },
+        {
+          "from": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8",
+          "kind": "tape_parent",
+          "to": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046"
+        },
+        {
+          "from": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046",
+          "kind": "tape_parent",
+          "to": "mu:38a399a08c6c84381cc7993d60d5380e9ab15193cae75fe98103a8560bbe0fbe"
+        },
+        {
+          "from": "mu:38a399a08c6c84381cc7993d60d5380e9ab15193cae75fe98103a8560bbe0fbe",
+          "kind": "tape_parent",
+          "to": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13"
+        },
+        {
+          "from": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "kind": "tape_parent",
+          "to": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732"
+        },
+        {
+          "from": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "kind": "tape_parent",
+          "to": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728"
+        },
+        {
+          "from": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728",
+          "kind": "tape_parent",
+          "to": "mu:839ad70b18012087523843d7c4d055e2c792eacc89b7c353ea61561386bde021"
+        },
+        {
+          "from": "mu:839ad70b18012087523843d7c4d055e2c792eacc89b7c353ea61561386bde021",
+          "kind": "tape_parent",
+          "to": "mu:f8138672d69f78262c02627de98e03d8bf01163c9da112308291e903ad972bc0"
+        },
+        {
+          "from": "mu:f8138672d69f78262c02627de98e03d8bf01163c9da112308291e903ad972bc0",
+          "kind": "tape_parent",
+          "to": "mu:0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324"
+        },
+        {
+          "from": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd",
+          "kind": "market_ref",
+          "to": "mu:0174cfb96dd8aeeb11b431207ff70c23cdf9cbcaf45ab8b7ea24de8d4cf31235"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:b5ba8762d9320ee19d1730a4e43121cd950acf6c3b95054fbd14ef93ef5777d4"
+        },
+        {
+          "from": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd",
+          "kind": "market_ref",
+          "to": "mu:b5ba8762d9320ee19d1730a4e43121cd950acf6c3b95054fbd14ef93ef5777d4"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:f0d41dc46d9d8b2e4731240335f4f04241d3bd59f5cdd9a7da1764712d1a2b5f"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:35d0f9e6c87795dbee3fd983693ea6125c61b3250fa55c7fb40e369a0396a9e8"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:e8a8487daf059196a3cf5569f5b2516f5d9bdc7b2694f94ae53214777a4c4231"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:382caaa7e5b0e24d12f5eb61046bd37c647aef323183cd943c6ec47854e04434"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:15ddae465c3c78853ff0759e144365fd1e3df03defdec415a075e5f44b0a52f6"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:bb874d7404cbf4991fb394da72049a95b52effa255a386fe7fd3d6492bf9bb62"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:38a399a08c6c84381cc7993d60d5380e9ab15193cae75fe98103a8560bbe0fbe"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13"
+        },
+        {
+          "from": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8",
+          "kind": "receipt_ref",
+          "to": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13"
+        },
+        {
+          "from": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046",
+          "kind": "macro_ref",
+          "to": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13"
+        },
+        {
+          "from": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "kind": "capsule_ref",
+          "to": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732"
+        },
+        {
+          "from": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8",
+          "kind": "receipt_ref",
+          "to": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732"
+        },
+        {
+          "from": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046",
+          "kind": "macro_ref",
+          "to": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732"
+        },
+        {
+          "from": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732"
+        },
+        {
+          "from": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd",
+          "kind": "market_ref",
+          "to": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728"
+        },
+        {
+          "from": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728"
+        },
+        {
+          "from": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "kind": "terminal_event_id",
+          "to": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728"
+        },
+        {
+          "from": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd",
+          "kind": "market_ref",
+          "to": "mu:839ad70b18012087523843d7c4d055e2c792eacc89b7c353ea61561386bde021"
+        },
+        {
+          "from": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728",
+          "kind": "settlement_event_id",
+          "to": "mu:839ad70b18012087523843d7c4d055e2c792eacc89b7c353ea61561386bde021"
+        },
+        {
+          "from": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "kind": "basis_event_id",
+          "to": "mu:f8138672d69f78262c02627de98e03d8bf01163c9da112308291e903ad972bc0"
+        },
+        {
+          "from": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "kind": "terminal_event_id",
+          "to": "mu:f8138672d69f78262c02627de98e03d8bf01163c9da112308291e903ad972bc0"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+        "authorization_head": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+        "tape_tip": "mu:0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a"
+      },
+      "event_count": 23,
+      "event_counts": {
+        "AtomAuthorized": 1,
+        "BudgetAllocated": 1,
+        "CandidateAccepted": 1,
+        "CostEvent": 1,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 1,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "ToolReceiptAppended": 6,
+        "WorkCapsuleBuilt": 1,
+        "WorkerDispatchAuthorized": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:f56417de037f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "f56417d",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:1931559086e221a27590365647b02e1dd071188054650c5c1248e3c69dc4ff9c",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:1931559086e2",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "1931559",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:c57e83515a6748965be4a67fbdb16255c338432727f20e9bf39b1a6ca55fd7d3",
+          "event_type": "AtomAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "2:AtomAuthorized:c57e83515a67",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "c57e835",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+          "event_type": "WorkerDispatchAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "3:WorkerDispatchAuthorized:aef2bf049cda",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "aef2bf0",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:44b07d975fd88b68a0f28b5e7a8126c468f512a72bc789af859e7591278b12b1",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "4:WorkCapsuleBuilt:44b07d975fd8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "44b07d9",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:678882fde149a64b1fd9b75c7eda130e45bbb75d86263f4015f1f3c66da2e3fd",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_3ca4462c9852c1a6",
+          "node_id": "5:MarketCreated:678882fde149",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "678882f",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:0174cfb96dd8aeeb11b431207ff70c23cdf9cbcaf45ab8b7ea24de8d4cf31235",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_3ca4462c9852c1a6",
+          "node_id": "6:PositionMinted:0174cfb96dd8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "0174cfb",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:b5ba8762d9320ee19d1730a4e43121cd950acf6c3b95054fbd14ef93ef5777d4",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_3ca4462c9852c1a6",
+          "node_id": "7:BudgetAllocated:b5ba8762d932",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "b5ba876",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:f0d41dc46d9d8b2e4731240335f4f04241d3bd59f5cdd9a7da1764712d1a2b5f",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:ToolReceiptAppended:f0d41dc46d9d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "f0d41dc",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:35d0f9e6c87795dbee3fd983693ea6125c61b3250fa55c7fb40e369a0396a9e8",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "9:ToolReceiptAppended:35d0f9e6c877",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "35d0f9e",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:e8a8487daf059196a3cf5569f5b2516f5d9bdc7b2694f94ae53214777a4c4231",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:ToolReceiptAppended:e8a8487daf05",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "e8a8487",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:382caaa7e5b0e24d12f5eb61046bd37c647aef323183cd943c6ec47854e04434",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "11:ToolReceiptAppended:382caaa7e5b0",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "382caaa",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:15ddae465c3c78853ff0759e144365fd1e3df03defdec415a075e5f44b0a52f6",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:ToolReceiptAppended:15ddae465c3c",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 12,
+          "short_id": "15ddae4",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:bb874d7404cbf4991fb394da72049a95b52effa255a386fe7fd3d6492bf9bb62",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "13:ToolReceiptAppended:bb874d7404cb",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 13,
+          "short_id": "bb874d7",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:WorkerReceiptImported:b6fca3707da5",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 14,
+          "short_id": "b6fca37",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "15:MacroObservationImported:3630106c8e07",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "3630106",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:38a399a08c6c84381cc7993d60d5380e9ab15193cae75fe98103a8560bbe0fbe",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "16:CostEvent:38a399a08c6c",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 16,
+          "short_id": "38a399a",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "17:OfficialEvaluatorEvidenceImported:ee8a56935ad8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 17,
+          "short_id": "ee8a569",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "18:CandidateAccepted:7d74eae536ba",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 18,
+          "short_id": "7d74eae",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "capsule_id": null,
+          "event_id": "mu:e29fbd0697363fcf7f3cc7a453fdfd677fef19e8a2aba5ed8efec184527f8728",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_3ca4462c9852c1a6",
+          "node_id": "19:MarketSettled:e29fbd069736",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "YES",
+          "sequence": 19,
+          "short_id": "e29fbd0",
+          "terminal_event_id": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:839ad70b18012087523843d7c4d055e2c792eacc89b7c353ea61561386bde021",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_3ca4462c9852c1a6",
+          "node_id": "20:RewardDistributed:839ad70b1801",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 20,
+          "short_id": "839ad70",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "capsule_id": null,
+          "event_id": "mu:f8138672d69f78262c02627de98e03d8bf01163c9da112308291e903ad972bc0",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "21:PPUTAccounted:f8138672d69f",
+          "predicate_product": "PASS",
+          "progress": 1,
+          "result": null,
+          "sequence": 21,
+          "short_id": "f813867",
+          "terminal_event_id": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "22:PredicateEvaluated:0e1e2777c8d4",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 22,
+          "short_id": "0e1e277",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        }
+      ],
+      "execution_findings": [
+        {
+          "detail": "CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.",
+          "finding": "official_evidence_precedes_accept",
+          "severity": "INFO"
+        }
+      ],
+      "first_candidate_accepted": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+      "git_evidence": {
+        "git_fsck_strict_stderr": "",
+        "git_fsck_strict_stdout": "",
+        "object_format": "sha256"
+      },
+      "golden_path": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:1931559086e221a27590365647b02e1dd071188054650c5c1248e3c69dc4ff9c",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:1931559086e2",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "1931559",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:44b07d975fd88b68a0f28b5e7a8126c468f512a72bc789af859e7591278b12b1",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "4:WorkCapsuleBuilt:44b07d975fd8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "44b07d9",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:b6fca3707da50ec160e86a48bff195e4228f9ee6adeaec15d74245dac61412b8",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:WorkerReceiptImported:b6fca3707da5",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 14,
+          "short_id": "b6fca37",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:3630106c8e07427d7b7bd7e5be3e0426b62806607aea0f3e389fffb263eda046",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "15:MacroObservationImported:3630106c8e07",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "3630106",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:ee8a56935ad83326088d779d50286e0b25147d2e8c8536c4d95e912207132e13",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "17:OfficialEvaluatorEvidenceImported:ee8a56935ad8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 17,
+          "short_id": "ee8a569",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+          "event_id": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "18:CandidateAccepted:7d74eae536ba",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 18,
+          "short_id": "7d74eae",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        }
+      ],
+      "golden_path_basis": "terminal_accepted_head",
+      "path_class": "accepted_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732"
+    },
+    {
+      "actual_refs": {
+        "accepted_head": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+        "authorization_head": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+        "tape_tip": "mu:c455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7"
+      },
+      "bundle": "evidence/bench/mini_swe_bench_stage9_native_api_worker_20260628/turingos/instances/django__django-12050/micro_tape.bundle",
+      "bundle_hash": "sha256:8c66d2b84e6008590616505dffa4f7698e7b60f484da40c716d8cb2cc0a314a0",
+      "bundle_verify_output": "The bundle contains these 5 refs:\nc455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7 refs/heads/master\nf56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1 refs/turingos/accepted_head\n6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb refs/turingos/authorization_head\nc455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7 refs/turingos/tape_tip\nc455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7 HEAD\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "PASS",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+          "kind": "tape_parent",
+          "to": "mu:cc0b2ea7e4008577bbfed791d74f18d8a1be25c4f89271d20353b675f980c28d"
+        },
+        {
+          "from": "mu:cc0b2ea7e4008577bbfed791d74f18d8a1be25c4f89271d20353b675f980c28d",
+          "kind": "tape_parent",
+          "to": "mu:5066a93a4513d4a24383c295e21b98df4c98406472ec3ffc464513f6b9b7d365"
+        },
+        {
+          "from": "mu:5066a93a4513d4a24383c295e21b98df4c98406472ec3ffc464513f6b9b7d365",
+          "kind": "tape_parent",
+          "to": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "tape_parent",
+          "to": "mu:ee33dab496d55ae1632503e1838cd3b76cb8a1698bce2bb16d9d6bb9538dc7eb"
+        },
+        {
+          "from": "mu:ee33dab496d55ae1632503e1838cd3b76cb8a1698bce2bb16d9d6bb9538dc7eb",
+          "kind": "tape_parent",
+          "to": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e"
+        },
+        {
+          "from": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e",
+          "kind": "tape_parent",
+          "to": "mu:86675d30b2be6d877ee501f44dd8b0083aeaaec3ae1d2c85d2d117a92b6a5410"
+        },
+        {
+          "from": "mu:86675d30b2be6d877ee501f44dd8b0083aeaaec3ae1d2c85d2d117a92b6a5410",
+          "kind": "tape_parent",
+          "to": "mu:4b4efd249e8deea492014b6b9b7c33949f97b3b70373527f2a4eab6587da1943"
+        },
+        {
+          "from": "mu:4b4efd249e8deea492014b6b9b7c33949f97b3b70373527f2a4eab6587da1943",
+          "kind": "tape_parent",
+          "to": "mu:7877cf88c76aeaa016bc0e28478d0c6da3eaeb4d4a43a0c9faf9c4045a815455"
+        },
+        {
+          "from": "mu:7877cf88c76aeaa016bc0e28478d0c6da3eaeb4d4a43a0c9faf9c4045a815455",
+          "kind": "tape_parent",
+          "to": "mu:1fb6650158f2ba77022cd96ef9039c8ed79ec3bdb39a29367774cfece2ccf0b8"
+        },
+        {
+          "from": "mu:1fb6650158f2ba77022cd96ef9039c8ed79ec3bdb39a29367774cfece2ccf0b8",
+          "kind": "tape_parent",
+          "to": "mu:8fe481b424850ca25c56216f4706062d4ef70d3c8d8f2bb7014fdd22da81ad70"
+        },
+        {
+          "from": "mu:8fe481b424850ca25c56216f4706062d4ef70d3c8d8f2bb7014fdd22da81ad70",
+          "kind": "tape_parent",
+          "to": "mu:32aca58a6b60738f76894c27a3ebee83dfd7a9148e3c394d4295c170a887ffc9"
+        },
+        {
+          "from": "mu:32aca58a6b60738f76894c27a3ebee83dfd7a9148e3c394d4295c170a887ffc9",
+          "kind": "tape_parent",
+          "to": "mu:6a784271b7c3ca8f6067296327d3f287eff07fcffccaa33b04d8605ad15a0334"
+        },
+        {
+          "from": "mu:6a784271b7c3ca8f6067296327d3f287eff07fcffccaa33b04d8605ad15a0334",
+          "kind": "tape_parent",
+          "to": "mu:57d092811f9f7cdd37a6142825ac591ae74a84f6a7a03163636a95660b4faba1"
+        },
+        {
+          "from": "mu:57d092811f9f7cdd37a6142825ac591ae74a84f6a7a03163636a95660b4faba1",
+          "kind": "tape_parent",
+          "to": "mu:f7d913baa8201ab30d4590a8f6029e2faf1e02ab0cd90c9333c3818e1668fc12"
+        },
+        {
+          "from": "mu:f7d913baa8201ab30d4590a8f6029e2faf1e02ab0cd90c9333c3818e1668fc12",
+          "kind": "tape_parent",
+          "to": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed"
+        },
+        {
+          "from": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "kind": "tape_parent",
+          "to": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd"
+        },
+        {
+          "from": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd",
+          "kind": "tape_parent",
+          "to": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa"
+        },
+        {
+          "from": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa",
+          "kind": "tape_parent",
+          "to": "mu:6184e5fc809862ef4874f24983851b8c23809148ca6c372a8d397d2466c14266"
+        },
+        {
+          "from": "mu:6184e5fc809862ef4874f24983851b8c23809148ca6c372a8d397d2466c14266",
+          "kind": "tape_parent",
+          "to": "mu:410a199ccb91f03e906c95fed5f3d04303c668cce10d7560f42a3c0eb1839b63"
+        },
+        {
+          "from": "mu:410a199ccb91f03e906c95fed5f3d04303c668cce10d7560f42a3c0eb1839b63",
+          "kind": "tape_parent",
+          "to": "mu:c455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb"
+        },
+        {
+          "from": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e",
+          "kind": "market_ref",
+          "to": "mu:86675d30b2be6d877ee501f44dd8b0083aeaaec3ae1d2c85d2d117a92b6a5410"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:4b4efd249e8deea492014b6b9b7c33949f97b3b70373527f2a4eab6587da1943"
+        },
+        {
+          "from": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e",
+          "kind": "market_ref",
+          "to": "mu:4b4efd249e8deea492014b6b9b7c33949f97b3b70373527f2a4eab6587da1943"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:7877cf88c76aeaa016bc0e28478d0c6da3eaeb4d4a43a0c9faf9c4045a815455"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:1fb6650158f2ba77022cd96ef9039c8ed79ec3bdb39a29367774cfece2ccf0b8"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:8fe481b424850ca25c56216f4706062d4ef70d3c8d8f2bb7014fdd22da81ad70"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:32aca58a6b60738f76894c27a3ebee83dfd7a9148e3c394d4295c170a887ffc9"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:6a784271b7c3ca8f6067296327d3f287eff07fcffccaa33b04d8605ad15a0334"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:57d092811f9f7cdd37a6142825ac591ae74a84f6a7a03163636a95660b4faba1"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:f7d913baa8201ab30d4590a8f6029e2faf1e02ab0cd90c9333c3818e1668fc12"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed"
+        },
+        {
+          "from": "mu:6a784271b7c3ca8f6067296327d3f287eff07fcffccaa33b04d8605ad15a0334",
+          "kind": "receipt_ref",
+          "to": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed"
+        },
+        {
+          "from": "mu:57d092811f9f7cdd37a6142825ac591ae74a84f6a7a03163636a95660b4faba1",
+          "kind": "macro_ref",
+          "to": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed"
+        },
+        {
+          "from": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "kind": "capsule_ref",
+          "to": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd"
+        },
+        {
+          "from": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd"
+        },
+        {
+          "from": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e",
+          "kind": "market_ref",
+          "to": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa"
+        },
+        {
+          "from": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa"
+        },
+        {
+          "from": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd",
+          "kind": "terminal_event_id",
+          "to": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa"
+        },
+        {
+          "from": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e",
+          "kind": "market_ref",
+          "to": "mu:6184e5fc809862ef4874f24983851b8c23809148ca6c372a8d397d2466c14266"
+        },
+        {
+          "from": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa",
+          "kind": "settlement_event_id",
+          "to": "mu:6184e5fc809862ef4874f24983851b8c23809148ca6c372a8d397d2466c14266"
+        },
+        {
+          "from": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "kind": "basis_event_id",
+          "to": "mu:410a199ccb91f03e906c95fed5f3d04303c668cce10d7560f42a3c0eb1839b63"
+        },
+        {
+          "from": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd",
+          "kind": "terminal_event_id",
+          "to": "mu:410a199ccb91f03e906c95fed5f3d04303c668cce10d7560f42a3c0eb1839b63"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+        "authorization_head": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+        "tape_tip": "mu:c455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7"
+      },
+      "event_count": 21,
+      "event_counts": {
+        "AtomAuthorized": 1,
+        "BudgetAllocated": 1,
+        "CostEvent": 1,
+        "FailureNode": 1,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 1,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "ToolReceiptAppended": 4,
+        "WorkCapsuleBuilt": 1,
+        "WorkerDispatchAuthorized": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:f56417de037f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "f56417d",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:cc0b2ea7e4008577bbfed791d74f18d8a1be25c4f89271d20353b675f980c28d",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:cc0b2ea7e400",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "cc0b2ea",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:5066a93a4513d4a24383c295e21b98df4c98406472ec3ffc464513f6b9b7d365",
+          "event_type": "AtomAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "2:AtomAuthorized:5066a93a4513",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "5066a93",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+          "event_type": "WorkerDispatchAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "3:WorkerDispatchAuthorized:6efe62b84bcb",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "6efe62b",
+          "terminal_event_id": null,
+          "writer_id": "writer:test-local-authority"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:ee33dab496d55ae1632503e1838cd3b76cb8a1698bce2bb16d9d6bb9538dc7eb",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "4:WorkCapsuleBuilt:ee33dab496d5",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "ee33dab",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:1fa1bb5f9b148f647ffaf830b1dae4d19f4fb99041993b9a3c486ac4e7029c9e",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_8c367ffa892da4c2",
+          "node_id": "5:MarketCreated:1fa1bb5f9b14",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "1fa1bb5",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:86675d30b2be6d877ee501f44dd8b0083aeaaec3ae1d2c85d2d117a92b6a5410",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_8c367ffa892da4c2",
+          "node_id": "6:PositionMinted:86675d30b2be",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "86675d3",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:4b4efd249e8deea492014b6b9b7c33949f97b3b70373527f2a4eab6587da1943",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_8c367ffa892da4c2",
+          "node_id": "7:BudgetAllocated:4b4efd249e8d",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "4b4efd2",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:7877cf88c76aeaa016bc0e28478d0c6da3eaeb4d4a43a0c9faf9c4045a815455",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:ToolReceiptAppended:7877cf88c76a",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "7877cf8",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:1fb6650158f2ba77022cd96ef9039c8ed79ec3bdb39a29367774cfece2ccf0b8",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "9:ToolReceiptAppended:1fb6650158f2",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "1fb6650",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:8fe481b424850ca25c56216f4706062d4ef70d3c8d8f2bb7014fdd22da81ad70",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:ToolReceiptAppended:8fe481b42485",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "8fe481b",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:32aca58a6b60738f76894c27a3ebee83dfd7a9148e3c394d4295c170a887ffc9",
+          "event_type": "ToolReceiptAppended",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "11:ToolReceiptAppended:32aca58a6b60",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "32aca58",
+          "terminal_event_id": null,
+          "writer_id": "writer:native-api-worker"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:6a784271b7c3ca8f6067296327d3f287eff07fcffccaa33b04d8605ad15a0334",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:WorkerReceiptImported:6a784271b7c3",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 12,
+          "short_id": "6a78427",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:57d092811f9f7cdd37a6142825ac591ae74a84f6a7a03163636a95660b4faba1",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "13:MacroObservationImported:57d092811f9f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 13,
+          "short_id": "57d0928",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:f7d913baa8201ab30d4590a8f6029e2faf1e02ab0cd90c9333c3818e1668fc12",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:CostEvent:f7d913baa820",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 14,
+          "short_id": "f7d913b",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": "PATCH_APPLIES_BUT_WRONG",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "15:OfficialEvaluatorEvidenceImported:beebdcf046c6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "FAIL",
+          "sequence": 15,
+          "short_id": "beebdcf",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_stage9_8c367ffa892da4c2",
+          "event_id": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd",
+          "event_type": "FailureNode",
+          "failure_class": "PATCH_APPLIES_BUT_WRONG",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "16:FailureNode:4d9c67993967",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": null,
+          "sequence": 16,
+          "short_id": "4d9c679",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "capsule_id": null,
+          "event_id": "mu:58baebeb7fb49c41a64eda71882e2c6959319dfd0c98b8fab99fefddb413eafa",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_8c367ffa892da4c2",
+          "node_id": "17:MarketSettled:58baebeb7fb4",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "NO",
+          "sequence": 17,
+          "short_id": "58baebe",
+          "terminal_event_id": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:6184e5fc809862ef4874f24983851b8c23809148ca6c372a8d397d2466c14266",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_stage9_8c367ffa892da4c2",
+          "node_id": "18:RewardDistributed:6184e5fc8098",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 18,
+          "short_id": "6184e5f",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:beebdcf046c63d65b58076b53381dc991a646f3905971ef77d88eaa06b14b1ed",
+          "capsule_id": null,
+          "event_id": "mu:410a199ccb91f03e906c95fed5f3d04303c668cce10d7560f42a3c0eb1839b63",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "19:PPUTAccounted:410a199ccb91",
+          "predicate_product": "PASS",
+          "progress": 0,
+          "result": null,
+          "sequence": 19,
+          "short_id": "410a199",
+          "terminal_event_id": "mu:4d9c679939673c83ba746e0d34619f43890b6b6aecd7e990cb5ba4fcb53f3ccd",
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:c455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "20:PredicateEvaluated:c455b24efa98",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 20,
+          "short_id": "c455b24",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        }
+      ],
+      "execution_findings": [],
+      "first_candidate_accepted": null,
+      "git_evidence": {
+        "git_fsck_strict_stderr": "",
+        "git_fsck_strict_stdout": "",
+        "object_format": "sha256"
+      },
+      "golden_path": [],
+      "golden_path_basis": null,
+      "path_class": "failed_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "terminal_candidate_accepted": null
+    }
+  ],
+  "schema_id": "MicroTapeDecisionDagAudit.v2",
+  "status_summary": {
+    "accepted_final_progress_one": "PASS",
+    "accepted_head_authority": "PASS",
+    "authorization_head": "PASS",
+    "basic_ref_reconstruction": "PASS",
+    "bundle_accessibility": "PASS",
+    "bundle_integrity": "PASS",
+    "canonical_payload_hash": "PASS",
+    "constitutional_protocol_audit": "PASS",
+    "cost_conservation_all_branches": "PASS",
+    "decision_dag_completeness": "PASS",
+    "economic_timing": "PASS",
+    "failed_progress_zero": "PASS",
+    "git_topology": "PASS",
+    "market_accounting_correctness": "PASS",
+    "overall": "PASS",
+    "ref_reconstruction": "PASS",
+    "registry_head_effect": "PASS",
+    "replay_structural_integrity": "PASS",
+    "terminal_golden_path_anchors_to_accepted_head": "PASS",
+    "vpput_accounting": "PASS"
+  },
+  "strict_findings": [],
+  "truth_source": "micro_tape_bundle_only",
+  "verdict": "PASS"
+}
