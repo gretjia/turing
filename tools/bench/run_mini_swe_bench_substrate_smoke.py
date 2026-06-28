@@ -565,6 +565,86 @@ def maybe_authorize(
         raise
 
 
+def _repo_ref_mu(repo: Path, ref: str) -> str | None:
+    proc = run_cmd(["git", "-C", str(repo), "rev-parse", "--verify", ref], timeout=120)
+    if proc.returncode != 0:
+        return None
+    return "mu:" + proc.stdout.strip()
+
+
+def _stage6_state_from_existing_repo(repo: Path) -> dict[str, Any]:
+    proc = run_cmd(["git", "-C", str(repo), "rev-list", "--reverse", "refs/turingos/tape_tip"], timeout=120)
+    if proc.returncode != 0:
+        raise RuntimeError(f"cannot read tape_tip chain for test-local authority:\n{proc.stderr}")
+    oids = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+    return {
+        "accepted_head": _repo_ref_mu(repo, "refs/turingos/accepted_head"),
+        "authorization_head": _repo_ref_mu(repo, "refs/turingos/authorization_head"),
+        "authority_epoch": 0,
+        "event_ids": {},
+        "events": [],
+        "sequence": len(oids),
+        "tape_tip": "mu:" + oids[-1] if oids else None,
+    }
+
+
+def append_test_local_authorization(
+    *,
+    repo: Path,
+    event_type: str,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    """Append a benchmark-scope AUTHORIZATION event without credential material.
+
+    This helper is intentionally kept in the Python benchmark harness. It does
+    not loosen production turingd approval RPCs, which still require OsKeyring.
+    """
+
+    if payload.get("signature_route") != "test_local_authority":
+        raise ValueError("test-local authorization payload must declare signature_route=test_local_authority")
+    if payload.get("authority_kind") != "test_local_authority_no_credentials":
+        raise ValueError("test-local authorization payload must declare authority_kind=test_local_authority_no_credentials")
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    row = registry.get(event_type)
+    if not row or row.get("event_class") != "AUTHORIZATION":
+        raise ValueError(f"{event_type} is not an AUTHORIZATION registry event")
+    before = _stage6_state_from_existing_repo(repo)
+    authorization_head_before = before["authorization_head"]
+    if before["tape_tip"] is not None:
+        parent_oid = before["tape_tip"].removeprefix("mu:")
+        checkout = run_cmd(["git", "-C", str(repo), "checkout", "--detach", "-q", parent_oid], timeout=120)
+        if checkout.returncode != 0:
+            raise RuntimeError(f"cannot align test-local authority parent to tape_tip:\n{checkout.stderr}")
+    event = append_stage6_event(
+        repo=repo,
+        state=before,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id="writer:test-local-authority",
+    )
+    return {
+        "event_type": event_type,
+        "event_id": event["event_id"],
+        "head_effect": "ADVANCE",
+        "authorization_head_moved": authorization_head_before != event["event_id"],
+        "accepted_head_moved": False,
+        "authority_provider": "test-local",
+        "signature_route": "test_local_authority",
+        "head_set": {
+            "tape_tip": before["tape_tip"],
+            "authorization_head": before["authorization_head"],
+            "accepted_head": before["accepted_head"],
+        }
+        | {
+            "tape_tip": event["event_id"],
+            "authorization_head": event["event_id"],
+        },
+    }
+
+
 def run_substrate_task(
     task: dict[str, Any],
     out_dir: Path,
@@ -575,6 +655,7 @@ def run_substrate_task(
     worker_timeout_s: int,
     broadcast_rules: list[dict[str, Any]] | None = None,
     authorization_mode: str = "auto",
+    authority_provider: str = "os-keyring",
 ) -> dict[str, Any]:
     instance_dir = out_dir / "instances" / task["instance_id"]
     project = instance_dir / "project"
@@ -616,19 +697,34 @@ def run_substrate_task(
         mark_module("M0_law_goal_harness")
 
         atom_id = f"atom_{task['instance_id']}"
-        atom_auth = maybe_authorize(
-            turingd,
-            "approval.authorize_atom",
-            approval_request(
-                approval_id=f"ap_atom_{task['instance_id']}",
-                action="atom_authorize",
-                subject_id=atom_id,
-                evidence_digest=digest_text(task["instance_id"] + ":atom"),
-                title_zh="批准 Atom",
-                body_en="Authorize the benchmark atom dispatch path.",
-            ),
-            authorization_mode=authorization_mode,
-        )
+        if authority_provider == "test-local":
+            if authorization_mode != "required":
+                raise RuntimeError("test-local authority requires --authorization-mode required")
+            atom_auth = append_test_local_authorization(
+                repo=micro_git,
+                event_type="AtomAuthorized",
+                payload={
+                    "atom_id": atom_id,
+                    "approval_id": f"ap_atom_{task['instance_id']}",
+                    "authority_kind": "test_local_authority_no_credentials",
+                    "signature_route": "test_local_authority",
+                    "subject_id": atom_id,
+                },
+            )
+        else:
+            atom_auth = maybe_authorize(
+                turingd,
+                "approval.authorize_atom",
+                approval_request(
+                    approval_id=f"ap_atom_{task['instance_id']}",
+                    action="atom_authorize",
+                    subject_id=atom_id,
+                    evidence_digest=digest_text(task["instance_id"] + ":atom"),
+                    title_zh="批准 Atom",
+                    body_en="Authorize the benchmark atom dispatch path.",
+                ),
+                authorization_mode=authorization_mode,
+            )
         if atom_auth is not None:
             mark_event(atom_auth, "AtomAuthorized")
         mark_module("M10_evidence_approval")
@@ -647,19 +743,33 @@ def run_substrate_task(
         mark_event(capsule, "WorkCapsuleBuilt")
         mark_module("M5_goal_module_atom_capsule")
 
-        dispatch_auth = maybe_authorize(
-            turingd,
-            "capsule.approve",
-            approval_request(
-                approval_id=f"ap_capsule_{task['instance_id']}",
-                action="capsule_approve",
-                subject_id=capsule_id,
-                evidence_digest=digest_text(capsule_id + ":dispatch"),
-                title_zh="批准 Capsule",
-                body_en="Authorize the benchmark work capsule dispatch.",
-            ),
-            authorization_mode=authorization_mode,
-        )
+        if authority_provider == "test-local":
+            dispatch_auth = append_test_local_authorization(
+                repo=micro_git,
+                event_type="WorkerDispatchAuthorized",
+                payload={
+                    "capsule_id": capsule_id,
+                    "worker_id": worker_id,
+                    "approval_id": f"ap_capsule_{task['instance_id']}",
+                    "authority_kind": "test_local_authority_no_credentials",
+                    "signature_route": "test_local_authority",
+                    "subject_id": capsule_id,
+                },
+            )
+        else:
+            dispatch_auth = maybe_authorize(
+                turingd,
+                "capsule.approve",
+                approval_request(
+                    approval_id=f"ap_capsule_{task['instance_id']}",
+                    action="capsule_approve",
+                    subject_id=capsule_id,
+                    evidence_digest=digest_text(capsule_id + ":dispatch"),
+                    title_zh="批准 Capsule",
+                    body_en="Authorize the benchmark work capsule dispatch.",
+                ),
+                authorization_mode=authorization_mode,
+            )
         if dispatch_auth is not None:
             mark_event(dispatch_auth, "WorkerDispatchAuthorized")
 
@@ -982,6 +1092,13 @@ def run_substrate_task(
         "worker_mode": worker_mode,
         "worker_id": worker_id,
         "authorization_mode": authorization_mode,
+        "authority_provider": authority_provider,
+        "fallback_to_auto_authorization": False,
+        "authorization_head": (
+            dispatch_auth.get("head_set", {}).get("authorization_head")
+            if dispatch_auth is not None
+            else (atom_auth.get("head_set", {}).get("authorization_head") if atom_auth is not None else None)
+        ),
         "authorization_head_expected": authorization_mode == "required",
         "market_id": market_id,
         "capsule_id": capsule_id,
@@ -1065,6 +1182,7 @@ def append_stage6_event(
     if predicate_product is None:
         predicate_product = "PASS" if row["predicate_required"] else "NOT_RUN"
     payload_hash = canonical_payload_digest(payload)
+    reason_digest = canonical_payload_digest([])
     event = {
         "accepted_head_before": state["accepted_head"],
         "authority_epoch": state["authority_epoch"],
@@ -1077,6 +1195,7 @@ def append_stage6_event(
         "payload_hash": payload_hash,
         "predicate_product": predicate_product,
         "prev_tape_tip": state["tape_tip"],
+        "reason_digest": reason_digest,
         "schema_id": "micro_event_envelope.v1",
         "sequence": state["sequence"],
         "verified": predicate_product == "PASS",
@@ -3431,6 +3550,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--worker-timeout-s", type=int, default=1200)
     parser.add_argument("--authorization-mode", choices=["auto", "required", "off"], default="auto")
+    parser.add_argument("--authority-provider", choices=["os-keyring", "test-local"], default="os-keyring")
     parser.add_argument("--daemon-bin-dir", default=str(REPO / "target" / "debug"))
     parser.add_argument("--broadcast-rules-file")
     parser.add_argument("--strict-microtape-fixture", action="store_true")
@@ -3442,6 +3562,8 @@ def main(argv: list[str] | None = None) -> int:
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    if args.authority_provider == "test-local" and args.authorization_mode != "required":
+        parser.error("--authority-provider test-local requires --authorization-mode required")
     if args.loop_until_pass_fixture and not args.tasks_jsonl:
         tasks = default_stage11_tasks()[: args.limit]
     else:
@@ -3537,6 +3659,7 @@ def main(argv: list[str] | None = None) -> int:
             args.worker_timeout_s,
             broadcast_rules=active_broadcast_rules,
             authorization_mode=args.authorization_mode,
+            authority_provider=args.authority_provider,
         )
         runs.append(run)
         active_broadcast_rules.extend(run.get("broadcast_rules_emitted", []))

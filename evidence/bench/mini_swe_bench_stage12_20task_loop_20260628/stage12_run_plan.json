@@ -1,9 +1,11 @@
 {
   "a02_does_not_run_workers": true,
   "atom": "Stage12-A02",
+  "authority_provider": "test-local",
   "authorization_mode": "required",
   "claim_boundary": "20-task scale/protocol evidence only; no statistical superiority/full-score claim",
   "expected_bundle_count_after_a03": 20,
+  "fallback_to_auto_authorization": false,
   "instance_ids": [
     "django__django-11790",
     "django__django-11815",
@@ -37,6 +39,8 @@
     "tools/bench/run_mini_swe_bench_substrate_smoke.py",
     "--authorization-mode",
     "required",
+    "--authority-provider",
+    "test-local",
     "--tasks-jsonl",
     "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/tasks_20.jsonl",
     "--out-dir",

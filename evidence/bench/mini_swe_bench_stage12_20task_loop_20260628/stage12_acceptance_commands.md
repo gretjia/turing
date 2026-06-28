@@ -2,11 +2,21 @@
 
 Run these commands from the repository root.
 
+`audit_stage12_release.py` recomputes strict MicroTape audit from the same coverage bundle paths and rejects stale strict summaries, relabeled fixture payloads, fewer-than-20 output, and manual intervention.
+
 ```bash
 python3 -m py_compile tools/bench/validate_stage12_contract.py
-python3 -m py_compile tools/bench/prepare_stage12_run_plan.py tools/bench/validate_stage12_contract.py
+python3 -m py_compile \
+  tools/bench/prepare_stage12_run_plan.py \
+  tools/bench/validate_stage12_contract.py \
+  tools/bench/audit_stage12_release.py
 
-pytest tests/test_stage12_contract.py tests/test_stage12_run_plan.py -q
+pytest \
+  tests/test_stage12_contract.py \
+  tests/test_stage12_run_plan.py \
+  tests/test_stage12_release_audit.py \
+  tests/test_stage12_test_local_authority.py \
+  -q
 
 python3 tools/bench/validate_stage12_contract.py \
   --root evidence/bench/mini_swe_bench_stage12_20task_loop_20260628
@@ -44,6 +54,10 @@ assert plan["expected_bundle_count_after_a03"] == 20
 assert plan["stage12_a03_requires_runner_atom"] is True
 assert "--loop-until-pass" not in plan["stage12_a03_command_template"]
 assert "--loop-until-pass-fixture" not in plan["stage12_a03_command_template"]
+assert "--authority-provider" in plan["stage12_a03_command_template"]
+assert "test-local" in plan["stage12_a03_command_template"]
+assert plan["authority_provider"] == "test-local"
+assert plan["fallback_to_auto_authorization"] is False
 assert len(tasks) == 20
 assert [row["instance_id"] for row in tasks] == plan["instance_ids"]
 for forbidden in ("micro_tape.bundle", "micro.git", "substrate_coverage.json"):

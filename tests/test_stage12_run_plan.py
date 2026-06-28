@@ -78,6 +78,8 @@ def test_stage12_run_plan_writes_tasks_and_runner_plan(tmp_path):
     assert "--tasks-jsonl" in command
     assert "--authorization-mode" in command
     assert "required" in command
+    assert "--authority-provider" in command
+    assert "test-local" in command
     assert not list(root.rglob("micro_tape.bundle"))
 
 
