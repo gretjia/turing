@@ -4011,6 +4011,515 @@ def run_stage14_release_audits(out_dir: Path) -> None:
             )
 
 
+def build_stage15_market_router_bundle(out_dir: Path, task: dict[str, Any]) -> dict[str, Any]:
+    auditor = load_micro_tape_auditor()
+    registry = auditor.load_event_registry()
+    instance_id = task["instance_id"]
+    instance_dir = out_dir / "turingos" / "instances" / instance_id
+    repo = instance_dir / "micro.git"
+    bundle = instance_dir / "micro_tape.bundle"
+    if repo.exists():
+        shutil.rmtree(repo)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    init = run_cmd(["git", "init", "--object-format=sha256", str(repo)], timeout=120)
+    if init.returncode != 0:
+        raise RuntimeError(f"stage15 git init failed:\n{init.stderr}")
+
+    state = stage6_base_state()
+    short = hashlib.sha256(instance_id.encode("utf-8")).hexdigest()[:16]
+    market_id = f"mkt_stage15_{short}"
+    run_id = f"run_stage15_{short}"
+    candidate_id = f"cand_stage15_{short}"
+    route_control = "deterministic_control"
+    route_native = "native_api_worker"
+    worker_control = "worker:sha256:" + hashlib.sha256(f"stage15:{instance_id}:control".encode("utf-8")).hexdigest()
+    worker_native = "worker:sha256:" + hashlib.sha256(f"stage15:{instance_id}:native".encode("utf-8")).hexdigest()
+    capsule_control = f"wc_stage15_{short}_control"
+    capsule_native = f"wc_stage15_{short}_native"
+    receipt_control = f"rcp_stage15_{short}_control"
+    receipt_native = f"rcp_stage15_{short}_native"
+    macro_control = f"macro:diff:stage15:{short}:control"
+    macro_native = f"macro:diff:stage15:{short}:native"
+    evidence_control = f"ev_stage15_{short}_control"
+    evidence_native = f"ev_stage15_{short}_native"
+    control_tokens = 180
+    native_tokens = 320
+    control_wall_ms = 90
+    native_wall_ms = 150
+    total_tokens = control_tokens + native_tokens
+    total_wall_ms = control_wall_ms + native_wall_ms
+
+    append = lambda event_type, payload, writer_id, **kwargs: append_stage6_event(
+        repo=repo,
+        state=state,
+        registry=registry,
+        canonical_payload_digest=auditor.canonical_payload_digest,
+        event_type=event_type,
+        payload=payload,
+        writer_id=writer_id,
+        **kwargs,
+    )
+
+    genesis = append("SystemConstitutionAccepted", {"constitution_digest": digest_text("stage15 constitution")}, "writer:bootstrap")
+    goal = append(
+        "GoalStateProposed",
+        {"goal_id": f"goal_stage15_{short}", "objective": "Stage15 multi-route market router fixture"},
+        "writer:goal",
+    )
+    market_created = append(
+        "MarketCreated",
+        {
+            "schema_id": "market_created.v1",
+            "market_id": market_id,
+            "initial_pool_y": "100",
+            "initial_pool_n": "100",
+            "k": "10000",
+            "truth_status": "statistical_signal_only",
+        },
+        "writer:market",
+    )
+    router_history = append(
+        "EvidenceBound",
+        {
+            "evidence_id": f"ev_stage15_router_history_{short}",
+            "content_digest": digest_text(instance_id + ":stage15:terminal-route-history"),
+            "storage_digest": digest_text("stage12-stage14-terminal-vpput-derived-route-stats"),
+            "required": True,
+            "evidence_kind": "market_router_terminal_history_projection",
+            "source": "micro_tape_terminal_history",
+            "contains_price_truth": False,
+        },
+        "writer:evidence",
+    )
+    price_basis_event_ids = [genesis["event_id"], goal["event_id"], market_created["event_id"], router_history["event_id"]]
+    price = append(
+        "MarketPriceBroadcast",
+        {
+            "schema_id": "market_price_broadcast.v1",
+            "market_id": market_id,
+            "mode": "shadow",
+            "authority": False,
+            "price_not_truth_ack": True,
+            "stats_source": "micro_tape_terminal_history",
+            "basis_event_ids": price_basis_event_ids,
+            "route_suggestions": [
+                {"route_type": route_control, "yes_price": "0.42", "budget_tokens": control_tokens},
+                {"route_type": route_native, "yes_price": "0.64", "budget_tokens": native_tokens},
+            ],
+        },
+        "writer:market",
+        name="price",
+    )
+    append(
+        "AtomAuthorized",
+        {
+            "atom_id": f"atom_stage15_{short}",
+            "approval_id": f"ap_atom_stage15_{short}",
+            "authority_kind": "test_local_authority_no_credentials",
+            "signature_route": "test_local_authority",
+        },
+        "writer:test-local-authority",
+    )
+    for route_type, worker_id, capsule_id, budget in [
+        (route_control, worker_control, capsule_control, control_tokens),
+        (route_native, worker_native, capsule_native, native_tokens),
+    ]:
+        append(
+            "WorkerDispatchAuthorized",
+            {
+                "capsule_id": capsule_id,
+                "worker_id": worker_id,
+                "approval_id": f"ap_dispatch_stage15_{short}_{route_type}",
+                "authority_kind": "test_local_authority_no_credentials",
+                "signature_route": "test_local_authority",
+                "route_type": route_type,
+                "market_router_suggestion_event_id": price["event_id"],
+            },
+            "writer:test-local-authority",
+        )
+        append(
+            "BudgetAllocated",
+            {
+                "market_id": market_id,
+                "route_type": route_type,
+                "branch_id": f"branch_stage15_{short}_{route_type}",
+                "capsule_id": capsule_id,
+                "market_router_suggestion_event_id": price["event_id"],
+                "allocation_reason": {
+                    "stats_source": "micro_tape_terminal_history",
+                    "price_signal_event_id": price["event_id"],
+                    "diversity_policy_hash": digest_text("stage15 diversity floor"),
+                },
+                "max_tokens": budget,
+                "max_wall_time_ms": 1000,
+            },
+            "writer:market",
+        )
+        append(
+            "PositionMinted",
+            {
+                "schema_id": "position_minted.v1",
+                "market_id": market_id,
+                "agent_id": worker_id,
+                "route_type": route_type,
+                "coin_in": "1",
+                "yes_out": "1",
+                "no_out": "1",
+                "invariant": "coin_in == yes_out == no_out",
+            },
+            "writer:market",
+        )
+        append(
+            "WorkCapsuleBuilt",
+            {
+                "capsule_id": capsule_id,
+                "private_contract_hash": digest_text(capsule_id + ":private"),
+                "acceptance_commands": ["stage15.official.eval"],
+                "allowed_files": ["django/**"],
+                "forbidden_files": SWEBENCH_FORBIDDEN_PATHS,
+                "route_type": route_type,
+                "market_router_suggestion_event_id": price["event_id"],
+                "pput_formula_absent": True,
+                "heldout_ids_absent": True,
+                "hidden_predicates_absent": True,
+                "raw_failure_logs_absent": True,
+            },
+            "writer:capsule",
+        )
+
+    patch_control = digest_text(instance_id + ":stage15:control:patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_control,
+            "capsule_id": capsule_control,
+            "worker_id": worker_control,
+            "exit_code": 1,
+            "stdout_hash": digest_text(instance_id + ":stage15:control:stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage15:control:stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage15:control:done"),
+            "credential_material_absent": True,
+            "micro_refs_moved": False,
+            "patch_hash": patch_control,
+            "route_type": route_control,
+        },
+        "writer:receipt",
+    )
+    append("MacroObservationImported", {"macro_id": macro_control, "capsule_id": capsule_control, "diff_hash": patch_control, "external_evidence_only": True}, "writer:macro")
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_control,
+            "route_type": route_control,
+            "branch_id": f"branch_stage15_{short}_{route_control}",
+            "capsule_id": capsule_control,
+            "prompt_tokens": 80,
+            "completion_tokens": 50,
+            "tool_tokens": 30,
+            "tool_stdout_tokens": 20,
+            "total_tokens": control_tokens,
+            "wall_time_ms": control_wall_ms,
+            "abandoned_branch": True,
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official_control = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_control,
+            "instance_id": instance_id,
+            "capsule_id": capsule_control,
+            "macro_anchor_id": macro_control,
+            "worker_receipt_id": receipt_control,
+            "candidate_patch_hash": patch_control,
+            "test_patch_hash": digest_text(instance_id + ":stage15:test-patch"),
+            "apply_candidate_result": "PASS",
+            "apply_test_patch_result": "PASS",
+            "target_test_exit_code": 1,
+            "target_test_result": "FAIL",
+            "stdout_hash": digest_text(instance_id + ":stage15:control:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage15:control:official-stderr"),
+            "result": "FAIL",
+            "failure_class": "SEMANTIC_FAIL",
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage15_market_router_fixture",
+        },
+        "writer:official-evaluator",
+        name="official_control",
+    )
+    failure = append(
+        "FailureNode",
+        {
+            "capsule_id": capsule_control,
+            "candidate_id": candidate_id,
+            "failure_class": "SEMANTIC_FAIL",
+            "detail": "Control route failed and was retained as abandoned branch cost.",
+            "official_evaluator_evidence_id": evidence_control,
+            "route_type": route_control,
+        },
+        "writer:predicate",
+        product="NOT_RUN",
+        name="control_failure",
+    )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": False,
+            "verified": False,
+            "accounting_stage": "progress",
+            "basis_event_id": official_control["event_id"],
+            "terminal_event_id": failure["event_id"],
+            "golden_path_token_count": 0,
+            "total_run_token_count": control_tokens,
+            "total_wall_time_ms": control_wall_ms,
+            "progress": 0,
+            "vpput_raw": "0",
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+
+    patch_native = digest_text(instance_id + ":stage15:native:patch")
+    append(
+        "WorkerReceiptImported",
+        {
+            "receipt_id": receipt_native,
+            "capsule_id": capsule_native,
+            "worker_id": worker_native,
+            "exit_code": 0,
+            "stdout_hash": digest_text(instance_id + ":stage15:native:stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage15:native:stderr"),
+            "done_json_hash": digest_text(instance_id + ":stage15:native:done"),
+            "credential_material_absent": True,
+            "micro_refs_moved": False,
+            "patch_hash": patch_native,
+            "route_type": route_native,
+        },
+        "writer:receipt",
+    )
+    append("MacroObservationImported", {"macro_id": macro_native, "capsule_id": capsule_native, "diff_hash": patch_native, "external_evidence_only": True}, "writer:macro")
+    append(
+        "CostEvent",
+        {
+            "schema_id": "cost_event.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "agent_id": worker_native,
+            "route_type": route_native,
+            "branch_id": f"branch_stage15_{short}_{route_native}",
+            "capsule_id": capsule_native,
+            "prompt_tokens": 130,
+            "completion_tokens": 90,
+            "tool_tokens": 60,
+            "tool_stdout_tokens": 40,
+            "total_tokens": native_tokens,
+            "wall_time_ms": native_wall_ms,
+            "abandoned_branch": False,
+            "counted_in_total": True,
+        },
+        "writer:pput",
+    )
+    official_native = append(
+        "OfficialEvaluatorEvidenceImported",
+        {
+            "schema_id": "official_evaluator_evidence_imported.v1",
+            "evidence_id": evidence_native,
+            "instance_id": instance_id,
+            "capsule_id": capsule_native,
+            "macro_anchor_id": macro_native,
+            "worker_receipt_id": receipt_native,
+            "candidate_patch_hash": patch_native,
+            "test_patch_hash": digest_text(instance_id + ":stage15:test-patch"),
+            "apply_candidate_result": "PASS",
+            "apply_test_patch_result": "PASS",
+            "target_test_exit_code": 0,
+            "target_test_result": "PASS",
+            "stdout_hash": digest_text(instance_id + ":stage15:native:official-stdout"),
+            "stderr_hash": digest_text(instance_id + ":stage15:native:official-stderr"),
+            "result": "PASS",
+            "failure_class": None,
+            "forbidden_test_edit_detected": False,
+            "forbidden_test_edit_paths": [],
+            "truth_source": "stage15_market_router_fixture",
+        },
+        "writer:official-evaluator",
+        name="official_native",
+    )
+    terminal = append(
+        "CandidateAccepted",
+        {
+            "candidate_id": candidate_id,
+            "capsule_id": capsule_native,
+            "macro_anchor_id": macro_native,
+            "worker_receipt_id": receipt_native,
+            "official_evaluator_evidence_id": evidence_native,
+            "selected_route_type": route_native,
+            "market_router_suggestion_event_id": price["event_id"],
+        },
+        "writer:predicate",
+        name="terminal",
+    )
+    settlement = append(
+        "MarketSettled",
+        {
+            "schema_id": "market_settled.v1",
+            "market_id": market_id,
+            "result": "YES",
+            "settlement_basis_event_id": official_native["event_id"],
+            "basis_kind": "official_eval",
+            "terminal_event_id": terminal["event_id"],
+            "is_terminal": True,
+            "price_not_truth_ack": True,
+        },
+        "writer:market",
+        name="settlement",
+    )
+    for worker_id, route_type, reward, slash in [
+        (worker_control, route_control, "0", "1"),
+        (worker_native, route_native, "1", "0"),
+    ]:
+        append(
+            "RewardDistributed",
+            {
+                "schema_id": "reward_distributed.v1",
+                "event_type": "RewardDistributed",
+                "market_id": market_id,
+                "agent_id": worker_id,
+                "route_type": route_type,
+                "reward_coin": reward,
+                "slash_coin": slash,
+                "reason": "TERMINAL_VPPUT_REPUTATION",
+                "settlement_event_id": settlement["event_id"],
+            },
+            "writer:market",
+        )
+    append(
+        "PPUTAccounted",
+        {
+            "schema_id": "pput_accounted.v1",
+            "run_id": run_id,
+            "problem_id": instance_id,
+            "split": "dogfood",
+            "solved": True,
+            "verified": True,
+            "accounting_stage": "final",
+            "basis_event_id": official_native["event_id"],
+            "terminal_event_id": terminal["event_id"],
+            "golden_path_token_count": native_tokens,
+            "total_run_token_count": total_tokens,
+            "total_wall_time_ms": total_wall_ms,
+            "progress": 1,
+            "vpput_raw": stage6_vpput(1, total_tokens, total_wall_ms),
+            "failed_branch_count": 1,
+            "hidden_from_worker_prompt": True,
+        },
+        "writer:pput",
+    )
+    create = run_cmd(["git", "bundle", "create", str(bundle.resolve()), "--all"], cwd=repo, timeout=120)
+    if create.returncode != 0:
+        raise RuntimeError(f"stage15 bundle create failed:\n{create.stderr}")
+    bundle_hash = digest_bytes(bundle.read_bytes())
+    shutil.rmtree(repo)
+    route_decisions = [
+        {"route_type": route_control, "stats_source": "micro_tape_terminal_history", "basis_event_ids": price_basis_event_ids, "authority": False, "affects": "budget_dispatch_suggestion_only"},
+        {"route_type": route_native, "stats_source": "micro_tape_terminal_history", "basis_event_ids": price_basis_event_ids, "authority": False, "affects": "budget_dispatch_suggestion_only"},
+    ]
+    return {
+        "instance_id": instance_id,
+        "expected_result": "PASS",
+        "authorization_mode": "required",
+        "micro_tape_bundle": str(bundle),
+        "micro_tape_bundle_sha256": bundle_hash,
+        "accepted_head": state["accepted_head"],
+        "authorization_head": state["authorization_head"],
+        "tape_tip": state["tape_tip"],
+        "market_id": market_id,
+        "route_types": [route_control, route_native],
+        "route_decisions": route_decisions,
+        "budget_by_route": {route_control: control_tokens, route_native: native_tokens},
+        "reputation_updates": [
+            {"agent_id": worker_control, "route_type": route_control, "basis_kind": "terminal_vpput", "terminal_event_id": terminal["event_id"], "delta": "-1"},
+            {"agent_id": worker_native, "route_type": route_native, "basis_kind": "terminal_vpput", "terminal_event_id": terminal["event_id"], "delta": "1"},
+        ],
+        "basis": "stage15_multi_agent_market_router",
+    }
+
+
+def generate_stage15_multi_agent_market_router_fixture(out_dir: Path, tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    run = build_stage15_market_router_bundle(out_dir, tasks[0])
+    meta = {
+        "schema_id": "Stage15MarketRouter.v1",
+        "route_types": run["route_types"],
+        "route_diversity_policy": {
+            "min_route_types_per_batch": 2,
+            "max_budget_share_per_route": 0.75,
+            "exploration_budget_floor": 0.15,
+            "collapse_exception_requires": "budget_terminal_or_route_unavailable_event",
+        },
+        "route_decisions": run["route_decisions"],
+        "budget_by_route": run["budget_by_route"],
+        "reputation_updates": run["reputation_updates"],
+    }
+    manifest = {
+        "schema_id": "Stage15MarketRouterFixtureManifest.v1",
+        "run_id": "stage15_multi_agent_market_router",
+        "truth_source": "fresh_micro_tape_bundles",
+        "scientific_status": "MULTI_AGENT_MARKET_ROUTER_FIXTURE_NOT_SOLVE_RATE",
+        "sample_size": 1,
+        "market_router": meta,
+        "turingos_arm_runs": [run],
+    }
+    turingos_dir = out_dir / "turingos"
+    write_json(turingos_dir / "substrate_coverage.json", manifest)
+    write_json(out_dir / "market_router_manifest.json", manifest)
+    write_json(out_dir / "bundle_manifest.json", manifest)
+    (out_dir / "bundle_sha256s.txt").write_text(f"{run['micro_tape_bundle_sha256']}  {run['micro_tape_bundle']}\n", encoding="utf-8")
+    return manifest
+
+
+def run_stage15_release_audits(out_dir: Path) -> None:
+    coverage = out_dir / "turingos" / "substrate_coverage.json"
+    commands = [
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_micro_tape_decision_dag.py"),
+            "--strict-vpput",
+            "--strict-terminal-market",
+            "--require-authorization-head",
+            "--coverage",
+            str(coverage),
+            "--out-dir",
+            str(out_dir / "micro_tape_audit_strict"),
+        ],
+        [
+            sys.executable,
+            str(REPO / "tools" / "bench" / "audit_market_router.py"),
+            "--coverage",
+            str(coverage),
+            "--out-dir",
+            str(out_dir),
+        ],
+    ]
+    for command in commands:
+        result = run_cmd(command, cwd=REPO, timeout=300)
+        if result.returncode != 0:
+            raise RuntimeError("Stage15 release audit failed:\n" + " ".join(command) + "\nSTDOUT:\n" + result.stdout + "\nSTDERR:\n" + result.stderr)
+
+
 def run_stage13_release_audits(out_dir: Path) -> None:
     coverage = out_dir / "turingos" / "substrate_coverage.json"
     commands = [
@@ -5052,6 +5561,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--corpus-failure-memory", action="store_true")
     parser.add_argument("--failure-taxonomy-fixture", action="store_true")
     parser.add_argument("--loop-until-pass-fixture", action="store_true")
+    parser.add_argument("--multi-agent-market-router", action="store_true")
     args = parser.parse_args(argv)
 
     out_dir = Path(args.out_dir)
@@ -5132,6 +5642,21 @@ def main(argv: list[str] | None = None) -> int:
             "worker_process": "stage14_corpus_failure_memory",
             "auditor_exit_code": 0,
             "scientific_status": "CORPUS_FAILURE_MEMORY_FIXTURE_NOT_SOLVE_RATE",
+            "sample_size": manifest["sample_size"],
+        }
+        write_json(out_dir / "substrate_smoke_result.json", summary)
+        return 0
+    if args.multi_agent_market_router:
+        if args.authorization_mode != "required":
+            parser.error("--multi-agent-market-router requires --authorization-mode required")
+        manifest = generate_stage15_multi_agent_market_router_fixture(out_dir, tasks)
+        run_stage15_release_audits(out_dir)
+        summary = {
+            "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+            "coverage": str(out_dir / "turingos" / "substrate_coverage.json"),
+            "worker_process": "stage15_multi_agent_market_router",
+            "auditor_exit_code": 0,
+            "scientific_status": "MULTI_AGENT_MARKET_ROUTER_FIXTURE_NOT_SOLVE_RATE",
             "sample_size": manifest["sample_size"],
         }
         write_json(out_dir / "substrate_smoke_result.json", summary)

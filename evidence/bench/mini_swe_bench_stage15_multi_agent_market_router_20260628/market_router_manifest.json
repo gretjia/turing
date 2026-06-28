@@ -1,0 +1,130 @@
+{
+  "market_router": {
+    "budget_by_route": {
+      "deterministic_control": 180,
+      "native_api_worker": 320
+    },
+    "reputation_updates": [
+      {
+        "agent_id": "worker:sha256:75936ce87e2203b51ab1d88543c4143cc85d2215ce6c885978006dbab08444cb",
+        "basis_kind": "terminal_vpput",
+        "delta": "-1",
+        "route_type": "deterministic_control",
+        "terminal_event_id": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448"
+      },
+      {
+        "agent_id": "worker:sha256:9d3a44e8c904fb1d0bb09f6ce113d4d21391d88be0f5700f805a8116c872a6c2",
+        "basis_kind": "terminal_vpput",
+        "delta": "1",
+        "route_type": "native_api_worker",
+        "terminal_event_id": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448"
+      }
+    ],
+    "route_decisions": [
+      {
+        "affects": "budget_dispatch_suggestion_only",
+        "authority": false,
+        "basis_event_ids": [
+          "mu:519a0038ac45608a504bdd8ea02850ecfc444d903696bd8b0862b68b5cd6cebe",
+          "mu:8f2419235987cafa29ea5c465dd3076519d433081ac423285ac84d1dab32f8cb",
+          "mu:03bb52ba1289b851446a8b991aefc4cf30271753dc15b7467dc7e2f0b1df227f",
+          "mu:8fc7e9dae47f844ca57f8393c715feac891e2080255a28d4237f7d61158c2c9d"
+        ],
+        "route_type": "deterministic_control",
+        "stats_source": "micro_tape_terminal_history"
+      },
+      {
+        "affects": "budget_dispatch_suggestion_only",
+        "authority": false,
+        "basis_event_ids": [
+          "mu:519a0038ac45608a504bdd8ea02850ecfc444d903696bd8b0862b68b5cd6cebe",
+          "mu:8f2419235987cafa29ea5c465dd3076519d433081ac423285ac84d1dab32f8cb",
+          "mu:03bb52ba1289b851446a8b991aefc4cf30271753dc15b7467dc7e2f0b1df227f",
+          "mu:8fc7e9dae47f844ca57f8393c715feac891e2080255a28d4237f7d61158c2c9d"
+        ],
+        "route_type": "native_api_worker",
+        "stats_source": "micro_tape_terminal_history"
+      }
+    ],
+    "route_diversity_policy": {
+      "collapse_exception_requires": "budget_terminal_or_route_unavailable_event",
+      "exploration_budget_floor": 0.15,
+      "max_budget_share_per_route": 0.75,
+      "min_route_types_per_batch": 2
+    },
+    "route_types": [
+      "deterministic_control",
+      "native_api_worker"
+    ],
+    "schema_id": "Stage15MarketRouter.v1"
+  },
+  "run_id": "stage15_multi_agent_market_router",
+  "sample_size": 1,
+  "schema_id": "Stage15MarketRouterFixtureManifest.v1",
+  "scientific_status": "MULTI_AGENT_MARKET_ROUTER_FIXTURE_NOT_SOLVE_RATE",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448",
+      "authorization_head": "mu:c10d90adadc2e81dfe8930a868b6536fdf708e0b89343b0a37ed7edc60216f98",
+      "authorization_mode": "required",
+      "basis": "stage15_multi_agent_market_router",
+      "budget_by_route": {
+        "deterministic_control": 180,
+        "native_api_worker": 320
+      },
+      "expected_result": "PASS",
+      "instance_id": "django__django-11790",
+      "market_id": "mkt_stage15_0fbc335ea7612a85",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage15_multi_agent_market_router_20260628/turingos/instances/django__django-11790/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:bdb1138b4f253b0b723b64aa31ec9b1e0295e6f5ad434c469ed71bc2397c4f01",
+      "reputation_updates": [
+        {
+          "agent_id": "worker:sha256:75936ce87e2203b51ab1d88543c4143cc85d2215ce6c885978006dbab08444cb",
+          "basis_kind": "terminal_vpput",
+          "delta": "-1",
+          "route_type": "deterministic_control",
+          "terminal_event_id": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448"
+        },
+        {
+          "agent_id": "worker:sha256:9d3a44e8c904fb1d0bb09f6ce113d4d21391d88be0f5700f805a8116c872a6c2",
+          "basis_kind": "terminal_vpput",
+          "delta": "1",
+          "route_type": "native_api_worker",
+          "terminal_event_id": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448"
+        }
+      ],
+      "route_decisions": [
+        {
+          "affects": "budget_dispatch_suggestion_only",
+          "authority": false,
+          "basis_event_ids": [
+            "mu:519a0038ac45608a504bdd8ea02850ecfc444d903696bd8b0862b68b5cd6cebe",
+            "mu:8f2419235987cafa29ea5c465dd3076519d433081ac423285ac84d1dab32f8cb",
+            "mu:03bb52ba1289b851446a8b991aefc4cf30271753dc15b7467dc7e2f0b1df227f",
+            "mu:8fc7e9dae47f844ca57f8393c715feac891e2080255a28d4237f7d61158c2c9d"
+          ],
+          "route_type": "deterministic_control",
+          "stats_source": "micro_tape_terminal_history"
+        },
+        {
+          "affects": "budget_dispatch_suggestion_only",
+          "authority": false,
+          "basis_event_ids": [
+            "mu:519a0038ac45608a504bdd8ea02850ecfc444d903696bd8b0862b68b5cd6cebe",
+            "mu:8f2419235987cafa29ea5c465dd3076519d433081ac423285ac84d1dab32f8cb",
+            "mu:03bb52ba1289b851446a8b991aefc4cf30271753dc15b7467dc7e2f0b1df227f",
+            "mu:8fc7e9dae47f844ca57f8393c715feac891e2080255a28d4237f7d61158c2c9d"
+          ],
+          "route_type": "native_api_worker",
+          "stats_source": "micro_tape_terminal_history"
+        }
+      ],
+      "route_types": [
+        "deterministic_control",
+        "native_api_worker"
+      ],
+      "tape_tip": "mu:828db8c9f5b37f83d78bfd8aa19c12aaf6323a7a6370cc08bed6ae535e422ead"
+    }
+  ]
+}

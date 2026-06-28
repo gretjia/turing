@@ -1,0 +1,17 @@
+{
+  "budget_by_route": {
+    "deterministic_control": 180,
+    "native_api_worker": 320
+  },
+  "route_diversity_policy": {
+    "collapse_exception_requires": "budget_terminal_or_route_unavailable_event",
+    "exploration_budget_floor": 0.15,
+    "max_budget_share_per_route": 0.75,
+    "min_route_types_per_batch": 2
+  },
+  "route_types": [
+    "deterministic_control",
+    "native_api_worker"
+  ],
+  "status": "PASS"
+}

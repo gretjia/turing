@@ -1,0 +1,19 @@
+{
+  "reputation_updates": [
+    {
+      "agent_id": "worker:sha256:75936ce87e2203b51ab1d88543c4143cc85d2215ce6c885978006dbab08444cb",
+      "basis_kind": "terminal_vpput",
+      "reward_event_id": "mu:1c6bcc57b11fd55ac38392ba7b0f771ec6e3a9458b9f9b3d972be8fb66d70f81",
+      "route_type": "deterministic_control",
+      "terminal_event_id": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448"
+    },
+    {
+      "agent_id": "worker:sha256:9d3a44e8c904fb1d0bb09f6ce113d4d21391d88be0f5700f805a8116c872a6c2",
+      "basis_kind": "terminal_vpput",
+      "reward_event_id": "mu:1d7d2aabde7ec9a64b6d83a2af5870961e56da579d0d4efd9aaf7398af4f88f2",
+      "route_type": "native_api_worker",
+      "terminal_event_id": "mu:e07a2c56b0758fb9df1fb70ef2083dec1cfc9bcc5164cffa7e4e9d9b57f40448"
+    }
+  ],
+  "status": "PASS"
+}
