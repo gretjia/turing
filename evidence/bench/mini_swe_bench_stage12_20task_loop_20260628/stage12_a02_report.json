@@ -1,0 +1,16 @@
+{
+  "a02_does_not_run_workers": true,
+  "atom": "Stage12-A02",
+  "expected_bundle_count_after_a03": 20,
+  "no_bundles_generated_by_a02": true,
+  "problems": [],
+  "root": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628",
+  "schema_id": "turingos.stage12.a02_report.v1",
+  "source_dataset_digest": "sha256:cafe0f03f7f6db133e98ad259f3a1cd0c6a59dce6965ddcb6e220df8b376ba5d",
+  "source_dataset_reference": "/tmp/turingos-swebench-data/verified-mini-50.jsonl",
+  "stage": "Stage12",
+  "stage12_run_plan": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/stage12_run_plan.json",
+  "status": "PASS",
+  "task_count": 20,
+  "tasks_jsonl": "evidence/bench/mini_swe_bench_stage12_20task_loop_20260628/tasks_20.jsonl"
+}
