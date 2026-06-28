@@ -2,6 +2,12 @@
 
 Status: proposed release train after Stage11 deterministic loop-until-PASS fixture.
 
+Companion execution controller:
+
+- `docs/handoff/STAGE12_TO_STAGE16_LOOP_ENGINEERING_EXECUTION_PLAN.md`
+
+This file defines release gates. The companion execution controller defines the engineering loop used to run, recover, rerun, audit, and release each stage.
+
 Base achieved state:
 
 - Stage8 proved deterministic no-HITL loop closure fixture.

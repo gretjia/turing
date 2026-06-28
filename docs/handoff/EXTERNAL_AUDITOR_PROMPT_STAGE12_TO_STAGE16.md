@@ -36,6 +36,9 @@ Important scope boundary:
 - If evidence is useful but claims exceed proof, return OVERCLAIM or PARTIAL.
 
 Required GitHub evidence to inspect:
+- docs/handoff/STAGE12_TO_STAGE16_LOOP_ENGINEERING_EXECUTION_PLAN.md
+- docs/handoff/STAGE12_TO_STAGE16_LOOP_ENGINEERING_PLAN_INDEPENDENT_AUDIT.md
+- docs/handoff/STAGE12_TO_STAGE16_RECURSIVE_AUDIT_PLAN.md
 - README.md under the evidence root.
 - bundle_manifest.json
 - bundle_sha256s.txt
@@ -99,6 +102,7 @@ General checks for all stages:
 13. Verify README/summary claim language does not exceed evidence.
 14. Verify every strict audit field is `PASS`. Any `NOT_RUN`, `BLOCKED`, `LEGACY_MISSING`, `WARN`, `PARTIAL`, missing field, or non-PASS strict value forces `release_next_stage: NO`.
 15. Verify `independent_recursive_audit.md` exists and was produced after final fixes for the exact pushed SHA/evidence path.
+16. Verify the stage evidence follows `STAGE12_TO_STAGE16_LOOP_ENGINEERING_EXECUTION_PLAN.md`; deviations must be reported as findings.
 
 Stage-specific checks:
 
@@ -236,6 +240,7 @@ Before sending this prompt to the external auditor, fill:
 <BUNDLE_MANIFEST_URL> =
 <BUNDLE_SHA256S_URL> =
 <STAGE_SPECIFIC_AUDIT_URLS> =
+<LOOP_ENGINEERING_EXECUTION_PLAN_URL> =
 ```
 
 Then verify:
