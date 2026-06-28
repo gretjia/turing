@@ -1,0 +1,41 @@
+{
+  "authorization_mode": "required",
+  "budget_profile": {
+    "max_attempts_per_instance": 5,
+    "max_tokens_per_instance": 400000,
+    "max_total_tokens": 200000000,
+    "max_total_wall_seconds": 3600000,
+    "max_wall_seconds_per_instance": 7200
+  },
+  "fallback_to_auto_authorization_allowed": false,
+  "full_score_claim_gate": {
+    "full_score_claim_allowed_before_run": false,
+    "requires_every_task_official_pass": true,
+    "requires_final_pput_progress_one": true,
+    "requires_unsolved_count_zero": true
+  },
+  "human_interventions_allowed_for_normal_tasks": false,
+  "manual_patch_count_allowed": 0,
+  "manual_rerun_selection_allowed": 0,
+  "retry_policy": {
+    "allowed_retry_authorization_events": [
+      "RetryAuthorized",
+      "WorkerDispatchAuthorized"
+    ],
+    "budget_terminal_event": "BudgetExhausted",
+    "max_retries": 5
+  },
+  "schema_id": "FullSweBenchVerifiedLoopManifest.v1",
+  "stage": "PhaseGFullManifestFreeze",
+  "stage_release_policy": {
+    "dry_run_can_release": false,
+    "exact_500_bundles_required_for_completed_campaign": true,
+    "external_exact_sha_audit_required": true,
+    "static_only_external_review_can_release": false
+  },
+  "vpput_policy": {
+    "cost_includes_all_agents_branches_failed_proposals_tool_stdout_context_reranks_abandoned_routes_wall_time": true,
+    "failed_progress": 0,
+    "solved_progress": 1
+  }
+}

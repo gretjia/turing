@@ -28,10 +28,11 @@ for improving the substrate, not the substrate itself.
 Current truth:
 
 ```text
-Phase F evaluator proof: PARTIAL
-Phase F repair loop: BLOCKED
-Stage16R real evaluator loop: PARTIAL, 2/7 repaired
-Full SWE-bench readiness: BLOCKED
+Phase F evaluator proof: PASS, executable official evaluator replay
+Phase F repair loop: superseded by fresh Stage16R-real completed packet
+Stage16R real evaluator loop: PASS, 7/7 repaired
+SWE-bench Verified 500 manifest freeze: PASS
+Full SWE-bench readiness: READY to start sealed Verified 500 campaign
 Full SWE-bench campaign: NOT STARTED
 Full SWE-bench score claim: FORBIDDEN
 ```
@@ -39,19 +40,19 @@ Full SWE-bench score claim: FORBIDDEN
 Next required action:
 
 ```text
-Retry the remaining Stage16R-real repair targets:
-- django__django-11790
-- django__django-11964
-- django__django-12209
-- django__django-12273
-- django__django-12308
+Start the SWE-bench Verified 500 sharded sealed campaign.
+
+Do not call readiness a result. Every task must still produce a MicroTape
+bundle. Full-score remains forbidden until all 500 have official PASS,
+CandidateAccepted, final PPUT progress=1, no-HITL counters zero, and exact-SHA
+external audit release.
 ```
 
-The first Stage16R-real loop produced seven fresh bundles and strict MicroTape
-PASS, but only `django__django-11815` and `django__django-12325` reached
-official PASS and `CandidateAccepted`. The remaining targets must be retried
-with narrower capsules/failure-memory guidance. Old Stage16R bundles must remain
-immutable.
+The Stage16R-real completed packet consolidates seven fresh worker-derived
+repair bundles. `django__django-12209` uses an explicit evaluator target fallback
+because the local `FAIL_TO_PASS` label is malformed; the evidence payload records
+`target_selection_source=test_patch_module_fallback_after_label_import_failure`.
+Old Stage16/Stage16R bundles remain immutable.
 
 ## Self-Improvement Rules
 

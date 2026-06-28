@@ -5,8 +5,10 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 PHASE_F_ROOT = REPO / "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628"
+PHASE_F_REAL_ROOT = REPO / "evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628"
 PHASE_F_REPAIR_ROOT = REPO / "evidence/bench/swe_bench_phase_f_repair_loop_20260628"
 STAGE16R_REAL_ROOT = REPO / "evidence/bench/swe_bench_stage16r_real_evaluator_20260628"
+STAGE16R_REAL_COMPLETED_ROOT = REPO / "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628"
 
 
 def load_module(name: str, path: Path):
@@ -22,7 +24,7 @@ def write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
 
 
-def minimal_full_manifest(task_count: int = 50) -> dict:
+def minimal_full_manifest(task_count: int = 500) -> dict:
     instance_ids = [f"repo__task-{index:04d}" for index in range(task_count)]
     return {
         "schema_id": "FullSweBenchTaskManifest.v1",
@@ -201,6 +203,92 @@ def test_full_swe_bench_ready_requires_phase_f_pass_and_full_manifest(tmp_path):
     assert report["release_phase_g"] is True
     assert report["blockers"] == []
     assert report["next_loop"] == "start_full_swe_bench_sharded_sealed_campaign"
+
+
+def test_full_swe_bench_readiness_rejects_verified_mini_manifest(tmp_path):
+    auditor = load_module(
+        "full_readiness_auditor",
+        REPO / "tools/bench/audit_full_swe_bench_readiness.py",
+    )
+    phase_f_root = tmp_path / "phase_f"
+    repair_root = tmp_path / "repair"
+    full_manifest_root = tmp_path / "mini_manifest"
+    write_json(
+        phase_f_root / "official_eval_replay_audit.json",
+        {
+            "status": "PASS",
+            "official_evaluator_executable_replay": True,
+            "release_next_phase_g": True,
+            "full_swe_bench_score_claim_allowed": False,
+            "full_dataset_claim_allowed": False,
+            "leaderboard_equivalence_claim_allowed": False,
+        },
+    )
+    write_json(
+        repair_root / "phase_f_repair_loop_audit.json",
+        {
+            "status": "PASS",
+            "release_next_phase_g": False,
+            "phase_f_evaluator_proof_required": True,
+            "required_next_action": "rerun_phase_f_evaluator_proof",
+        },
+    )
+    write_json(full_manifest_root / "task_manifest.json", minimal_full_manifest(task_count=50))
+    write_json(full_manifest_root / "loop_manifest.json", minimal_full_loop_manifest())
+    (full_manifest_root / "full_campaign_acceptance_commands.md").write_text(
+        "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput\n"
+    )
+    write_json(
+        full_manifest_root / "CLAIM_BOUNDARY.json",
+        {
+            "schema_id": "FullSweBenchClaimBoundary.v1",
+            "not_sampled_subset": True,
+            "full_swe_bench_score_claim_allowed_before_run": False,
+            "leaderboard_equivalence_claim_allowed_before_run": False,
+        },
+    )
+
+    report = auditor.audit_full_swe_bench_readiness(
+        phase_f_root=phase_f_root,
+        repair_loop_root=repair_root,
+        full_manifest_root=full_manifest_root,
+    )
+
+    assert report["status"] == "FAIL"
+    assert any("500-task" in problem for problem in report["problems"])
+
+
+def test_completed_stage16r_real_supersedes_old_repair_blocker(tmp_path):
+    auditor = load_module(
+        "full_readiness_auditor",
+        REPO / "tools/bench/audit_full_swe_bench_readiness.py",
+    )
+    full_manifest_root = tmp_path / "full_manifest"
+    write_json(full_manifest_root / "task_manifest.json", minimal_full_manifest(task_count=500))
+    write_json(full_manifest_root / "loop_manifest.json", minimal_full_loop_manifest())
+    (full_manifest_root / "full_campaign_acceptance_commands.md").write_text(
+        "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput\n"
+    )
+    write_json(
+        full_manifest_root / "CLAIM_BOUNDARY.json",
+        {
+            "schema_id": "FullSweBenchClaimBoundary.v1",
+            "not_sampled_subset": True,
+            "full_swe_bench_score_claim_allowed_before_run": False,
+            "leaderboard_equivalence_claim_allowed_before_run": False,
+        },
+    )
+
+    report = auditor.audit_full_swe_bench_readiness(
+        phase_f_root=PHASE_F_REAL_ROOT,
+        repair_loop_root=PHASE_F_REPAIR_ROOT,
+        stage16r_real_root=STAGE16R_REAL_COMPLETED_ROOT,
+        full_manifest_root=full_manifest_root,
+    )
+
+    assert report["status"] == "READY"
+    assert report["stage16r_real"]["official_pass_count"] == 7
+    assert "fresh_stage16r_real_evaluator_bundles_required" not in report["blockers"]
 
 
 def test_full_swe_bench_readiness_rejects_full_score_overclaim(tmp_path):

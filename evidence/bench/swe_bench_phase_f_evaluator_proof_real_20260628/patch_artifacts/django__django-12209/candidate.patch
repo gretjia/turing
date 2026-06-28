@@ -1,0 +1,31 @@
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index e3b14a41a0..75401c1ac6 100644
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -843,18 +843,18 @@ class Model(metaclass=ModelBase):
+         if pk_val is None:
+             pk_val = meta.pk.get_pk_value_on_save(self)
+             setattr(self, meta.pk.attname, pk_val)
++            # Skip an UPDATE when adding an instance and primary key has a default.
++            if (
++                not force_insert and
++                self._state.adding and
++                self._meta.pk.default and
++                self._meta.pk.default is not NOT_PROVIDED
++            ):
++                force_insert = True
+         pk_set = pk_val is not None
+         if not pk_set and (force_update or update_fields):
+             raise ValueError("Cannot force an update in save() with no primary key.")
+         updated = False
+-        # Skip an UPDATE when adding an instance and primary key has a default.
+-        if (
+-            not force_insert and
+-            self._state.adding and
+-            self._meta.pk.default and
+-            self._meta.pk.default is not NOT_PROVIDED
+-        ):
+-            force_insert = True
+         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
+         if pk_set and not force_insert:
+             base_qs = cls._base_manager.using(using)

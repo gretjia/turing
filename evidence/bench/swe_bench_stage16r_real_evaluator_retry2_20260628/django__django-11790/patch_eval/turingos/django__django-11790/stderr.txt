@@ -1,0 +1,9 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254) ... ok
+test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.016s
+
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...

@@ -1,0 +1,117 @@
+{
+  "broadcast_rules": [],
+  "by_arm": {
+    "direct": {
+      "pass": 0,
+      "total": 1
+    },
+    "turingos": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "results": [
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11790",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:bbf0eee588141f79b2b8533b76ba35c251280f340270f46203b414d927ad3547",
+        "candidate_write_event_type": "CandidateAccepted",
+        "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_retry2_20260628/django__django-11790/turingos/instances/django__django-11790/micro_tape.bundle",
+        "micro_tape_bundle_refreshed_after_eval": true,
+        "micro_tape_bundle_sha256": "sha256:59424e95caaeb76442c8c07de1d730e2d5744cd050e6c506abdd40a53774bc29",
+        "official_evidence_event_id": "mu:b197e3d325d209099c7b14aaaadfa3d1d4555d41cf38666d42f376237fa97e57",
+        "predicate_product": "PASS",
+        "terminal_events": [
+          {
+            "event_id": "mu:446b465e7525a1d49870fdda78c965f8079b568459ef4b37bd0b4d8542d19a85",
+            "event_type": "MarketSettled",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:61bd2d34b4bd0a181fcfd44afe5293d10250d188a3546400d8e21a65ed1b9447",
+            "event_type": "RewardDistributed",
+            "head_effect": "PRESERVE"
+          },
+          {
+            "event_id": "mu:dcac7d852eb140ebdf2670becec4337bbf137c7bea425508003da7ff195d165f",
+            "event_type": "PPUTAccounted",
+            "head_effect": "PRESERVE"
+          }
+        ]
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:4b276f8daf9a32bccd26e1ec2a6c046f6ea88ab38924551cf777ca305ebeb202",
+        "capsule_id": "wc_django__django-11790",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_8cc45a22ead1cfa4",
+        "fail_to_pass_labels": [
+          "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+          "test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:1148dda221bb11213a7fd81f0b7c0b45b7b9ee9e5b6a415944f42ead0c06c8b6",
+        "stdout_hash": "sha256:e90aafda4a4308322c9e341b42197cb27384b5f5b6b9a44ee3e995cc740c5efa",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:b4fdde454b6adea97827dd0a5dcee9e79125173863025c7a8db3ff7ea88a8ec9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_d69153138b7668ae90fbb0d716a4bbd3"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/swe_bench_stage16r_real_evaluator_retry2_20260628/django__django-11790/patch_eval/turingos/django__django-11790/stderr.txt",
+      "stdout": "evidence/bench/swe_bench_stage16r_real_evaluator_retry2_20260628/django__django-11790/patch_eval/turingos/django__django-11790/stdout.txt",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ]
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11790",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_2e2e6a1d13d44c01",
+        "fail_to_pass_labels": [
+          "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+          "test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest)"
+        ],
+        "failure_class": "MISSING_OR_EMPTY_PATCH",
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11790",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:b4fdde454b6adea97827dd0a5dcee9e79125173863025c7a8db3ff7ea88a8ec9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "missing_or_empty_patch",
+      "result": "FAIL"
+    }
+  ],
+  "sample_size": 1,
+  "schema_id": "DjangoSweBenchPatchEval.v1",
+  "statistical_claim": "none_smoke_only"
+}

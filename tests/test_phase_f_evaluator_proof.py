@@ -7,6 +7,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 STAGE16_ROOT = REPO / "evidence/bench/swe_bench_stage16_full_sealed_20260628"
 STAGE16R_ROOT = REPO / "evidence/bench/swe_bench_stage16r_unsolved_repair_20260628"
+STAGE16R_REAL_COMPLETED_ROOT = REPO / "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628"
 
 
 def load_module(name: str, path: Path):
@@ -46,6 +47,26 @@ def test_phase_f_builder_creates_evaluator_proof_for_20_task_shard(tmp_path):
     harness = json.loads((out_dir / "official_harness_digest.json").read_text())
     assert harness["recorded_harness_artifact_sha256"] == harness["recorded_harness_digest"]
     assert (out_dir / harness["recorded_harness_artifact_path"]).exists()
+
+
+def test_phase_f_builder_uses_real_stage16r_artifacts_when_available(tmp_path):
+    builder = load_module("phase_f_builder", REPO / "tools/bench/build_phase_f_evaluator_proof.py")
+    auditor = load_module("phase_f_auditor", REPO / "tools/bench/audit_phase_f_evaluator_proof.py")
+    out_dir = tmp_path / "phase_f_real"
+
+    builder.build_phase_f_evaluator_proof(STAGE16_ROOT, STAGE16R_REAL_COMPLETED_ROOT, out_dir)
+    report = auditor.audit_phase_f(STAGE16_ROOT, STAGE16R_REAL_COMPLETED_ROOT, out_dir)
+    patch_manifest = json.loads((out_dir / "patch_manifest.json").read_text())
+    stage16r_patches = [item for item in patch_manifest["patches"] if item["source_stage"] == "Stage16R"]
+
+    assert report["status"] == "PASS"
+    assert report["official_evaluator_executable_replay"] is True
+    assert report["release_next_phase_g"] is True
+    assert len(stage16r_patches) == 7
+    assert all(item["source_kind"] == "stage16r_real_worker_derived_patch_eval_artifact" for item in stage16r_patches)
+    assert not (out_dir / "harness_inputs" / "tasks_20.jsonl").exists()
+    evaluator_manifest = json.loads((out_dir / "evaluator_manifest.json").read_text())
+    assert evaluator_manifest["tasks_jsonl_committed"] is False
 
 
 def test_phase_f_audit_rejects_non_required_evidence_descriptor(tmp_path):

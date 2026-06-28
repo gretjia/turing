@@ -762,6 +762,51 @@ def test_django_fail_to_pass_labels_convert_to_runtests_labels():
     ]
 
 
+def test_django_test_modules_from_test_patch_ignores_model_helpers():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    modules = evaluator.django_test_modules_from_test_patch(
+        """diff --git a/tests/serializers/models/data.py b/tests/serializers/models/data.py
+--- a/tests/serializers/models/data.py
++++ b/tests/serializers/models/data.py
+diff --git a/tests/serializers/test_data.py b/tests/serializers/test_data.py
+--- a/tests/serializers/test_data.py
++++ b/tests/serializers/test_data.py
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+"""
+    )
+
+    assert modules == ["serializers.test_data"]
+
+
+def test_official_evidence_records_target_selection_source():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    payload = evaluator.official_evaluator_evidence_payload(
+        task={
+            "instance_id": "django__django-12209",
+            "FAIL_TO_PASS": ["partial(func, *args, **keywords) - new function with partial application"],
+            "test_patch": "diff --git a/tests/serializers/test_data.py b/tests/serializers/test_data.py\n",
+        },
+        arm="turingos",
+        candidate_patch_text="diff --git a/django/db/models/base.py b/django/db/models/base.py\n",
+        apply_candidate_result={"status": "PASS", "exit_code": 0, "stdout": "", "stderr": ""},
+        apply_test_patch_result={"status": "PASS", "exit_code": 0, "stdout": "", "stderr": ""},
+        target_test_result={
+            "status": "PASS",
+            "exit_code": 0,
+            "stdout": "",
+            "stderr": "",
+            "target_tests": ["serializers.test_data"],
+            "target_selection_source": "test_patch_module_fallback_after_label_import_failure",
+        },
+    )
+
+    assert payload["target_selection_source"] == "test_patch_module_fallback_after_label_import_failure"
+    assert payload["target_tests"] == ["serializers.test_data"]
+    assert payload["result"] == "PASS"
+
+
 def test_evaluator_refreshes_micro_tape_bundle_after_terminal_import(tmp_path):
     evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
     repo = tmp_path / "micro"

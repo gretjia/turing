@@ -1,6 +1,6 @@
 # Full SWE-bench Ready Loop Engineering Plan
 
-Status: active execution controller after Phase F repair-loop blocker.
+Status: active execution controller after full-readiness gate.
 
 ## Core Illusion
 
@@ -24,11 +24,11 @@ PhaseFRepairLoop(BLOCKED)
 ## Current State
 
 ```text
-phase_f_evaluator_proof: PARTIAL
-phase_f_repair_loop: BLOCKED
-stage16r_real_evaluator_loop: PARTIAL, 2/7 repaired
-full_swe_bench_readiness: BLOCKED
-next_loop: retry_remaining_stage16r_real_targets
+phase_f_evaluator_proof: PASS
+stage16r_real_evaluator_loop: PASS, 7/7 repaired
+phase_g_verified_500_manifest: PASS
+full_swe_bench_readiness: READY
+next_loop: start_full_swe_bench_sharded_sealed_campaign
 ```
 
 ## Loop Controller

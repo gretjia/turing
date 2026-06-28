@@ -81,8 +81,8 @@ def audit_full_manifest(root: Path) -> tuple[str, list[str], list[str], dict[str
         problems.append("full task manifest instance_ids must be a string list")
     elif len(ids) != len(set(ids)):
         problems.append("full task manifest instance_ids must be unique")
-    if not isinstance(task_count, int) or isinstance(task_count, bool) or task_count <= 20:
-        problems.append("full task manifest task_count must be greater than the prior 20-task shard")
+    if not isinstance(task_count, int) or isinstance(task_count, bool) or task_count < 500:
+        problems.append("full task manifest task_count must be at least the SWE-bench Verified 500-task dataset")
     if task_count != official_count:
         problems.append("task_count must equal official_dataset_task_count")
     if isinstance(ids, list) and task_count != len(ids):
@@ -179,8 +179,13 @@ def audit_full_swe_bench_readiness(
     stage16r_real_count = stage16r_real.get("fresh_real_evaluator_bundle_count")
     stage16r_remaining = stage16r_real.get("remaining_repair_count")
     has_stage16r_real_bundles = isinstance(stage16r_real_count, int) and stage16r_real_count > 0
-    if has_stage16r_real_bundles and stage16r_remaining != 0:
-        blockers.append("remaining_stage16r_real_repairs_required")
+    if has_stage16r_real_bundles:
+        if stage16r_remaining != 0:
+            blockers.append("remaining_stage16r_real_repairs_required")
+        if stage16r_real.get("status") != "PASS" and stage16r_remaining == 0:
+            problems.append("completed Stage16R-real packet must report status=PASS")
+        if stage16r_real.get("strict_microtape_status") != "PASS" and stage16r_remaining == 0:
+            problems.append("completed Stage16R-real packet must report strict_microtape_status=PASS")
     elif repair_status == "BLOCKED" or repair.get("replayable_repair_bundle_count") == 0:
         blockers.append("fresh_stage16r_real_evaluator_bundles_required")
     if repair.get("release_next_phase_g") is True:

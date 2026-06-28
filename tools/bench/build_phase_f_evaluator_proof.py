@@ -73,8 +73,21 @@ def command_bytes(command: list[str]) -> bytes:
     return subprocess.check_output(command, cwd=REPO)
 
 
-def artifact_sources(instance_id: str, source_stage: str) -> dict[str, str | Path]:
+def artifact_sources(instance_id: str, source_stage: str, stage16r_root: Path | None = None) -> dict[str, str | Path]:
     if source_stage == "Stage16R":
+        if stage16r_root is not None:
+            candidate_patch = stage16r_root / "turingos" / "instances" / instance_id / "worker_logs" / "diff.patch"
+            test_patch = stage16r_root / "patch_eval" / "turingos" / instance_id / "test.patch"
+            stdout = stage16r_root / "patch_eval" / "turingos" / instance_id / "stdout.txt"
+            stderr = stage16r_root / "patch_eval" / "turingos" / instance_id / "stderr.txt"
+            if candidate_patch.exists() and test_patch.exists() and stdout.exists() and stderr.exists():
+                return {
+                    "candidate_patch_path": candidate_patch,
+                    "test_patch_path": test_patch,
+                    "stdout_path": stdout,
+                    "stderr_path": stderr,
+                    "source_kind": "stage16r_real_worker_derived_patch_eval_artifact",
+                }
         return {
             "candidate_patch_text": f"{instance_id}:stage16r:repair-patch",
             "test_patch_text": f"{instance_id}:stage16r:test-patch",
@@ -91,26 +104,26 @@ def artifact_sources(instance_id: str, source_stage: str) -> dict[str, str | Pat
     }
 
 
-def materialize_artifacts(root: Path, record: dict[str, Any]) -> dict[str, Path]:
+def materialize_artifacts(root: Path, record: dict[str, Any], stage16r_root: Path | None = None) -> dict[str, Path]:
     instance_id = record["instance_id"]
     source_stage = record["source_stage"]
-    source = artifact_sources(instance_id, source_stage)
+    source = artifact_sources(instance_id, source_stage, stage16r_root)
     base = root / "patch_artifacts" / instance_id
     logs = root / "target_test_logs" / instance_id
     candidate = base / "candidate.patch"
     test_patch = base / "official_test.patch"
     stdout = logs / "stdout.txt"
     stderr = logs / "stderr.txt"
-    if source_stage == "Stage16R":
-        write_text_exact(candidate, str(source["candidate_patch_text"]))
-        write_text_exact(test_patch, str(source["test_patch_text"]))
-        write_text_exact(stdout, str(source["stdout_text"]))
-        write_text_exact(stderr, str(source["stderr_text"]))
-    else:
+    if "candidate_patch_path" in source:
         copy_file(Path(source["candidate_patch_path"]), candidate)
         copy_file(Path(source["test_patch_path"]), test_patch)
         copy_file(Path(source["stdout_path"]), stdout)
         copy_file(Path(source["stderr_path"]), stderr)
+    else:
+        write_text_exact(candidate, str(source["candidate_patch_text"]))
+        write_text_exact(test_patch, str(source["test_patch_text"]))
+        write_text_exact(stdout, str(source["stdout_text"]))
+        write_text_exact(stderr, str(source["stderr_text"]))
     return {
         "candidate_patch": candidate,
         "official_test_patch": test_patch,
@@ -119,16 +132,13 @@ def materialize_artifacts(root: Path, record: dict[str, Any]) -> dict[str, Path]
     }
 
 
-def materialize_harness_inputs(root: Path, instance_id: str, candidate_patch: Path) -> dict[str, Path]:
-    tasks_jsonl = root / "harness_inputs" / "tasks_20.jsonl"
-    if not tasks_jsonl.exists():
-        copy_file(STAGE12_ROOT / "tasks_20.jsonl", tasks_jsonl)
+def materialize_harness_inputs(root: Path, instance_id: str, candidate_patch: Path) -> dict[str, Path | str]:
     turingos_patch = root / "harness_inputs" / "turingos" / instance_id / "diff.patch"
     direct_patch = root / "harness_inputs" / "direct" / instance_id / "diff.patch"
     copy_file(candidate_patch, turingos_patch)
     write_text_exact(direct_patch, "")
     return {
-        "tasks_jsonl": tasks_jsonl,
+        "tasks_jsonl": "<external SWE-bench Verified Mini 50 JSONL matching dataset_manifest.source_dataset_digest>",
         "turingos_patch": turingos_patch,
         "direct_patch": direct_patch,
         "turingos_dir": root / "harness_inputs" / "turingos",
@@ -167,9 +177,9 @@ def build_phase_f_evaluator_proof(stage16_root: Path, stage16r_root: Path, out_d
     for instance_id in instance_ids:
         record = records[instance_id]
         official = record["official_payload"]
-        artifacts = materialize_artifacts(out_dir, record)
+        artifacts = materialize_artifacts(out_dir, record, stage16r_root)
         harness_inputs = materialize_harness_inputs(out_dir, instance_id, artifacts["candidate_patch"])
-        source = artifact_sources(instance_id, record["source_stage"])
+        source = artifact_sources(instance_id, record["source_stage"], stage16r_root)
         for artifact_kind, path in artifacts.items():
             required_evidence.append(
                 {
@@ -201,7 +211,7 @@ def build_phase_f_evaluator_proof(stage16_root: Path, stage16r_root: Path, out_d
             "python3",
             "tools/bench/evaluate_django_swe_bench_patches.py",
             "--tasks-jsonl",
-            rel(out_dir, harness_inputs["tasks_jsonl"]),
+            str(harness_inputs["tasks_jsonl"]),
             "--limit",
             "20",
             "--turingos-dir",
@@ -217,8 +227,10 @@ def build_phase_f_evaluator_proof(stage16_root: Path, stage16r_root: Path, out_d
                 "source_stage": record["source_stage"],
                 "evaluator_command": " ".join(command),
                 "harness_path": "tools/bench/evaluate_django_swe_bench_patches.py",
-                "command_shape": "batch_harness_replay",
-                "tasks_jsonl": rel(out_dir, harness_inputs["tasks_jsonl"]),
+                "command_shape": "batch_harness_replay_external_dataset_by_digest",
+                "tasks_jsonl": str(harness_inputs["tasks_jsonl"]),
+                "tasks_jsonl_committed": False,
+                "tasks_jsonl_not_committed_reason": "dataset rows contain official patch/test_patch fields; public packet uses digest-bound external dataset descriptor",
                 "turingos_dir": rel(out_dir, harness_inputs["turingos_dir"]),
                 "direct_dir": rel(out_dir, harness_inputs["direct_dir"]),
                 "replay_out": rel(out_dir, harness_inputs["out"]),
@@ -295,8 +307,10 @@ def build_phase_f_evaluator_proof(stage16_root: Path, stage16r_root: Path, out_d
         {
             "schema_id": "PhaseFEvaluatorManifest.v1",
             "task_count": len(instance_ids),
-            "command_shape": "batch_harness_replay",
-            "tasks_jsonl": "harness_inputs/tasks_20.jsonl",
+            "command_shape": "batch_harness_replay_external_dataset_by_digest",
+            "tasks_jsonl": "<external SWE-bench Verified Mini 50 JSONL matching dataset_manifest.source_dataset_digest>",
+            "tasks_jsonl_committed": False,
+            "tasks_jsonl_not_committed_reason": "dataset rows contain official patch/test_patch fields; public packet uses digest-bound external dataset descriptor",
             "turingos_dir": "harness_inputs/turingos",
             "direct_dir": "harness_inputs/direct",
             "evaluations": evaluations,

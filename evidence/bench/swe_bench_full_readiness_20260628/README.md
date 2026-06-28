@@ -1,34 +1,39 @@
 # Full SWE-bench Readiness
 
-Scope: launch-readiness gate for starting a full SWE-bench sealed campaign.
+Scope: launch-readiness gate for starting a sealed SWE-bench Verified 500
+campaign.
 
-This packet is intentionally a blocker packet. It does not claim that full
-SWE-bench is ready. It records the exact remaining gates that must pass before a
-full campaign may start.
+This packet does not claim a completed full-score run. It only proves the launch
+prerequisites for the next sealed campaign are satisfied:
+
+- Phase F evaluator proof is PASS with executable official evaluator replay.
+- Stage16R-real repair evidence is PASS with 7/7 fresh worker-derived repairs.
+- SWE-bench Verified full 500 manifest is frozen with `selection_policy=ALL`.
+- Full-score, leaderboard-equivalence, P1/P2, and provider-billing-complete
+  VPPUT claims remain forbidden before the sealed campaign completes.
 
 Current result:
 
 ```text
-status: BLOCKED
-full_swe_bench_ready: false
-release_phase_g: false
-next_loop: retry_remaining_stage16r_real_targets
+status: READY
+full_swe_bench_ready: true
+release_phase_g: true
+next_loop: start_full_swe_bench_sharded_sealed_campaign
 ```
 
-Primary blockers:
+Primary evidence:
 
-- fresh Stage16R-real evaluator bundles exist, but only 2 of 7 repair targets
-  passed official evaluator;
-- Phase F evaluator proof is still PARTIAL;
-- full dataset manifest freeze has not happened.
+- `evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628/`
+- `evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/`
+- `evidence/bench/swe_bench_phase_g_verified_500_manifest_20260628/`
 
 Verification command:
 
 ```bash
 python3 tools/bench/audit_full_swe_bench_readiness.py \
-  --phase-f-root evidence/bench/swe_bench_phase_f_evaluator_proof_20260628 \
+  --phase-f-root evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628 \
   --repair-loop-root evidence/bench/swe_bench_phase_f_repair_loop_20260628 \
-  --stage16r-real-root evidence/bench/swe_bench_stage16r_real_evaluator_20260628 \
-  --full-manifest-root evidence/bench/swe_bench_full_manifest_20260628 \
+  --stage16r-real-root evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628 \
+  --full-manifest-root evidence/bench/swe_bench_phase_g_verified_500_manifest_20260628 \
   --out evidence/bench/swe_bench_full_readiness_20260628/full_swe_bench_readiness_audit.json
 ```

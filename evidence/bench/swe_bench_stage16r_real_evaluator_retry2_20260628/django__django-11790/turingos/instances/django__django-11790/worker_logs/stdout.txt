@@ -1,0 +1,16 @@
+**Patch created and left in the worktree (django/contrib/auth/forms.py).**
+
+The edit was made after inspecting the AuthenticationForm initialization path (post-`super().__init__` / `copy.deepcopy(base_fields)` in forms/forms.py + the post-creation `.max_length` assignment) + the UsernameField + CharField/Field `__init__` + widget attr hook path (where `widget_attrs` only runs at field construction time, so HTML attrs + direct `.widget.attrs` updates are required for dynamic model metadata like this).
+
+The smallest production-code change (1 added line, no test/benchmark edits, no stringification of the numeric metadata value, matching patterns used elsewhere in the same file for `.widget.attrs`): 
+
+```diff
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index a0cfed0995..f6f73ba3e8 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -194,0 +195 @@ class AuthenticationForm(forms.Form):
++        self.fields['username'].widget.attrs['maxlength'] = self.fields['username'].max_length
+```
+
+(Stopped immediately after `git diff` produced the unified diff.)

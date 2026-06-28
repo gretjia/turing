@@ -5,3 +5,5 @@ evidence/bench/**/worker_logs/*.txt -whitespace
 evidence/bench/**/worker_logs/visible_prompt.txt -whitespace
 evidence/bench/**/patch_eval/**/*.patch -whitespace
 evidence/bench/**/patch_eval/**/*.txt -whitespace
+evidence/bench/**/patch_artifacts/**/*.patch -whitespace
+evidence/bench/**/harness_inputs/**/*.patch -whitespace

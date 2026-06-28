@@ -1,29 +1,23 @@
 {
-  "blockers": [
-    "full_dataset_manifest_freeze_required",
-    "phase_f_evaluator_proof_pass_required",
-    "remaining_stage16r_real_repairs_required"
-  ],
+  "blockers": [],
   "full_manifest": {
-    "missing_files": [
-      "task_manifest.json",
-      "loop_manifest.json",
-      "CLAIM_BOUNDARY.json",
-      "full_campaign_acceptance_commands.md"
-    ],
-    "root": "evidence/bench/swe_bench_full_manifest_20260628",
-    "status": "MISSING"
+    "authorization_mode": "required",
+    "official_dataset_task_count": 500,
+    "root": "evidence/bench/swe_bench_phase_g_verified_500_manifest_20260628",
+    "selection_policy": "ALL",
+    "status": "PASS",
+    "task_count": 500
   },
-  "full_swe_bench_ready": false,
-  "next_loop": "retry_remaining_stage16r_real_targets",
+  "full_swe_bench_ready": true,
+  "next_loop": "start_full_swe_bench_sharded_sealed_campaign",
   "phase_f": {
-    "official_evaluator_executable_replay": false,
-    "release_next_phase_g": false,
-    "root": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628",
-    "status": "PARTIAL"
+    "official_evaluator_executable_replay": true,
+    "release_next_phase_g": true,
+    "root": "evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628",
+    "status": "PASS"
   },
   "problems": [],
-  "release_phase_g": false,
+  "release_phase_g": true,
   "repair_loop": {
     "phase_f_evaluator_proof_required": true,
     "release_next_phase_g": false,
@@ -34,11 +28,11 @@
   "schema_id": "FullSweBenchReadinessAudit.v1",
   "stage16r_real": {
     "fresh_real_evaluator_bundle_count": 7,
-    "official_pass_count": 2,
-    "remaining_repair_count": 5,
-    "root": "evidence/bench/swe_bench_stage16r_real_evaluator_20260628",
-    "status": "PARTIAL",
+    "official_pass_count": 7,
+    "remaining_repair_count": 0,
+    "root": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628",
+    "status": "PASS",
     "strict_microtape_status": "PASS"
   },
-  "status": "BLOCKED"
+  "status": "READY"
 }

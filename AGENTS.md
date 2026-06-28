@@ -31,13 +31,18 @@ release work, read these files before changing code or evidence:
 
 ## Current Loop Stop
 
-As of the Phase F repair-loop hardening, full SWE-bench is not ready to start.
+As of the full-readiness gate, TuringOS is ready to start a sealed
+SWE-bench Verified 500 campaign. This is a launch-readiness claim only, not a
+full-score result, leaderboard-equivalence claim, or P1/P2 product claim.
+
 The correct next loop is:
 
 ```text
-retry remaining Stage16R-real repair targets
--> rerun Phase F evaluator proof after all 7 repair targets pass
--> freeze full dataset manifest
--> readiness audit READY
--> start full SWE-bench sharded sealed campaign
+start SWE-bench Verified 500 sharded sealed campaign
+-> every instance writes a MicroTape bundle
+-> solved: official PASS -> CandidateAccepted -> final PPUT progress=1
+-> unsolved: no CandidateAccepted -> final PPUT progress=0
+-> strict audit every shard
+-> repair only unsolved frontier
+-> full-score claim gate only if unsolved_count == 0 across all 500
 ```

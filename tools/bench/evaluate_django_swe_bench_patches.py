@@ -50,6 +50,30 @@ def django_test_labels(fail_to_pass: list[str]) -> list[str]:
     return labels
 
 
+def django_test_modules_from_test_patch(test_patch: str) -> list[str]:
+    modules: set[str] = set()
+    for line in test_patch.splitlines():
+        if not line.startswith("diff --git "):
+            continue
+        parts = line.split()
+        for token in parts[2:4]:
+            if not token.startswith(("a/", "b/")):
+                continue
+            path = token[2:]
+            p = Path(path)
+            if len(p.parts) < 2 or p.parts[0] != "tests" or p.suffix != ".py":
+                continue
+            if p.name != "tests.py" and not p.name.startswith("test"):
+                continue
+            modules.add(".".join(p.with_suffix("").parts[1:]))
+    return sorted(modules)
+
+
+def is_unittest_label_import_failure(proc: subprocess.CompletedProcess[str]) -> bool:
+    text = f"{proc.stdout}\n{proc.stderr}"
+    return "_FailedTest" in text or "Failed to import test module" in text or "ModuleNotFoundError" in text
+
+
 def run_cmd(argv: list[str], *, cwd: Path | None = None, timeout: int = 120) -> subprocess.CompletedProcess[str]:
     return subprocess.run(argv, cwd=cwd, text=True, capture_output=True, timeout=timeout)
 
@@ -166,6 +190,8 @@ def official_evaluator_evidence_payload(
         "apply_candidate_result": candidate_status,
         "apply_test_patch_result": test_patch_status,
         "fail_to_pass_labels": parse_fail_to_pass(task.get("FAIL_TO_PASS", [])),
+        "target_tests": target_test_result.get("target_tests", []),
+        "target_selection_source": target_test_result.get("target_selection_source", "FAIL_TO_PASS"),
         "target_test_exit_code": target_test_result.get("exit_code"),
         "target_test_result": target_status,
         "stdout_hash": digest_text(stdout),
@@ -663,7 +689,9 @@ def evaluate_patch(
             "stderr": apply_tests.stderr[-2000:],
             "official_evaluator_evidence": evidence,
         }
+    env = {"PYTHONPATH": str(eval_tree)}
     labels = django_test_labels(parse_fail_to_pass(task["FAIL_TO_PASS"]))
+    target_selection_source = "FAIL_TO_PASS"
     command = [
         str(python),
         str(eval_tree / "tests" / "runtests.py"),
@@ -671,8 +699,19 @@ def evaluate_patch(
         "--verbosity",
         "2",
     ]
-    env = {"PYTHONPATH": str(eval_tree)}
     proc = subprocess.run(command, text=True, capture_output=True, timeout=600, env=env)
+    fallback_labels = django_test_modules_from_test_patch(str(task.get("test_patch", "")))
+    if proc.returncode != 0 and fallback_labels and is_unittest_label_import_failure(proc):
+        labels = fallback_labels
+        target_selection_source = "test_patch_module_fallback_after_label_import_failure"
+        command = [
+            str(python),
+            str(eval_tree / "tests" / "runtests.py"),
+            *labels,
+            "--verbosity",
+            "2",
+        ]
+        proc = subprocess.run(command, text=True, capture_output=True, timeout=600, env=env)
     (result_dir / "stdout.txt").write_text(proc.stdout, encoding="utf-8")
     (result_dir / "stderr.txt").write_text(proc.stderr, encoding="utf-8")
     evidence = official_evaluator_evidence_payload(
@@ -696,6 +735,8 @@ def evaluate_patch(
             "exit_code": proc.returncode,
             "stdout": proc.stdout,
             "stderr": proc.stderr,
+            "target_tests": labels,
+            "target_selection_source": target_selection_source,
         },
         **_substrate_ref_kwargs(substrate_run),
     )
@@ -705,6 +746,7 @@ def evaluate_patch(
         "result": "PASS" if proc.returncode == 0 else "FAIL",
         "exit_code": proc.returncode,
         "target_tests": labels,
+        "target_selection_source": target_selection_source,
         "stdout": str(result_dir / "stdout.txt"),
         "stderr": str(result_dir / "stderr.txt"),
         "official_evaluator_evidence": evidence,

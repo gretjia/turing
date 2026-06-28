@@ -1,0 +1,17 @@
+**Patch left in worktree (via edit to production code only):**
+
+```diff
+diff --git a/django/db/models/enums.py b/django/db/models/enums.py
+index bbe362a6ab..1163a6d3bd 100644
+--- a/django/db/models/enums.py
++++ b/django/db/models/enums.py
+@@ -60,6 +60,8 @@ class ChoicesMeta(enum.EnumMeta):
+
+ class Choices(enum.Enum, metaclass=ChoicesMeta):
+     """Class for creating enumerated choices."""
++    def __str__(self):
++        return str(self.value)
+     pass
+```
+
+(The change is the smallest production edit targeting enum member `__str__` so `str(member) == str(member.value)` for `Choices`/`TextChoices`/`IntegerChoices` while leaving all other behaviors, primitive value exposure on model instances, labels, `.value`, `.choices`, etc. untouched. No test/benchmark files were edited.)

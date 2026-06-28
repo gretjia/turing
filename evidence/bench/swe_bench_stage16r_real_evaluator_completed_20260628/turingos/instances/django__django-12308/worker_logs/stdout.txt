@@ -1,0 +1,28 @@
+**Patch applied to production code only** (django/contrib/admin/utils.py: display_for_field).
+
+- Added minimal special case for `models.JSONField` (covers the main field + deprecated postgres subclass via inheritance).
+- Uses the JSONField *form* `prepare_value` path (handles `InvalidJSONInput` + custom encoder/decoder; produces valid JSON output like `{"foo": "bar"}` instead of Python dict repr).
+- Wraps in `try`/`except (TypeError, ValueError)` + fallback to `display_for_value` (avoids crash on non-serializable cases like `dict` with `tuple` keys, per the capsule rules; preserves prior display behavior on fallback).
+- No other files touched, no test/benchmark files edited, no extra imports/defs, smallest change that satisfies the stated requirements.
+
+The diff is left in the worktree:
+
+```diff
+diff --git a/django/contrib/admin/utils.py b/django/contrib/admin/utils.py
+index e4ddc8f017..f86856c8d8 100644
+--- a/django/contrib/admin/utils.py
++++ b/django/contrib/admin/utils.py
+@@ -398,6 +398,11 @@ def display_for_field(value, field, empty_value_display):
+         return formats.number_format(value)
+     elif isinstance(field, models.FileField) and value:
+         return format_html('<a href="{}">{}</a>', value.url, value)
++    elif isinstance(field, models.JSONField):
++        try:
++            return field.formfield().prepare_value(value)
++        except (TypeError, ValueError):
++            return display_for_value(value, empty_value_display)
+     else:
+         return display_for_value(value, empty_value_display)
+```
+
+(Mentally re-ran target path: valid JSON dict/list → proper `json.dumps` output via prepare; bad value like tuple-key dict → fallback, no exception; None/empty already handled upstream.)
