@@ -13,6 +13,22 @@ This document is the engineering controller. The recursive audit plan defines re
 
 TuringOS becomes stronger only when a failed real attempt is converted into replayable MicroTape state that changes a later attempt, while truth still moves only through predicate-approved Micro events.
 
+## Ambition and Evaluation Philosophy
+
+The long-term ambition is not to wrap a stronger benchmark harness around existing LLM workers. The ambition is to grow an LLM-backed TuringOS substrate that can keep searching, reflecting, compressing failures, reusing memory, allocating attention, and replaying its own work under constitutional constraints for as much time and budget as the operator grants.
+
+SWE-bench full score is the first concrete frontier because it is externally checkable and forces real software repair. It is not the final goal. The real test is whether each run improves the machine:
+
+- failures become structured MicroTape state, not discarded logs;
+- MetaAI or equivalent reviewer roles compress failure evidence into abstract, shielded guidance;
+- later capsules consume those rules and change behavior;
+- Native API tool receipts make worker actions increasingly whitebox;
+- market and PPUT improve routing and budget use without becoming truth;
+- replay reconstructs decisions, costs, failures, accepted heads, final patches, and VPPUT;
+- code accuracy and substrate completeness improve even when solve-rate does not.
+
+Therefore each stage must evaluate both product outcome and substrate learning. A stage that improves solve-rate while bypassing tape, predicates, receipts, failure memory, or replay is a failure. A stage that exposes a real substrate bug and fixes it with replayable evidence is progress even if the benchmark result does not improve in that round.
+
 ## Non-Negotiable Boundaries
 
 - MicroTape is the source of truth.
