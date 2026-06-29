@@ -1,0 +1,24 @@
+{
+  "command": "python -m swebench.harness.run_evaluation --dataset_name SWE-bench/SWE-bench_Verified --split test --predictions_path evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S00_predictions.jsonl --run_id turingos_verified500_S00 --max_workers 2",
+  "docker_environment_required": true,
+  "execute_now": false,
+  "execution_requested": true,
+  "note": "Execution blocked until every shard task has one worker-derived unified-diff prediction.",
+  "official_harness_kind": "upstream_swebench_docker",
+  "predictions_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S00_predictions.jsonl",
+  "problems": [
+    "predictions missing"
+  ],
+  "run_id": "turingos_verified500_S00",
+  "schema_id": "turingos.swebench_shard_run_packet.v1",
+  "shard_id": "S00",
+  "status": "BLOCKED",
+  "validation": {
+    "expected_prediction_count": 50,
+    "prediction_count": 0,
+    "problems": [
+      "predictions missing"
+    ],
+    "status": "FAIL"
+  }
+}

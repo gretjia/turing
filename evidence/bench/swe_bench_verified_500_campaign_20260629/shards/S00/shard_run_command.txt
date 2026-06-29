@@ -1,0 +1,1 @@
+python -m swebench.harness.run_evaluation --dataset_name SWE-bench/SWE-bench_Verified --split test --predictions_path evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S00_predictions.jsonl --run_id turingos_verified500_S00 --max_workers 2

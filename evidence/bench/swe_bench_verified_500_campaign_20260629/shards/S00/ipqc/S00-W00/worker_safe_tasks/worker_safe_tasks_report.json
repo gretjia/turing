@@ -1,0 +1,88 @@
+{
+  "ipqc_window_id": "S00-W00",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_safe_tasks_report.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "task_count": 10,
+  "tasks": [
+    {
+      "instance_id": "astropy__astropy-12907",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/astropy__astropy-12907/task_packet.json",
+      "task_packet_sha256": "sha256:4f73000546bf5e6da32e44e6acdf1d5e44848c5fde316e2f63d67197e566e56a",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/astropy__astropy-12907/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:f5d9385ff5516f8635747ca0392f14167e0649d8e5a58ee7518837f1c4e9ff65"
+    },
+    {
+      "instance_id": "django__django-10097",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/django__django-10097/task_packet.json",
+      "task_packet_sha256": "sha256:cfc0bbf221bc4643a87dcacad9c69e6ec31e7eecd25fa7188af9a6e0ecd42b46",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/django__django-10097/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:c0bb2b5e69b520c38a3085a5ebef1d4b1d7e540d5574c3341ab140ecf86b9865"
+    },
+    {
+      "instance_id": "matplotlib__matplotlib-13989",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/matplotlib__matplotlib-13989/task_packet.json",
+      "task_packet_sha256": "sha256:ab6c36feb680436bb575dc8e2ff0bff650a0893ad8d255be79c8db96cfa2fc15",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/matplotlib__matplotlib-13989/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:14427bc8445a01249f16697f3990eda165f88309b15e8d3af22dbd83f942ba5a"
+    },
+    {
+      "instance_id": "mwaskom__seaborn-3069",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/mwaskom__seaborn-3069/task_packet.json",
+      "task_packet_sha256": "sha256:ab793b9854cf85efaacff538b56ab3651b5579519d0e3e44ed6df46ed4e2c50d",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/mwaskom__seaborn-3069/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:ea70e67c140dffc5886f878081018273d26d128b5835813a6125ddc8171efa33"
+    },
+    {
+      "instance_id": "pallets__flask-5014",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pallets__flask-5014/task_packet.json",
+      "task_packet_sha256": "sha256:651b5001c43b6c8bb2216fa25dd6ada7b82c5ef939671c19ff3618e7c27c3bb4",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pallets__flask-5014/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:8698a340a4e4633a5a046d9f14185f6dbdd1e2e60075bfa28b7e4684c4fff30e"
+    },
+    {
+      "instance_id": "psf__requests-1142",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/psf__requests-1142/task_packet.json",
+      "task_packet_sha256": "sha256:aa6047e77c7350415538d25957eaeae9a08b2b174f7a392bd71f49e575f7473e",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/psf__requests-1142/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:ae0f8818d19e36a64a0ee9579896ca25a0b108d9b37778afcb518b39d4ac0557"
+    },
+    {
+      "instance_id": "pydata__xarray-2905",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pydata__xarray-2905/task_packet.json",
+      "task_packet_sha256": "sha256:40091b5a32ae9314fd7a50047e11ad8757c04ac54feec825d3a51c86b98c8c3f",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pydata__xarray-2905/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:45b3e18a6e46d69e5b0c2f1ae78474d56add71e29b16f69339590b430736a7eb"
+    },
+    {
+      "instance_id": "pylint-dev__pylint-4551",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pylint-dev__pylint-4551/task_packet.json",
+      "task_packet_sha256": "sha256:ff71551344f6f38087fdb417914aacbcd89120d62f7daa2cbc8246bc6eef5419",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pylint-dev__pylint-4551/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:03b6deee87210bf802f86b6a156e19a4a007b102171dbcd7525ea06999f25d51"
+    },
+    {
+      "instance_id": "pytest-dev__pytest-10051",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pytest-dev__pytest-10051/task_packet.json",
+      "task_packet_sha256": "sha256:30bb52dfe5e59bed66252508eb8dcf24f0b9baf88ccebf5312384563fe8ea2f6",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pytest-dev__pytest-10051/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:bd8d49cb2fd3fb7682712db287addec6c2875c05aafc17cb85fcc3566474b07b"
+    },
+    {
+      "instance_id": "scikit-learn__scikit-learn-10297",
+      "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/scikit-learn__scikit-learn-10297/task_packet.json",
+      "task_packet_sha256": "sha256:86e58f6269758b4687f98fe2ca61c872a346ccff0b0873fdb4f3db5fed3ebf97",
+      "worker_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/scikit-learn__scikit-learn-10297/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:43f0cb9f11e3561769310eca3da7eb7c2764c1847b37ea9127996da6e87c1ad1"
+    }
+  ],
+  "worker_visible_forbidden_fields": [
+    "FAIL_TO_PASS",
+    "PASS_TO_PASS",
+    "hints_text",
+    "patch",
+    "test_patch"
+  ],
+  "written_count": 10
+}

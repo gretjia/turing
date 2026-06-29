@@ -2,8 +2,20 @@
 
 This directory freezes the internal official-harness campaign control plane.
 It does not run the 500 tasks and does not claim official leaderboard
-equivalence. Upstream SWE-bench Docker harness identity must pass before any
-official campaign launch.
+equivalence.
+
+Current supervisor state:
+- upstream SWE-bench Docker harness identity gate: READY, via Phase F official
+  harness qualification at commit d055ae4bd013ff09298ae8af576ebdbcf32a4e8c;
+- full Verified 500 manifest freeze: PASS;
+- campaign execution: not started;
+- next gate: S00 must provide one worker-derived unified-diff prediction per
+  shard task before the official harness command can be marked ready.
+- S00-W00 worker-safe task packets: materialized for 10/10 tasks from the local
+  Verified dataset cache, with dataset gold patches, test patches, hidden test
+  labels, and hints removed from worker-visible packets.
+- S00 execution gate: BLOCKED until `predictions/shard_S00_predictions.jsonl`
+  contains 50 worker-derived unified-diff predictions matching the S00 manifest.
 
 Execution policy:
 - one-shot 500 run: FORBIDDEN
@@ -11,3 +23,9 @@ Execution policy:
 - process QC: 10-task IPQC window
 - audit atom: 50-task sealed shard
 - full campaign: 10 shards x 50 tasks
+
+Current S00-W00 worker-safe packet root:
+
+```text
+shards/S00/ipqc/S00-W00/worker_safe_tasks/
+```
