@@ -14,6 +14,8 @@ Current supervisor state:
 - S00-W00 worker-safe task packets: materialized for 10/10 tasks from the local
   Verified dataset cache, with dataset gold patches, test patches, hidden test
   labels, and hints removed from worker-visible packets.
+- S00-W00 worker-derived candidates: 1/10 audited source-only candidate patch
+  exists for `django__django-10097`.
 - S00 execution gate: BLOCKED until `predictions/shard_S00_predictions.jsonl`
   contains 50 worker-derived unified-diff predictions matching the S00 manifest.
 
@@ -28,4 +30,12 @@ Current S00-W00 worker-safe packet root:
 
 ```text
 shards/S00/ipqc/S00-W00/worker_safe_tasks/
+```
+
+Current audited S00 candidate:
+
+```text
+shards/S00/tasks/django__django-10097/candidate.patch
+shards/S00/tasks/django__django-10097/worker_receipt.json
+shards/S00/tasks/django__django-10097/worker_candidate_audit.json
 ```

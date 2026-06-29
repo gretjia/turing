@@ -1,0 +1,113 @@
+{
+  "status": "COMPLETED",
+  "instance_id": "django__django-10097",
+  "source_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/django__django-10097/worker_capsule.md",
+  "base_commit": "b9cf764be62e77b4777b3a75ec256f6209a57671",
+  "repo_url": "https://github.com/django/django.git",
+  "commands_run": [
+    {
+      "command": "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/django__django-10097/worker_capsule.md",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "read worker-safe capsule"
+    },
+    {
+      "command": "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/django__django-10097/task_packet.json",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "read worker-safe task packet"
+    },
+    {
+      "command": "git clone --quiet https://github.com/django/django.git /tmp/turingos_worker_django_10097 || git -C /tmp/turingos_worker_django_10097 fetch --quiet origin; git -C /tmp/turingos_worker_django_10097 checkout --quiet b9cf764be62e77b4777b3a75ec256f6209a57671",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "public upstream checkout prepared at base commit"
+    },
+    {
+      "command": "rg -n \"class URLValidator|URLValidator|invalid_urls|valid_urls\" django tests -g '*.py' -g '*.txt'",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "located URLValidator implementation and validator tests"
+    },
+    {
+      "command": "sed -n '1,260p' django/core/validators.py; sed -n '1,420p' tests/validators/tests.py",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "inspected public source and tests needed for the patch"
+    },
+    {
+      "command": "python tests/runtests.py validators -v 2",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "failed: python executable not found"
+    },
+    {
+      "command": "python3 tests/runtests.py validators -v 2",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "failed: local django package not importable without PYTHONPATH"
+    },
+    {
+      "command": "PYTHONPATH=. python3 tests/runtests.py validators -v 2",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "failed before tests due Django 2.2 using gettext.translation(codeset=...) on Python 3.11"
+    },
+    {
+      "command": "PYTHONPATH=. python3 - <<'PY' ... URLValidator invalid-auth assertions ... PY",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "red check failed as expected before implementation: ValidationError not raised for 'http://user/name@example.com/'"
+    },
+    {
+      "command": "PYTHONPATH=. python3 - <<'PY' ... URLValidator valid and invalid auth assertions ... PY",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "passed: targeted URLValidator checks passed"
+    },
+    {
+      "command": "command -v python3.10 || true; command -v python3.9 || true; command -v python3.8 || true",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "no older Python interpreter found on PATH"
+    },
+    {
+      "command": "PYTHONPATH=. python3 -m unittest tests.validators.tests -v",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "failed before useful validation because Django settings were not configured"
+    },
+    {
+      "command": "PYTHONPATH=. DJANGO_SETTINGS_MODULE=tests.test_sqlite python3 -m unittest tests.validators.tests -v",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "failed with unrelated Django 2.2/Python 3.11 compatibility issues: gettext codeset TypeError, stricter invalid IPv6 URL parsing, and existing trailing-newline URL expectations"
+    },
+    {
+      "command": "git -C /tmp/turingos_worker_django_10097 diff -- django/core/validators.py tests/validators/tests.py > evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/django__django-10097/candidate.patch",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "candidate.patch written"
+    },
+    {
+      "command": "python3 -m json.tool evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/django__django-10097/worker_receipt.json >/dev/null",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "passed: receipt JSON parsed successfully"
+    },
+    {
+      "command": "git diff --check -- django/core/validators.py tests/validators/tests.py",
+      "cwd": "/tmp/turingos_worker_django_10097",
+      "result": "passed: no whitespace errors"
+    },
+    {
+      "command": "git -C /tmp/turingos_worker_django_10097 worktree add --detach /tmp/turingos_worker_django_10097_applycheck b9cf764be62e77b4777b3a75ec256f6209a57671 && git -C /tmp/turingos_worker_django_10097_applycheck apply --check /home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/django__django-10097/candidate.patch",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "passed: candidate patch applies cleanly to the base commit"
+    },
+    {
+      "command": "apply_patch to remove the tests/validators/tests.py hunk from evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/django__django-10097/candidate.patch",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "candidate.patch rewritten as source-only; local test changes are excluded from the submitted model_patch"
+    },
+    {
+      "command": "git -C /tmp/turingos_worker_django_10097_applycheck apply --check /home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/django__django-10097/candidate.patch",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "result": "passed: source-only candidate patch applies cleanly to the base commit"
+    }
+  ],
+  "candidate_patch_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/django__django-10097/candidate.patch",
+  "submitted_patch_scope": "source_only",
+  "local_verification_scratch": "During worker derivation, tests/validators/tests.py was edited in the temporary checkout only to perform local red/green regression verification. Those test changes are intentionally excluded from candidate.patch for the official SWE-bench prediction path.",
+  "candidate_source": "worker_derived",
+  "integrity_statement": "I read only the worker-safe task_packet.json and worker_capsule.md for this instance from campaign evidence. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, hidden evaluator labels, campaign manifests, old bundles, auditors, or unrelated evidence. The patch was derived from the public django/django repository at the stated base commit and the worker-safe problem statement.",
+  "open_risks": [
+    "Full Django validators suite was not cleanly runnable in this environment because Django 2.2 is incompatible with Python 3.11 in unrelated areas.",
+    "Targeted URLValidator checks for accepted encoded credentials and rejected raw '/', ':', '@', and query-delimiter credential confusion passed."
+  ]
+}

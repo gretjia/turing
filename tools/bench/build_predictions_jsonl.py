@@ -51,6 +51,7 @@ def build_predictions(root: Path, shard: str, *, model_name: str = "turingos-int
                 "model_name_or_path": model_name,
                 "model_patch": patch_text,
                 "candidate_patch_sha256": sha256_bytes(patch_bytes),
+                "candidate_source": "worker_derived",
             }
         )
 

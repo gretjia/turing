@@ -11,6 +11,7 @@ unified-diff prediction before the shard can be marked ready to execute.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -51,6 +52,10 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def looks_like_unified_diff(text: str) -> bool:
     return text.startswith("diff --git ") and "\n--- " in text and "\n+++ " in text and "\n@@" in text
+
+
+def sha256_text(text: str) -> str:
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def validate_predictions(root: Path, shard: str, predictions: Path) -> dict[str, Any]:
@@ -113,12 +118,16 @@ def validate_predictions(root: Path, shard: str, predictions: Path) -> dict[str,
             problems.append("prediction missing instance_id")
             continue
         actual_ids.append(instance_id)
-        source = row.get("candidate_source", "worker_derived")
-        if source not in WORKER_DERIVED_SOURCES:
+        source = row.get("candidate_source")
+        if not isinstance(source, str):
+            problems.append(f"prediction source missing: {instance_id}")
+        elif source not in WORKER_DERIVED_SOURCES:
             problems.append(f"prediction source is not worker-derived: {instance_id}")
         patch = row.get("model_patch")
         if not isinstance(patch, str) or not looks_like_unified_diff(patch):
             problems.append(f"prediction patch is not a unified diff: {instance_id}")
+        elif row.get("candidate_patch_sha256") != sha256_text(patch):
+            problems.append(f"candidate patch sha256 mismatch: {instance_id}")
 
     expected_set = set(expected_ids)
     actual_set = set(actual_ids)

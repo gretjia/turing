@@ -19,6 +19,9 @@ dataset gold patches, test patches, hidden evaluator labels, and hints. They
 are preparation evidence only; they are not predictions and do not start the
 official harness.
 
+`django__django-10097` now has one audited worker-derived source-only candidate
+patch. This is still only 1/50 S00 predictions. It does not release S00.
+
 This packet makes the next loop executable without drift:
 
 1. freeze 500-task manifest;
@@ -38,6 +41,7 @@ while official_campaign_not_complete:
   freeze/read campaign manifest
   for shard in S00..S09:
     materialize worker-safe task packets for the next 10-task IPQC window
+    audit each worker candidate patch before prediction assembly
     build worker-derived predictions for all 50 shard tasks
     block if predictions are incomplete or non-worker-derived
     run each instance as its own atom

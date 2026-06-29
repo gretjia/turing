@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import subprocess
+import hashlib
 from pathlib import Path
 
 
@@ -41,11 +42,12 @@ def write_predictions(root: Path, shard: str, rows: list[dict[str, str]]):
 
 
 def prediction(instance_id: str, patch: str | None = None, *, source: str = "worker_derived"):
+    patch_text = patch or "diff --git a/a.py b/a.py\n--- a/a.py\n+++ b/a.py\n@@ -1 +1 @@\n-a\n+b\n"
     return {
         "instance_id": instance_id,
         "model_name_or_path": "turingos-test",
-        "model_patch": patch or "diff --git a/a.py b/a.py\n--- a/a.py\n+++ b/a.py\n@@ -1 +1 @@\n-a\n+b\n",
-        "candidate_patch_sha256": "sha256:" + "0" * 64,
+        "model_patch": patch_text,
+        "candidate_patch_sha256": "sha256:" + hashlib.sha256(patch_text.encode("utf-8")).hexdigest(),
         "candidate_source": source,
     }
 
@@ -84,6 +86,34 @@ def test_shard_runner_blocks_execution_with_non_worker_candidate_source(tmp_path
 
     assert packet["status"] == "BLOCKED"
     assert f"prediction source is not worker-derived: {instance_ids[0]}" in packet["problems"]
+
+
+def test_shard_runner_blocks_execution_when_candidate_source_is_missing(tmp_path):
+    runner = load_module("shard_runner", REPO / "tools/bench/run_swebench_shard.py")
+    root = tmp_path / "campaign"
+    instance_ids = write_shard_manifest(root, count=1)
+    row = prediction(instance_ids[0])
+    row.pop("candidate_source")
+    write_predictions(root, "S00", [row])
+
+    packet = runner.build_command(root, "S00", 2, execution_requested=True)
+
+    assert packet["status"] == "BLOCKED"
+    assert f"prediction source missing: {instance_ids[0]}" in packet["problems"]
+
+
+def test_shard_runner_blocks_execution_with_candidate_patch_hash_mismatch(tmp_path):
+    runner = load_module("shard_runner", REPO / "tools/bench/run_swebench_shard.py")
+    root = tmp_path / "campaign"
+    instance_ids = write_shard_manifest(root, count=1)
+    row = prediction(instance_ids[0])
+    row["candidate_patch_sha256"] = "sha256:" + "f" * 64
+    write_predictions(root, "S00", [row])
+
+    packet = runner.build_command(root, "S00", 2, execution_requested=True)
+
+    assert packet["status"] == "BLOCKED"
+    assert f"candidate patch sha256 mismatch: {instance_ids[0]}" in packet["problems"]
 
 
 def test_shard_runner_blocks_execution_with_non_unified_diff_prediction(tmp_path):
