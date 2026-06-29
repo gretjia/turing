@@ -1,0 +1,24 @@
+diff --git a/lib/matplotlib/ticker.py b/lib/matplotlib/ticker.py
+index 209a3f92ce..adb34338d0 100644
+--- a/lib/matplotlib/ticker.py
++++ b/lib/matplotlib/ticker.py
+@@ -2379,8 +2379,10 @@ class LogLocator(Locator):
+         if not np.isfinite(vmin) or not np.isfinite(vmax):
+             return 1, 10  # initial range, no data plotted yet
+ 
++        swapped = False
+         if vmin > vmax:
+             vmin, vmax = vmax, vmin
++            swapped = True
+         if vmax <= 0:
+             cbook._warn_external(
+                 "Data has no positive values, and therefore cannot be "
+@@ -2395,6 +2397,8 @@ class LogLocator(Locator):
+         if vmin == vmax:
+             vmin = _decade_less(vmin, self._base)
+             vmax = _decade_greater(vmax, self._base)
++        if swapped:
++            vmin, vmax = vmax, vmin
+         return vmin, vmax
+ 
+ 
