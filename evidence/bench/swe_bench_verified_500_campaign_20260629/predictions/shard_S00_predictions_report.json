@@ -1,12 +1,8 @@
 {
-  "prediction_count": 6,
+  "prediction_count": 10,
   "predictions_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S00_predictions.jsonl",
-  "predictions_sha256": "sha256:e93a844dc7b160af59f746d9e2fc720311e189d58451b28937d25b5e16b3ab3a",
+  "predictions_sha256": "sha256:638da003f3b47d380befb6cf4f32feed05f045a52b76200009efdeca92d4eb0e",
   "problems": [
-    "candidate patch missing: pydata__xarray-2905",
-    "candidate patch missing: pylint-dev__pylint-4551",
-    "candidate patch missing: pytest-dev__pytest-10051",
-    "candidate patch missing: scikit-learn__scikit-learn-10297",
     "candidate patch missing: sphinx-doc__sphinx-10323",
     "candidate patch missing: sympy__sympy-11618",
     "candidate patch missing: astropy__astropy-13033",

@@ -1,0 +1,26 @@
+{
+  "instance_id": "sphinx-doc__sphinx-10323",
+  "status": "BLOCKED",
+  "blocker": "Required worker-safe task files were not materialized at the expected paths, so the task cannot be inspected without violating integrity rules.",
+  "source_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/worker_capsule.md",
+  "task_packet_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/task_packet.json",
+  "base_commit": null,
+  "repo_url": null,
+  "commands_run": [
+    "sed -n '1,220p' /home/zephryj/.codex/skills/test-driven-development/SKILL.md",
+    "sed -n '1,220p' /home/zephryj/.codex/skills/verification-before-completion/SKILL.md",
+    "test -f evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/task_packet.json && sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/task_packet.json",
+    "test -f evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/worker_capsule.md && sed -n '1,320p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/worker_capsule.md",
+    "cd /home/zephryj/turingos_backup/work/turing && test -f evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/task_packet.json && sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/task_packet.json",
+    "cd /home/zephryj/turingos_backup/work/turing && test -f evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/worker_capsule.md && sed -n '1,320p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/sphinx-doc__sphinx-10323/worker_capsule.md",
+    "mkdir -p evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/sphinx-doc__sphinx-10323"
+  ],
+  "candidate_patch_path": null,
+  "candidate_source": "worker_derived",
+  "submitted_patch_scope": "source_only",
+  "integrity_statement": "I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, hints_text, official solution hints, gold patches, hidden evaluator labels, or task evidence outside the worker-safe packet/capsule. The worker-safe packet and capsule were unavailable, so no candidate patch was produced.",
+  "open_risks": [
+    "No source patch was produced because the worker-safe task packet and capsule were missing.",
+    "base_commit and repo_url could not be determined without the capsule."
+  ]
+}

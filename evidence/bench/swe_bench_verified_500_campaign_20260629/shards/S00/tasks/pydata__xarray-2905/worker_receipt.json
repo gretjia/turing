@@ -1,0 +1,41 @@
+{
+  "instance_id": "pydata__xarray-2905",
+  "source_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pydata__xarray-2905/worker_capsule.md",
+  "base_commit": "7c4e2ac83f7b4306296ff9b7b51aaf016e5ad614",
+  "repo_url": "https://github.com/pydata/xarray.git",
+  "commands_run": [
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/pydata__xarray-2905/task_packet.json",
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/pydata__xarray-2905/worker_capsule.md",
+    "git clone https://github.com/pydata/xarray.git /tmp/turingos_worker_xarray_2905",
+    "git checkout 7c4e2ac83f7b4306296ff9b7b51aaf016e5ad614",
+    "rg/sed source inspection under /tmp/turingos_worker_xarray_2905 for Variable.__setitem__, as_compatible_data, and related tests",
+    "python -m pytest xarray/tests/test_worker_tmp_xarray_2905.py -q (failed: python not found)",
+    "python3 -m pytest xarray/tests/test_worker_tmp_xarray_2905.py -q (failed: system NumPy 2.x incompatible with base xarray)",
+    "python3 -m venv /tmp/turingos_worker_xarray_2905/.venv",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pip install 'numpy<2' 'pandas>=0.25' pytest",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pytest xarray/tests/test_worker_tmp_xarray_2905.py -q (failed before fix)",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pip install 'pandas<2'",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pytest xarray/tests/test_worker_tmp_xarray_2905.py -q",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pytest xarray/tests/test_variable.py::TestVariable::test_setitem xarray/tests/test_variable.py::TestVariable::test_setitem_fancy -q",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pytest xarray/tests/test_dataarray.py::TestDataArray::test_setitem xarray/tests/test_dataarray.py::TestDataArray::test_setitem_fancy -q",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python - <<'PY' ... capsule minimal reproducer assertions ... PY",
+    "/tmp/turingos_worker_xarray_2905/.venv/bin/python -m pytest xarray/tests/test_variable.py::TestVariable::test_setitem xarray/tests/test_variable.py::TestVariable::test_setitem_fancy xarray/tests/test_dataarray.py::TestDataArray::test_setitem xarray/tests/test_dataarray.py::TestDataArray::test_setitem_fancy -q",
+    "git diff --check -- xarray/core/variable.py",
+    "git diff --name-only",
+    "git diff -- xarray/core/variable.py > evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pydata__xarray-2905/candidate.patch",
+    "python3 -m json.tool evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pydata__xarray-2905/worker_receipt.json",
+    "git apply --check --reverse evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pydata__xarray-2905/candidate.patch",
+    "grep -E '^diff --git' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pydata__xarray-2905/candidate.patch",
+    "wc -l evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pydata__xarray-2905/candidate.patch evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pydata__xarray-2905/worker_receipt.json"
+  ],
+  "candidate_patch_path": "shards/S00/tasks/pydata__xarray-2905/candidate.patch",
+  "status": "COMPLETED",
+  "candidate_source": "worker_derived",
+  "submitted_patch_scope": "source_only",
+  "integrity_statement": "I inspected only the worker-safe task packet and worker capsule for this instance from campaign evidence. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, hints_text, official solution hints, gold patches, hidden evaluator labels, or task evidence outside the worker-safe packet/capsule. The candidate patch was derived from public upstream source inspection and local verification.",
+  "open_risks": [
+    "Full SWE-bench harness was not run, per instruction.",
+    "Verification used Python 3.11 with NumPy 1.26.4 and pandas 1.5.3 in a local venv, not the historical Python 3.5 environment from the issue report.",
+    "The fix preserves arbitrary non-array-like Python objects for scalar assignment into object-dtype variables; unusual third-party array-likes that do not expose standard ndarray, pandas, xarray, or duck-array markers may still be treated as scalar objects in that narrow case."
+  ]
+}

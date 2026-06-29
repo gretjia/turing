@@ -14,10 +14,11 @@ Current supervisor state:
 - S00-W00 worker-safe task packets: materialized for 10/10 tasks from the local
   Verified dataset cache, with dataset gold patches, test patches, hidden test
   labels, and hints removed from worker-visible packets.
-- S00-W00 worker-derived candidates: 6/10 audited source-only candidate patches
-  exist for `astropy__astropy-12907`, `django__django-10097`,
-  `matplotlib__matplotlib-13989`, `mwaskom__seaborn-3069`, and
-  `pallets__flask-5014`, and `psf__requests-1142`.
+- S00-W00 worker-derived candidates: 10/10 audited source-only candidate
+  patches exist.
+- S00-W01 worker-safe task packets: materialized for 10/10 tasks, with dataset
+  gold patches, test patches, hidden test labels, and hints removed from
+  worker-visible packets.
 - S00 execution gate: BLOCKED until `predictions/shard_S00_predictions.jsonl`
   contains 50 worker-derived unified-diff predictions matching the S00 manifest.
 
@@ -32,6 +33,7 @@ Current S00-W00 worker-safe packet root:
 
 ```text
 shards/S00/ipqc/S00-W00/worker_safe_tasks/
+shards/S00/ipqc/S00-W01/worker_safe_tasks/
 ```
 
 Current audited S00 candidates:
@@ -45,4 +47,8 @@ shards/S00/tasks/matplotlib__matplotlib-13989/
 shards/S00/tasks/mwaskom__seaborn-3069/
 shards/S00/tasks/pallets__flask-5014/
 shards/S00/tasks/psf__requests-1142/
+shards/S00/tasks/pydata__xarray-2905/
+shards/S00/tasks/pylint-dev__pylint-4551/
+shards/S00/tasks/pytest-dev__pytest-10051/
+shards/S00/tasks/scikit-learn__scikit-learn-10297/
 ```
