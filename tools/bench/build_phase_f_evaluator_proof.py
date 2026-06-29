@@ -279,6 +279,10 @@ def build_phase_f_evaluator_proof(stage16_root: Path, stage16r_root: Path, out_d
         out_dir / "official_harness_digest.json",
         {
             "schema_id": "PhaseFHarnessDigest.v1",
+            "harness_kind": "turingos_internal_target_test_replay",
+            "repo_local_internal_replay_harness": True,
+            "upstream_swebench_official_docker_harness": False,
+            "official_swebench_blocker": "upstream_swebench_docker_run_evaluation_required",
             "harness_path": "tools/bench/evaluate_django_swe_bench_patches.py",
             "recorded_harness_digest": recorded_harness_digest,
             "current_harness_digest": current_harness_digest,
@@ -354,20 +358,29 @@ def build_phase_f_evaluator_proof(stage16_root: Path, stage16r_root: Path, out_d
 
 def write_docs(out_dir: Path, report: dict[str, Any]) -> None:
     blockers = "\n".join(f"- {item}" for item in report.get("blockers", [])) or "- none"
-    readme = f"""# Phase F Evaluator Proof
+    readme = f"""# Phase F Internal Evaluator Replay Proof
 
-Scope: evaluator-artifact proof for the frozen Stage12 20-task shard after Stage16R.
+Scope: TuringOS internal evaluator replay proof for the frozen Stage12 20-task shard after Stage16R.
 
-This is not a full SWE-bench dataset, not a full SWE-bench score claim, and not a leaderboard-equivalence claim.
+This is not the upstream SWE-bench Docker evaluator, not a full SWE-bench dataset, not a full SWE-bench score claim, and not a leaderboard-equivalence claim.
+
+The repo-local Django target-test runner is useful internal Macro evidence. It
+does not release an official SWE-bench campaign. Official readiness still
+requires `python -m swebench.harness.run_evaluation` evidence, Docker logs,
+evaluation results, and both FAIL_TO_PASS and PASS_TO_PASS checks.
 
 Result:
 - status: {report['status']}
 - task_count: {report['task_count']}
 - artifact_microtape_digest_binding: {report['artifact_microtape_digest_binding']}
 - official_evaluator_executable_replay: {report['official_evaluator_executable_replay']}
-- all_solved_tasks_have_reproducible_official_eval: {report['all_solved_tasks_have_reproducible_official_eval']}
+- phase_f_real_evaluator_proof_as_internal_replay: {report['phase_f_real_evaluator_proof_as_internal_replay']}
+- phase_f_real_evaluator_proof_as_official_swebench: {report['phase_f_real_evaluator_proof_as_official_swebench']}
+- all_solved_tasks_have_reproducible_internal_replay: {report['all_solved_tasks_have_reproducible_internal_replay']}
 - all_candidate_accepts_have_required_evidence: {report['all_candidate_accepts_have_required_evidence']}
 - release_next_phase_g: {report['release_next_phase_g']}
+- release_next_phase_g_as_internal_rehearsal: {report['release_next_phase_g_as_internal_rehearsal']}
+- release_next_phase_g_as_official_campaign: {report['release_next_phase_g_as_official_campaign']}
 - full_swe_bench_score_claim_allowed: false
 - full_dataset_claim_allowed: false
 
@@ -398,9 +411,13 @@ python3 tools/bench/audit_phase_f_evaluator_proof.py \\
 ```
 """
     (out_dir / "README.md").write_text(readme, encoding="utf-8")
-    prompt = """# External Auditor Prompt: Phase F
+    prompt = """# External Auditor Prompt: Phase F Internal Replay
 
-Audit the exact pushed SHA. Phase F may claim evaluator-artifact binding for the frozen 20-task shard only.
+Audit the exact pushed SHA. Phase F may claim internal evaluator-artifact binding for the frozen 20-task shard only.
+
+It must not claim upstream SWE-bench official Docker harness equivalence unless
+the packet contains `python -m swebench.harness.run_evaluation` evidence, Docker
+logs, evaluation results, and both FAIL_TO_PASS and PASS_TO_PASS checks.
 
 Check:
 1. `CLAIM_BOUNDARY.json` forbids full dataset, full SWE-bench score, and leaderboard-equivalence claims.
@@ -409,19 +426,34 @@ Check:
 4. Every artifact appears as `required: true` in `required_evidence_manifest.json`.
 5. Every evaluator entry references the MicroTape `OfficialEvaluatorEvidenceImported` and `CandidateAccepted` event IDs.
 6. Every evaluator entry records command, harness digest, dataset digest, apply results, target exit code, and log digests.
-7. `official_eval_replay_audit.json` reports PASS only if executable official replay is proven. PARTIAL is acceptable only when blockers are explicit and `release_next_phase_g=false`.
+7. `official_eval_replay_audit.json` reports PASS only for internal replay unless upstream SWE-bench Docker harness evidence is present.
 
 Verdict fields:
 ```text
-phase_f_evaluator_artifact_binding: PASS|PARTIAL|FAIL
+phase_f_internal_evaluator_artifact_binding: PASS|PARTIAL|FAIL
+phase_f_as_upstream_swebench_official: PASS|BLOCKED|FAIL
 full_dataset_claim: FORBIDDEN|OVERCLAIM
 leaderboard_equivalence_claim: FORBIDDEN|OVERCLAIM
-release_next_phase_g: YES|NO
+release_next_phase_g_as_internal_rehearsal: YES|NO
+release_next_phase_g_as_official_campaign: YES|NO
 ```
 """
     (out_dir / "phase_f_external_auditor_prompt.md").write_text(prompt, encoding="utf-8")
     (out_dir / "independent_recursive_audit.md").write_text(
-        "# Phase F Independent Recursive Audit\n\nPending external recursive audit on exact pushed SHA.\n",
+        "# Phase F Independent Recursive Audit\n\n"
+        "Verdict: PASS as TuringOS internal replay; BLOCKED as upstream SWE-bench official evaluator proof.\n\n"
+        "Findings:\n\n"
+        "- The packet binds imported evaluator evidence to replayable artifact descriptors for the frozen 20-task shard.\n"
+        "- Stage16R-real repair targets use worker-derived unified diffs rather than digest-only fixture text.\n"
+        "- Required patch/log evidence descriptors are present and digest-bound.\n"
+        "- The evaluator identity is repo-local `tools/bench/evaluate_django_swe_bench_patches.py`, recorded as `turingos_internal_target_test_replay`.\n"
+        "- The packet explicitly sets `upstream_swebench_official_docker_harness=false` and `phase_f_real_evaluator_proof_as_official_swebench=BLOCKED`.\n"
+        "- `release_next_phase_g_as_internal_rehearsal=true`; official campaign release remains false.\n\n"
+        "Required next action before official campaign launch:\n\n"
+        "```text\n"
+        "upstream_swebench_docker_run_evaluation_required\n"
+        "```\n\n"
+        "This requires `python -m swebench.harness.run_evaluation`, Docker logs, evaluation_results, FAIL_TO_PASS/PASS_TO_PASS checks, and regenerated readiness.\n",
         encoding="utf-8",
     )
 

@@ -1,14 +1,22 @@
 {
   "all_candidate_accepts_have_required_evidence": true,
-  "all_solved_tasks_have_reproducible_official_eval": true,
+  "all_solved_tasks_have_reproducible_internal_replay": true,
+  "all_solved_tasks_have_reproducible_official_eval": false,
   "artifact_microtape_digest_binding": true,
   "blockers": [],
   "full_dataset_claim_allowed": false,
   "full_swe_bench_score_claim_allowed": false,
   "leaderboard_equivalence_claim_allowed": false,
   "official_evaluator_executable_replay": true,
+  "official_harness_kind": "turingos_internal_target_test_replay",
+  "official_swebench_blocker": "upstream_swebench_docker_run_evaluation_required",
+  "phase_f_real_evaluator_proof_as_internal_replay": "PASS",
+  "phase_f_real_evaluator_proof_as_official_swebench": "BLOCKED",
   "problems": [],
-  "release_next_phase_g": true,
+  "release_next_phase_g": false,
+  "release_next_phase_g_as_internal_rehearsal": true,
+  "release_next_phase_g_as_official_campaign": false,
+  "repo_local_evaluator_claim": false,
   "runs": [
     {
       "candidate_accepted_event_id": "mu:bbf0eee588141f79b2b8533b76ba35c251280f340270f46203b414d927ad3547",
@@ -174,5 +182,7 @@
   "schema_id": "PhaseFEvaluatorProofAudit.v1",
   "secret_scan_status": "PASS",
   "status": "PASS",
-  "task_count": 20
+  "task_count": 20,
+  "turingos_internal_target_test_replay": true,
+  "upstream_swebench_official_docker_harness": false
 }

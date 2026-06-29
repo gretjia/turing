@@ -1,23 +1,53 @@
 {
-  "blockers": [],
+  "blockers": [
+    "upstream_swebench_docker_harness_required"
+  ],
   "full_manifest": {
     "authorization_mode": "required",
     "official_dataset_task_count": 500,
+    "official_harness_digest_status": "PENDING_UPSTREAM_SWEBENCH_DOCKER_QUALIFICATION",
     "root": "evidence/bench/swe_bench_phase_g_verified_500_manifest_20260628",
     "selection_policy": "ALL",
     "status": "PASS",
     "task_count": 500
   },
-  "full_swe_bench_ready": true,
-  "next_loop": "start_full_swe_bench_sharded_sealed_campaign",
+  "full_swe_bench_ready": false,
+  "internal_rehearsal_next_loop": "start_phase_g_internal_rehearsal_over_verified_500_manifest",
+  "next_loop": "official_swebench_docker_harness_qualification",
+  "official_harness_problems": [
+    "official_harness_kind must be upstream_swebench_docker",
+    "upstream_swebench_official_docker_harness must be true",
+    "official_harness_command must invoke python -m swebench.harness.run_evaluation",
+    "docker_required must be true",
+    "docker_build_logs_present must be true",
+    "evaluation_results_present must be true",
+    "pass_to_pass_checked must be true",
+    "fail_to_pass_checked must be true"
+  ],
+  "official_harness_status": "BLOCKED",
   "phase_f": {
+    "docker_build_logs_present": false,
+    "docker_required": false,
+    "evaluation_results_present": false,
+    "fail_to_pass_checked": false,
     "official_evaluator_executable_replay": true,
-    "release_next_phase_g": true,
+    "official_harness_command": null,
+    "official_harness_kind": "turingos_internal_target_test_replay",
+    "pass_to_pass_checked": false,
+    "release_next_phase_g": false,
+    "release_next_phase_g_as_internal_rehearsal": true,
+    "release_next_phase_g_as_official_campaign": false,
+    "repo_local_evaluator_claim": false,
     "root": "evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628",
-    "status": "PASS"
+    "status": "PASS",
+    "upstream_swebench_official_docker_harness": false
   },
+  "phase_g_internal_rehearsal_launch": true,
+  "phase_g_official_campaign_launch": false,
   "problems": [],
-  "release_phase_g": true,
+  "release_phase_g": false,
+  "release_phase_g_as_internal_rehearsal": true,
+  "release_phase_g_as_official_campaign": false,
   "repair_loop": {
     "phase_f_evaluator_proof_required": true,
     "release_next_phase_g": false,
@@ -25,6 +55,7 @@
     "root": "evidence/bench/swe_bench_phase_f_repair_loop_20260628",
     "status": "BLOCKED"
   },
+  "required_next_action": "official_swebench_docker_harness_qualification",
   "schema_id": "FullSweBenchReadinessAudit.v1",
   "stage16r_real": {
     "fresh_real_evaluator_bundle_count": 7,
@@ -34,5 +65,5 @@
     "status": "PASS",
     "strict_microtape_status": "PASS"
   },
-  "status": "READY"
+  "status": "BLOCKED"
 }

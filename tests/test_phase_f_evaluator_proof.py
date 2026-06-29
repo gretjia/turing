@@ -61,7 +61,13 @@ def test_phase_f_builder_uses_real_stage16r_artifacts_when_available(tmp_path):
 
     assert report["status"] == "PASS"
     assert report["official_evaluator_executable_replay"] is True
-    assert report["release_next_phase_g"] is True
+    assert report["release_next_phase_g"] is False
+    assert report["release_next_phase_g_as_internal_rehearsal"] is True
+    assert report["release_next_phase_g_as_official_campaign"] is False
+    assert report["official_harness_kind"] == "turingos_internal_target_test_replay"
+    assert report["upstream_swebench_official_docker_harness"] is False
+    assert report["phase_f_real_evaluator_proof_as_official_swebench"] == "BLOCKED"
+    assert report["all_solved_tasks_have_reproducible_internal_replay"] is True
     assert len(stage16r_patches) == 7
     assert all(item["source_kind"] == "stage16r_real_worker_derived_patch_eval_artifact" for item in stage16r_patches)
     assert not (out_dir / "harness_inputs" / "tasks_20.jsonl").exists()

@@ -28,11 +28,13 @@ for improving the substrate, not the substrate itself.
 Current truth:
 
 ```text
-Phase F evaluator proof: PASS, executable official evaluator replay
+Phase F evaluator proof: PASS as TuringOS internal target-test replay
+Phase F as upstream SWE-bench official Docker harness: BLOCKED
 Phase F repair loop: superseded by fresh Stage16R-real completed packet
 Stage16R real evaluator loop: PASS, 7/7 repaired
 SWE-bench Verified 500 manifest freeze: PASS
-Full SWE-bench readiness: READY to start sealed Verified 500 campaign
+Official SWE-bench campaign readiness: BLOCKED
+Internal sealed rehearsal readiness: READY
 Full SWE-bench campaign: NOT STARTED
 Full SWE-bench score claim: FORBIDDEN
 ```
@@ -40,12 +42,16 @@ Full SWE-bench score claim: FORBIDDEN
 Next required action:
 
 ```text
-Start the SWE-bench Verified 500 sharded sealed campaign.
+Qualify upstream SWE-bench Docker harness evidence before official campaign
+launch. Internal sealed rehearsal over the Verified 500 manifest is allowed if
+it remains named and claim-bound as internal rehearsal.
 
-Do not call readiness a result. Every task must still produce a MicroTape
-bundle. Full-score remains forbidden until all 500 have official PASS,
-CandidateAccepted, final PPUT progress=1, no-HITL counters zero, and exact-SHA
-external audit release.
+Do not call internal target-test replay an official SWE-bench evaluator result.
+Official readiness requires `python -m swebench.harness.run_evaluation`, Docker
+logs, evaluation_results, FAIL_TO_PASS and PASS_TO_PASS checks, and regenerated
+readiness. Full-score remains forbidden until all 500 have upstream official
+PASS, CandidateAccepted, final PPUT progress=1, no-HITL counters zero, and
+exact-SHA external audit release.
 ```
 
 The Stage16R-real completed packet consolidates seven fresh worker-derived
@@ -65,7 +71,8 @@ Old Stage16/Stage16R bundles remain immutable.
    controls the next loop.
 5. Do not use old fixture artifacts to prove executable official evaluator
    replay.
-6. Do not freeze a full dataset manifest before Phase F evaluator proof can
-   release the manifest-freeze loop.
+6. Do not freeze a full dataset manifest before Phase F internal replay can
+   support internal rehearsal, and do not launch official campaign before
+   upstream SWE-bench Docker harness evidence exists.
 7. Every future success claim must include exact SHA, GitHub evidence path,
    commands run, and the relevant audit JSON path.

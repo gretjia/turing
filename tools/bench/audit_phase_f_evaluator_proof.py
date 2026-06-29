@@ -324,6 +324,7 @@ def audit_phase_f(stage16_root: Path, stage16r_root: Path, root: Path) -> dict[s
         status = "PARTIAL"
     else:
         status = "PASS"
+    internal_replay_pass = status == "PASS"
     return {
         "schema_id": "PhaseFEvaluatorProofAudit.v1",
         "status": status,
@@ -331,10 +332,20 @@ def audit_phase_f(stage16_root: Path, stage16r_root: Path, root: Path) -> dict[s
         "full_swe_bench_score_claim_allowed": False,
         "full_dataset_claim_allowed": False,
         "leaderboard_equivalence_claim_allowed": False,
-        "release_next_phase_g": status == "PASS",
+        "official_harness_kind": "turingos_internal_target_test_replay",
+        "turingos_internal_target_test_replay": True,
+        "upstream_swebench_official_docker_harness": False,
+        "repo_local_evaluator_claim": False,
+        "phase_f_real_evaluator_proof_as_internal_replay": "PASS" if internal_replay_pass else status,
+        "phase_f_real_evaluator_proof_as_official_swebench": "BLOCKED",
+        "official_swebench_blocker": "upstream_swebench_docker_run_evaluation_required",
+        "release_next_phase_g": False,
+        "release_next_phase_g_as_internal_rehearsal": internal_replay_pass,
+        "release_next_phase_g_as_official_campaign": False,
         "artifact_microtape_digest_binding": artifact_binding,
         "official_evaluator_executable_replay": executable_replay,
-        "all_solved_tasks_have_reproducible_official_eval": executable_replay,
+        "all_solved_tasks_have_reproducible_internal_replay": executable_replay,
+        "all_solved_tasks_have_reproducible_official_eval": False,
         "all_candidate_accepts_have_required_evidence": all_accepts_required and not problems,
         "secret_scan_status": "PASS" if not secret_problems else "FAIL",
         "problems": problems,

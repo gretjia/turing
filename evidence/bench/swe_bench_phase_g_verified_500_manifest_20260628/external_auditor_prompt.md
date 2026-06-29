@@ -11,3 +11,13 @@ Questions:
 4. Are authorization_mode required, no auto fallback, no manual patch/rerun, and strict MicroTape acceptance commands present?
 5. Does CLAIM_BOUNDARY forbid full-score, leaderboard-equivalence, P1/P2, and provider-billing-complete VPPUT claims before a sealed run?
 6. Is this SWE-bench Verified 500 scope, not classic SWE-bench 2294?
+7. Does CLAIM_BOUNDARY allow only internal sealed rehearsal, while blocking official SWE-bench campaign launch until upstream Docker harness evidence exists?
+
+Expected scoped verdict:
+
+```text
+manifest_freeze: PASS
+internal_rehearsal_manifest_use: ALLOWED
+official_swebench_campaign_launch: BLOCKED
+required_next_action: upstream_swebench_docker_harness_qualification
+```

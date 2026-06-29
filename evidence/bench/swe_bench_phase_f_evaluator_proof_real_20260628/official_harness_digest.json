@@ -1,12 +1,16 @@
 {
-  "current_git_commit": "382f48b8d447f0bdef1a25f79d0ae6c635df58c2",
+  "current_git_commit": "6b9daadc607268f700c67bca5ff80f6d2d0fe560",
   "current_harness_digest": "sha256:867c9fa087f3f4266b805056d563db539bb7b08a2355d41ef447b66f43752f1d",
   "digest_matches_current": false,
+  "harness_kind": "turingos_internal_target_test_replay",
   "harness_path": "tools/bench/evaluate_django_swe_bench_patches.py",
+  "official_swebench_blocker": "upstream_swebench_docker_run_evaluation_required",
   "recorded_harness_artifact_path": "harness/recorded_evaluate_django_swe_bench_patches.py",
   "recorded_harness_artifact_sha256": "sha256:42455a8e6abbfa042c3c792de4a99c487742c2ce09acddc4ee401b212f222c55",
   "recorded_harness_commit": "49936f4a1101c561a3608714f32c41111f7a7619",
   "recorded_harness_digest": "sha256:42455a8e6abbfa042c3c792de4a99c487742c2ce09acddc4ee401b212f222c55",
   "recorded_harness_version": "repo-local tools/bench/evaluate_django_swe_bench_patches.py at base_commit_sha",
-  "schema_id": "PhaseFHarnessDigest.v1"
+  "repo_local_internal_replay_harness": true,
+  "schema_id": "PhaseFHarnessDigest.v1",
+  "upstream_swebench_official_docker_harness": false
 }

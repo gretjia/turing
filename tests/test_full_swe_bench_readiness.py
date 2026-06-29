@@ -64,6 +64,39 @@ def minimal_full_loop_manifest() -> dict:
     }
 
 
+def minimal_phase_f_internal_replay() -> dict:
+    return {
+        "status": "PASS",
+        "official_evaluator_executable_replay": True,
+        "release_next_phase_g": True,
+        "full_swe_bench_score_claim_allowed": False,
+        "full_dataset_claim_allowed": False,
+        "leaderboard_equivalence_claim_allowed": False,
+    }
+
+
+def minimal_phase_f_upstream_official() -> dict:
+    data = minimal_phase_f_internal_replay()
+    data.update(
+        {
+            "official_harness_kind": "upstream_swebench_docker",
+            "upstream_swebench_official_docker_harness": True,
+            "official_harness_command": (
+                "python -m swebench.harness.run_evaluation "
+                "--dataset_name SWE-bench/SWE-bench_Verified "
+                "--split test --predictions_path predictions.jsonl --run_id test"
+            ),
+            "docker_required": True,
+            "docker_build_logs_present": True,
+            "evaluation_results_present": True,
+            "pass_to_pass_checked": True,
+            "fail_to_pass_checked": True,
+            "repo_local_evaluator_claim": False,
+        }
+    )
+    return data
+
+
 def test_current_phase_f_blocks_full_swe_bench_readiness():
     auditor = load_module(
         "full_readiness_auditor",
@@ -118,14 +151,7 @@ def test_phase_f_pass_still_blocks_without_full_manifest_freeze(tmp_path):
     full_manifest_root = tmp_path / "full_manifest"
     write_json(
         phase_f_root / "official_eval_replay_audit.json",
-        {
-            "status": "PASS",
-            "official_evaluator_executable_replay": True,
-            "release_next_phase_g": True,
-            "full_swe_bench_score_claim_allowed": False,
-            "full_dataset_claim_allowed": False,
-            "leaderboard_equivalence_claim_allowed": False,
-        },
+        minimal_phase_f_upstream_official(),
     )
     write_json(
         repair_root / "phase_f_repair_loop_audit.json",
@@ -159,14 +185,7 @@ def test_full_swe_bench_ready_requires_phase_f_pass_and_full_manifest(tmp_path):
     full_manifest_root = tmp_path / "full_manifest"
     write_json(
         phase_f_root / "official_eval_replay_audit.json",
-        {
-            "status": "PASS",
-            "official_evaluator_executable_replay": True,
-            "release_next_phase_g": True,
-            "full_swe_bench_score_claim_allowed": False,
-            "full_dataset_claim_allowed": False,
-            "leaderboard_equivalence_claim_allowed": False,
-        },
+        minimal_phase_f_upstream_official(),
     )
     write_json(
         repair_root / "phase_f_repair_loop_audit.json",
@@ -202,7 +221,7 @@ def test_full_swe_bench_ready_requires_phase_f_pass_and_full_manifest(tmp_path):
     assert report["full_swe_bench_ready"] is True
     assert report["release_phase_g"] is True
     assert report["blockers"] == []
-    assert report["next_loop"] == "start_full_swe_bench_sharded_sealed_campaign"
+    assert report["next_loop"] == "start_official_swebench_verified_500_sharded_sealed_campaign"
 
 
 def test_full_swe_bench_readiness_rejects_verified_mini_manifest(tmp_path):
@@ -215,14 +234,7 @@ def test_full_swe_bench_readiness_rejects_verified_mini_manifest(tmp_path):
     full_manifest_root = tmp_path / "mini_manifest"
     write_json(
         phase_f_root / "official_eval_replay_audit.json",
-        {
-            "status": "PASS",
-            "official_evaluator_executable_replay": True,
-            "release_next_phase_g": True,
-            "full_swe_bench_score_claim_allowed": False,
-            "full_dataset_claim_allowed": False,
-            "leaderboard_equivalence_claim_allowed": False,
-        },
+        minimal_phase_f_upstream_official(),
     )
     write_json(
         repair_root / "phase_f_repair_loop_audit.json",
@@ -258,6 +270,42 @@ def test_full_swe_bench_readiness_rejects_verified_mini_manifest(tmp_path):
     assert any("500-task" in problem for problem in report["problems"])
 
 
+def test_manifest_freeze_allows_explicit_pending_official_harness_digest(tmp_path):
+    auditor = load_module(
+        "full_readiness_auditor",
+        REPO / "tools/bench/audit_full_swe_bench_readiness.py",
+    )
+    full_manifest_root = tmp_path / "full_manifest"
+    manifest = minimal_full_manifest(task_count=500)
+    manifest["official_harness_digest"] = "PENDING_UPSTREAM_SWEBENCH_DOCKER_QUALIFICATION"
+    manifest["official_harness_version"] = "PENDING_UPSTREAM_SWEBENCH_DOCKER_HARNESS_QUALIFICATION"
+    manifest["official_harness_digest_status"] = "PENDING_UPSTREAM_SWEBENCH_DOCKER_QUALIFICATION"
+    manifest["internal_replay_harness_digest"] = "sha256:" + "3" * 64
+    manifest["internal_replay_harness_kind"] = "repo_local_django_target_test_replay"
+    write_json(full_manifest_root / "task_manifest.json", manifest)
+    write_json(full_manifest_root / "loop_manifest.json", minimal_full_loop_manifest())
+    (full_manifest_root / "full_campaign_acceptance_commands.md").write_text(
+        "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput\n"
+    )
+    write_json(
+        full_manifest_root / "CLAIM_BOUNDARY.json",
+        {
+            "schema_id": "FullSweBenchClaimBoundary.v1",
+            "not_sampled_subset": True,
+            "full_swe_bench_score_claim_allowed_before_run": False,
+            "leaderboard_equivalence_claim_allowed_before_run": False,
+            "full_swe_bench_verified_campaign_ready_claim_allowed": False,
+        },
+    )
+
+    status, blockers, problems, details = auditor.audit_full_manifest(full_manifest_root)
+
+    assert status == "PASS"
+    assert blockers == []
+    assert problems == []
+    assert details["official_harness_digest_status"] == "PENDING_UPSTREAM_SWEBENCH_DOCKER_QUALIFICATION"
+
+
 def test_completed_stage16r_real_supersedes_old_repair_blocker(tmp_path):
     auditor = load_module(
         "full_readiness_auditor",
@@ -286,9 +334,113 @@ def test_completed_stage16r_real_supersedes_old_repair_blocker(tmp_path):
         full_manifest_root=full_manifest_root,
     )
 
-    assert report["status"] == "READY"
+    assert report["status"] == "BLOCKED"
+    assert report["phase_g_official_campaign_launch"] is False
+    assert report["release_phase_g_as_official_campaign"] is False
+    assert report["phase_g_internal_rehearsal_launch"] is True
+    assert report["release_phase_g_as_internal_rehearsal"] is True
+    assert report["required_next_action"] == "official_swebench_docker_harness_qualification"
+    assert "upstream_swebench_docker_harness_required" in report["blockers"]
     assert report["stage16r_real"]["official_pass_count"] == 7
     assert "fresh_stage16r_real_evaluator_bundles_required" not in report["blockers"]
+
+
+def test_repo_local_evaluator_replay_cannot_release_official_campaign(tmp_path):
+    auditor = load_module(
+        "full_readiness_auditor",
+        REPO / "tools/bench/audit_full_swe_bench_readiness.py",
+    )
+    phase_f_root = tmp_path / "phase_f"
+    repair_root = tmp_path / "repair"
+    full_manifest_root = tmp_path / "full_manifest"
+    write_json(phase_f_root / "official_eval_replay_audit.json", minimal_phase_f_internal_replay())
+    write_json(
+        repair_root / "phase_f_repair_loop_audit.json",
+        {
+            "status": "PASS",
+            "release_next_phase_g": False,
+            "phase_f_evaluator_proof_required": True,
+            "required_next_action": "rerun_phase_f_evaluator_proof",
+        },
+    )
+    write_json(full_manifest_root / "task_manifest.json", minimal_full_manifest(task_count=500))
+    write_json(full_manifest_root / "loop_manifest.json", minimal_full_loop_manifest())
+    (full_manifest_root / "full_campaign_acceptance_commands.md").write_text(
+        "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput\n"
+    )
+    write_json(
+        full_manifest_root / "CLAIM_BOUNDARY.json",
+        {
+            "schema_id": "FullSweBenchClaimBoundary.v1",
+            "not_sampled_subset": True,
+            "full_swe_bench_score_claim_allowed_before_run": False,
+            "leaderboard_equivalence_claim_allowed_before_run": False,
+        },
+    )
+
+    report = auditor.audit_full_swe_bench_readiness(
+        phase_f_root=phase_f_root,
+        repair_loop_root=repair_root,
+        full_manifest_root=full_manifest_root,
+    )
+
+    assert report["status"] == "BLOCKED"
+    assert report["full_swe_bench_ready"] is False
+    assert report["phase_g_official_campaign_launch"] is False
+    assert report["release_phase_g_as_official_campaign"] is False
+    assert report["phase_g_internal_rehearsal_launch"] is True
+    assert report["release_phase_g_as_internal_rehearsal"] is True
+    assert report["required_next_action"] == "official_swebench_docker_harness_qualification"
+    assert "upstream_swebench_docker_harness_required" in report["blockers"]
+    assert report["phase_f"]["official_harness_kind"] == "turingos_internal_target_test_replay"
+
+
+def test_official_campaign_requires_pass_to_pass_and_docker_logs(tmp_path):
+    auditor = load_module(
+        "full_readiness_auditor",
+        REPO / "tools/bench/audit_full_swe_bench_readiness.py",
+    )
+    phase_f_root = tmp_path / "phase_f"
+    repair_root = tmp_path / "repair"
+    full_manifest_root = tmp_path / "full_manifest"
+    phase_f = minimal_phase_f_upstream_official()
+    phase_f["pass_to_pass_checked"] = False
+    phase_f["docker_build_logs_present"] = False
+    write_json(phase_f_root / "official_eval_replay_audit.json", phase_f)
+    write_json(
+        repair_root / "phase_f_repair_loop_audit.json",
+        {
+            "status": "PASS",
+            "release_next_phase_g": False,
+            "phase_f_evaluator_proof_required": True,
+            "required_next_action": "rerun_phase_f_evaluator_proof",
+        },
+    )
+    write_json(full_manifest_root / "task_manifest.json", minimal_full_manifest(task_count=500))
+    write_json(full_manifest_root / "loop_manifest.json", minimal_full_loop_manifest())
+    (full_manifest_root / "full_campaign_acceptance_commands.md").write_text(
+        "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput\n"
+    )
+    write_json(
+        full_manifest_root / "CLAIM_BOUNDARY.json",
+        {
+            "schema_id": "FullSweBenchClaimBoundary.v1",
+            "not_sampled_subset": True,
+            "full_swe_bench_score_claim_allowed_before_run": False,
+            "leaderboard_equivalence_claim_allowed_before_run": False,
+        },
+    )
+
+    report = auditor.audit_full_swe_bench_readiness(
+        phase_f_root=phase_f_root,
+        repair_loop_root=repair_root,
+        full_manifest_root=full_manifest_root,
+    )
+
+    assert report["status"] == "BLOCKED"
+    assert "upstream_swebench_docker_harness_required" in report["blockers"]
+    assert "pass_to_pass_checked must be true" in report["official_harness_problems"]
+    assert "docker_build_logs_present must be true" in report["official_harness_problems"]
 
 
 def test_full_swe_bench_readiness_rejects_full_score_overclaim(tmp_path):

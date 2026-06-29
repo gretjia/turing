@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,65 @@ def _false(data: dict[str, Any], key: str) -> bool:
 
 def _sha256(value: Any) -> bool:
     return isinstance(value, str) and SHA256_RE.match(value) is not None
+
+
+def _contains_upstream_swebench_command(command: Any) -> bool:
+    if not isinstance(command, str):
+        return False
+    try:
+        parts = shlex.split(command)
+    except ValueError:
+        return False
+    return "-m" in parts and "swebench.harness.run_evaluation" in parts
+
+
+def audit_upstream_swebench_harness(phase_f: dict[str, Any]) -> tuple[str, list[str], dict[str, Any]]:
+    """Check whether Phase F is backed by upstream SWE-bench Docker harness evidence.
+
+    The older Phase F packet is a valid TuringOS internal target-test replay, but
+    it is not the upstream SWE-bench Docker evaluator. Keep that distinction
+    explicit so internal rehearsal cannot drift into official campaign release.
+    """
+
+    problems: list[str] = []
+    details: dict[str, Any] = {}
+
+    explicit_kind = phase_f.get("official_harness_kind")
+    if explicit_kind is None:
+        harness_kind = "turingos_internal_target_test_replay"
+    else:
+        harness_kind = explicit_kind
+    details["official_harness_kind"] = harness_kind
+    details["upstream_swebench_official_docker_harness"] = phase_f.get(
+        "upstream_swebench_official_docker_harness", False
+    )
+    details["official_harness_command"] = phase_f.get("official_harness_command")
+    details["docker_required"] = phase_f.get("docker_required", False)
+    details["docker_build_logs_present"] = phase_f.get("docker_build_logs_present", False)
+    details["evaluation_results_present"] = phase_f.get("evaluation_results_present", False)
+    details["pass_to_pass_checked"] = phase_f.get("pass_to_pass_checked", False)
+    details["fail_to_pass_checked"] = phase_f.get("fail_to_pass_checked", False)
+    details["repo_local_evaluator_claim"] = phase_f.get("repo_local_evaluator_claim")
+
+    if harness_kind != "upstream_swebench_docker":
+        problems.append("official_harness_kind must be upstream_swebench_docker")
+    if phase_f.get("upstream_swebench_official_docker_harness") is not True:
+        problems.append("upstream_swebench_official_docker_harness must be true")
+    if not _contains_upstream_swebench_command(phase_f.get("official_harness_command")):
+        problems.append("official_harness_command must invoke python -m swebench.harness.run_evaluation")
+    for key in [
+        "docker_required",
+        "docker_build_logs_present",
+        "evaluation_results_present",
+        "pass_to_pass_checked",
+        "fail_to_pass_checked",
+    ]:
+        if phase_f.get(key) is not True:
+            problems.append(f"{key} must be true")
+    if phase_f.get("repo_local_evaluator_claim") is not False:
+        problems.append("repo_local_evaluator_claim must be false")
+
+    return ("PASS" if not problems else "BLOCKED"), problems, details
 
 
 def audit_full_manifest(root: Path) -> tuple[str, list[str], list[str], dict[str, Any]]:
@@ -93,8 +153,10 @@ def audit_full_manifest(root: Path) -> tuple[str, list[str], list[str], dict[str
         problems.append("full task manifest exclusion_reason must be empty")
     if not _sha256(task.get("source_dataset_digest")):
         problems.append("source_dataset_digest must be sha256-bound")
-    if not _sha256(task.get("official_harness_digest")):
-        problems.append("official_harness_digest must be sha256-bound")
+    if task.get("official_harness_digest_status") == "PENDING_UPSTREAM_SWEBENCH_DOCKER_QUALIFICATION":
+        details["official_harness_digest_status"] = task.get("official_harness_digest_status")
+    elif not _sha256(task.get("official_harness_digest")):
+        problems.append("official_harness_digest must be sha256-bound or explicitly pending upstream SWE-bench Docker qualification")
 
     if loop.get("authorization_mode") != "required":
         problems.append("full campaign must use authorization_mode=required")
@@ -138,6 +200,8 @@ def audit_full_manifest(root: Path) -> tuple[str, list[str], list[str], dict[str
         problems.append("full_score_claim_before_run_forbidden")
     if claim.get("leaderboard_equivalence_claim_allowed_before_run") is not False:
         problems.append("leaderboard_equivalence_claim_before_run_forbidden")
+    if claim.get("full_swe_bench_verified_campaign_ready_claim_allowed") is True:
+        problems.append("full_swe_bench_verified_campaign_ready_claim_forbidden_without_official_harness")
     if "audit_micro_tape_decision_dag.py" not in commands or "--strict-vpput" not in commands:
         problems.append("acceptance commands must include strict MicroTape/VPPUT audit")
 
@@ -159,8 +223,13 @@ def audit_full_swe_bench_readiness(
 
     phase_f_status = phase_f.get("status")
     phase_f_replay = _truthy(phase_f, "official_evaluator_executable_replay")
-    phase_f_release = _truthy(phase_f, "release_next_phase_g")
-    if phase_f_status != "PASS" or not phase_f_replay or not phase_f_release:
+    official_harness_status, official_harness_problems, official_harness_details = audit_upstream_swebench_harness(phase_f)
+    legacy_phase_f_release = _truthy(phase_f, "release_next_phase_g")
+    phase_f_internal_release = _truthy(phase_f, "release_next_phase_g_as_internal_rehearsal") or legacy_phase_f_release
+    phase_f_official_release = _truthy(phase_f, "release_next_phase_g_as_official_campaign") or (
+        legacy_phase_f_release and official_harness_status == "PASS"
+    )
+    if phase_f_status != "PASS" or not phase_f_replay or not phase_f_internal_release:
         blockers.append("phase_f_evaluator_proof_pass_required")
     for key in [
         "full_swe_bench_score_claim_allowed",
@@ -201,10 +270,28 @@ def audit_full_swe_bench_readiness(
 
     if problems:
         status = "FAIL"
+    elif official_harness_status != "PASS":
+        blockers.append("upstream_swebench_docker_harness_required")
+        status = "BLOCKED"
+    elif not phase_f_official_release:
+        blockers.append("phase_f_official_campaign_release_required")
+        status = "BLOCKED"
     elif blockers:
         status = "BLOCKED"
     else:
         status = "READY"
+
+    internal_rehearsal_ready = (
+        not problems
+        and "phase_f_evaluator_proof_pass_required" not in blockers
+        and "fresh_stage16r_real_evaluator_bundles_required" not in blockers
+        and "remaining_stage16r_real_repairs_required" not in blockers
+        and "full_dataset_manifest_freeze_required" not in blockers
+        and manifest_status == "PASS"
+        and phase_f_status == "PASS"
+        and phase_f_replay
+        and phase_f_internal_release
+    )
 
     if "remaining_stage16r_real_repairs_required" in blockers:
         next_loop = "retry_remaining_stage16r_real_targets"
@@ -214,8 +301,10 @@ def audit_full_swe_bench_readiness(
         next_loop = "rerun_phase_f_evaluator_proof"
     elif "full_dataset_manifest_freeze_required" in blockers:
         next_loop = "phase_g_full_manifest_freeze"
+    elif "upstream_swebench_docker_harness_required" in blockers:
+        next_loop = "official_swebench_docker_harness_qualification"
     elif status == "READY":
-        next_loop = "start_full_swe_bench_sharded_sealed_campaign"
+        next_loop = "start_official_swebench_verified_500_sharded_sealed_campaign"
     else:
         next_loop = "fix_readiness_audit_problems"
 
@@ -224,12 +313,31 @@ def audit_full_swe_bench_readiness(
         "status": status,
         "full_swe_bench_ready": status == "READY",
         "release_phase_g": status == "READY",
+        "phase_g_official_campaign_launch": status == "READY",
+        "release_phase_g_as_official_campaign": status == "READY",
+        "phase_g_internal_rehearsal_launch": internal_rehearsal_ready,
+        "release_phase_g_as_internal_rehearsal": internal_rehearsal_ready,
         "next_loop": next_loop,
+        "internal_rehearsal_next_loop": (
+            "start_phase_g_internal_rehearsal_over_verified_500_manifest"
+            if internal_rehearsal_ready
+            else None
+        ),
+        "required_next_action": (
+            "official_swebench_docker_harness_qualification"
+            if "upstream_swebench_docker_harness_required" in blockers
+            else next_loop
+        ),
+        "official_harness_status": official_harness_status,
+        "official_harness_problems": official_harness_problems,
         "phase_f": {
             "root": str(phase_f_root),
             "status": phase_f_status,
             "official_evaluator_executable_replay": phase_f_replay,
-            "release_next_phase_g": phase_f_release,
+            "release_next_phase_g": legacy_phase_f_release,
+            "release_next_phase_g_as_internal_rehearsal": phase_f_internal_release,
+            "release_next_phase_g_as_official_campaign": phase_f_official_release,
+            **official_harness_details,
         },
         "repair_loop": {
             "root": str(repair_loop_root),

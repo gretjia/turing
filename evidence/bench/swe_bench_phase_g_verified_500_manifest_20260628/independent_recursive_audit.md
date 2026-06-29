@@ -1,12 +1,31 @@
-# Independent Recursive Audit — Full SWE-bench Verified 500 Readiness
+# Independent Recursive Audit — Phase G Verified 500 Manifest
 
-Verdict: READY scoped.
+Verdict: manifest freeze PASS; official campaign launch BLOCKED; internal
+sealed rehearsal allowed.
 
 Findings:
 
-- No raw Phase F JSONL remains: no `.jsonl` / `tasks_20.jsonl` files exist under `evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628`, and JSON artifact files contain no raw task fields named `patch` or `test_patch`. The packet declares the task JSONL as external and not committed in `evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628/evaluator_manifest.json`.
-- Phase F real audit reports `status: PASS`, executable replay true, no blockers/problems, and full-score/full-dataset/leaderboard claims false.
-- Full-readiness audit reports `status: READY`, `full_swe_bench_ready: true`, `release_phase_g: true`, and next loop `start_full_swe_bench_sharded_sealed_campaign`.
-- No overclaim found in scoped packet text: readiness README says launch-readiness only, not completed full-score run; Phase G README says the manifest does not run the campaign or claim a full score.
+- The SWE-bench Verified 500 manifest is frozen with `selection_policy=ALL`,
+  500 instance ids, no exclusions, and digest-bound dataset descriptors.
+- The repo-local target-test runner is recorded only as an internal replay
+  harness. Upstream SWE-bench official harness digest is explicitly pending
+  qualification.
+- The manifest does not run the campaign and does not claim a full score.
+- The current Phase F evaluator proof is repo-local TuringOS internal replay,
+  not upstream SWE-bench Docker harness evidence.
+- Therefore this manifest may be used for an internal sealed rehearsal only.
+- Official campaign launch requires upstream SWE-bench harness qualification:
+  `python -m swebench.harness.run_evaluation`, Docker logs,
+  `evaluation_results`, FAIL_TO_PASS and PASS_TO_PASS checks, and regenerated
+  readiness.
 
-No blocker remains for the scoped launch-readiness claim. This does not claim a completed SWE-bench score.
+Machine boundary:
+
+```text
+phase_g_verified_500_manifest_freeze: PASS
+phase_g_internal_sealed_rehearsal_ready_claim_allowed: true
+phase_g_official_swebench_campaign_ready_claim_allowed: false
+full_swe_bench_verified_campaign_ready_claim_allowed: false
+full_swe_bench_score_claim_allowed_before_run: false
+leaderboard_equivalence_claim_allowed_before_run: false
+```

@@ -1,24 +1,30 @@
-# Full SWE-bench Readiness
+# SWE-bench Verified 500 Readiness
 
-Scope: launch-readiness gate for starting a sealed SWE-bench Verified 500
-campaign.
+Scope: readiness gate for the SWE-bench Verified 500 manifest.
 
-This packet does not claim a completed full-score run. It only proves the launch
-prerequisites for the next sealed campaign are satisfied:
+This packet does not claim a completed full-score run. After external audit, it
+also does not release an official SWE-bench campaign. The current evidence
+supports an internal sealed rehearsal only.
 
-- Phase F evaluator proof is PASS with executable official evaluator replay.
+- Phase F evaluator proof is PASS as TuringOS internal target-test replay.
+- Phase F is BLOCKED as upstream SWE-bench official Docker harness proof.
 - Stage16R-real repair evidence is PASS with 7/7 fresh worker-derived repairs.
 - SWE-bench Verified full 500 manifest is frozen with `selection_policy=ALL`.
-- Full-score, leaderboard-equivalence, P1/P2, and provider-billing-complete
-  VPPUT claims remain forbidden before the sealed campaign completes.
+- Full-score, leaderboard-equivalence, official campaign, P1/P2, and
+  provider-billing-complete VPPUT claims remain forbidden before upstream
+  SWE-bench Docker harness evidence exists.
 
 Current result:
 
 ```text
-status: READY
-full_swe_bench_ready: true
-release_phase_g: true
-next_loop: start_full_swe_bench_sharded_sealed_campaign
+status: BLOCKED
+phase_g_official_campaign_launch: false
+phase_g_internal_rehearsal_launch: true
+release_phase_g_as_official_campaign: false
+release_phase_g_as_internal_rehearsal: true
+next_loop: official_swebench_docker_harness_qualification
+internal_rehearsal_next_loop: start_phase_g_internal_rehearsal_over_verified_500_manifest
+blockers: [upstream_swebench_docker_harness_required]
 ```
 
 Primary evidence:
@@ -26,6 +32,7 @@ Primary evidence:
 - `evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628/`
 - `evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/`
 - `evidence/bench/swe_bench_phase_g_verified_500_manifest_20260628/`
+- `evidence/bench/swe_bench_full_readiness_20260628/official_swebench_docker_harness_qualification.md`
 
 Verification command:
 

@@ -1,4 +1,4 @@
-# Phase G Full SWE-bench Verified 500 Acceptance Commands
+# Phase G SWE-bench Verified 500 Acceptance Commands
 
 ```bash
 python3 tools/bench/audit_full_swe_bench_readiness.py \
@@ -11,4 +11,8 @@ python3 tools/bench/audit_full_swe_bench_readiness.py \
 python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput --strict-terminal-market --require-authorization-head <per-shard bundle args>
 ```
 
-Readiness starts the sealed campaign only; full-score remains forbidden until all 500 tasks have official PASS, CandidateAccepted, final PPUT progress=1, and exact-SHA external audit release.
+Current readiness permits only an internal sealed rehearsal. Official
+SWE-bench campaign launch remains blocked until upstream Docker harness evidence
+exists. Full-score remains forbidden until all 500 tasks have upstream official
+PASS, CandidateAccepted, final PPUT progress=1, and exact-SHA external audit
+release.

@@ -17,8 +17,8 @@ release work, read these files before changing code or evidence:
 - A blocker packet is not a release artifact.
 - A fixture PASS is not a real-world capability PASS.
 - A repair-loop structural PASS is not Phase G release.
-- Phase G/full-campaign launch requires Phase F evaluator proof PASS with
-  executable official evaluator replay.
+- Official Phase G/full-campaign launch requires upstream SWE-bench Docker
+  harness evidence, not only repo-local target-test replay.
 - Current old Stage16R MicroTape bundles are immutable; supersede with fresh
   bundles, never rewrite.
 - Dataset gold patches, official solution patches, hidden heldout labels,
@@ -31,14 +31,24 @@ release work, read these files before changing code or evidence:
 
 ## Current Loop Stop
 
-As of the full-readiness gate, TuringOS is ready to start a sealed
-SWE-bench Verified 500 campaign. This is a launch-readiness claim only, not a
-full-score result, leaderboard-equivalence claim, or P1/P2 product claim.
+As of the latest readiness gate, TuringOS is ready to start an internal sealed
+rehearsal over the SWE-bench Verified 500 manifest. Official SWE-bench campaign
+launch remains blocked until upstream Docker harness evidence exists.
 
-The correct next loop is:
+The correct official next loop is:
 
 ```text
-start SWE-bench Verified 500 sharded sealed campaign
+official_swebench_docker_harness_qualification
+-> python -m swebench.harness.run_evaluation evidence
+-> Docker build/run logs and evaluation_results
+-> FAIL_TO_PASS and PASS_TO_PASS checks
+-> regenerate readiness
+```
+
+The allowed internal rehearsal loop is:
+
+```text
+start Phase G internal rehearsal over SWE-bench Verified 500 manifest
 -> every instance writes a MicroTape bundle
 -> solved: official PASS -> CandidateAccepted -> final PPUT progress=1
 -> unsolved: no CandidateAccepted -> final PPUT progress=0

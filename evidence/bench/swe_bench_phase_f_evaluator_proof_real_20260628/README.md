@@ -1,17 +1,26 @@
-# Phase F Evaluator Proof
+# Phase F Internal Evaluator Replay Proof
 
-Scope: evaluator-artifact proof for the frozen Stage12 20-task shard after Stage16R.
+Scope: TuringOS internal evaluator replay proof for the frozen Stage12 20-task shard after Stage16R.
 
-This is not a full SWE-bench dataset, not a full SWE-bench score claim, and not a leaderboard-equivalence claim.
+This is not the upstream SWE-bench Docker evaluator, not a full SWE-bench dataset, not a full SWE-bench score claim, and not a leaderboard-equivalence claim.
+
+The repo-local Django target-test runner is useful internal Macro evidence. It
+does not release an official SWE-bench campaign. Official readiness still
+requires `python -m swebench.harness.run_evaluation` evidence, Docker logs,
+evaluation results, and both FAIL_TO_PASS and PASS_TO_PASS checks.
 
 Result:
 - status: PASS
 - task_count: 20
 - artifact_microtape_digest_binding: True
 - official_evaluator_executable_replay: True
-- all_solved_tasks_have_reproducible_official_eval: True
+- phase_f_real_evaluator_proof_as_internal_replay: PASS
+- phase_f_real_evaluator_proof_as_official_swebench: BLOCKED
+- all_solved_tasks_have_reproducible_internal_replay: True
 - all_candidate_accepts_have_required_evidence: True
-- release_next_phase_g: True
+- release_next_phase_g: False
+- release_next_phase_g_as_internal_rehearsal: True
+- release_next_phase_g_as_official_campaign: False
 - full_swe_bench_score_claim_allowed: false
 - full_dataset_claim_allowed: false
 

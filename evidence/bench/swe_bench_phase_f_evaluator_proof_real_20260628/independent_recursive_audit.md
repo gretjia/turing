@@ -1,12 +1,20 @@
-# Independent Recursive Audit — Full SWE-bench Verified 500 Readiness
+# Phase F Independent Recursive Audit
 
-Verdict: READY scoped.
+Verdict: PASS as TuringOS internal replay; BLOCKED as upstream SWE-bench official evaluator proof.
 
 Findings:
 
-- No raw Phase F JSONL remains: no `.jsonl` / `tasks_20.jsonl` files exist under `evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628`, and JSON artifact files contain no raw task fields named `patch` or `test_patch`. The packet declares the task JSONL as external and not committed in `evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628/evaluator_manifest.json`.
-- Phase F real audit reports `status: PASS`, executable replay true, no blockers/problems, and full-score/full-dataset/leaderboard claims false.
-- Full-readiness audit reports `status: READY`, `full_swe_bench_ready: true`, `release_phase_g: true`, and next loop `start_full_swe_bench_sharded_sealed_campaign`.
-- No overclaim found in scoped packet text: readiness README says launch-readiness only, not completed full-score run; Phase G README says the manifest does not run the campaign or claim a full score.
+- The packet binds imported evaluator evidence to replayable artifact descriptors for the frozen 20-task shard.
+- Stage16R-real repair targets use worker-derived unified diffs rather than digest-only fixture text.
+- Required patch/log evidence descriptors are present and digest-bound.
+- The evaluator identity is repo-local `tools/bench/evaluate_django_swe_bench_patches.py`, recorded as `turingos_internal_target_test_replay`.
+- The packet explicitly sets `upstream_swebench_official_docker_harness=false` and `phase_f_real_evaluator_proof_as_official_swebench=BLOCKED`.
+- `release_next_phase_g_as_internal_rehearsal=true`; official campaign release remains false.
 
-No blocker remains for the scoped launch-readiness claim. This does not claim a completed SWE-bench score.
+Required next action before official campaign launch:
+
+```text
+upstream_swebench_docker_run_evaluation_required
+```
+
+This requires `python -m swebench.harness.run_evaluation`, Docker logs, evaluation_results, FAIL_TO_PASS/PASS_TO_PASS checks, and regenerated readiness.
