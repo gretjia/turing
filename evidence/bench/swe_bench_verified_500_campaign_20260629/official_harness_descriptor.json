@@ -1,0 +1,10 @@
+{
+  "command_template": "python -m swebench.harness.run_evaluation --dataset_name SWE-bench/SWE-bench_Verified --split test --predictions_path <predictions.jsonl> --run_id <run_id> --max_workers <N>",
+  "docker_environment_required": true,
+  "fail_to_pass_required": true,
+  "gate_status": "REQUIRED_BEFORE_OFFICIAL_CAMPAIGN",
+  "official_harness_kind": "upstream_swebench_docker",
+  "pass_to_pass_required": true,
+  "repo_local_evaluator_may_be_marked_official": false,
+  "schema_id": "turingos.official_swebench_harness_descriptor.v1"
+}

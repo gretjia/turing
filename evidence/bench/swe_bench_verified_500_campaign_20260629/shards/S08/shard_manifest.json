@@ -1,0 +1,509 @@
+{
+  "audit_atom": "50_task_sealed_shard",
+  "ipqc_window_size": 10,
+  "schema_id": "turingos.swebench_verified_500_shard_manifest.v1",
+  "shard_id": "S08",
+  "task_count": 50,
+  "tasks": [
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 400,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14376",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 153,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 401,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14404",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 154,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 402,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14434",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 155,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 403,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14493",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 156,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 404,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14500",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 157,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 405,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14534",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 158,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 406,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14539",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 159,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 407,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14559",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 160,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 408,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14580",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 161,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 409,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14608",
+      "ipqc_window_id": "S08-W00",
+      "original_manifest_index": 162,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 410,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14631",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 163,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 411,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14672",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 164,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 412,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14725",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 165,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 413,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14752",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 166,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 414,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14765",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 167,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 415,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14771",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 168,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 416,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14787",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 169,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 417,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14792",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 170,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 418,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14855",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 171,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 419,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14915",
+      "ipqc_window_id": "S08-W01",
+      "original_manifest_index": 172,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 420,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-14999",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 173,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 421,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15022",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 174,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 422,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15037",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 175,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 423,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15098",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 176,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 424,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15103",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 177,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 425,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15104",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 178,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 426,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15127",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 179,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 427,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15128",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 180,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 428,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15161",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 181,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 429,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15252",
+      "ipqc_window_id": "S08-W02",
+      "original_manifest_index": 182,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 430,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15268",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 183,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 431,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15277",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 184,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 432,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15278",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 185,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 433,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15280",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 186,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 434,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15315",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 187,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 435,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15368",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 188,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 436,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15375",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 189,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 437,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15380",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 190,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 438,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15382",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 191,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 439,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15467",
+      "ipqc_window_id": "S08-W03",
+      "original_manifest_index": 192,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 440,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15499",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 193,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 441,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15503",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 194,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 442,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15525",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 195,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 443,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15554",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 196,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 444,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15561",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 197,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 445,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15563",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 198,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 446,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15569",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 199,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 447,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15572",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 200,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 448,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15629",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 201,
+      "repo": "django",
+      "shard_id": "S08"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 449,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-15695",
+      "ipqc_window_id": "S08-W04",
+      "original_manifest_index": 202,
+      "repo": "django",
+      "shard_id": "S08"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "audit_atom": "50_task_sealed_shard",
+  "campaign_shape": "10_shards_x_50",
+  "deep_qc_sampling": "REQUIRED",
+  "execution_atom": "instance_id",
+  "gold_patch_shortcut": "FORBIDDEN",
+  "ipqc_window_size": 10,
+  "leaderboard_equivalence_claim": "FORBIDDEN_UNLESS_EXTERNAL_LEADERBOARD_SUBMISSION_ACCEPTED",
+  "official_harness_identity_gate": "REQUIRED",
+  "one_shot_500_run": "FORBIDDEN",
+  "post_campaign_full_audit": "REQUIRED",
+  "process_qc_during_execution": "REQUIRED",
+  "schema_id": "turingos.swebench_verified_500_campaign_config.v1",
+  "shard_count": 10,
+  "shard_size": 50
+}
