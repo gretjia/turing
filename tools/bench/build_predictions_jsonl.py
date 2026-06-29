@@ -26,6 +26,13 @@ def sha256_bytes(data: bytes) -> str:
     return "sha256:" + hashlib.sha256(data).hexdigest()
 
 
+def load_candidate_audit(root: Path, shard: str, instance_id: str) -> dict[str, Any] | None:
+    path = root / "shards" / shard / "tasks" / instance_id / "worker_candidate_audit.json"
+    if not path.exists():
+        return None
+    return load_json(path)
+
+
 def build_predictions(root: Path, shard: str, *, model_name: str = "turingos-internal-rehearsal") -> dict[str, Any]:
     shard_manifest = load_json(root / "shards" / shard / "shard_manifest.json")
     rows: list[dict[str, Any]] = []
@@ -45,12 +52,29 @@ def build_predictions(root: Path, shard: str, *, model_name: str = "turingos-int
             continue
         patch_bytes = patch_path.read_bytes()
         patch_text = patch_bytes.decode("utf-8")
+        patch_sha = sha256_bytes(patch_bytes)
+        candidate_audit = load_candidate_audit(root, shard, instance_id)
+        if candidate_audit is None:
+            problems.append(f"candidate audit missing: {instance_id}")
+            continue
+        if candidate_audit.get("status") != "PASS":
+            problems.append(f"candidate audit not PASS: {instance_id}")
+            continue
+        if candidate_audit.get("candidate_patch_sha256") != patch_sha:
+            problems.append(f"candidate audit sha256 mismatch: {instance_id}")
+            continue
+        if candidate_audit.get("candidate_source") != "worker_derived":
+            problems.append(f"candidate audit source is not worker-derived: {instance_id}")
+            continue
+        if candidate_audit.get("submitted_patch_scope") != "source_only":
+            problems.append(f"candidate audit scope is not source_only: {instance_id}")
+            continue
         rows.append(
             {
                 "instance_id": instance_id,
                 "model_name_or_path": model_name,
                 "model_patch": patch_text,
-                "candidate_patch_sha256": sha256_bytes(patch_bytes),
+                "candidate_patch_sha256": patch_sha,
                 "candidate_source": "worker_derived",
             }
         )

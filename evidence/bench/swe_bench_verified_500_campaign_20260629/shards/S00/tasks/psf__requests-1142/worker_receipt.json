@@ -1,0 +1,42 @@
+{
+  "instance_id": "psf__requests-1142",
+  "status": "COMPLETED",
+  "source_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/psf__requests-1142/worker_capsule.md",
+  "base_commit": "22623bd8c265b78b161542663ee980738441c307",
+  "repo_url": "https://github.com/psf/requests.git",
+  "commands_run": [
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/psf__requests-1142/worker_capsule.md",
+    "python3 -m json.tool evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/psf__requests-1142/task_packet.json",
+    "git clone https://github.com/psf/requests.git /tmp/turingos_worker_requests_1142",
+    "git -C /tmp/turingos_worker_requests_1142 checkout 22623bd8c265b78b161542663ee980738441c307",
+    "rg -n \"Content-Length|content-length|prepare_body|PreparedRequest|headers\" requests test_requests.py testserver -S",
+    "rg --files",
+    "git status --short",
+    "sed -n '210,430p' requests/models.py",
+    "sed -n '1,180p' test_requests.py",
+    "sed -n '180,420p' test_requests.py",
+    "apply_patch: add temporary local test test_prepared_get_request_has_no_content_length to test_requests.py",
+    "python3 -m unittest test_requests.RequestsTestCase.test_prepared_get_request_has_no_content_length",
+    "command -v python2 || true; command -v python2.7 || true; python --version",
+    "python3 with collections.abc compatibility aliases: run temporary local test test_requests.RequestsTestCase.test_prepared_get_request_has_no_content_length and observe expected Content-Length assertion failure",
+    "apply_patch: update requests/models.py prepare_content_length source logic",
+    "python3 with collections.abc compatibility aliases: rerun temporary local test and run adjacent behavior assertions for GET, HEAD, auth GET, empty POST, and explicit GET Content-Length",
+    "apply_patch: remove temporary local test from test_requests.py",
+    "git diff -- requests/models.py test_requests.py",
+    "git status --short",
+    "git diff -- requests/models.py > evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/psf__requests-1142/candidate.patch",
+    "python3 -m json.tool evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/psf__requests-1142/worker_receipt.json >/dev/null",
+    "grep -E '^(diff --git|--- |\\+\\+\\+ )' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/psf__requests-1142/candidate.patch",
+    "git diff --check -- requests/models.py",
+    "git apply --reverse --check /home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/psf__requests-1142/candidate.patch",
+    "python3 with collections.abc compatibility aliases: focused behavior checks for GET, HEAD, auth GET, empty POST, and explicit GET Content-Length"
+  ],
+  "candidate_patch_path": "shards/S00/tasks/psf__requests-1142/candidate.patch",
+  "candidate_source": "worker_derived",
+  "submitted_patch_scope": "source_only",
+  "integrity_statement": "I inspected only the worker-safe task packet and capsule for this instance, plus the public upstream repository checkout at the stated base commit. I did not read or use raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, hints_text, official solution hints, gold patches, hidden evaluator labels, or task evidence outside the worker-safe packet/capsule.",
+  "open_risks": [
+    "The full SWE-bench harness was not run, per instruction.",
+    "The legacy Requests checkout does not import on Python 3.11 without temporary collections.abc aliases, so local verification used an in-process compatibility shim only for test execution."
+  ]
+}

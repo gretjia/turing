@@ -14,8 +14,10 @@ Current supervisor state:
 - S00-W00 worker-safe task packets: materialized for 10/10 tasks from the local
   Verified dataset cache, with dataset gold patches, test patches, hidden test
   labels, and hints removed from worker-visible packets.
-- S00-W00 worker-derived candidates: 1/10 audited source-only candidate patch
-  exists for `django__django-10097`.
+- S00-W00 worker-derived candidates: 6/10 audited source-only candidate patches
+  exist for `astropy__astropy-12907`, `django__django-10097`,
+  `matplotlib__matplotlib-13989`, `mwaskom__seaborn-3069`, and
+  `pallets__flask-5014`, and `psf__requests-1142`.
 - S00 execution gate: BLOCKED until `predictions/shard_S00_predictions.jsonl`
   contains 50 worker-derived unified-diff predictions matching the S00 manifest.
 
@@ -32,10 +34,15 @@ Current S00-W00 worker-safe packet root:
 shards/S00/ipqc/S00-W00/worker_safe_tasks/
 ```
 
-Current audited S00 candidate:
+Current audited S00 candidates:
 
 ```text
 shards/S00/tasks/django__django-10097/candidate.patch
 shards/S00/tasks/django__django-10097/worker_receipt.json
 shards/S00/tasks/django__django-10097/worker_candidate_audit.json
+shards/S00/tasks/astropy__astropy-12907/
+shards/S00/tasks/matplotlib__matplotlib-13989/
+shards/S00/tasks/mwaskom__seaborn-3069/
+shards/S00/tasks/pallets__flask-5014/
+shards/S00/tasks/psf__requests-1142/
 ```

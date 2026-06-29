@@ -19,8 +19,8 @@ dataset gold patches, test patches, hidden evaluator labels, and hints. They
 are preparation evidence only; they are not predictions and do not start the
 official harness.
 
-`django__django-10097` now has one audited worker-derived source-only candidate
-patch. This is still only 1/50 S00 predictions. It does not release S00.
+S00 currently has six audited worker-derived source-only candidate patches.
+This is still only 6/50 S00 predictions. It does not release S00.
 
 This packet makes the next loop executable without drift:
 
