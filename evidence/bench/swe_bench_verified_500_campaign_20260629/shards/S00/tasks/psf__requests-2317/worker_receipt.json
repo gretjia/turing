@@ -1,0 +1,11 @@
+{
+  "instance_id": "psf__requests-2317",
+  "status": "COMPLETED",
+  "candidate_source": "worker_derived",
+  "submitted_patch_scope": "source_only",
+  "source_capsule_path": "shards/S00/ipqc/S00-W04/worker_safe_tasks/psf__requests-2317/worker_capsule.md",
+  "touched_paths": [
+    "requests/sessions.py"
+  ],
+  "integrity_statement": "This worker-safe candidate was derived without reading or using dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, gold patches, or hidden evaluator labels."
+}

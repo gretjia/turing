@@ -1,0 +1,46 @@
+diff --git a/lib/matplotlib/axes/_base.py b/lib/matplotlib/axes/_base.py
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -648,6 +648,22 @@ class _AxesBase(martist.Artist):
+                 axis.callbacks.connect(
+                     'units', self._unit_change_handler(name)))
+ 
++        self._reset_tick_params()
++
++    @staticmethod
++    def _get_tick_label_visibility(axis):
++        return {
++            name: {k: kw[k] for k in ("label1On", "label2On") if k in kw}
++            for name, kw in [("major", axis._major_tick_kw),
++                             ("minor", axis._minor_tick_kw)]}
++
++    @staticmethod
++    def _restore_tick_label_visibility(axis, visibility):
++        for name, kw in visibility.items():
++            if kw:
++                axis.set_tick_params(which=name, **kw)
++
++    def _reset_tick_params(self):
+         rcParams = mpl.rcParams
+         self.tick_params(
+             top=rcParams['xtick.top'] and rcParams['xtick.minor.top'],
+@@ -1192,6 +1208,8 @@ class _AxesBase(martist.Artist):
+ 
+         xaxis_visible = self.xaxis.get_visible()
+         yaxis_visible = self.yaxis.get_visible()
++        xaxis_label_visibility = self._get_tick_label_visibility(self.xaxis)
++        yaxis_label_visibility = self._get_tick_label_visibility(self.yaxis)
+ 
+         self.xaxis.clear()
+         self.yaxis.clear()
+@@ -1298,6 +1316,10 @@ class _AxesBase(martist.Artist):
+ 
+         self.set_axis_on()
+ 
++        self._reset_tick_params()
++        self._restore_tick_label_visibility(self.xaxis, xaxis_label_visibility)
++        self._restore_tick_label_visibility(self.yaxis, yaxis_label_visibility)
++
+         self.xaxis.set_clip_path(self.patch)
+         self.yaxis.set_clip_path(self.patch)
+ 

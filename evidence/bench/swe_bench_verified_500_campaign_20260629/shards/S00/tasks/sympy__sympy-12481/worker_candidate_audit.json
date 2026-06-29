@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/sympy__sympy-12481/candidate.patch",
+  "candidate_patch_sha256": "sha256:78d85b1d06591cad52c854a0ce286528e5d4bedeffee04f8bfe5cf01fd5f00fe",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sympy/combinatorics/permutations.py"
+  ],
+  "instance_id": "sympy__sympy-12481",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

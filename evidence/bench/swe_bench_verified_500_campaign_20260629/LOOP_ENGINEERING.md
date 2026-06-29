@@ -19,9 +19,15 @@ dataset gold patches, test patches, hidden evaluator labels, and hints. They
 are preparation evidence only; they are not predictions and do not start the
 official harness.
 
-S00-W00, S00-W01, S00-W02, and S00-W03 are complete with forty audited
-worker-derived source-only candidate patches. S00 is still only 40/50
-predictions. It does not release S00.
+S00-W00, S00-W01, S00-W02, and S00-W03 are complete. S00-W04 has worker-safe
+packets for 10/10 tasks and audited source-only candidates for 8/10 tasks. S00
+is currently 48/50 predictions and remains BLOCKED. It does not release S00.
+
+Supervisor stop decision: stop additional frontier-model worker generation here.
+The current partial shard is useful as loop/evidence-gate data, but continuing
+with the strongest available worker would mostly test frontier-model patching
+ability. The next loop should target a formal TuringOS computation witness
+rather than shard completion.
 
 This packet makes the next loop executable without drift:
 

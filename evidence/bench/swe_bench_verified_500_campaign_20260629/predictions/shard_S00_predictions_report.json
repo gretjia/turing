@@ -1,18 +1,10 @@
 {
-  "prediction_count": 40,
+  "prediction_count": 48,
   "predictions_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S00_predictions.jsonl",
-  "predictions_sha256": "sha256:319ee5b60a0770997e490d41fce488f05d931f475ddfb28f01613b8eadaf9d09",
+  "predictions_sha256": "sha256:f067029fad4fad3e69cd801694a9098537051cb7638ce09aff2cc9cbb4b43666",
   "problems": [
-    "candidate patch missing: scikit-learn__scikit-learn-11310",
-    "candidate patch missing: sphinx-doc__sphinx-10466",
-    "candidate patch missing: sympy__sympy-12481",
-    "candidate patch missing: astropy__astropy-13453",
-    "candidate patch missing: django__django-10973",
-    "candidate patch missing: matplotlib__matplotlib-20826",
-    "candidate patch missing: psf__requests-2317",
-    "candidate patch missing: pydata__xarray-3677",
-    "candidate patch missing: pylint-dev__pylint-6386",
-    "candidate patch missing: pytest-dev__pytest-5631"
+    "candidate audit missing: pydata__xarray-3677",
+    "candidate patch missing: pylint-dev__pylint-6386"
   ],
   "schema_id": "turingos.swebench_predictions_build_report.v1",
   "shard_id": "S00",
