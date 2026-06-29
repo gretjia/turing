@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/matplotlib__matplotlib-20676/candidate.patch",
+  "candidate_patch_sha256": "sha256:fb19475c038e2151f8a9cad6ec6250e752e76b8faa8bda7a294fa6ad6b80618f",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "lib/matplotlib/widgets.py"
+  ],
+  "instance_id": "matplotlib__matplotlib-20676",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

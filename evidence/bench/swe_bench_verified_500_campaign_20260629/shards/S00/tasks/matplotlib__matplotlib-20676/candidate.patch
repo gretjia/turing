@@ -1,0 +1,36 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index a199e45..cc36a0b 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -2366,10 +2366,15 @@ class ToolLineHandles:
+             line_props = {}
+         line_props.update({'visible': False, 'animated': useblit})
+ 
+-        line_fun = ax.axvline if self.direction == 'horizontal' else ax.axhline
++        transform = (ax.get_xaxis_transform() if self.direction == 'horizontal'
++                     else ax.get_yaxis_transform())
+         self._line_props = line_props
+ 
+-        self.artists = [line_fun(p, **line_props) for p in positions]
++        self.artists = [Line2D([], [], transform=transform, **line_props)
++                        for _ in positions]
++        for artist in self.artists:
++            ax.add_line(artist)
++        self.set_data(positions)
+ 
+     @property
+     def positions(self):
+@@ -2392,9 +2397,11 @@ class ToolLineHandles:
+         positions : tuple of length 2
+             Set the positions of the handle in data coordinates
+         """
+-        method = 'set_xdata' if self.direction == 'horizontal' else 'set_ydata'
+         for line, p in zip(self.artists, positions):
+-            getattr(line, method)([p, p])
++            if self.direction == 'horizontal':
++                line.set_data([p, p], [0, 1])
++            else:
++                line.set_data([0, 1], [p, p])
+ 
+     def set_visible(self, value):
+         """Set the visibility state of the handles artist."""

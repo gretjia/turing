@@ -26,7 +26,12 @@ Current supervisor state:
   worker-visible packets.
 - S00-W02 worker-derived candidates: 10/10 audited source-only candidate
   patches exist.
-- S00 predictions: 30/50 worker-derived unified-diff predictions assembled.
+- S00-W03 worker-safe task packets: materialized for 10/10 tasks, with dataset
+  gold patches, test patches, hidden test labels, and hints removed from
+  worker-visible packets.
+- S00-W03 worker-derived candidates: 10/10 audited source-only candidate
+  patches exist.
+- S00 predictions: 40/50 worker-derived unified-diff predictions assembled.
 - S00 execution gate: BLOCKED until `predictions/shard_S00_predictions.jsonl`
   contains 50 worker-derived unified-diff predictions matching the S00 manifest.
 
@@ -43,6 +48,7 @@ Current S00 worker-safe packet roots:
 shards/S00/ipqc/S00-W00/worker_safe_tasks/
 shards/S00/ipqc/S00-W01/worker_safe_tasks/
 shards/S00/ipqc/S00-W02/worker_safe_tasks/
+shards/S00/ipqc/S00-W03/worker_safe_tasks/
 ```
 
 Current audited S00 candidates:
@@ -80,4 +86,14 @@ shards/S00/tasks/psf__requests-1766/
 shards/S00/tasks/pydata__xarray-3151/
 shards/S00/tasks/pylint-dev__pylint-4661/
 shards/S00/tasks/pytest-dev__pytest-10356/
+shards/S00/tasks/scikit-learn__scikit-learn-10908/
+shards/S00/tasks/sphinx-doc__sphinx-10449/
+shards/S00/tasks/sympy__sympy-12419/
+shards/S00/tasks/astropy__astropy-13398/
+shards/S00/tasks/django__django-10914/
+shards/S00/tasks/matplotlib__matplotlib-20676/
+shards/S00/tasks/psf__requests-1921/
+shards/S00/tasks/pydata__xarray-3305/
+shards/S00/tasks/pylint-dev__pylint-4970/
+shards/S00/tasks/pytest-dev__pytest-5262/
 ```

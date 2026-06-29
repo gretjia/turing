@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/pytest-dev__pytest-5262/candidate.patch",
+  "candidate_patch_sha256": "sha256:0b531e89beac2c5af37b8e0280bf1db165aaafe5add5280c72947ec3c4d13319",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "src/_pytest/capture.py"
+  ],
+  "instance_id": "pytest-dev__pytest-5262",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

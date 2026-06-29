@@ -19,9 +19,9 @@ dataset gold patches, test patches, hidden evaluator labels, and hints. They
 are preparation evidence only; they are not predictions and do not start the
 official harness.
 
-S00-W00, S00-W01, and S00-W02 are complete with thirty audited worker-derived
-source-only candidate patches. S00 is still only 30/50 predictions. It does not
-release S00.
+S00-W00, S00-W01, S00-W02, and S00-W03 are complete with forty audited
+worker-derived source-only candidate patches. S00 is still only 40/50
+predictions. It does not release S00.
 
 This packet makes the next loop executable without drift:
 
