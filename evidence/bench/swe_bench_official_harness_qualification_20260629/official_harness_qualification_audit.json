@@ -1,23 +1,18 @@
 {
-  "blockers": [
-    "docker_build_or_cache_logs_present",
-    "docker_environment_used",
-    "evaluation_results_present",
-    "stdout_stderr_digests_present"
-  ],
+  "blockers": [],
   "official_harness_kind": "upstream_swebench_docker",
+  "phase_f_completed_count": 20,
+  "phase_f_error_count": 0,
+  "phase_f_error_ids": [],
+  "phase_f_expected_task_count": 20,
+  "phase_f_resolved_count": 20,
+  "phase_f_submitted_count": 20,
+  "phase_f_unresolved_count": 0,
+  "phase_f_unresolved_ids": [],
   "prediction_count": 20,
-  "problems": [
-    "docker_environment_used must be true",
-    "evaluation_results_present must be true",
-    "stdout_stderr_digests_present must be true",
-    "docker_build_or_cache_logs_present must be true",
-    "fail_to_pass_checked must be true",
-    "pass_to_pass_checked must be true",
-    "evaluation_results_path does not exist: evaluation_results/results.json"
-  ],
-  "release_next_phase_g": false,
-  "required_next_action": "produce_upstream_swebench_docker_run_evaluation_evidence",
+  "problems": [],
+  "release_next_phase_g": true,
+  "required_next_action": "regenerate_full_readiness_audit_with_official_harness_identity",
   "schema_id": "turingos.official_swebench_harness_qualification_audit.v1",
-  "status": "BLOCKED"
+  "status": "PASS"
 }

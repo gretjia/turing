@@ -133,6 +133,37 @@ def test_official_harness_qualification_rejects_gold_patch_prediction_source(tmp
     assert "prediction uses forbidden candidate source: django__django-11790" in report["problems"]
 
 
+def test_official_harness_qualification_blocks_unresolved_phase_f_replay(tmp_path):
+    auditor = load_module("official_harness_qualification", REPO / "tools/bench/audit_official_harness_qualification.py")
+    write_complete_packet(tmp_path)
+    write_json(
+        tmp_path / "evaluation_results/results.json",
+        {
+            "total_instances": 500,
+            "submitted_instances": 20,
+            "completed_instances": 20,
+            "resolved_instances": 19,
+            "unresolved_instances": 1,
+            "error_instances": 0,
+            "resolved_ids": ["ok"] * 19,
+            "unresolved_ids": ["django__django-11885"],
+            "error_ids": [],
+        },
+    )
+    q_path = tmp_path / "official_harness_qualification.json"
+    q = json.loads(q_path.read_text())
+    q["phase_f_expected_task_count"] = 20
+    q["phase_f_requires_all_resolved"] = True
+    q_path.write_text(json.dumps(q, indent=2, sort_keys=True) + "\n")
+
+    report = auditor.audit_qualification(tmp_path)
+
+    assert report["status"] == "BLOCKED"
+    assert report["release_next_phase_g"] is False
+    assert report["required_next_action"] == "repair_unresolved_official_phase_f_target"
+    assert "Phase F official replay unresolved ids: django__django-11885" in report["problems"]
+
+
 def test_official_harness_qualification_builder_blocks_without_executable_results(tmp_path):
     builder = load_module("official_harness_builder", REPO / "tools/bench/build_official_harness_qualification.py")
     auditor = load_module("official_harness_qualification", REPO / "tools/bench/audit_official_harness_qualification.py")

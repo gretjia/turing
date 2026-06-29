@@ -1,0 +1,33 @@
+{
+  "completed_instances": 20,
+  "dataset_name": "princeton-nlp/SWE-bench_Verified",
+  "error_ids": [],
+  "error_instances": 0,
+  "evidence": {
+    "evaluation_results_path": "phase_f_20_repaired_run/evaluation_results.json",
+    "harness_logs_raw_path": "phase_f_20_repaired_run/harness_logs_raw.tar.gz",
+    "predictions_path": "predictions_phase_f_20_repaired.jsonl",
+    "stderr_path": "phase_f_20_repaired_run/stderr.txt",
+    "stdout_path": "phase_f_20_repaired_run/stdout.txt"
+  },
+  "evidence_sha256": {
+    "evaluation_results": "sha256:190333fe4a4ee17a561e3b2ad4f00c714bf2ee333664739a189521ccb845b2ab",
+    "harness_logs_raw": "sha256:4c43618c381a8886c6e115eea8a4e81e6b52e15c00c32670d71ecfef3bf12ed9",
+    "predictions": "sha256:faba4c28b40842dba7db3fb96cc81b4a24bfeae5350ed2e0c515b5495a20d4c7",
+    "stderr": "sha256:d5cc9e0630ae51ec48670d2f0afca25e8f6a15c072dcdf5f54b400a7afc02210",
+    "stdout": "sha256:c9bb0ff5a69c8b8850f6199d46a11f31ae8faec29c5c095099666c13d94889f7"
+  },
+  "official_harness_kind": "upstream_swebench_docker",
+  "release_next_phase_g": true,
+  "repair_audit": "phase_f_11885_repair/repair_audit.json",
+  "required_next_action": "regenerate_full_readiness_audit_with_official_harness_identity",
+  "resolved_instances": 20,
+  "run_id": "turingos_phase_f_20_official_repaired_20260629",
+  "schema_id": "turingos.phase_f_20_repaired_official_replay_audit.v1",
+  "split": "test",
+  "status": "PASS",
+  "submitted_instances": 20,
+  "supersedes_blocked_replay_audit": "phase_f_20_run/phase_f_20_official_replay_audit.json",
+  "unresolved_ids": [],
+  "unresolved_instances": 0
+}

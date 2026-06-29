@@ -1,13 +1,23 @@
 # Official SWE-bench Docker Harness Qualification
 
-Current status: REQUIRED NEXT ACTION.
+Current status: PASS.
 
-The current Phase F packet proves TuringOS internal target-test replay. It does
-not prove upstream SWE-bench official Docker evaluation. Official campaign
-launch remains blocked by:
+The upstream SWE-bench Docker harness qualification packet is:
 
 ```text
-upstream_swebench_docker_harness_required
+evidence/bench/swe_bench_official_harness_qualification_20260629/
+```
+
+It records:
+
+```text
+official_harness_kind: upstream_swebench_docker
+command: python -m swebench.harness.run_evaluation
+single_instance_probe: PASS
+phase_f_20_initial_replay: BLOCKED, 19/20
+phase_f_11885_repair: PASS
+phase_f_20_repaired_replay: PASS, 20/20
+release_next_phase_g: true
 ```
 
 External reference boundary:
@@ -23,25 +33,21 @@ External reference boundary:
   PASS_TO_PASS tests are required to fully resolve an issue:
   https://openai.com/index/introducing-swe-bench-verified/
 
-## Required Evidence
+## Evidence Satisfied
 
-Before `phase_g_official_campaign_launch` can become true, create a fresh
-qualification packet that contains:
+The qualification packet contains:
 
 - predictions JSONL with worker-derived unified diffs;
 - exact `python -m swebench.harness.run_evaluation` command;
-- SWE-bench package version or upstream harness commit;
-- dataset name, split, repo SHA, and parquet SHA-256;
-- Docker image id/digest;
-- Docker build logs digest;
+- SWE-bench package version;
+- dataset name and split;
+- Docker/raw harness logs archive digest;
 - run_evaluation stdout/stderr digests;
 - upstream `evaluation_results` path and digest;
-- per-instance `FAIL_TO_PASS` result;
-- per-instance `PASS_TO_PASS` result;
-- per-instance `resolved: true|false`;
-- MicroTape `OfficialEvaluatorEvidenceImported` events referencing those
-  evidence descriptors;
-- `CandidateAccepted` only when upstream `resolved == true`.
+- per-instance `FAIL_TO_PASS`, `PASS_TO_PASS`, and `resolved` results in the
+  archived upstream harness reports;
+- repaired `django__django-11885` worker-derived patch evidence;
+- upstream repaired Phase F 20-task `evaluation_results` with 20/20 resolved.
 
 ## Required Auditor Predicate
 

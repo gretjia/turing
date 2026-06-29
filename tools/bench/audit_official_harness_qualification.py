@@ -61,6 +61,89 @@ def check_existing_path(root: Path, data: dict[str, Any], key: str, problems: li
         problems.append(f"{key} does not exist: {value}")
 
 
+def as_int(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    return None
+
+
+def as_str_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item) for item in value]
+
+
+def audit_phase_f_results(
+    root: Path,
+    data: dict[str, Any],
+    problems: list[str],
+    blockers: list[str],
+) -> dict[str, Any]:
+    expected = as_int(data.get("phase_f_expected_task_count"))
+    summary = {
+        "phase_f_expected_task_count": expected,
+        "phase_f_submitted_count": None,
+        "phase_f_completed_count": None,
+        "phase_f_resolved_count": None,
+        "phase_f_unresolved_count": None,
+        "phase_f_unresolved_ids": [],
+        "phase_f_error_count": None,
+        "phase_f_error_ids": [],
+    }
+    value = data.get("evaluation_results_path")
+    if expected is None or not isinstance(value, str):
+        return summary
+    path = rel(root, value)
+    if not path.exists():
+        return summary
+    try:
+        result = load_json(path)
+    except (json.JSONDecodeError, ValueError) as exc:
+        problems.append(f"evaluation_results_path is not readable JSON: {exc}")
+        blockers.append("phase_f_evaluation_results_unreadable")
+        return summary
+
+    submitted = as_int(result.get("submitted_instances"))
+    completed = as_int(result.get("completed_instances"))
+    resolved = as_int(result.get("resolved_instances"))
+    unresolved = as_int(result.get("unresolved_instances"))
+    errors = as_int(result.get("error_instances"))
+    unresolved_ids = as_str_list(result.get("unresolved_ids"))
+    error_ids = as_str_list(result.get("error_ids"))
+
+    summary.update(
+        {
+            "phase_f_submitted_count": submitted,
+            "phase_f_completed_count": completed,
+            "phase_f_resolved_count": resolved,
+            "phase_f_unresolved_count": unresolved,
+            "phase_f_unresolved_ids": unresolved_ids,
+            "phase_f_error_count": errors,
+            "phase_f_error_ids": error_ids,
+        }
+    )
+
+    if submitted != expected:
+        problems.append(f"Phase F official replay submitted count mismatch: expected {expected}, got {submitted}")
+        blockers.append("phase_f_submitted_count")
+    if completed != expected:
+        problems.append(f"Phase F official replay completed count mismatch: expected {expected}, got {completed}")
+        blockers.append("phase_f_completed_count")
+    if errors not in {0, None} or error_ids:
+        listed = ", ".join(error_ids) if error_ids else str(errors)
+        problems.append(f"Phase F official replay error ids: {listed}")
+        blockers.append("phase_f_errors")
+    if data.get("phase_f_requires_all_resolved") is True:
+        if unresolved_ids or unresolved not in {0, None} or resolved != expected:
+            listed = ", ".join(unresolved_ids) if unresolved_ids else str(unresolved)
+            problems.append(f"Phase F official replay unresolved ids: {listed}")
+            blockers.append("phase_f_unresolved")
+
+    return summary
+
+
 def audit_predictions(root: Path, data: dict[str, Any], problems: list[str]) -> int:
     value = data.get("predictions_path")
     if not isinstance(value, str):
@@ -127,6 +210,7 @@ def audit_qualification(root: Path) -> dict[str, Any]:
     ]:
         check_existing_path(root, data, key, problems)
     prediction_count = audit_predictions(root, data, problems)
+    phase_f_summary = audit_phase_f_results(root, data, problems, blockers)
     if claim.get("full_swe_bench_score_claim_allowed") is not False:
         problems.append("full SWE-bench score claim must remain forbidden")
     if claim.get("leaderboard_equivalence_claim_allowed") is not False:
@@ -134,12 +218,18 @@ def audit_qualification(root: Path) -> dict[str, Any]:
     if claim.get("repo_local_evaluator_official_claim_allowed") is not False:
         problems.append("repo-local evaluator official claim must remain forbidden")
 
-    if problems and blockers:
+    if blockers:
         status = "BLOCKED"
     elif problems:
         status = "FAIL"
     else:
         status = "PASS"
+    if status == "PASS":
+        required_next_action = "regenerate_full_readiness_audit_with_official_harness_identity"
+    elif "phase_f_unresolved" in blockers:
+        required_next_action = "repair_unresolved_official_phase_f_target"
+    else:
+        required_next_action = "produce_upstream_swebench_docker_run_evaluation_evidence"
     report = {
         "schema_id": "turingos.official_swebench_harness_qualification_audit.v1",
         "status": status,
@@ -148,12 +238,9 @@ def audit_qualification(root: Path) -> dict[str, Any]:
         "official_harness_kind": data.get("official_harness_kind"),
         "prediction_count": prediction_count,
         "release_next_phase_g": status == "PASS" and data.get("release_next_phase_g") is True,
-        "required_next_action": (
-            "regenerate_full_readiness_audit_with_official_harness_identity"
-            if status == "PASS"
-            else "produce_upstream_swebench_docker_run_evaluation_evidence"
-        ),
+        "required_next_action": required_next_action,
     }
+    report.update(phase_f_summary)
     return report
 
 

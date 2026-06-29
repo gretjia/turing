@@ -1,7 +1,5 @@
 {
-  "blockers": [
-    "upstream_swebench_docker_harness_required"
-  ],
+  "blockers": [],
   "full_manifest": {
     "authorization_mode": "required",
     "official_dataset_task_count": 500,
@@ -11,43 +9,34 @@
     "status": "PASS",
     "task_count": 500
   },
-  "full_swe_bench_ready": false,
+  "full_swe_bench_ready": true,
   "internal_rehearsal_next_loop": "start_phase_g_internal_rehearsal_over_verified_500_manifest",
-  "next_loop": "official_swebench_docker_harness_qualification",
-  "official_harness_problems": [
-    "official_harness_kind must be upstream_swebench_docker",
-    "upstream_swebench_official_docker_harness must be true",
-    "official_harness_command must invoke python -m swebench.harness.run_evaluation",
-    "docker_required must be true",
-    "docker_build_logs_present must be true",
-    "evaluation_results_present must be true",
-    "pass_to_pass_checked must be true",
-    "fail_to_pass_checked must be true"
-  ],
-  "official_harness_status": "BLOCKED",
+  "next_loop": "start_official_swebench_verified_500_sharded_sealed_campaign",
+  "official_harness_problems": [],
+  "official_harness_status": "PASS",
   "phase_f": {
-    "docker_build_logs_present": false,
-    "docker_required": false,
-    "evaluation_results_present": false,
-    "fail_to_pass_checked": false,
+    "docker_build_logs_present": true,
+    "docker_required": true,
+    "evaluation_results_present": true,
+    "fail_to_pass_checked": true,
     "official_evaluator_executable_replay": true,
-    "official_harness_command": null,
-    "official_harness_kind": "turingos_internal_target_test_replay",
-    "pass_to_pass_checked": false,
-    "release_next_phase_g": false,
+    "official_harness_command": "python -m swebench.harness.run_evaluation --dataset_name princeton-nlp/SWE-bench_Verified --split test --predictions_path predictions_phase_f_20_repaired.jsonl --max_workers 2 --timeout 1800 --run_id turingos_phase_f_20_official_repaired_20260629 --report_dir phase_f_20_repaired_run",
+    "official_harness_kind": "upstream_swebench_docker",
+    "pass_to_pass_checked": true,
+    "release_next_phase_g": true,
     "release_next_phase_g_as_internal_rehearsal": true,
-    "release_next_phase_g_as_official_campaign": false,
+    "release_next_phase_g_as_official_campaign": true,
     "repo_local_evaluator_claim": false,
-    "root": "evidence/bench/swe_bench_phase_f_evaluator_proof_real_20260628",
+    "root": "evidence/bench/swe_bench_official_harness_qualification_20260629",
     "status": "PASS",
-    "upstream_swebench_official_docker_harness": false
+    "upstream_swebench_official_docker_harness": true
   },
   "phase_g_internal_rehearsal_launch": true,
-  "phase_g_official_campaign_launch": false,
+  "phase_g_official_campaign_launch": true,
   "problems": [],
-  "release_phase_g": false,
+  "release_phase_g": true,
   "release_phase_g_as_internal_rehearsal": true,
-  "release_phase_g_as_official_campaign": false,
+  "release_phase_g_as_official_campaign": true,
   "repair_loop": {
     "phase_f_evaluator_proof_required": true,
     "release_next_phase_g": false,
@@ -55,7 +44,7 @@
     "root": "evidence/bench/swe_bench_phase_f_repair_loop_20260628",
     "status": "BLOCKED"
   },
-  "required_next_action": "official_swebench_docker_harness_qualification",
+  "required_next_action": "start_official_swebench_verified_500_sharded_sealed_campaign",
   "schema_id": "FullSweBenchReadinessAudit.v1",
   "stage16r_real": {
     "fresh_real_evaluator_bundle_count": 7,
@@ -65,5 +54,5 @@
     "status": "PASS",
     "strict_microtape_status": "PASS"
   },
-  "status": "BLOCKED"
+  "status": "READY"
 }
