@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/sphinx-doc__sphinx-10435/candidate.patch",
+  "candidate_patch_sha256": "sha256:69b3726cb67f4a90a8a63c24aab1a941fc3e73a77a48f367fced8b7133366dbb",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sphinx/writers/latex.py"
+  ],
+  "instance_id": "sphinx-doc__sphinx-10435",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}
