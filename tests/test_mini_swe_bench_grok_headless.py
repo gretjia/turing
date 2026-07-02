@@ -1109,6 +1109,7 @@ def test_gate_a_terminal_post_verification_events_encode_market_and_final_pput()
         "worker_completion_tokens_estimate": 5,
         "worker_tool_stdout_tokens_estimate": 3,
         "worker_elapsed_ms": 20,
+        "worker_cost_microusd": 7,
     }
     evidence_payload = {
         "evidence_id": "ev_official_pass",
@@ -1146,6 +1147,7 @@ def test_gate_a_terminal_post_verification_events_encode_market_and_final_pput()
     assert pput["terminal_event_id"] == verified["candidate_event_id"]
     assert pput["total_run_token_count"] == 18
     assert pput["total_wall_time_ms"] == 20
+    assert pput["total_run_cost_microusd"] == 7
     assert pput["vpput_raw"] != "0"
 
 
@@ -1182,6 +1184,37 @@ def test_gate_a_terminal_post_verification_events_failed_run_progress_zero():
     assert events[1]["payload"]["slash_coin"] == "1"
     assert events[2]["payload"]["progress"] == 0
     assert events[2]["payload"]["vpput_raw"] == "0"
+
+
+def test_real_mutation_event_payloads_include_sandbox_provenance():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    sandbox = {
+        "kind": "runsc_rootless_do",
+        "network": "none",
+        "runsc_version": "runsc version release-20260608.0",
+        "runsc_binary_sha256": "sha256:" + "4" * 64,
+        "selftest_exit": 0,
+    }
+
+    worker_payload = runner.with_sandbox_provenance(
+        "WorkerReceiptImported",
+        {"receipt_id": "rcp_real", "capsule_id": "wc_real"},
+        sandbox,
+    )
+    macro_payload = runner.with_sandbox_provenance(
+        "MacroObservationImported",
+        {"macro_id": "macro:diff:real", "capsule_id": "wc_real"},
+        sandbox,
+    )
+    non_mutation_payload = runner.with_sandbox_provenance(
+        "CostEvent",
+        {"schema_id": "turingos.cost_event.v2"},
+        sandbox,
+    )
+
+    assert worker_payload["sandbox"] == sandbox
+    assert macro_payload["sandbox"] == sandbox
+    assert "sandbox" not in non_mutation_payload
 
 
 def test_gate_a_failure_evidence_reduces_to_abstract_broadcast_rule():

@@ -463,9 +463,31 @@ def increment(mapping: dict[str, int], key: str, amount: int = 1) -> None:
     mapping[key] = mapping.get(key, 0) + amount
 
 
-def append_preserve(turingd: Daemon, event_type: str, writer_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+def with_sandbox_provenance(
+    event_type: str,
+    payload: dict[str, Any],
+    sandbox: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if (
+        event_type in SANDBOX_MUTATION_EVENT_TYPES
+        and "sandbox" not in payload
+        and isinstance(sandbox, dict)
+    ):
+        return {**payload, "sandbox": sandbox}
+    return payload
+
+
+def append_preserve(
+    turingd: Daemon,
+    event_type: str,
+    writer_id: str,
+    payload: dict[str, Any],
+    *,
+    sandbox: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     if event_type == "CostEvent":
         payload = normalize_cost_event_payload(payload)
+    payload = with_sandbox_provenance(event_type, payload, sandbox)
     if "event_type" not in payload:
         payload = {"event_type": event_type, **payload}
     return rpc(
@@ -937,6 +959,7 @@ def run_substrate_task(
         receipts.append(result)
 
     worker_id = "worker:sha256:" + "f" * 64 if worker_mode == "fake" else worker_id_for_grok(model)
+    sandbox = runsc_sandbox_block()
 
     with Daemon("turingd", bin_dir, runtime / "turingd.sock", micro_git=micro_git, project=project) as turingd:
         increment(process_calls, "turingd")
@@ -1031,6 +1054,18 @@ def run_substrate_task(
             )
             mark_event(first_dispatch_auth, "WorkerDispatchAuthorized")
 
+            if sandbox.get("kind") == "HOST_ASSUMED":
+                assumed = append_preserve(
+                    turingd,
+                    "SandboxBoundaryAssumed",
+                    "writer:sandbox",
+                    {
+                        "schema_id": "sandbox_boundary_assumed.v1",
+                        "sandbox": sandbox,
+                    },
+                )
+                mark_event(assumed, "SandboxBoundaryAssumed")
+
             first_receipt = append_preserve(
                 turingd,
                 "WorkerReceiptImported",
@@ -1049,6 +1084,7 @@ def run_substrate_task(
                     "patch_hash": first_patch_hash,
                     "worker_attempt_kind": "forced_noop_first_attempt",
                 },
+                sandbox=sandbox,
             )
             mark_event(first_receipt, "WorkerReceiptImported")
 
@@ -1063,6 +1099,7 @@ def run_substrate_task(
                     "external_evidence_only": True,
                     "macro_observation_kind": "empty_patch",
                 },
+                sandbox=sandbox,
             )
             mark_event(first_macro, "MacroObservationImported")
 
@@ -1371,6 +1408,20 @@ def run_substrate_task(
         mark_module("M7_executor_broker")
         increment(process_calls, "fake_worker" if worker_mode == "fake" else "grok_cli")
 
+        if sandbox.get("kind") == "HOST_ASSUMED" and not any(
+            item.get("event_type") == "SandboxBoundaryAssumed" for item in receipts
+        ):
+            assumed = append_preserve(
+                turingd,
+                "SandboxBoundaryAssumed",
+                "writer:sandbox",
+                {
+                    "schema_id": "sandbox_boundary_assumed.v1",
+                    "sandbox": sandbox,
+                },
+            )
+            mark_event(assumed, "SandboxBoundaryAssumed")
+
         worker_receipt = append_preserve(
             turingd,
             "WorkerReceiptImported",
@@ -1387,6 +1438,7 @@ def run_substrate_task(
                 "micro_refs_moved": worker_result["micro_refs_moved"],
                 "patch_hash": worker_result["patch_hash"],
             },
+            sandbox=sandbox,
         )
         mark_event(worker_receipt, "WorkerReceiptImported")
 
@@ -1401,6 +1453,7 @@ def run_substrate_task(
                 "diff_hash": worker_result["patch_hash"],
                 "external_evidence_only": True,
             },
+            sandbox=sandbox,
         )
         mark_event(macro, "MacroObservationImported")
         mark_module("M8_macro_observer")
@@ -1589,6 +1642,8 @@ def run_substrate_task(
         "worker_completion_tokens_estimate": worker_result["completion_tokens_estimate"],
         "worker_tool_stdout_tokens_estimate": worker_result["tool_stdout_tokens_estimate"],
         "worker_elapsed_ms": worker_result["elapsed_ms"],
+        "worker_cost_microusd": 0,
+        "sandbox": sandbox,
         "worker_log_dir": worker_result["log_dir"],
         "worker_worktree": worker_result["worktree"],
         "predicate_write_event_type": accepted["write_event_type"],

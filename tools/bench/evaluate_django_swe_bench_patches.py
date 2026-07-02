@@ -285,10 +285,12 @@ def terminal_post_verification_events(
         + _positive_int(substrate_run.get("worker_tool_stdout_tokens_estimate"))
     )
     wall_time_ms = _positive_int(substrate_run.get("worker_elapsed_ms"))
+    cost_microusd = _positive_int(substrate_run.get("worker_cost_microusd"))
     first_attempt = substrate_run.get("stage12_first_attempt")
     if isinstance(first_attempt, dict):
         total_tokens += _positive_int(first_attempt.get("total_tokens"))
         wall_time_ms += _positive_int(first_attempt.get("wall_time_ms"))
+        cost_microusd += _positive_int(first_attempt.get("cost_microusd"))
     market_id = str(substrate_run.get("market_id") or f"mkt_{substrate_run['instance_id']}")
     worker_id = str(substrate_run.get("worker_id") or "worker:sha256:" + "0" * 64)
     basis_event_id = str(verified["official_evidence_event_id"])
@@ -338,6 +340,7 @@ def terminal_post_verification_events(
                 "golden_path_token_count": total_tokens if passed else 0,
                 "total_run_token_count": total_tokens,
                 "total_wall_time_ms": wall_time_ms,
+                "total_run_cost_microusd": cost_microusd,
                 "progress": progress,
                 "vpput_raw": _vpput_decimal_string(progress, total_tokens, wall_time_ms),
                 "failed_branch_count": 1,
