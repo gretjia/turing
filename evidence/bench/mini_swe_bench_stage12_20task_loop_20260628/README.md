@@ -1,3 +1,8 @@
+> **M0-P5 EVIDENCE LABEL (2026-07-02):** `REAL`.
+> This root is labeled by `EVIDENCE_LABEL.json`. Do not infer official full-score,
+> external-verification, or release status from the directory name alone.
+> See `DJANGO_11885_PROVENANCE_NOTE.md` before citing Stage12/16 solve counts.
+
 # Stage12 20-Task Loop-Until-PASS Release Packet
 
 Scope: Stage12 20-task scale/protocol evidence for the TuringOS SWE-bench pipeline.

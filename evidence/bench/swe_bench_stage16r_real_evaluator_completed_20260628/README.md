@@ -1,3 +1,7 @@
+> **M0-P5 EVIDENCE LABEL (2026-07-02):** `MIXED`.
+> This root is labeled by `EVIDENCE_LABEL.json`. Do not infer official full-score,
+> external-verification, or release status from the directory name alone.
+
 # Stage16R Real Evaluator Completed Packet
 
 This packet consolidates seven fresh worker-derived Stage16R repair bundles. It supersedes no old MicroTape and rewrites no Stage16/Stage16R evidence.

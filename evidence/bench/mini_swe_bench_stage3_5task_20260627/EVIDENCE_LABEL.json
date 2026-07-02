@@ -1,0 +1,9 @@
+{
+  "audit_ref": "TURINGOS_RETROSPECTIVE_AUDIT_FINDINGS_20260702.md F4/R8 and section 7 answer 5",
+  "label": "MIXED",
+  "rationale": "Early mini-bench run over real task IDs with direct and TuringOS artifacts, before current claim-boundary and harness rules.",
+  "real_subpaths": [
+    "see root-specific artifacts and CLAIM_BOUNDARY.json where present"
+  ],
+  "root": "turing/evidence/bench/mini_swe_bench_stage3_5task_20260627"
+}

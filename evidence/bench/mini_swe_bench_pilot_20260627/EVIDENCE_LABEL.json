@@ -1,0 +1,9 @@
+{
+  "audit_ref": "TURINGOS_RETROSPECTIVE_AUDIT_FINDINGS_20260702.md F4/R8 and section 7 answer 5",
+  "label": "MIXED",
+  "rationale": "Pilot evidence over real task IDs with baseline/worker artifacts, but pre-harness and not a release score surface.",
+  "real_subpaths": [
+    "see root-specific artifacts and CLAIM_BOUNDARY.json where present"
+  ],
+  "root": "turing/evidence/bench/mini_swe_bench_pilot_20260627"
+}

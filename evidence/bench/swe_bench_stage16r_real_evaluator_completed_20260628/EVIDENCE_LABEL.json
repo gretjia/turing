@@ -1,0 +1,9 @@
+{
+  "audit_ref": "TURINGOS_RETROSPECTIVE_AUDIT_FINDINGS_20260702.md F4/R8 and section 7 answer 5",
+  "label": "MIXED",
+  "rationale": "Stage16R completed packet over real task IDs with repo-local evaluator surfaces; not an official harness score.",
+  "real_subpaths": [
+    "see root-specific artifacts and CLAIM_BOUNDARY.json where present"
+  ],
+  "root": "turing/evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628"
+}

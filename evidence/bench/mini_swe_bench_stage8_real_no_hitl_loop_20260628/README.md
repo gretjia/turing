@@ -1,3 +1,7 @@
+> **M0-P5 EVIDENCE LABEL (2026-07-02):** `FIXTURE`.
+> This root is labeled by `EVIDENCE_LABEL.json`. Do not infer official full-score,
+> external-verification, or release status from the directory name alone.
+
 # Stage8 Real No-HITL Loop MicroTape Qualification
 
 Scope: protocol qualification fixture for a SWE-bench-shaped task. This is not a solve-rate claim and not a statistical benchmark.

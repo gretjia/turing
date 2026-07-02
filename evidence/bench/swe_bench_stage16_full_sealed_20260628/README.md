@@ -1,3 +1,8 @@
+> **M0-P5 EVIDENCE LABEL (2026-07-02):** `MIXED`.
+> This root is labeled by `EVIDENCE_LABEL.json`. Do not infer official full-score,
+> external-verification, or release status from the directory name alone.
+> See `DJANGO_11885_PROVENANCE_NOTE.md` before citing Stage12/16 solve counts.
+
 # Stage16 Sealed Campaign Replay Packet
 
 Artifact kind: `STAGE16_SHARD_SEALED_REPLAY`

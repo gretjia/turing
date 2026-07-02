@@ -43,3 +43,11 @@ Audit questions:
    manifest, and full-score overclaim?
 10. Is the correct next loop fresh Stage16R-real evaluator bundles, not full
     dataset execution?
+
+## TURINGOS-M0-P5-CORRECTION (2026-07-02)
+
+This handoff prompt is historical and stale. Later sibling evidence records
+Stage16R repair progress as 7/7 targets repaired, while full-score and
+leaderboard-equivalence claims remain blocked by the claim-boundary files and
+the governance registry. Use the M0 governance verifier and current evidence
+labels before reusing this prompt.
