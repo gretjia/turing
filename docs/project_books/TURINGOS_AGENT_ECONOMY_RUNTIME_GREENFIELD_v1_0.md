@@ -1,3 +1,9 @@
+> **TURINGOS-GOVERNANCE-STAMP v1 (2026-07-02)**
+> Status: SUBORDINATED to ADR-GOV-001 by ADR-GOV-003.
+> This legacy document is not the top authority for `PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702`.
+> Do not treat this document as human-ratified, OG-10 signed, M2-enabling, CLOSED, RELEASED, or RATIFIED.
+> Verify: `bash /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh`
+
 # TuringOS Agent Economy Runtime Greenfield v1.0
 
 Status: active execution baseline for `/goal TuringOS_Agent_Economy_Runtime_Greenfield_v1_0`.
