@@ -1,0 +1,18 @@
+ M Cargo.lock
+ M crates/turing-cli/Cargo.toml
+ M crates/turing-cli/src/main.rs
+ M crates/turing-cli/tests/cli_gates.rs
+ M crates/turing-projection/src/lib.rs
+ M crates/turing-projection/tests/projection_builder.rs
+?? docs/hci/
+?? evidence/operator_hci_console_v1/
+?? schemas/operator/
+?? scripts/audit_operator_agent.py
+?? scripts/audit_operator_cli_copy.py
+?? scripts/lint_ascii_schema_keys.py
+?? scripts/lint_hci_copy.py
+?? scripts/run_operator_simulated_human.py
+?? src/turingos/operator_agent.py
+?? tests/audit/
+?? tests/e2e/
+?? tests/test_operator_agent.py
