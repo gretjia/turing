@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/turing-contracts",
+    "crates/turing-xcheck",
     "crates/turing-git-tape",
     "crates/turing-kernel",
     "crates/turing-execd",

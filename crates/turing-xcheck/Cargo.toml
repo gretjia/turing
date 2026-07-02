@@ -1,0 +1,16 @@
+[package]
+name = "turing-xcheck"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[[bin]]
+name = "turing-xcheck"
+path = "src/main.rs"
+
+[dependencies]
+turing-contracts = { path = "../turing-contracts" }
+
+[lints]
+workspace = true

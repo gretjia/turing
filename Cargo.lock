@@ -621,6 +621,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-xcheck"
+version = "0.0.0"
+dependencies = [
+ "turing-contracts",
+]
+
+[[package]]
 name = "typenum"
 version = "1.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
