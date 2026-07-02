@@ -28,7 +28,7 @@ pub enum EventClass {
     Authorization,
     /// PRESERVE; only `tape_tip` moves (the 6 PROPOSAL events).
     Proposal,
-    /// PRESERVE; only `tape_tip` moves (the 9 OBSERVATION events).
+    /// PRESERVE; only `tape_tip` moves (the 11 OBSERVATION events).
     Observation,
     /// PRESERVE; only `tape_tip` moves (the 6 RECEIPT events).
     Receipt,
@@ -62,9 +62,12 @@ pub const ECONOMY_EVENT_COUNT: usize = 15;
 /// Additive benchmark evidence events introduced by the mini-SWE-bench Gate A loop.
 pub const BENCHMARK_EVENT_COUNT: usize = 1;
 
-/// Total closed registry cardinality after additive economy and benchmark events.
+/// Additive sandbox provenance events introduced by the M1d mutation-boundary gate.
+pub const SANDBOX_EVENT_COUNT: usize = 1;
+
+/// Total closed registry cardinality after additive economy, benchmark, and sandbox events.
 pub const TOTAL_EVENT_COUNT: usize =
-    BASELINE_EVENT_COUNT + ECONOMY_EVENT_COUNT + BENCHMARK_EVENT_COUNT;
+    BASELINE_EVENT_COUNT + ECONOMY_EVENT_COUNT + BENCHMARK_EVENT_COUNT + SANDBOX_EVENT_COUNT;
 
 /// Which sovereign ref a class targets (the registry `target_ref` column).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -238,6 +241,15 @@ mod tests {
         assert_eq!(
             official_evaluator.payload_schema_id,
             "official_evaluator_evidence_imported.v1"
+        );
+
+        let sandbox_boundary = registry("SandboxBoundaryAssumed").unwrap();
+        assert_eq!(sandbox_boundary.class, EventClass::Observation);
+        assert_eq!(sandbox_boundary.head_effect, HeadEffect::Preserve);
+        assert_eq!(sandbox_boundary.target_ref, TargetRef::TapeTip);
+        assert_eq!(
+            sandbox_boundary.payload_schema_id,
+            "sandbox_boundary_assumed.v1"
         );
     }
 

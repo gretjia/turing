@@ -175,6 +175,7 @@ fn approval_preview(
     ))
 }
 
+#[allow(clippy::too_many_arguments)]
 fn approval_sign(
     key_id: &str,
     approval_id: &str,

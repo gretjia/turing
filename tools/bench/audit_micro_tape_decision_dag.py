@@ -38,6 +38,7 @@ COST_SOURCE_KINDS = {
     "bounded_estimate",
     "fixture",
 }
+MUTATION_EVENT_TYPES = {"WorkerReceiptImported", "MacroObservationImported"}
 
 
 def sha256_text(text: str) -> str:
@@ -835,6 +836,55 @@ def cost_provenance_status(events: list[dict[str, Any]]) -> str:
     return "PASS"
 
 
+def sandbox_block_status(payload: dict[str, Any]) -> str:
+    sandbox = payload.get("sandbox")
+    if not isinstance(sandbox, dict):
+        return "FAIL"
+    kind = sandbox.get("kind")
+    if kind == "runsc_rootless_do":
+        if sandbox.get("network") != "none":
+            return "FAIL"
+        if not isinstance(sandbox.get("runsc_version"), str) or not sandbox.get("runsc_version"):
+            return "FAIL"
+        if not sha256_ref(sandbox.get("runsc_binary_sha256")):
+            return "FAIL"
+        if sandbox.get("selftest_exit") != 0:
+            return "FAIL"
+        return "PASS"
+    if kind == "HOST_ASSUMED":
+        if not sha256_ref(sandbox.get("reason_digest")):
+            return "FAIL"
+        if not sha256_ref(sandbox.get("host_digest")):
+            return "FAIL"
+        return "WARN"
+    return "FAIL"
+
+
+def sandbox_host_assumed_count(events: list[dict[str, Any]]) -> int:
+    count = 0
+    for event in events:
+        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
+        sandbox = payload.get("sandbox") if isinstance(payload, dict) else None
+        if isinstance(sandbox, dict) and sandbox.get("kind") == "HOST_ASSUMED":
+            count += 1
+    return count
+
+
+def sandbox_provenance_status(events: list[dict[str, Any]]) -> str:
+    mutation_events = [
+        event
+        for event in events
+        if event.get("event_type") in MUTATION_EVENT_TYPES
+    ]
+    if not mutation_events:
+        return "NOT_TESTED"
+    statuses = [
+        sandbox_block_status(event["payload"] if isinstance(event.get("payload"), dict) else {})
+        for event in mutation_events
+    ]
+    return worst_status(statuses)
+
+
 def cost_conservation_status(events: list[dict[str, Any]]) -> str:
     final_pputs = [
         event
@@ -926,6 +976,7 @@ def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str,
     checks["decision_dag_completeness"] = check_decision_dag(events, edges, actual_refs["accepted_head"])
     checks["terminal_golden_path_anchors_to_accepted_head"] = terminal_golden_path_status(events, actual_refs["accepted_head"])
     checks["cost_provenance"] = cost_provenance_status(events)
+    checks["sandbox_provenance"] = sandbox_provenance_status(events)
     checks.update(vpput_statuses(findings, events, actual_refs["accepted_head"]))
     if checks["economic_timing"] == "WARN":
         checks["market_accounting_correctness"] = "WARN" if any("market" in f["finding"] or "reward" in f["finding"] for f in findings) else "PASS"
@@ -953,6 +1004,7 @@ def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str,
         "derived_refs": derived_refs,
         "event_count": len(events),
         "event_counts": dict(sorted(event_counts.items())),
+        "sandbox_host_assumed_count": sandbox_host_assumed_count(events),
         "events": [event_summary(event) for event in events],
         "dag_edges": edges,
         "golden_path": golden_path(events, actual_refs["accepted_head"]),
@@ -1038,6 +1090,7 @@ def audit_bundles(
     strict_terminal_market: bool = False,
     require_authorization_head: bool = False,
     require_cost_provenance: bool = False,
+    require_sandbox_provenance: bool = False,
 ) -> dict[str, Any]:
     work_dir.mkdir(parents=True, exist_ok=True)
     registry = load_event_registry(event_registry_path)
@@ -1050,6 +1103,9 @@ def audit_bundles(
     status_summary = aggregate_status(runs)
     status_summary["cost_provenance"] = worst_status(
         [run["checks"].get("cost_provenance", "NOT_TESTED") for run in runs]
+    )
+    status_summary["sandbox_provenance"] = worst_status(
+        [run["checks"].get("sandbox_provenance", "NOT_TESTED") for run in runs]
     )
     strict_findings: list[dict[str, str]] = []
     if strict_vpput and status_summary.get("vpput_accounting") != "PASS":
@@ -1080,6 +1136,13 @@ def audit_bundles(
                 "message": "strict cost gate requires CostEvent.v2 provenance PASS",
             }
         )
+    if require_sandbox_provenance and status_summary.get("sandbox_provenance") != "PASS":
+        strict_findings.append(
+            {
+                "id": "require_sandbox_provenance",
+                "message": "strict sandbox gate requires runsc mutation provenance PASS",
+            }
+        )
     if strict_findings:
         status_summary["overall"] = "FAIL"
     return {
@@ -1095,6 +1158,7 @@ def audit_bundles(
             "event_count": sum(run["event_count"] for run in runs),
             "event_counts": dict(sorted(event_counts.items())),
             "finding_counts": dict(sorted(finding_counts.items())),
+            "sandbox_host_assumed_count": sum(run.get("sandbox_host_assumed_count", 0) for run in runs),
         },
         "runs": runs,
     }
@@ -1251,6 +1315,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strict-terminal-market", action="store_true")
     parser.add_argument("--require-authorization-head", action="store_true")
     parser.add_argument("--require-cost-provenance", action="store_true")
+    parser.add_argument("--require-sandbox-provenance", action="store_true")
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args(argv)
 
@@ -1271,6 +1336,7 @@ def main(argv: list[str] | None = None) -> int:
             strict_terminal_market=args.strict_terminal_market,
             require_authorization_head=args.require_authorization_head,
             require_cost_provenance=args.require_cost_provenance,
+            require_sandbox_provenance=args.require_sandbox_provenance,
         )
     write_json(out_dir / "micro_tape_decision_dag_audit.json", report)
     write_markdown(report, out_dir / "micro_tape_decision_dag.md")

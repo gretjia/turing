@@ -4,15 +4,16 @@
   "status": "FROZEN_V5_3_1",
   "as_of": "2026-06-21",
   "lineage": "Human-ratified Phase-0 exact 20 ADVANCE set plus a v5.3.1 closed reconstruction of the 26 PRESERVE names; this file is the v5.3.1 authoritative registry. The missing original registry artifact is not silently impersonated.",
-  "registry_name_set_sha256": "3a7dd31316a15be381c69591821564fd6ef51faf24be4c474fe9712dc0671183",
+  "registry_name_set_sha256": "8cd62584552ad22b7755299daef7137e7fba4074b7a91f20b09900586e567e6a",
+  "registry_name_set_sha256_profile": "sorted_canonical_names_lf_trailing_lf",
   "counts": {
-    "total": 61,
+    "total": 63,
     "advance": 20,
-    "preserve": 41,
+    "preserve": 43,
     "sovereign_accept": 12,
     "authorization": 8,
     "proposal": 6,
-    "observation": 9,
+    "observation": 11,
     "receipt": 6,
     "failure": 5,
     "economy": 15
@@ -416,6 +417,17 @@
       "payload_schema_id": "official_evaluator_evidence_imported.v1",
       "ordinal": 10,
       "status": "ADDITIVE_BENCHMARK_V1"
+    },
+    {
+      "canonical_name": "SandboxBoundaryAssumed",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "sandbox_boundary_assumed.v1",
+      "ordinal": 11,
+      "status": "ADDITIVE_SANDBOX_PROVENANCE_V1_0"
     },
     {
       "canonical_name": "WorkerDispatched",

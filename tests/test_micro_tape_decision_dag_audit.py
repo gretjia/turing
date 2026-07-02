@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -249,6 +250,16 @@ def cost_event_v2_payload(*, cost_microusd=12, cost_source_kind="fixture", bound
     }
 
 
+def sandbox_block():
+    return {
+        "kind": "runsc_rootless_do",
+        "network": "none",
+        "runsc_version": "runsc version release-20260608.0",
+        "runsc_binary_sha256": "sha256:" + "4" * 64,
+        "selftest_exit": 0,
+    }
+
+
 def test_micro_tape_auditor_replays_bundle_and_builds_reference_dag(tmp_path):
     auditor = load_auditor()
     bundle = make_bundle(tmp_path, accepted_specs())
@@ -382,6 +393,7 @@ def test_market_and_pput_timing_downgrade_overall_to_partial(tmp_path):
         strict_vpput=True,
         strict_terminal_market=True,
         require_authorization_head=True,
+        require_sandbox_provenance=True,
     )
     assert strict_report["verdict"] == "FAIL"
     assert "strict_vpput" in {item["id"] for item in strict_report["strict_findings"]}
@@ -582,6 +594,7 @@ def test_stage6_strict_microtape_fixture_passes_all_strict_gates(tmp_path):
         strict_vpput=True,
         strict_terminal_market=True,
         require_authorization_head=True,
+        require_sandbox_provenance=True,
     )
 
     summary = report["status_summary"]
@@ -603,11 +616,49 @@ def test_stage6_strict_microtape_fixture_passes_all_strict_gates(tmp_path):
         "vpput_accounting",
         "economic_timing",
         "market_accounting_correctness",
+        "sandbox_provenance",
         "constitutional_protocol_audit",
     ]:
         assert summary[key] == "PASS", key
     assert {run["path_class"] for run in report["runs"]} == {"accepted_path", "failed_path"}
     assert all(Path(item["micro_tape_bundle"]).exists() for item in manifest["turingos_arm_runs"])
+
+
+def test_runsc_sandbox_block_missing_explicit_path_returns_host_assumed(tmp_path):
+    runner = load_substrate_runner()
+
+    block = runner.runsc_sandbox_block(str(tmp_path / "missing-runsc"))
+
+    assert block["kind"] == "HOST_ASSUMED"
+    assert block["reason_digest"].startswith("sha256:")
+    assert block["host_digest"].startswith("sha256:")
+
+
+def test_stage6_broken_runsc_path_emits_host_assumed_preserve_event(tmp_path, monkeypatch):
+    auditor = load_auditor()
+    runner = load_substrate_runner()
+    original_which = shutil.which
+    monkeypatch.setattr(runner.shutil, "which", lambda name: None if name == "runsc" else original_which(name))
+    out_dir = tmp_path / "stage6"
+    tasks = [
+        {
+            "instance_id": "django__django-12039_stage6_host_assumed",
+            "repo": "django/django",
+            "base_commit": "58c1acb1d6054dfec29d0f30b1033bae6ef62aec",
+            "problem_statement": "Use proper whitespace in CREATE INDEX statements.",
+            "stage6_expected_result": "PASS",
+        }
+    ]
+
+    manifest = runner.generate_stage6_strict_microtape_fixtures(out_dir, tasks)
+    bundle = Path(manifest["turingos_arm_runs"][0]["micro_tape_bundle"])
+    report = auditor.audit_bundles([bundle], tmp_path / "audit_work", require_sandbox_provenance=True)
+
+    run_report = report["runs"][0]
+    assert run_report["event_counts"]["SandboxBoundaryAssumed"] == 1
+    assert report["aggregate"]["sandbox_host_assumed_count"] >= 1
+    assert report["status_summary"]["sandbox_provenance"] == "WARN"
+    assert "require_sandbox_provenance" in {item["id"] for item in report["strict_findings"]}
 
 
 def test_final_pput_cost_conservation_mismatch_fails_vpput(tmp_path):
@@ -677,6 +728,60 @@ def test_require_cost_provenance_rejects_unspecified_source(tmp_path):
     assert report["verdict"] == "FAIL"
     assert report["status_summary"]["cost_provenance"] == "FAIL"
     assert "require_cost_provenance" in {item["id"] for item in report["strict_findings"]}
+
+
+def test_require_sandbox_provenance_rejects_mutation_event_without_block(tmp_path):
+    auditor = load_auditor()
+    bundle = make_bundle(tmp_path, accepted_specs())
+
+    report = auditor.audit_bundles(
+        [bundle],
+        tmp_path / "work",
+        require_sandbox_provenance=True,
+    )
+
+    assert report["verdict"] == "FAIL"
+    assert report["status_summary"]["sandbox_provenance"] == "FAIL"
+    assert "require_sandbox_provenance" in {item["id"] for item in report["strict_findings"]}
+
+
+def test_require_sandbox_provenance_passes_with_runsc_blocks(tmp_path):
+    auditor = load_auditor()
+    specs = accepted_specs()
+    for spec in specs:
+        if spec["event_type"] in {"WorkerReceiptImported", "MacroObservationImported"}:
+            spec["payload"] = {**spec["payload"], "sandbox": sandbox_block()}
+    bundle = make_bundle(tmp_path, specs)
+
+    report = auditor.audit_bundles(
+        [bundle],
+        tmp_path / "work",
+        require_sandbox_provenance=True,
+    )
+
+    assert report["status_summary"]["sandbox_provenance"] == "PASS"
+    assert "require_sandbox_provenance" not in {item["id"] for item in report["strict_findings"]}
+
+
+def test_require_sandbox_provenance_cli_flag_fails_missing_block(tmp_path):
+    auditor = load_auditor()
+    bundle = make_bundle(tmp_path, accepted_specs())
+    out_dir = tmp_path / "audit"
+
+    rc = auditor.main(
+        [
+            "--bundle",
+            str(bundle),
+            "--require-sandbox-provenance",
+            "--out-dir",
+            str(out_dir),
+        ]
+    )
+
+    report = json.loads((out_dir / "micro_tape_decision_dag_audit.json").read_text(encoding="utf-8"))
+    assert rc == 1
+    assert report["status_summary"]["sandbox_provenance"] == "FAIL"
+    assert "require_sandbox_provenance" in {item["id"] for item in report["strict_findings"]}
 
 
 def test_costevent_v2_provenance_passes_and_cost_microusd_conserves(tmp_path):

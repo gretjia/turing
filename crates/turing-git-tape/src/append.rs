@@ -478,16 +478,13 @@ impl Append {
         let value: Value = serde_json::from_slice(&bytes)
             .map_err(|e| AppendError::IncoherentPreState(format!("parent body not JSON: {e}")))?;
         let env = MicroEventEnvelope::from_jcs_value(&value)?;
-        if env.event_type == reducer::AUTHORITY_TRANSFER_EVENT_TYPE {
-            if let Ok(amended) = ProjectLawAmended::from_jcs_value(&env.payload) {
-                if amended.is_human_signed_authority_transfer() {
-                    if let Some(next) = env.authority_epoch.checked_add(1) {
-                        if amended.new_authority_epoch == next {
-                            return Ok(next);
-                        }
-                    }
-                }
-            }
+        if env.event_type == reducer::AUTHORITY_TRANSFER_EVENT_TYPE
+            && let Ok(amended) = ProjectLawAmended::from_jcs_value(&env.payload)
+            && amended.is_human_signed_authority_transfer()
+            && let Some(next) = env.authority_epoch.checked_add(1)
+            && amended.new_authority_epoch == next
+        {
+            return Ok(next);
         }
         Ok(env.authority_epoch)
     }

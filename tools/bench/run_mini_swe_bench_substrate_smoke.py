@@ -48,6 +48,7 @@ REQUIRED_MODULES = [
 ]
 SWEBENCH_FORBIDDEN_PATHS = ["secrets", "tests/**", "*/tests/**", "test_*.py", "*_test.py"]
 NATIVE_API_TOOLS = ["read_file", "list_dir", "grep", "apply_patch", "write_file", "run_command"]
+SANDBOX_MUTATION_EVENT_TYPES = {"WorkerReceiptImported", "MacroObservationImported"}
 STAGE10_FAILURE_CLASSES = [
     "INSTALL_FAIL",
     "TEST_TIMEOUT",
@@ -114,6 +115,76 @@ def digest_bytes(data: bytes) -> str:
 TOKEN_BOUND_KIND = "upper_bound_utf8_bytes_over_2"
 M1C_PRICE_TABLE_DIGEST = "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a"
 LEGACY_COST_EVENT_SCHEMA = "cost_event." + "v1"
+
+
+def host_digest() -> str:
+    try:
+        uname = os.uname()
+        host = {
+            "sysname": uname.sysname,
+            "release": uname.release,
+            "machine": uname.machine,
+        }
+    except AttributeError:
+        host = {"platform": sys.platform, "os_name": os.name}
+    return digest_text(json.dumps(host, sort_keys=True))
+
+
+def host_assumed_sandbox(reason: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "kind": "HOST_ASSUMED",
+        "reason_digest": digest_text(json.dumps(reason, sort_keys=True)),
+        "host_digest": host_digest(),
+    }
+
+
+def runsc_sandbox_block(runsc_path: str | None = None) -> dict[str, Any]:
+    runsc = runsc_path or shutil.which("runsc")
+    if runsc is None:
+        return host_assumed_sandbox({"reason": "runsc_missing"})
+
+    runsc_file = Path(runsc).resolve()
+    try:
+        version = run_cmd([str(runsc_file), "--version"], timeout=30)
+        selftest = run_cmd([str(runsc_file), "--rootless", "--network=none", "do", "/bin/true"], timeout=60)
+    except OSError as error:
+        return host_assumed_sandbox(
+            {
+                "reason": "runsc_probe_exec_error",
+                "runsc_path_sha256": digest_text(str(runsc_file)),
+                "error_class": type(error).__name__,
+                "errno": int(error.errno or 0),
+            }
+        )
+    if version.returncode == 0 and selftest.returncode == 0:
+        try:
+            runsc_binary_sha256 = digest_bytes(runsc_file.read_bytes())
+        except OSError as error:
+            return host_assumed_sandbox(
+                {
+                    "reason": "runsc_digest_read_error",
+                    "runsc_path_sha256": digest_text(str(runsc_file)),
+                    "error_class": type(error).__name__,
+                    "errno": int(error.errno or 0),
+                }
+            )
+        return {
+            "kind": "runsc_rootless_do",
+            "network": "none",
+            "runsc_version": version.stdout.strip(),
+            "runsc_binary_sha256": runsc_binary_sha256,
+            "selftest_exit": 0,
+        }
+    return host_assumed_sandbox(
+        {
+            "reason": "runsc_selftest_failed",
+            "runsc_path_sha256": digest_text(str(runsc_file)),
+            "version_exit": version.returncode,
+            "selftest_exit": selftest.returncode,
+            "selftest_stdout_sha256": digest_text(selftest.stdout or ""),
+            "selftest_stderr_sha256": digest_text(selftest.stderr or ""),
+        }
+    )
 
 
 def upper_bound_tokens_from_utf8_bytes(text: str, *, bytes_per_token_floor: int = 2) -> int:
@@ -1586,6 +1657,10 @@ def append_stage6_event(
 ) -> dict[str, Any]:
     if event_type == "CostEvent":
         payload = normalize_cost_event_payload(payload)
+    if event_type in SANDBOX_MUTATION_EVENT_TYPES and "sandbox" not in payload:
+        sandbox = state.get("sandbox")
+        if isinstance(sandbox, dict):
+            payload = {**payload, "sandbox": sandbox}
     row = registry[event_type]
     predicate_product = product
     if predicate_product is None:
@@ -1634,6 +1709,7 @@ def stage6_base_state() -> dict[str, Any]:
         "authority_epoch": 0,
         "event_ids": {},
         "events": [],
+        "sandbox": None,
         "sequence": 0,
         "tape_tip": None,
     }
@@ -1662,6 +1738,7 @@ def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: st
         raise RuntimeError(f"stage6 git init failed:\n{init.stderr}")
 
     state = stage6_base_state()
+    state["sandbox"] = runsc_sandbox_block()
     worker_id = "worker:sha256:" + hashlib.sha256(f"stage6:{instance_id}:worker".encode("utf-8")).hexdigest()
     capsule_id = f"wc_stage6_{hashlib.sha256(instance_id.encode('utf-8')).hexdigest()[:16]}"
     atom_id = f"atom_stage6_{hashlib.sha256((instance_id + ':atom').encode('utf-8')).hexdigest()[:16]}"
@@ -1777,6 +1854,15 @@ def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: st
         },
         "writer:market",
     )
+    if isinstance(state.get("sandbox"), dict) and state["sandbox"].get("kind") == "HOST_ASSUMED":
+        append(
+            "SandboxBoundaryAssumed",
+            {
+                "schema_id": "sandbox_boundary_assumed.v1",
+                "sandbox": state["sandbox"],
+            },
+            "writer:sandbox",
+        )
     patch_hash = digest_text(instance_id + ":" + expected_result + ":patch")
     append(
         "WorkerReceiptImported",
@@ -1994,6 +2080,7 @@ def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: st
         "capsule_id": capsule_id,
         "candidate_id": candidate_id,
         "market_id": market_id,
+        "sandbox": state["sandbox"],
         "basis": "stage6_strict_microtape_protocol_fixture",
     }
 
