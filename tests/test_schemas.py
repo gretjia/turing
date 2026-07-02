@@ -90,6 +90,13 @@ def _stub_assert_no_floats(payload):
 
 
 def _install_seam_stubs():
+    try:
+        __import__("turingos.codec")
+        __import__("turingos.registry")
+        return
+    except Exception:
+        pass
+
     codec = sys.modules.get("turingos.codec")
     if codec is None:
         codec = types.ModuleType("turingos.codec")
@@ -527,10 +534,14 @@ class TestEventPayload(unittest.TestCase):
 
 
 class TestCostEventV2(unittest.TestCase):
-    def test_valid_cost_event_v2_passes_direct_and_event_payload_validation(self):
+    def test_valid_cost_event_v2_passes_direct_validation(self):
         payload = valid_cost_event_v2()
         self.assertIsNone(schemas.validate_cost_event_v2(payload))
-        self.assertIsNone(schemas.validate_event_payload("CostEvent", payload))
+
+    def test_cost_event_v2_is_not_in_frozen_event_registry(self):
+        payload = valid_cost_event_v2()
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_event_payload("CostEvent", payload)
 
     def test_missing_cost_source_kind_rejected(self):
         payload = valid_cost_event_v2()

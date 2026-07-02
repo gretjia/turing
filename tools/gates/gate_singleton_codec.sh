@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 is_allowed_path() {
   case "$1" in
-    src/turingos/codec.py) return 0 ;; # Python derived view until M1e routes through Rust.
+    src/turingos/codec.py) return 0 ;; # Rust owner client plus labeled Python xcheck fixture.
     src/turingos/tape.py) return 0 ;; # Legacy Python Tape path, demoted in M1e.
     src/turingos/replay.py) return 0 ;; # Replay manifest digest helper, not substrate owner.
     tools/bench/audit_micro_tape_decision_dag.py) return 0 ;; # Independent auditor by design.

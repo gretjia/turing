@@ -1,4 +1,5 @@
-use std::process::Command;
+use std::io::Write;
+use std::process::{Command, Stdio};
 
 fn turing() -> Command {
     Command::new(env!("CARGO_BIN_EXE_turing"))
@@ -43,6 +44,102 @@ fn unknown_command_fails_closed() {
     assert!(!output.status.success());
     let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
     assert!(stderr.contains("unknown turing command"));
+}
+
+#[test]
+fn jcs_canonicalize_writes_canonical_bytes_without_trailing_newline() {
+    let mut child = turing()
+        .args(["jcs", "canonicalize"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn jcs canonicalize");
+    child
+        .stdin
+        .as_mut()
+        .expect("stdin")
+        .write_all(b"{\"b\":2,\"a\":\"h\xc3\xa9\",\"arr\":[true,null]}")
+        .expect("write JSON");
+
+    let output = child.wait_with_output().expect("run jcs canonicalize");
+
+    assert!(
+        output.status.success(),
+        "jcs canonicalize failed: {output:?}"
+    );
+    assert_eq!(
+        output.stdout,
+        b"{\"a\":\"h\xc3\xa9\",\"arr\":[true,null],\"b\":2}"
+    );
+    assert!(
+        output.stderr.is_empty(),
+        "stderr: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+#[test]
+fn jcs_canonicalize_batch_emits_indexed_hex_lines() {
+    let mut child = turing()
+        .args(["jcs", "canonicalize", "--batch"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn jcs canonicalize batch");
+    child
+        .stdin
+        .as_mut()
+        .expect("stdin")
+        .write_all(b"# ignored\n\n{\"b\":2,\"a\":1}\n{\"b\":0,\"a\":true}\n")
+        .expect("write JSONL");
+
+    let output = child
+        .wait_with_output()
+        .expect("run jcs canonicalize batch");
+
+    assert!(
+        output.status.success(),
+        "jcs canonicalize batch failed: {output:?}"
+    );
+    assert!(
+        output.stderr.is_empty(),
+        "stderr: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(
+        String::from_utf8(output.stdout).expect("stdout UTF-8"),
+        "1\t7b2261223a312c2262223a327d\n2\t7b2261223a747275652c2262223a307d\n"
+    );
+}
+
+#[test]
+fn jcs_canonicalize_fails_closed_on_framing_violation() {
+    let mut child = turing()
+        .args(["jcs", "canonicalize"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn jcs canonicalize");
+    child
+        .stdin
+        .as_mut()
+        .expect("stdin")
+        .write_all(b"{\"a\":1}\n")
+        .expect("write JSON");
+
+    let output = child.wait_with_output().expect("run jcs canonicalize");
+
+    assert!(
+        !output.status.success(),
+        "framing violation must fail closed"
+    );
+    assert!(output.stdout.is_empty(), "stdout: {output:?}");
+    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+    assert!(stderr.contains("jcs canonicalize failed"));
+    assert!(stderr.contains("framing violation"));
 }
 
 #[test]

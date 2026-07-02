@@ -11,7 +11,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 
 ALLOWLIST = {
-    "src/turingos/codec.py": "Python derived view until M1e routes through Rust",
+    "src/turingos/codec.py": "Rust owner client plus labeled Python xcheck fixture",
     "src/turingos/tape.py": "legacy Python Tape path, demoted in M1e",
     "src/turingos/replay.py": "replay manifest digest helper, not substrate owner",
     "tools/bench/audit_micro_tape_decision_dag.py": "independent auditor by design",

@@ -10,8 +10,11 @@ Run: PYTHONPATH=src python3 -m unittest tests.test_codec -v
 from __future__ import annotations
 
 import hashlib
+import os
 import re
+import subprocess
 import unittest
+from unittest.mock import patch
 
 from turingos import codec
 from turingos.errors import AsciiKeyViolation, FloatViolation
@@ -41,6 +44,47 @@ class TestCanonicalBytesDeterminism(unittest.TestCase):
     def test_nested_determinism(self):
         p = {"outer": {"z": 1, "a": 2}, "list": [{"k": 1}, {"k": 2}]}
         self.assertEqual(codec.canonical_bytes(p), codec.canonical_bytes(p))
+
+
+class TestOwnerCanonicalizationRouting(unittest.TestCase):
+    def test_derived_python_fixture_canonicalizes_without_owner_cli(self):
+        with patch("subprocess.run", side_effect=AssertionError("must not call owner CLI")):
+            result = codec.derived_python_canonical_bytes_fixture({"b": 2, "a": 1})
+
+        self.assertEqual(result, b'{"a":1,"b":2}')
+
+    def test_canonical_bytes_routes_unsorted_payload_to_turing_jcs_cli(self):
+        calls = []
+
+        def fake_run(args, **kwargs):
+            calls.append((args, kwargs))
+            return subprocess.CompletedProcess(args, 0, stdout=b'{"owner":true}', stderr=b"")
+
+        with patch.dict(os.environ, {"TURING_JCS_BIN": "/tmp/turing"}, clear=False):
+            with patch("subprocess.run", side_effect=fake_run):
+                result = codec.canonical_bytes({"b": 2, "a": 1})
+
+        self.assertEqual(result, b'{"owner":true}')
+        self.assertEqual(len(calls), 1)
+        args, kwargs = calls[0]
+        self.assertEqual(args, ["/tmp/turing", "jcs", "canonicalize"])
+        self.assertEqual(kwargs["input"], b'{"b":2,"a":1}')
+        self.assertEqual(kwargs["stdout"], subprocess.PIPE)
+        self.assertEqual(kwargs["stderr"], subprocess.PIPE)
+        self.assertFalse(kwargs.get("check", True))
+
+    def test_canonical_bytes_fails_closed_when_turing_jcs_cli_fails(self):
+        def fake_run(args, **_kwargs):
+            return subprocess.CompletedProcess(args, 2, stdout=b"", stderr=b"strict parse failed")
+
+        with patch.dict(os.environ, {"TURING_JCS_BIN": "/tmp/turing"}, clear=False):
+            with patch("subprocess.run", side_effect=fake_run):
+                with self.assertRaises(RuntimeError) as ctx:
+                    codec.canonical_bytes({"a": 1})
+
+        message = str(ctx.exception)
+        self.assertIn("turing jcs canonicalize failed", message)
+        self.assertIn("strict parse failed", message)
 
 
 class TestKeyOrderIndependence(unittest.TestCase):

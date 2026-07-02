@@ -1,3 +1,4 @@
+use std::io::{self, Read, Write};
 use std::path::Path;
 use std::process::ExitCode;
 
@@ -7,11 +8,22 @@ use turing_approval::{
     HardwareSigningBackend, InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute,
     SigningBackend,
 };
+use turing_contracts::jcs;
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let words: Vec<&str> = args.iter().map(String::as_str).collect();
+
+    if words.first() == Some(&"jcs") {
+        return match run_jcs_command(&words) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(message) => {
+                eprintln!("{message}");
+                ExitCode::from(2)
+            }
+        };
+    }
 
     match dispatch(&words) {
         Ok(message) => {
@@ -23,6 +35,66 @@ fn main() -> ExitCode {
             ExitCode::from(2)
         }
     }
+}
+
+fn run_jcs_command(args: &[&str]) -> Result<(), String> {
+    match args {
+        ["jcs", "canonicalize"] => {
+            let mut input = String::new();
+            io::stdin()
+                .read_to_string(&mut input)
+                .map_err(|error| format!("jcs canonicalize failed to read stdin: {error}"))?;
+            let value = jcs::parse_strict(&input)
+                .map_err(|error| format!("jcs canonicalize failed: {error}"))?;
+            let bytes = jcs::canonicalize(&value)
+                .map_err(|error| format!("jcs canonicalize failed: {error}"))?;
+            io::stdout()
+                .write_all(&bytes)
+                .map_err(|error| format!("jcs canonicalize failed to write stdout: {error}"))?;
+            Ok(())
+        }
+        ["jcs", "canonicalize", "--batch"] => {
+            let mut input = String::new();
+            io::stdin()
+                .read_to_string(&mut input)
+                .map_err(|error| format!("jcs canonicalize batch failed to read stdin: {error}"))?;
+
+            let mut case_index = 0usize;
+            let mut output = String::new();
+            for raw_line in input.lines() {
+                let line = raw_line.trim_end_matches('\r');
+                if line.trim().is_empty() || line.trim_start().starts_with('#') {
+                    continue;
+                }
+                case_index += 1;
+                let value = jcs::parse_strict(line).map_err(|error| {
+                    format!("jcs canonicalize batch failed at case {case_index}: {error}")
+                })?;
+                let bytes = jcs::canonicalize(&value).map_err(|error| {
+                    format!("jcs canonicalize batch failed at case {case_index}: {error}")
+                })?;
+                output.push_str(&format!("{case_index}\t{}\n", lower_hex(&bytes)));
+            }
+            io::stdout().write_all(output.as_bytes()).map_err(|error| {
+                format!("jcs canonicalize batch failed to write stdout: {error}")
+            })?;
+            Ok(())
+        }
+        _ => Err(format!(
+            "unknown turing jcs command: {:?}. supported: jcs canonicalize [--batch]",
+            args
+        )),
+    }
+}
+
+fn lower_hex(bytes: &[u8]) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        out.push(HEX[(byte >> 4) as usize] as char);
+        out.push(HEX[(byte & 0x0f) as usize] as char);
+    }
+    out
 }
 
 fn dispatch(args: &[&str]) -> Result<String, String> {

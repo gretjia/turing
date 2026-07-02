@@ -1,7 +1,10 @@
-"""turingos.jcs.v1 — the canonical codec (F-5, ADR-0006).
+"""turingos.jcs.v1 — Python client for the Rust-owned canonical codec (F-5, ADR-0006).
 
-This is the one byte-deterministic codec for the whole kernel. It implements the
-frozen policy in `contracts/codec_policy.md`:
+The canonical byte owner is `turing-contracts::jcs`, exposed to Python through
+`turing jcs canonicalize`. This module enforces Python-side guard errors, sends
+JSON bytes across that process boundary, and retains a labeled derived fixture
+serializer only for M1A cross-check gates. The frozen policy in
+`contracts/codec_policy.md` remains:
 
   C-1  canonical_bytes = RFC 8785 (JCS) of the payload, minimal separators,
        object keys sorted by UTF-16 code-unit order.
@@ -11,9 +14,9 @@ frozen policy in `contracts/codec_policy.md`:
   C-5  event_id = "mu:" + <git_commit_oid> (sha256 -> 64 hex), EVENT_ID_RE.
   C-6  determinism: two semantically-equal payloads => identical bytes & digest.
 
-ASCII-key property: for ASCII-only keys, Python `sorted()` (Unicode code-point
-order) coincides with RFC 8785 UTF-16 code-unit order, so `json.dumps(..., sort_keys=True)`
-yields exactly the RFC 8785 ordering — no separate UTF-16 sort is required.
+ASCII-key fixture property: for ASCII-only keys, Python `sorted()` (Unicode
+code-point order) coincides with RFC 8785 UTF-16 code-unit order, so the derived
+fixture serializer can independently cross-check the Rust owner on the M1A corpus.
 
 Subset only: payloads contain ASCII keys and values drawn from {int, bool, None,
 str, list, dict}. NaN/Inf are rejected (`allow_nan=False`).
@@ -22,7 +25,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import shutil
+import subprocess
+from pathlib import Path
 
 from .errors import AsciiKeyViolation, FloatViolation
 
@@ -63,12 +70,8 @@ def assert_no_floats(payload) -> None:
             assert_no_floats(item)
 
 
-def canonical_bytes(payload: dict) -> bytes:
-    """Return the RFC 8785 (JCS) byte string of `payload` (C-1).
-
-    Enforces the codec guards first (ASCII keys, no floats), then serializes with
-    sorted keys + minimal separators. NaN/Inf are rejected via allow_nan=False.
-    """
+def derived_python_canonical_bytes_fixture(payload) -> bytes:
+    """Derived Python JCS fixture used only for cross-check gates."""
     assert_ascii_keys(payload)
     assert_no_floats(payload)
     return json.dumps(
@@ -78,6 +81,57 @@ def canonical_bytes(payload: dict) -> bytes:
         ensure_ascii=False,
         allow_nan=False,
     ).encode("utf-8")
+
+
+def canonical_bytes(payload: dict) -> bytes:
+    """Return the Rust-owner RFC 8785 (JCS) byte string of `payload` (C-1)."""
+    assert_ascii_keys(payload)
+    assert_no_floats(payload)
+    raw_input = json.dumps(
+        payload,
+        sort_keys=False,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    cmd = _owner_jcs_command()
+    try:
+        proc = subprocess.run(
+            cmd,
+            input=raw_input,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+    except OSError as exc:
+        raise RuntimeError(f"turing jcs canonicalize failed to execute {cmd[0]!r}: {exc}") from exc
+    if proc.returncode != 0:
+        stderr = proc.stderr.decode("utf-8", errors="replace").strip()
+        detail = f": {stderr}" if stderr else ""
+        raise RuntimeError(
+            f"turing jcs canonicalize failed with exit {proc.returncode}{detail}"
+        )
+    return proc.stdout
+
+
+def _owner_jcs_command() -> list[str]:
+    configured = os.environ.get("TURING_JCS_BIN")
+    if configured:
+        return [configured, "jcs", "canonicalize"]
+
+    repo_root = Path(__file__).resolve().parents[2]
+    for relative in ("target/debug/turing", "target/release/turing"):
+        candidate = repo_root / relative
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return [str(candidate), "jcs", "canonicalize"]
+
+    found = shutil.which("turing")
+    if found:
+        return [found, "jcs", "canonicalize"]
+
+    raise RuntimeError(
+        "turing jcs canonicalize unavailable: set TURING_JCS_BIN or build turing-cli"
+    )
 
 
 def content_digest(payload: dict) -> str:

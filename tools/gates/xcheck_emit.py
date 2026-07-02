@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     for case_index, value in iter_cases(Path(args.corpus)):
-        print(f"{case_index}\t{codec.canonical_bytes(value).hex()}")
+        print(f"{case_index}\t{codec.derived_python_canonical_bytes_fixture(value).hex()}")
     return 0
 
 
