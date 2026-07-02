@@ -95,7 +95,11 @@ fn daemons_reject_world_writable_socket_parents() {
         }
         std::thread::sleep(Duration::from_millis(20));
     }
-    let status = status.expect("daemon should exit on unsafe socket parent");
+    if status.is_none() {
+        let _ = child.kill();
+    }
+    let waited = child.wait().expect("wait daemon child");
+    let status = status.unwrap_or(waited);
     assert!(!status.success(), "daemon must reject unsafe socket parent");
 }
 
@@ -408,25 +412,7 @@ fn pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage() {
         AppendRequest::new(
             "CostEvent",
             "writer:pput",
-            json!({
-                "schema_id": "cost_event.v1",
-                "event_type": "CostEvent",
-                "head_effect": "PRESERVE",
-                "run_id": "run_tape",
-                "problem_id": "problem_tape",
-                "split": "heldout",
-                "agent_id": "agent_worker",
-                "branch_id": "branch_failed",
-                "capsule_id": "wc_snapshot",
-                "prompt_tokens": 2,
-                "completion_tokens": 3,
-                "tool_tokens": 5,
-                "tool_stdout_tokens": 7,
-                "total_tokens": 17,
-                "wall_time_ms": 100,
-                "tool_stdout_hash": digest('f'),
-                "counted_in_total": true
-            }),
+            cost_event_v2("run_tape", "problem_tape", "branch_failed", 17, 100),
         )
         .predicate_pass(),
     )
@@ -972,6 +958,49 @@ fn wait_for_socket(socket: &Path, child: &mut Child) {
 
 fn digest(ch: char) -> String {
     format!("sha256:{}", ch.to_string().repeat(64))
+}
+
+fn cost_event_v2(
+    run_id: &str,
+    problem_id: &str,
+    branch_id: &str,
+    total_tokens: u64,
+    wall_time_ms: u64,
+) -> Value {
+    json!({
+        "schema_id": "turingos.cost_event.v2",
+        "run_id": run_id,
+        "problem_id": problem_id,
+        "split": "heldout",
+        "agent_id": "agent_worker",
+        "branch_id": branch_id,
+        "capsule_id": "wc_snapshot",
+        "receipt_id": "rcpt:".to_string() + &"1".repeat(64),
+        "worker": {
+            "adapter_kind": "fake",
+            "provider": "fixture",
+            "model_id_requested": "fixture-model",
+            "model_id_resolved": "fixture-model-20260702",
+            "endpoint": "fixture://pput",
+            "request_id": "req_fixture_pput",
+            "response_sha256": digest('b')
+        },
+        "usage": {
+            "input_tokens": total_tokens / 2,
+            "output_tokens": total_tokens - (total_tokens / 2),
+            "total_tokens": total_tokens,
+            "provider_usage_raw_sha256": digest('c')
+        },
+        "cost": {
+            "cost_source_kind": "fixture",
+            "cost_microusd": 0,
+            "price_table_digest": "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a",
+            "bound_kind": null
+        },
+        "wall_time_ms": wall_time_ms,
+        "tool_stdout_hash": digest('f'),
+        "counted_in_total": true
+    })
 }
 
 fn grant_json() -> Value {

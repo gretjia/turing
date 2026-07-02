@@ -33,7 +33,9 @@ use turing_execd::capability::{
 };
 use turing_execd::{FakeWorker, WorkerRunRequest};
 use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
-use turing_pput::{CostEvent, PputProjection, Split, WorkerPromptShield};
+use turing_pput::{
+    CostAmount, CostEvent, CostUsage, CostWorker, PputProjection, Split, WorkerPromptShield,
+};
 use turing_predicate::{PredicateCheck, PredicateKernel};
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
@@ -1975,9 +1977,15 @@ fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
 
 fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
     let schema_id = required_str(value, "schema_id")?;
-    if schema_id != "cost_event.v1" {
-        return Err(format!("unsupported cost event schema_id {schema_id:?}"));
+    match schema_id.as_str() {
+        "cost_event.v1" => parse_cost_event_v1(value),
+        "turingos.cost_event.v2" => parse_cost_event_v2(value),
+        _ => Err(format!("unsupported cost event schema_id {schema_id:?}")),
     }
+}
+
+fn parse_cost_event_v1(value: &Value) -> Result<CostEvent, String> {
+    let schema_id = required_str(value, "schema_id")?;
     let event_type = required_str(value, "event_type")?;
     if event_type != "CostEvent" {
         return Err(format!("unsupported cost event_type {event_type:?}"));
@@ -2007,9 +2015,141 @@ fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
     if !counted_in_total {
         return Err("CostEvent counted_in_total must be true".to_string());
     }
+    let run_id = required_str(value, "run_id")?;
+    let problem_id = required_str(value, "problem_id")?;
+    let branch_id = required_str(value, "branch_id")?;
+    let capsule_id = required_str(value, "capsule_id")?;
+    let tool_stdout_hash = required_digest(value, "tool_stdout_hash")?;
+    let receipt_material = format!("{run_id}:{branch_id}:{tool_stdout_hash}");
+    let receipt_id = format!("rcpt:{}", jcs::sha256_hex(receipt_material.as_bytes()));
 
     Ok(CostEvent {
         schema_id,
+        event_type,
+        head_effect,
+        run_id,
+        problem_id,
+        split: parse_pput_split(&required_str(value, "split")?)?,
+        agent_id: required_str(value, "agent_id")?,
+        branch_id,
+        capsule_id,
+        receipt_id,
+        worker: CostWorker {
+            adapter_kind: "fake".to_string(),
+            provider: "fixture".to_string(),
+            model_id_requested: "legacy-cost-event-v1".to_string(),
+            model_id_resolved: "legacy-cost-event-v1".to_string(),
+            endpoint: "legacy://cost_event.v1".to_string(),
+            request_id: "legacy_cost_event_v1".to_string(),
+            response_sha256: tool_stdout_hash.clone(),
+        },
+        usage: CostUsage {
+            prompt_tokens,
+            completion_tokens,
+            tool_tokens,
+            tool_stdout_tokens,
+            total_tokens,
+            provider_usage_raw_sha256: format!(
+                "sha256:{}",
+                jcs::sha256_hex(
+                    format!(
+                        "{prompt_tokens}:{completion_tokens}:{tool_tokens}:{tool_stdout_tokens}:{total_tokens}"
+                    )
+                    .as_bytes()
+                )
+            ),
+        },
+        cost: CostAmount {
+            cost_source_kind: "fixture".to_string(),
+            cost_microusd: 0,
+            price_table_digest:
+                "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a"
+                    .to_string(),
+            bound_kind: None,
+        },
+        prompt_tokens,
+        completion_tokens,
+        tool_tokens,
+        tool_stdout_tokens,
+        total_tokens,
+        wall_time_ms: required_u64(value, "wall_time_ms")?,
+        tool_stdout_hash,
+        counted_in_total,
+    })
+}
+
+fn parse_cost_event_v2(value: &Value) -> Result<CostEvent, String> {
+    let event_type = match value.get("event_type") {
+        Some(_) => required_str(value, "event_type")?,
+        None => "CostEvent".to_string(),
+    };
+    if event_type != "CostEvent" {
+        return Err(format!("unsupported cost event_type {event_type:?}"));
+    }
+    let head_effect = match value.get("head_effect") {
+        Some(_) => required_str(value, "head_effect")?,
+        None => "PRESERVE".to_string(),
+    };
+    if head_effect != "PRESERVE" {
+        return Err(format!(
+            "CostEvent head_effect must be PRESERVE, got {head_effect:?}"
+        ));
+    }
+    let worker_value = required_object(value, "worker")?;
+    let usage_value = required_object(value, "usage")?;
+    let cost_value = required_object(value, "cost")?;
+
+    let cache_prompt_tokens = optional_u64(usage_value, "prompt_cache_hit_tokens")?
+        .unwrap_or(0)
+        .saturating_add(optional_u64(usage_value, "prompt_cache_miss_tokens")?.unwrap_or(0));
+    let prompt_tokens = optional_u64(usage_value, "prompt_tokens")?
+        .or(optional_u64(usage_value, "input_tokens")?)
+        .unwrap_or(cache_prompt_tokens);
+    let completion_tokens = optional_u64(usage_value, "completion_tokens")?
+        .or(optional_u64(usage_value, "output_tokens")?)
+        .unwrap_or(0);
+    let tool_tokens = optional_u64(usage_value, "tool_tokens")?.unwrap_or(0);
+    let tool_stdout_tokens = optional_u64(usage_value, "tool_stdout_tokens")?.unwrap_or(0);
+    let computed_total = prompt_tokens
+        .checked_add(completion_tokens)
+        .and_then(|count| count.checked_add(tool_tokens))
+        .and_then(|count| count.checked_add(tool_stdout_tokens))
+        .ok_or_else(|| "CostEvent token total overflow".to_string())?;
+    let total_tokens = optional_u64(usage_value, "total_tokens")?.unwrap_or(computed_total);
+    if total_tokens != computed_total {
+        return Err(format!(
+            "CostEvent usage.total_tokens {total_tokens} does not match counted total {computed_total}"
+        ));
+    }
+    let counted_in_total = match value.get("counted_in_total") {
+        Some(_) => required_bool(value, "counted_in_total")?,
+        None => true,
+    };
+    if !counted_in_total {
+        return Err("CostEvent counted_in_total must be true".to_string());
+    }
+    let response_sha256 = required_digest(worker_value, "response_sha256")?;
+    let tool_stdout_hash = match value.get("tool_stdout_hash") {
+        Some(_) => required_digest(value, "tool_stdout_hash")?,
+        None => response_sha256.clone(),
+    };
+    let source = required_str(cost_value, "cost_source_kind")?;
+    if !matches!(
+        source.as_str(),
+        "provider_receipt_inline"
+            | "provider_usage_api_reconciled"
+            | "bounded_estimate"
+            | "fixture"
+    ) {
+        return Err(format!("unsupported cost_source_kind {source:?}"));
+    }
+    let bound_kind = optional_str(cost_value, "bound_kind")?;
+    if source == "bounded_estimate" && bound_kind.as_deref().unwrap_or("").is_empty() {
+        return Err("bounded_estimate CostEvent requires bound_kind".to_string());
+    }
+
+    Ok(CostEvent {
+        schema_id: required_str(value, "schema_id")?,
         event_type,
         head_effect,
         run_id: required_str(value, "run_id")?,
@@ -2018,13 +2158,37 @@ fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
         agent_id: required_str(value, "agent_id")?,
         branch_id: required_str(value, "branch_id")?,
         capsule_id: required_str(value, "capsule_id")?,
+        receipt_id: required_str(value, "receipt_id")?,
+        worker: CostWorker {
+            adapter_kind: required_str(worker_value, "adapter_kind")?,
+            provider: required_str(worker_value, "provider")?,
+            model_id_requested: required_str(worker_value, "model_id_requested")?,
+            model_id_resolved: required_str(worker_value, "model_id_resolved")?,
+            endpoint: required_str(worker_value, "endpoint")?,
+            request_id: required_str(worker_value, "request_id")?,
+            response_sha256,
+        },
+        usage: CostUsage {
+            prompt_tokens,
+            completion_tokens,
+            tool_tokens,
+            tool_stdout_tokens,
+            total_tokens,
+            provider_usage_raw_sha256: required_digest(usage_value, "provider_usage_raw_sha256")?,
+        },
+        cost: CostAmount {
+            cost_source_kind: source,
+            cost_microusd: required_u64(cost_value, "cost_microusd")?,
+            price_table_digest: required_digest(cost_value, "price_table_digest")?,
+            bound_kind,
+        },
         prompt_tokens,
         completion_tokens,
         tool_tokens,
         tool_stdout_tokens,
         total_tokens,
         wall_time_ms: required_u64(value, "wall_time_ms")?,
-        tool_stdout_hash: required_digest(value, "tool_stdout_hash")?,
+        tool_stdout_hash,
         counted_in_total,
     })
 }
@@ -2115,8 +2279,7 @@ fn load_cost_events_from_tape(repo: &Path) -> Result<Vec<CostEvent>, String> {
     envelopes
         .into_iter()
         .filter_map(|(_, envelope)| {
-            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
-            if event_type == "CostEvent" {
+            if envelope.event_type == "CostEvent" {
                 Some(envelope.payload)
             } else {
                 None
@@ -2131,7 +2294,7 @@ fn load_projection_events_from_tape(repo: &Path) -> Result<Vec<ProjectionEvent>,
     envelopes
         .into_iter()
         .filter_map(|(event_id, envelope)| {
-            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
+            let event_type = envelope.event_type;
             if !(event_type.starts_with("Market")
                 || event_type.starts_with("PPUT")
                 || event_type == "CostEvent")
@@ -2144,9 +2307,9 @@ fn load_projection_events_from_tape(repo: &Path) -> Result<Vec<ProjectionEvent>,
                 .or_else(|| envelope.payload.get("market_id"))
                 .or_else(|| envelope.payload.get("run_id"))
                 .and_then(Value::as_str)
-                .unwrap_or(event_type)
+                .unwrap_or(event_type.as_str())
                 .to_string();
-            Some((event_id, envelope.event_type, subject_id))
+            Some((event_id, event_type, subject_id))
         })
         .map(|(event_id, event_type, subject_id)| {
             Ok(ProjectionEvent::new(event_id, event_type, subject_id))
@@ -2363,6 +2526,23 @@ fn optional_str(value: &Value, key: &str) -> Result<Option<String>, String> {
         Some(Value::Null) | None => Ok(None),
         Some(Value::String(raw)) => Ok(Some(raw.clone())),
         Some(_) => Err(format!("{key} string or null is required")),
+    }
+}
+
+fn required_object<'a>(value: &'a Value, key: &str) -> Result<&'a Value, String> {
+    value
+        .get(key)
+        .filter(|item| item.is_object())
+        .ok_or_else(|| format!("{key} object is required"))
+}
+
+fn optional_u64(value: &Value, key: &str) -> Result<Option<u64>, String> {
+    match value.get(key) {
+        None => Ok(None),
+        Some(raw) => raw
+            .as_u64()
+            .map(Some)
+            .ok_or_else(|| format!("{key} unsigned integer is required")),
     }
 }
 

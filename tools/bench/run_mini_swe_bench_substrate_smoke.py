@@ -111,6 +111,127 @@ def digest_bytes(data: bytes) -> str:
     return "sha256:" + hashlib.sha256(data).hexdigest()
 
 
+TOKEN_BOUND_KIND = "upper_bound_utf8_bytes_over_2"
+M1C_PRICE_TABLE_DIGEST = "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a"
+LEGACY_COST_EVENT_SCHEMA = "cost_event." + "v1"
+
+
+def upper_bound_tokens_from_utf8_bytes(text: str, *, bytes_per_token_floor: int = 2) -> int:
+    if bytes_per_token_floor <= 0:
+        raise ValueError("bytes_per_token_floor must be positive")
+    byte_len = len(text.encode("utf-8"))
+    return (byte_len + bytes_per_token_floor - 1) // bytes_per_token_floor
+
+
+def cost_event_v2_payload(
+    *,
+    run_id: str,
+    problem_id: str,
+    split: str,
+    agent_id: str,
+    branch_id: str,
+    capsule_id: str,
+    prompt_tokens: int,
+    completion_tokens: int,
+    tool_tokens: int,
+    tool_stdout_tokens: int,
+    total_tokens: int,
+    wall_time_ms: int,
+    tool_stdout_hash: str | None = None,
+    counted_in_total: bool = True,
+    cost_source_kind: str = "fixture",
+    bound_kind: str | None = None,
+    adapter_kind: str = "fake",
+    provider: str = "fixture",
+    model_id_requested: str = "fixture-model",
+    model_id_resolved: str = "fixture-model-20260702",
+    endpoint: str = "fixture://bench",
+    request_id: str | None = None,
+    response_sha256: str | None = None,
+    cost_microusd: int = 0,
+) -> dict[str, Any]:
+    counted_total = prompt_tokens + completion_tokens + tool_tokens + tool_stdout_tokens
+    if total_tokens != counted_total:
+        raise ValueError(f"CostEvent total_tokens {total_tokens} != counted total {counted_total}")
+    receipt_seed = f"{run_id}:{branch_id}:{capsule_id}"
+    receipt_id = "rcpt:" + hashlib.sha256(receipt_seed.encode("utf-8")).hexdigest()
+    usage = {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "tool_tokens": tool_tokens,
+        "tool_stdout_tokens": tool_stdout_tokens,
+        "total_tokens": total_tokens,
+    }
+    usage_fingerprint = f"{prompt_tokens}:{completion_tokens}:{tool_tokens}:{tool_stdout_tokens}:{total_tokens}"
+    return {
+        "schema_id": "turingos.cost_event.v2",
+        "run_id": run_id,
+        "problem_id": problem_id,
+        "split": split,
+        "agent_id": agent_id,
+        "branch_id": branch_id,
+        "capsule_id": capsule_id,
+        "receipt_id": receipt_id,
+        "worker": {
+            "adapter_kind": adapter_kind,
+            "provider": provider,
+            "model_id_requested": model_id_requested,
+            "model_id_resolved": model_id_resolved,
+            "endpoint": endpoint,
+            "request_id": request_id or receipt_id,
+            "response_sha256": response_sha256 or digest_text(receipt_seed),
+        },
+        "usage": {
+            **usage,
+            "provider_usage_raw_sha256": digest_text(usage_fingerprint),
+        },
+        "cost": {
+            "cost_source_kind": cost_source_kind,
+            "cost_microusd": cost_microusd,
+            "price_table_digest": M1C_PRICE_TABLE_DIGEST,
+            "bound_kind": bound_kind,
+        },
+        "wall_time_ms": wall_time_ms,
+        "tool_stdout_hash": tool_stdout_hash or digest_text(receipt_seed + ":stdout"),
+        "counted_in_total": counted_in_total,
+    }
+
+
+def normalize_cost_event_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    if payload.get("schema_id") == "turingos.cost_event.v2":
+        return payload
+    if payload.get("schema_id") != LEGACY_COST_EVENT_SCHEMA:
+        return payload
+    cost_source_kind = payload.get("cost_source_kind")
+    bound_kind = payload.get("bound_kind")
+    if cost_source_kind in {None, "estimated_tokens", "bounded_estimate"}:
+        cost_source_kind = "bounded_estimate"
+        bound_kind = bound_kind or TOKEN_BOUND_KIND
+    elif cost_source_kind not in {"provider_receipt_inline", "provider_usage_api_reconciled", "fixture"}:
+        cost_source_kind = "fixture"
+        bound_kind = None
+    return cost_event_v2_payload(
+        run_id=str(payload["run_id"]),
+        problem_id=str(payload.get("problem_id", payload["run_id"])),
+        split=str(payload.get("split", "dogfood")),
+        agent_id=str(payload.get("agent_id", "worker:unknown")),
+        branch_id=str(payload.get("branch_id", "branch:unknown")),
+        capsule_id=str(payload.get("capsule_id", "cap:unknown")),
+        prompt_tokens=int(payload.get("prompt_tokens", 0)),
+        completion_tokens=int(payload.get("completion_tokens", 0)),
+        tool_tokens=int(payload.get("tool_tokens", 0)),
+        tool_stdout_tokens=int(payload.get("tool_stdout_tokens", 0)),
+        total_tokens=int(payload.get("total_tokens", 0)),
+        wall_time_ms=int(payload.get("wall_time_ms", 0)),
+        tool_stdout_hash=payload.get("tool_stdout_hash"),
+        counted_in_total=bool(payload.get("counted_in_total", True)),
+        cost_source_kind=str(cost_source_kind),
+        bound_kind=bound_kind,
+        adapter_kind="fake" if cost_source_kind == "fixture" else "cli",
+        provider="fixture" if cost_source_kind == "fixture" else "bounded",
+    )
+
+
 def read_tasks(path: Path, limit: int) -> list[dict[str, Any]]:
     tasks = []
     with path.open("r", encoding="utf-8") as handle:
@@ -272,6 +393,8 @@ def increment(mapping: dict[str, int], key: str, amount: int = 1) -> None:
 
 
 def append_preserve(turingd: Daemon, event_type: str, writer_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    if event_type == "CostEvent":
+        payload = normalize_cost_event_payload(payload)
     if "event_type" not in payload:
         payload = {"event_type": event_type, **payload}
     return rpc(
@@ -495,9 +618,10 @@ def run_grok_worker(
         "credential_material_absent": True,
         "micro_refs_moved": False,
         "elapsed_ms": elapsed_ms,
-        "prompt_tokens_estimate": len(prompt.split()),
-        "completion_tokens_estimate": len(proc.stdout.split()),
-        "tool_stdout_tokens_estimate": len((proc.stdout + "\n" + proc.stderr).split()),
+        "token_count_bound_kind": TOKEN_BOUND_KIND,
+        "prompt_tokens_estimate": upper_bound_tokens_from_utf8_bytes(prompt),
+        "completion_tokens_estimate": upper_bound_tokens_from_utf8_bytes(proc.stdout),
+        "tool_stdout_tokens_estimate": upper_bound_tokens_from_utf8_bytes(proc.stdout + "\n" + proc.stderr),
         "worktree": str(worktree_abs),
         "log_dir": str(log_dir),
     }
@@ -876,7 +1000,7 @@ def run_substrate_task(
                 "CostEvent",
                 "writer:pput",
                 {
-                    "schema_id": "cost_event.v1",
+                    "schema_id": LEGACY_COST_EVENT_SCHEMA,
                     "head_effect": "PRESERVE",
                     "run_id": f"run_{task['instance_id']}",
                     "problem_id": task["instance_id"],
@@ -1154,6 +1278,7 @@ def run_substrate_task(
                     },
                 )
                 worker_result["elapsed_ms"] = 1
+                worker_result["token_count_bound_kind"] = "fixture"
                 worker_result["prompt_tokens_estimate"] = 1
                 worker_result["completion_tokens_estimate"] = 1
                 worker_result["tool_stdout_tokens_estimate"] = 1
@@ -1250,7 +1375,7 @@ def run_substrate_task(
             "CostEvent",
             "writer:pput",
             {
-                "schema_id": "cost_event.v1",
+                "schema_id": LEGACY_COST_EVENT_SCHEMA,
                 "head_effect": "PRESERVE",
                 "run_id": f"run_{task['instance_id']}",
                 "problem_id": task["instance_id"],
@@ -1268,6 +1393,12 @@ def run_substrate_task(
                 "wall_time_ms": worker_result["elapsed_ms"],
                 "tool_stdout_hash": digest_text(worker_result["stdout_hash"] + worker_result["stderr_hash"]),
                 "counted_in_total": True,
+                "cost_source_kind": (
+                    "fixture"
+                    if worker_result.get("token_count_bound_kind") == "fixture"
+                    else "bounded_estimate"
+                ),
+                "bound_kind": worker_result.get("token_count_bound_kind"),
             },
         )
         mark_event(cost, "CostEvent")
@@ -1290,6 +1421,7 @@ def run_substrate_task(
                 + worker_result["completion_tokens_estimate"]
                 + worker_result["tool_stdout_tokens_estimate"],
                 "total_wall_time_ms": worker_result["elapsed_ms"],
+                "total_run_cost_microusd": 0,
                 "progress": 0,
                 "vpput_raw": "0",
                 "failed_branch_count": 1,
@@ -1381,6 +1513,7 @@ def run_substrate_task(
         "broadcast_rules_injected": broadcast_rules or [],
         "broadcast_rules_emitted": [],
         "worker_exit_code": worker_result["exit_code"],
+        "worker_token_count_bound_kind": worker_result.get("token_count_bound_kind"),
         "worker_prompt_tokens_estimate": worker_result["prompt_tokens_estimate"],
         "worker_completion_tokens_estimate": worker_result["completion_tokens_estimate"],
         "worker_tool_stdout_tokens_estimate": worker_result["tool_stdout_tokens_estimate"],
@@ -1451,6 +1584,8 @@ def append_stage6_event(
     product: str | None = None,
     name: str | None = None,
 ) -> dict[str, Any]:
+    if event_type == "CostEvent":
+        payload = normalize_cost_event_payload(payload)
     row = registry[event_type]
     predicate_product = product
     if predicate_product is None:
@@ -1672,7 +1807,7 @@ def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: st
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": f"run_{instance_id}",
             "problem_id": instance_id,
             "split": "dogfood",
@@ -1703,6 +1838,7 @@ def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: st
             "golden_path_token_count": 0,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": wall_time_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0,
             "vpput_raw": "0",
             "failed_branch_count": 1,
@@ -1818,6 +1954,7 @@ def build_stage6_bundle(out_dir: Path, task: dict[str, Any], expected_result: st
             "golden_path_token_count": total_tokens if progress == 1 else 0,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": wall_time_ms,
+            "total_run_cost_microusd": 0,
             "progress": progress,
             "vpput_raw": stage6_vpput(progress, total_tokens, wall_time_ms),
             "failed_branch_count": 1 if progress == 0 else 0,
@@ -2050,7 +2187,7 @@ def build_stage8_no_hitl_loop_bundle(out_dir: Path, task: dict[str, Any]) -> dic
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -2123,6 +2260,7 @@ def build_stage8_no_hitl_loop_bundle(out_dir: Path, task: dict[str, Any]) -> dic
             "golden_path_token_count": 0,
             "total_run_token_count": first_tokens,
             "total_wall_time_ms": first_wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0,
             "vpput_raw": "0",
             "failed_branch_count": 1,
@@ -2255,7 +2393,7 @@ def build_stage8_no_hitl_loop_bundle(out_dir: Path, task: dict[str, Any]) -> dic
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -2357,6 +2495,7 @@ def build_stage8_no_hitl_loop_bundle(out_dir: Path, task: dict[str, Any]) -> dic
             "golden_path_token_count": total_tokens,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": total_wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 1,
             "vpput_raw": stage6_vpput(1, total_tokens, total_wall_ms),
             "failed_branch_count": 1,
@@ -2645,7 +2784,7 @@ def build_stage9_native_api_worker_bundle(out_dir: Path, task: dict[str, Any], e
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -2771,6 +2910,7 @@ def build_stage9_native_api_worker_bundle(out_dir: Path, task: dict[str, Any], e
             "golden_path_token_count": total_tokens if progress == 1 else 0,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": progress,
             "vpput_raw": stage6_vpput(progress, total_tokens, wall_ms),
             "failed_branch_count": 0 if progress == 1 else 1,
@@ -3148,7 +3288,7 @@ def build_stage13_native_api_worker_bundle(out_dir: Path, task: dict[str, Any], 
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -3272,6 +3412,7 @@ def build_stage13_native_api_worker_bundle(out_dir: Path, task: dict[str, Any], 
             "golden_path_token_count": total_tokens if progress == 1 else 0,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": progress,
             "vpput_raw": stage6_vpput(progress, total_tokens, wall_ms),
             "failed_branch_count": 0 if progress == 1 else 1,
@@ -3497,7 +3638,7 @@ def build_stage14_source_failure_bundle(out_dir: Path, task: dict[str, Any], ind
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -3612,6 +3753,7 @@ def build_stage14_source_failure_bundle(out_dir: Path, task: dict[str, Any], ind
             "golden_path_token_count": 0,
             "total_run_token_count": tokens,
             "total_wall_time_ms": wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0,
             "vpput_raw": "0",
             "failed_branch_count": 1,
@@ -3801,7 +3943,7 @@ def build_stage14_consumer_bundle(out_dir: Path, task: dict[str, Any], source_fa
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -3903,6 +4045,7 @@ def build_stage14_consumer_bundle(out_dir: Path, task: dict[str, Any], source_fa
             "golden_path_token_count": tokens,
             "total_run_token_count": tokens,
             "total_wall_time_ms": wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 1,
             "vpput_raw": stage6_vpput(1, tokens, wall_ms),
             "failed_branch_count": 0,
@@ -4209,7 +4352,7 @@ def build_stage15_market_router_bundle(out_dir: Path, task: dict[str, Any]) -> d
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -4283,6 +4426,7 @@ def build_stage15_market_router_bundle(out_dir: Path, task: dict[str, Any]) -> d
             "golden_path_token_count": 0,
             "total_run_token_count": control_tokens,
             "total_wall_time_ms": control_wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0,
             "vpput_raw": "0",
             "failed_branch_count": 1,
@@ -4313,7 +4457,7 @@ def build_stage15_market_router_bundle(out_dir: Path, task: dict[str, Any]) -> d
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -4421,6 +4565,7 @@ def build_stage15_market_router_bundle(out_dir: Path, task: dict[str, Any]) -> d
             "golden_path_token_count": native_tokens,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": total_wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 1,
             "vpput_raw": stage6_vpput(1, total_tokens, total_wall_ms),
             "failed_branch_count": 1,
@@ -4697,7 +4842,7 @@ def build_stage10_failure_taxonomy_bundle(out_dir: Path, task: dict[str, Any], f
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -4822,6 +4967,7 @@ def build_stage10_failure_taxonomy_bundle(out_dir: Path, task: dict[str, Any], f
             "golden_path_token_count": 0,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0,
             "vpput_raw": "0",
             "failed_branch_count": 1,
@@ -5067,7 +5213,7 @@ def build_stage11_loop_until_pass_bundle(
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",
@@ -5158,6 +5304,7 @@ def build_stage11_loop_until_pass_bundle(
             "golden_path_token_count": 0,
             "total_run_token_count": first_tokens,
             "total_wall_time_ms": first_wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0,
             "vpput_raw": "0",
             "failed_branch_count": 1,
@@ -5265,7 +5412,7 @@ def build_stage11_loop_until_pass_bundle(
         append(
             "CostEvent",
             {
-                "schema_id": "cost_event.v1",
+                "schema_id": LEGACY_COST_EVENT_SCHEMA,
                 "run_id": run_id,
                 "problem_id": instance_id,
                 "split": "dogfood",
@@ -5398,6 +5545,7 @@ def build_stage11_loop_until_pass_bundle(
             "golden_path_token_count": total_tokens if not force_budget_exhausted else 0,
             "total_run_token_count": total_tokens,
             "total_wall_time_ms": total_wall_ms,
+            "total_run_cost_microusd": 0,
             "progress": 0 if force_budget_exhausted else 1,
             "vpput_raw": stage6_vpput(0 if force_budget_exhausted else 1, total_tokens, total_wall_ms),
             "failed_branch_count": 1,

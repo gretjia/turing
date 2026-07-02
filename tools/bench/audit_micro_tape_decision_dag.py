@@ -31,6 +31,13 @@ CRITICAL_REPLAY_CHECKS = {
     "registry_head_effect",
     "accepted_head_authority",
 }
+COST_EVENT_V2_SCHEMA_ID = "turingos.cost_event.v2"
+COST_SOURCE_KINDS = {
+    "provider_receipt_inline",
+    "provider_usage_api_reconciled",
+    "bounded_estimate",
+    "fixture",
+}
 
 
 def sha256_text(text: str) -> str:
@@ -735,6 +742,99 @@ def positive_int(value: Any) -> int:
     return 0
 
 
+def sha256_ref(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == len("sha256:") + 64
+        and value.startswith("sha256:")
+        and all(ch in "0123456789abcdef" for ch in value.removeprefix("sha256:"))
+    )
+
+
+def cost_event_total_tokens(payload: dict[str, Any]) -> int:
+    if "total_tokens" in payload:
+        return positive_int(payload.get("total_tokens"))
+    usage = payload.get("usage")
+    if not isinstance(usage, dict):
+        return 0
+    if "total_tokens" in usage:
+        return positive_int(usage.get("total_tokens"))
+    if "input_tokens" in usage or "output_tokens" in usage:
+        return positive_int(usage.get("input_tokens")) + positive_int(usage.get("output_tokens"))
+    if "prompt_tokens" in usage or "completion_tokens" in usage:
+        return positive_int(usage.get("prompt_tokens")) + positive_int(usage.get("completion_tokens"))
+    deepseek_prompt = positive_int(usage.get("prompt_cache_hit_tokens")) + positive_int(
+        usage.get("prompt_cache_miss_tokens")
+    )
+    if deepseek_prompt or "completion_tokens" in usage:
+        return deepseek_prompt + positive_int(usage.get("completion_tokens"))
+    return sum(
+        positive_int(value)
+        for key, value in usage.items()
+        if isinstance(key, str) and key.endswith("_tokens")
+    )
+
+
+def cost_event_cost_microusd(payload: dict[str, Any]) -> int | None:
+    cost = payload.get("cost")
+    if isinstance(cost, dict) and "cost_microusd" in cost:
+        value = cost.get("cost_microusd")
+    elif "cost_microusd" in payload:
+        value = payload.get("cost_microusd")
+    else:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        return None
+    return value
+
+
+def cost_provenance_status(events: list[dict[str, Any]]) -> str:
+    cost_events = [
+        event
+        for event in events
+        if event.get("event_type") == "CostEvent" and isinstance(event.get("payload"), dict)
+    ]
+    if not cost_events:
+        return "NOT_TESTED"
+    for event in cost_events:
+        payload = event["payload"]
+        if has_float(payload):
+            return "FAIL"
+        if payload.get("schema_id") != COST_EVENT_V2_SCHEMA_ID:
+            return "LEGACY_MISSING"
+        worker = payload.get("worker")
+        usage = payload.get("usage")
+        cost = payload.get("cost")
+        if not isinstance(worker, dict) or not isinstance(usage, dict) or not isinstance(cost, dict):
+            return "FAIL"
+        if worker.get("adapter_kind") not in {"native_api", "cli", "fake"}:
+            return "FAIL"
+        for key in ("provider", "model_id_requested", "model_id_resolved", "endpoint", "request_id"):
+            if not isinstance(worker.get(key), str) or not worker.get(key):
+                return "FAIL"
+        if not sha256_ref(worker.get("response_sha256")):
+            return "FAIL"
+        if worker.get("provider") == "deepseek":
+            for key in ("prompt_cache_hit_tokens", "prompt_cache_miss_tokens"):
+                if not isinstance(usage.get(key), int) or isinstance(usage.get(key), bool):
+                    return "FAIL"
+        if not sha256_ref(usage.get("provider_usage_raw_sha256")):
+            return "FAIL"
+        source = cost.get("cost_source_kind")
+        if source not in COST_SOURCE_KINDS:
+            return "FAIL"
+        if cost_event_cost_microusd(payload) is None:
+            return "FAIL"
+        if not sha256_ref(cost.get("price_table_digest")):
+            return "FAIL"
+        bound_kind = cost.get("bound_kind")
+        if source == "bounded_estimate" and (not isinstance(bound_kind, str) or not bound_kind):
+            return "FAIL"
+        if source != "bounded_estimate" and bound_kind is not None and not isinstance(bound_kind, str):
+            return "FAIL"
+    return "PASS"
+
+
 def cost_conservation_status(events: list[dict[str, Any]]) -> str:
     final_pputs = [
         event
@@ -767,12 +867,17 @@ def cost_conservation_status(events: list[dict[str, Any]]) -> str:
                 matching.append(cost_payload)
         if not matching:
             return "FAIL"
-        token_total = sum(positive_int(item.get("total_tokens")) for item in matching)
+        token_total = sum(cost_event_total_tokens(item) for item in matching)
         wall_total = sum(positive_int(item.get("wall_time_ms")) for item in matching)
         if payload.get("total_run_token_count") != token_total:
             return "FAIL"
         if payload.get("total_wall_time_ms") != wall_total:
             return "FAIL"
+        cost_values = [cost_event_cost_microusd(item) for item in matching]
+        if "total_run_cost_microusd" in payload or any(value is not None for value in cost_values):
+            cost_total = sum(value or 0 for value in cost_values)
+            if payload.get("total_run_cost_microusd") != cost_total:
+                return "FAIL"
     return "PASS"
 
 
@@ -820,6 +925,7 @@ def audit_one_bundle(bundle: Path, work_dir: Path, registry: dict[str, dict[str,
     checks["economic_timing"] = check_economic_timing(findings)
     checks["decision_dag_completeness"] = check_decision_dag(events, edges, actual_refs["accepted_head"])
     checks["terminal_golden_path_anchors_to_accepted_head"] = terminal_golden_path_status(events, actual_refs["accepted_head"])
+    checks["cost_provenance"] = cost_provenance_status(events)
     checks.update(vpput_statuses(findings, events, actual_refs["accepted_head"]))
     if checks["economic_timing"] == "WARN":
         checks["market_accounting_correctness"] = "WARN" if any("market" in f["finding"] or "reward" in f["finding"] for f in findings) else "PASS"
@@ -931,6 +1037,7 @@ def audit_bundles(
     strict_vpput: bool = False,
     strict_terminal_market: bool = False,
     require_authorization_head: bool = False,
+    require_cost_provenance: bool = False,
 ) -> dict[str, Any]:
     work_dir.mkdir(parents=True, exist_ok=True)
     registry = load_event_registry(event_registry_path)
@@ -941,6 +1048,9 @@ def audit_bundles(
         event_counts.update(run["event_counts"])
         finding_counts.update(finding["finding"] for finding in run["execution_findings"])
     status_summary = aggregate_status(runs)
+    status_summary["cost_provenance"] = worst_status(
+        [run["checks"].get("cost_provenance", "NOT_TESTED") for run in runs]
+    )
     strict_findings: list[dict[str, str]] = []
     if strict_vpput and status_summary.get("vpput_accounting") != "PASS":
         strict_findings.append(
@@ -961,6 +1071,13 @@ def audit_bundles(
             {
                 "id": "require_authorization_head",
                 "message": "strict authorization gate requires authorization_head PASS",
+            }
+        )
+    if require_cost_provenance and status_summary.get("cost_provenance") != "PASS":
+        strict_findings.append(
+            {
+                "id": "require_cost_provenance",
+                "message": "strict cost gate requires CostEvent.v2 provenance PASS",
             }
         )
     if strict_findings:
@@ -1133,6 +1250,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strict-vpput", action="store_true")
     parser.add_argument("--strict-terminal-market", action="store_true")
     parser.add_argument("--require-authorization-head", action="store_true")
+    parser.add_argument("--require-cost-provenance", action="store_true")
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args(argv)
 
@@ -1152,6 +1270,7 @@ def main(argv: list[str] | None = None) -> int:
             strict_vpput=args.strict_vpput,
             strict_terminal_market=args.strict_terminal_market,
             require_authorization_head=args.require_authorization_head,
+            require_cost_provenance=args.require_cost_provenance,
         )
     write_json(out_dir / "micro_tape_decision_dag_audit.json", report)
     write_markdown(report, out_dir / "micro_tape_decision_dag.md")

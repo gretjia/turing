@@ -38,11 +38,17 @@ from . import errors
 # --- frozen patterns (mirror the JSON schemas) -------------------------------
 CAPSULE_SCHEMA_ID = "turingos.capsule.v1"
 RECEIPT_SCHEMA_ID = "turingos.receipt.v1"
+COST_EVENT_V2_SCHEMA_ID = "turingos.cost_event.v2"
 
 _CAPSULE_ID_RE = re.compile(r"^cap:[0-9a-f]{8,64}$")
 _RECEIPT_ID_RE = re.compile(r"^rcpt:[0-9a-f]{8,64}$")
+_SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 _RECEIPT_STATUS = frozenset({"ok", "failed", "timeout", "killed"})
+_ADAPTER_KINDS = frozenset({"native_api", "cli", "fake"})
+_COST_SOURCE_KINDS = frozenset(
+    {"provider_receipt_inline", "provider_usage_api_reconciled", "bounded_estimate", "fixture"}
+)
 
 
 def _fail(message: str) -> "None":
@@ -104,6 +110,14 @@ def _check_int(obj: dict, key: str, where: str, *, minimum: "int | None" = None)
         _fail(f"{where}.{key}: expected integer, got {type(v).__name__}")
     if minimum is not None and v < minimum:
         _fail(f"{where}.{key}: {v} < minimum {minimum}")
+
+
+def _check_sha256(obj: dict, key: str, where: str) -> None:
+    if key not in obj:
+        return
+    v = obj[key]
+    if not isinstance(v, str) or not _SHA256_RE.fullmatch(v):
+        _fail(f"{where}.{key}: expected sha256:<64 lowercase hex>, got {v!r}")
 
 
 def _check_str_array(
@@ -320,6 +334,122 @@ def validate_receipt(receipt: dict) -> None:
         )
 
 
+# --- public API: validate_cost_event_v2 -------------------------------------
+_COST_EVENT_V2_REQUIRED = (
+    "schema_id",
+    "run_id",
+    "problem_id",
+    "split",
+    "agent_id",
+    "branch_id",
+    "capsule_id",
+    "receipt_id",
+    "worker",
+    "usage",
+    "cost",
+    "wall_time_ms",
+)
+_COST_EVENT_V2_ALLOWED = frozenset(
+    {
+        "schema_id",
+        "run_id",
+        "problem_id",
+        "split",
+        "agent_id",
+        "branch_id",
+        "capsule_id",
+        "receipt_id",
+        "worker",
+        "usage",
+        "cost",
+        "wall_time_ms",
+        "tool_stdout_hash",
+        "counted_in_total",
+    }
+)
+_COST_WORKER_REQUIRED = (
+    "adapter_kind",
+    "provider",
+    "model_id_requested",
+    "model_id_resolved",
+    "endpoint",
+    "request_id",
+    "response_sha256",
+)
+_COST_WORKER_ALLOWED = frozenset(_COST_WORKER_REQUIRED)
+_COST_REQUIRED = (
+    "cost_source_kind",
+    "cost_microusd",
+    "price_table_digest",
+    "bound_kind",
+)
+_COST_ALLOWED = frozenset(_COST_REQUIRED)
+
+
+def validate_cost_event_v2(payload: dict) -> None:
+    """Validate a tape-canonical CostEvent.v2 payload. Raises SchemaInvalid."""
+    where = "cost_event_v2"
+    _require_dict(payload, where)
+    _codec_guard(payload, where)
+    _check_keys(payload, required=_COST_EVENT_V2_REQUIRED, allowed=_COST_EVENT_V2_ALLOWED, where=where)
+
+    _check_const(payload, "schema_id", COST_EVENT_V2_SCHEMA_ID, where)
+    _check_str(payload, "run_id", where, min_length=1)
+    _check_str(payload, "problem_id", where, min_length=1)
+    _check_str(payload, "split", where, min_length=1)
+    _check_str(payload, "agent_id", where, min_length=1)
+    _check_str(payload, "branch_id", where, min_length=1)
+    _check_str(payload, "capsule_id", where, min_length=1)
+    _check_pattern(payload, "receipt_id", _RECEIPT_ID_RE, where)
+    _check_int(payload, "wall_time_ms", where, minimum=0)
+    _check_sha256(payload, "tool_stdout_hash", where)
+    if "counted_in_total" in payload and not isinstance(payload["counted_in_total"], bool):
+        _fail(f"{where}.counted_in_total: expected boolean, got {type(payload['counted_in_total']).__name__}")
+
+    worker = _require_dict(payload["worker"], f"{where}.worker")
+    _check_keys(worker, required=_COST_WORKER_REQUIRED, allowed=_COST_WORKER_ALLOWED, where=f"{where}.worker")
+    for key in _COST_WORKER_REQUIRED:
+        _check_str(worker, key, f"{where}.worker", min_length=1)
+    if worker["adapter_kind"] not in _ADAPTER_KINDS:
+        _fail(
+            f"{where}.worker.adapter_kind: {worker['adapter_kind']!r} not in enum "
+            f"{{{', '.join(sorted(_ADAPTER_KINDS))}}}"
+        )
+    _check_sha256(worker, "response_sha256", f"{where}.worker")
+
+    usage = _require_dict(payload["usage"], f"{where}.usage")
+    if "provider_usage_raw_sha256" not in usage:
+        _fail(f"{where}.usage: missing required field(s): provider_usage_raw_sha256")
+    token_fields = [key for key in usage if key != "provider_usage_raw_sha256"]
+    if not token_fields:
+        _fail(f"{where}.usage: at least one provider token field is required")
+    _check_sha256(usage, "provider_usage_raw_sha256", f"{where}.usage")
+    for key in token_fields:
+        _check_int(usage, key, f"{where}.usage", minimum=0)
+    if worker["provider"] == "deepseek":
+        for key in ("prompt_cache_hit_tokens", "prompt_cache_miss_tokens"):
+            if key not in usage:
+                _fail(f"{where}.usage: deepseek requires {key}")
+            _check_int(usage, key, f"{where}.usage", minimum=0)
+
+    cost = _require_dict(payload["cost"], f"{where}.cost")
+    _check_keys(cost, required=_COST_REQUIRED, allowed=_COST_ALLOWED, where=f"{where}.cost")
+    source = cost.get("cost_source_kind")
+    if source not in _COST_SOURCE_KINDS:
+        _fail(
+            f"{where}.cost.cost_source_kind: {source!r} not in enum "
+            f"{{{', '.join(sorted(_COST_SOURCE_KINDS))}}}"
+        )
+    _check_int(cost, "cost_microusd", f"{where}.cost", minimum=0)
+    _check_sha256(cost, "price_table_digest", f"{where}.cost")
+    bound_kind = cost.get("bound_kind")
+    if source == "bounded_estimate":
+        if not isinstance(bound_kind, str) or not bound_kind:
+            _fail(f"{where}.cost.bound_kind: bounded_estimate requires non-empty string")
+    elif bound_kind is not None and not isinstance(bound_kind, str):
+        _fail(f"{where}.cost.bound_kind: expected string or null, got {type(bound_kind).__name__}")
+
+
 # --- public API: validate_event_payload -------------------------------------
 def validate_event_payload(event_type: str, payload: dict) -> None:
     """Validate an event payload: closed-world type + dict + codec guard.
@@ -337,3 +467,5 @@ def validate_event_payload(event_type: str, payload: dict) -> None:
     where = f"event_payload[{event_type}]"
     _require_dict(payload, where)
     _codec_guard(payload, where)
+    if event_type == "CostEvent" and payload.get("schema_id") == COST_EVENT_V2_SCHEMA_ID:
+        validate_cost_event_v2(payload)

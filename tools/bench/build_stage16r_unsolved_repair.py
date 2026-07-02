@@ -335,7 +335,7 @@ def build_repair_bundle(out_dir: Path, source_run: dict[str, Any], source_covera
     append(
         "CostEvent",
         {
-            "schema_id": "cost_event.v1",
+            "schema_id": runner.LEGACY_COST_EVENT_SCHEMA,
             "run_id": run_id,
             "problem_id": instance_id,
             "split": "dogfood",

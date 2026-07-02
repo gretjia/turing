@@ -32,7 +32,8 @@ import signal
 import subprocess
 import time
 
-from .. import codec
+from .. import codec, schemas
+from . import cost as worker_cost
 
 # Grace window between SIGTERM and SIGKILL when reaping a hung process group.
 _TERM_GRACE_S = 1.0
@@ -88,6 +89,54 @@ def _normalized_failure_receipt(adapter, capsule: dict, worktree: str, status: s
         "status": status,
         "no_orphan": True,
     }
+
+
+def _run_dimension(capsule: dict, key: str, fallback: str) -> str:
+    value = capsule.get(key)
+    return value if isinstance(value, str) and value else fallback
+
+
+def _record_fixture_cost_event(adapter, capsule: dict, receipt: dict) -> None:
+    """Record supervisor-side CostEvent.v2 provenance for adapter dispatch paths."""
+    if not isinstance(receipt, dict):
+        return
+    existing = getattr(adapter, "last_cost_event", None)
+    if isinstance(existing, dict) and existing.get("receipt_id") == receipt.get("receipt_id"):
+        try:
+            schemas.validate_cost_event_v2(existing)
+        except Exception:  # noqa: BLE001 - invalid adapter event falls through to fixture fallback
+            pass
+        else:
+            return
+    worker_id = str(receipt.get("worker_id") or getattr(adapter, "worker_id", "worker"))
+    usage = {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "tool_tokens": 0,
+        "tool_stdout_tokens": 0,
+        "total_tokens": 0,
+    }
+    event = worker_cost.cost_event_from_receipt(
+        receipt,
+        run_id=_run_dimension(capsule, "run_id", f"run:{receipt.get('capsule_id', 'unknown')}"),
+        problem_id=_run_dimension(capsule, "problem_id", _run_dimension(capsule, "atom_id", "problem:unknown")),
+        split=_run_dimension(capsule, "split", "dogfood"),
+        agent_id=worker_id,
+        branch_id=_run_dimension(capsule, "branch_id", f"branch:{worker_id}"),
+        adapter_kind="fake",
+        provider="fixture",
+        model_id_requested="fixture-model",
+        model_id_resolved="fixture-model-20260702",
+        endpoint="fixture://worker-adapter",
+        request_id=str(receipt.get("receipt_id", "req_fixture")),
+        response_sha256=codec.content_digest(receipt),
+        usage=usage,
+        cost_source_kind="fixture",
+        cost_microusd=0,
+        wall_time_ms=0,
+        provider_usage_raw=usage,
+    )
+    setattr(adapter, "last_cost_event", event)
 
 
 def _pgid_alive(pgid: int):
@@ -206,7 +255,9 @@ def _dispatch_subprocess(adapter, capsule: dict, worktree: str, *, timeout_s: in
                     stream.close()
             except OSError:
                 pass
-        return _normalized_failure_receipt(adapter, capsule, worktree, status)
+        receipt = _normalized_failure_receipt(adapter, capsule, worktree, status)
+        _record_fixture_cost_event(adapter, capsule, receipt)
+        return receipt
 
     # Process exited on its own within the budget. Make sure no descendant lingers.
     if _pgid_alive(pgid) is not False:
@@ -220,8 +271,11 @@ def _dispatch_subprocess(adapter, capsule: dict, worktree: str, *, timeout_s: in
         # we normalize a clean exit into an ok-status receipt skeleton. (A real subprocess worker
         # would emit a full receipt JSON; that parsing belongs to its concrete adapter.run().)
         receipt = _normalized_failure_receipt(adapter, capsule, worktree, "ok")
+        _record_fixture_cost_event(adapter, capsule, receipt)
         return receipt
-    return _normalized_failure_receipt(adapter, capsule, worktree, "failed")
+    receipt = _normalized_failure_receipt(adapter, capsule, worktree, "failed")
+    _record_fixture_cost_event(adapter, capsule, receipt)
+    return receipt
 
 
 def dispatch(adapter: WorkerAdapter, capsule: dict, worktree: str, *, timeout_s: int) -> dict:
@@ -256,9 +310,13 @@ def dispatch(adapter: WorkerAdapter, capsule: dict, worktree: str, *, timeout_s:
     try:
         receipt = adapter.run(capsule, worktree)
     except TimeoutError:
-        return _normalized_failure_receipt(adapter, capsule, worktree, "timeout")
+        receipt = _normalized_failure_receipt(adapter, capsule, worktree, "timeout")
+        _record_fixture_cost_event(adapter, capsule, receipt)
+        return receipt
     except Exception:  # noqa: BLE001 — any worker crash normalizes to a failed receipt
-        return _normalized_failure_receipt(adapter, capsule, worktree, "failed")
+        receipt = _normalized_failure_receipt(adapter, capsule, worktree, "failed")
+        _record_fixture_cost_event(adapter, capsule, receipt)
+        return receipt
     finally:
         if alarm_set:
             signal.alarm(0)
@@ -269,4 +327,5 @@ def dispatch(adapter: WorkerAdapter, capsule: dict, worktree: str, *, timeout_s:
     # present (an in-process worker spawns no group, so trivially no orphan).
     if isinstance(receipt, dict):
         receipt.setdefault("no_orphan", True)
+        _record_fixture_cost_event(adapter, capsule, receipt)
     return receipt

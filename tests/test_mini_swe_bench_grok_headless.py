@@ -32,6 +32,14 @@ def load_module(path: Path, module_name: str):
     return module
 
 
+def test_substrate_smoke_token_bound_estimator_uses_utf8_bytes_not_word_count():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    text = "one two three"
+
+    assert runner.upper_bound_tokens_from_utf8_bytes(text) > len(text.split())
+    assert runner.TOKEN_BOUND_KIND == "upper_bound_utf8_bytes_over_2"
+
+
 def test_grok_headless_argv_turns_planning_memory_and_subagents_off():
     harness = load_harness()
     argv = harness.grok_worker_argv(

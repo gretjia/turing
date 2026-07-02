@@ -644,9 +644,9 @@
       "target_ref": "tape_tip",
       "predicate_required": true,
       "human_required": false,
-      "payload_schema_id": "cost_event.v1",
+      "payload_schema_id": "turingos.cost_event.v2",
       "ordinal": 10,
-      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+      "status": "ADDITIVE_AGENT_ECONOMY_V2_0"
     },
     {
       "canonical_name": "BranchCostEvent",

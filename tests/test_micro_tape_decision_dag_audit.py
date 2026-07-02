@@ -218,6 +218,37 @@ def accepted_specs():
     ]
 
 
+def cost_event_v2_payload(*, cost_microusd=12, cost_source_kind="fixture", bound_kind=None):
+    return {
+        "schema_id": "turingos.cost_event.v2",
+        "run_id": "run_cost_v2",
+        "problem_id": "prob_cost_v2",
+        "capsule_id": "cap_cost_v2",
+        "receipt_id": "rcpt:" + "1" * 64,
+        "worker": {
+            "adapter_kind": "fake",
+            "provider": "fixture",
+            "model_id_requested": "fixture-model",
+            "model_id_resolved": "fixture-model-20260702",
+            "endpoint": "fixture://worker",
+            "request_id": "req_cost_v2",
+            "response_sha256": "sha256:" + "2" * 64,
+        },
+        "usage": {
+            "input_tokens": 7,
+            "output_tokens": 3,
+            "provider_usage_raw_sha256": "sha256:" + "3" * 64,
+        },
+        "cost": {
+            "cost_source_kind": cost_source_kind,
+            "cost_microusd": cost_microusd,
+            "price_table_digest": "sha256:" + "4" * 64,
+            "bound_kind": bound_kind,
+        },
+        "wall_time_ms": 5,
+    }
+
+
 def test_micro_tape_auditor_replays_bundle_and_builds_reference_dag(tmp_path):
     auditor = load_auditor()
     bundle = make_bundle(tmp_path, accepted_specs())
@@ -620,4 +651,131 @@ def test_final_pput_cost_conservation_mismatch_fails_vpput(tmp_path):
 
     assert run_report["checks"]["cost_conservation_all_branches"] == "FAIL"
     assert run_report["checks"]["vpput_accounting"] == "FAIL"
+    assert report["verdict"] == "FAIL"
+
+
+def test_require_cost_provenance_rejects_unspecified_source(tmp_path):
+    auditor = load_auditor()
+    bad_payload = cost_event_v2_payload(cost_source_kind="unspecified")
+    bundle = make_bundle(
+        tmp_path,
+        [
+            {
+                "event_type": "SystemConstitutionAccepted",
+                "payload": {"constitution_digest": "sha256:" + "1" * 64},
+            },
+            {"event_type": "CostEvent", "payload": bad_payload},
+        ],
+    )
+
+    report = auditor.audit_bundles(
+        [bundle],
+        tmp_path / "work",
+        require_cost_provenance=True,
+    )
+
+    assert report["verdict"] == "FAIL"
+    assert report["status_summary"]["cost_provenance"] == "FAIL"
+    assert "require_cost_provenance" in {item["id"] for item in report["strict_findings"]}
+
+
+def test_costevent_v2_provenance_passes_and_cost_microusd_conserves(tmp_path):
+    auditor = load_auditor()
+    specs = [
+        {
+            "event_type": "SystemConstitutionAccepted",
+            "payload": {"constitution_digest": "sha256:" + "1" * 64},
+        },
+        {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "cap_cost_v2"}},
+        {"event_type": "CostEvent", "payload": cost_event_v2_payload(cost_microusd=12)},
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "name": "official",
+            "payload": {"capsule_id": "cap_cost_v2", "evidence_id": "ev_cost_v2", "result": "PASS"},
+        },
+        {
+            "event_type": "CandidateAccepted",
+            "name": "accept",
+            "payload": {
+                "candidate_id": "cand_cost_v2",
+                "capsule_id": "cap_cost_v2",
+                "official_evaluator_evidence_id": "ev_cost_v2",
+            },
+        },
+        {
+            "event_type": "PPUTAccounted",
+            "payload": lambda ctx: {
+                "run_id": "run_cost_v2",
+                "problem_id": "prob_cost_v2",
+                "accounting_stage": "final",
+                "progress": 1,
+                "total_run_token_count": 10,
+                "total_wall_time_ms": 5,
+                "total_run_cost_microusd": 12,
+                "vpput_raw": "1/10",
+                "basis_event_id": ctx["event_ids"]["official"],
+                "terminal_event_id": ctx["event_ids"]["accept"],
+            },
+        },
+    ]
+    bundle, _ = make_bundle_with_context(tmp_path, specs)
+
+    report = auditor.audit_bundles(
+        [bundle],
+        tmp_path / "work",
+        require_cost_provenance=True,
+        strict_vpput=True,
+    )
+    run_report = report["runs"][0]
+
+    assert run_report["checks"]["cost_provenance"] == "PASS"
+    assert run_report["checks"]["cost_conservation_all_branches"] == "PASS"
+    assert "require_cost_provenance" not in {item["id"] for item in report["strict_findings"]}
+
+
+def test_costevent_v2_cost_microusd_mismatch_fails_vpput(tmp_path):
+    auditor = load_auditor()
+    specs = [
+        {
+            "event_type": "SystemConstitutionAccepted",
+            "payload": {"constitution_digest": "sha256:" + "1" * 64},
+        },
+        {"event_type": "WorkCapsuleBuilt", "payload": {"capsule_id": "cap_cost_v2"}},
+        {"event_type": "CostEvent", "payload": cost_event_v2_payload(cost_microusd=12)},
+        {
+            "event_type": "OfficialEvaluatorEvidenceImported",
+            "name": "official",
+            "payload": {"capsule_id": "cap_cost_v2", "evidence_id": "ev_cost_v2", "result": "PASS"},
+        },
+        {
+            "event_type": "CandidateAccepted",
+            "name": "accept",
+            "payload": {
+                "candidate_id": "cand_cost_v2",
+                "capsule_id": "cap_cost_v2",
+                "official_evaluator_evidence_id": "ev_cost_v2",
+            },
+        },
+        {
+            "event_type": "PPUTAccounted",
+            "payload": lambda ctx: {
+                "run_id": "run_cost_v2",
+                "problem_id": "prob_cost_v2",
+                "accounting_stage": "final",
+                "progress": 1,
+                "total_run_token_count": 10,
+                "total_wall_time_ms": 5,
+                "total_run_cost_microusd": 11,
+                "vpput_raw": "1/10",
+                "basis_event_id": ctx["event_ids"]["official"],
+                "terminal_event_id": ctx["event_ids"]["accept"],
+            },
+        },
+    ]
+    bundle, _ = make_bundle_with_context(tmp_path, specs)
+
+    report = auditor.audit_bundles([bundle], tmp_path / "work", strict_vpput=True)
+
+    assert report["runs"][0]["checks"]["cost_conservation_all_branches"] == "FAIL"
+    assert report["runs"][0]["checks"]["vpput_accounting"] == "FAIL"
     assert report["verdict"] == "FAIL"
