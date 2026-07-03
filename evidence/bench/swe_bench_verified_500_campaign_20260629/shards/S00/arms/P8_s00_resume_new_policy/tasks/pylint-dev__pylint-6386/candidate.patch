@@ -1,0 +1,18 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index 7f4e4e1..a5f5c4b 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -277,10 +277,10 @@ class Run:
+         group = self._parser.add_argument_group(
+             title="Verbosity",
+         )
+         group.add_argument(
+             "-v",
+             "--verbose",
+-            metavar="VERBOSE",
+-            type=int,
++            action="count",
+             default=0,
+-            help="Specify the verbosity level.",
++            help="In verbose mode, extra error-checking and analysis time is displayed.",
+         )

@@ -1,0 +1,10 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index d16bfe05a7..c4c37c2e6b 100644
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -93,6 +93,8 @@ def _coord_matrix(model):
+     bool array
+     """
++    if isinstance(model, CompoundModel):
++        return separability_matrix(model)
+     return model._coord_matrix() > 0

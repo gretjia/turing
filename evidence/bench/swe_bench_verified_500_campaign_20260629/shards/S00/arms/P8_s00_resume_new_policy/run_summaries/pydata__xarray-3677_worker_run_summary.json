@@ -1,0 +1,58 @@
+{
+  "agent_id": "m3-p8-deepseek-s00-new-policy-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": null,
+  "branch_id": "branch:m3-p8-s00-resume",
+  "broadcast_rules_file": null,
+  "broadcast_section": "none",
+  "claim_boundary": {
+    "arm": "A",
+    "confirmatory_s01": false,
+    "deepseek_only_source_context_loop": false,
+    "has_failure_memory_broadcast": false,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p8",
+  "extra_context_file": null,
+  "extra_context_root": null,
+  "ipqc_window_id": "S00-W04",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [],
+  "provider": "deepseek",
+  "reasoning_effort": "high",
+  "run_id_prefix": "m3-p8-s00-new-policy",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S00",
+  "source_context_name": null,
+  "split_label": "s00-mixed-policy-inventory",
+  "status": "PASS",
+  "task_count_completed": 1,
+  "task_count_requested": 1,
+  "task_dir_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/arms/P8_s00_resume_new_policy/tasks",
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 756,
+      "candidate_patch_sha256": "sha256:e7558fd37b33ae575f44cb12420aba7459d7595d164ce360c308d251dea3dfd0",
+      "cost_microusd": 7307,
+      "instance_id": "pydata__xarray-3677",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 8373,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 650,
+        "prompt_tokens": 650,
+        "total_tokens": 9023
+      }
+    }
+  ],
+  "thinking": {
+    "type": "enabled"
+  },
+  "visible_capsule_out_dir": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/arms/P8_s00_resume_new_policy/visible_capsules",
+  "wall_time_ms": 106901
+}

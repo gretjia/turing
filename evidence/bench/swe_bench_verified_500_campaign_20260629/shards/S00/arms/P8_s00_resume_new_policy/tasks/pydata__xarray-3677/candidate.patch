@@ -1,0 +1,20 @@
+diff --git a/xarray/core/merge.py b/xarray/core/merge.py
+index 1234567..abcdefg 100644
+--- a/xarray/core/merge.py
++++ b/xarray/core/merge.py
+@@ -826,6 +826,14 @@ def dataset_merge_method(
+     """Guts of dataset.merge method."""
+     from .dataset import Dataset
+     if isinstance(other, dict):
+         other = dataset._construct_dataarray(other)
++    from .dataarray import DataArray
++    if isinstance(other, DataArray):
++        other = Dataset({other.name: other})
++    if isinstance(other, (list, tuple)):
++        other = [
++            Dataset({o.name: o}) if isinstance(o, DataArray) else o
++            for o in other
++        ]
+     priority_arg = 0
+     return merge_core(
+         [dataset] + (list(other) if isinstance(other, (list, tuple))

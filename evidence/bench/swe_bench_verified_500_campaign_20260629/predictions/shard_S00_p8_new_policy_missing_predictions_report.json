@@ -1,0 +1,19 @@
+{
+  "candidate_source": "worker_derived",
+  "mixed_policy_inventory_only": true,
+  "model_name_or_path": "deepseek-v4-pro__armA__s00-resume-new-policy",
+  "module_atom": "M3.P8-2",
+  "performance_claim_allowed": false,
+  "prediction_count": 2,
+  "prediction_ids": [
+    "pydata__xarray-3677",
+    "pylint-dev__pylint-6386"
+  ],
+  "predictions_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S00_p8_new_policy_missing_predictions.jsonl",
+  "predictions_sha256": "sha256:091027135c25cc697e7fc6b6266cdd0cfbe12840f141dc70d2e3379b3c1a7afe",
+  "problems": [],
+  "s00_score_claim_allowed": false,
+  "schema_id": "turingos.m3.p8.s00_new_policy_predictions_report.v1",
+  "shard_id": "S00",
+  "status": "PASS"
+}
