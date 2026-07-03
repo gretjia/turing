@@ -1,0 +1,20 @@
+{
+  "gate_id": "TC-09",
+  "not_run_is_fail": true,
+  "observed": {
+    "programs_checked": [
+      "copy_a_to_b",
+      "add_a_b",
+      "multiply_small",
+      "branch_zero_nonzero",
+      "known_halting_busy_loop_with_budget",
+      "spin_static_halt_unreachable",
+      "recurs_zero_decjz",
+      "guarded_growth_budget"
+    ],
+    "replay_twice_identical": true
+  },
+  "schema_id": "turingos.tc4.gate_verdict.v1",
+  "timestamp_utc": "2026-07-03T00:00:00Z",
+  "verdict": "PASS"
+}

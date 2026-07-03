@@ -1,0 +1,56 @@
+{
+  "not_run_is_fail": true,
+  "rows": [
+    {
+      "caught_by": "AuditError",
+      "description": "tampered_payload_byte",
+      "message": "payload hash mismatch at sequence 1",
+      "mutant": "m1",
+      "status": "KILLED"
+    },
+    {
+      "caught_by": "AuditError",
+      "description": "dropped_event",
+      "message": "sequence mismatch at 3",
+      "mutant": "m2",
+      "status": "KILLED"
+    },
+    {
+      "caught_by": "AuditError",
+      "description": "dropped_event_rechained",
+      "message": "authorized pc mismatch",
+      "mutant": "m3",
+      "status": "KILLED"
+    },
+    {
+      "caught_by": "AuditError",
+      "description": "reordered_adjacent_events_rechained",
+      "message": "MachineStateObserved without pending applied state",
+      "mutant": "m4",
+      "status": "KILLED"
+    },
+    {
+      "caught_by": "AuditError",
+      "description": "duplicated_instruction_applied_rechained",
+      "message": "prev_state_hash mismatch",
+      "mutant": "m5",
+      "status": "KILLED"
+    },
+    {
+      "caught_by": "AuditError",
+      "description": "payload_tamper_with_payload_hash_updated",
+      "message": "next_state_hash mismatch",
+      "mutant": "m6",
+      "status": "KILLED"
+    },
+    {
+      "caught_by": "AuditError",
+      "description": "corrupt_machine_state_observed_counter",
+      "message": "payload hash mismatch at sequence 4",
+      "mutant": "m7",
+      "status": "KILLED"
+    }
+  ],
+  "schema_id": "turingos.tc4.mutation_matrix.v1",
+  "verdict": "PASS"
+}

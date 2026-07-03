@@ -1,0 +1,16 @@
+{
+  "gate_id": "TC-01",
+  "not_run_is_fail": true,
+  "observed": {
+    "ops": [
+      "INC",
+      "DECJZ",
+      "HALT"
+    ],
+    "payload_schema_count": 5,
+    "unknown_instruction_policy": "REJECT"
+  },
+  "schema_id": "turingos.tc4.gate_verdict.v1",
+  "timestamp_utc": "2026-07-03T00:00:00Z",
+  "verdict": "PASS"
+}

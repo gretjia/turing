@@ -1,0 +1,35 @@
+{
+  "gate_id": "TC-05",
+  "not_run_is_fail": true,
+  "observed": {
+    "loop_programs": {
+      "add_a_b": {
+        "event_type": "ComputationHalted",
+        "final_state": {
+          "counter_a": 0,
+          "counter_b": 6,
+          "halted": true,
+          "program_counter": 2
+        },
+        "final_state_hash": "sha256:bebed3fe8634e52aa5a3f02dbaa60a7e6ac70dfddd7bca47e23277adf4fd5f6e",
+        "kind": "HALTED",
+        "steps_executed": 10
+      },
+      "multiply_small": {
+        "event_type": "ComputationHalted",
+        "final_state": {
+          "counter_a": 0,
+          "counter_b": 6,
+          "halted": true,
+          "program_counter": 4
+        },
+        "final_state_hash": "sha256:ad8ba77e3332bb16faade972246bbe9cb94fa969b3033415b20452b4f62f81bb",
+        "kind": "HALTED",
+        "steps_executed": 10
+      }
+    }
+  },
+  "schema_id": "turingos.tc4.gate_verdict.v1",
+  "timestamp_utc": "2026-07-03T00:00:00Z",
+  "verdict": "PASS"
+}
