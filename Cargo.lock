@@ -623,6 +623,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "turing-witness"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
+ "turing-contracts",
+ "turing-git-tape",
+]
+
+[[package]]
 name = "turing-xcheck"
 version = "0.0.0"
 dependencies = [

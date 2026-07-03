@@ -8,19 +8,19 @@
 //!
 //! This is a LAW-VERIFICATION gate over the pure reducer ([`turing_kernel::reducer::apply`],
 //! established at SG-12). The test is **exhaustive and adversarial over the REAL registry**:
-//! it iterates ALL 46 canonical event names loaded from the ratified
+//! it iterates all canonical event names loaded from the ratified
 //! `pack/04_registries/event_registry_v5_3_1.json` (via the public contracts registry API —
 //! NOT a hand-typed list), and for each event, from a non-trivial pre-state
 //! (`authorization_head = Some(A)`, `accepted_head = Some(B)`), asserts:
 //!
 //!   * product = PASS  → `authorization_head` advances to the new OID **IFF** the registry
 //!     class is AUTHORIZATION (∧ the registry head_effect is ADVANCE); for every one of the
-//!     38 non-AUTHORIZATION events it stays == A. For the 8 AUTHORIZATION events the OTHER
+//!     non-AUTHORIZATION events it stays == A. For the 9 AUTHORIZATION events the OTHER
 //!     head (`accepted_head`) stays == B — at most one sovereign head moves.
 //!   * product = FAIL and product = NOT_RUN → `authorization_head` NEVER advances (stays
-//!     == A), even for the 8 AUTHORIZATION events.
+//!     == A), even for the 9 AUTHORIZATION events.
 //!
-//! and finally counts that EXACTLY 8 events advance `authorization_head` under PASS and that
+//! and finally counts that EXACTLY 9 events advance `authorization_head` under PASS and that
 //! they are EXACTLY the AUTHORIZATION class. The registry head_effect is the registry-derived
 //! truth (never writer-asserted) — the test feeds `registry(name).head_effect` straight into
 //! the reducer, so a reducer that ignored class, or keyed off the wrong head, or honoured
@@ -77,13 +77,13 @@ const ALL_PRODUCTS: [PredicateProduct; 3] = [
 // --- the exhaustive registry-derived law check -------------------------------
 
 #[test]
-fn only_authorization_advance_pass_advances_authorization_head_over_all_46_events() {
+fn only_authorization_advance_pass_advances_authorization_head_over_all_registered_events() {
     let pre = nontrivial_pre();
     let a = head_a();
     let b = head_b();
     let n = new_event_oid();
 
-    // Bind the REAL registry: iterate ALL 46 canonical names from the ratified pack
+    // Bind the REAL registry: iterate all canonical names from the ratified pack
     // (registry-derived, never a hand-typed list). Guard the count so a shrunk/grown
     // registry can't silently make this vacuous.
     let names: Vec<String> = registry::event_names().map(str::to_owned).collect();
@@ -98,7 +98,7 @@ fn only_authorization_advance_pass_advances_authorization_head_over_all_46_event
         "event_names() must enumerate exactly the registered set"
     );
 
-    // Tally of events that advance authorization_head under PASS — must end at exactly 8,
+    // Tally of events that advance authorization_head under PASS — must end at exactly 9,
     // and that set must be exactly the AUTHORIZATION class.
     let mut advancing_under_pass: Vec<String> = Vec::new();
 
@@ -196,12 +196,12 @@ fn only_authorization_advance_pass_advances_authorization_head_over_all_46_event
         }
     }
 
-    // EXACTLY 8 events advance authorization_head under PASS — and they are EXACTLY the
+    // EXACTLY 9 events advance authorization_head under PASS — and they are EXACTLY the
     // AUTHORIZATION class (verified two ways: count, and that each is AUTHORIZATION).
     assert_eq!(
         advancing_under_pass.len(),
-        8,
-        "exactly 8 events may advance authorization_head under PASS (the AUTHORIZATION class), \
+        9,
+        "exactly 9 events may advance authorization_head under PASS (the AUTHORIZATION class), \
          got: {advancing_under_pass:?}"
     );
     for name in &advancing_under_pass {
@@ -212,15 +212,15 @@ fn only_authorization_advance_pass_advances_authorization_head_over_all_46_event
         );
     }
     // The advancing set IS the AUTHORIZATION set: every AUTHORIZATION event is present, and
-    // no non-AUTHORIZATION event is (count 8 + all-AUTHORIZATION above ⇒ set equality).
+    // no non-AUTHORIZATION event is (count 9 + all-AUTHORIZATION above ⇒ set equality).
     let authorization_names: Vec<&String> = names
         .iter()
         .filter(|nm| registry::registry(nm).unwrap().class == EventClass::Authorization)
         .collect();
     assert_eq!(
         authorization_names.len(),
-        8,
-        "the registry must declare exactly 8 AUTHORIZATION events"
+        9,
+        "the registry must declare exactly 9 AUTHORIZATION events"
     );
     for nm in &authorization_names {
         assert!(
@@ -244,7 +244,7 @@ fn authorization_event_under_fail_or_not_run_never_advances_authorization_head()
         .filter(|nm| registry::registry(nm).unwrap().class == EventClass::Authorization)
         .map(str::to_owned)
         .collect();
-    assert_eq!(auth_names.len(), 8, "8 AUTHORIZATION events expected");
+    assert_eq!(auth_names.len(), 9, "9 AUTHORIZATION events expected");
 
     for name in &auth_names {
         let row = registry::registry(name).unwrap();

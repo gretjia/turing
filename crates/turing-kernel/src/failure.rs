@@ -39,7 +39,7 @@ use crate::reducer::{self, HeadDecision, PreState};
 pub enum RejectClass {
     /// A1 — the raw bytes are not one parseable `turingos.jcs.v1` object ("parse failure").
     MalformedBytes,
-    /// A2 — `event_type` / `event_schema_id` is outside the closed 46-event registry.
+    /// A2 — `event_type` / `event_schema_id` is outside the closed registry.
     UnknownEventType,
     /// A3 — a required `MicroEventEnvelope.v1` field is missing, or `event_id` /
     /// `head_set_after` is present.

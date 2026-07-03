@@ -124,4 +124,4 @@ def test_current_repo_registry_passes_self_consistency(tmp_path):
     assert result.returncode == 0, result.stderr
     data = json.loads(report.read_text(encoding="utf-8"))
     assert data["verdict"] == "PASS"
-    assert data["observed"]["counts"]["total"] == 63
+    assert data["observed"]["counts"]["total"] == 68

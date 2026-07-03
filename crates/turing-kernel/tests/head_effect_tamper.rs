@@ -148,7 +148,7 @@ fn preserve_class_event_carrying_advance_is_rejected_head_effect_disagreement() 
 
 #[test]
 fn admission_a4_holds_for_every_event_in_the_real_registry() {
-    // Exhaustive over the closed 46: for EACH event, carrying the registry head_effect admits,
+    // Exhaustive over the closed registry: for EACH event, carrying the registry head_effect admits,
     // and carrying the OPPOSITE head_effect is rejected HEAD_EFFECT_DISAGREEMENT. Binds the
     // real registry (registry-derived, never a hand-typed list).
     let names: Vec<String> = registry::event_names().map(str::to_owned).collect();
@@ -185,20 +185,22 @@ fn admission_a4_holds_for_every_event_in_the_real_registry() {
             "{name}: carrying a forged head_effect ({forged:?}) must be rejected"
         );
     }
-    // Registry self-consistency sanity (the 20/26 ADVANCE/PRESERVE split).
-    assert_eq!(advance_seen, 20, "20 ADVANCE events in the closed registry");
+    // Registry self-consistency sanity (the 21/47 ADVANCE/PRESERVE split).
+    assert_eq!(advance_seen, 21, "21 ADVANCE events in the closed registry");
     assert_eq!(
         preserve_seen,
         26 + registry::ECONOMY_EVENT_COUNT
             + registry::BENCHMARK_EVENT_COUNT
-            + registry::SANDBOX_EVENT_COUNT,
-        "baseline PRESERVE events plus additive economy, benchmark, and sandbox events in the closed registry"
+            + registry::SANDBOX_EVENT_COUNT
+            + registry::TC_WITNESS_EVENT_COUNT
+            - 1,
+        "baseline PRESERVE events plus additive economy, benchmark, sandbox, and TC witness events in the closed registry"
     );
 }
 
 #[test]
 fn admission_a4_rejects_an_unknown_event_type_closed_world() {
-    // A4 binds the registry as the sole source of truth; an event_type outside the closed 46
+    // A4 binds the registry as the sole source of truth; an event_type outside the closed registry
     // has no registry row, so its head_effect cannot be validated → UNKNOWN_EVENT_TYPE
     // (closed-world reject), never silently admitted.
     assert!(registry::registry("NotARealEvent").is_none());

@@ -8,14 +8,14 @@
 //!
 //! This is the `accepted_head` sibling of SG-15's `authorization_head` law verification, run
 //! over the same pure reducer ([`turing_kernel::reducer::apply`], established at SG-12). The
-//! test is **exhaustive and adversarial over the REAL registry**: it iterates ALL 46 canonical
+//! test is **exhaustive and adversarial over the REAL registry**: it iterates all canonical
 //! event names loaded from the ratified `pack/04_registries/event_registry_v5_3_1.json` (via
 //! the public contracts registry API — NOT a hand-typed list), and for each event, from a
 //! non-trivial pre-state (`authorization_head = Some(A)`, `accepted_head = Some(B)`), asserts:
 //!
 //!   * product = PASS  → `accepted_head` advances to the new OID **IFF** the registry class is
 //!     SOVEREIGN_ACCEPT (∧ the registry head_effect is ADVANCE) — exactly the 12; for every one
-//!     of the other 34 events it stays == B. For the 12 SOVEREIGN_ACCEPT events the OTHER head
+//!     of the non-SOVEREIGN_ACCEPT events it stays == B. For the 12 SOVEREIGN_ACCEPT events the OTHER head
 //!     (`authorization_head`) stays == A — at most one sovereign head moves; head_moved ==
 //!     AcceptedHead.
 //!   * product = FAIL and product = NOT_RUN → `accepted_head` NEVER advances (stays == B), even
@@ -80,13 +80,13 @@ const ALL_PRODUCTS: [PredicateProduct; 3] = [
 // --- the exhaustive registry-derived law check -------------------------------
 
 #[test]
-fn only_sovereign_accept_advance_pass_advances_accepted_head_over_all_46_events() {
+fn only_sovereign_accept_advance_pass_advances_accepted_head_over_all_registered_events() {
     let pre = nontrivial_pre();
     let a = head_a();
     let b = head_b();
     let n = new_event_oid();
 
-    // Bind the REAL registry: iterate ALL 46 canonical names from the ratified pack
+    // Bind the REAL registry: iterate all canonical names from the ratified pack
     // (registry-derived, never a hand-typed list). Guard the count so a shrunk/grown
     // registry can't silently make this vacuous.
     let names: Vec<String> = registry::event_names().map(str::to_owned).collect();

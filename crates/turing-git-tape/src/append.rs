@@ -179,7 +179,7 @@ pub enum AppendError {
     Git(crate::git::GitError),
     /// The canonical codec rejected the payload or envelope bytes.
     Jcs(jcs::JcsError),
-    /// `event_type` is outside the closed 46-event registry (`UNKNOWN_EVENT_TYPE`).
+    /// `event_type` is outside the closed registry (`UNKNOWN_EVENT_TYPE`).
     UnknownEventType(String),
     /// A predicate-required event was appended without an asserted product. The success
     /// path never fabricates a verified PASS; the caller must assert the predicate result
@@ -266,7 +266,7 @@ pub enum StaleAppendError {
     Git(crate::git::GitError),
     /// The canonical codec rejected the payload or envelope bytes.
     Jcs(jcs::JcsError),
-    /// `event_type` is outside the closed 46-event registry.
+    /// `event_type` is outside the closed registry.
     UnknownEventType(String),
     /// A predicate-required event was staged without an asserted product.
     PredicateProductRequired(String),

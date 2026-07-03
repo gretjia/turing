@@ -25,7 +25,7 @@ pub use crate::failure::RejectClass;
 /// value carried in the writer's envelope is accepted *only if it equals that row*. Given a
 /// candidate's `event_type` and its **carried** `head_effect`, this returns:
 ///
-/// - `Err(RejectClass::UnknownEventType)` if `event_type` is outside the closed 46-event
+/// - `Err(RejectClass::UnknownEventType)` if `event_type` is outside the closed
 ///   registry — a closed-world reject (the registry has no row to validate against), never a
 ///   silent admit. (A2 also covers unknown types; A4 fails closed the same way rather than
 ///   trusting a writer-supplied effect for an unknown event.)
