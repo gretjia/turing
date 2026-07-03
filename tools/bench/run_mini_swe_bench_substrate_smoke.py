@@ -14,6 +14,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -113,8 +114,13 @@ def digest_bytes(data: bytes) -> str:
 
 
 TOKEN_BOUND_KIND = "upper_bound_utf8_bytes_over_2"
-M1C_PRICE_TABLE_DIGEST = "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a"
+M1C_PRICE_TABLE_DIGEST = "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c"
 LEGACY_COST_EVENT_SCHEMA = "cost_event." + "v1"
+XAI_GROK_BUILD_INPUT_MICROUSD_PER_MTOK = 1_000_000
+XAI_GROK_BUILD_CACHED_INPUT_MICROUSD_PER_MTOK = 200_000
+XAI_GROK_BUILD_OUTPUT_MICROUSD_PER_MTOK = 2_000_000
+MICROUSD_PER_MTOK_DENOMINATOR = 1_000_000
+GROK_SESSION_RESPONSE_RE = re.compile(r'received "session/prompt" response: (\{.*\})')
 
 
 def host_digest() -> str:
@@ -192,6 +198,98 @@ def upper_bound_tokens_from_utf8_bytes(text: str, *, bytes_per_token_floor: int 
         raise ValueError("bytes_per_token_floor must be positive")
     byte_len = len(text.encode("utf-8"))
     return (byte_len + bytes_per_token_floor - 1) // bytes_per_token_floor
+
+
+def ceil_microusd(tokens: int, unit_microusd_per_mtok: int) -> int:
+    if tokens < 0:
+        raise ValueError("tokens must be nonnegative")
+    return (tokens * unit_microusd_per_mtok + MICROUSD_PER_MTOK_DENOMINATOR - 1) // MICROUSD_PER_MTOK_DENOMINATOR
+
+
+def xai_grok_build_cost_microusd(usage: dict[str, int]) -> int:
+    input_tokens = int(usage.get("input_tokens", 0))
+    cached_input_tokens = min(int(usage.get("cached_input_tokens", 0)), input_tokens)
+    uncached_input_tokens = input_tokens - cached_input_tokens
+    output_tokens = int(usage.get("output_tokens", 0))
+    return (
+        ceil_microusd(uncached_input_tokens, XAI_GROK_BUILD_INPUT_MICROUSD_PER_MTOK)
+        + ceil_microusd(cached_input_tokens, XAI_GROK_BUILD_CACHED_INPUT_MICROUSD_PER_MTOK)
+        + ceil_microusd(output_tokens, XAI_GROK_BUILD_OUTPUT_MICROUSD_PER_MTOK)
+    )
+
+
+def _int_meta(meta: dict[str, Any], key: str, *, default: int | None = None) -> int:
+    value = meta.get(key, default)
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError(f"Grok debug metadata missing nonnegative integer {key}")
+    return value
+
+
+def _grok_prompt_response_meta(debug_log: str) -> dict[str, Any]:
+    for line in reversed(debug_log.splitlines()):
+        match = GROK_SESSION_RESPONSE_RE.search(line)
+        if not match:
+            continue
+        response = json.loads(match.group(1))
+        meta = response.get("_meta")
+        if isinstance(meta, dict) and "inputTokens" in meta and "outputTokens" in meta:
+            return meta
+    raise ValueError("Grok debug log did not contain session/prompt usage metadata")
+
+
+def sanitized_grok_provider_receipt(
+    debug_log: str,
+    *,
+    stdout_text: str,
+    stderr_text: str,
+    model_requested: str,
+) -> dict[str, Any]:
+    meta = _grok_prompt_response_meta(debug_log)
+    request_id = str(meta.get("requestId") or meta.get("promptId") or "")
+    session_id = str(meta.get("sessionId") or "")
+    model_reported = str(meta.get("modelId") or model_requested)
+    if not request_id or not session_id:
+        raise ValueError("Grok debug metadata missing requestId/sessionId")
+
+    usage = {
+        "input_tokens": _int_meta(meta, "inputTokens"),
+        "cached_input_tokens": _int_meta(meta, "cachedReadTokens", default=0),
+        "output_tokens": _int_meta(meta, "outputTokens"),
+    }
+    if "reasoningTokens" in meta:
+        usage["reasoning_tokens"] = _int_meta(meta, "reasoningTokens")
+    provider_raw = {
+        "inputTokens": usage["input_tokens"],
+        "cachedReadTokens": usage["cached_input_tokens"],
+        "outputTokens": usage["output_tokens"],
+        "reasoningTokens": usage.get("reasoning_tokens", 0),
+        "totalTokens": _int_meta(meta, "totalTokens", default=usage["input_tokens"] + usage["output_tokens"]),
+    }
+    return {
+        "schema_id": "grok_cli_provider_receipt.v1",
+        "provider": "xai",
+        "endpoint": "grok-cli:responses",
+        "session_id": session_id,
+        "request_id": request_id,
+        "prompt_id": str(meta.get("promptId") or request_id),
+        "model_id_requested": model_requested,
+        "model_id_resolved": model_reported,
+        "usage": usage,
+        "usage_raw_sha256": digest_text(json.dumps(provider_raw, sort_keys=True, separators=(",", ":"))),
+        "response_sha256": digest_text(stdout_text),
+        "stderr_sha256": digest_text(stderr_text),
+        "cost": {
+            "computed_cost_microusd": xai_grok_build_cost_microusd(usage),
+            "price_table_digest": M1C_PRICE_TABLE_DIGEST,
+            "pricing_model": "xai_grok_build_20260703",
+            "unit_prices_microusd_per_mtok": {
+                "input_tokens": XAI_GROK_BUILD_INPUT_MICROUSD_PER_MTOK,
+                "cached_input_tokens": XAI_GROK_BUILD_CACHED_INPUT_MICROUSD_PER_MTOK,
+                "output_tokens": XAI_GROK_BUILD_OUTPUT_MICROUSD_PER_MTOK,
+            },
+        },
+        "raw_debug_retained": False,
+    }
 
 
 def cost_event_v2_payload(
@@ -301,6 +399,102 @@ def normalize_cost_event_payload(payload: dict[str, Any]) -> dict[str, Any]:
         adapter_kind="fake" if cost_source_kind == "fixture" else "cli",
         provider="fixture" if cost_source_kind == "fixture" else "bounded",
     )
+
+
+def cost_event_payload_for_worker_result(
+    *,
+    task: dict[str, Any],
+    worker_id: str,
+    worker_mode: str,
+    capsule_id: str,
+    worker_result: dict[str, Any],
+) -> dict[str, Any]:
+    run_id = f"run_{task['instance_id']}"
+    branch_id = f"branch_{worker_mode}"
+    provider_receipt = worker_result.get("provider_receipt")
+    if isinstance(provider_receipt, dict) and provider_receipt.get("schema_id") == "grok_cli_provider_receipt.v1":
+        receipt_seed = f"{run_id}:{branch_id}:{capsule_id}:{provider_receipt['request_id']}"
+        usage = dict(provider_receipt["usage"])
+        usage["provider_usage_raw_sha256"] = provider_receipt["usage_raw_sha256"]
+        return {
+            "schema_id": "turingos.cost_event.v2",
+            "run_id": run_id,
+            "problem_id": task["instance_id"],
+            "split": "dogfood",
+            "agent_id": worker_id,
+            "branch_id": branch_id,
+            "capsule_id": capsule_id,
+            "receipt_id": "rcpt:" + hashlib.sha256(receipt_seed.encode("utf-8")).hexdigest(),
+            "worker": {
+                "adapter_kind": "cli",
+                "provider": provider_receipt["provider"],
+                "model_id_requested": provider_receipt["model_id_requested"],
+                "model_id_resolved": provider_receipt["model_id_resolved"],
+                "endpoint": provider_receipt["endpoint"],
+                "request_id": provider_receipt["request_id"],
+                "response_sha256": provider_receipt["response_sha256"],
+            },
+            "usage": usage,
+            "cost": {
+                "cost_source_kind": "provider_receipt_inline",
+                "cost_microusd": provider_receipt["cost"]["computed_cost_microusd"],
+                "price_table_digest": provider_receipt["cost"]["price_table_digest"],
+                "bound_kind": None,
+            },
+            "wall_time_ms": worker_result["elapsed_ms"],
+            "tool_stdout_hash": digest_text(worker_result["stdout_hash"] + worker_result["stderr_hash"]),
+            "counted_in_total": True,
+        }
+
+    return {
+        "schema_id": LEGACY_COST_EVENT_SCHEMA,
+        "head_effect": "PRESERVE",
+        "run_id": run_id,
+        "problem_id": task["instance_id"],
+        "split": "dogfood",
+        "agent_id": worker_id,
+        "branch_id": branch_id,
+        "capsule_id": capsule_id,
+        "prompt_tokens": worker_result["prompt_tokens_estimate"],
+        "completion_tokens": worker_result["completion_tokens_estimate"],
+        "tool_tokens": 0,
+        "tool_stdout_tokens": worker_result["tool_stdout_tokens_estimate"],
+        "total_tokens": worker_result["prompt_tokens_estimate"]
+        + worker_result["completion_tokens_estimate"]
+        + worker_result["tool_stdout_tokens_estimate"],
+        "wall_time_ms": worker_result["elapsed_ms"],
+        "tool_stdout_hash": digest_text(worker_result["stdout_hash"] + worker_result["stderr_hash"]),
+        "counted_in_total": True,
+        "cost_source_kind": (
+            "fixture"
+            if worker_result.get("token_count_bound_kind") == "fixture"
+            else "bounded_estimate"
+        ),
+        "bound_kind": worker_result.get("token_count_bound_kind"),
+    }
+
+
+def worker_result_total_tokens(worker_result: dict[str, Any]) -> int:
+    provider_receipt = worker_result.get("provider_receipt")
+    if isinstance(provider_receipt, dict) and isinstance(provider_receipt.get("usage"), dict):
+        usage = provider_receipt["usage"]
+        return int(usage.get("input_tokens", 0)) + int(usage.get("output_tokens", 0))
+    return (
+        worker_result["prompt_tokens_estimate"]
+        + worker_result["completion_tokens_estimate"]
+        + worker_result["tool_stdout_tokens_estimate"]
+    )
+
+
+def worker_result_cost_microusd(worker_result: dict[str, Any]) -> int:
+    provider_receipt = worker_result.get("provider_receipt")
+    if isinstance(provider_receipt, dict):
+        cost = provider_receipt.get("cost")
+        if isinstance(cost, dict):
+            value = cost.get("computed_cost_microusd")
+            if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                return value
+    return 0
 
 
 def read_tasks(path: Path, limit: int) -> list[dict[str, Any]]:
@@ -646,6 +840,9 @@ def run_grok_worker(
     checkout_task(task, worktree)
     prompt = visible_grok_prompt(task, capsule_id, broadcast_rules=broadcast_rules)
     worktree_abs = worktree.resolve()
+    log_dir = instance_dir / "worker_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    raw_debug_log = log_dir / "grok_debug_raw.log"
     argv = [
         "grok",
         "-p",
@@ -665,6 +862,9 @@ def run_grok_worker(
         "--no-subagents",
         "--max-turns",
         str(max_turns),
+        "--debug",
+        "--debug-file",
+        str(raw_debug_log),
         "--verbatim",
     ]
     proc, elapsed_ms = run_cmd_timed(argv, timeout=timeout_s)
@@ -673,6 +873,23 @@ def run_grok_worker(
     stdout_hash = digest_text(proc.stdout)
     stderr_hash = digest_text(proc.stderr)
     patch_hash = digest_text(diff_text)
+    provider_receipt = None
+    provider_receipt_error = None
+    if raw_debug_log.exists():
+        try:
+            provider_receipt = sanitized_grok_provider_receipt(
+                raw_debug_log.read_text(encoding="utf-8", errors="replace"),
+                stdout_text=proc.stdout,
+                stderr_text=proc.stderr,
+                model_requested=model,
+            )
+        except (json.JSONDecodeError, OSError, ValueError) as error:
+            provider_receipt_error = str(error)
+        finally:
+            try:
+                raw_debug_log.unlink()
+            except FileNotFoundError:
+                pass
     done = {
         "schema_id": "grok_worker_done.v1",
         "instance_id": task["instance_id"],
@@ -682,13 +899,17 @@ def run_grok_worker(
         "elapsed_ms": elapsed_ms,
         "patch_hash": patch_hash,
     }
+    if provider_receipt is not None:
+        done["provider_receipt_id"] = provider_receipt["request_id"]
+        done["cost_source_kind"] = "provider_receipt_inline"
+        done["cost_microusd"] = provider_receipt["cost"]["computed_cost_microusd"]
+    elif provider_receipt_error is not None:
+        done["provider_receipt_error_digest"] = digest_text(provider_receipt_error)
     done_json = json.dumps(done, sort_keys=True, separators=(",", ":"))
     receipt_id = "rcp_" + hashlib.sha256(
         f"{task['instance_id']}:{worker_id}:{stdout_hash}:{stderr_hash}:{patch_hash}".encode("utf-8")
     ).hexdigest()[:32]
 
-    log_dir = instance_dir / "worker_logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
     (log_dir / "command.json").write_text(
         json.dumps({"argv": redacted_grok_argv(argv)}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -698,6 +919,28 @@ def run_grok_worker(
     (log_dir / "stderr.txt").write_text(proc.stderr, encoding="utf-8")
     (log_dir / "diff.patch").write_text(diff_text, encoding="utf-8")
     (log_dir / "done.json").write_text(done_json + "\n", encoding="utf-8")
+    if provider_receipt is not None:
+        write_json(log_dir / "provider_receipt_sanitized.json", provider_receipt)
+    elif provider_receipt_error is not None:
+        write_json(
+            log_dir / "provider_receipt_status.json",
+            {
+                "schema_id": "grok_cli_provider_receipt_status.v1",
+                "status": "missing_or_unparseable",
+                "error_digest": digest_text(provider_receipt_error),
+                "raw_debug_retained": False,
+            },
+        )
+    if provider_receipt is not None:
+        prompt_tokens = int(provider_receipt["usage"].get("input_tokens", 0))
+        completion_tokens = int(provider_receipt["usage"].get("output_tokens", 0))
+        tool_stdout_tokens = 0
+        token_count_bound_kind = None
+    else:
+        prompt_tokens = upper_bound_tokens_from_utf8_bytes(prompt)
+        completion_tokens = upper_bound_tokens_from_utf8_bytes(proc.stdout)
+        tool_stdout_tokens = upper_bound_tokens_from_utf8_bytes(proc.stdout + "\n" + proc.stderr)
+        token_count_bound_kind = TOKEN_BOUND_KIND
 
     return {
         "receipt_id": receipt_id,
@@ -711,12 +954,13 @@ def run_grok_worker(
         "credential_material_absent": True,
         "micro_refs_moved": False,
         "elapsed_ms": elapsed_ms,
-        "token_count_bound_kind": TOKEN_BOUND_KIND,
-        "prompt_tokens_estimate": upper_bound_tokens_from_utf8_bytes(prompt),
-        "completion_tokens_estimate": upper_bound_tokens_from_utf8_bytes(proc.stdout),
-        "tool_stdout_tokens_estimate": upper_bound_tokens_from_utf8_bytes(proc.stdout + "\n" + proc.stderr),
+        "token_count_bound_kind": token_count_bound_kind,
+        "prompt_tokens_estimate": prompt_tokens,
+        "completion_tokens_estimate": completion_tokens,
+        "tool_stdout_tokens_estimate": tool_stdout_tokens,
         "worktree": str(worktree_abs),
         "log_dir": str(log_dir),
+        "provider_receipt": provider_receipt,
     }
 
 
@@ -1498,32 +1742,13 @@ def run_substrate_task(
             turingd,
             "CostEvent",
             "writer:pput",
-            {
-                "schema_id": LEGACY_COST_EVENT_SCHEMA,
-                "head_effect": "PRESERVE",
-                "run_id": f"run_{task['instance_id']}",
-                "problem_id": task["instance_id"],
-                "split": "dogfood",
-                "agent_id": worker_id,
-                "branch_id": f"branch_{worker_mode}",
-                "capsule_id": capsule_id,
-                "prompt_tokens": worker_result["prompt_tokens_estimate"],
-                "completion_tokens": worker_result["completion_tokens_estimate"],
-                "tool_tokens": 0,
-                "tool_stdout_tokens": worker_result["tool_stdout_tokens_estimate"],
-                "total_tokens": worker_result["prompt_tokens_estimate"]
-                + worker_result["completion_tokens_estimate"]
-                + worker_result["tool_stdout_tokens_estimate"],
-                "wall_time_ms": worker_result["elapsed_ms"],
-                "tool_stdout_hash": digest_text(worker_result["stdout_hash"] + worker_result["stderr_hash"]),
-                "counted_in_total": True,
-                "cost_source_kind": (
-                    "fixture"
-                    if worker_result.get("token_count_bound_kind") == "fixture"
-                    else "bounded_estimate"
-                ),
-                "bound_kind": worker_result.get("token_count_bound_kind"),
-            },
+            cost_event_payload_for_worker_result(
+                task=task,
+                worker_id=worker_id,
+                worker_mode=worker_mode,
+                capsule_id=capsule_id,
+                worker_result=worker_result,
+            ),
         )
         mark_event(cost, "CostEvent")
 
@@ -1541,11 +1766,9 @@ def run_substrate_task(
                 "verified": False,
                 "accounting_stage": "progress",
                 "golden_path_token_count": 0,
-                "total_run_token_count": worker_result["prompt_tokens_estimate"]
-                + worker_result["completion_tokens_estimate"]
-                + worker_result["tool_stdout_tokens_estimate"],
+                "total_run_token_count": worker_result_total_tokens(worker_result),
                 "total_wall_time_ms": worker_result["elapsed_ms"],
-                "total_run_cost_microusd": 0,
+                "total_run_cost_microusd": worker_result_cost_microusd(worker_result),
                 "progress": 0,
                 "vpput_raw": "0",
                 "failed_branch_count": 1,
@@ -1642,7 +1865,7 @@ def run_substrate_task(
         "worker_completion_tokens_estimate": worker_result["completion_tokens_estimate"],
         "worker_tool_stdout_tokens_estimate": worker_result["tool_stdout_tokens_estimate"],
         "worker_elapsed_ms": worker_result["elapsed_ms"],
-        "worker_cost_microusd": 0,
+        "worker_cost_microusd": worker_result_cost_microusd(worker_result),
         "sandbox": sandbox,
         "worker_log_dir": worker_result["log_dir"],
         "worker_worktree": worker_result["worktree"],

@@ -4,6 +4,8 @@ import json
 import subprocess
 from pathlib import Path
 
+from turingos import schemas
+
 
 REPO = Path(__file__).resolve().parents[1]
 HARNESS = REPO / "tools" / "bench" / "mini_swe_bench_grok_headless.py"
@@ -38,6 +40,84 @@ def test_substrate_smoke_token_bound_estimator_uses_utf8_bytes_not_word_count():
 
     assert runner.upper_bound_tokens_from_utf8_bytes(text) > len(text.split())
     assert runner.TOKEN_BOUND_KIND == "upper_bound_utf8_bytes_over_2"
+
+
+def test_grok_debug_receipt_sanitizes_provider_usage_and_costs():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    debug_log = "\n".join(
+        [
+            'config=SamplerConfig { credential_debug: Some("redacted-material-must-not-appear") }',
+            'received "session/prompt" response: {"stopReason":"end_turn","_meta":{"sessionId":"sess_1","requestId":"req_1","promptId":"req_1","totalTokens":20725,"modelId":"grok-build","inputTokens":20499,"outputTokens":225,"cachedReadTokens":2880,"reasoningTokens":214}}',
+        ]
+    )
+    stdout_text = '{"text":"M1C_JSON_PROBE_OK","requestId":"req_1","sessionId":"sess_1"}'
+
+    receipt = runner.sanitized_grok_provider_receipt(
+        debug_log,
+        stdout_text=stdout_text,
+        stderr_text="",
+        model_requested="grok-build",
+    )
+
+    assert receipt["schema_id"] == "grok_cli_provider_receipt.v1"
+    assert receipt["raw_debug_retained"] is False
+    assert receipt["request_id"] == "req_1"
+    assert receipt["usage"]["input_tokens"] == 20499
+    assert receipt["usage"]["cached_input_tokens"] == 2880
+    assert receipt["usage"]["output_tokens"] == 225
+    assert receipt["usage"]["reasoning_tokens"] == 214
+    assert receipt["cost"]["computed_cost_microusd"] == 18645
+    assert "redacted-material-must-not-appear" not in json.dumps(receipt)
+
+
+def test_grok_provider_receipt_yields_provider_inline_cost_event():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    receipt = {
+        "schema_id": "grok_cli_provider_receipt.v1",
+        "provider": "xai",
+        "endpoint": "grok-cli:responses",
+        "session_id": "sess_1",
+        "request_id": "req_1",
+        "model_id_requested": "grok-build",
+        "model_id_resolved": "grok-build",
+        "usage": {
+            "input_tokens": 20499,
+            "cached_input_tokens": 2880,
+            "output_tokens": 225,
+            "reasoning_tokens": 214,
+        },
+        "usage_raw_sha256": "sha256:" + "1" * 64,
+        "response_sha256": "sha256:" + "2" * 64,
+        "cost": {
+            "computed_cost_microusd": 18645,
+            "price_table_digest": runner.M1C_PRICE_TABLE_DIGEST,
+        },
+    }
+    worker_result = {
+        "provider_receipt": receipt,
+        "elapsed_ms": 1234,
+        "stdout_hash": "sha256:" + "3" * 64,
+        "stderr_hash": "sha256:" + "4" * 64,
+    }
+
+    payload = runner.cost_event_payload_for_worker_result(
+        task={"instance_id": "django__django-12039"},
+        worker_id="worker:sha256:" + "5" * 64,
+        worker_mode="grok",
+        capsule_id="wc_django__django-12039",
+        worker_result=worker_result,
+    )
+
+    assert payload["schema_id"] == "turingos.cost_event.v2"
+    assert payload["cost"]["cost_source_kind"] == "provider_receipt_inline"
+    assert payload["cost"]["cost_microusd"] == 18645
+    assert payload["cost"]["bound_kind"] is None
+    assert payload["worker"]["provider"] == "xai"
+    assert payload["worker"]["request_id"] == "req_1"
+    assert payload["usage"]["provider_usage_raw_sha256"] == "sha256:" + "1" * 64
+
+    tape_payload = {"event_type": "CostEvent", **payload}
+    assert schemas.validate_cost_event_v2(tape_payload) is None
 
 
 def test_grok_headless_argv_turns_planning_memory_and_subagents_off():

@@ -352,6 +352,7 @@ _COST_EVENT_V2_REQUIRED = (
 _COST_EVENT_V2_ALLOWED = frozenset(
     {
         "schema_id",
+        "event_type",
         "run_id",
         "problem_id",
         "split",
@@ -394,6 +395,8 @@ def validate_cost_event_v2(payload: dict) -> None:
     _check_keys(payload, required=_COST_EVENT_V2_REQUIRED, allowed=_COST_EVENT_V2_ALLOWED, where=where)
 
     _check_const(payload, "schema_id", COST_EVENT_V2_SCHEMA_ID, where)
+    if "event_type" in payload:
+        _check_const(payload, "event_type", "CostEvent", where)
     _check_str(payload, "run_id", where, min_length=1)
     _check_str(payload, "problem_id", where, min_length=1)
     _check_str(payload, "split", where, min_length=1)

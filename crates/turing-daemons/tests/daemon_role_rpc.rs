@@ -994,7 +994,7 @@ fn cost_event_v2(
         "cost": {
             "cost_source_kind": "fixture",
             "cost_microusd": 0,
-            "price_table_digest": "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a",
+            "price_table_digest": "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c",
             "bound_kind": null
         },
         "wall_time_ms": wall_time_ms,

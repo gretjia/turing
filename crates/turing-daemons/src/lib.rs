@@ -2063,7 +2063,7 @@ fn parse_cost_event_v1(value: &Value) -> Result<CostEvent, String> {
             cost_source_kind: "fixture".to_string(),
             cost_microusd: 0,
             price_table_digest:
-                "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a"
+                "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c"
                     .to_string(),
             bound_kind: None,
         },

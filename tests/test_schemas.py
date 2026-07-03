@@ -538,6 +538,15 @@ class TestCostEventV2(unittest.TestCase):
         payload = valid_cost_event_v2()
         self.assertIsNone(schemas.validate_cost_event_v2(payload))
 
+    def test_cost_event_v2_allows_tape_payload_event_type_mirror(self):
+        payload = valid_cost_event_v2()
+        payload["event_type"] = "CostEvent"
+        self.assertIsNone(schemas.validate_cost_event_v2(payload))
+
+        payload["event_type"] = "PPUTAccounted"
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
     def test_cost_event_v2_is_not_in_frozen_event_registry(self):
         payload = valid_cost_event_v2()
         with self.assertRaises(SchemaInvalid):

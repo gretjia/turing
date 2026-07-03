@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use turing_contracts::jcs;
 
 const M1C_PRICE_TABLE_DIGEST: &str =
-    "sha256:38847526b4322ad2e7178845730d52aa44661bb33d668428b934a6d29969af0a";
+    "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Split {

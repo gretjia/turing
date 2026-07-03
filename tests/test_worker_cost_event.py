@@ -81,6 +81,9 @@ class TestWorkerCostEvent(unittest.TestCase):
         }
         self.assertIn(("deepseek", "deepseek-chat", "prompt_cache_hit_tokens"), keys)
         self.assertIn(("deepseek", "deepseek-chat", "prompt_cache_miss_tokens"), keys)
+        self.assertIn(("xai", "grok-build", "input_tokens"), keys)
+        self.assertIn(("xai", "grok-build", "cached_input_tokens"), keys)
+        self.assertIn(("xai", "grok-build", "output_tokens"), keys)
 
     def test_cost_event_from_receipt_has_worker_identity_and_no_secret_headers(self):
         payload = cost.cost_event_from_receipt(
