@@ -75,9 +75,26 @@ any Charter-invariant risk.
 
 ## Ready-block shape
 
-The "ready-block" is the structured status block a loop run emits at exit
-(Step 3 Exit / Step 8 HANDOFF) proving the run is ready to ship or hand off.
-It has two layers in this harness:
+The "ready-block" is the structured block that launches the NEXT atom, in the
+exact shape locked by the secure OS roadmap (docs/roadmap/secure_os_18_month/,
+spec §8: every phase ends with one):
+
+```text
+Activate AgenticForgeLoop v1.4 / TuringLoop
+Task: <phase/atom task>
+ETA estimate: <hours / steps>
+frontier_mode: auto
+test_mode: auto_full
+Start at autonomy tier <tier>
+human_ux_gate: <true|false>
+allowed_files:
+  - <paths>
+acceptance_commands:
+  - <commands>
+next_atom ID: <ID>
+```
+
+At loop exit the run also emits status evidence, in two layers:
 
 - **Routing/gate layer** (unified `loop` v2.0, Step 3 Exit): write
   `routing_decision.json` + `timing.json` + a gate receipt; the HANDOFF
