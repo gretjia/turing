@@ -104,3 +104,13 @@ next_recommended_atom: <id or "done">
 A ready-block is only valid once every step in the checklist above has run
 (or was explicitly skipped by a documented predicate) and the acceptance
 commands for the atom/phase all exit 0.
+
+## Substrate freeze pre-commit hook (HW-SW-003)
+
+This repo ships a pre-commit hook (`.githooks/pre-commit`) that runs the
+forbidden-file guard and the substrate freeze audit before every commit.
+Enable it once per clone with:
+
+```
+git config core.hooksPath .githooks
+```

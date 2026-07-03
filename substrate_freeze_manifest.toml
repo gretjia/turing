@@ -1,0 +1,48 @@
+# substrate_freeze_manifest.toml — HW-SW-003 C1
+#
+# Pins sha256 digests of the constitution and the substrate-critical source
+# files this repo's audits bind to. scripts/audit-substrate-freeze.sh
+# recomputes every digest below with sha256sum and fails closed on any
+# mismatch; it also independently checks the constitution digest against the
+# pinned value in evidence/loops/hw_sw_001_20260703/PREDICATE.md, so tampering
+# only this file cannot silently move the constitution pin.
+#
+# REPIN: ceremony — any legitimate change to a pinned digest below MUST:
+#   1. Recompute the new digest: `sha256sum <path>`.
+#   2. Update the matching entry below in the SAME commit as the source
+#      change (or, for the constitution, in the same commit as the
+#      human-sudo-authored constitutional amendment).
+#   3. Use a commit message containing the literal token `REPIN:` followed
+#      by the rationale, e.g.:
+#        REPIN: turing-approval lib.rs — added HardwareFuture byte surface
+#   A digest changing here without a `REPIN:` commit is a freeze violation,
+#   not a routine update.
+#
+# This manifest is a tooling artifact (allowed_files), not the constitution
+# itself; only the constitution file this manifest points at is forbidden to
+# write.
+
+[constitution]
+path = "turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md"
+path_is_relative_to = "TURINGOS_WORK_ROOT"
+sha256 = "a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0"
+
+[[files]]
+path = "crates/turing-approval/src/lib.rs"
+sha256 = "ce9d4676086aa9fb46270d80f1f958a432d9754f34d93e96c31f12dca6920751"
+
+[[files]]
+path = "crates/turing-replay/src/lib.rs"
+sha256 = "c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31"
+
+[[files]]
+path = "crates/turing-git-tape/src/head_set.rs"
+sha256 = "794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016"
+
+[[files]]
+path = "crates/turing-git-tape/src/append.rs"
+sha256 = "c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665"
+
+[[files]]
+path = "crates/turing-kernel/src/reducer.rs"
+sha256 = "43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3"

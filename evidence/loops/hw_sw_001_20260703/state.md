@@ -25,3 +25,22 @@
   the v1.4 8-step list, the ready-block shape, and the .grok/skills/** (2026-07-03)
   supersession note.
 - Status: ADDRESSED.
+
+## Checkpoint 3 — HW-SW-003 (substrate freeze + forbidden-file guard)
+- C1 `./scripts/audit-substrate-freeze.sh` -> exit 0: substrate_freeze_manifest.toml
+  pins real sha256sum digests (constitution + 5 crate source anchors), all recomputed
+  and matched; constitution digest independently checked against the pinned
+  a0174ef8...ca3ad0 value. Fixed a real bug found while proving this: the manifest's
+  awk key-parser used `[a-zA-Z_]+` which does not match digit-bearing keys like
+  `sha256`, silently truncating the parse; fixed to `[a-zA-Z0-9_]+`.
+  `--manifest <path>` override verified with a deliberately tampered copy -> exit 1.
+- C2 `./scripts/audit-forbidden-files.sh --staged` -> exit 0 on the current clean
+  staging area. `--check turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md`
+  -> exit 1 (negative vector, as required). `--check scripts/calc-ipqc-interval.sh`
+  -> exit 0 (benign path sanity check).
+- C3 `.githooks/pre-commit` exists, executable, invokes audit-forbidden-files.sh
+  --staged then audit-substrate-freeze.sh; `bash .githooks/pre-commit` -> exit 0 on
+  clean tree. Enable one-liner (`git config core.hooksPath .githooks`) documented in
+  docs/loop_harness/README.md. `.gitignore` gains a `.turingos/` line (repo already
+  had `/.turingos/` root-anchored; appended the literal unanchored form per spec).
+- Status: ADDRESSED.
