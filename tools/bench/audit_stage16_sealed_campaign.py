@@ -90,14 +90,24 @@ def event_id(event: dict[str, Any] | None) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def cost_event_total_tokens(event_payload: dict[str, Any]) -> int:
+    value = event_payload.get("total_tokens")
+    if isinstance(value, int) and value > 0 and not isinstance(value, bool):
+        return value
+    usage = event_payload.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get("total_tokens")
+        if isinstance(value, int) and value > 0 and not isinstance(value, bool):
+            return value
+    return 0
+
+
 def cost_total(events: list[dict[str, Any]]) -> int:
     total = 0
     for event in events:
         if event.get("event_type") != "CostEvent":
             continue
-        value = payload(event).get("total_tokens")
-        if isinstance(value, int) and value > 0 and not isinstance(value, bool):
-            total += value
+        total += cost_event_total_tokens(payload(event))
     return total
 
 
@@ -108,10 +118,11 @@ def cost_sources(events: list[dict[str, Any]]) -> dict[str, Any]:
         if event.get("event_type") != "CostEvent":
             continue
         event_payload = payload(event)
-        kind = event_payload.get("cost_source_kind")
+        cost = event_payload.get("cost")
+        kind = cost.get("cost_source_kind") if isinstance(cost, dict) else event_payload.get("cost_source_kind")
         if isinstance(kind, str):
             kinds.add(kind)
-        if event_payload.get("provider_reported") is True:
+        if event_payload.get("provider_reported") is True or kind in {"provider_receipt_inline", "provider_usage_api_reconciled"}:
             provider_reported = True
     return {
         "cost_source_kind": sorted(kinds) or ["unspecified"],

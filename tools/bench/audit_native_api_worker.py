@@ -39,6 +39,18 @@ def event_payload(event: dict[str, Any]) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def cost_token_field(cost: dict[str, Any], field: str) -> int | None:
+    value = cost.get(field)
+    if isinstance(value, int) and value >= 0 and not isinstance(value, bool):
+        return value
+    usage = cost.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get(field)
+        if isinstance(value, int) and value >= 0 and not isinstance(value, bool):
+            return value
+    return None
+
+
 def event_id(event: dict[str, Any]) -> str:
     return str(event["_event_id"])
 
@@ -132,7 +144,11 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
     cost_events = [event_payload(event) for event in events if event.get("event_type") == "CostEvent"]
     if not cost_events:
         problems.append("CostEvent missing")
-    elif not all(int(payload.get("tool_tokens") or 0) >= 0 and int(payload.get("tool_stdout_tokens") or 0) >= 0 for payload in cost_events):
+    elif not all(
+        cost_token_field(payload, "tool_tokens") is not None
+        and cost_token_field(payload, "tool_stdout_tokens") is not None
+        for payload in cost_events
+    ):
         problems.append("CostEvent tool costs missing")
 
     return {

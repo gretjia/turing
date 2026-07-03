@@ -37,6 +37,18 @@ def payload(event: dict[str, Any] | None) -> dict[str, Any]:
     return event["payload"]
 
 
+def cost_event_total_tokens(event_payload: dict[str, Any]) -> int:
+    value = event_payload.get("total_tokens")
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+        return value
+    usage = event_payload.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get("total_tokens")
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            return value
+    return 0
+
+
 def event_index(events: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return {event["_event_id"]: event for event in events}
 
@@ -187,9 +199,9 @@ def audit_run(run: dict[str, Any], auditor: Any, work_root: Path, index: int) ->
         problems.append("terminal accepted attempt must have final PPUT progress 1")
 
     cost_total = sum(
-        int(payload(event).get("total_tokens", 0))
+        cost_event_total_tokens(payload(event))
         for event in events
-        if event.get("event_type") == "CostEvent" and isinstance(payload(event).get("total_tokens"), int)
+        if event.get("event_type") == "CostEvent"
     )
     final_pput = next(
         (event for event in pputs if payload(event).get("accounting_stage") == "final" and payload(event).get("progress") == 1),

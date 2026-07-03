@@ -59,6 +59,18 @@ def receipt_tokens(receipts: list[dict[str, Any]]) -> dict[str, int]:
     return totals
 
 
+def cost_token_field(cost: dict[str, Any], field: str) -> int | None:
+    value = cost.get(field)
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+        return value
+    usage = cost.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get(field)
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            return value
+    return None
+
+
 def cost_event_tokens(events: list[dict[str, Any]]) -> dict[str, int] | None:
     costs = [payload(event) for event in events if event.get("event_type") == "CostEvent"]
     if not costs:
@@ -66,8 +78,8 @@ def cost_event_tokens(events: list[dict[str, Any]]) -> dict[str, int] | None:
     totals = {field: 0 for field in TOKEN_FIELDS}
     for cost in costs:
         for field in TOKEN_FIELDS:
-            value = cost.get(field)
-            if not isinstance(value, int) or value < 0:
+            value = cost_token_field(cost, field)
+            if value is None:
                 return None
             totals[field] += value
     return totals

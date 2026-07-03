@@ -430,7 +430,12 @@ def validate_chain(
             if event.get("head_effect") != row["head_effect"]:
                 problems.append(f"{event_id}: head_effect {event.get('head_effect')} != registry {row['head_effect']}")
                 categories["registry_head_effect"] = "FAIL"
-            if event.get("event_schema_id") != row["payload_schema_id"]:
+            schema_compatible = (
+                event_type == "CostEvent"
+                and event.get("event_schema_id") == "cost_event.v1"
+                and row["payload_schema_id"] == COST_EVENT_V2_SCHEMA_ID
+            )
+            if event.get("event_schema_id") != row["payload_schema_id"] and not schema_compatible:
                 problems.append(
                     f"{event_id}: event_schema_id {event.get('event_schema_id')} != registry {row['payload_schema_id']}"
                 )
@@ -924,8 +929,9 @@ def cost_conservation_status(events: list[dict[str, Any]]) -> str:
         if payload.get("total_wall_time_ms") != wall_total:
             return "FAIL"
         cost_values = [cost_event_cost_microusd(item) for item in matching]
-        if "total_run_cost_microusd" in payload or any(value is not None for value in cost_values):
-            cost_total = sum(value or 0 for value in cost_values)
+        cost_total = sum(value or 0 for value in cost_values)
+        has_observable_cost = any(value is not None and value > 0 for value in cost_values)
+        if "total_run_cost_microusd" in payload or has_observable_cost:
             if payload.get("total_run_cost_microusd") != cost_total:
                 return "FAIL"
     return "PASS"

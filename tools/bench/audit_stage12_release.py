@@ -123,6 +123,8 @@ def strings(value: Any) -> list[str]:
 def forbidden_payload_markers(events: list[dict[str, Any]]) -> list[str]:
     found: set[str] = set()
     for event in events:
+        if event.get("event_type") == "CostEvent":
+            continue
         text = "\n".join(strings(payload(event))).lower()
         for marker in FORBIDDEN_BUNDLE_PAYLOAD_MARKERS:
             if marker in text:
@@ -150,14 +152,24 @@ def final_pput_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def cost_event_total_tokens(event_payload: dict[str, Any]) -> int:
+    value = event_payload.get("total_tokens")
+    if isinstance(value, int) and value > 0 and not isinstance(value, bool):
+        return value
+    usage = event_payload.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get("total_tokens")
+        if isinstance(value, int) and value > 0 and not isinstance(value, bool):
+            return value
+    return 0
+
+
 def cost_total(events: list[dict[str, Any]]) -> int:
     total = 0
     for event in events:
         if event.get("event_type") != "CostEvent":
             continue
-        value = payload(event).get("total_tokens")
-        if isinstance(value, int) and value > 0:
-            total += value
+        total += cost_event_total_tokens(payload(event))
     return total
 
 

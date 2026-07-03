@@ -88,6 +88,18 @@ def sha256_file(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def cost_event_total_tokens(event_payload: dict[str, Any]) -> int:
+    value = event_payload.get("total_tokens")
+    if isinstance(value, int) and value > 0 and not isinstance(value, bool):
+        return value
+    usage = event_payload.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get("total_tokens")
+        if isinstance(value, int) and value > 0 and not isinstance(value, bool):
+            return value
+    return 0
+
+
 def source_unsolved(source_stage16_root: Path) -> list[dict[str, Any]]:
     aggregate = load_json(source_stage16_root / "stage16_aggregate_report.json")
     return [run for run in aggregate.get("runs", []) if isinstance(run, dict) and not run.get("solved")]
@@ -107,9 +119,7 @@ def cost_total(events: list[dict[str, Any]]) -> int:
     for event in events:
         if event.get("event_type") != "CostEvent":
             continue
-        value = payload(event).get("total_tokens")
-        if isinstance(value, int) and value > 0 and not isinstance(value, bool):
-            total += value
+        total += cost_event_total_tokens(payload(event))
     return total
 
 

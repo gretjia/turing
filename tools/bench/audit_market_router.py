@@ -60,6 +60,18 @@ def positive_int(value: Any) -> int:
     return value if isinstance(value, int) and value >= 0 and not isinstance(value, bool) else 0
 
 
+def cost_event_total_tokens(event_payload: dict[str, Any]) -> int:
+    value = event_payload.get("total_tokens")
+    if isinstance(value, int) and value >= 0 and not isinstance(value, bool):
+        return value
+    usage = event_payload.get("usage")
+    if isinstance(usage, dict):
+        value = usage.get("total_tokens")
+        if isinstance(value, int) and value >= 0 and not isinstance(value, bool):
+            return value
+    return 0
+
+
 def sequence(event: dict[str, Any]) -> int | None:
     value = event.get("sequence")
     return value if isinstance(value, int) and not isinstance(value, bool) else None
@@ -286,7 +298,7 @@ def audit_market_router_evidence(coverage: dict[str, Any], events: list[dict[str
     if not cost_events or not final_pputs:
         problems.append("CostEvent and final PPUTAccounted required")
     else:
-        total_cost = sum(positive_int(event.get("total_tokens")) for event in cost_events)
+        total_cost = sum(cost_event_total_tokens(event) for event in cost_events)
         if not any(pput.get("total_run_token_count") == total_cost for pput in final_pputs):
             problems.append("all route/abandoned branch costs must count in final VPPUT")
 
