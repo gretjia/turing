@@ -142,6 +142,31 @@ def test_shard_runner_marks_execution_ready_with_complete_worker_predictions(tmp
     assert packet["problems"] == []
 
 
+def test_shard_runner_records_preregistered_official_harness_flags(tmp_path):
+    runner = load_module("shard_runner", REPO / "tools/bench/run_swebench_shard.py")
+    root = tmp_path / "campaign"
+    instance_ids = write_shard_manifest(root, count=1)
+    write_predictions(root, "S00", [prediction(instance_ids[0])])
+
+    packet = runner.build_command(
+        root,
+        "S00",
+        2,
+        run_id="unit",
+        execution_requested=True,
+        report_dir=root / "scoring" / "unit",
+    )
+
+    assert packet["status"] == "READY_TO_EXECUTE"
+    assert "--dataset_name princeton-nlp/SWE-bench_Verified" in packet["command"]
+    assert "--split test" in packet["command"]
+    assert "--max_workers 2" in packet["command"]
+    assert "--timeout 1800" in packet["command"]
+    assert "--cache_level env" in packet["command"]
+    assert "--namespace swebench" in packet["command"]
+    assert f"--report_dir {root / 'scoring' / 'unit'}" in packet["command"]
+
+
 def test_shard_runner_execute_cli_exits_nonzero_when_predictions_are_missing(tmp_path):
     root = tmp_path / "campaign"
     write_shard_manifest(root)

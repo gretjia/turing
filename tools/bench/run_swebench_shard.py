@@ -155,16 +155,26 @@ def build_command(
     run_id: str | None = None,
     *,
     execution_requested: bool = False,
+    predictions_path: Path | None = None,
+    report_dir: Path | None = None,
+    timeout: int = 1800,
+    cache_level: str = "env",
+    namespace: str = "swebench",
 ) -> dict[str, Any]:
     run_id = run_id or f"turingos_verified500_{shard}"
-    predictions = root / "predictions" / f"shard_{shard}_predictions.jsonl"
+    predictions = predictions_path or root / "predictions" / f"shard_{shard}_predictions.jsonl"
+    report_dir = report_dir or root / "shards" / shard / "official_eval" / run_id
     command = (
         "python -m swebench.harness.run_evaluation "
-        "--dataset_name SWE-bench/SWE-bench_Verified "
+        "--dataset_name princeton-nlp/SWE-bench_Verified "
         "--split test "
         f"--predictions_path {predictions} "
         f"--run_id {run_id} "
-        f"--max_workers {max_workers}"
+        f"--max_workers {max_workers} "
+        f"--timeout {timeout} "
+        f"--cache_level {cache_level} "
+        f"--namespace {namespace} "
+        f"--report_dir {report_dir}"
     )
     validation = validate_predictions(root, shard, predictions) if execution_requested else None
     problems = validation["problems"] if validation else []
@@ -177,6 +187,10 @@ def build_command(
         "docker_environment_required": True,
         "command": command,
         "predictions_path": str(predictions),
+        "report_dir": str(report_dir),
+        "timeout": timeout,
+        "cache_level": cache_level,
+        "namespace": namespace,
         "run_id": run_id,
         "execute_now": execution_requested and not problems,
         "execution_requested": execution_requested,
@@ -203,9 +217,25 @@ def main() -> int:
     parser.add_argument("--shard", required=True)
     parser.add_argument("--max-workers", type=int, default=2)
     parser.add_argument("--run-id")
+    parser.add_argument("--predictions-path", type=Path)
+    parser.add_argument("--report-dir", type=Path)
+    parser.add_argument("--timeout", type=int, default=1800)
+    parser.add_argument("--cache-level", default="env")
+    parser.add_argument("--namespace", default="swebench")
     parser.add_argument("--execute", action="store_true", help="validate the shard is ready to execute")
     args = parser.parse_args()
-    packet = build_command(args.root, args.shard, args.max_workers, args.run_id, execution_requested=args.execute)
+    packet = build_command(
+        args.root,
+        args.shard,
+        args.max_workers,
+        args.run_id,
+        execution_requested=args.execute,
+        predictions_path=args.predictions_path,
+        report_dir=args.report_dir,
+        timeout=args.timeout,
+        cache_level=args.cache_level,
+        namespace=args.namespace,
+    )
     print(json.dumps(packet, indent=2, sort_keys=True))
     return 1 if args.execute and packet["status"] != "READY_TO_EXECUTE" else 0
 

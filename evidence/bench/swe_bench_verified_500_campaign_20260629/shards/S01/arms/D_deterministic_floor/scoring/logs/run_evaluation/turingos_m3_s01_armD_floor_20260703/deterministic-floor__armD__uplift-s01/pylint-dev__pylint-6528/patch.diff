@@ -1,0 +1,9 @@
+diff --git a/turingos_deterministic_floor_marker.py b/turingos_deterministic_floor_marker.py
+new file mode 100644
+index 0000000000..a531b096c4
+--- /dev/null
++++ b/turingos_deterministic_floor_marker.py
+@@ -0,0 +1,3 @@
++"""Deterministic no-op marker for TuringOS Arm D floor."""
++
++TURINGOS_ARM_D_FLOOR = True
