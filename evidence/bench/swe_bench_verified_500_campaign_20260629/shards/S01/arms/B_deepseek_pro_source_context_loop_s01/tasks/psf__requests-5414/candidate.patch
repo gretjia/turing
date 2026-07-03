@@ -1,0 +1,13 @@
+diff --git a/requests/models.py b/requests/models.py
+index e7d292d..3714e98 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -352,7 +352,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         import idna
+ 
+         try:
+-            host = idna.encode(host, uts46=True).decode('utf-8')
++            host = idna.encode(host, uts46=True).decode('ascii')
+         except idna.IDNAError:
+             raise UnicodeError
+         return host

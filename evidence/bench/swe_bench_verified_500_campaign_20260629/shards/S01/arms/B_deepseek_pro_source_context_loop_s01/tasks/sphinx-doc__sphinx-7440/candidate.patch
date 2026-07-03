@@ -1,0 +1,31 @@
+diff --git a/sphinx/domains/std.py b/sphinx/domains/std.py
+index d820cfe..8b15b99 100644
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -636,7 +636,7 @@ class StandardDomain(Domain):
+         """
+         if name in self.anonlabels and self.anonlabels[name] != (docname, node_id):
+             logger.warning(__('duplicate label %s, other instance in %s'),
+-                           name, self.env.doc2path(self.anonlabels[name][0]))
++                           name, self.anonlabels[name][0])
+ 
+         self.anonlabels[name] = (docname, node_id)
+         if title:
+@@ -654,7 +654,7 @@ class StandardDomain(Domain):
+         """
+         if (objtype, name) in self.objects:
+             docname = self.objects[objtype, name][0]
+-            logger.warning(__('duplicate %s description of %s, other instance in %s'),
++            logger.warning(__('duplicate %s description of %s, other instance in %s') % (objtype, name, docname),
+                            objtype, name, docname, location=location)
+         self.objects[objtype, name] = (self.env.docname, labelid)
+ 
+@@ -725,7 +725,7 @@ class StandardDomain(Domain):
+                 continue
+             if name in self.labels:
+                 logger.warning(__('duplicate label %s, other instance in %s'),
+-                               name, env.doc2path(self.labels[name][0]),
++                               name, self.labels[name][0],
+                                location=node)
+             self.anonlabels[name] = docname, labelid
+             if node.tagname in ('section', 'rubric'):

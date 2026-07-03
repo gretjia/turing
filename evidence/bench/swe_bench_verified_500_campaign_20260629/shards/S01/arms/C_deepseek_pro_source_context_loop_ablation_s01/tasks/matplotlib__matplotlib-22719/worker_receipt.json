@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:3b78059ac6f101e002c9dd60e2a78901f3a152985b9f190ef3d3c80a532867ed",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 812,
+  "content_sha256": "sha256:05ae77646d82f2a3b4df0e11621f71920c7aa23cba6fce5be24f1cf4efdff0ca",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:5dd976f985f28587540655c6b7854c2ab1886ef644ebcdd96034fe848f45ce73",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 2136,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "matplotlib__matplotlib-22719",
+    "receipt_id": "rcpt:8e2cb56ec670ad5486a1fa5770e71605d06fbb57b128b9e2199493547a764fe9",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W02-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 197,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 4691,
+      "prompt_tokens": 4691,
+      "provider_usage_raw_sha256": "sha256:41f8dd3695dddaf723310d16bb61fd295647b1e2024bbd27ec848a6905a2e329",
+      "total_tokens": 4888
+    },
+    "wall_time_ms": 4616,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "cfeddb1a-197d-43cf-9baf-1365df22131c",
+      "response_sha256": "sha256:987114eba2c727f4e5b34cac250423c3637bf71a8c7793b3cf7a7778395678cb"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "matplotlib__matplotlib-22719",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W02",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch lib/matplotlib/category.py...\nApplied patch lib/matplotlib/category.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:21f80b10519f37f1579458c15687c5bf1a3c161254fd2079cfa434f851b320a5",
+  "response_sha256": "sha256:987114eba2c727f4e5b34cac250423c3637bf71a8c7793b3cf7a7778395678cb",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/matplotlib__matplotlib-22719/worker_capsule.md",
+  "source_context_length_chars": 8257,
+  "source_context_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/matplotlib__matplotlib-22719/source_context.md",
+  "source_context_sha256": "sha256:221cae776291712e866761d5894b49ca0c9ecb58bf7fadc8be60255b956b0306",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 197,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 4691,
+    "prompt_tokens": 4691,
+    "total_tokens": 4888
+  },
+  "usage_raw_sha256": "sha256:41f8dd3695dddaf723310d16bb61fd295647b1e2024bbd27ec848a6905a2e329",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/matplotlib__matplotlib-22719/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:0c4c7e7b5212814d78b122776f98d4c9a37e27729ae57cfc970b92245d8427ab",
+  "wall_time_ms": 4616
+}

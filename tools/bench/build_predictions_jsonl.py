@@ -26,8 +26,18 @@ def sha256_bytes(data: bytes) -> str:
     return "sha256:" + hashlib.sha256(data).hexdigest()
 
 
-def load_candidate_audit(root: Path, shard: str, instance_id: str) -> dict[str, Any] | None:
-    path = root / "shards" / shard / "tasks" / instance_id / "worker_candidate_audit.json"
+def load_candidate_audit(
+    root: Path,
+    shard: str,
+    instance_id: str,
+    *,
+    task_dir_root: Path | None = None,
+) -> dict[str, Any] | None:
+    path = (
+        task_dir_root / instance_id / "worker_candidate_audit.json"
+        if task_dir_root is not None
+        else root / "shards" / shard / "tasks" / instance_id / "worker_candidate_audit.json"
+    )
     if not path.exists():
         return None
     return load_json(path)
@@ -60,6 +70,9 @@ def build_predictions(
     *,
     model_name: str = "turingos-internal-rehearsal",
     window: str | None = None,
+    task_dir_root: Path | None = None,
+    predictions_out: Path | None = None,
+    report_out: Path | None = None,
 ) -> dict[str, Any]:
     tasks, problems = shard_tasks(root, shard, window)
     rows: list[dict[str, Any]] = []
@@ -71,15 +84,22 @@ def build_predictions(
         if task.get("candidate_source") not in (None, "worker_derived", "worker_derived_patch"):
             problems.append(f"candidate source is not worker-derived: {instance_id}")
             continue
-        patch_rel = task.get("candidate_patch_path") or f"shards/{shard}/tasks/{instance_id}/candidate.patch"
-        patch_path = root / patch_rel
+        if task_dir_root is not None:
+            patch_path = task_dir_root / instance_id / "candidate.patch"
+            try:
+                patch_rel = str(patch_path.relative_to(root))
+            except ValueError:
+                patch_rel = str(patch_path)
+        else:
+            patch_rel = task.get("candidate_patch_path") or f"shards/{shard}/tasks/{instance_id}/candidate.patch"
+            patch_path = root / patch_rel
         if not patch_path.exists():
             problems.append(f"candidate patch missing: {instance_id}")
             continue
         patch_bytes = patch_path.read_bytes()
         patch_text = patch_bytes.decode("utf-8")
         patch_sha = sha256_bytes(patch_bytes)
-        candidate_audit = load_candidate_audit(root, shard, instance_id)
+        candidate_audit = load_candidate_audit(root, shard, instance_id, task_dir_root=task_dir_root)
         if candidate_audit is None:
             problems.append(f"candidate audit missing: {instance_id}")
             continue
@@ -105,7 +125,7 @@ def build_predictions(
             }
         )
 
-    out = predictions_path(root, shard, window)
+    out = predictions_out or predictions_path(root, shard, window)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
     report = {
@@ -119,7 +139,7 @@ def build_predictions(
         "predictions_sha256": sha256_bytes(out.read_bytes()),
     }
     report_suffix = f"_{window}" if window else ""
-    write_json(root / "predictions" / f"shard_{shard}{report_suffix}_predictions_report.json", report)
+    write_json(report_out or root / "predictions" / f"shard_{shard}{report_suffix}_predictions_report.json", report)
     return report
 
 
@@ -129,8 +149,19 @@ def main() -> int:
     parser.add_argument("--shard", required=True)
     parser.add_argument("--window")
     parser.add_argument("--model-name", default="turingos-internal-rehearsal")
+    parser.add_argument("--task-dir-root", type=Path)
+    parser.add_argument("--predictions-out", type=Path)
+    parser.add_argument("--report-out", type=Path)
     args = parser.parse_args()
-    report = build_predictions(args.root, args.shard, model_name=args.model_name, window=args.window)
+    report = build_predictions(
+        args.root,
+        args.shard,
+        model_name=args.model_name,
+        window=args.window,
+        task_dir_root=args.task_dir_root,
+        predictions_out=args.predictions_out,
+        report_out=args.report_out,
+    )
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0 if report["status"] == "PASS" else 1
 

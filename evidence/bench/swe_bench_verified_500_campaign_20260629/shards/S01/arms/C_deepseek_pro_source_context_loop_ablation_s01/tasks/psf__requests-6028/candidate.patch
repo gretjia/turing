@@ -1,0 +1,13 @@
+diff --git a/requests/models.py b/requests/models.py
+index dfbea85..31eb39a 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -531,7 +531,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+     def prepare_content_length(self, body):
+         """Prepare Content-Length header based on request method and body"""
+         if body is not None:
+-            length = super_len(body)
++            length = super_len(body) if body else 0
+             if length:
+                 # If length exists, set it. Otherwise, we fallback
+                 # to Transfer-Encoding: chunked.

@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:83051f67396240d64b7a875e25e8855d25a938257aff50edc35c2ca5acdb2338",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 796,
+  "content_sha256": "sha256:7924d31a1c30e226c8620f5d91f73f0fdb7d1703d92dd43fc6d4a82b13d7d53b",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:2694fafb00dc0639511271508f9d681e5bda1788a70aebe141c9cb9d713a53eb",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 1533,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pydata__xarray-4075",
+    "receipt_id": "rcpt:7938a940b3f98c4200e5cf49ce7db3f6ddaf911ec0ea2900db0593e7ca993a4f",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W01-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 245,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3159,
+      "prompt_tokens": 3159,
+      "provider_usage_raw_sha256": "sha256:6348a464a9cf6ad7042cda463bd11519c292476715107042d2cd44bd03df0644",
+      "total_tokens": 3404
+    },
+    "wall_time_ms": 5403,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "2b0ffd1e-e4e1-4f4c-bc82-352a2970b010",
+      "response_sha256": "sha256:1f1df3094ed9bc9d15a4597ea69fc13a9cc1b6173d145f010c6968ab170c45aa"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "pydata__xarray-4075",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W01",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch xarray/core/weighted.py...\nHunk #1 succeeded at 142 (offset -11 lines).\nApplied patch xarray/core/weighted.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:9939bac3cc925a2798b058ed5ec4885452f493daf9e865eea96007bd3cc2d217",
+  "response_sha256": "sha256:1f1df3094ed9bc9d15a4597ea69fc13a9cc1b6173d145f010c6968ab170c45aa",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pydata__xarray-4075/worker_capsule.md",
+  "source_context_length_chars": 8348,
+  "source_context_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pydata__xarray-4075/source_context.md",
+  "source_context_sha256": "sha256:850194ac1ceedbaef1987743e3517150367453f781eec21f08f9a47b3ba306ef",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 245,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 3159,
+    "prompt_tokens": 3159,
+    "total_tokens": 3404
+  },
+  "usage_raw_sha256": "sha256:6348a464a9cf6ad7042cda463bd11519c292476715107042d2cd44bd03df0644",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/pydata__xarray-4075/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:afe92fdb67f307cdaa4b1b9f75a324013c24966f8f076cf634ad3ea62b780ab8",
+  "wall_time_ms": 5403
+}

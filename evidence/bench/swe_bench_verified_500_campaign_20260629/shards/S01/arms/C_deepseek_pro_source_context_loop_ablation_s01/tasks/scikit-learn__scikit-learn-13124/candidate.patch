@@ -1,0 +1,23 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+index 24394f8..c6ec693 100644
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -655,7 +655,7 @@ class StratifiedKFold(_BaseKFold):
+             KFold(self.n_splits, shuffle=self.shuffle,
+                   random_state=rng).split(np.zeros(max(count, self.n_splits)))
+             for count in y_counts]
+-
++        rng = check_random_state(self.random_state)
+         test_folds = np.zeros(n_samples, dtype=np.int)
+         for test_fold_indices, per_cls_splits in enumerate(zip(*per_cls_cvs)):
+             for cls, (_, test_split) in zip(unique_y, per_cls_splits):
+@@ -667,6 +667,9 @@ class StratifiedKFold(_BaseKFold):
+                 # If this is the case, let's trim it:
+                 test_split = test_split[test_split < len(cls_test_folds)]
+                 cls_test_folds[test_split] = test_fold_indices
++                if self.shuffle:
++                    cls_test_folds[:] = rng.permutation(
++                        np.arange(len(cls_test_folds)))
+                 test_folds[y == cls] = cls_test_folds
+ 
+         return test_folds

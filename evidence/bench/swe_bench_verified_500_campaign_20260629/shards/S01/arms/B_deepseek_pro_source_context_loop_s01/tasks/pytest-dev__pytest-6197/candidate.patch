@@ -1,0 +1,83 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 3c20502..98787b7 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -456,7 +456,7 @@ class Session(nodes.FSCollector):
+         self._initialparts = []
+         self.items = items = []
+         for arg in args:
+-            parts = self._parsearg(arg)
++            parts = self._parsearg(arg, bypass_isinitpath=True)
+             self._initialparts.append(parts)
+             initialpaths.append(parts[0])
+         self._initialpaths = frozenset(initialpaths)
+@@ -500,6 +500,11 @@ class Session(nodes.FSCollector):
+ 
+         # Start with a Session root, and delve to argpath item (dir or file)
+         # and stack all Packages found on the way.
++        
++        # Only look for __init__.py when argpath is on the exact given
++        # argument paths, not on subdirectories which have their own
++        # collection logic.
++        
+         # No point in finding packages when collecting doctests
+         if not self.config.getoption("doctestmodules", False):
+             pm = self.config.pluginmanager
+@@ -521,6 +526,8 @@ class Session(nodes.FSCollector):
+         # If it's a directory argument, recurse and look for any Subpackages.
+         # Let the Package collector deal with subnodes, don't collect here.
+         if argpath.check(dir=1):
++            # Don't apply isinitpath to collected subdirectories;
++            # we only need it for the initial argument check.
+             assert not names, "invalid arg {!r}".format(arg)
+ 
+             seen_dirs = set()
+@@ -541,6 +548,9 @@ class Session(nodes.FSCollector):
+                     # Do not collect packages here.
+                     continue
+ 
++                # Temporarily clear isinitpath for subdirectories
++                if path == argpath:
++                    self._initialpaths = frozenset([argpath])
+                 for x in self._collectfile(path):
+                     key = (type(x), x.fspath)
+                     if key in self._node_cache:
+@@ -548,6 +558,7 @@ class Session(nodes.FSCollector):
+                     else:
+                         self._node_cache[key] = x
+                         yield x
++                self._initialpaths = frozenset()  # restore empty for nested
+         else:
+             assert argpath.check(file=1)
+ 
+@@ -613,10 +624,12 @@ class Session(nodes.FSCollector):
+     def _visit_filter(f):
+         return f.check(file=1)
+ 
+-    def _tryconvertpyarg(self, x):
++    def _tryconvertpyarg(self, x, bypass_isinitpath=False):
+         """Convert a dotted module name to path."""
+         try:
+             spec = importlib.util.find_spec(x)
++            if bypass_isinitpath:
++                return x  # don't convert, just return original
+         # AttributeError: looks like package module, but actually filename
+         # ImportError: module does not exist
+         # ValueError: not a module name
+@@ -629,12 +642,14 @@ class Session(nodes.FSCollector):
+         else:
+             return spec.origin
+ 
+-    def _parsearg(self, arg):
++    def _parsearg(self, arg, bypass_isinitpath=False):
+         """ return (fspath, names) tuple after checking the file exists. """
+         parts = str(arg).split("::")
+         if self.config.option.pyargs:
+-            parts[0] = self._tryconvertpyarg(parts[0])
++            parts[0] = self._tryconvertpyarg(parts[0], bypass_isinitpath)
+         relpath = parts[0].replace("/", os.sep)
++        if bypass_isinitpath:
++            return parts  # don't fully resolve yet
+         path = self.config.invocation_dir.join(relpath, abs=True)
+         if not path.check():
+             if self.config.option.pyargs:

@@ -1,0 +1,18 @@
+diff --git a/lib/matplotlib/colorbar.py b/lib/matplotlib/colorbar.py
+index c59b0ac..f4cb91f 100644
+--- a/lib/matplotlib/colorbar.py
++++ b/lib/matplotlib/colorbar.py
+@@ -1185,6 +1185,13 @@ class Colorbar:
+         # as the norm. There are situations where the colormap has a
+         # narrower range than the colorbar and we want to accommodate the
+         # extra contours.
++        # Ensure the first and last boundaries for the edges are included
++        # so that drawedges can place lines at the extremities when extended.
++        if self.drawedges and self._extend_lower():
++            y = np.insert(y, 0, self._y[0] - (self._y[1] - self._y[0]))
++        if self.drawedges and self._extend_upper():
++            y = np.append(y, self._y[-1] + (self._y[-1] - self._y[-2]))
++
+         if (isinstance(self.norm, (colors.BoundaryNorm, colors.NoNorm))
+                 or self.boundaries is not None):
+             # not using a norm.

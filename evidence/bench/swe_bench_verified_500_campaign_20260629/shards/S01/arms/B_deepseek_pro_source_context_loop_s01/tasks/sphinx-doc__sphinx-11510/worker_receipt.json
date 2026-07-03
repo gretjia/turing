@@ -1,0 +1,93 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:e9ec241fa9782d139cd4bfe7f04ad84042bccb903525a9f05720eeb5a9a08695",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 317,
+  "content_sha256": "sha256:241061af298baa86017caf0f5bc527570cbc3fc93ccaad17a09af7e4da673cbe",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:28a8491226699d7fc5d054165ec44a3aca17aafe6a0cdf04d23beeb76a6044f8",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 221,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "sphinx-doc__sphinx-11510",
+    "receipt_id": "rcpt:3ebd400f659f1ebf3f9e764ee952019fc25f54dd6cf10c87d17cbaa8a9150e6a",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 101,
+      "prompt_cache_hit_tokens": 9472,
+      "prompt_cache_miss_tokens": 245,
+      "prompt_tokens": 9717,
+      "provider_usage_raw_sha256": "sha256:af1904a6363cc67c9bfc2ab9ececaa3406f05a4b2a57e97768c86cae6daeb779",
+      "total_tokens": 9818
+    },
+    "wall_time_ms": 2318,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "faea2f97-9923-4aa5-800e-ae36d9a5c217",
+      "response_sha256": "sha256:6f1307724ad084eaf4a6bad82a3cf98c0079a22ec563801f4b6e7d21d5e07daa"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 899,
+  "extra_context_path": "shards/S01/loop_self_repair_contexts/S01-W03/sphinx-doc__sphinx-11510/extra_context.md",
+  "extra_context_sha256": "sha256:25f9ff792f6f7118975bde292413f5b9f5d8b98dcfcdebe1c950a3982f0c863f",
+  "instance_id": "sphinx-doc__sphinx-11510",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded extra context file, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 10",
+    "output": "Checking patch sphinx/io.py...\nHunk #1 succeeded at 112 (offset 13 lines).\nApplied patch sphinx/io.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:101aec2106271890076bb909dbf6894f0b7e0a01a958eac5e5c6d8e8e172e225",
+  "response_sha256": "sha256:6f1307724ad084eaf4a6bad82a3cf98c0079a22ec563801f4b6e7d21d5e07daa",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/sphinx-doc__sphinx-11510/worker_capsule.md",
+  "source_context_length_chars": 32785,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/sphinx-doc__sphinx-11510/source_context.md",
+  "source_context_sha256": "sha256:e7ea687dd83e1a5838fb767567ead6a9d04b18438c8074fd069ea3936c9cabe1",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 101,
+    "prompt_cache_hit_tokens": 9472,
+    "prompt_cache_miss_tokens": 245,
+    "prompt_tokens": 9717,
+    "total_tokens": 9818
+  },
+  "usage_raw_sha256": "sha256:af1904a6363cc67c9bfc2ab9ececaa3406f05a4b2a57e97768c86cae6daeb779",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/sphinx-doc__sphinx-11510/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:9966ff24bc8be8ed5721814778c65a1bfb24de0e94a20bd9117993e18c547243",
+  "wall_time_ms": 2318
+}

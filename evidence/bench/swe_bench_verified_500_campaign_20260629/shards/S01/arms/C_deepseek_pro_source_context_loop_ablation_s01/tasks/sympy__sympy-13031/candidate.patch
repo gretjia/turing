@@ -1,0 +1,17 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+index da1d307..bb9eece 100644
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -2011,6 +2011,12 @@ class MatrixBase(MatrixDeprecated,
+                 if len(ncol) > 1:
+                     raise ValueError("Got rows of variable lengths: %s" %
+                                      sorted(list(ncol)))
++                if 0 in ncol:
++                    # Allow 0-column matrices in hstack/vstack
++                    if not all(c == 0 for c in ncol):
++                        raise ValueError("Got rows of variable lengths: %s" %
++                                         sorted(list(ncol)))
++                    ncol = {0}
+                 cols = ncol.pop() if ncol else 0
+                 rows = len(in_mat) if cols else 0
+                 if rows:

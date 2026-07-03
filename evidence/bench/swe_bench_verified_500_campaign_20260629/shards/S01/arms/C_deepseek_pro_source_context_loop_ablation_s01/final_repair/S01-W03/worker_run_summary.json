@@ -1,0 +1,221 @@
+{
+  "agent_id": "m3-p6-deepseek-loop-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W03/source_snapshots",
+  "branch_id": "branch:m3-p6:C",
+  "broadcast_rules_file": null,
+  "broadcast_section": "always",
+  "claim_boundary": {
+    "arm": "C",
+    "confirmatory_s01": false,
+    "deepseek_only_source_context_loop": true,
+    "has_failure_memory_broadcast": true,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p6",
+  "extra_context_file": null,
+  "extra_context_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/loop_self_repair_contexts/S01-W03",
+  "ipqc_window_id": "S01-W03",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [],
+  "provider": "deepseek",
+  "reasoning_effort": null,
+  "run_id_prefix": "m3-p6-arm-c-source-context-loop-ablation",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S01",
+  "source_context_name": "source_context.md",
+  "split_label": "s01-loop-arm-c-ablation",
+  "status": "PASS",
+  "task_count_completed": 10,
+  "task_count_requested": 10,
+  "task_dir_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks",
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 1255,
+      "candidate_patch_sha256": "sha256:5bbe14fbd42f7b339a0ab8e2f7232b646fb344f3ec00d66ae3e8aeb016c6bf6a",
+      "cost_microusd": 3765,
+      "instance_id": "scikit-learn__scikit-learn-12973",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 410,
+        "prompt_cache_hit_tokens": 7168,
+        "prompt_cache_miss_tokens": 8083,
+        "prompt_tokens": 15251,
+        "total_tokens": 15661
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 516,
+      "candidate_patch_sha256": "sha256:abbf55b7d188d6a3fd201ffabb672b09d9b13aed7d94feab1cdbb518f27a4b02",
+      "cost_microusd": 278,
+      "instance_id": "sphinx-doc__sphinx-11510",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 146,
+        "prompt_cache_hit_tokens": 9216,
+        "prompt_cache_miss_tokens": 292,
+        "prompt_tokens": 9508,
+        "total_tokens": 9654
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 490,
+      "candidate_patch_sha256": "sha256:f5bff03d44cd127e74d367f01becf70c1e7673bb1c597740cb74170864fdd668",
+      "cost_microusd": 3563,
+      "instance_id": "sympy__sympy-13372",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 154,
+        "prompt_cache_hit_tokens": 6400,
+        "prompt_cache_miss_tokens": 8120,
+        "prompt_tokens": 14520,
+        "total_tokens": 14674
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 862,
+      "candidate_patch_sha256": "sha256:8dcde6d4cce44a6fc9341ff1f0f203551abebef003f0af9dcc7cf929722a148c",
+      "cost_microusd": 798,
+      "instance_id": "astropy__astropy-14182",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 280,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1338,
+        "prompt_tokens": 1338,
+        "total_tokens": 1618
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 908,
+      "candidate_patch_sha256": "sha256:f88104844a32c33f5a344dcb2ae3afa5a96c7310b69f198854c097333e9a744b",
+      "cost_microusd": 3668,
+      "instance_id": "django__django-11095",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 243,
+        "prompt_cache_hit_tokens": 12160,
+        "prompt_cache_miss_tokens": 8144,
+        "prompt_tokens": 20304,
+        "total_tokens": 20547
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 717,
+      "candidate_patch_sha256": "sha256:2ef1836585d69342cf3096c574b578db78916fd442840d9e23702f5282fd2dea",
+      "cost_microusd": 393,
+      "instance_id": "matplotlib__matplotlib-22865",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 234,
+        "prompt_cache_hit_tokens": 16640,
+        "prompt_cache_miss_tokens": 327,
+        "prompt_tokens": 16967,
+        "total_tokens": 17201
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 838,
+      "candidate_patch_sha256": "sha256:3be80b30a15b2e19b7abeb24396594072332dd6624f13fe136dd930e3fab641c",
+      "cost_microusd": 1277,
+      "instance_id": "pydata__xarray-4356",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 263,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2514,
+        "prompt_tokens": 2514,
+        "total_tokens": 2777
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 712,
+      "candidate_patch_sha256": "sha256:671a57e03fda1d630817e7399d86777ea43828db643680d8f0dfbafad705f059",
+      "cost_microusd": 1019,
+      "instance_id": "pylint-dev__pylint-7277",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 436,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1554,
+        "prompt_tokens": 1554,
+        "total_tokens": 1990
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 739,
+      "candidate_patch_sha256": "sha256:079ac4e270ce35b8e606a8efae2660241899a472db23a5fbea30f94abf59266b",
+      "cost_microusd": 3094,
+      "instance_id": "pytest-dev__pytest-6197",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 212,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 6942,
+        "prompt_tokens": 6942,
+        "total_tokens": 7154
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 1165,
+      "candidate_patch_sha256": "sha256:77cb93a2827281e13153f74ffc66bef19eea287dbe7a7508682f43c5476c8e9f",
+      "cost_microusd": 565,
+      "instance_id": "scikit-learn__scikit-learn-13124",
+      "model_reported": "deepseek-v4-pro",
+      "reused_existing_passing_artifact": true,
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 321,
+        "prompt_cache_hit_tokens": 23168,
+        "prompt_cache_miss_tokens": 510,
+        "prompt_tokens": 23678,
+        "total_tokens": 23999
+      }
+    }
+  ],
+  "thinking": {
+    "type": "disabled"
+  },
+  "visible_capsule_out_dir": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules",
+  "wall_time_ms": 2
+}

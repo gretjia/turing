@@ -1,0 +1,17 @@
+diff --git a/pylint/__init__.py b/pylint/__init__.py
+index 9f3dd74..4fe7605 100644
+--- a/pylint/__init__.py
++++ b/pylint/__init__.py
+@@ -96,6 +96,12 @@ def modify_sys_path() -> None:
+       if pylint is installed in an editable configuration (as the last item).
+       https://github.com/PyCQA/pylint/issues/4161
+     """
++    cwd = os.getcwd()
++    if sys.path[0] not in ("", ".", cwd):
++        # The first entry is not the current working directory
++        # so we should not remove it (see issue #7277).
++        return
++
+     sys.path.pop(0)
+     env_pythonpath = os.environ.get("PYTHONPATH", "")
+     cwd = os.getcwd()

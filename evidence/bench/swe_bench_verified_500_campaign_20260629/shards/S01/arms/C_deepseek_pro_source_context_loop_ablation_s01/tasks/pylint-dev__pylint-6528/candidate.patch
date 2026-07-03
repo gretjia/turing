@@ -1,0 +1,38 @@
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+index 53345a6..672fc5e 100644
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -570,6 +570,24 @@ class PyLinter(
+ 
+         Returns iterator of paths to discovered modules and packages.
+         """
++        ignore_list: list[str] = self.config.ignore
++        ignore_list_re: list[Pattern[str]] = self.config.ignore_patterns
++        ignore_list_paths_re: list[Pattern[str]] = self._ignore_paths
++
++        def _is_ignored(path: str) -> bool:
++            """Check if a path should be ignored based on ignore settings."""
++            basename = os.path.basename(path)
++            if basename in ignore_list:
++                return True
++            if any(pattern.match(basename) for pattern in ignore_list_re):
++                return True
++            if any(pattern.match(path) for pattern in ignore_list_paths_re):
++                return True
++            return False
++
++        if _is_ignored(something):
++            continue
++
+         for something in files_or_modules:
+             if os.path.isdir(something) and not os.path.isfile(
+                 os.path.join(something, "__init__.py")
+@@ -579,6 +597,8 @@ class PyLinter(
+                     if any(root.startswith(s) for s in skip_subtrees):
+                         # Skip subtree of already discovered package.
+                         continue
++                        # Skip subtree of already discovered package.
++                        continue
+                     if "__init__.py" in files:
+                         skip_subtrees.append(root)
+                         yield root

@@ -1,0 +1,13 @@
+diff --git a/sphinx/util/typing.py b/sphinx/util/typing.py
+index eb38d23..26c3842 100644
+--- a/sphinx/util/typing.py
++++ b/sphinx/util/typing.py
+@@ -54,6 +54,8 @@ def stringify(annotation: Any) -> str:
+         return annotation.__qualname__
+     elif annotation is Ellipsis:
+         return '...'
++    elif annotation is None:
++        return 'None'
+ 
+     if sys.version_info >= (3, 7):  # py37+
+         return _stringify_py37(annotation)

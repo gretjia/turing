@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:991ecc0c254da551acb77b797401d62d5089f92016d30c15d89a6054beef42e5",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 766,
+  "content_sha256": "sha256:b6348d4e4d9f1ac9e12f6f7ec514f9f2056a1aeda542b250df6282f557a9de38",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:20d1f846a117ef955411dde576ea9d3175f4b453a6f13c6dd61dc6c0fe51f359",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 947,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "django__django-11066",
+    "receipt_id": "rcpt:5949e199c6f6b13a01ea65d50ba9039298842d34060d308c909c9c9fe9afd9b9",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W01-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 187,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1880,
+      "prompt_tokens": 1880,
+      "provider_usage_raw_sha256": "sha256:6f9d38663fe6c72b997a7e5d17a8c062e3132c8efa27774d277817cf4ff8ba61",
+      "total_tokens": 2067
+    },
+    "wall_time_ms": 3665,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "1efe4c00-e2e4-4984-8835-998477d09b96",
+      "response_sha256": "sha256:281bc6359fa2039704db21048919c5531c39272c0c941f975b6250630bd12b98"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "django__django-11066",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W01",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch django/contrib/contenttypes/management/__init__.py...\nHunk #1 succeeded at 24 (offset -1 lines).\nApplied patch django/contrib/contenttypes/management/__init__.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:7976d6bbba216142ad37d960b2c22bb282af7b44ff276124688e9175e88d24da",
+  "response_sha256": "sha256:281bc6359fa2039704db21048919c5531c39272c0c941f975b6250630bd12b98",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/django__django-11066/worker_capsule.md",
+  "source_context_length_chars": 5201,
+  "source_context_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/django__django-11066/source_context.md",
+  "source_context_sha256": "sha256:687263404a6c671ee0c1cbe7454e4009f215825671f2acd7e8da87ed91291c72",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 187,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 1880,
+    "prompt_tokens": 1880,
+    "total_tokens": 2067
+  },
+  "usage_raw_sha256": "sha256:6f9d38663fe6c72b997a7e5d17a8c062e3132c8efa27774d277817cf4ff8ba61",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/django__django-11066/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:d0b07a7dc7f7795d4060639a58788e251304fcd22ae32a8c2999037978f5b5f7",
+  "wall_time_ms": 3665
+}

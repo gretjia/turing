@@ -1,0 +1,14 @@
+diff --git a/lib/matplotlib/dates.py b/lib/matplotlib/dates.py
+index 4d8ddf3..90ac607 100644
+--- a/lib/matplotlib/dates.py
++++ b/lib/matplotlib/dates.py
+@@ -804,6 +804,9 @@ class ConciseDateFormatter(ticker.Formatter):
+                 # all tickdate are the same, so only micros might be different
+                 # set to the most precise (6: microseconds doesn't exist...)
+                 level = 5
++            if 0 <= level <= 1:
++                show_offset = True
++                level = 5
+ 
+         # level is the basic level we will label at.
+         # now loop through and decide the actual ticklabels

@@ -77,6 +77,60 @@ def test_predictions_builder_uses_worker_patch_digest_and_writes_jsonl(tmp_path)
     assert row["candidate_source"] == "worker_derived"
 
 
+def test_predictions_builder_can_use_custom_task_dir_and_outputs(tmp_path):
+    builder = load_module("predictions_builder", REPO / "tools/bench/build_predictions_jsonl.py")
+    root = tmp_path / "campaign"
+    task_root = root / "shards/S00/arms/B_deepseek_loop/tasks"
+    patch = task_root / "repo__task-1/candidate.patch"
+    make_patch(patch)
+    patch_sha = "sha256:" + hashlib.sha256(patch.read_bytes()).hexdigest()
+    audit_path = task_root / "repo__task-1/worker_candidate_audit.json"
+    audit_path.write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "instance_id": "repo__task-1",
+                "candidate_source": "worker_derived",
+                "submitted_patch_scope": "source_only",
+                "candidate_patch_path": str(patch.relative_to(root)),
+                "candidate_patch_sha256": patch_sha,
+                "problems": [],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    shard_manifest = root / "shards/S00/shard_manifest.json"
+    shard_manifest.parent.mkdir(parents=True, exist_ok=True)
+    shard_manifest.write_text(
+        json.dumps(
+            {
+                "shard_id": "S00",
+                "tasks": [{"instance_id": "repo__task-1", "candidate_source": "worker_derived"}],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    predictions_out = root / "predictions/shard_S00_armB_predictions.jsonl"
+    report_out = root / "predictions/shard_S00_armB_predictions_report.json"
+
+    report = builder.build_predictions(
+        root,
+        "S00",
+        model_name="deepseek-v4-pro__armB__source-context-loop-s01",
+        task_dir_root=task_root,
+        predictions_out=predictions_out,
+        report_out=report_out,
+    )
+
+    assert report["status"] == "PASS"
+    assert report["predictions_path"] == str(predictions_out)
+    assert report_out.exists()
+    row = json.loads(predictions_out.read_text().strip())
+    assert row["model_name_or_path"] == "deepseek-v4-pro__armB__source-context-loop-s01"
+
+
 def test_predictions_builder_can_limit_to_ipqc_window(tmp_path):
     builder = load_module("predictions_builder", REPO / "tools/bench/build_predictions_jsonl.py")
     root = tmp_path / "campaign"

@@ -1,0 +1,24 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index ab475f7..93ca300 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -894,6 +894,19 @@ class SkyCoord(ShapedLikeNDArray):
+             if frame_cls is not None and self.frame.is_transformable_to(frame_cls):
+                 return self.transform_to(attr)
+ 
++        # Check if attr is defined on the class. If so, let the original
++        # AttributeError propagate with the correct error message. This
++        # prevents masking errors from user-defined properties or methods
++        # on subclasses.
++        for cls in self.__class__.__mro__:
++            if attr in cls.__dict__:
++                # Attribute is defined on the class. Let the standard
++                # getattr mechanism handle it, which will raise the
++                # correct AttributeError.
++                raise AttributeError(
++                    f"'{self.__class__.__name__}' object has no attribute '{attr}'"
++                ) from None
++
+         # Fail
+         raise AttributeError(
+             f"'{self.__class__.__name__}' object has no attribute '{attr}'"

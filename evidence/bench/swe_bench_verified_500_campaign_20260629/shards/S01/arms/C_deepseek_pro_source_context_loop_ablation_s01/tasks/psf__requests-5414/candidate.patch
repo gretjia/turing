@@ -1,0 +1,35 @@
+diff --git a/requests/models.py b/requests/models.py
+index e7d292d..27caf51 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -385,6 +385,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         except LocationParseError as e:
+             raise InvalidURL(*e.args)
+ 
++        try:
++            raise InvalidURL(*e.args)
++
+         if not scheme:
+             error = ("Invalid URL {0!r}: No schema supplied. Perhaps you meant http://{0}?")
+             error = error.format(to_native_string(url, 'utf8'))
+@@ -401,8 +404,8 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         if not unicode_is_ascii(host):
+             try:
+                 host = self._get_idna_encoded_host(host)
+-            except UnicodeError:
+-                raise InvalidURL('URL has an invalid label.')
++            except (UnicodeError, idna.IDNAError):
++                raise InvalidURL(*e.args) from None
+         elif host.startswith(u'*'):
+             raise InvalidURL('URL has an invalid label.')
+ 
+@@ -435,6 +438,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+ 
+         enc_params = self._encode_params(params)
+         if enc_params:
++        except (UnicodeError, idna.IDNAError):
++            raise InvalidURL('URL has an invalid label.')
++
+             if query:
+                 query = '%s&%s' % (query, enc_params)
+             else:

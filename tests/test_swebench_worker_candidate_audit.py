@@ -58,6 +58,23 @@ def test_worker_candidate_audit_passes_source_only_worker_patch(tmp_path):
     assert (root / "shards/S00/tasks/django__django-10097/candidate.patch.sha256").exists()
 
 
+def test_worker_candidate_audit_can_use_custom_task_dir_root(tmp_path):
+    auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
+    root = tmp_path / "campaign"
+    write_candidate(root)
+    custom = root / "shards/S00/arms/B_deepseek_loop/tasks"
+    original = root / "shards/S00/tasks/django__django-10097"
+    target = custom / "django__django-10097"
+    target.parent.mkdir(parents=True)
+    original.rename(target)
+
+    report = auditor.audit_candidate(root, "S00", "django__django-10097", task_dir_root=custom)
+
+    assert report["status"] == "PASS"
+    assert report["candidate_patch_path"] == "shards/S00/arms/B_deepseek_loop/tasks/django__django-10097/candidate.patch"
+    assert (target / "candidate.patch.sha256").exists()
+
+
 def test_worker_candidate_audit_checks_patch_applies_to_source_snapshot(tmp_path):
     auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
     root = tmp_path / "campaign"

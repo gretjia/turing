@@ -1,0 +1,25 @@
+diff --git a/sphinx/environment/adapters/toctree.py b/sphinx/environment/adapters/toctree.py
+index 9678e3c..f9518fc 100644
+--- a/sphinx/environment/adapters/toctree.py
++++ b/sphinx/environment/adapters/toctree.py
+@@ -129,6 +129,9 @@ class TocTree:
+                         # 'self' refers to the document from which this
+                         # toctree originates
+                         ref = toctreenode['parent']
++                        if ref in ('genindex', 'modindex', 'search'):
++                            # special page entries are allowed even though they are not real documents
++                            pass
+                         if not title:
+                             title = clean_astext(self.env.titles[ref])
+                         reference = nodes.reference('', '', internal=True,
+@@ -165,6 +168,10 @@ class TocTree:
+                                        ref, location=toctreenode)
+                 except KeyError:
+                     # this is raised if the included file does not exist
++                    if ref in ('genindex', 'modindex', 'search'):
++                        # allow special pages even though they are not real documents
++                        continue
++
+                     if excluded(self.env.doc2path(ref, False)):
+                         message = __('toctree contains reference to excluded document %r')
+                     elif not included(self.env.doc2path(ref, False)):

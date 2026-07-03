@@ -1,0 +1,92 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:0d047d1541da55de9107810ed3213e6b170fc85587e30d1e30b67d28b319c26a",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 818,
+  "content_sha256": "sha256:c879e0eec1c147e8353ad054f04098bf8aed09f6fa87eab14eba6eed93c00701",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:711fec30aabfb8f75a764f391b38f7fb70b1423a8e131b196c42801c26668426",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 8791,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "django__django-11095",
+    "receipt_id": "rcpt:3fe88ced94e14f7f3b5650f51aabe88226d31150a62c33aa27926869f3a7529f",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 208,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 20513,
+      "prompt_tokens": 20513,
+      "provider_usage_raw_sha256": "sha256:8f963b76edded8a41bd95328a9b97dec46e8b11e9c7e4369d4b1a51c957a50f2",
+      "total_tokens": 20721
+    },
+    "wall_time_ms": 5406,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "e9e399bd-54c6-4734-a293-257024025dc0",
+      "response_sha256": "sha256:f187f12b3915fa7a73eedf6e58472f2772cfa892a8b1bcbac35b41304139f71b"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "django__django-11095",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch django/contrib/admin/options.py...\nHunk #1 succeeded at 580 (offset -14 lines).\nApplied patch django/contrib/admin/options.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:37ca8d3648bd824eb4c16e7d5acc52ec5fce39f94979f9b2b675e7e5175bf74c",
+  "response_sha256": "sha256:f187f12b3915fa7a73eedf6e58472f2772cfa892a8b1bcbac35b41304139f71b",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/django__django-11095/worker_capsule.md",
+  "source_context_length_chars": 91830,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/django__django-11095/source_context.md",
+  "source_context_sha256": "sha256:3a6acd4c8e5cb89ef22499f1a30bcf83dfdf9a2323b420e16698ecebbd5c1c76",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 208,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 20513,
+    "prompt_tokens": 20513,
+    "total_tokens": 20721
+  },
+  "usage_raw_sha256": "sha256:8f963b76edded8a41bd95328a9b97dec46e8b11e9c7e4369d4b1a51c957a50f2",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/django__django-11095/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:9ca9956f555109bbecdb8fdfa3c63f16844cbdba0efd0dacb8ae92523badae4c",
+  "wall_time_ms": 5406
+}

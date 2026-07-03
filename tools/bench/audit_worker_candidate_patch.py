@@ -86,8 +86,15 @@ def check_patch_applies(patch_path: Path, apply_root: Path) -> tuple[bool, str]:
     return result.returncode == 0, output
 
 
-def audit_candidate(root: Path, shard: str, instance_id: str, *, apply_root: Path | None = None) -> dict[str, Any]:
-    task_dir = root / "shards" / shard / "tasks" / instance_id
+def audit_candidate(
+    root: Path,
+    shard: str,
+    instance_id: str,
+    *,
+    apply_root: Path | None = None,
+    task_dir_root: Path | None = None,
+) -> dict[str, Any]:
+    task_dir = (task_dir_root / instance_id) if task_dir_root is not None else root / "shards" / shard / "tasks" / instance_id
     patch_path = task_dir / "candidate.patch"
     receipt_path = task_dir / "worker_receipt.json"
     problems: list[str] = []
@@ -174,8 +181,15 @@ def main() -> int:
     parser.add_argument("--shard", required=True)
     parser.add_argument("--instance-id", required=True)
     parser.add_argument("--apply-root", type=Path)
+    parser.add_argument("--task-dir-root", type=Path)
     args = parser.parse_args()
-    report = audit_candidate(args.root, args.shard, args.instance_id, apply_root=args.apply_root)
+    report = audit_candidate(
+        args.root,
+        args.shard,
+        args.instance_id,
+        apply_root=args.apply_root,
+        task_dir_root=args.task_dir_root,
+    )
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0 if report["status"] == "PASS" else 1
 

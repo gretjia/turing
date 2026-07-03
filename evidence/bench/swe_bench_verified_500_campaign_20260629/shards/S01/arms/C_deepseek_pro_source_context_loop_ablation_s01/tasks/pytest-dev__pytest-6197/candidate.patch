@@ -1,0 +1,15 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 3c20502..5f783c7 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -510,7 +510,9 @@ class Session(nodes.FSCollector):
+                 if parent.isdir():
+                     pkginit = parent.join("__init__.py")
+                     if pkginit.isfile():
+-                        if pkginit not in self._node_cache:
++                        if pkginit not in self._node_cache and pkginit not in [
++                            p[0] for p in self._notfound
++                        ]:
+                             col = self._collectfile(pkginit, handle_dupes=False)
+                             if col:
+                                 if isinstance(col[0], Package):

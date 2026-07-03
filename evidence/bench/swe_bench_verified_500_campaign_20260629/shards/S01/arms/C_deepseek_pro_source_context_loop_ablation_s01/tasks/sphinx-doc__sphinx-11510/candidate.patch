@@ -1,0 +1,16 @@
+diff --git a/sphinx/io.py b/sphinx/io.py
+index 4874fdf..0a3721a 100644
+--- a/sphinx/io.py
++++ b/sphinx/io.py
+@@ -112,7 +112,10 @@ class SphinxStandaloneReader(SphinxBaseReader):
+         # emit "source-read" event
+         arg = [content]
+         env.events.emit('source-read', env.docname, arg)
+-        return arg[0]
++        new_content = arg[0]
++        if new_content is not content:
++            env.temp_data['source'] = new_content
++        return new_content
+ 
+ 
+ class SphinxI18nReader(SphinxBaseReader):

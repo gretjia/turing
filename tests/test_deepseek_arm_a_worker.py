@@ -168,6 +168,157 @@ def test_worker_visible_context_appends_extra_context_file(tmp_path):
     assert metadata["extra_context_sha256"].startswith("sha256:")
 
 
+def test_resolve_extra_context_file_prefers_instance_context_root(tmp_path):
+    worker = load_worker()
+    fallback = tmp_path / "fallback.md"
+    fallback.write_text("fallback\n", encoding="utf-8")
+    instance_context = tmp_path / "contexts/repo__task-1/extra_context.md"
+    instance_context.parent.mkdir(parents=True)
+    instance_context.write_text("instance-specific\n", encoding="utf-8")
+
+    selected = worker.resolve_extra_context_file(
+        instance_id="repo__task-1",
+        extra_context_file=fallback,
+        extra_context_root=tmp_path / "contexts",
+    )
+    fallback_selected = worker.resolve_extra_context_file(
+        instance_id="repo__task-2",
+        extra_context_file=fallback,
+        extra_context_root=tmp_path / "contexts",
+    )
+
+    assert selected == instance_context
+    assert fallback_selected == fallback
+
+
+def test_load_existing_pass_result_summarizes_task_without_provider_call(tmp_path):
+    worker = load_worker()
+    task_dir = tmp_path / "tasks/repo__task-1"
+    task_dir.mkdir(parents=True)
+    patch_text = "diff --git a/pkg/mod.py b/pkg/mod.py\n"
+    (task_dir / "candidate.patch").write_text(patch_text, encoding="utf-8")
+    worker.write_json(
+        task_dir / "worker_receipt.json",
+        {
+            "status": "COMPLETED",
+            "model_reported": "deepseek-v4-pro",
+            "candidate_patch_sha256": worker.sha256_text(patch_text),
+            "cost_event": {"cost": {"cost_microusd": 123}},
+            "usage": {"prompt_tokens": 10, "completion_tokens": 2, "total_tokens": 12},
+        },
+    )
+    worker.write_json(
+        task_dir / "worker_candidate_audit.json",
+        {"status": "PASS", "problems": []},
+    )
+
+    row = worker.load_existing_pass_result(instance_id="repo__task-1", task_dir=task_dir)
+
+    assert row == {
+        "instance_id": "repo__task-1",
+        "status": "COMPLETED",
+        "model_reported": "deepseek-v4-pro",
+        "candidate_patch_sha256": worker.sha256_text(patch_text),
+        "candidate_patch_bytes": len(patch_text.encode("utf-8")),
+        "candidate_audit_status": "PASS",
+        "candidate_audit_problems": [],
+        "cost_microusd": 123,
+        "usage": {"prompt_tokens": 10, "completion_tokens": 2, "total_tokens": 12},
+        "reused_existing_passing_artifact": True,
+    }
+
+
+def test_main_reuses_existing_passing_artifacts_without_api_key(tmp_path, monkeypatch):
+    worker = load_worker()
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    root = tmp_path / "campaign"
+    capsule = root / "shards/S01/ipqc/S01-W00/worker_safe_tasks/repo__task-1/worker_capsule.md"
+    capsule.parent.mkdir(parents=True)
+    capsule.write_text("# worker-safe capsule\n", encoding="utf-8")
+    worker.write_json(
+        root / "shards/S01/ipqc/S01-W00/worker_safe_tasks/worker_safe_tasks_report.json",
+        {
+            "status": "PASS",
+            "tasks": [{"worker_capsule_path": str(capsule.relative_to(root))}],
+        },
+    )
+    task_dir = root / "shards/S01/arms/C/tasks/repo__task-1"
+    task_dir.mkdir(parents=True)
+    patch_text = "diff --git a/pkg/mod.py b/pkg/mod.py\n"
+    (task_dir / "candidate.patch").write_text(patch_text, encoding="utf-8")
+    worker.write_json(
+        task_dir / "worker_receipt.json",
+        {
+            "status": "COMPLETED",
+            "model_reported": "deepseek-v4-pro",
+            "candidate_patch_sha256": worker.sha256_text(patch_text),
+            "cost_event": {"cost": {"cost_microusd": 0}},
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        },
+    )
+    worker.write_json(task_dir / "worker_candidate_audit.json", {"status": "PASS", "problems": []})
+    out = root / "summary.json"
+
+    status = worker.main(
+        [
+            "--root",
+            str(root),
+            "--shard",
+            "S01",
+            "--window",
+            "S01-W00",
+            "--task-dir-root",
+            str(root / "shards/S01/arms/C/tasks"),
+            "--reuse-existing-passing",
+            "--out",
+            str(out),
+        ]
+    )
+
+    summary = json.loads(out.read_text(encoding="utf-8"))
+    assert status == 0
+    assert summary["status"] == "PASS"
+    assert summary["task_count_completed"] == 1
+    assert summary["tasks"][0]["reused_existing_passing_artifact"] is True
+    assert "missing_env" not in summary
+
+
+def test_worker_visible_context_can_add_broadcast_section(tmp_path):
+    worker = load_worker()
+    capsule = tmp_path / "worker_capsule.md"
+    capsule.write_text("# worker capsule\n", encoding="utf-8")
+    rules_file = tmp_path / "rules.json"
+    rules_file.write_text(
+        json.dumps(
+            {
+                "rules": [
+                    {
+                        "rule_id": "br_format",
+                        "failure_class": "PATCH_FORMAT",
+                        "guidance": "Return a complete unified diff with hunk headers.",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    rules = worker.load_broadcast_rules(rules_file)
+
+    text, metadata = worker.load_worker_visible_context(
+        capsule,
+        broadcast_rules=rules,
+        broadcast_rules_file=rules_file,
+        broadcast_section_mode="always",
+    )
+
+    assert "# worker capsule" in text
+    assert "BEGIN_TURINGOS_BROADCAST_RULES" in text
+    assert "PATCH_FORMAT" in text
+    assert metadata["broadcast_rule_count"] == 1
+    assert metadata["broadcast_rule_ids"] == ["br_format"]
+    assert metadata["broadcast_rules_path"] == str(rules_file)
+
+
 def test_normalize_patch_against_source_recounts_applicable_hunks(tmp_path):
     worker = load_worker()
     source_root = tmp_path / "source"
@@ -335,3 +486,101 @@ def test_worker_result_packet_can_stamp_m3_p5_confirmatory_labels(tmp_path):
     assert "source_context.md" in packet["integrity_statement"]
     assert "private reasoning" not in json.dumps(packet, sort_keys=True)
     schemas.validate_cost_event_v2(packet["cost_event"])
+
+
+def test_worker_result_packet_can_stamp_loop_arm_metadata(tmp_path):
+    worker = load_worker()
+    root = tmp_path / "campaign"
+    capsule = root / "shards/S01/ipqc/S01-W00/worker_safe_tasks/repo__task-1/worker_capsule.md"
+    visible = root / "shards/S01/arms/B_deepseek_loop/capsules/repo__task-1/worker_visible_capsule.md"
+    capsule.parent.mkdir(parents=True)
+    visible.parent.mkdir(parents=True)
+    capsule.write_text("# worker-safe capsule\n", encoding="utf-8")
+    visible.write_text("# visible capsule\n", encoding="utf-8")
+    table = {
+        "schema_id": "turingos.m3.price_table.v1",
+        "models": [
+            {
+                "provider": "deepseek",
+                "model_id": "deepseek-v4-pro",
+                "input_cache_hit_microusd_per_mtok": 3500,
+                "input_cache_miss_microusd_per_mtok": 420000,
+                "output_microusd_per_mtok": 840000,
+            }
+        ],
+    }
+    request_payload = worker.build_worker_request(
+        model="deepseek-v4-pro",
+        capsule_text=visible.read_text(encoding="utf-8"),
+        max_tokens=256,
+        system_role_label="weak SWE-bench worker under the TuringOS loop",
+    )
+    response = {
+        "id": "chatcmpl-worker",
+        "model": "deepseek-v4-pro",
+        "choices": [{"message": {"content": "diff --git a/pkg/mod.py b/pkg/mod.py\n"}}],
+        "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 20,
+            "total_tokens": 120,
+            "prompt_cache_hit_tokens": 10,
+            "prompt_cache_miss_tokens": 90,
+        },
+    }
+
+    packet = worker.build_worker_result_packet(
+        root=root,
+        shard="S01",
+        window="S01-W00",
+        instance_id="repo__task-1",
+        model_requested="deepseek-v4-pro",
+        request_payload=request_payload,
+        response=response,
+        response_raw=json.dumps(response, sort_keys=True),
+        wall_time_ms=25,
+        price_table=table,
+        source_capsule_path=capsule,
+        patch_text="diff --git a/pkg/mod.py b/pkg/mod.py\n",
+        source_context_metadata={
+            "broadcast_section_mode": "always",
+            "broadcast_rule_count": 1,
+            "broadcast_rule_ids": ["br_format"],
+            "broadcast_section_sha256": "sha256:" + "1" * 64,
+        },
+        experiment_phase="m3-p6",
+        run_id_prefix="m3-p6-arm-b",
+        split_label="s01-loop-arm-b",
+        agent_id="m3-p6-deepseek-loop-worker",
+        branch_id="branch:m3-p6:B",
+        arm_label="B",
+        receipt_schema_id="turingos.m3.deepseek_loop_worker_receipt.v1",
+        visible_capsule_path=visible,
+        visible_capsule_sha256=worker.sha256_text(visible.read_text(encoding="utf-8")),
+    )
+
+    assert packet["schema_id"] == "turingos.m3.deepseek_loop_worker_receipt.v1"
+    assert packet["arm_label"] == "B"
+    assert packet["visible_capsule_path"] == "shards/S01/arms/B_deepseek_loop/capsules/repo__task-1/worker_visible_capsule.md"
+    assert packet["broadcast_rule_ids"] == ["br_format"]
+    assert packet["cost_event"]["branch_id"] == "branch:m3-p6:B"
+    schemas.validate_cost_event_v2(packet["cost_event"])
+
+
+def test_loop_run_summary_claim_boundary_uses_requested_arm_and_loop_flags():
+    worker = load_worker()
+
+    boundary = worker.build_claim_boundary(
+        experiment_phase="m3-p6",
+        shard="S01",
+        arm_label="B",
+        broadcast_section="always",
+    )
+
+    assert boundary == {
+        "arm": "B",
+        "pilot_only": False,
+        "confirmatory_s01": False,
+        "deepseek_only_source_context_loop": True,
+        "has_failure_memory_broadcast": True,
+        "no_uplift_result": True,
+    }

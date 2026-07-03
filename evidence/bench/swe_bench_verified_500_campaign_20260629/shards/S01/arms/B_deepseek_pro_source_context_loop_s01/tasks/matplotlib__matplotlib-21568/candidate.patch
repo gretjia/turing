@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/dates.py b/lib/matplotlib/dates.py
+index 0766156..1f58b4b 100644
+--- a/lib/matplotlib/dates.py
++++ b/lib/matplotlib/dates.py
+@@ -843,7 +843,7 @@ class ConciseDateFormatter(ticker.Formatter):
+                 self.offset_string = _wrap_in_tex(self.offset_string)
+ 
+         if self._usetex:
+-            return [_wrap_in_tex(l) for l in labels]
++            return labels
+         else:
+             return labels
+ 

@@ -1,0 +1,13 @@
+diff --git a/src/_pytest/config/__init__.py b/src/_pytest/config/__init__.py
+index 3a0eca5..a09afe2 100644
+--- a/src/_pytest/config/__init__.py
++++ b/src/_pytest/config/__init__.py
+@@ -196,7 +196,7 @@ def _prepareconfig(args=None, plugins=None):
+     pluginmanager = config.pluginmanager
+     try:
+         if plugins:
+-            for plugin in plugins:
++            for plugin in list(plugins):
+                 if isinstance(plugin, str):
+                     pluginmanager.consider_pluginarg(plugin)
+                 else:
