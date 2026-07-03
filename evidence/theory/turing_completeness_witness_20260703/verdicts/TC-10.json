@@ -1,0 +1,15 @@
+{
+  "clean_clone_required": true,
+  "custody_separated_required": true,
+  "expected_external_action": "Clone the exact packet commit, verify the packet manifest, re-run TC-01..TC-09, then write the TC-10 verdict outside implementer custody.",
+  "external_verifier_artifact": null,
+  "external_verifier_required": true,
+  "gate_id": "TC-10",
+  "implementer_may_run": false,
+  "not_run_is_fail": true,
+  "schema_id": "turingos.tc5.tc10_slot.v1",
+  "status_reason": "M5_CLASS_EXTERNAL_VERIFIER_REQUIRED",
+  "subject_commit": "ed6234f2dc398d7763596643902f26d4b8d3ef6c",
+  "timestamp_utc": "2026-07-03T00:00:00Z",
+  "verdict": "NOT_RUN"
+}

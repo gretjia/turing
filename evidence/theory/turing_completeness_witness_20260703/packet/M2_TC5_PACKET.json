@@ -1,0 +1,61 @@
+{
+  "claims": {
+    "claim_boundary": "evidence/theory/turing_completeness_witness_20260703/packet/CLAIM_BOUNDARY.json",
+    "m2_gate_claim_allowed": false,
+    "tc10_external_artifact_exists": false,
+    "turing_completeness_claim_allowed": false
+  },
+  "clean_clone_instructions": [
+    "git clone <repo-url> fresh",
+    "cd fresh && git checkout <exact_sha_from_plan_packet_descriptor>",
+    "sha256sum -c evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+    "cd evidence/theory/turing_completeness_witness_20260703 && sha256sum -c bundle_sha256s.txt",
+    "cd <repo-root> && PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc4_audit.py",
+    "cd <repo-root> && python3 tools/theory/audit_tc4_witness.py --root evidence/theory/turing_completeness_witness_20260703",
+    "write TC-10 verdict outside implementer custody; do not edit this packet in place"
+  ],
+  "explicit_non_claims": {
+    "closed": false,
+    "constitution_bytes_changed": false,
+    "externally_verified": false,
+    "m2_enabled": false,
+    "og10_or_genesis_signature": false,
+    "ratified": false,
+    "released": false,
+    "shipped": false,
+    "tc10_external_artifact_exists": false,
+    "turing_completeness_claim_allowed": false
+  },
+  "module": "M2",
+  "packet_manifest": "evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+  "packet_role": "external_verifier_input",
+  "phase": "M2.TC5",
+  "phase_status": "ADDRESSED",
+  "schema_id": "turingos.tc5.external_packet.v1",
+  "status_ceiling": "ADDRESSED",
+  "subject_commit": "ed6234f2dc398d7763596643902f26d4b8d3ef6c",
+  "subject_repo": "/home/zephryj/turingos_backup/work/turing",
+  "tc01_tc09": {
+    "all_pass": true,
+    "summary": "evidence/theory/turing_completeness_witness_20260703/verdicts/TC4_AUDIT_SUMMARY.json",
+    "verdicts": {
+      "TC-01": "PASS",
+      "TC-02": "PASS",
+      "TC-03": "PASS",
+      "TC-04": "PASS",
+      "TC-05": "PASS",
+      "TC-06": "PASS",
+      "TC-07": "PASS",
+      "TC-08": "PASS",
+      "TC-09": "PASS"
+    }
+  },
+  "tc10": {
+    "external_verifier_required": true,
+    "implementer_may_run": false,
+    "not_run_is_fail": true,
+    "path": "evidence/theory/turing_completeness_witness_20260703/verdicts/TC-10.json",
+    "verdict": "NOT_RUN"
+  },
+  "timestamp_utc": "2026-07-03T00:00:00Z"
+}

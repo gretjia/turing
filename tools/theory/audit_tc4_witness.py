@@ -621,11 +621,14 @@ def audit(root: Path) -> dict[str, Any]:
 
 
 def write_outputs(root: Path, report: dict[str, Any]) -> None:
+    tc4_verdict_files = {f"TC-{index:02}.json" for index in range(1, 10)}
+    tc4_verdict_files.add("TC4_AUDIT_SUMMARY.json")
     for relative in ["verdicts", "mutations", "noninterference"]:
         path = root / relative
         if path.exists():
             for child in path.glob("*.json"):
-                child.unlink()
+                if relative != "verdicts" or child.name in tc4_verdict_files:
+                    child.unlink()
         path.mkdir(parents=True, exist_ok=True)
     for gate_id, verdict in sorted(report["verdicts"].items()):
         _write_json(root / "verdicts" / f"{gate_id}.json", verdict)
