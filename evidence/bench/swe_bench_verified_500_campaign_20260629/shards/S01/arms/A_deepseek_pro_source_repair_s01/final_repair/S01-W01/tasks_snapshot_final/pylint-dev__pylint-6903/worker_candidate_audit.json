@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W01/source_snapshots/pylint-dev__pylint-6903",
+    "output": "Checking patch pylint/lint/run.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/tasks/pylint-dev__pylint-6903/candidate.patch",
+  "candidate_patch_sha256": "sha256:e2e698f190c0990d9953c10944340e562b16ae5b6f69a09155e0b6870770bafd",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "pylint/lint/run.py"
+  ],
+  "instance_id": "pylint-dev__pylint-6903",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

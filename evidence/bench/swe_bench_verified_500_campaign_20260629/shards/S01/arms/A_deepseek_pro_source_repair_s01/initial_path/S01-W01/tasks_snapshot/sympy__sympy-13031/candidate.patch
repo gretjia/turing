@@ -1,0 +1,13 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+index e1c88b8880..2d010e7d6d 100644
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -4232,7 +4232,7 @@ def hstack(cls, *args):
+         if len(args) == 0:
+             return cls._new()
+ 
+-        kls = type(args[0])
++        kls = cls._new
+         return reduce(kls.row_join, args)
+ 
+     def row_join(self, rhs):

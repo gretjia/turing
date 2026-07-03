@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W00/source_snapshots/matplotlib__matplotlib-20859",
+    "output": "Checking patch lib/matplotlib/legend.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/tasks/matplotlib__matplotlib-20859/candidate.patch",
+  "candidate_patch_sha256": "sha256:3fcc4a8bc2859851ec77a1e079bb4f39dfb66133ea55dbfeac4d981bcb9007ac",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "lib/matplotlib/legend.py"
+  ],
+  "instance_id": "matplotlib__matplotlib-20859",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

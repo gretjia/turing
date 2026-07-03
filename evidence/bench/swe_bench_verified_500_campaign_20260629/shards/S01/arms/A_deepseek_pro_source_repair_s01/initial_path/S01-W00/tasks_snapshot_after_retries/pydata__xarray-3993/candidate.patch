@@ -1,0 +1,50 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -1975,13 +1975,23 @@ class DataArray(AbstractArray, DataWithCoords):
+     def differentiate(self, coord, edge_order=1):
+         """ Differentiate with second order accurate centered differences.
+         """
+         ds = self._to_temp_dataset()
+         result = ds.differentiate(coord=coord, edge_order=edge_order)
+         return self._from_temp_dataset(result)
+ 
+-    def integrate(self, dim=None, **kwargs):
+-        """Integrate along the given dimension.
++    def integrate(self, coord=None, **kwargs):
++        """Integrate along the given coordinate.
+ 
+         Parameters
+         ----------
+-        dim : str, optional
+-            Dimension over which to integrate.
++        coord : str, optional
++            Coordinate over which to integrate.
++        dim : str, optional
++            .. deprecated:: 0.12.1
++                Use ``coord`` instead.
+         **kwargs : dict
+-            Additional arguments passed on to the `integrate` method of
+-            the underlying `Dataset`.
+ 
+         Returns
+         -------
+         DataArray
+         """
++        dim = kwargs.pop("dim", None)
++        if dim is not None:
++            warnings.warn(
++                "The `dim` argument to `integrate` is deprecated. "
++                "Use `coord` instead.",
++                FutureWarning,
++                stacklevel=2,
++            )
++            if coord is not None:
++                raise ValueError(
++                    "Cannot specify both `coord` and `dim`. Use `coord` only."
++                )
++            coord = dim
+         ds = self._to_temp_dataset()
+-        result = ds.integrate(coord=dim, **kwargs)
++        result = ds.integrate(coord=coord, **kwargs)
+         return self._from_temp_dataset(result)

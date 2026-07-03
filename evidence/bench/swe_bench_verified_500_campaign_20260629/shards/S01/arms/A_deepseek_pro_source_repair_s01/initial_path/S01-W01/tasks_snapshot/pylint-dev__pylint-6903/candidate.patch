@@ -1,0 +1,15 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index d9f3f7c98..ee66cbb50 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -53,7 +53,9 @@ def _query_cpu() -> int | None:
+                         f"scale up and scale down.\n",
+                     )
+                     cpu_share = int(cpu_share)
+-                    return cpu_share // 1024
++                    # Avoid returning 0, which would break multiprocessing
++                    # when --jobs=0 is used.
++                    return max(cpu_share // 1024, 1)
+     except Exception:  # pylint: disable=broad-except
+         return None
+     return None

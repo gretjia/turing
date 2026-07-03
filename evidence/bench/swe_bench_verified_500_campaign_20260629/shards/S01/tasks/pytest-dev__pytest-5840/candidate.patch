@@ -1,0 +1,12 @@
+diff --git a/src/_pytest/config/__init__.py b/src/_pytest/config/__init__.py
+index 3a0eca5..4984aba 100644
+--- a/src/_pytest/config/__init__.py
++++ b/src/_pytest/config/__init__.py
+@@ -441,6 +441,7 @@ class PytestPluginManager(PluginManager):
+         except KeyError:
+             pkgpath = conftestpath.pypkgpath()
+             if pkgpath is None:
++                self._conftestpath2mod[conftestpath] = mod
+                 _ensure_removed_sysmodule(conftestpath.purebasename)
+             try:
+                 mod = conftestpath.pyimport()

@@ -52,7 +52,12 @@ def diff_paths(patch_text: str) -> list[str]:
 
 def is_test_path(path: str) -> bool:
     parts = path.split("/")
-    return path.startswith("test_") or "/tests/" in f"/{path}" or "tests" in parts
+    basename = parts[-1] if parts else path
+    return (
+        basename.startswith("test_")
+        or basename.endswith("_test.py")
+        or any(part in {"test", "tests", "testing"} for part in parts)
+    )
 
 
 def check_patch_applies(patch_path: Path, apply_root: Path) -> tuple[bool, str]:

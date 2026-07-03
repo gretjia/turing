@@ -1,0 +1,13 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index b0d8749c..9e2f6f2e 100644
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -2366,7 +2366,7 @@ class DataArray(AbstractArray, DataWithCoords):
+         # pull variables out of the y dimension
+         unstacked = {}
+         for name, idx in all_y.items():
+-            unstacked[name] = self.sel({stacked_dim: idx}).drop(stacked_dim)
++            unstacked[name] = self.sel({stacked_dim: idx}).squeeze(stacked_dim, drop=True)
+ 
+         ds = Dataset(unstacked)
+         ds.attrs = self.attrs

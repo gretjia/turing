@@ -1,0 +1,14 @@
+diff --git a/sphinx/environment/adapters/toctree.py b/sphinx/environment/adapters/toctree.py
+index 9678e3c..99d58c7 100644
+--- a/sphinx/environment/adapters/toctree.py
++++ b/sphinx/environment/adapters/toctree.py
+@@ -167,6 +167,9 @@ class TocTree:
+                     # this is raised if the included file does not exist
+                     if excluded(self.env.doc2path(ref, False)):
+                         message = __('toctree contains reference to excluded document %r')
++                    elif ref in ('genindex', 'modindex', 'search'):
++                        # special pages that are auto-generated and should be allowed
++                        continue
+                     elif not included(self.env.doc2path(ref, False)):
+                         message = __('toctree contains reference to non-included document %r')
+                     else:

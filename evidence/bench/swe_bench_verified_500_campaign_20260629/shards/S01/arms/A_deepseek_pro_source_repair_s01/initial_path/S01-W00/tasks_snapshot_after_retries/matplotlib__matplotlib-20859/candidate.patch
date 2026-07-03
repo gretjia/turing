@@ -1,0 +1,25 @@
+diff --git a/lib/matplotlib/legend.py b/lib/matplotlib/legend.py
+--- a/lib/matplotlib/legend.py
++++ b/lib/matplotlib/legend.py
+@@ -10,7 +10,7 @@ from matplotlib.cbook import _check_in_list
+ from matplotlib.artist import Artist, allow_rasterization
+ from matplotlib.axes import Axes
+-from matplotlib.figure import Figure
++from matplotlib.figure import Figure, FigureBase
+ from matplotlib.font_manager import FontProperties
+ from matplotlib.lines import Line2D
+ from matplotlib.patches import Patch, FancyBboxPatch, Shadow
+@@ -432,8 +432,8 @@ class Legend(Artist):
+                     parent_box = parent.bbox
+                 else:
+                     parent_box = parent.get_tightbbox(renderer)
+-        elif isinstance(parent, Figure):
+-            parent_box = parent.bbox
++        elif isinstance(parent, FigureBase):
++            parent_box = parent.bbox
+         else:
+-            raise TypeError("Legend needs either Axes or Figure as parent")
++            raise TypeError("Legend needs either Axes or FigureBase as parent")
+ 
+         self.parent = parent
+         self._fill = kwargs.pop('fill', True)

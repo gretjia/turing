@@ -1,0 +1,19 @@
+diff --git a/sklearn/linear_model/least_angle.py b/sklearn/linear_model/least_angle.py
+index 8c2afd970..969c3bafd 100644
+--- a/sklearn/linear_model/least_angle.py
++++ b/sklearn/linear_model/least_angle.py
+@@ -1538,9 +1538,11 @@ class LassoLarsIC(Lars):
+             Subset of the LassoLarsIC solution, returned + selected
+         """
+         return self._coefs[:self.n_iter_], self._itensors[:self.n_iter_]
+-
+-    def fit(self, X, y, copy_X=True):
+-        self._copy_X = copy_X
++    
++    def fit(self, X, y, copy_X=None):
++        if copy_X is not None:
++            self.copy_X = copy_X
++        self._copy_X = self.copy_X
+         self._fit(X, y)
+ 
+         if self.criterion == 'aic':

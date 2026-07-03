@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S01/tasks/sphinx-doc__sphinx-10614/candidate.patch",
+  "candidate_patch_sha256": "sha256:a1edf9705f805f06374cdc5d14ff4ba3d97c58757a2304c199207179cdd557bb",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sphinx/ext/inheritance_diagram.py"
+  ],
+  "instance_id": "sphinx-doc__sphinx-10614",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

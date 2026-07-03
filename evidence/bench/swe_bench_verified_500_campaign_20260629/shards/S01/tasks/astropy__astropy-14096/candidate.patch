@@ -1,0 +1,13 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index ab475f7..924de8f 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -895,6 +895,8 @@ class SkyCoord(ShapedLikeNDArray):
+                 return self.transform_to(attr)
+ 
+         # Fail
++        if hasattr(self, attr):
++            return super().__getattribute__(attr)
+         raise AttributeError(
+             f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+         )

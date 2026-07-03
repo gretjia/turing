@@ -1,0 +1,118 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 3b3d3c2e8..3e62acf18 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -16,13 +16,21 @@
+ import os
+ import sys
++import re
+ from collections.abc import Sequence
+ 
+ from pylint.lint.utils import get_fatal_error_message, prepare_crash_report
+ 
+ 
++def _is_ignored(filepath, ignore_list, ignore_list_re, ignore_list_paths_re):
++    basename = os.path.basename(filepath)
++    return (
++        basename in ignore_list
++        or any(re.match(pattern, basename) for pattern in ignore_list_re)
++        or any(re.match(pattern, filepath) for pattern in ignore_list_paths_re)
++    )
++
++
+ def expand_modules(
+     files_or_modules: Sequence[str],
+-    ignore_list: list[str],
+-    ignore_list_re: list[str],
++    ignore_list: list[str] = (),
++    ignore_list_re: list[str] = (),
++    ignore_list_paths_re: list[str] = (),
+ ) -> tuple[list[dict[str, str]], list[Exception | KeyboardInterrupt]]:
+     """Take a list of files/modules/packages and return the list of tuple
+     (file, module name, error code) which have to be actually checked.
+@@ -31,12 +39,14 @@
+     result = []
+     errors: list[Exception | KeyboardInterrupt] = []
+     path = sys.path.copy()
++    current_dir = os.getcwd()
+ 
+     for something in files_or_modules:
+         basename = os.path.basename(something)
+         if (
+             basename in ignore_list
+-            or _is_in_ignore_list_re(basename, ignore_list_re)
++            or any(re.match(pattern, basename) for pattern in ignore_list_re)
++            or any(re.match(pattern, something) for pattern in ignore_list_paths_re)
+         ):
+             continue
+         module_path = get_python_path(something)
+@@ -89,19 +99,25 @@
+     return result, errors
+ 
+ 
+-def _is_in_ignore_list_re(element: str, ignore_list_re: list[str]) -> bool:
+-    """Determine if the element is matched in a regex ignore list."""
+-    for file_pattern in ignore_list_re:
+-        if re.match(file_pattern, element):
+-            return True
+-    return False
+-
+-
+-def expand_dir(dirpath: str, ignore_list: list[str], ignore_list_re: list[str]):
++def expand_dir(
++    dirpath: str,
++    ignore_list: list[str] = (),
++    ignore_list_re: list[str] = (),
++    ignore_list_paths_re: list[str] = (),
++    _original_dir: str = None,
++) -> list[str]:
++    """Recursively discover Python files in a directory.
++
++    Respects ignore lists, ignore regex patterns, and ignore path patterns.
++    """
+     all_py_files = []
+-    for dirpath, _dirnames, filenames in os.walk(dirpath):
++    if _original_dir is None:
++        _original_dir = os.path.abspath(dirpath)
++
++    for root, _dirnames, filenames in os.walk(dirpath):
+         for filename in filenames:
+             if filename.endswith(".py"):
+-                all_py_files.append(os.path.join(dirpath, filename))
++                full_path = os.path.join(root, filename)
++                rel_path = os.path.relpath(full_path, _original_dir)
++                if not _is_ignored(rel_path, ignore_list, ignore_list_re, ignore_list_paths_re):
++                    all_py_files.append(full_path)
+     return all_py_files
+-
+-
+-def _is_ignored_checker_dir(dirpath):
+-    return "site-packages" in dirpath or "dist-packages" in dirpath
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+index 0905b7519..3c3dfc5a2 100644
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -367,6 +367,7 @@
+         ignore_list = self.config.ignore_list or ()
+         ignore_list_re = self.config.ignore_list_re or ()
++        ignore_list_paths_re = self.config.ignore_list_paths_re or ()
+ 
+         if self.config.recursive:
+             files_or_modules = list(files_or_modules)
+@@ -378,6 +379,8 @@
+                     dirpath,
+                     ignore_list=ignore_list,
+                     ignore_list_re=ignore_list_re,
++                    ignore_list_paths_re=ignore_list_paths_re,
++                    _original_dir=os.getcwd(),
+                 )
+             )
+             files_or_modules = list(set(files_or_modules))
+@@ -396,6 +399,7 @@
+             expand_modules(
+                 files_or_modules,
+                 ignore_list,
+                 ignore_list_re,
++                ignore_list_paths_re,
+             ),
+         )

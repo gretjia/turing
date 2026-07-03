@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S01/tasks/scikit-learn__scikit-learn-12973/candidate.patch",
+  "candidate_patch_sha256": "sha256:67a9c83424e9c8237f522aa598a1f591200d216e659057c96c0ba4d61bca7b3c",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sklearn/linear_model/least_angle.py"
+  ],
+  "instance_id": "scikit-learn__scikit-learn-12973",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

@@ -1,0 +1,79 @@
+{
+  "candidate_patch_sha256": "sha256:e2e698f190c0990d9953c10944340e562b16ae5b6f69a09155e0b6870770bafd",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 713,
+  "content_sha256": "sha256:e7f5a02fa91e4fc2ee74a3c67cd1c2ba57e8189616337eb528aea19058ca89e1",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:bf35553833746997365e6d0350f6379dd40a6483ec33ad33ffcd27bdef365d05",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 1142,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pylint-dev__pylint-6903",
+    "receipt_id": "rcpt:c0d91a866fb321f6242116c6a1285fa2ef13d5768ccc5d25a918d5f8d7d7e132",
+    "run_id": "m3-p5-arm-a-source-repair-S01-W01-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-confirmatory-source-repair",
+    "usage": {
+      "completion_tokens": 255,
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 2199,
+      "prompt_tokens": 3223,
+      "provider_usage_raw_sha256": "sha256:6df28872b9cf4a6ae693acb1ce2a68de145a0af03b33c9c2188c0b29d28eb505",
+      "total_tokens": 3478
+    },
+    "wall_time_ms": 3781,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "395ae055-4a08-4075-9d45-09c9c9cd5840",
+      "response_sha256": "sha256:b95c5b0c19fe82ff0b13071586faf6f351b961fb12c229554efed1c9ecf6b58b"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "pylint-dev__pylint-6903",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W01",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 21",
+    "output": "Checking patch pylint/lint/run.py...\nHunk #2 succeeded at 76 (offset 2 lines).\nApplied patch pylint/lint/run.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:96a7ee170b43405988614f96835e6478b3fabf625d74dcd468ba76fa4a9abe1d",
+  "response_sha256": "sha256:b95c5b0c19fe82ff0b13071586faf6f351b961fb12c229554efed1c9ecf6b58b",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pylint-dev__pylint-6903/worker_capsule.md",
+  "source_context_length_chars": 8577,
+  "source_context_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pylint-dev__pylint-6903/source_context.md",
+  "source_context_sha256": "sha256:9374997d675b1f378ceda6800d5225cda9ec145494ba748a34929ecf83ababeb",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 255,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 2199,
+    "prompt_tokens": 3223,
+    "total_tokens": 3478
+  },
+  "usage_raw_sha256": "sha256:6df28872b9cf4a6ae693acb1ce2a68de145a0af03b33c9c2188c0b29d28eb505",
+  "wall_time_ms": 3781
+}

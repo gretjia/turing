@@ -1,0 +1,13 @@
+diff --git a/django/contrib/contenttypes/management/__init__.py b/django/contrib/contenttypes/management/__init__.py
+index 0cc3ae5d9a..8b924f2e2e 100644
+--- a/django/contrib/contenttypes/management/__init__.py
++++ b/django/contrib/contenttypes/management/__init__.py
+@@ -24,7 +24,7 @@ class RenameContentType(migrations.RunPython):
+                 new_model = to_state.apps.get_model(app_label, new_model_name)
+                 if ct is not None:
+                     ct.model = new_model_name
+-                    with transaction.atomic(using=db):
++                    with transaction.atomic(using=db, savepoint=False):
+                         ct.save(update_fields={'model'})
+                 else:
+                     # No matching content type, attempt to find one with the new name, if it exists

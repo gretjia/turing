@@ -150,6 +150,24 @@ def test_worker_visible_context_appends_source_context_file(tmp_path):
     assert metadata["source_context_sha256"].startswith("sha256:")
 
 
+def test_worker_visible_context_appends_extra_context_file(tmp_path):
+    worker = load_worker()
+    capsule = tmp_path / "worker_capsule.md"
+    capsule.write_text("# worker capsule\n", encoding="utf-8")
+    extra_context = tmp_path / "path_hints.md"
+    extra_context.write_text("Available source paths:\n- pkg/mod.py\n", encoding="utf-8")
+
+    text, metadata = worker.load_worker_visible_context(
+        capsule,
+        extra_context_file=extra_context,
+    )
+
+    assert "# worker capsule" in text
+    assert "Available source paths" in text
+    assert metadata["extra_context_path"] == str(extra_context)
+    assert metadata["extra_context_sha256"].startswith("sha256:")
+
+
 def test_normalize_patch_against_source_recounts_applicable_hunks(tmp_path):
     worker = load_worker()
     source_root = tmp_path / "source"
@@ -236,4 +254,84 @@ def test_worker_result_packet_has_cost_event_and_no_raw_model_text(tmp_path):
     assert "worker-safe" in packet["integrity_statement"]
     assert "raw_model_content" not in json.dumps(packet, sort_keys=True)
     assert response["choices"][0]["message"]["content"] not in json.dumps(packet, sort_keys=True)
+    schemas.validate_cost_event_v2(packet["cost_event"])
+
+
+def test_worker_result_packet_can_stamp_m3_p5_confirmatory_labels(tmp_path):
+    worker = load_worker()
+    root = tmp_path / "campaign"
+    capsule = root / "shards/S01/ipqc/S01-W00/worker_safe_tasks/repo__task-1/worker_capsule.md"
+    capsule.parent.mkdir(parents=True)
+    capsule.write_text("# worker-safe capsule\n", encoding="utf-8")
+    table = {
+        "schema_id": "turingos.m3.price_table.v1",
+        "models": [
+            {
+                "provider": "deepseek",
+                "model_id": "deepseek-v4-pro",
+                "input_cache_hit_microusd_per_mtok": 3500,
+                "input_cache_miss_microusd_per_mtok": 420000,
+                "output_microusd_per_mtok": 840000,
+            }
+        ],
+    }
+    request_payload = worker.build_worker_request(
+        model="deepseek-v4-pro",
+        capsule_text=capsule.read_text(encoding="utf-8"),
+        max_tokens=256,
+        thinking_type="enabled",
+        reasoning_effort="high",
+    )
+    response = {
+        "id": "chatcmpl-worker",
+        "model": "deepseek-v4-pro",
+        "choices": [
+            {
+                "message": {
+                    "content": "diff --git a/pkg/mod.py b/pkg/mod.py\n--- a/pkg/mod.py\n+++ b/pkg/mod.py\n@@ -1 +1 @@\n-old\n+new\n",
+                    "reasoning_content": "private reasoning",
+                }
+            }
+        ],
+        "usage": {
+            "prompt_tokens": 100,
+            "completion_tokens": 20,
+            "total_tokens": 120,
+            "prompt_cache_hit_tokens": 10,
+            "prompt_cache_miss_tokens": 90,
+        },
+    }
+
+    packet = worker.build_worker_result_packet(
+        root=root,
+        shard="S01",
+        window="S01-W00",
+        instance_id="repo__task-1",
+        model_requested="deepseek-v4-pro",
+        request_payload=request_payload,
+        response=response,
+        response_raw=json.dumps(response, sort_keys=True),
+        wall_time_ms=25,
+        price_table=table,
+        source_capsule_path=capsule,
+        patch_text=worker.extract_unified_diff(response["choices"][0]["message"]["content"]),
+        source_context_metadata={
+            "source_context_path": str(capsule.parent / "source_context.md"),
+            "source_context_sha256": "sha256:" + "0" * 64,
+            "source_context_length_chars": 128,
+        },
+        experiment_phase="m3-p5",
+        run_id_prefix="m3-p5-arm-a",
+        split_label="s01-confirmatory",
+        agent_id="m3-p5-deepseek-arm-a-worker",
+        branch_id="branch:m3-p5",
+    )
+
+    assert packet["experiment_phase"] == "m3-p5"
+    assert packet["cost_event"]["run_id"] == "m3-p5-arm-a-S01-W00-deepseek-v4-pro"
+    assert packet["cost_event"]["split"] == "s01-confirmatory"
+    assert packet["cost_event"]["agent_id"] == "m3-p5-deepseek-arm-a-worker"
+    assert packet["cost_event"]["branch_id"] == "branch:m3-p5"
+    assert "source_context.md" in packet["integrity_statement"]
+    assert "private reasoning" not in json.dumps(packet, sort_keys=True)
     schemas.validate_cost_event_v2(packet["cost_event"])

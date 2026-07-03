@@ -1,0 +1,17 @@
+diff --git a/requests/models.py b/requests/models.py
+index 3de2c71..6e4a6b6 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -100,7 +100,11 @@ class RequestEncodingMixin(object):
+         if not data and json is not None:
+             content_type = 'application/json'
+ 
+-        data = to_native_string(data)
++        if not isinstance(data, bytes):
++            try:
++                data = to_native_string(data)
++            except TypeError:
++                pass
+ 
+         if data:
+             body = data

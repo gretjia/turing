@@ -1,0 +1,77 @@
+{
+  "candidate_patch_sha256": "sha256:67a9c83424e9c8237f522aa598a1f591200d216e659057c96c0ba4d61bca7b3c",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 691,
+  "content_sha256": "sha256:e0845e758f30db1ff87c0e18a58600edd71d1036c6f5fae53354d60a81dc3bef",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:34c3904d37619246f9f1a0535b5db5998b09caca0a481f2b595075469b7e396f",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 449,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "scikit-learn__scikit-learn-12973",
+    "receipt_id": "rcpt:504e93e0a41931e3450de15b2b1cf8d5320dc113cd40299c08949fa92bc2d58e",
+    "run_id": "m3-p5-arm-a-initial-path-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-path-proposal",
+    "usage": {
+      "completion_tokens": 226,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 616,
+      "prompt_tokens": 616,
+      "provider_usage_raw_sha256": "sha256:3fdc020786b808a4efc5cce9d53995d269005de6c832157ed5d989453912a99e",
+      "total_tokens": 842
+    },
+    "wall_time_ms": 4651,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "1ad2b831-6107-4cf3-a40a-a4cc0d353a47",
+      "response_sha256": "sha256:553ef513d1905f803855c6f83e6623d38f55c4963651350a7467e213f0e14369"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "scikit-learn__scikit-learn-12973",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "status": "NOT_REQUESTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:30ee9e155e8aadfe810fa2301bdefb3a7338c2d33936b29d283da45a5d3d7647",
+  "response_sha256": "sha256:553ef513d1905f803855c6f83e6623d38f55c4963651350a7467e213f0e14369",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/scikit-learn__scikit-learn-12973/worker_capsule.md",
+  "source_context_length_chars": 0,
+  "source_context_path": null,
+  "source_context_sha256": null,
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 226,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 616,
+    "prompt_tokens": 616,
+    "total_tokens": 842
+  },
+  "usage_raw_sha256": "sha256:3fdc020786b808a4efc5cce9d53995d269005de6c832157ed5d989453912a99e",
+  "wall_time_ms": 4651
+}

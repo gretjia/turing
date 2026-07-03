@@ -1,0 +1,19 @@
+diff --git a/sphinx/io.py b/sphinx/io.py
+index 4874fdf..04fe807 100644
+--- a/sphinx/io.py
++++ b/sphinx/io.py
+@@ -112,6 +112,14 @@ class SphinxStandaloneReader(SphinxBaseReader):
+         # emit "source-read" event
+         arg = [content]
+         env.events.emit('source-read', env.docname, arg)
++        # If the source was modified by a source-read event listener,
++        # we need to re-parse the document from the modified source
++        # to propagate changes (e.g., to included files).
++        if arg[0] != content:
++            # Temporarily replace the source input with the modified content
++            from docutils.io import StringInput
++            self.source = StringInput(source=arg[0], source_path=self.source.source_path)
++            return arg[0]
+         return arg[0]
+ 
+ 

@@ -1,0 +1,210 @@
+{
+  "agent_id": "m3-p5-deepseek-arm-a-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W00/source_snapshots",
+  "branch_id": "branch:m3-p5",
+  "claim_boundary": {
+    "arm": "A",
+    "confirmatory_s01": true,
+    "no_failure_memory": true,
+    "no_turingos_loop": true,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p5",
+  "extra_context_file": null,
+  "ipqc_window_id": "S01-W00",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [
+    "pylint-dev__pylint-6528: candidate audit FAIL"
+  ],
+  "provider": "deepseek",
+  "reasoning_effort": null,
+  "run_id_prefix": "m3-p5-arm-a-source-repair",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S01",
+  "source_context_name": "source_context.md",
+  "split_label": "s01-confirmatory-source-repair",
+  "status": "FAIL",
+  "task_count_completed": 10,
+  "task_count_requested": 10,
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 634,
+      "candidate_patch_sha256": "sha256:601321d9768458dc3df6a43c3d8a009333efb93af6092d05bd8b649a67c2efa1",
+      "cost_microusd": 7572,
+      "instance_id": "scikit-learn__scikit-learn-11578",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 187,
+        "prompt_cache_hit_tokens": 2048,
+        "prompt_cache_miss_tokens": 17636,
+        "prompt_tokens": 19684,
+        "total_tokens": 19871
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 1586,
+      "candidate_patch_sha256": "sha256:57af0f37082d187446f31f453c0679479872232c456c9dfaf8d9cba52d00bc85",
+      "cost_microusd": 2162,
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 402,
+        "prompt_cache_hit_tokens": 1024,
+        "prompt_cache_miss_tokens": 4335,
+        "prompt_tokens": 5359,
+        "total_tokens": 5761
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 2419,
+      "candidate_patch_sha256": "sha256:a249b81b2df14460bf0b44660396bb3d19aeb9f454dc2d935c8a5c031c731f3a",
+      "cost_microusd": 10128,
+      "instance_id": "sympy__sympy-12489",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 677,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 22757,
+        "prompt_tokens": 23141,
+        "total_tokens": 23818
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 647,
+      "candidate_patch_sha256": "sha256:411f0e04298a5d6c7729f22ac18b0557a238c90022722bafbcb50291c3fc59fb",
+      "cost_microusd": 1448,
+      "instance_id": "astropy__astropy-13579",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 221,
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 2990,
+        "prompt_tokens": 4654,
+        "total_tokens": 4875
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 491,
+      "candidate_patch_sha256": "sha256:15f84b3269f4d5fde7e51b5c515197685cde56e42927cba5152c9ff8c71aba38",
+      "cost_microusd": 878,
+      "instance_id": "django__django-10999",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 219,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 1647,
+        "prompt_tokens": 2031,
+        "total_tokens": 2250
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 480,
+      "candidate_patch_sha256": "sha256:3fcc4a8bc2859851ec77a1e079bb4f39dfb66133ea55dbfeac4d981bcb9007ac",
+      "cost_microusd": 4965,
+      "instance_id": "matplotlib__matplotlib-20859",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 178,
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 11458,
+        "prompt_tokens": 12226,
+        "total_tokens": 12404
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 716,
+      "candidate_patch_sha256": "sha256:355eaf42c7dabd20a35a02ee8f11f40919ddc2a2dccc64bddcdcfe24e27280ba",
+      "cost_microusd": 2951,
+      "instance_id": "psf__requests-2931",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 156,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 6710,
+        "prompt_tokens": 6966,
+        "total_tokens": 7122
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 1332,
+      "candidate_patch_sha256": "sha256:cb666afd954ac79b8ef71fc8839db52338395008d8a505673bfd5db3b6669caa",
+      "cost_microusd": 16602,
+      "instance_id": "pydata__xarray-3993",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 384,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 38757,
+        "prompt_tokens": 39141,
+        "total_tokens": 39525
+      }
+    },
+    {
+      "candidate_audit_problems": [
+        "candidate patch does not apply to source snapshot: Checking patch pylint/lint/expand_modules.py...\nerror: while searching for:\n        if (\n            basename in ignore_list\n            or _is_in_ignore_list_re(os.path.basename(something), ignore_list_re)\n            continue\n        module_path = get_python_path(something)\n        additional_search_path = [\".\", module_path] + path\n\nerror: patch failed: pylint/lint/expand_modules.py:55\nerror: pylint/lint/expand_modules.py: patch does not apply"
+      ],
+      "candidate_audit_status": "FAIL",
+      "candidate_patch_bytes": 1020,
+      "candidate_patch_sha256": "sha256:16dfecea1a10b03980b872e5e73d784c4efeb7b1d6a9d75bcb5a3cb3f4a49faa",
+      "cost_microusd": 5128,
+      "instance_id": "pylint-dev__pylint-6528",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 266,
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 11669,
+        "prompt_tokens": 12437,
+        "total_tokens": 12703
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 2738,
+      "candidate_patch_sha256": "sha256:5296739cf5a7fff03427ca5ec551a6d024c889463922abbbbfbebe0e25593c5f",
+      "cost_microusd": 4312,
+      "instance_id": "pytest-dev__pytest-5787",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 706,
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 8847,
+        "prompt_tokens": 9743,
+        "total_tokens": 10449
+      }
+    }
+  ],
+  "thinking": {
+    "type": "disabled"
+  },
+  "wall_time_ms": 58897
+}

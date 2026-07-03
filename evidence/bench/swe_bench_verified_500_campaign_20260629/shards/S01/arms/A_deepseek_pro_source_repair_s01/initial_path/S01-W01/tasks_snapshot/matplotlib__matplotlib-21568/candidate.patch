@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/dates.py b/lib/matplotlib/dates.py
+index a7a07be..7e8c993 100644
+--- a/lib/matplotlib/dates.py
++++ b/lib/matplotlib/dates.py
+@@ -587,7 +587,9 @@ class AutoDateFormatter(ticker.Formatter):
+         self.scaled = scaled
+         self._locator = locator
+         self._formatter = DateFormatter("%Y-%m-%d %H:%M:%S")
+-        self._usetex = rcParams["text.usetex"]
++        # Always set usetex to False so that the spacing between
++        # the date parts uses normal spaces instead of TeX spaces.
++        self._usetex = False
+ 
+     def _set_locator(self, locator):
+         self._locator = locator

@@ -1,0 +1,53 @@
+{
+  "agent_id": "m3-p5-deepseek-arm-a-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W04/source_snapshots",
+  "branch_id": "branch:m3-p5",
+  "claim_boundary": {
+    "arm": "A",
+    "confirmatory_s01": true,
+    "no_failure_memory": true,
+    "no_turingos_loop": true,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p5",
+  "extra_context_file": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W04/worker_safe_tasks/pylint-dev__pylint-8898/repair_format_context.md",
+  "ipqc_window_id": "S01-W04",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [],
+  "provider": "deepseek",
+  "reasoning_effort": null,
+  "run_id_prefix": "m3-p5-arm-a-source-repair-retry",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S01",
+  "source_context_name": "source_context.md",
+  "split_label": "s01-confirmatory-source-repair-retry",
+  "status": "PASS",
+  "task_count_completed": 1,
+  "task_count_requested": 1,
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 3080,
+      "candidate_patch_sha256": "sha256:796f2ba048e432c3aebd7897e8dfcd46df2f091aa0e73949eb6c7cac07c6aa10",
+      "cost_microusd": 797,
+      "instance_id": "pylint-dev__pylint-8898",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 795,
+        "prompt_cache_hit_tokens": 4736,
+        "prompt_cache_miss_tokens": 266,
+        "prompt_tokens": 5002,
+        "total_tokens": 5797
+      }
+    }
+  ],
+  "thinking": {
+    "type": "disabled"
+  },
+  "wall_time_ms": 11457
+}

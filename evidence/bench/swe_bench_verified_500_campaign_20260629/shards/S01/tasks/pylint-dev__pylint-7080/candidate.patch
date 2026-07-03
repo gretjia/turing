@@ -1,0 +1,31 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 5cacc03..ad7e123 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -75,7 +75,8 @@ def expand_modules(
+ 
+     for something in files_or_modules:
+         basename = os.path.basename(something)
+-        if _is_ignored_file(
++        if basename in ignore_list or _is_in_ignore_list_re(
++            basename, ignore_list_re
+             something, ignore_list, ignore_list_re, ignore_list_paths_re
+         ):
+             continue
+@@ -140,10 +141,12 @@ def expand_modules(
+             ):
+                 if filepath == subfilepath:
+                     continue
+-                if _is_in_ignore_list_re(
+-                    os.path.basename(subfilepath), ignore_list_re
+-                ) or _is_in_ignore_list_re(subfilepath, ignore_list_paths_re):
+-                    continue
++                if _is_ignored_file(
++                    subfilepath,
++                    ignore_list,
++                    ignore_list_re,
++                    ignore_list_paths_re,
++                ):
+ 
+                 modpath = _modpath_from_file(
+                     subfilepath, is_namespace, path=additional_search_path

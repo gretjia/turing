@@ -1,0 +1,14 @@
+diff --git a/pylint/__init__.py b/pylint/__init__.py
+index e53ff1e..65ec703 100644
+--- a/pylint/__init__.py
++++ b/pylint/__init__.py
+@@ -96,7 +96,8 @@ def modify_sys_path() -> None:
+     if cwd in sys.path:
+         sys.path.remove(cwd)
+     # if we're in a python virtualenv, the path is also added by runpy
+-    sys.path.pop(0)
++    if sys.path[0] in ("", ".", cwd):
++        sys.path.pop(0)
+ 
+ 
+ def run_pylint() -> None:

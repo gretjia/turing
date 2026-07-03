@@ -123,6 +123,27 @@ def test_worker_candidate_audit_rejects_test_file_patch(tmp_path):
     assert "candidate patch touches test path: tests/validators/tests.py" in report["problems"]
 
 
+def test_worker_candidate_audit_rejects_testing_directory_test_file(tmp_path):
+    auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
+    root = tmp_path / "campaign"
+    write_candidate(
+        root,
+        patch=(
+            "diff --git a/testing/test_collection.py b/testing/test_collection.py\n"
+            "--- a/testing/test_collection.py\n"
+            "+++ b/testing/test_collection.py\n"
+            "@@ -1 +1 @@\n"
+            "-old\n"
+            "+new\n"
+        ),
+    )
+
+    report = auditor.audit_candidate(root, "S00", "django__django-10097")
+
+    assert report["status"] == "FAIL"
+    assert "candidate patch touches test path: testing/test_collection.py" in report["problems"]
+
+
 def test_worker_candidate_audit_rejects_missing_integrity_statement(tmp_path):
     auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
     root = tmp_path / "campaign"

@@ -1,0 +1,43 @@
+diff --git a/django/contrib/admin/options.py b/django/contrib/admin/options.py
+index 71aa17e1b8..fac744c3f5 100644
+--- a/django/contrib/admin/options.py
++++ b/django/contrib/admin/options.py
+@@ -1553,6 +1553,12 @@ class ModelAdmin(BaseModelAdmin):
+         """
+         return [inline(self.model, self.admin_site) for inline in self.inlines]
+ 
++    def get_inlines(self, request, obj=None):
++        """
++        Hook for specifying custom inlines based on the request or model instance.
++        """
++        return self.inlines
++
+     def get_urls(self):
+         from django.urls import path
+ 
+@@ -1953,7 +1959,7 @@ class InlineModelAdmin(BaseModelAdmin):
+ 
+     def get_formset(self, request, obj=None, **kwargs):
+         """Return a BaseInlineFormSet class for use in admin add/change views."""
+-        if 'fields' in kwargs:
++        if 'fields' in kwargs:  
+             fields = kwargs.pop('fields')
+         else:
+             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
+@@ -2003,12 +2009,13 @@ class InlineModelAdmin(BaseModelAdmin):
+         if request.method == 'POST' and '_saveasnew' in request.POST:
+             return not self.has_change_permission(request, obj)
+         return self.has_change_permission(request, obj)
+-
++    
+     def get_inline_instances(self, request, obj=None):
+-        inline_instances = []
+-        for inline_class in self.inlines:
++        inline_instances = []  
++        for inline_class in self.get_inlines(request, obj):
+             inline = inline_class(self.model, self.admin_site)
+             if request:
++
+                 if not (inline.has_view_or_change_permission(request, obj) or
+                         inline.has_add_permission(request, obj) or
+                         inline.has_delete_permission(request, obj)):

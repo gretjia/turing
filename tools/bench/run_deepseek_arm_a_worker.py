@@ -100,26 +100,47 @@ def load_worker_visible_context(
     capsule_path: Path,
     *,
     source_context_name: str | None = None,
+    extra_context_file: Path | None = None,
 ) -> tuple[str, dict[str, Any]]:
     capsule_text = capsule_path.read_text(encoding="utf-8")
     metadata: dict[str, Any] = {}
-    if not source_context_name:
-        return capsule_text, metadata
-    source_context_path = capsule_path.parent / source_context_name
-    if not source_context_path.exists():
-        return capsule_text, metadata
-    source_context_text = source_context_path.read_text(encoding="utf-8")
-    metadata = {
-        "source_context_path": str(source_context_path),
-        "source_context_sha256": provider.sha256_text(source_context_text),
-        "source_context_length_chars": len(source_context_text),
-    }
+    parts = [capsule_text.rstrip()]
+    if source_context_name:
+        source_context_path = capsule_path.parent / source_context_name
+        if source_context_path.exists():
+            source_context_text = source_context_path.read_text(encoding="utf-8")
+            metadata.update(
+                {
+                    "source_context_path": str(source_context_path),
+                    "source_context_sha256": provider.sha256_text(source_context_text),
+                    "source_context_length_chars": len(source_context_text),
+                }
+            )
+            parts.extend(["## Worker-Visible Repository Source Context", source_context_text.strip()])
+    if extra_context_file is not None and extra_context_file.exists():
+        extra_context_text = extra_context_file.read_text(encoding="utf-8")
+        metadata.update(
+            {
+                "extra_context_path": str(extra_context_file),
+                "extra_context_sha256": provider.sha256_text(extra_context_text),
+                "extra_context_length_chars": len(extra_context_text),
+            }
+        )
+        parts.extend(["## Worker-Visible Extra Context", extra_context_text.strip()])
+    return "\n\n".join(part for part in parts if part) + "\n", metadata
+
+
+def integrity_statement(source_context_metadata: dict[str, Any]) -> str:
+    visible_inputs = ["worker-safe task_packet.json", "worker_capsule.md"]
+    if source_context_metadata.get("source_context_path"):
+        visible_inputs.append("audited source_context.md selected from worker-derived candidate diff paths")
+    if source_context_metadata.get("extra_context_path"):
+        visible_inputs.append("recorded extra context file")
     return (
-        capsule_text.rstrip()
-        + "\n\n## Worker-Visible Repository Source Context\n\n"
-        + source_context_text.strip()
-        + "\n",
-        metadata,
+        "I read only the "
+        + ", ".join(visible_inputs)
+        + ". I did not read raw SWE-bench dataset rows, dataset patches, test patches, "
+        "FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels."
     )
 
 
@@ -274,6 +295,11 @@ def build_worker_result_packet(
     thinking_type: str = "disabled",
     reasoning_effort: str | None = None,
     patch_normalization: dict[str, Any] | None = None,
+    experiment_phase: str = "m3-p4",
+    run_id_prefix: str = "m3-p4-arm-a",
+    split_label: str = "s02-pilot",
+    agent_id: str = "m3-p4-deepseek-arm-a-worker",
+    branch_id: str = "branch:m3-p4",
 ) -> dict[str, Any]:
     source_context_metadata = source_context_metadata or {}
     patch_normalization = patch_normalization or {"status": "NOT_REQUESTED"}
@@ -304,19 +330,20 @@ def build_worker_result_packet(
         usage=usage,
         price_table=price_table,
     )
+    run_id = f"{run_id_prefix}-{window}-{model_requested}"
     cost_event = worker_cost.cost_event_from_receipt(
         cost_receipt(
-            run_id=f"m3-p4-arm-a-{window}-{model_requested}",
+            run_id=run_id,
             capsule_id=capsule_id,
             instance_id=instance_id,
             model_requested=model_requested,
             response_sha256=response_sha256,
         ),
-        run_id=f"m3-p4-arm-a-{window}-{model_requested}",
+        run_id=run_id,
         problem_id=instance_id,
-        split="s02-pilot",
-        agent_id="m3-p4-deepseek-arm-a-worker",
-        branch_id="branch:m3-p4",
+        split=split_label,
+        agent_id=agent_id,
+        branch_id=branch_id,
         adapter_kind="native_api",
         provider="deepseek",
         model_id_requested=model_requested,
@@ -334,6 +361,7 @@ def build_worker_result_packet(
     packet = {
         "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
         "status": "COMPLETED",
+        "experiment_phase": experiment_phase,
         "shard_id": shard,
         "ipqc_window_id": window,
         "instance_id": instance_id,
@@ -358,7 +386,10 @@ def build_worker_result_packet(
         "usage": usage,
         "usage_raw_sha256": codec.content_digest(raw_usage),
         "cost_event": cost_event,
-        "integrity_statement": INTEGRITY_STATEMENT,
+        "extra_context_path": None,
+        "extra_context_sha256": None,
+        "extra_context_length_chars": 0,
+        "integrity_statement": integrity_statement(source_context_metadata),
         "wall_time_ms": wall_time_ms,
     }
     packet["thinking"] = {"type": thinking_type}
@@ -373,6 +404,15 @@ def build_worker_result_packet(
             packet["source_context_path"] = context_path
         packet["source_context_sha256"] = source_context_metadata.get("source_context_sha256")
         packet["source_context_length_chars"] = source_context_metadata.get("source_context_length_chars", 0)
+    extra_context_path = source_context_metadata.get("extra_context_path")
+    if isinstance(extra_context_path, str):
+        path_obj = Path(extra_context_path)
+        try:
+            packet["extra_context_path"] = str(path_obj.relative_to(root))
+        except ValueError:
+            packet["extra_context_path"] = extra_context_path
+        packet["extra_context_sha256"] = source_context_metadata.get("extra_context_sha256")
+        packet["extra_context_length_chars"] = source_context_metadata.get("extra_context_length_chars", 0)
     return packet
 
 
@@ -400,11 +440,18 @@ def run_one_task(
     thinking_type: str,
     reasoning_effort: str | None,
     source_context_name: str | None,
+    extra_context_file: Path | None,
     apply_root_dir: Path | None,
+    experiment_phase: str,
+    run_id_prefix: str,
+    split_label: str,
+    agent_id: str,
+    branch_id: str,
 ) -> dict[str, Any]:
     capsule_text, source_context_metadata = load_worker_visible_context(
         capsule_path,
         source_context_name=source_context_name,
+        extra_context_file=extra_context_file,
     )
     request_payload = build_worker_request(
         model=model,
@@ -450,6 +497,11 @@ def run_one_task(
         thinking_type=thinking_type,
         reasoning_effort=reasoning_effort,
         patch_normalization=patch_normalization,
+        experiment_phase=experiment_phase,
+        run_id_prefix=run_id_prefix,
+        split_label=split_label,
+        agent_id=agent_id,
+        branch_id=branch_id,
         patch_text=patch_text,
     )
     write_json(task_dir / "worker_receipt.json", receipt)
@@ -480,7 +532,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--thinking", choices=["enabled", "disabled"], default="disabled")
     parser.add_argument("--reasoning-effort", choices=["high", "max"])
     parser.add_argument("--source-context-name")
+    parser.add_argument("--extra-context-file", type=Path)
     parser.add_argument("--apply-root-dir", type=Path)
+    parser.add_argument("--experiment-phase", default="m3-p4")
+    parser.add_argument("--run-id-prefix", default="m3-p4-arm-a")
+    parser.add_argument("--split-label", default="s02-pilot")
+    parser.add_argument("--agent-id", default="m3-p4-deepseek-arm-a-worker")
+    parser.add_argument("--branch-id", default="branch:m3-p4")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--instance-id")
     parser.add_argument("--out", type=Path)
@@ -494,9 +552,15 @@ def main(argv: list[str] | None = None) -> int:
         "ipqc_window_id": args.window,
         "provider": "deepseek",
         "model_requested": args.model,
+        "experiment_phase": args.experiment_phase,
+        "run_id_prefix": args.run_id_prefix,
+        "split_label": args.split_label,
+        "agent_id": args.agent_id,
+        "branch_id": args.branch_id,
         "thinking": {"type": args.thinking},
         "reasoning_effort": args.reasoning_effort,
         "source_context_name": args.source_context_name,
+        "extra_context_file": str(args.extra_context_file) if args.extra_context_file is not None else None,
         "apply_root_dir": str(args.apply_root_dir) if args.apply_root_dir is not None else None,
         "api_key_env": args.api_key_env,
         "credential_material": "env_only_not_serialized",
@@ -534,7 +598,13 @@ def main(argv: list[str] | None = None) -> int:
                     thinking_type=args.thinking,
                     reasoning_effort=args.reasoning_effort,
                     source_context_name=args.source_context_name,
+                    extra_context_file=args.extra_context_file,
                     apply_root_dir=args.apply_root_dir,
+                    experiment_phase=args.experiment_phase,
+                    run_id_prefix=args.run_id_prefix,
+                    split_label=args.split_label,
+                    agent_id=args.agent_id,
+                    branch_id=args.branch_id,
                 )
             )
         except urllib.error.HTTPError as error:
@@ -573,7 +643,8 @@ def main(argv: list[str] | None = None) -> int:
         "wall_time_ms": int((time.monotonic() - started) * 1000),
         "claim_boundary": {
             "arm": "A",
-            "pilot_only": True,
+            "pilot_only": args.experiment_phase == "m3-p4",
+            "confirmatory_s01": args.experiment_phase == "m3-p5" and args.shard == "S01",
             "no_turingos_loop": True,
             "no_failure_memory": True,
             "no_uplift_result": True,

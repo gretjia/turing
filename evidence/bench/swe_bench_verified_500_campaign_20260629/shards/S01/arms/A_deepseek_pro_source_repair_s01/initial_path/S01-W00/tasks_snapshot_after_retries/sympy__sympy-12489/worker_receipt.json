@@ -1,0 +1,74 @@
+{
+  "candidate_patch_sha256": "sha256:8a01157622c3602ae9a996384ba8845d539ab34a6673b3efe55ba25cd4d7799d",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1306,
+  "content_sha256": "sha256:ec79970df3ad1ff457709ba8c87e179f64ed4b1583e9edbd89fbad470c2d96b2",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:88ef73e4461eeacff548dc1f4763be473b033ecbfd197c811e53ae519afce40b",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 354,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "sympy__sympy-12489",
+    "receipt_id": "rcpt:70bb5310477a5e592568166040276e7864600582870fbcc935c2305100ff1298",
+    "run_id": "m3-p5-arm-a-initial-path-retry-S01-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-path-proposal-retry",
+    "usage": {
+      "completion_tokens": 374,
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 90,
+      "prompt_tokens": 474,
+      "provider_usage_raw_sha256": "sha256:966bd2f914069a6b7402514802c42c594a9d3872583bd037ef32d434aa0166d8",
+      "total_tokens": 848
+    },
+    "wall_time_ms": 8022,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "f58b888c-d7f9-4182-b804-2020ccecc9ad",
+      "response_sha256": "sha256:dcf63cc6878d078fd2a43aa126e02b27e17839d62d8d9dd6f578181128c7e82f"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "instance_id": "sympy__sympy-12489",
+  "integrity_statement": "I read only the worker-safe task_packet.json and worker_capsule.md. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "status": "NOT_REQUESTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:a5d8ffa936aa0dd7cd75386a10339dbbedbe9e10db09684351fd8eda7e62d577",
+  "response_sha256": "sha256:dcf63cc6878d078fd2a43aa126e02b27e17839d62d8d9dd6f578181128c7e82f",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/sympy__sympy-12489/worker_capsule.md",
+  "source_context_length_chars": 0,
+  "source_context_path": null,
+  "source_context_sha256": null,
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 374,
+    "prompt_cache_hit_tokens": 384,
+    "prompt_cache_miss_tokens": 90,
+    "prompt_tokens": 474,
+    "total_tokens": 848
+  },
+  "usage_raw_sha256": "sha256:966bd2f914069a6b7402514802c42c594a9d3872583bd037ef32d434aa0166d8",
+  "wall_time_ms": 8022
+}

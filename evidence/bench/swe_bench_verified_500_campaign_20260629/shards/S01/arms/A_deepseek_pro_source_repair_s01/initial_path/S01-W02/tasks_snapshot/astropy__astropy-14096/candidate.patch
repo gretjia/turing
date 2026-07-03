@@ -1,0 +1,32 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index 86c58a3bc1e..b570419d60d 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -591,9 +591,16 @@ def _parse_frame_arg(frame, args, kwargs):
+ 
+     def __getattr__(self, attr):
+         # Do not let the complex transform architecture add new attributes
+-        # to SkyCoord, e.g., by transforming to the first element in a
+-        # frame string.
++        # to SkyCoord, e.g., by transforming to the first element in a frame
++        # string. We only intercept here if it looks like frame transform
++        # machinery rather than a user-defined subclass attribute.
+         if not attr.startswith('_'):
++            # Check if attribute exists in the class or as a frame transform
++            # name before raising an error. This preserves the original
++            # behaviour of intercepting frame name lookups, but avoids
++            # shadowing errors from subclass properties/methods.
++            if hasattr(self.__class__, attr):
++                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+             frame_attrs = self.get_frame_attr_names()
+             if attr in frame_attrs:
+                 raise AttributeError(
+@@ -604,6 +611,7 @@ def __getattr__(self, attr):
+ 
+         # Fail with intended error message on non-existing attribute
+         raise AttributeError("'{}' object has no attribute '{}'"
+-                             .format(self.__class__.__name__, attr))
++                             .format(self.__class__.__name__, attr)) from None
+ 
+     def __setattr__(self, attr, val):
+         # This is to make anything available through __getattr__ immutable

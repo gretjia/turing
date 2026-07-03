@@ -1,0 +1,79 @@
+{
+  "candidate_patch_sha256": "sha256:796f2ba048e432c3aebd7897e8dfcd46df2f091aa0e73949eb6c7cac07c6aa10",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 3080,
+  "content_sha256": "sha256:9857c0b83a4fa98ed786eaf115d63157f9003b5517a67ba580acf87caea2b83d",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:2ecd2388823d07ddfeca2f81b762875cfd3cdbc31d9850696a69bd782b8c955c",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 797,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pylint-dev__pylint-8898",
+    "receipt_id": "rcpt:42d958a36098667d96263d97c7a6065e73c69dfa206c82dbae47d4180482cb75",
+    "run_id": "m3-p5-arm-a-source-repair-retry-S01-W04-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-confirmatory-source-repair-retry",
+    "usage": {
+      "completion_tokens": 795,
+      "prompt_cache_hit_tokens": 4736,
+      "prompt_cache_miss_tokens": 266,
+      "prompt_tokens": 5002,
+      "provider_usage_raw_sha256": "sha256:67669012eba7ed75f700b2f78a46055bf49518f7b6ed4b0599f90e440fea5c69",
+      "total_tokens": 5797
+    },
+    "wall_time_ms": 11383,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "f10b7660-9183-469c-abae-d09cf9145b32",
+      "response_sha256": "sha256:950ec242483a2b91e4907601329d686af9f9406d6fa90820e8c7938b72b20be3"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 556,
+  "extra_context_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pylint-dev__pylint-8898/repair_format_context.md",
+  "extra_context_sha256": "sha256:db9ba36ee52985aac80796079448ef2b8bb21caf3713642888ad13e141f99c06",
+  "instance_id": "pylint-dev__pylint-8898",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded extra context file. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W04",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 73",
+    "output": "Checking patch pylint/config/argument.py...\nHunk #1 succeeded at 84 (offset 3 lines).\nHunk #2 succeeded at 105 (offset 5 lines).\nHunk #3 succeeded at 115 (offset 6 lines).\nApplied patch pylint/config/argument.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:2ffde7a5b6ddf891bb90c7acdd0b0fa54a356adc02b11079a7d6a6d99da4fc38",
+  "response_sha256": "sha256:950ec242483a2b91e4907601329d686af9f9406d6fa90820e8c7938b72b20be3",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pylint-dev__pylint-8898/worker_capsule.md",
+  "source_context_length_chars": 15128,
+  "source_context_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pylint-dev__pylint-8898/source_context.md",
+  "source_context_sha256": "sha256:4c7893054e8f93d4920d823e20de6747d09fd2b9e0d6d478a63a1edc1724afca",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 795,
+    "prompt_cache_hit_tokens": 4736,
+    "prompt_cache_miss_tokens": 266,
+    "prompt_tokens": 5002,
+    "total_tokens": 5797
+  },
+  "usage_raw_sha256": "sha256:67669012eba7ed75f700b2f78a46055bf49518f7b6ed4b0599f90e440fea5c69",
+  "wall_time_ms": 11383
+}

@@ -1,0 +1,19 @@
+diff --git a/lib/matplotlib/colorbar.py b/lib/matplotlib/colorbar.py
+index 00c19ef1fb..2c47f552be 100644
+--- a/lib/matplotlib/colorbar.py
++++ b/lib/matplotlib/colorbar.py
+@@ -439,10 +439,10 @@ class Colorbar:
+         self.dividers.set_color('none')
+         self.dividers.set_linewidth(0)
+ 
+-        # copy the contours from the filler
+-        self.dividers.set_data(self.filler.contours)
+-        self.dividers.set_xdata(self.filler.contours)
+-        self.dividers.set_ydata(self.filler.contours)
++        # copy the edges from the filler
++        self.dividers.set_data(self.filler.edges)
++        self.dividers.set_xdata(self.filler.edges)
++        self.dividers.set_ydata(self.filler.edges)
+ 
+         self.drawedges = drawedges
+         self._drawedges = None

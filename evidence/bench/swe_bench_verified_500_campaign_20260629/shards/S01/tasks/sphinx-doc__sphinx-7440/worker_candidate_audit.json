@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W04/source_snapshots/sphinx-doc__sphinx-7440",
+    "output": "Checking patch sphinx/domains/std.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/tasks/sphinx-doc__sphinx-7440/candidate.patch",
+  "candidate_patch_sha256": "sha256:20fb03fcd76e7375f0f48d345f0feda0dabce4cf0ff2ecf13e76dcf93a7cf2dc",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sphinx/domains/std.py"
+  ],
+  "instance_id": "sphinx-doc__sphinx-7440",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

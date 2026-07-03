@@ -1,0 +1,36 @@
+diff --git a/src/_pytest/_code/code.py b/src/_pytest/_code/code.py
+index d27e3f70a..cf15c2e9a 100644
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -1387,6 +1387,22 @@ class ExceptionChainRepr(ReprTraceback):
+         for entry, cause in zip(self.chain, self.causes):
+             entry.toterminal(tw)
+ 
++    def __unicode__(self):
++        parts = []
++        for i, entry in enumerate(self.chain):
++            if i > 0:
++                cause = self.causes[i]
++                if cause == "explicit":
++                    parts.append(
++                        "The above exception was the direct cause of the following exception:"
++                    )
++                elif cause == "implicit":
++                    parts.append(
++                        "During handling of the above exception, another exception occurred:"
++                    )
++            parts.append(str(entry))
++        return "\n".join(parts)
++
+ 
+ class TerminalRepr:
+     def __str__(self):
+@@ -1734,7 +1750,7 @@ class ExceptionInfo:
+         for i, exc in enumerate(self._getexcinfo_chain()):
+             excinfo = exc.__class__(exc._excinfo)
+             # excinfo reprtraceback returns a ReprTraceback instance
+-            reprtraceback = excinfo.getrepr(style=style)
++            reprtraceback = excinfo.getrepr(style=style, chain=False)
+             chain.append(reprtraceback)
+         if len(chain) == 1:
+             return chain[0]

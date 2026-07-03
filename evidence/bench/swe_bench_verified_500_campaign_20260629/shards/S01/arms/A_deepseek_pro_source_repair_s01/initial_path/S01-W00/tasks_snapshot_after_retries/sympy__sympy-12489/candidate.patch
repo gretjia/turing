@@ -1,0 +1,36 @@
+diff --git a/sympy/combinatorics/permutations.py b/sympy/combinatorics/permutations.py
+index 7b5490e902..b37d3de26f 100644
+--- a/sympy/combinatorics/permutations.py
++++ b/sympy/combinatorics/permutations.py
+@@ -905,13 +905,16 @@ def __new__(cls, args, size=None, **kwargs):
+             raise TypeError("Permutation argument must be a list or string")
+ 
+     @staticmethod
+-    def _af_new(perm):
++    def _af_new(cls, perm):
+         """A method to produce a Permutation object from a list;
+         the list is bound to the _array_form attribute, so it must
+         not be modified; this method is meant for internal use only;
+         the list ``a`` is supposed to be generated as a temporary value
+         in a method, so p = _af_new(a) is the only object
+         to hold a reference to ``a``::
++
++        ``cls`` can be Permutation or a subclass; if it is a subclass,
++        the instance will have that type.
+ 
+         Examples
+         ========
+@@ -922,11 +925,11 @@ def _af_new(perm):
+         Permutation([1, 0, 2, 3])
+ 
+         """
+-        p = Basic.__new__(Perm, perm)
++        p = Basic.__new__(cls, perm)
+         p._array_form = perm
+         return p
+ 
+-    _af_new = staticmethod(_af_new)
++    _af_new = classmethod(_af_new)
+ 
+     def _hashable_content(self):
+         # this is new

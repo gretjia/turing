@@ -1,0 +1,13 @@
+diff --git a/sympy/core/basic.py b/sympy/core/basic.py
+index 5d25b31c4f..c5d4078e3f 100644
+--- a/sympy/core/basic.py
++++ b/sympy/core/basic.py
+@@ -313,7 +313,7 @@ def __eq__(self, other):
+             # sympy/sympy#3003
+             if other.__class__.__eq__ is not type(self).__eq__:
+                 ok = False
+-            return ok
++            return ok if ok else NotImplemented
+         if not isinstance(other, Basic):
+             return False    # sympy object != non-sympy object
+         return self._hashable_content() == other._hashable_content()

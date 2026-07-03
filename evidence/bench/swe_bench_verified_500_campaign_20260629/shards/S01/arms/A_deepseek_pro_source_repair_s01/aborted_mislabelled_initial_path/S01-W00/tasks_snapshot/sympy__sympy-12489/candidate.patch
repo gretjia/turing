@@ -1,0 +1,63 @@
+diff --git a/sympy/combinatorics/permutations.py b/sympy/combinatorics/permutations.py
+index e3f3d6ac26..7e8a1a1c6b 100644
+--- a/sympy/combinatorics/permutations.py
++++ b/sympy/combinatorics/permutations.py
+@@ -78,10 +78,10 @@ def _af_new(perm):
+     the list ``a`` is supposed to be generated as a temporary list
+     in a method, so p = Perm._af_new(a) is the only object
+     to hold a reference to it. If the list is supposed to be
+     held by more than one object, a copy of the list should be
+     used."""
+-    new = Basic.__new__(Perm, perm)
++    new = Basic.__new__(cls, perm)
+     new._array_form = perm
+     new._cyclic_form = None
+     return new
+ 
+@@ -135,7 +135,7 @@ class Permutation(Basic):
+     """
+     _is_permutation = True
+-    _af_new = staticmethod(_af_new)
++    _af_new = classmethod(_af_new)
+ 
+     def __new__(cls, *args, **kwargs):
+         """
+@@ -288,7 +288,7 @@ def __new__(cls, *args, **kwargs):
+                     if len(set(a)) != len(a):
+                         raise ValueError("cannot have repeated elements")
+                 else:
+-                    return _af_new(a)
++                    return cls._af_new(a)
+             if isinstance(a, Perm):
+                 if a._cyclic_form is not None:
+                     return Perm._af_new(a.array_form)
+@@ -395,10 +395,10 @@ def array_form(self):
+         return self._array_form[:]
+ 
+-    @staticmethod
+-    def _af_rmul(a, b):
++    @classmethod
++    def _af_rmul(cls, a, b):
+         """
+         Return the product b*a; input and output are array forms. The ith value
+         is a[b[i]].
+ 
+         Examples
+@@ -411,7 +411,7 @@ def _af_rmul(a, b):
+         """
+-        return _af_new([a[i] for i in b])
++        return cls._af_new([a[i] for i in b])
+ 
+-    @staticmethod
+-    def _af_rmuln(*args):
++    @classmethod
++    def _af_rmuln(cls, *args):
+         """
+         Return the product of the given permutations, using _af_rmul
+         for each factor. Input and output are array forms.
+@@ -421,7 +421,7 @@ def _af_rmuln(*args):
+-        return _af_new(reduce(lambda a, b: [a[i] for i in b], args))
++        return cls._af_new(reduce(lambda a, b: [a[i] for i in b], args))
+ 
+     @classmethod
+     def rmul(cls, *args):

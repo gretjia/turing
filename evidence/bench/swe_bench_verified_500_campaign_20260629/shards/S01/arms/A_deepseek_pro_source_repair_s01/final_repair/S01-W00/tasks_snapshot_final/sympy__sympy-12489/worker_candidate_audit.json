@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W00/source_snapshots/sympy__sympy-12489",
+    "output": "Checking patch sympy/combinatorics/permutations.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/tasks/sympy__sympy-12489/candidate.patch",
+  "candidate_patch_sha256": "sha256:a249b81b2df14460bf0b44660396bb3d19aeb9f454dc2d935c8a5c031c731f3a",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sympy/combinatorics/permutations.py"
+  ],
+  "instance_id": "sympy__sympy-12489",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}
