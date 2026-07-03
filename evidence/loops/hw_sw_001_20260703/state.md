@@ -44,3 +44,14 @@
   docs/loop_harness/README.md. `.gitignore` gains a `.turingos/` line (repo already
   had `/.turingos/` root-anchored; appended the literal unanchored form per spec).
 - Status: ADDRESSED.
+
+## Full gate — A1..C3 in sequence
+- Ran every acceptance command from PREDICATE.md A1..C3 once, sequentially, on the
+  first attempt after all three atoms landed. Full transcript in
+  evidence/loops/hw_sw_001_20260703/gate_receipt.txt.
+- Result: every command matched its PREDICATE-specified outcome exactly (A1 full=0,
+  A1 --commit 1=0, A2 pytest=0/16 passed, B1 vec1..4=0 with exact oracle values
+  33/25/156/25, B1 vec5=2, B2=0, B3 default=0, B3 --scope projections=0, B4 doc
+  present, C1=0, C2 --staged=0, C2 --check negative vector=1, C3 pre-commit=0).
+- No failures, no rework, no LESSONS.md entry required.
+- Status: HW-SW-001..003 ADDRESSED, pending sovereign accept.
