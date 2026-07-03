@@ -1,0 +1,25 @@
+{
+  "schema_id": "turingos.tc_witness_claim_boundary.v1",
+  "scope": "M2.TC3 run/export evidence",
+  "status_ceiling": "IMPLEMENTER_ADDRESSED",
+  "evidence_class": "REAL_DETERMINISTIC_EXECUTION",
+  "turing_completeness_claim_allowed": false,
+  "tc10_external_artifact_exists": false,
+  "claims_allowed": [
+    "five halting witness programs executed through MicroTape",
+    "three budget-stopped non-halting examples recorded with C1/C2/C3 certificates",
+    "git bundles and sha256 digests recorded for TC3 witness tapes",
+    "seed-pinned fuzz corpus generated"
+  ],
+  "claims_forbidden": [
+    "TuringOS is Turing-complete",
+    "TC-10 passed",
+    "EXTERNALLY_VERIFIED",
+    "CLOSED",
+    "RELEASED",
+    "RATIFIED",
+    "SHIPPED",
+    "M2_ENABLED"
+  ],
+  "not_run_is_fail": true
+}

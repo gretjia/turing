@@ -1,0 +1,91 @@
+{
+  "schema_id": "turingos.tc3.bundle_manifest.v1",
+  "evidence_class": "REAL_DETERMINISTIC_EXECUTION",
+  "generator": "turing-witness tc3_export v1",
+  "generated_at_utc": "2026-07-03T00:00:00Z",
+  "program_count": 8,
+  "halting_program_count": 5,
+  "nonhalting_program_count": 3,
+  "runs": [
+    {
+      "program_id": "copy_a_to_b",
+      "expected_terminal_event": "ComputationHalted",
+      "terminal_event_id": "mu:85c5ac979ccfdf226f555caeba9237fedc2d66d2e46ec5f1dabd26b279be93c6",
+      "final_state_hash": "sha256:0e8fe3a802dc78d424ed722707cc5af9d99bb18199508d7c81785e6893e12234",
+      "steps_executed": 8,
+      "bundle_path": "tapes/copy_a_to_b/micro_tape.bundle",
+      "bundle_sha256": "3717d53929dd883e63afcdc3196e42c3c6de7eb9d3e63e1f7ad01e82b5c1757e",
+      "certificate_class": null
+    },
+    {
+      "program_id": "add_a_b",
+      "expected_terminal_event": "ComputationHalted",
+      "terminal_event_id": "mu:6a3416c6fed04e473a3c2e016295a61080a7fa5d21bb2ddb535118829e3547fd",
+      "final_state_hash": "sha256:bebed3fe8634e52aa5a3f02dbaa60a7e6ac70dfddd7bca47e23277adf4fd5f6e",
+      "steps_executed": 10,
+      "bundle_path": "tapes/add_a_b/micro_tape.bundle",
+      "bundle_sha256": "1e8087db8cba245cdd1984148ba24976b4ae9deaa0e2bb69f9f725ea06c5f821",
+      "certificate_class": null
+    },
+    {
+      "program_id": "multiply_small",
+      "expected_terminal_event": "ComputationHalted",
+      "terminal_event_id": "mu:8ddd8e800ed5be430662e4b358616188236d95aed917402a03ce56ca348b920d",
+      "final_state_hash": "sha256:ad8ba77e3332bb16faade972246bbe9cb94fa969b3033415b20452b4f62f81bb",
+      "steps_executed": 10,
+      "bundle_path": "tapes/multiply_small/micro_tape.bundle",
+      "bundle_sha256": "9195e3b7a0decaf7ccf971704a2f6a1e18463a88bcb2f4bd8de16e4ed271398c",
+      "certificate_class": null
+    },
+    {
+      "program_id": "branch_zero_nonzero",
+      "expected_terminal_event": "ComputationHalted",
+      "terminal_event_id": "mu:4d9c5351709d9308c15dd96c5002885bc1f4a7a9b513c109b4f31dd6011bec9d",
+      "final_state_hash": "sha256:9a41d950e9ac4d0df84df9d8426412a199a33318aaca53a2be9f7c1500a16136",
+      "steps_executed": 6,
+      "bundle_path": "tapes/branch_zero_nonzero/micro_tape.bundle",
+      "bundle_sha256": "b1b1708cb09c27e935ff96d816db1acbd9fe81864f9e0957a7a3b46a50c1a5d3",
+      "certificate_class": null
+    },
+    {
+      "program_id": "known_halting_busy_loop_with_budget",
+      "expected_terminal_event": "ComputationHalted",
+      "terminal_event_id": "mu:7c978c17b6c2292e61c3d01627f818a97deb9f018e1030e7de1571daf69297b1",
+      "final_state_hash": "sha256:47b677627f73b62f3671eb007af9a153758f079109987d2eb1e3017f15d7a9b4",
+      "steps_executed": 12,
+      "bundle_path": "tapes/known_halting_busy_loop_with_budget/micro_tape.bundle",
+      "bundle_sha256": "664d49eddf3e682a9a93c78190d73ffe419dad680aad3ebf92af24bbcd997ec0",
+      "certificate_class": null
+    },
+    {
+      "program_id": "spin_static_halt_unreachable",
+      "expected_terminal_event": "BudgetExhausted",
+      "terminal_event_id": "mu:c05a3942767238fcac4eb4146a41ca977a5050abe9196e4b1ec8e043bc174940",
+      "final_state_hash": "sha256:3fb645e6021748f73d31f603a0f741d98744894914cf64b419186f115ed67f94",
+      "steps_executed": 8,
+      "bundle_path": "tapes/spin_static_halt_unreachable/micro_tape.bundle",
+      "bundle_sha256": "212a1a5bc3d3306532eed3e5a73ef53de0a0110d207679ed3499cd9916ccd366",
+      "certificate_class": "C1_STATIC_HALT_UNREACHABILITY"
+    },
+    {
+      "program_id": "recurs_zero_decjz",
+      "expected_terminal_event": "BudgetExhausted",
+      "terminal_event_id": "mu:56040260e7a1851c48faa0f9cea3e5cc2237bb9525dc137da77a2257a237355a",
+      "final_state_hash": "sha256:411c4340997bb1ee20f4aec5825e6b8f8fc5a876bfecd3645c03e1b85de1d27b",
+      "steps_executed": 8,
+      "bundle_path": "tapes/recurs_zero_decjz/micro_tape.bundle",
+      "bundle_sha256": "e3d5b3c60c944bd5488d01fbec0fde3e4b5c67b41770c7dc40c778bbb93a9f84",
+      "certificate_class": "C2_STATE_RECURRENCE"
+    },
+    {
+      "program_id": "guarded_growth_budget",
+      "expected_terminal_event": "BudgetExhausted",
+      "terminal_event_id": "mu:c096c159e9453314caae253190c218cc0b27fa9a6320ac305107bc790493461d",
+      "final_state_hash": "sha256:1b839b690bc030776f78082701cc15f7891f4d69fb24cec20fc78e59ac6a60b9",
+      "steps_executed": 8,
+      "bundle_path": "tapes/guarded_growth_budget/micro_tape.bundle",
+      "bundle_sha256": "4b640abef2b3ea1c0f185ccb29a9cef7b24ced35244aa0d9e9c78246a9b2b9b4",
+      "certificate_class": "C3_BUDGET_BOUNDED"
+    }
+  ]
+}

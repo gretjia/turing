@@ -1,0 +1,30 @@
+{
+  "schema_id": "turingos.tc3.program_fixture.v1",
+  "program_id": "spin_static_halt_unreachable",
+  "category": "NON_HALTING",
+  "program": [
+    {
+      "op": "INC",
+      "counter": "counter_a",
+      "next_pc": 0
+    }
+  ],
+  "initial_state": {
+    "program_counter": 0,
+    "counter_a": 0,
+    "counter_b": 0,
+    "halted": false
+  },
+  "step_budget": 8,
+  "expected_terminal_event": "BudgetExhausted",
+  "certificate_class": "C1_STATIC_HALT_UNREACHABILITY",
+  "certificate": {
+    "class": "C1_STATIC_HALT_UNREACHABILITY",
+    "checker": "control_flow_reachability_v1",
+    "reachable_pcs": [
+      0
+    ],
+    "halt_pcs": [],
+    "halt_reachable": false
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema_id": "turingos.tc3.program_fixture.v1",
+  "program_id": "add_a_b",
+  "category": "HALTING",
+  "program": [
+    {
+      "op": "DECJZ",
+      "counter": "counter_a",
+      "zero_pc": 2,
+      "nonzero_pc": 1
+    },
+    {
+      "op": "INC",
+      "counter": "counter_b",
+      "next_pc": 0
+    },
+    {
+      "op": "HALT"
+    }
+  ],
+  "initial_state": {
+    "program_counter": 0,
+    "counter_a": 4,
+    "counter_b": 2,
+    "halted": false
+  },
+  "step_budget": 16,
+  "expected_terminal_event": "ComputationHalted",
+  "certificate_class": null,
+  "certificate": null
+}

@@ -1,0 +1,11 @@
+{
+  "schema_id": "turingos.tc3.fuzz_manifest.v1",
+  "generator_version": "v1",
+  "seed": 20260702,
+  "program_count": 500,
+  "max_program_len": 32,
+  "max_steps": 4096,
+  "corpus": "fuzz/corpus.jsonl",
+  "rust_results": "fuzz/rust_results.jsonl",
+  "differential_results": "fuzz/differential_results.json"
+}

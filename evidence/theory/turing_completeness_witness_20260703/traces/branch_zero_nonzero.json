@@ -1,0 +1,118 @@
+{
+  "schema_id": "turingos.tc3.witness_trace.v1",
+  "program_id": "branch_zero_nonzero",
+  "terminal_event_id": "mu:4d9c5351709d9308c15dd96c5002885bc1f4a7a9b513c109b4f31dd6011bec9d",
+  "terminal_event_type": "ComputationHalted",
+  "terminal_kind": "HALTED",
+  "steps_executed": 6,
+  "final_state": {
+    "program_counter": 2,
+    "counter_a": 0,
+    "counter_b": 2,
+    "halted": true
+  },
+  "final_state_hash": "sha256:9a41d950e9ac4d0df84df9d8426412a199a33318aaca53a2be9f7c1500a16136",
+  "events": [
+    {
+      "event_id": "mu:c84ed52044c435fcb5700176406fe81056bd61d4c82a0a4ae8bb6d5f33d9f818",
+      "event_type": "ComputationStarted",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:03450bd07467112578e15a328c798a08594eb795adb10ecb4d613ea89d7a8b01",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:f190f4ceff9e4f00c954c7e6cad0c5f372cde11b2da8781ba1dc5e614e22c1a0",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:d67cdcdf298b3be6279eb04e6a3bc53f2471cbbaca49bb022d0d0bc2ac9ea887",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:37c41d15b75aedde85faf7659cd9d7b567aa0e5041eb7a0843766b47c357ac71",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:0296262078cdc9e52d3ef5aa78c89305e25de9e2aa590f76bfb92d08cbda8dd6",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:f113b11b79a7cfeef7579f1943884d49dfa7055e1d7ccbf9eeec873121e90314",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:90982e9350b4c0650b410e983b25100d1fd812c491743d3d1023343767294fa2",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:8e955763c37c4e250ebd36b3e25d39e0d0bb53555313d8615c7de4b61ba0fef1",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:450edc92070ba68e6c2216d8894a69b8dc96416bd8ced3b44956e4dc533bea66",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:05a772b4bf7600a4fcf1cdd467feb39c405590dd6a5917958f4cced608bfee3d",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:e90c15f3c7886ad28de1a1c0939745215a2888567a3ccf5a26e84b873786228c",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:463b13a1cc2213c9bfc4559515092ecebb1b9e45948265c5e897abc3da3cc5ce",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:feb55ea1cbbdc97a6c149d794c094d18f6640de667c2c4178ac4b0ff6b232bca",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:0518468d133d7b7cd8d22bfd09540dfa0daf3a52cca39a3a72bbe9ef79d74b95",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:8a58a8326495b45b40a1f06437559c5bc04b1b8c8cf451957dbdbd6f58895e81",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:8518f76016fe54758c52054740456f94d825873560141e1938dcd2cc21bf4ba8",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:2ee8403d9c75d751bd9fc32e2b797ef1415e5d32209cd1322fc84ef3b7930bc5",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:06b916f5985ba1cc7c872af710680b57f18e476ed27d368a1195efaa9a93b8f4",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:4d9c5351709d9308c15dd96c5002885bc1f4a7a9b513c109b4f31dd6011bec9d",
+      "event_type": "ComputationHalted",
+      "head_moved": "None"
+    }
+  ],
+  "reducer_checked": true
+}

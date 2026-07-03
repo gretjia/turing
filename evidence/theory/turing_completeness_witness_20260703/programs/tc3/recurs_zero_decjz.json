@@ -1,0 +1,38 @@
+{
+  "schema_id": "turingos.tc3.program_fixture.v1",
+  "program_id": "recurs_zero_decjz",
+  "category": "NON_HALTING",
+  "program": [
+    {
+      "op": "DECJZ",
+      "counter": "counter_a",
+      "zero_pc": 0,
+      "nonzero_pc": 1
+    },
+    {
+      "op": "HALT"
+    }
+  ],
+  "initial_state": {
+    "program_counter": 0,
+    "counter_a": 0,
+    "counter_b": 0,
+    "halted": false
+  },
+  "step_budget": 8,
+  "expected_terminal_event": "BudgetExhausted",
+  "certificate_class": "C2_STATE_RECURRENCE",
+  "certificate": {
+    "class": "C2_STATE_RECURRENCE",
+    "checker": "deterministic_state_hash_recurrence_v1",
+    "first_step_index": 0,
+    "second_step_index": 1,
+    "state_hash": "sha256:411c4340997bb1ee20f4aec5825e6b8f8fc5a876bfecd3645c03e1b85de1d27b",
+    "state": {
+      "program_counter": 0,
+      "counter_a": 0,
+      "counter_b": 0,
+      "halted": false
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema_id": "turingos.tc3.program_fixture.v1",
+  "program_id": "guarded_growth_budget",
+  "category": "NON_HALTING",
+  "program": [
+    {
+      "op": "DECJZ",
+      "counter": "counter_b",
+      "zero_pc": 1,
+      "nonzero_pc": 2
+    },
+    {
+      "op": "INC",
+      "counter": "counter_a",
+      "next_pc": 0
+    },
+    {
+      "op": "HALT"
+    }
+  ],
+  "initial_state": {
+    "program_counter": 0,
+    "counter_a": 0,
+    "counter_b": 0,
+    "halted": false
+  },
+  "step_budget": 8,
+  "expected_terminal_event": "BudgetExhausted",
+  "certificate_class": "C3_BUDGET_BOUNDED",
+  "certificate": {
+    "class": "C3_BUDGET_BOUNDED",
+    "checker": "budget_stop_observation_v1",
+    "claim": "did_not_halt_within_recorded_step_budget",
+    "step_budget": 8
+  }
+}
