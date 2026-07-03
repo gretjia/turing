@@ -1,0 +1,22 @@
+diff --git a/sympy/sets/sets.py b/sympy/sets/sets.py
+index 4e79a89..0a21071 100644
+--- a/sympy/sets/sets.py
++++ b/sympy/sets/sets.py
+@@ -1265,15 +1265,14 @@ def _complement(self, other):
+             # For simplicity set is a FiniteSet and other is some Set (Interval)
+             if isinstance(other, Set):
+                 # If set is a FiniteSet and other is some Set (like Interval)
+-                # We need to check if elements of set are elements of other
+-                # and filter them out
++                # Filter out elements that are in other
+                 from sympy import Dummy, Lambda, symbols
+                 from sympy.sets import imageset
+                 
+                 if not any(element.has(Symbol) for element in self):
+                     return FiniteSet(*[element for element in self if element not in other])
+                 else:
+-                    return FiniteSet(*[element for element in self if element not in other])
++                    return FiniteSet(*[element for element in self if element not in other], evaluate=False)
+ 
+     @property
+     def is_iterable(self):

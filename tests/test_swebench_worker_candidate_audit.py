@@ -58,6 +58,50 @@ def test_worker_candidate_audit_passes_source_only_worker_patch(tmp_path):
     assert (root / "shards/S00/tasks/django__django-10097/candidate.patch.sha256").exists()
 
 
+def test_worker_candidate_audit_checks_patch_applies_to_source_snapshot(tmp_path):
+    auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
+    root = tmp_path / "campaign"
+    source_root = tmp_path / "source"
+    source_path = source_root / "django/core/validators.py"
+    source_path.parent.mkdir(parents=True)
+    source_path.write_text("different\n", encoding="utf-8")
+    write_candidate(root)
+
+    report = auditor.audit_candidate(root, "S00", "django__django-10097", apply_root=source_root)
+
+    assert report["status"] == "FAIL"
+    assert any(problem.startswith("candidate patch does not apply") for problem in report["problems"])
+
+
+def test_worker_candidate_audit_accepts_patch_that_applies_to_source_snapshot(tmp_path):
+    auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
+    root = tmp_path / "campaign"
+    source_root = tmp_path / "source"
+    source_path = source_root / "django/core/validators.py"
+    source_path.parent.mkdir(parents=True)
+    source_path.write_text("old\n", encoding="utf-8")
+    write_candidate(root)
+
+    report = auditor.audit_candidate(root, "S00", "django__django-10097", apply_root=source_root)
+
+    assert report["status"] == "PASS"
+    assert report["apply_check"]["status"] == "PASS"
+    assert "Skipped patch" not in report["apply_check"]["output"]
+
+
+def test_worker_candidate_audit_rejects_apply_check_that_skips_patch(tmp_path):
+    auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
+    root = tmp_path / "campaign"
+    source_root = tmp_path / "source"
+    source_root.mkdir()
+    write_candidate(root)
+
+    report = auditor.audit_candidate(root, "S00", "django__django-10097", apply_root=source_root)
+
+    assert report["status"] == "FAIL"
+    assert any("source snapshot missing diff path" in problem for problem in report["problems"])
+
+
 def test_worker_candidate_audit_rejects_test_file_patch(tmp_path):
     auditor = load_module("candidate_auditor", REPO / "tools/bench/audit_worker_candidate_patch.py")
     root = tmp_path / "campaign"

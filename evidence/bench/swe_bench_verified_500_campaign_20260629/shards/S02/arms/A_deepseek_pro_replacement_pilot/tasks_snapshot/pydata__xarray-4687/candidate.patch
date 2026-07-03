@@ -1,0 +1,26 @@
+diff --git a/xarray/core/ops.py b/xarray/core/ops.py
+index 68e97e55..4ce2f1a7 100644
+--- a/xarray/core/ops.py
++++ b/xarray/core/ops.py
+@@ -444,7 +444,7 @@ def where_method(self, cond, other):
+ 
+     return apply_ufunc(
+         duck_array_ops.where,
+-        cond, self, other
++        cond, self, other, keep_attrs=True
+     )
+ 
+ 
+diff --git a/xarray/core/computation.py b/xarray/core/computation.py
+index 85f0cf6b..5ebaae96 100644
+--- a/xarray/core/computation.py
++++ b/xarray/core/computation.py
+@@ -412,7 +412,7 @@ def apply_dataarray_vfunc(
+         index_vars = dataset_variable_merge(index_vars, ordered=True)
+ 
+     result_var = result_vars[0]
+-    coord_vars = merge_coords_without_align(coord_vars.values())
++    coord_vars = merge_coords_without_align(list(coord_vars.values()))
+     attrs = result_var.attrs
+     result_var.attrs = {}
+     result = DataArray(result_var, coords=coord_vars, name=name)

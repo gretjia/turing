@@ -142,6 +142,50 @@ def test_shard_runner_marks_execution_ready_with_complete_worker_predictions(tmp
     assert packet["problems"] == []
 
 
+def test_shard_runner_can_gate_ipqc_window_predictions(tmp_path):
+    runner = load_module("shard_runner", REPO / "tools/bench/run_swebench_shard.py")
+    root = tmp_path / "campaign"
+    shard_dir = root / "shards/S00"
+    shard_dir.mkdir(parents=True)
+    (shard_dir / "shard_manifest.json").write_text(
+        json.dumps(
+            {
+                "shard_id": "S00",
+                "tasks": [
+                    {
+                        "instance_id": "repo__task-1",
+                        "ipqc_window_id": "S00-W00",
+                        "candidate_source": "worker_derived",
+                    },
+                    {
+                        "instance_id": "repo__task-2",
+                        "ipqc_window_id": "S00-W01",
+                        "candidate_source": "worker_derived",
+                    },
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    predictions = write_predictions(root, "S00", [prediction("repo__task-1")])
+
+    packet = runner.build_command(
+        root,
+        "S00",
+        2,
+        execution_requested=True,
+        predictions_path=predictions,
+        window="S00-W00",
+    )
+
+    assert packet["status"] == "READY_TO_EXECUTE"
+    assert packet["ipqc_window_id"] == "S00-W00"
+    assert packet["validation"]["expected_prediction_count"] == 1
+    assert packet["validation"]["prediction_count"] == 1
+
+
 def test_shard_runner_records_preregistered_official_harness_flags(tmp_path):
     runner = load_module("shard_runner", REPO / "tools/bench/run_swebench_shard.py")
     root = tmp_path / "campaign"

@@ -1,0 +1,37 @@
+diff --git a/xarray/core/computation.py b/xarray/core/computation.py
+index 6bf26d2..c16f0fa 100644
+--- a/xarray/core/computation.py
++++ b/xarray/core/computation.py
+@@ -24,6 +24,7 @@
+ from .options import OPTIONS, _get_keep_attrs
+ from .pycompat import is_duck_dask_array
+ from .utils import is_dict_like
++from .variable import Variable
+ from .missing import get_clean_interp_index
+
+ if TYPE_CHECKING:
+@@ -789,7 +790,7 @@
+     return result.transpose(*all_dims, missing_dims="ignore")
+
+
+-def where(cond, x, y):
++def where(cond, x, y, keep_attrs=True):
+     """Return elements from `x` or `y` depending on `cond`.
+
+     Performs xarray-like broadcasting across input arguments.
+@@ -806,6 +807,9 @@
+         values to choose from where `cond` is True
+     y : scalar, array, Variable, DataArray or Dataset
+         values to choose from where `cond` is False
++    keep_attrs : bool, optional
++        If True, the attributes (`attrs`) will be copied from the first
++        argument to the new object. Default is True.
+
+     Returns
+     -------
+@@ -848,6 +852,7 @@
+         join="exact",
+         dataset_join="exact",
+         dask="allowed",
++        keep_attrs=keep_attrs,
+     )

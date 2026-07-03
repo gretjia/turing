@@ -1,0 +1,70 @@
+{
+  "candidate_patch_sha256": "sha256:bdf5b21b42383e90d00d1b4dac12087564f7c63168e958c647201ed50b38a02c",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 575,
+  "content_sha256": "sha256:91ec09db62afc5d22acf68c98835452f61c39c52410ed07c965404a1e6d8d711",
+  "cost_event": {
+    "agent_id": "m3-p4-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p4",
+    "capsule_id": "cap:592ab8ff5b45e22901833e131cb46f58cdaacf86121628183ba90f9f1d8adac9",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 188,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "matplotlib__matplotlib-23299",
+    "receipt_id": "rcpt:7361dacdb97aea899624abcf3f6bb41acd434db443ac4dfe14b6de05d14cf6c0",
+    "run_id": "m3-p4-arm-a-S02-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s02-pilot",
+    "usage": {
+      "completion_tokens": 168,
+      "prompt_cache_hit_tokens": 1792,
+      "prompt_cache_miss_tokens": 96,
+      "prompt_tokens": 1888,
+      "provider_usage_raw_sha256": "sha256:a35e6eef4e7a9226e98675cd7b1960de974d2710a9d0f9e443aacd0a2cb70d15",
+      "total_tokens": 2056
+    },
+    "wall_time_ms": 3116,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "3730de18-548f-4f6d-88c6-87ec55cf0baf",
+      "response_sha256": "sha256:7d06f5224005b785626bafc885cff34a1f566d241fddd6c7c707fa1517f2b5fd"
+    }
+  },
+  "instance_id": "matplotlib__matplotlib-23299",
+  "integrity_statement": "I read only the worker-safe task_packet.json and worker_capsule.md. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S02-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:288904e6be8a2776c113660daf84a8093fe268da0c1c66e051e738181c9e8fe4",
+  "response_sha256": "sha256:7d06f5224005b785626bafc885cff34a1f566d241fddd6c7c707fa1517f2b5fd",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S02",
+  "source_capsule_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/matplotlib__matplotlib-23299/worker_capsule.md",
+  "source_context_length_chars": 5081,
+  "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/matplotlib__matplotlib-23299/source_context.md",
+  "source_context_sha256": "sha256:87ebdb52164158bed6c9ebca4b8434da79b670fad4e1d2f18b21f0b7b5242810",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 168,
+    "prompt_cache_hit_tokens": 1792,
+    "prompt_cache_miss_tokens": 96,
+    "prompt_tokens": 1888,
+    "total_tokens": 2056
+  },
+  "usage_raw_sha256": "sha256:a35e6eef4e7a9226e98675cd7b1960de974d2710a9d0f9e443aacd0a2cb70d15",
+  "wall_time_ms": 3116
+}

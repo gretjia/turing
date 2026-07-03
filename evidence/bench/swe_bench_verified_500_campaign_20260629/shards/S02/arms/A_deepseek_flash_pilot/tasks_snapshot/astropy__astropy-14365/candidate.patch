@@ -1,0 +1,13 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+index e12410bb27..f6104bb6cb 100644
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -156,7 +156,7 @@ class QDPHeader:
+             else:
+                 # Not a comment, so try to split into command and data
+                 # parts.
+-                command = line.split()[0]
++                command = line.split()[0].upper()
+                 if command in commands:
+                     # Make sure the errors and Poisson data tags are handed
+                     # correctly.

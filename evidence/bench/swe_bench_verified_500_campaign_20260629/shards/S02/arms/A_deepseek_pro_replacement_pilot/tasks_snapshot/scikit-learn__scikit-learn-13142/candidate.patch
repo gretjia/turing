@@ -1,0 +1,30 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+index 3db1a651a..e5f7e0bbf 100644
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -394,7 +394,9 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+ 
+         if self.n_init == 1:
+             self._initialize_parameters(X, random_state)
++            best_params = self._get_parameters()
++            best_n_iter = self.n_iter_
++            max_lower_bound = self.lower_bound_
+         else:
+             # do multiple initializations
+             max_lower_bound = -np.infty
+@@ -406,7 +408,6 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+                     # taking note of the best parameters
+                     if self.lower_bound_ > max_lower_bound:
+                         max_lower_bound = self.lower_bound_
+-                        best_params = self._get_parameters()
+                         best_n_iter = self.n_iter_
+             self._set_parameters(best_params)
+             self.n_iter_ = best_n_iter
+@@ -414,6 +415,7 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+ 
+         # Always do a final e-step to guarantee that the labels returned by
+         # fit_predict(X) are always consistent with fit(X).predict(X)
++        # (including when n_init > 1)
+         _, log_resp = self._e_step(X)
+ 
+         if not self.converged_:

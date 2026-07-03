@@ -1,0 +1,34 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+index 108bd4158..b079e2f07 100644
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -305,9 +305,13 @@ class BaseMixture(six.with_metaclass(ABCMeta, DensityMixin, BaseEstimator)):
+ 
+         Returns
+         -------
+-        labels : array, shape (n_samples,)
++        labels : array, shape (n_samples,)
+\ No newline at end of file
++            Component labels.
++        """
++        self.fit(X, y)
++        return self.predict(X)
++
++    def fit_predict(self, X, y=None):
++        """Fit the model and predict the labels for X.
++
++        Parameters
++        ----------
++        X : array-like, shape (n_samples, n_features)
++
++        y : Ignored
++
++        Returns
++        -------
++        labels : array, shape (n_samples,)
++            Component labels.
++        """
++        self._check_is_fitted = False  # force re-fit (no-op when already fitted)
++        self.fit(X, y)
++        return self._predict(X, self.means_, self.covariances_, self.weights_)
+\ No newline at end of file

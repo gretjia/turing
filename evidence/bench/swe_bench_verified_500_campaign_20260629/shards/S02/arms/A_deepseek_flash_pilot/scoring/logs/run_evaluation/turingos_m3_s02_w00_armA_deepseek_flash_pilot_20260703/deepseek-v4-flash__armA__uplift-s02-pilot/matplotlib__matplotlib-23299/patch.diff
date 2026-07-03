@@ -1,0 +1,18 @@
+diff --git a/lib/matplotlib/__init__.py b/lib/matplotlib/__init__.py
+index fff5a5e..a5b32d5 100644
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -1382,6 +1382,13 @@ def get_backend():
+     if backend == rcParams['backend']:
+         return backend
+     # We need to detect if the backend is already loaded.
++    # If rcParams is in a temporary state (e.g., inside rc_context),
++    # we need to restore the original backend before switching.
++    if hasattr(rcParams, '_original'):
++        original_backend = rcParams._original.get('backend')
++        if original_backend is not None and original_backend != backend:
++            # Don't switch backend if we're inside rc_context
++            return backend
+     # Try to load and switch to the requested backend.
+     switch_backend(backend)
+     return rcParams['backend']

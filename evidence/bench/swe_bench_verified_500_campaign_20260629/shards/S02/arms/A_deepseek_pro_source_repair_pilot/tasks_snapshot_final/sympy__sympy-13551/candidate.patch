@@ -1,0 +1,13 @@
+diff --git a/sympy/concrete/products.py b/sympy/concrete/products.py
+index 66aafde..69f1981 100644
+--- a/sympy/concrete/products.py
++++ b/sympy/concrete/products.py
+@@ -289,7 +289,7 @@ class Product(ExprWithIntLimits):
+             return p / q
+ 
+         elif term.is_Mul:
+-            exclude, include = [], []
++            exclude, include = [S.One], []
+ 
+             for t in term.args:
+                 p = self._eval_product(t, (k, a, n))

@@ -1,0 +1,21 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/ipqc/S02-W00/source_snapshots/sympy__sympy-13551",
+    "output": "error: corrupt patch at line 26",
+    "status": "FAIL"
+  },
+  "candidate_patch_path": "shards/S02/tasks/sympy__sympy-13551/candidate.patch",
+  "candidate_patch_sha256": "sha256:c3a5a83b701078404fc268d927652b16fc859185deb6a19c9dca2ca023e9a2d7",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sympy/concrete/products.py"
+  ],
+  "instance_id": "sympy__sympy-13551",
+  "problems": [
+    "candidate patch does not apply to source snapshot: error: corrupt patch at line 26"
+  ],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S02",
+  "status": "FAIL",
+  "submitted_patch_scope": "source_only"
+}

@@ -33,11 +33,37 @@ def load_candidate_audit(root: Path, shard: str, instance_id: str) -> dict[str, 
     return load_json(path)
 
 
-def build_predictions(root: Path, shard: str, *, model_name: str = "turingos-internal-rehearsal") -> dict[str, Any]:
+def shard_tasks(root: Path, shard: str, window: str | None = None) -> tuple[list[dict[str, Any]], list[str]]:
     shard_manifest = load_json(root / "shards" / shard / "shard_manifest.json")
-    rows: list[dict[str, Any]] = []
     problems: list[str] = []
-    for task in shard_manifest.get("tasks", []):
+    tasks = shard_manifest.get("tasks")
+    if not isinstance(tasks, list):
+        return [], ["shard manifest tasks must be a list"]
+    selected = [
+        task
+        for task in tasks
+        if isinstance(task, dict) and (window is None or task.get("ipqc_window_id") == window)
+    ]
+    if window is not None and not selected:
+        problems.append(f"no shard tasks found for window: {window}")
+    return selected, problems
+
+
+def predictions_path(root: Path, shard: str, window: str | None = None) -> Path:
+    suffix = f"_{window}" if window else ""
+    return root / "predictions" / f"shard_{shard}{suffix}_predictions.jsonl"
+
+
+def build_predictions(
+    root: Path,
+    shard: str,
+    *,
+    model_name: str = "turingos-internal-rehearsal",
+    window: str | None = None,
+) -> dict[str, Any]:
+    tasks, problems = shard_tasks(root, shard, window)
+    rows: list[dict[str, Any]] = []
+    for task in tasks:
         instance_id = task.get("instance_id")
         if not isinstance(instance_id, str):
             problems.append("task missing instance_id")
@@ -79,7 +105,7 @@ def build_predictions(root: Path, shard: str, *, model_name: str = "turingos-int
             }
         )
 
-    out = root / "predictions" / f"shard_{shard}_predictions.jsonl"
+    out = predictions_path(root, shard, window)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
     report = {
@@ -87,11 +113,13 @@ def build_predictions(root: Path, shard: str, *, model_name: str = "turingos-int
         "status": "PASS" if not problems else "FAIL",
         "problems": problems,
         "shard_id": shard,
+        "ipqc_window_id": window,
         "prediction_count": len(rows),
         "predictions_path": str(out),
         "predictions_sha256": sha256_bytes(out.read_bytes()),
     }
-    write_json(root / "predictions" / f"shard_{shard}_predictions_report.json", report)
+    report_suffix = f"_{window}" if window else ""
+    write_json(root / "predictions" / f"shard_{shard}{report_suffix}_predictions_report.json", report)
     return report
 
 
@@ -99,9 +127,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--shard", required=True)
+    parser.add_argument("--window")
     parser.add_argument("--model-name", default="turingos-internal-rehearsal")
     args = parser.parse_args()
-    report = build_predictions(args.root, args.shard, model_name=args.model_name)
+    report = build_predictions(args.root, args.shard, model_name=args.model_name, window=args.window)
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0 if report["status"] == "PASS" else 1
 

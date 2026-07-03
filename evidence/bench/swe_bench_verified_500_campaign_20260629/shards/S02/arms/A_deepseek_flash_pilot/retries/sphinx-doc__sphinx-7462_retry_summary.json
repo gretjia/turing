@@ -1,0 +1,40 @@
+{
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "claim_boundary": {
+    "arm": "A",
+    "no_failure_memory": true,
+    "no_turingos_loop": true,
+    "no_uplift_result": true,
+    "pilot_only": true
+  },
+  "credential_material": "env_only_not_serialized",
+  "ipqc_window_id": "S02-W00",
+  "model_requested": "deepseek-v4-flash",
+  "problems": [],
+  "provider": "deepseek",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S02",
+  "status": "PASS",
+  "task_count_completed": 1,
+  "task_count_requested": 1,
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 618,
+      "candidate_patch_sha256": "sha256:3ee5cebe2a244c4882911bcda33fc86735d97b805051a108cdc19e24befcfc68",
+      "cost_microusd": 119,
+      "instance_id": "sphinx-doc__sphinx-7462",
+      "model_reported": "deepseek-v4-flash",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 143,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 557,
+        "prompt_tokens": 557,
+        "total_tokens": 700
+      }
+    }
+  ],
+  "wall_time_ms": 2547
+}

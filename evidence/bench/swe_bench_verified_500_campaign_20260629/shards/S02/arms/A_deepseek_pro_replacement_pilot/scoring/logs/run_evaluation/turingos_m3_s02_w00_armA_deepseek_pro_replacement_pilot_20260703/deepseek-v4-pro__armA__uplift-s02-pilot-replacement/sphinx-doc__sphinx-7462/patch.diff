@@ -1,0 +1,23 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 8e177555f..2cb4509c5 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -103,6 +103,10 @@ def _unparse_pep_604_annotation(node: ast.Subscript) -> Optional[List[Node]]:
+ def _unparse(node: ast.AST) -> List[Node]:
+     if isinstance(node, ast.Attribute):
+         return [nodes.Text("%s.%s" % (node.value.id, node.attr))]
++    if isinstance(node, ast.Tuple):
++        if not node.elts:
++            # empty tuple (Tuple[()])
++            return [nodes.Text("()")]
+     if isinstance(node, ast.Constant):
+         if node.value is Ellipsis:
+             return [addnodes.desc_sig_punctuation('', "...")]
+@@ -128,8 +132,6 @@ def _unparse(node: ast.AST) -> List[Node]:
+                 result.append(addnodes.desc_sig_punctuation('', ']'))
+             except IndexError:
+                 pass
+-            if type(node.slice) is ast.Tuple:
+-                result.pop()  # remove pop last ]
+             return result
+     raise TypeError  # not all nodes converted

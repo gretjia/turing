@@ -1,0 +1,144 @@
+diff --git a/astropy/io/ascii/cds.py b/astropy/io/ascii/cds.py
+--- a/astropy/io/ascii/cds.py
++++ b/astropy/io/ascii/cds.py
+@@ -175,13 +175,12 @@ class CdsHeader(BaseHeader):
+             # The pattern below matches CDS unit strings such as:
+             #  10+3J/m/s/kpc2    -> 10+3 J m-1 s-1 kpc-2
+             #  10-7J/s/kpc2      -> 10-7 J s-1 kpc-2
+-            #  10+3J/m/s/kpc2    parsed as 10+3J / m / s / kpc2
+-            unit_parts = re.split(r'[*/]', unit_str)
++            unit_parts = unit_str.split('/')
+             if len(unit_parts) > 1:
+-                # The first part is the multiplier with the first unit,
++                # first part: multiplier + first numerator unit(s)
+                 numerator = unit_parts[0]
+-                # The rest are denominator units
+-                denominator = unit_parts[1:]
++                # remaining parts: denominator units (may include * for multiple denominator factors)
++                denominator = [d.replace('*', '/') for d in unit_parts[1:]]
+             else:
+                 numerator = unit_str
+                 denominator = []
+@@ -194,13 +193,14 @@ class CdsHeader(BaseHeader):
+             #
+             # The splits below are different for numerator and denominator so that
+             # the final unit string can be reconstructed in the correct order.
+-            num_parts = re.split(r'([*])', numerator)
++            num_parts = re.split(r'[*]', numerator)
+             num_parts_out = []
+             for num_part in num_parts:
+                 if num_part == '':
+                     continue
+                 if num_part == '*':
+-                    num_parts_out.append(num_part)
++                    # star in numerator means multiplication between numerator parts
++                    num_parts_out.append('*')
+                 else:
+                     num_parts_out.append(num_part)
+             num_parts = num_parts_out
+@@ -208,23 +208,33 @@ class CdsHeader(BaseHeader):
+             # Now we parse the denominator parts individually.  These
+             # can include '*' as well.
+             denom_parts_out = []
+-            for denom_part in denominator:
+-                dparts = re.split(r'([*])', denom_part)
++            for denom_part in denominator:  # each denom_part may be something like 's*kpc2'
++                # split on '*' but keep only the actual unit tokens
++                dparts = [x for x in re.split(r'[*]', denom_part) if x]
+                 for dpart in dparts:
+-                    if dpart == '':
+-                        continue
+-                    if dpart == '*':
+-                        denom_parts_out.append('*')
+-                    else:
+-                        denom_parts_out.append(dpart)
++                    if dpart == '*':
++                        continue   # stars between denominator units are implicit
++                    denom_parts_out.append(dpart)
+             denom_parts = denom_parts_out
+ 
++            # Build the final numerator: all num_parts already in correct order
++            # Build numerator string (including '*' between tokens)
++            num_str_parts = []
++            for p in num_parts:
++                if p == '*':
++                    num_str_parts.append('*')
++                else:
++                    num_str_parts.append(p)
++            # Build denominator string (we will add '/' between denominator units as per FITS convention)
++            den_str_parts = []
++            for p in denom_parts:
++                if p == '*':
++                    den_str_parts.append('/')  # '*' in denominator actually means *next* denominator unit => actually '/'? Wait.
++                # actually CDS denominator splits on '/', so a '/' in the original is a separator.
++                # But '*' inside a denominator part (like 's*kpc2') should be interpreted as multiplication of denominator units,
++                # which is 's kpc2' with implicit multiplication.  Do NOT insert '/'.
++                else:
++                    den_str_parts.append(p)
++            # According to CDS, division is always explicit via '/'.  Multiple numerator units are separated by '*' and denominator units are just concatenated? Actually standard: "10+3J/m/s/kpc2" means 10^3 J m-1 s-1 kpc-2.  So each '/' adds a new denominator factor.  There is no '*' between denominator factors; they are just listed separated by '/'.  But in the given example, denominator contains 'm/s/kpc2' which when split by '/' yields ['m','s','kpc2'].  These should become m-1 s-1 kpc-2, i.e., with implicit multiplication.  So we should just write them as 'm s kpc2' and let the unit parser apply the powers.  However the old code was producing 's / (kpc2 m)' improperly.
++            # Given the second example '10-7J/s/kpc2' the denominator list is ['s','kpc2'] -> should become 's kpc2' but with negative exponent, i.e., s-1 kpc-2.  The current bug is that the order is wrong and it prints 'J kpc2 / s' in one case.
++            # Actually looking at the expected output from the bug report: the SBCONT column unit becomes '1e+3 J s / (kpc2 m)' which is wrong.  The correct should be '1e+3 J m-1 s-1 kpc-2' i.e., '10+3 J / (m s kpc2)'.  The old code put 's' in the numerator and 'kpc2 m' in denominator with a parentheses.  The new code should produce proper FITS-style units.
++            # We'll construct the numerator part: multiplier + numerator unit(s) with '*' between them if multiple.
++            # For denominator: just concatenate with spaces (or maybe '/')?  Since we're going to parse with astropy.units, we can output a string like '10+3J / (m s kpc2)' or '10+3J m-1 s-1 kpc-2'.
++            # The easiest approach: build a string like '10+3J / m / s / kpc2' which astropy's unit parser understands because it interprets '/' as division.  Actually astropy's Unit(format='fits') uses ' ' for multiplication and '/' for division.  But the multi-slash form 'J/m/s/kpc2' is not standard FITS.  Better to produce '10+3J m-1 s-1 kpc-2'.  We can do that by negating denominator exponents.
++            # However the current code just returns a single string to be parsed by units.  The bug is that the order was jumbled.  So we need to preserve the original order of numerator and denominator as they appear.
++            # Let's implement a simpler approach: recombine the tokens preserving order.
++            # We have num_parts (list of numerator tokens) and denom_parts (list of denominator tokens) in the order they appeared.
++            # Construct a unit string like '10+3J * m-1 * s-1 * kpc-2' or better '10+3J / m / s / kpc2'?  Actually '10+3J/m/s/kpc2' is what the original CDS string had, but astropy's units do not handle that well?  Looking at the bug, it seems the original code was parsing the CDS string and then reconstructing it in a way that changed order.  The new code should just pass a proper FITS unit string.
++            # In astropy, the FITS unit format uses '/' to separate numerator and denominator groups.  For example, 'J / (m s kpc2)' would be correct for J/(m*s*kpc2).  But the CDS standard says 'J/m/s/kpc2' which is equivalent but not FITS-like.  The parser in astropy (Unit('J/m/s/kpc2')) actually works and gives J/(m*s*kpc2).  Let's test: Unit('J/m/s/kpc2') -> Unit("J / (m s kpc2)")?  Actually I think astropy can parse that.  But the bug report shows that the output was '1e+3 J s / (kpc2 m)' which means the order got swapped.  So the problem is in how we assembled the tokens.
++            # The CDS string '10+3J/m/s/kpc2' has numerator: '10+3J', denominator: 'm', 's', 'kpc2'.  The buggy code put 'm' and 's' and 'kpc2' into denom_parts but then when reconstructing the unit it produced 'J s / (kpc2 m)' incorrectly.
++            # Let's look at the current code after the changes above: it produces num_parts = ['10+3J'] and denom_parts = ['m','s','kpc2'].  Then to reconstruct the unit string we need to combine them.  The old code used a formatter that produced the jumbled order.  We'll instead produce a string like '10+3J / m / s / kpc2' which is unambiguous.
++            # The simplest fix: produce a unit string by concatenating numerator parts with '*' and denominator parts with '/' separators: numerator_part + '/' + denom_part1 + '/' + denom_part2... but that would give '10+3J/m/s/kpc2', which is correct and should parse as J/(m*s*kpc2).  The bug is that the old code used .format() with some other logic that swapped the order.
++            # Actually looking at the CdsHeader read method: after parsing the unit string, it uses unit.to_string('fits') which may reorder?  But the mismatch is between the input and the output.  We'll fix by ensuring the reconstruction preserves the original order.
++            # Let's try: for num_parts, join with '*' if there are multiple, but we have only one in numerator: '10+3J'.  For denom_parts, join with ' ' and then wrap in parentheses?  Actually unit string format: '10+3J / (m s kpc2)' works.  To avoid order issues, we can construct numerator_str = ' * '.join(num_parts) and denominator_str = ' '.join(denom_parts).  Then unit_comb = numerator_str + ' / (' + denominator_str + ')' .  That would give '10+3J / (m s kpc2)' which is correct.
++            # For the second column: '10-7J/s/kpc2' -> numerator '10-7J', denominator ['s','kpc2'] -> '10-7J / (s kpc2)' which is J * s-1 * kpc-2, correct.
++            # Let's test with the buggy case: '10+3J/m/s/kpc2' -> '10+3J / (m s kpc2)' -> parsed as J/(m s kpc2) = J m-1 s-1 kpc-2, correct.
++            # The old buggy output was '1e+3 J s / (kpc2 m)' which had 's' in numerator and denominator order reversed.  The new code will produce correct order.
++            # So implement the reconstruction.
++            if len(num_parts) > 0:
++                num_str = ' * '.join(num_parts)
++            else:
++                num_str = ''
++            if len(denom_parts) > 0:
++                denom_str = ' '.join(denom_parts)
++                unit = num_str + ' / (' + denom_str + ')'
++            else:
++                unit = num_str
++            # Overwrite the unit string.
++            col.unit = Unit(unit, format='fits')  # but we want to return a string for further parsing? Actually the code currently sets col.unit = Unit(unit) after modifications? Looking at the function: it reassembles unit from the parts.  Let's just replace the final unit string.
++            # We'll replace the original unit string with the correctly ordered one.
++            unit_str = unit  # The variable name used later is 'unit_str'.  Actually the function returns col.unit after setting.  We'll just modify unit_str.
+             # Now reassemble the full unit string from the parts in the
+             # order that we parsed them.  The original unit string was
+             # something like '10+3J/m/s/kpc2' and we want to produce
+@@ -237,24 +247,14 @@ class CdsHeader(BaseHeader):
+             # denominator units all in one place and not splitting them
+             # up with '*' that might be interpreted as multiplication or
+             # something else.
+-            new_unit_str = ''
+-            for i, np in enumerate(num_parts):
+-                new_unit_str += np
+-                if i < len(num_parts) - 1 and np != '*' and num_parts[i + 1] != '*':
+-                    new_unit_str += ' '
+-            if len(denom_parts) > 0:
+-                new_unit_str += ' / ('
+-                for i, dp in enumerate(denom_parts):
+-                    new_unit_str += dp
+-                    if i < len(denom_parts) - 1 and dp != '*' and denom_parts[i + 1] != '*':
+-                        new_unit_str += ' '
+-                new_unit_str += ')'
+-            # Strip trailing spaces
+-            new_unit_str = new_unit_str.strip()
+-            if new_unit_str == '':
++            # Instead of the complex logic above (which introduced the ordering bug), we now use the simpler string built earlier.
++            # We already built unit_str as 'num_str / (denom_str)' or just num_str.
++            # But we need to assign to col.unit using Unit constructor to get a proper Unit object.
++            # Since col.unit is later converted to Unit anyway, we can set it from the reconstructed string.
++            if unit_str == '':
+                 col.unit = None
+             else:
+-                col.unit = Unit(new_unit_str, format='fits')
++                col.unit = Unit(unit_str, format='fits')
+ 
+     def _get_cols(self, lines):
+         """

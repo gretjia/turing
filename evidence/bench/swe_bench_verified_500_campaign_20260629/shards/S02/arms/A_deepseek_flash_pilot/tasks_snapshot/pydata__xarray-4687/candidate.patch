@@ -1,0 +1,14 @@
+diff --git a/xarray/core/computation.py b/xarray/core/computation.py
+index c10c2074..e2e23590 100644
+--- a/xarray/core/computation.py
++++ b/xarray/core/computation.py
+@@ -1459,6 +1459,10 @@ def where(cond, x, y, keep_attrs=None):
+     merge_attrs = _get_keep_attrs(default=True)
+     if keep_attrs is None:
+         keep_attrs = merge_attrs
++    # Preserve attributes from x or y if keep_attrs is True
++    if keep_attrs:
++        result.attrs = x.attrs if hasattr(x, 'attrs') else {}
++        result.attrs.update(y.attrs if hasattr(y, 'attrs') else {})
+ 
+     return result

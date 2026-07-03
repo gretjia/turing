@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/ipqc/S02-W00/source_snapshots/matplotlib__matplotlib-23299",
+    "output": "Checking patch lib/matplotlib/_pylab_helpers.py...\nHunk #1 succeeded at 117 (offset 3 lines).",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S02/tasks/matplotlib__matplotlib-23299/candidate.patch",
+  "candidate_patch_sha256": "sha256:bdf5b21b42383e90d00d1b4dac12087564f7c63168e958c647201ed50b38a02c",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "lib/matplotlib/_pylab_helpers.py"
+  ],
+  "instance_id": "matplotlib__matplotlib-23299",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S02",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

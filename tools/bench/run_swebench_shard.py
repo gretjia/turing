@@ -58,7 +58,7 @@ def sha256_text(text: str) -> str:
     return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def validate_predictions(root: Path, shard: str, predictions: Path) -> dict[str, Any]:
+def validate_predictions(root: Path, shard: str, predictions: Path, *, window: str | None = None) -> dict[str, Any]:
     problems: list[str] = []
     shard_manifest_path = root / "shards" / shard / "shard_manifest.json"
     if not shard_manifest_path.exists():
@@ -80,7 +80,15 @@ def validate_predictions(root: Path, shard: str, predictions: Path) -> dict[str,
         }
 
     expected_ids: list[str] = []
-    for task in tasks:
+    selected_tasks = [
+        task
+        for task in tasks
+        if isinstance(task, dict) and (window is None or task.get("ipqc_window_id") == window)
+    ]
+    if window is not None and not selected_tasks:
+        problems.append(f"no shard tasks found for window: {window}")
+
+    for task in selected_tasks:
         if not isinstance(task, dict) or not isinstance(task.get("instance_id"), str):
             problems.append("shard manifest task missing instance_id")
             continue
@@ -160,9 +168,11 @@ def build_command(
     timeout: int = 1800,
     cache_level: str = "env",
     namespace: str = "swebench",
+    window: str | None = None,
 ) -> dict[str, Any]:
     run_id = run_id or f"turingos_verified500_{shard}"
-    predictions = predictions_path or root / "predictions" / f"shard_{shard}_predictions.jsonl"
+    prediction_suffix = f"_{window}" if window else ""
+    predictions = predictions_path or root / "predictions" / f"shard_{shard}{prediction_suffix}_predictions.jsonl"
     report_dir = report_dir or root / "shards" / shard / "official_eval" / run_id
     command = (
         "python -m swebench.harness.run_evaluation "
@@ -176,13 +186,14 @@ def build_command(
         f"--namespace {namespace} "
         f"--report_dir {report_dir}"
     )
-    validation = validate_predictions(root, shard, predictions) if execution_requested else None
+    validation = validate_predictions(root, shard, predictions, window=window) if execution_requested else None
     problems = validation["problems"] if validation else []
     status = "READY_TO_EXECUTE" if execution_requested and not problems else "BLOCKED" if execution_requested else "PLAN_ONLY"
     packet = {
         "schema_id": "turingos.swebench_shard_run_packet.v1",
         "status": status,
         "shard_id": shard,
+        "ipqc_window_id": window,
         "official_harness_kind": "upstream_swebench_docker",
         "docker_environment_required": True,
         "command": command,
@@ -222,6 +233,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=1800)
     parser.add_argument("--cache-level", default="env")
     parser.add_argument("--namespace", default="swebench")
+    parser.add_argument("--window")
     parser.add_argument("--execute", action="store_true", help="validate the shard is ready to execute")
     args = parser.parse_args()
     packet = build_command(
@@ -235,6 +247,7 @@ def main() -> int:
         timeout=args.timeout,
         cache_level=args.cache_level,
         namespace=args.namespace,
+        window=args.window,
     )
     print(json.dumps(packet, indent=2, sort_keys=True))
     return 1 if args.execute and packet["status"] != "READY_TO_EXECUTE" else 0

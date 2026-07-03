@@ -77,6 +77,49 @@ def test_predictions_builder_uses_worker_patch_digest_and_writes_jsonl(tmp_path)
     assert row["candidate_source"] == "worker_derived"
 
 
+def test_predictions_builder_can_limit_to_ipqc_window(tmp_path):
+    builder = load_module("predictions_builder", REPO / "tools/bench/build_predictions_jsonl.py")
+    root = tmp_path / "campaign"
+    patch = root / "shards/S00/tasks/repo__task-1/candidate.patch"
+    make_patch(patch)
+    write_candidate_audit(root, "S00", "repo__task-1", patch)
+    shard_manifest = root / "shards/S00/shard_manifest.json"
+    shard_manifest.parent.mkdir(parents=True, exist_ok=True)
+    shard_manifest.write_text(
+        json.dumps(
+            {
+                "shard_id": "S00",
+                "tasks": [
+                    {
+                        "instance_id": "repo__task-1",
+                        "ipqc_window_id": "S00-W00",
+                        "candidate_patch_path": "shards/S00/tasks/repo__task-1/candidate.patch",
+                        "candidate_source": "worker_derived",
+                    },
+                    {
+                        "instance_id": "repo__task-2",
+                        "ipqc_window_id": "S00-W01",
+                        "candidate_patch_path": "shards/S00/tasks/repo__task-2/candidate.patch",
+                        "candidate_source": "worker_derived",
+                    },
+                ],
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+
+    report = builder.build_predictions(root, "S00", window="S00-W00")
+
+    assert report["status"] == "PASS"
+    assert report["prediction_count"] == 1
+    assert report["ipqc_window_id"] == "S00-W00"
+    rows = (root / "predictions/shard_S00_S00-W00_predictions.jsonl").read_text().splitlines()
+    assert len(rows) == 1
+    assert json.loads(rows[0])["instance_id"] == "repo__task-1"
+    assert (root / "predictions/shard_S00_S00-W00_predictions_report.json").exists()
+
+
 def test_predictions_builder_rejects_candidate_without_passed_audit(tmp_path):
     builder = load_module("predictions_builder", REPO / "tools/bench/build_predictions_jsonl.py")
     root = tmp_path / "campaign"
