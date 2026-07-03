@@ -1,0 +1,51 @@
+{
+  "routing_decision": {
+    "task_id": "TASK-20260703-hw-sw-001-substrate-lockdown",
+    "signals": {
+      "task_id": "TASK-20260703-hw-sw-001-substrate-lockdown",
+      "description": "Phase 1 atoms HW-SW-001..003: Art. 0.2 traceability audit script + pytest mirror, sufficiency audit scripts + calc-ipqc-interval.sh + loop harness doc, substrate freeze manifest + forbidden-file guard",
+      "task_class": "code",
+      "gate_scriptable": true,
+      "ambiguous_intent": false,
+      "cross_team_glossary": false,
+      "needs_design": false,
+      "eta_hours": 6,
+      "human_ux_gate": false,
+      "multi_atom": true,
+      "shipgate_mandatory": true,
+      "high_risk": false,
+      "live_sources": false,
+      "source_count": 0,
+      "sources_independent": true,
+      "sources_ordered": false,
+      "rate_limit_fragile": false,
+      "parallel_slices": 3,
+      "slices_independent": true,
+      "glossary_before_merge": false,
+      "terminology_risk": false,
+      "long_horizon": true,
+      "unattended": false,
+      "iteration_cap": 15,
+      "session_cap_minutes": 120
+    },
+    "path": "turing_full",
+    "plan_depth": "lite",
+    "turing_depth": "full",
+    "fetch_mode": "none",
+    "require_glossary": false,
+    "require_predicate": true,
+    "escalate_reasons": [
+      "gate_scriptable_code_atom",
+      "eta_hours>=2",
+      "multi_atom",
+      "shipgate_mandatory",
+      "long_horizon",
+      "eta_multi_atom_horizon"
+    ],
+    "horizon_mode": true,
+    "require_horizon_state": true,
+    "unattended_mode": false,
+    "iteration_cap": 15,
+    "session_cap_minutes": 120
+  }
+}
