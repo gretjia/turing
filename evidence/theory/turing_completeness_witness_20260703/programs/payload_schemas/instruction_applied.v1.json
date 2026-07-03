@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turingos.local/schemas/instruction_applied.v1.json",
+  "title": "instruction_applied.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "program_id",
+    "step_index",
+    "pc_before",
+    "pc_after",
+    "instruction",
+    "prev_state_hash",
+    "next_state_hash"
+  ],
+  "properties": {
+    "program_id": {
+      "type": "string"
+    },
+    "step_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pc_before": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pc_after": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "instruction": {
+      "type": "object"
+    },
+    "prev_state_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "next_state_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

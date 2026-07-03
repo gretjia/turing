@@ -1,0 +1,67 @@
+{
+  "schema_id": "turingos.tc_witness.instruction_registry.v1",
+  "evidence_class": "TC0_FREEZE_ARTIFACT",
+  "machine_class": "minsky_counter_machine",
+  "machine_class_version": "two_counter_v1_generic_core",
+  "counters": [
+    "counter_a",
+    "counter_b"
+  ],
+  "unknown_instruction_policy": "REJECT",
+  "pc_range_policy": "REJECT_OUT_OF_RANGE_AT_LOAD",
+  "decjz_semantics": "if counter==0: jump zero_pc WITHOUT decrement; else: decrement then jump nonzero_pc",
+  "state_hash_semantics": "sha256 over canonical payload bytes for {counter_a,counter_b,halted,program_counter}; step_index excluded",
+  "state_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "program_counter",
+      "counter_a",
+      "counter_b",
+      "halted"
+    ],
+    "properties": {
+      "program_counter": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "counter_a": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "counter_b": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "halted": {
+        "type": "boolean"
+      }
+    }
+  },
+  "instructions": [
+    {
+      "op": "INC",
+      "fields": {
+        "counter": "counter_name",
+        "next_pc": "pc"
+      }
+    },
+    {
+      "op": "DECJZ",
+      "fields": {
+        "counter": "counter_name",
+        "zero_pc": "pc",
+        "nonzero_pc": "pc"
+      }
+    },
+    {
+      "op": "HALT",
+      "fields": {}
+    }
+  ],
+  "loader_contract": {
+    "jump_targets": "every pc target must be an integer in [0, program_length)",
+    "halting": "execution stops only at explicit HALT",
+    "codec_subset": "payload leaves are integers, strings, and booleans; floats are forbidden"
+  }
+}

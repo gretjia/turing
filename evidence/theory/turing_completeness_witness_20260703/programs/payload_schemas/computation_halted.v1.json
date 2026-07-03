@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turingos.local/schemas/computation_halted.v1.json",
+  "title": "computation_halted.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "program_id",
+    "final_step_index",
+    "final_state",
+    "final_state_hash",
+    "halt_kind"
+  ],
+  "properties": {
+    "program_id": {
+      "type": "string"
+    },
+    "final_step_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "final_state": {
+      "$ref": "state.v1"
+    },
+    "final_state_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "halt_kind": {
+      "const": "EXPLICIT_HALT"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turingos.local/schemas/instruction_authorized.v1.json",
+  "title": "instruction_authorized.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "program_id",
+    "step_index",
+    "pc",
+    "instruction",
+    "predicate",
+    "budget_remaining"
+  ],
+  "properties": {
+    "program_id": {
+      "type": "string"
+    },
+    "step_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pc": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "instruction": {
+      "type": "object"
+    },
+    "predicate": {
+      "const": "instruction_in_closed_table_and_budget_remaining"
+    },
+    "budget_remaining": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "turingos.tc0.additive_event_registry_rows_proposal.v1",
+  "proposal_status": "PROPOSED_M0_CHAIN",
+  "status_label": "ADDITIVE_TC_WITNESS_V1",
+  "baseline_event_registry_path": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+  "baseline_event_registry_sha256": "9e1d514dbfb056f9d194d1ff4b1f52b8a93584f9fcaffec89461ed59db13c0f3",
+  "shared_registry_edited_by_tc0": false,
+  "proposed_rows": [
+    {
+      "canonical_name": "ComputationStarted",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "computation_started.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1"
+    },
+    {
+      "canonical_name": "InstructionAuthorized",
+      "event_class": "AUTHORIZATION",
+      "head_effect": "ADVANCE",
+      "target_ref": "authorization_head",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "instruction_authorized.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1"
+    },
+    {
+      "canonical_name": "InstructionApplied",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "instruction_applied.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1"
+    },
+    {
+      "canonical_name": "MachineStateObserved",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "machine_state_observed.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1"
+    },
+    {
+      "canonical_name": "ComputationHalted",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "computation_halted.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1"
+    }
+  ],
+  "notes": [
+    "InstructionAuthorized is the only ADVANCE row and targets authorization_head, matching existing authorization-class shape.",
+    "Budget stops reuse the frozen BudgetExhausted row; TC0 does not propose a new budget-stop event.",
+    "Rows are proposed for the M0 governance chain and are not silently appended to the shared registry by this artifact."
+  ]
+}

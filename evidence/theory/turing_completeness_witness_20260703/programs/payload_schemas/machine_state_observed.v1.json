@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turingos.local/schemas/machine_state_observed.v1.json",
+  "title": "machine_state_observed.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "program_id",
+    "step_index",
+    "state",
+    "state_hash"
+  ],
+  "properties": {
+    "program_id": {
+      "type": "string"
+    },
+    "step_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "state": {
+      "$ref": "state.v1"
+    },
+    "state_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}
