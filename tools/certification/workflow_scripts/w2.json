@@ -1,0 +1,23 @@
+{
+  "schema_id": "turingos.fce_workflow_script.v1",
+  "workflow_id": "FCE-W2",
+  "title": "Interrupt and resume",
+  "fixture_or_real": "TEMPLATE",
+  "steps": [
+    {
+      "actor": "orchestrator",
+      "input": "Start a three-task loop run and stop after task two first attempt.",
+      "expected_observable": "prekill_tip_digest_recorded"
+    },
+    {
+      "actor": "fresh_orchestrator",
+      "input": "Resume from tracker and tape only.",
+      "expected_observable": "no_duplicate_attempt_events"
+    },
+    {
+      "actor": "auditor",
+      "input": "Strict audit the spliced run.",
+      "expected_observable": "strict_audit_pass"
+    }
+  ]
+}
