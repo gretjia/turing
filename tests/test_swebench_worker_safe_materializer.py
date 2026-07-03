@@ -79,7 +79,28 @@ def test_materializer_writes_worker_safe_packet_without_gold_or_test_fields(tmp_
     assert "FAIL_TO_PASS" not in rendered
     assert "PASS_TO_PASS" not in rendered
     assert "hints_text" not in rendered
-    assert packet["gold_patch_fields_removed"] is True
+    assert packet["restricted_source_fields_removed"] is True
+
+
+def test_materializer_worker_visible_artifacts_do_not_name_restricted_solution_material(tmp_path):
+    materializer = load_module(
+        "worker_safe_materializer", REPO / "tools/bench/materialize_swebench_worker_safe_tasks.py"
+    )
+    root = tmp_path / "campaign"
+    write_shard_manifest(root)
+    dataset = tmp_path / "dataset.jsonl"
+    write_dataset_jsonl(dataset)
+
+    materializer.materialize(root, "S00", "S00-W00", dataset_jsonl=dataset)
+
+    task_dir = root / "shards/S00/ipqc/S00-W00/worker_safe_tasks/astropy__astropy-12907"
+    visible_text = (
+        (task_dir / "task_packet.json").read_text(encoding="utf-8")
+        + "\n"
+        + (task_dir / "worker_capsule.md").read_text(encoding="utf-8")
+    ).lower()
+    for marker in ["gold patch", "gold_patch", "official solution", "fail_to_pass", "pass_to_pass", "hints_text"]:
+        assert marker not in visible_text
 
 
 def test_materializer_blocks_when_shard_task_is_missing_from_dataset(tmp_path):

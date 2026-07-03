@@ -98,7 +98,7 @@ def worker_safe_packet(row: dict[str, Any], *, shard: str, window: str) -> dict[
             "shard_id": shard,
             "ipqc_window_id": window,
             "visible_to_worker": True,
-            "gold_patch_fields_removed": True,
+            "restricted_source_fields_removed": True,
             "forbidden_field_count_removed": sum(1 for field in FORBIDDEN_FIELDS if field in row),
             "candidate_source_policy": "worker_derived_patch_only",
         }
@@ -122,7 +122,7 @@ def worker_capsule_text(packet: dict[str, Any]) -> str:
             "",
             "## Candidate Policy",
             "",
-            "Produce a worker-derived unified diff against the base commit. Do not use dataset gold patches, official solution patches, or hidden evaluator labels.",
+            "Produce a worker-derived unified diff against the base commit. Use only this packet, repository inspection, and your own reasoning.",
             "",
         ]
     )

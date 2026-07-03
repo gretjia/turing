@@ -1,0 +1,88 @@
+{
+  "ipqc_window_id": "S01-W01",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_safe_tasks_report.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "task_count": 10,
+  "tasks": [
+    {
+      "instance_id": "scikit-learn__scikit-learn-12585",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/scikit-learn__scikit-learn-12585/task_packet.json",
+      "task_packet_sha256": "sha256:1d698f78e463a16a72cdcfc296500918d7f95f611b98639937987635884b4f19",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/scikit-learn__scikit-learn-12585/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:57169601eb87a46137d0b466fba31a92e173e47883bdf34c64b611e845506b65"
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10673",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/sphinx-doc__sphinx-10673/task_packet.json",
+      "task_packet_sha256": "sha256:f09011fd6ff694ddd6b84d13527ac704ef06a1fba21986826f465639eecea547",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/sphinx-doc__sphinx-10673/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:5b2de4e9c6b3ec764cbb0509bdef0f1453f459dddbeefa09e9e289146137fb94"
+    },
+    {
+      "instance_id": "sympy__sympy-13031",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/sympy__sympy-13031/task_packet.json",
+      "task_packet_sha256": "sha256:3f52e9dfba8be6d3f4054f24867cf8aec461c8a1274bdce2dec7e7cc4b0b6fdf",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/sympy__sympy-13031/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:dd688159ca64adbee912778e438e6d871757dde53ac396a127a8f05470ad538d"
+    },
+    {
+      "instance_id": "astropy__astropy-13977",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/astropy__astropy-13977/task_packet.json",
+      "task_packet_sha256": "sha256:b00f24c9765ca1e6da40d0ee69c1a7ae6bc90c8d28a34702ac3db918d2743365",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/astropy__astropy-13977/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:ea853f4f25ad5113fcb0e8932e86e1ded419417ed069b899b6650941f57e4fc3"
+    },
+    {
+      "instance_id": "django__django-11066",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/django__django-11066/task_packet.json",
+      "task_packet_sha256": "sha256:4283e604f0911270aed51961a37b662c69ef18fe36c787add319af8c3488c99e",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/django__django-11066/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:5a507ab02467583790d77073619e83ef3861821cc5887612c20ddd8065cfeb4a"
+    },
+    {
+      "instance_id": "matplotlib__matplotlib-21568",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/matplotlib__matplotlib-21568/task_packet.json",
+      "task_packet_sha256": "sha256:3368bc31c1ac0b141aad6543b5a26e5a4d99df93663d140beddbbe13eb22f4ad",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/matplotlib__matplotlib-21568/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:45afff61def2b6bde4824516a78a0b576d9cab26c1b598d98cfe76be91cb22fa"
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/psf__requests-5414/task_packet.json",
+      "task_packet_sha256": "sha256:01bc87b472b0d351cd3b6bcc728a44775c0944210ae4b7224ce3a8ce8da10a64",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/psf__requests-5414/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:e381bc72772db6f1691767a79654ddedef7490271550a80914a3dab055f6ff02"
+    },
+    {
+      "instance_id": "pydata__xarray-4075",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pydata__xarray-4075/task_packet.json",
+      "task_packet_sha256": "sha256:5553d3ea22a1df7014ac1ee77322dda2f21048357e4f286f0988d6ca429560aa",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pydata__xarray-4075/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:2c08b43241c586de7d4f00e51f5725d0a240fd9be4566adb953279b3bdaf8e0d"
+    },
+    {
+      "instance_id": "pylint-dev__pylint-6903",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pylint-dev__pylint-6903/task_packet.json",
+      "task_packet_sha256": "sha256:57e8883fe669599b4858b9ec79721c1e895197cbf2d49ded0e1f7b48946ad3b3",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pylint-dev__pylint-6903/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:7024e547218c557c40a60338890d19a54be82aae70e2e1c7a89d7c315dcf5902"
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "task_packet_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pytest-dev__pytest-5809/task_packet.json",
+      "task_packet_sha256": "sha256:dbb55aa7958638d0557f388653a8630494fc3af620651e3983662032bb229b5c",
+      "worker_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/pytest-dev__pytest-5809/worker_capsule.md",
+      "worker_capsule_sha256": "sha256:c764a226dc88414f5bb3b749c0469b861ced4ea0f7124017ffe793a487cbcf2e"
+    }
+  ],
+  "worker_visible_forbidden_fields": [
+    "FAIL_TO_PASS",
+    "PASS_TO_PASS",
+    "hints_text",
+    "patch",
+    "test_patch"
+  ],
+  "written_count": 10
+}

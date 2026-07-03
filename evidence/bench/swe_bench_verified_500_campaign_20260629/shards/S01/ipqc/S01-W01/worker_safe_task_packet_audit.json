@@ -1,0 +1,76 @@
+{
+  "forbidden_packet_keys": [
+    "FAIL_TO_PASS",
+    "PASS_TO_PASS",
+    "hints_text",
+    "patch",
+    "test_patch"
+  ],
+  "forbidden_visible_markers": [
+    "fail_to_pass",
+    "gold patch",
+    "gold_patch",
+    "hints_text",
+    "official solution",
+    "pass_to_pass",
+    "test_patch"
+  ],
+  "ipqc_window_id": "S01-W01",
+  "packet_count": 10,
+  "problems": [],
+  "schema_id": "turingos.worker_safe_task_packet_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "tasks": [
+    {
+      "instance_id": "astropy__astropy-13977",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "django__django-11066",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "matplotlib__matplotlib-21568",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "psf__requests-5414",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "pydata__xarray-4075",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "pylint-dev__pylint-6903",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "pytest-dev__pytest-5809",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "scikit-learn__scikit-learn-12585",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10673",
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "instance_id": "sympy__sympy-13031",
+      "problems": [],
+      "status": "PASS"
+    }
+  ]
+}
