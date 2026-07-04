@@ -1,0 +1,319 @@
+{
+  "all_required_items_present": true,
+  "child_phase_statuses": {
+    "M3.P1": "ADDRESSED",
+    "M3.P2": "ADDRESSED",
+    "M3.P3": "ADDRESSED",
+    "M3.P4": "ADDRESSED",
+    "M3.P5": "ADDRESSED",
+    "M3.P6": "ADDRESSED",
+    "M3.P7": "ADDRESSED"
+  },
+  "claim_boundary": {
+    "absolute_rate_is_capability_claim": false,
+    "fixture_outputs_are_not_performance_evidence": false,
+    "full_score_claim_allowed": false,
+    "turingos_improves_workers_claim_allowed": false
+  },
+  "confirmatory_results": {
+    "H1_B_gt_A": {
+      "arm1_resolved": 14,
+      "arm2_resolved": 16,
+      "ci95_high": 0.16,
+      "ci95_low": -0.06,
+      "delta": 0.04,
+      "exact_mcnemar_two_sided_p": 0.7265625,
+      "holm_alpha": 0.025,
+      "holm_reject": false,
+      "positive_direction": true
+    },
+    "H2_B_gt_C": {
+      "arm1_resolved": 16,
+      "arm2_resolved": 16,
+      "blocked_by_h1": true,
+      "ci95_high": 0.1,
+      "ci95_low": -0.1,
+      "delta": 0.0,
+      "exact_mcnemar_two_sided_p": 1.0,
+      "holm_alpha": null,
+      "holm_reject": false,
+      "positive_direction": false
+    }
+  },
+  "digest_bound_artifacts": [
+    {
+      "label": "1_adrs:ADR-M3-01-worker-policy-receipts.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-01-worker-policy-receipts.md",
+      "sha256": "f0fc1b06a46937beebf6ecad561762356de69c966e82652c75235191ca68de4c"
+    },
+    {
+      "label": "1_adrs:ADR-M3-02-preregistered-four-arm-s01.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-02-preregistered-four-arm-s01.md",
+      "sha256": "1ae17984978f64b0192ec8fb1a8804fdcc34260b6488f8aedfd04ff23086c751"
+    },
+    {
+      "label": "1_adrs:ADR-M3-03-statistical-analysis-plan.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-03-statistical-analysis-plan.md",
+      "sha256": "5dc35bc17e485f327c8c5f355b76b488038164f70396fbaa2c0612f43f59867b"
+    },
+    {
+      "label": "1_adrs:ADR-M3-04-weak-worker-roster.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-04-weak-worker-roster.md",
+      "sha256": "a4c4ebf2fd637e6ce2868de919e3e314fb48b6272511e936d9fc3888fd08a1b8"
+    },
+    {
+      "label": "1_adrs:ADR-M3-05-upstream-harness-sole-scorer.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-05-upstream-harness-sole-scorer.md",
+      "sha256": "add7f52cc5f5b8677620ebe8faceb7f6302a4c87999b166183dfb6dc6f5cbd8d"
+    },
+    {
+      "label": "2_preregistration_freeze:PREREGISTRATION.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/PREREGISTRATION.md",
+      "sha256": "0846e4d1e1f42e6e6374a39f73e7c2ced531441c4aa50ebdb3758a5b3d966f89"
+    },
+    {
+      "label": "2_preregistration_freeze:PREREGISTRATION.sha256",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/PREREGISTRATION.sha256",
+      "sha256": "c1c6e8f24abab445695d4c0688120bc8f15bc254a952bac80412b2013c094dbc"
+    },
+    {
+      "label": "2_preregistration_freeze:M3_P1_INDEPENDENT_ACK.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P1_INDEPENDENT_ACK.json",
+      "sha256": "9d5ba80bb7ed35f0004e9f3ca358c52df35f94c996b6f334825a830e985e0043"
+    },
+    {
+      "label": "2_preregistration_freeze:M3_P1_DIGEST_TAPE_EVENT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P1_DIGEST_TAPE_EVENT.json",
+      "sha256": "cef5e87ebd963c5f6eb078e29f6ecf563240b7ccc0c19b569dcac4e5803bd9af"
+    },
+    {
+      "label": "2_preregistration_freeze:M3_P1_VERDICT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P1_VERDICT.json",
+      "sha256": "4bce579723d7d4f1bf53e16014bc18c7ab3e4853f78f94d5477e42873168088f"
+    },
+    {
+      "label": "3_packet_materialization:M3_P2_WORKER_SAFE_ARTIFACTS.sha256",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_WORKER_SAFE_ARTIFACTS.sha256",
+      "sha256": "f63410ccd7c0ff9411c5df3567b8a9ecde9a9a27c386988bb71435ace65514da"
+    },
+    {
+      "label": "3_packet_materialization:M3_P2_GOLD_PATCH_GUARD.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_GOLD_PATCH_GUARD.json",
+      "sha256": "74c4f4c2b0d6c0c4b766e921bd5055e706a2363ec70c487750ff4099390aaddc"
+    },
+    {
+      "label": "3_packet_materialization:M3_P2_VERDICT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_VERDICT.json",
+      "sha256": "55cfbbd937ad7769e5564664ab1e5554dc85d4c811ffcbe6418985c80a168823"
+    },
+    {
+      "label": "3_packet_materialization:M3_P2_PACKET_LEAKAGE_AUDIT_TRANSCRIPT.txt",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_PACKET_LEAKAGE_AUDIT_TRANSCRIPT.txt",
+      "sha256": "94235b9f7bab55e92022b34f8c2626d6c80150d88caa324073f8a88473eccd90"
+    },
+    {
+      "label": "4_floor_and_pilot:M3_P3_VERDICT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P3_VERDICT.json",
+      "sha256": "7bee8114be814f5375a3eef62f98ab810a417a19c43b011ca95cac79caa3752a"
+    },
+    {
+      "label": "4_floor_and_pilot:M3_P3_RETRY_SUMMARY.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P3_RETRY_SUMMARY.json",
+      "sha256": "ec6ff7f61af1667a8f32c33bd98b46f116c3825021797fb884a4715c5a206538"
+    },
+    {
+      "label": "4_floor_and_pilot:M3_P4_CALIBRATION_REPORT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_CALIBRATION_REPORT.json",
+      "sha256": "800f865fff6cdda2aebc27da5468ffd1158d11587409e94965909692ad53f49c"
+    },
+    {
+      "label": "4_floor_and_pilot:M3_P4_WORKER_REPLACEMENT_DECISION.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_WORKER_REPLACEMENT_DECISION.json",
+      "sha256": "dc231ef31136717f6eb5ed9b5332afac827c727b4a88726ca7d2c5c467e2227e"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:M3_P5_ARM_A_S01_RESULT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P5_ARM_A_S01_RESULT.json",
+      "sha256": "5e51ab2bbfda70833d4081ce84b8754df8baead0a1bf9234be56967165907b23"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:M3_P6_ARM_BC_S01_RESULT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P6_ARM_BC_S01_RESULT.json",
+      "sha256": "42627f5f1a88ba50ae4b202d17b6c9dc688f65b6d05f075e5ca8b998be081156"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:shard_S01_predictions.jsonl",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_predictions.jsonl",
+      "sha256": "5318bffafe08ea2955f6b4608ddcbd589f05b607cde32f4349f5d59dcb2a0725"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:shard_S01_armB_predictions.jsonl",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions.jsonl",
+      "sha256": "4c41414ee38d09709cc14a63baab81a062fd3a41758241dd062cdf2b574d59b8"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:shard_S01_armC_predictions.jsonl",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armC_predictions.jsonl",
+      "sha256": "9d52240803f83f84ae7350fa6c5784fc099e6ae193b2ef677934a4eb476719fe"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+      "sha256": "a9cdb57d7bdb77435b90b24f338a1813049a1e630548c6d17890638137a1f452"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+      "sha256": "85c3cfd9b23345538869fa68706dd13be92a2143b7b2126fab54088dd7d888cc"
+    },
+    {
+      "label": "5_per_arm_predictions_and_scores:deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+      "sha256": "dbd8b5324ef91893dfb4f6440106aa2bca6e17229bb76d5ddb188c04ae9c06d7"
+    },
+    {
+      "label": "6_ablation_honesty:m3_p6_ablation_capsule_audit.json",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/m3_p6_ablation_capsule_audit.json",
+      "sha256": "0d9d55728f7fc8df8a16f1ea963f1751066ad8a83dfcaf9021a75c128ee08870"
+    },
+    {
+      "label": "7_frozen_analysis_report:M3_P7_FROZEN_ANALYSIS_RESULT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P7_FROZEN_ANALYSIS_RESULT.json",
+      "sha256": "cb3409427941efd3da45f266c82f294cd8c3319a0c6b3e131a2c8b7316f53d08"
+    },
+    {
+      "label": "7_frozen_analysis_report:analyze_uplift.py",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/analyze_uplift.py",
+      "sha256": "8abd1b2c902bf100913e0c6e950988d2e06046607cb055f46d79de9e7d5462ec"
+    },
+    {
+      "label": "7_frozen_analysis_report:experiment_manifest.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/experiment_manifest.json",
+      "sha256": "eab7929ecd4a2e54795f23b4a82a6ae9e259b78f0e3de67f9a827a7062e4b02a"
+    },
+    {
+      "label": "7_frozen_analysis_report:UPLIFT_REPORT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.json",
+      "sha256": "9a3862fa76381187cef83ffbbdaec5c777c739750e02b2d103f377763456c0c4"
+    },
+    {
+      "label": "7_frozen_analysis_report:UPLIFT_REPORT.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.md",
+      "sha256": "f2aaaf935c3b2a3fec53d9ba37354754b9d1bb905a2800e3a4f7953db5932f72"
+    },
+    {
+      "label": "7_frozen_analysis_report:DEVIATIONS.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/DEVIATIONS.md",
+      "sha256": "a5106fa37184f23af23108b22dca842c150386ab6861895147b4d7f82ffd09ca"
+    },
+    {
+      "label": "7_frozen_analysis_report:M3G_ANALYSIS_RECHECK.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3G_ANALYSIS_RECHECK.json",
+      "sha256": "ec8a399ea2fca58737b58f704451b73fec4b3d0a5428ef7cde792c3353ec42fa"
+    }
+  ],
+  "gate_id": "M3.G",
+  "module": "M3",
+  "recorded_at_utc": "2026-07-03T17:25:00Z",
+  "required_artifacts": [
+    {
+      "id": 1,
+      "name": "1_adrs",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-01-worker-policy-receipts.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-02-preregistered-four-arm-s01.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-03-statistical-analysis-plan.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-04-weak-worker-roster.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M3-05-upstream-harness-sole-scorer.md"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 2,
+      "name": "2_preregistration_freeze",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/PREREGISTRATION.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/PREREGISTRATION.sha256",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P1_INDEPENDENT_ACK.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P1_DIGEST_TAPE_EVENT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P1_VERDICT.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 3,
+      "name": "3_packet_materialization",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_WORKER_SAFE_ARTIFACTS.sha256",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_GOLD_PATCH_GUARD.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_VERDICT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P2_PACKET_LEAKAGE_AUDIT_TRANSCRIPT.txt"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 4,
+      "name": "4_floor_and_pilot",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P3_VERDICT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P3_RETRY_SUMMARY.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_CALIBRATION_REPORT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_WORKER_REPLACEMENT_DECISION.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 5,
+      "name": "5_per_arm_predictions_and_scores",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P5_ARM_A_S01_RESULT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P6_ARM_BC_S01_RESULT.json",
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_predictions.jsonl",
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions.jsonl",
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armC_predictions.jsonl",
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 6,
+      "name": "6_ablation_honesty",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/m3_p6_ablation_capsule_audit.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 7,
+      "name": "7_frozen_analysis_report",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P7_FROZEN_ANALYSIS_RESULT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/analyze_uplift.py",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/experiment_manifest.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/DEVIATIONS.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3G_ANALYSIS_RECHECK.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 8,
+      "name": "8_tracker_update",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "schema": "turingos.m3_g_artifact_rollup.v1",
+  "scope": {
+    "measurement_label": "DeepSeek-only same-provider source-context loop measurement",
+    "original_heterogeneous_roster_generalization_claim_allowed": false,
+    "p8_s00_resume_gates_m3g": false
+  },
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}

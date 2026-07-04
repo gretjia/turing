@@ -1,0 +1,222 @@
+{
+  "active_repo": {
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "1ef13c559105680a2a999c8efd951de3f866bb24",
+    "commit_subject": "m3: score s01 deterministic floor",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "working_tree_status_after_commit": "clean during verdict preparation"
+  },
+  "blocked_follow_on_atoms": [
+    {
+      "atom": "M3.P4",
+      "reason": "provider canary calls and S02 weakness-band pilot have not run yet"
+    },
+    {
+      "atom": "M3.P5-M3.P7",
+      "reason": "no Arm A/B/C worker predictions, receipts, official scoring, or frozen uplift analysis exist yet"
+    },
+    {
+      "atom": "M3.G",
+      "reason": "module gate requires P1-P7 measurement artifacts; only P1-P3 are addressed"
+    }
+  ],
+  "module_atom": "M3.P3",
+  "non_claims": [
+    "No deterministic-floor task resolved; no STOP root-cause investigation was required.",
+    "No M3 worker/provider call, S02 pilot, Arm A/B/C run, real uplift result, M3.G roll-up, M4 real-input report, FCE run, external audit, release, ratification, M2 enablement, OG-10 signature, or constitution-byte change is claimed.",
+    "This verdict is capped at ADDRESSED and is not CLOSED, RELEASED, RATIFIED, EXTERNALLY_VERIFIED, or SHIPPED."
+  ],
+  "official_harness": {
+    "cache_level": "env",
+    "dataset_name": "princeton-nlp/SWE-bench_Verified",
+    "max_workers_initial": 2,
+    "max_workers_retry": 1,
+    "max_workers_rewrite": 2,
+    "namespace": "swebench",
+    "report_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/D_deterministic_floor/scoring/deterministic-floor__armD__uplift-s01.turingos_m3_s01_armD_floor_20260703.json",
+    "report_sha256": "df8fbcceb94944df2ec9356ff98c7e26dc899cf760ad2bbba2876060c60094c1",
+    "run_id": "turingos_m3_s01_armD_floor_20260703",
+    "split": "test",
+    "swebench_version": "4.1.0",
+    "timeout": 1800
+  },
+  "overall_status": "ADDRESSED",
+  "plan_artifacts": [
+    {
+      "path": "m3_uplift_lab/tests/test_m3_p3_floor.sh",
+      "sha256": "532a9c3b5aec1d4d895506bc49d5aede1b5484d1ea6a495ccdb7347519f6a66d"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_RETRY_SUMMARY.json",
+      "sha256": "ec6ff7f61af1667a8f32c33bd98b46f116c3825021797fb884a4715c5a206538"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_AUDIT_TRANSCRIPT.txt",
+      "sha256": "61716a7b88392cd8dbd358e665cfc6b2cb2ec19f8447de7d5d6f59dfcae23422"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_REPO_TEST_TRANSCRIPT.txt",
+      "sha256": "ecf57d762b443151696ef4727347520d0d5715719bac1e0cd93caddf627ffa61"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_PY_COMPILE_TRANSCRIPT.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_M1A_GUARDRAIL_TRANSCRIPT.txt",
+      "sha256": "c70742c54905bb790bd2ce33f54333a14c7c8820412a459bd565ad3364d822e9"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_P1_GATE_TRANSCRIPT.txt",
+      "sha256": "8a767110f475942b5e5d31f980959e6616a97aac9f166c8f725c128449f14a6f"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_P2_GATE_TRANSCRIPT.txt",
+      "sha256": "21936fef70269930fcd6d9fe7f7f67ebbeafc38ecf731c2cc5edd9dacf7d0c83"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P3_FLOOR_GATE_TRANSCRIPT.txt",
+      "sha256": "9448dbdf33318468f6f490c0a9597055378c607a60ba35baa04d25ac548e56c3"
+    }
+  ],
+  "primary_repo_artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/build_deterministic_floor_predictions.py",
+      "sha256": "301ff3de5251b690e8eb95aa159db57986881a14889255cbdb792a2a8cb91ab8"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_deterministic_floor_result.py",
+      "sha256": "4dac84799ff194fbf1c7528f253ea33cf9532071f416c35e1f09d0eb4f1db6c0"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/run_swebench_shard.py",
+      "sha256": "21f0414ab0458f5df8fb77f70615b4bf000435057e1a4ff7536389530b02c949"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_worker_policy_predictions.py",
+      "sha256": "bd5d68a3269733e69a903dec967f5d46bd62eb10fb6cdac67ef848cb77b3b2d4"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_swebench_deterministic_floor.py",
+      "sha256": "80607f11389741ab72dd3ab468f64a3309651908fb2608782d6832d45cc8857f"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_swebench_shard_runner.py",
+      "sha256": "6fe5c5c521c60264c77ae7ebeb02087df2c77a94926d44b679e669aff83609e7"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_swebench_worker_policy_predictions.py",
+      "sha256": "ae19c49d548166185cb7aff64288a2670170dcdd5aa95db92261728fcca4b247"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "sha256": "92190500879a60842f4a8752a5ae7d702e779ec06b337177674f7d70625bc513"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions_report.json",
+      "sha256": "678c4b2137a69e46f7c6eda1b1c374c729e305a3882bd0de29a19774d8c451c2"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_worker_policy_audit.json",
+      "sha256": "27051352579b236f072f61948c387e17b5dc2ceb6b5e8a2fdca4954a8175f1f2"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/D_deterministic_floor/scoring/deterministic-floor__armD__uplift-s01.turingos_m3_s01_armD_floor_20260703.json",
+      "sha256": "df8fbcceb94944df2ec9356ff98c7e26dc899cf760ad2bbba2876060c60094c1"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/D_deterministic_floor/scoring/deterministic_floor_result_audit.json",
+      "sha256": "61716a7b88392cd8dbd358e665cfc6b2cb2ec19f8447de7d5d6f59dfcae23422"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/D_deterministic_floor/deterministic_floor_result_audit.json",
+      "sha256": "61716a7b88392cd8dbd358e665cfc6b2cb2ec19f8447de7d5d6f59dfcae23422"
+    }
+  ],
+  "recorded_at_utc": "2026-07-03T09:04:49Z",
+  "results": {
+    "audit_problems": [],
+    "audit_status": "PASS",
+    "completed_instances": 50,
+    "empty_patch_instances": 0,
+    "error_ids": [],
+    "error_instances": 0,
+    "per_instance_report_json_count": 50,
+    "policy_audit_row_count": 50,
+    "policy_audit_status": "PASS",
+    "prediction_count": 50,
+    "resolved_ids": [],
+    "resolved_instances": 0,
+    "stop_condition_triggered": false,
+    "submitted_instances": 50,
+    "task_dir_count": 50,
+    "unresolved_instances": 50
+  },
+  "retry_summary": {
+    "final_rewrite_report_sha256": "df8fbcceb94944df2ec9356ff98c7e26dc899cf760ad2bbba2876060c60094c1",
+    "initial_error_instances": 34,
+    "path": "evidence/session_20260702/M3_P3_RETRY_SUMMARY.json",
+    "remaining_retry_id_count": 33,
+    "sample_retry_instance": "pytest-dev__pytest-5787",
+    "sha256": "ec6ff7f61af1667a8f32c33bd98b46f116c3825021797fb884a4715c5a206538"
+  },
+  "schema_id": "turingos.m3.p3.verdict.v1",
+  "scope": "Arm D deterministic floor end-to-end for S01, scored by upstream SWE-bench harness. STOP condition was any resolved deterministic-floor task.",
+  "source_inputs": {
+    "campaign_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629",
+    "candidate_source": "deterministic_floor",
+    "dataset_descriptor_sha256": "8dde6fef97ef978d5e973a6c3e75cd46f464b5681e85e6b8f7b86edeb269d1e2",
+    "model_name_or_path": "deterministic-floor__armD__uplift-s01",
+    "patch_template_sha256": "sha256:5206b8de80913bcd55989686b3a2d683553736f8e14bfadb0f298e65920edd64",
+    "prediction_report_sha256": "678c4b2137a69e46f7c6eda1b1c374c729e305a3882bd0de29a19774d8c451c2",
+    "predictions_sha256": "92190500879a60842f4a8752a5ae7d702e779ec06b337177674f7d70625bc513",
+    "s01_shard_manifest_sha256": "68261be554042a3ca38454211d98014fc305b77ebff200414d9bb3d0e7c3a3ec",
+    "worker_policy_audit_sha256": "27051352579b236f072f61948c387e17b5dc2ceb6b5e8a2fdca4954a8175f1f2"
+  },
+  "status_ceiling": "ADDRESSED",
+  "verified_commands": [
+    {
+      "command": "python3 tools/bench/audit_deterministic_floor_result.py --root evidence/bench/swe_bench_verified_500_campaign_20260629 --shard S01 --official-report evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/D_deterministic_floor/scoring/deterministic-floor__armD__uplift-s01.turingos_m3_s01_armD_floor_20260703.json --out evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/D_deterministic_floor/scoring/deterministic_floor_result_audit.json",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_AUDIT_TRANSCRIPT.txt"
+    },
+    {
+      "command": "env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest tests/test_swebench_deterministic_floor.py tests/test_swebench_shard_runner.py tests/test_swebench_worker_policy_predictions.py -q",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_REPO_TEST_TRANSCRIPT.txt"
+    },
+    {
+      "command": "env PYTHONPYCACHEPREFIX=/tmp/m3_p3_pycache python3 -m py_compile tools/bench/build_deterministic_floor_predictions.py tools/bench/audit_deterministic_floor_result.py tools/bench/run_swebench_shard.py tools/bench/audit_worker_policy_predictions.py",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_PY_COMPILE_TRANSCRIPT.txt"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_M1A_GUARDRAIL_TRANSCRIPT.txt"
+    },
+    {
+      "command": "bash m3_uplift_lab/tests/test_m3_p1_freeze.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_P1_GATE_TRANSCRIPT.txt"
+    },
+    {
+      "command": "bash m3_uplift_lab/tests/test_m3_p2_packets.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_P2_GATE_TRANSCRIPT.txt"
+    },
+    {
+      "command": "bash m3_uplift_lab/tests/test_m3_p3_floor.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702",
+      "exit_code": 0,
+      "transcript": "evidence/session_20260702/M3_P3_FLOOR_GATE_TRANSCRIPT.txt"
+    }
+  ],
+  "verifier_class": "self-check plus tracker log"
+}

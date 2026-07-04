@@ -1,0 +1,11 @@
+{
+  "not_run_is_fail_disposition": "recorded_deviation_for_M4P2; no external verification claimed",
+  "reason": "audit_failure_taxonomy.py and audit_failure_memory_activation.py require micro_tape_bundle coverage entries. The M3 S01 DeepSeek continuation artifacts used file-level worker receipts and visible capsules, not micro_tape_bundle coverage.",
+  "schema_id": "m4.lifecycle_legacy_auditor_note.v1",
+  "status": "NOT_APPLICABLE_FOR_M3_DEEPSEEK_CONTINUATION",
+  "substitute_artifacts": [
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/lineage_table.json",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/rule_lifecycle_table.json",
+    "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/m3_p6_ablation_capsule_audit.json"
+  ]
+}

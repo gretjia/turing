@@ -1,0 +1,46 @@
+{
+  "analysis_root": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703",
+  "derivation_rule": "For each arm, copy upstream submitted/completed/resolved/unresolved/empty/error outcomes for S01 submitted_ids; set incomplete_ids to submitted_ids minus completed_ids; preserve raw source report path/hash and source incomplete count as provenance.",
+  "derived_results": [
+    {
+      "arm": "A",
+      "derived_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armA/evaluation_results.json",
+      "derived_sha256": "c58eee8d2f29788453f728e079b3747c2ae4e631a6e396889a6af74ed7114a76",
+      "resolved_instances": 14,
+      "source_report_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+      "source_report_sha256": "a9cdb57d7bdb77435b90b24f338a1813049a1e630548c6d17890638137a1f452",
+      "submitted_instances": 50
+    },
+    {
+      "arm": "B",
+      "derived_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armB/evaluation_results.json",
+      "derived_sha256": "ce0cce30419542258aa010339f325a78b5608900abf99de3a67a69252f6b21a8",
+      "resolved_instances": 16,
+      "source_report_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+      "source_report_sha256": "85c3cfd9b23345538869fa68706dd13be92a2143b7b2126fab54088dd7d888cc",
+      "submitted_instances": 50
+    },
+    {
+      "arm": "C",
+      "derived_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armC/evaluation_results.json",
+      "derived_sha256": "8a88678b2a047621de6492cb7c521bdc4535828e058552685d67b251d5e01601",
+      "resolved_instances": 16,
+      "source_report_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+      "source_report_sha256": "dbd8b5324ef91893dfb4f6440106aa2bca6e17229bb76d5ddb188c04ae9c06d7",
+      "submitted_instances": 50
+    }
+  ],
+  "manifest_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/experiment_manifest.json",
+  "manifest_sha256": "eab7929ecd4a2e54795f23b4a82a6ae9e259b78f0e3de67f9a827a7062e4b02a",
+  "non_claims": [
+    "This derivation is not a new scorer and does not change upstream resolved/unresolved outcomes.",
+    "This does not claim the original heterogeneous-worker preregistration was executed byte-identically.",
+    "This does not claim TuringOS improves workers, external verification, release, ratification, M2 enablement, OG-10 signature, genesis signature, or constitution-byte change."
+  ],
+  "pairwise_exclusions": 0,
+  "recorded_at_utc": "2026-07-03T15:15:00Z",
+  "schema_id": "turingos.m3.p7.analysis_input_derivation.v1",
+  "source_incomplete_ids_disposition": "Official reports list 450 non-submitted Verified split tasks as incomplete; these are outside S01 submitted_ids and are not pairwise exclusions.",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}

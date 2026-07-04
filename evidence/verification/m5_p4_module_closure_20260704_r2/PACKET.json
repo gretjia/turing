@@ -1,0 +1,49 @@
+{
+  "audit_surface": "github_only",
+  "auditor_must_not_use": [
+    "implementation chat",
+    "local plan directory",
+    "agent memory summaries",
+    "uncommitted local files"
+  ],
+  "closure_certificate_schema_id": "turingos.closure_certificate.v1",
+  "copied_plan_artifact_count": 89,
+  "exact_commit_supplied_out_of_band": true,
+  "handoff_packets": {
+    "M3.G": "evidence/verification/m5_p4_module_closure_20260704_r2/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3G_M5_P4_HANDOFF_PACKET.json",
+    "M4.G": "evidence/verification/m5_p4_module_closure_20260704_r2/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M4G_M5_P4_HANDOFF_PACKET.json"
+  },
+  "non_claims": [
+    "This packet does not itself confer external verification.",
+    "This packet does not claim release, SHIPPED status, M2 enablement, OG-10/genesis signature, or constitution-byte change.",
+    "Auditor verdict may be PASS or FAIL; FAIL requires repair and resubmission with a new packet."
+  ],
+  "packet_kind": "M5.P4_MODULE_CLOSURE_GITHUB_PACKET",
+  "packet_local_checks": {
+    "M3.G": "evidence/verification/m5_p4_module_closure_20260704_r2/packet_checks/run_m3_analysis_recheck.sh",
+    "M4.G": "evidence/verification/m5_p4_module_closure_20260704_r2/packet_checks/run_m4_p3_northstar_check.sh"
+  },
+  "packet_root": "evidence/verification/m5_p4_module_closure_20260704_r2",
+  "primary_files": {
+    "manifest": "evidence/verification/m5_p4_module_closure_20260704_r2/PACKET_MANIFEST.sha256",
+    "prompt_template": "evidence/verification/m5_p4_module_closure_20260704_r2/AUDITOR_PROMPT_TEMPLATE.md",
+    "repo_artifacts": "evidence/verification/m5_p4_module_closure_20260704_r2/REPO_ARTIFACTS.json",
+    "source_map": "evidence/verification/m5_p4_module_closure_20260704_r2/SOURCE_MAP.json"
+  },
+  "prior_audit_certificate": "evidence/verification/m5_p4_module_closure_20260704_r2/prior_audit/M5_P4_GROK_FAIL_CERTIFICATE.json",
+  "prior_audit_verdict": "FAIL",
+  "repair_of_packet_root": "evidence/verification/m5_p4_module_closure_20260704",
+  "repair_reason_codes": [
+    "M3_MISSING_ANALYSIS_REEXECUTION_INPUTS",
+    "M4_MISSING_P3_ARTIFACT_MANIFEST"
+  ],
+  "repo_native_artifact_count": 7,
+  "repository_url": "https://github.com/gretjia/turing",
+  "schema_id": "turingos.m5.p4.github_module_closure_packet.v1",
+  "status_ceiling": "ADDRESSED",
+  "target_branch": "goal/mini-swe-bench-grok-worker",
+  "targets": [
+    "M3.G",
+    "M4.G"
+  ]
+}

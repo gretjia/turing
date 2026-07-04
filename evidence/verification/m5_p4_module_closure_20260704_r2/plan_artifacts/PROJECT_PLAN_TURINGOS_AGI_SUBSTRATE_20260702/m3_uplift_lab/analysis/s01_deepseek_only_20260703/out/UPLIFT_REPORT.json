@@ -1,0 +1,105 @@
+{
+  "analysis_inputs": "upstream_swebench_evaluation_results_json_only",
+  "claim_boundary": {
+    "absolute_rate_is_capability_claim": false,
+    "fixture_outputs_are_not_performance_evidence": false,
+    "full_score_claim_allowed": false,
+    "turingos_improves_workers_claim_allowed": false
+  },
+  "confirmatory_tests": {
+    "H1_B_gt_A": {
+      "arm1": "A",
+      "arm1_resolved": 14,
+      "arm2": "B",
+      "arm2_resolved": 16,
+      "bootstrap_ci95": {
+        "ci95_high": 0.16,
+        "ci95_low": -0.06,
+        "method": "cluster_by_task_percentile_bootstrap",
+        "replicates": 10000,
+        "seed": 20260702
+      },
+      "both_resolved": 11,
+      "delta": 0.04,
+      "exact_mcnemar_two_sided_p": 0.7265625,
+      "harm_only": 3,
+      "holm_alpha": 0.025,
+      "holm_reject": false,
+      "neither_resolved": 31,
+      "pairs": 50,
+      "positive_direction": true,
+      "uplift_only": 5
+    },
+    "H2_B_gt_C": {
+      "arm1": "C",
+      "arm1_resolved": 16,
+      "arm2": "B",
+      "arm2_resolved": 16,
+      "blocked_by_h1": true,
+      "bootstrap_ci95": {
+        "ci95_high": 0.1,
+        "ci95_low": -0.1,
+        "method": "cluster_by_task_percentile_bootstrap",
+        "replicates": 10000,
+        "seed": 20260703
+      },
+      "both_resolved": 13,
+      "delta": 0.0,
+      "exact_mcnemar_two_sided_p": 1.0,
+      "harm_only": 3,
+      "holm_alpha": null,
+      "holm_reject": false,
+      "neither_resolved": 31,
+      "pairs": 50,
+      "positive_direction": false,
+      "uplift_only": 3
+    }
+  },
+  "evidence_class": "REAL_HARNESS_OUTPUTS",
+  "exploratory": {
+    "per_worker_B_minus_A": [
+      {
+        "arm1": "A",
+        "arm1_resolved": 14,
+        "arm2": "B",
+        "arm2_resolved": 16,
+        "both_resolved": 11,
+        "delta": 0.04,
+        "exact_mcnemar_two_sided_p": 0.7265625,
+        "harm_only": 3,
+        "neither_resolved": 31,
+        "pairs": 50,
+        "uplift_only": 5,
+        "worker": "deepseek-v4-pro__same-provider-source-context-worker"
+      }
+    ],
+    "per_worker_B_minus_C": [
+      {
+        "arm1": "C",
+        "arm1_resolved": 16,
+        "arm2": "B",
+        "arm2_resolved": 16,
+        "both_resolved": 13,
+        "delta": 0.0,
+        "exact_mcnemar_two_sided_p": 1.0,
+        "harm_only": 3,
+        "neither_resolved": 31,
+        "pairs": 50,
+        "uplift_only": 3,
+        "worker": "deepseek-v4-pro__same-provider-source-context-worker"
+      }
+    ]
+  },
+  "fixture": false,
+  "manifest": {
+    "evidence_class": "REAL_HARNESS_OUTPUTS_DERIVED_S01_SCOPE",
+    "schema_id": "turingos.m3.deepseek_only_s01_analysis_manifest.v1"
+  },
+  "mde_statement": "Pre-registered design is powered for large effects: one worker on 50 paired tasks has roughly 15-23 percentage point MDE depending on harm rate; pooling 2-3 workers targets roughly 6-14 percentage points before task-clustering inflation.",
+  "schema_id": "turingos.m3.uplift_report.v1",
+  "source_root": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703",
+  "tasks": 50,
+  "workers": [
+    "deepseek-v4-pro__same-provider-source-context-worker"
+  ]
+}

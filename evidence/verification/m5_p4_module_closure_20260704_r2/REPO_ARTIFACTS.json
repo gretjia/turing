@@ -1,0 +1,30 @@
+[
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_predictions.jsonl",
+    "sha256": "5318bffafe08ea2955f6b4608ddcbd589f05b607cde32f4349f5d59dcb2a0725"
+  },
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions.jsonl",
+    "sha256": "4c41414ee38d09709cc14a63baab81a062fd3a41758241dd062cdf2b574d59b8"
+  },
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armC_predictions.jsonl",
+    "sha256": "9d52240803f83f84ae7350fa6c5784fc099e6ae193b2ef677934a4eb476719fe"
+  },
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+    "sha256": "a9cdb57d7bdb77435b90b24f338a1813049a1e630548c6d17890638137a1f452"
+  },
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+    "sha256": "85c3cfd9b23345538869fa68706dd13be92a2143b7b2126fab54088dd7d888cc"
+  },
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+    "sha256": "dbd8b5324ef91893dfb4f6440106aa2bca6e17229bb76d5ddb188c04ae9c06d7"
+  },
+  {
+    "github_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/m3_p6_ablation_capsule_audit.json",
+    "sha256": "0d9d55728f7fc8df8a16f1ea963f1751066ad8a83dfcaf9021a75c128ee08870"
+  }
+]

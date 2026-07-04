@@ -1,0 +1,65 @@
+{
+  "artifacts": [
+    {
+      "label": "northstar_report",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/NORTHSTAR_REPORT.md",
+      "sha256": "919dff5871f57ec135dcb5d810f5c2afca8413d8b9136e36056a4e2c54d3befc"
+    },
+    {
+      "label": "claim_boundary",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/CLAIM_BOUNDARY.json",
+      "sha256": "7192b99ca6d6494d27e755c48730b209a108b6ee80a848c063522f81eb03452f"
+    },
+    {
+      "label": "hvpput_report",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/hvpput_report.v1.json",
+      "sha256": "809d08ad01436b511ca7539e8dfb295a3ad79d7d8d9e681e3f49dda64e0810ed"
+    },
+    {
+      "label": "h2_consumption_note",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/h2_consumption_note.json",
+      "sha256": "1b7b9b41f67f8543339038fb31209f5a28bfb04fe8fe993df87be609be3f6e6f"
+    },
+    {
+      "label": "m4_p1_result",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_REAL_INPUT_RESULT.json",
+      "sha256": "279062225a95f263bcc35d838cb5cd16b04b075f303e82b18783c5fe9c1281ec"
+    },
+    {
+      "label": "m4_p2_result",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P2_CAUSAL_LIFECYCLE_RESULT.json",
+      "sha256": "f25b3981aecc9aecae1abf97e3288d6bf3cf77b93dd3cf55b8ea13b5c986a7b4"
+    }
+  ],
+  "claim_boundary": {
+    "failure_memory_causal_claim_allowed": false,
+    "hvpput_is_capability_claim": false,
+    "report_status_ceiling": "ADDRESSED"
+  },
+  "gates": {
+    "claim_boundary_h2_tied": "PASS",
+    "cost_provenance_cited": "PASS",
+    "forbidden_phrase_lint": "PASS",
+    "mandatory_null_sentence": "PASS",
+    "skeleton_heading_conformance": "PASS"
+  },
+  "mandatory_direction": "null",
+  "mandatory_direction_sentence": "\u0394_BC = 0.0 [CI includes 0]; the study was powered for MDE = Pre-registered design is powered for large effects: one worker on 50 paired tasks has roughly 15-23 percentage point MDE depending on harm rate; pooling 2-3 workers targets roughly 6-14 percentage points before task-clustering inflation; smaller true effects are not excluded. No failure-memory efficacy claim is made.",
+  "module_atom": "M4.P3",
+  "non_claims": [
+    "M4.P3 is implementer-addressed only, not externally verified.",
+    "No failure-memory efficacy claim is made.",
+    "H-VPPUT is not an absolute capability claim.",
+    "No release, ratification, M2 enablement, OG-10/genesis signature, or constitution byte change is claimed."
+  ],
+  "recorded_at_utc": "2026-07-03T16:50:00Z",
+  "schema_id": "turingos.m4.p3.northstar_result.v1",
+  "scope": {
+    "analysis_label": "real_s01_deepseek_20260703",
+    "h2_delta": 0.0,
+    "h2_source_sha256": "sha256:9a3862fa76381187cef83ffbbdaec5c777c739750e02b2d103f377763456c0c4",
+    "heldout_shard": "S01"
+  },
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}
