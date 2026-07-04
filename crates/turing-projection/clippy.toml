@@ -1,0 +1,11 @@
+disallowed-methods = [
+  { path = "turing_git_tape::append::Append::append", reason = "HCI-A: projection surfaces never write the tape (ADR-M6-005)" },
+  { path = "turing_git_tape::append::Append::stage", reason = "HCI-A no-write" },
+  { path = "turing_git_tape::append::Append::append_with_contention", reason = "HCI-A no-write" },
+  { path = "turing_git_tape::append::StagedAppend::commit", reason = "HCI-A no-write" },
+  { path = "turing_git_tape::append::StagedAppend::re_mint_and_commit", reason = "HCI-A no-write" },
+]
+
+disallowed-types = [
+  { path = "turing_git_tape::append::AppendRequest", reason = "HCI-A: request type implies intent to write" },
+]
