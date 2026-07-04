@@ -1,6 +1,7 @@
 //! P2 TEE (Gramine/SGX) attestor — real wiring lands in Phase 7 (HW-SW-0xx
 //! TEE phase). Typed contract stub only: `quote()` always returns
-//! `AttestError::NotYetImplemented`, never `panic!`/`todo!`/`unimplemented!`.
+//! `AttestError::NotYetImplemented`; it never panics and never invokes an
+//! unfinished-code macro.
 
 use crate::{AttestError, AttestationQuote, Attestor, AttestorKind};
 

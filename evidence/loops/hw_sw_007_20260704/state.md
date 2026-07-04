@@ -53,6 +53,41 @@
 - `cargo test -p turing-attest policy` → 4/4 green. `cargo test -p
   turing-attest identity` → 3/3 green.
 
-Next: HW-SW-009 (lib.rs Attestor/SimulatedAttestor — already implemented and
-green from the red-first commit; qt_quote.rs — already implemented; four
-q_t_quote fixtures still to author).
+## Checkpoint 3 — HW-SW-009 (turing-attest skeleton + q_t_quote fixtures)
+
+- `lib.rs`: `Attestor` trait, `AttestorKind`, `AttestationQuote`,
+  `AttestError::NotYetImplemented`, `SimulatedAttestor` (signature always
+  `"simulated:" + hex(qualifying)` via a local `hex_lower` helper — no `hex`
+  crate added, since `turing-attest`'s only allowed deps are
+  serde/serde_json/toml/turing-contracts). `tpm.rs::TpmAttestor` and
+  `tee.rs::TeeAttestor` stubs return `AttestError::NotYetImplemented { phase:
+  "phase04" }` / `{ phase: "phase07" }`. These were already implemented in
+  the red-first commit and passed immediately (no external data file
+  needed); this checkpoint is their gate confirmation.
+- `qt_quote.rs`: `QtQuote`/`Quoted`/`Quote` serde structs, `QtQuoteError`,
+  `qualifying_digest()` = `sha256_hex(canonicalize(quoted))` via
+  `turing_contracts::jcs` (reused, not reimplemented), `validate()`.
+- Four fixtures authored under `fixtures/`:
+  - `q_t_quote.valid.json` — kind=simulated; `quote.pcr_digest` computed via
+    a throwaway test invoking the real `qualifying_digest()` function (value
+    a02529a2d625f18ca9708c756fb407b70787e33453db3abaf0ae4aafd23aae46),
+    confirmed self-consistent by `qt_quote_valid_parses_and_digest_self_consistent`;
+    `policy_hash` = real sha256 of the committed `attestation_policy.toml`.
+  - `q_t_quote.invalid_schema.json` — `schema_id = "q_t_quote.v0"`.
+  - `q_t_quote.invalid_digest.json` — `quote.pcr_digest` deliberately zeroed.
+  - `q_t_quote.invalid_nonascii.json` — the `quote.kind` key renamed to a
+    non-ASCII variant (`"kìnd"`).
+- Gate-relevant fix: doc comments in `lib.rs`/`tpm.rs`/`tee.rs` originally
+  spelled out the literal macro names (`` `panic!`/`todo!`/`unimplemented!` ``)
+  to describe the "never panics" contract; PREDICATE G's grep
+  (`grep -rn 'todo!\|unimplemented!\|panic!' crates/turing-attest/src/`) is a
+  plain string match with no comment awareness, so those doc comments were
+  themselves false-positive hits. Reworded to describe the constraint in
+  prose without the literal macro-with-bang substrings. Re-ran the grep after
+  the edit: zero matches.
+- `cargo test -p turing-attest` (whole crate): 19/19 green
+  (2 attestor + 3 identity + 6 manifest + 4 policy + 4 qt_quote).
+- `grep -rn 'todo!\|unimplemented!\|panic!' crates/turing-attest/src/` →
+  clean (no output).
+
+Next: Phase gate G1..G6.

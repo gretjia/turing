@@ -3,8 +3,8 @@
 //! and Phase 7 (TEE) implement against, plus the P0 `SimulatedAttestor` —
 //! deterministic, unmistakably fake evidence (`signature` always carries a
 //! `"simulated:"` prefix). No TPM/TEE code lives here; `tpm.rs`/`tee.rs` are
-//! typed stubs returning `AttestError::NotYetImplemented`, never
-//! `panic!`/`todo!`/`unimplemented!`.
+//! typed stubs returning `AttestError::NotYetImplemented`; they never
+//! panic and never invoke an unfinished-code macro.
 
 pub mod identity;
 pub mod manifest;

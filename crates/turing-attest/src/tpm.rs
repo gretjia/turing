@@ -1,6 +1,7 @@
 //! P1 TPM2 attestor — real wiring lands in Phase 4 (HW-SW-014). This is a
 //! typed contract stub only: `quote()` always returns
-//! `AttestError::NotYetImplemented`, never `panic!`/`todo!`/`unimplemented!`.
+//! `AttestError::NotYetImplemented`; it never panics and never invokes an
+//! unfinished-code macro.
 
 use crate::{AttestError, AttestationQuote, Attestor, AttestorKind};
 
