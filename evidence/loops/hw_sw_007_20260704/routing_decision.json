@@ -1,0 +1,51 @@
+{
+  "routing_decision": {
+    "task_id": "TASK-20260704-hw-sw-007-009-attest-schemas",
+    "signals": {
+      "task_id": "TASK-20260704-hw-sw-007-009-attest-schemas",
+      "description": "Phase 3 atoms HW-SW-007..009: hardware manifest, attestation policy, device identity schemas + validators, turing-attest crate skeleton, q_t_quote fixtures",
+      "task_class": "code",
+      "gate_scriptable": true,
+      "ambiguous_intent": false,
+      "cross_team_glossary": false,
+      "needs_design": false,
+      "eta_hours": 6,
+      "human_ux_gate": false,
+      "multi_atom": true,
+      "shipgate_mandatory": true,
+      "high_risk": false,
+      "live_sources": false,
+      "source_count": 0,
+      "sources_independent": true,
+      "sources_ordered": false,
+      "rate_limit_fragile": false,
+      "parallel_slices": 3,
+      "slices_independent": false,
+      "glossary_before_merge": false,
+      "terminology_risk": false,
+      "long_horizon": true,
+      "unattended": false,
+      "iteration_cap": 15,
+      "session_cap_minutes": 180
+    },
+    "path": "turing_full",
+    "plan_depth": "lite",
+    "turing_depth": "full",
+    "fetch_mode": "none",
+    "require_glossary": false,
+    "require_predicate": true,
+    "escalate_reasons": [
+      "gate_scriptable_code_atom",
+      "eta_hours>=2",
+      "multi_atom",
+      "shipgate_mandatory",
+      "long_horizon",
+      "eta_multi_atom_horizon"
+    ],
+    "horizon_mode": true,
+    "require_horizon_state": true,
+    "unattended_mode": false,
+    "iteration_cap": 15,
+    "session_cap_minutes": 180
+  }
+}
