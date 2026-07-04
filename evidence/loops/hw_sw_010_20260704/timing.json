@@ -1,0 +1,1 @@
+{"implement_ms":2530130,"verify_ms":140155,"note":"real vTPM quote; 3 real bugs fixed (swtpm leak, od hex-collapse, TPM slot exhaustion). Wart: trait error-path collapses to NotYetImplemented — cosmetic, deferred additive fix (add AttestError::Backend)."}
