@@ -27,6 +27,13 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def pytest_env() -> dict[str, str]:
+    env = dict(os.environ)
+    env["PYTHONPATH"] = "src"
+    env.pop("FCE_CONTEXT_SEPARATED", None)
+    return env
+
+
 def rel(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
 
@@ -122,8 +129,7 @@ def main() -> int:
     scenario_root.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
 
-    py_env = dict(os.environ)
-    py_env["PYTHONPATH"] = "src"
+    py_env = pytest_env()
     commands = [
         run_command(
             name="python_pytest_collect",
