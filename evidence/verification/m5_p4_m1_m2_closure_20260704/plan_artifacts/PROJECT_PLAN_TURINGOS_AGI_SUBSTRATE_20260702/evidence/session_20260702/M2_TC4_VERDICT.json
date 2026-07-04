@@ -1,0 +1,190 @@
+{
+  "active_repo": {
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "ed6234f2dc398d7763596643902f26d4b8d3ef6c",
+    "commit_message": "m2: add tc4 witness audit gates",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "status_after_commit": "clean"
+  },
+  "artifact_manifest": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC4_ARTIFACT_MANIFEST.sha256",
+    "sha256": "fb7c087a43a92dcea21d10fbb4d0aba05b873cbef6b9edf8f40e61839721029a"
+  },
+  "commands": [
+    {
+      "command": "python3 -m py_compile tools/theory/audit_tc4_witness.py tests/test_theory_tc4_audit.py",
+      "exit_code": 0,
+      "summary": "TC4 audit runner and pytest compile cleanly"
+    },
+    {
+      "command": "python3 tools/theory/audit_tc4_witness.py --root evidence/theory/turing_completeness_witness_20260703 --write",
+      "exit_code": 0,
+      "summary": "TC4 audit PASS; wrote TC-01..TC-09, mutation matrix, noninterference report, and summary"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc4_audit.py",
+      "exit_code": 0,
+      "summary": "TC4 focused pytest passed"
+    },
+    {
+      "command": "cargo fmt --check",
+      "exit_code": 0,
+      "summary": "workspace formatting check exited 0"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "exit_code": 0,
+      "summary": "full Python suite reached 100% and exited 0"
+    },
+    {
+      "command": "python3 tools/theory/audit_tc3_evidence.py --root evidence/theory/turing_completeness_witness_20260703 && python3 tools/theory/audit_tc4_witness.py --root evidence/theory/turing_completeness_witness_20260703 --write",
+      "exit_code": 0,
+      "summary": "TC3 differential audit and TC4 audit both passed"
+    },
+    {
+      "command": "cargo test --workspace",
+      "exit_code": 0,
+      "summary": "full Rust workspace test suite exited 0"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "exit_code": 0,
+      "summary": "M1A self-tests and clean gates PASS"
+    },
+    {
+      "command": "git diff --check && git diff --cached --check",
+      "exit_code": 0,
+      "summary": "no whitespace errors before commit"
+    },
+    {
+      "command": "post-commit: PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc4_audit.py && python3 tools/theory/audit_tc4_witness.py --root evidence/theory/turing_completeness_witness_20260703 --write",
+      "exit_code": 0,
+      "summary": "focused TC4 smoke passed after commit ed6234f2dc398d7763596643902f26d4b8d3ef6c"
+    }
+  ],
+  "explicit_non_claims": {
+    "closed": false,
+    "constitution_bytes_changed": false,
+    "externally_verified": false,
+    "m2_enabled": false,
+    "og10_or_genesis_signature": false,
+    "ratified": false,
+    "released": false,
+    "shipped": false,
+    "tc10_external_artifact_exists": false,
+    "turing_completeness_claim_allowed": false
+  },
+  "module": "M2",
+  "notes": "M2.TC4 supplies deterministic local audit evidence for TC-01..TC-09 only. It does not claim TC-10, Turing-completeness, M2.G, external verification, or M2 enablement.",
+  "not_run_is_fail": true,
+  "phase": "M2.TC4",
+  "phase_status": "ADDRESSED",
+  "requirements": [
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/verdicts/TC4_AUDIT_SUMMARY.json",
+      "id": "ATOM-TC4-1-differential-equality",
+      "observed": {
+        "fuzz_cases_checked": 500,
+        "fuzz_failure_count": 0,
+        "programs_checked": 8,
+        "tc03_verdict": "PASS"
+      },
+      "requirement": "Audit all TC3 programs and the seed-pinned fuzz corpus against the independent reference interpreter.",
+      "sha256": "0788b7f9504eb090f5ccd654823bddd71e97913246e21b0a001af47e36234af4",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/mutations/matrix.json",
+      "id": "ATOM-TC4-2-mutation-matrix",
+      "observed": {
+        "killed": 7,
+        "mutants": [
+          "m1",
+          "m2",
+          "m3",
+          "m4",
+          "m5",
+          "m6",
+          "m7"
+        ],
+        "state_chain_mutants": [
+          "m3",
+          "m5"
+        ],
+        "survivors": 0
+      },
+      "requirement": "Run mutation matrix m1-m7, including mandatory state-chain mutants m3 and m5, with survivors represented as FAIL.",
+      "sha256": "39bc7be410afad12425a9176ebb6218b3dd2f07226d18ead59a9b2098ebdc597",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/noninterference/report.json",
+      "id": "ATOM-TC4-3-noninterference-replay",
+      "observed": {
+        "interleave_invariant": true,
+        "replay_twice_identical": true,
+        "sabotage_meta_test": "FAILS_AS_EXPECTED",
+        "tc09_verdict": "PASS"
+      },
+      "requirement": "Prove interleave-invariance with a sabotage meta-test and replay-twice determinism.",
+      "sha256": "292bf4006318aadefa3e9fc01d590f863e523d1406864d9b30583b02d088b075",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/verdicts",
+      "id": "tc01-through-tc09",
+      "observed": {
+        "all_not_run_is_fail": true,
+        "all_pass": true,
+        "verdict_ids": [
+          "TC-01",
+          "TC-02",
+          "TC-03",
+          "TC-04",
+          "TC-05",
+          "TC-06",
+          "TC-07",
+          "TC-08",
+          "TC-09"
+        ]
+      },
+      "requirement": "Write verdict JSONs TC-01 through TC-09, all PASS, with not-run-is-fail semantics.",
+      "sha256": "0788b7f9504eb090f5ccd654823bddd71e97913246e21b0a001af47e36234af4",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/CLAIM_BOUNDARY.json",
+      "id": "claim-boundary",
+      "observed": {
+        "status_ceiling": "IMPLEMENTER_ADDRESSED",
+        "tc10_external_artifact_exists": false,
+        "turing_completeness_claim_allowed": false
+      },
+      "requirement": "Evidence root claim boundary forbids TC-10, external-verification, and unqualified Turing-completeness claims.",
+      "sha256": "620d4b4ac5096f483446221663272212920ad243584d804d788ac3ef834beea4",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC4_FRESH_CONTEXT_VERIFIER.json",
+      "id": "fresh-context-verifier",
+      "may_mark_m2_tc4_addressed": true,
+      "requirement": "Fresh-context verifier confirms TC4 may be marked ADDRESSED.",
+      "sha256": "8e0f2eaa42f5043a30d898ac2863cadaf9140e4e620c7a4ff6ee12a1c3864134",
+      "status": "PASS"
+    }
+  ],
+  "schema": "turingos.m2_tc4_verdict.v1",
+  "status_ceiling": "ADDRESSED",
+  "tdd_evidence": {
+    "green": [
+      "TC4 audit runner wrote TC-01..TC-09 verdicts plus mutation/noninterference evidence.",
+      "TC4 focused pytest, full Python suite, full Rust workspace tests, M1A gates, and fresh verifier exited 0."
+    ],
+    "red": [
+      "PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc4_audit.py failed before implementation because tools/theory/audit_tc4_witness.py was missing.",
+      "Direct TC4 CLI with a relative root exposed a bundle-path resolution failure before the audit runner was hardened."
+    ]
+  },
+  "timestamp_utc": "2026-07-03T04:32:25Z",
+  "verdict": "PASS"
+}

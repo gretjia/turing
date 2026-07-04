@@ -1,0 +1,58 @@
+{
+  "blockers": [],
+  "checked_commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+  "commands": [
+    {
+      "cmd": "bash governance/verify_alignment.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702",
+      "exit_code": 0,
+      "result": "GREEN"
+    },
+    {
+      "cmd": "git status --short && git rev-parse HEAD",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "result": "clean; HEAD 9eea210772c526ef50fde339518832aa92aa9f87"
+    },
+    {
+      "cmd": "python3 tools/theory/build_tc5_packet.py --root evidence/theory/turing_completeness_witness_20260703 --check",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "cmd": "sha256sum -c evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0,
+      "result": "all OK"
+    },
+    {
+      "cmd": "sha256sum -c evidence/session_20260702/M2_TC5_ARTIFACT_MANIFEST.sha256",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702",
+      "exit_code": 0,
+      "result": "all OK"
+    }
+  ],
+  "evidence_checks": {
+    "active_repo_clean": "PASS: git status --short was empty and HEAD matched the clean-clone target commit.",
+    "authority_alignment": "PASS: verify_alignment.sh returned GREEN.",
+    "claim_boundary": "PASS: root and packet boundaries keep turing_completeness_claim_allowed false and tc10_external_artifact_exists false; packet m2_gate_claim_allowed is false.",
+    "clean_clone_instructions": "PASS: descriptor, packet JSON, and README include clean-clone / manifest verification / outside-custody TC-10 instructions.",
+    "m2g_not_satisfied": "PASS: M2.G passed is explicitly forbidden and m2_gate_claim_allowed is false.",
+    "packet_descriptor": "PASS: descriptor exists, artifact-manifest verification passed, phase_status/status_ceiling are ADDRESSED, and clean_clone_target_commit is 9eea210772c526ef50fde339518832aa92aa9f87.",
+    "packet_manifest": "PASS: sha256sum -c packet/PACKET_MANIFEST.sha256 verified from repo root.",
+    "repo_packet_files": "PASS: packet contains CLAIM_BOUNDARY.json, M2_TC5_PACKET.json, PACKET_MANIFEST.sha256, and README.md.",
+    "tc10_boundary": "PASS: verdicts/TC-10.json exists with verdict NOT_RUN, not_run_is_fail true, external_verifier_artifact null, implementer_may_run false.",
+    "tc10_not_satisfied": "PASS: TC-10 remains NOT_RUN and is not a pass artifact.",
+    "tc5_packet_check": "PASS: build_tc5_packet.py --check returned verdict PASS, TC-01..TC-09 all pass, TC-10 NOT_RUN, not_run_is_fail true."
+  },
+  "may_mark_m2_tc5_addressed": true,
+  "non_claims": [
+    "Does not claim TC-10 passed.",
+    "Does not claim M2.G passed or M2 enabled.",
+    "Does not claim EXTERNALLY_VERIFIED, CLOSED, RELEASED, RATIFIED, or SHIPPED.",
+    "Does not claim Turing completeness."
+  ],
+  "verdict": "PASS",
+  "verifier_id": "codex-fresh-context-m2-tc5-20260703"
+}

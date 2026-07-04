@@ -1,0 +1,86 @@
+{
+  "schema": "turingos.m2_tc1_verdict.v1",
+  "module": "M2",
+  "phase": "M2.TC1",
+  "timestamp_utc": "2026-07-03T03:11:00Z",
+  "verdict": "PASS",
+  "phase_status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "not_run_is_fail": true,
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "5245eaae012a51a742ba765976376c912051f481",
+    "status_after_commit": "clean"
+  },
+  "requirements": [
+    {
+      "id": "ATOM-TC1-1",
+      "requirement": "Reference interpreter <=80 lines from the frozen obligations file, stdlib only.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/tools/theory/reference_interpreter.py",
+      "sha256": "f6c15bfec2b3e8c071059c815e1cd69ca999bef2843723fff9a3b22c692a954e",
+      "nonblank_noncomment_lines": 80
+    },
+    {
+      "id": "ATOM-TC1-1-tests",
+      "requirement": "Unit tests include DECJZ edge order and reference no tape write surface.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/tests/test_theory_reference_interpreter.py",
+      "sha256": "d2fea7a9ff2b740cc58281786671589ae6a18d5b7fd9be85e60af2a1e3cd1f48"
+    },
+    {
+      "id": "ATOM-TC1-1-provenance",
+      "requirement": "Authorship provenance recorded; semantic input was the frozen obligations file.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/reference_interpreter_authorship.json",
+      "sha256": "85e5db30660557115cf0d20e7341b4e35af52d456f9e64af06b7601244681fc2",
+      "authoring_agent": "019f25e4-f8ba-7351-aa3f-bf60d0dd3077"
+    },
+    {
+      "id": "fresh-context-verifier",
+      "requirement": "Fresh-context verifier confirms TC1 may be marked ADDRESSED.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC1_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "2630a509c5ae96635791ea3f5f5357db969adcfc89d2aaa13b314ccdc665aabb"
+    }
+  ],
+  "commands": [
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_theory_reference_interpreter.py",
+      "exit_code": 0,
+      "summary": "8 passed"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_theory_reference_interpreter.py tests/test_theory_tc0_registry_lint.py tests/test_theory_tc0_artifacts.py",
+      "exit_code": 0,
+      "summary": "14 passed"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "exit_code": 0,
+      "summary": "full Python suite exited 0"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "exit_code": 0,
+      "summary": "M1A self-tests and clean gates PASS"
+    },
+    {
+      "command": "fresh verifier focused pytest and M1A gates",
+      "exit_code": 0,
+      "summary": "fresh verifier report records 8 passed and M1A gates PASS"
+    }
+  ],
+  "explicit_non_claims": {
+    "tc10_external_artifact_exists": false,
+    "turing_completeness_claim_allowed": false,
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "m2_enabled": false
+  },
+  "notes": "M2.TC1 supplies the independent Python reference interpreter only. It does not claim replay equality, TC-10, Turing-completeness, M2.G, or external verification."
+}

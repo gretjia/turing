@@ -1,0 +1,30 @@
+{
+  "cost": {
+    "computed_cost_microusd": 8633,
+    "price_table_digest": "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c",
+    "pricing_model": "xai_grok_build_20260703",
+    "unit_prices_microusd_per_mtok": {
+      "cached_input_tokens": 200000,
+      "input_tokens": 1000000,
+      "output_tokens": 2000000
+    }
+  },
+  "endpoint": "grok-cli:responses",
+  "model_id_requested": "grok-build",
+  "model_id_resolved": "grok-build",
+  "prompt_id": "b931ac4b-f8cf-4ea0-87cc-e62885ba1dcc",
+  "provider": "xai",
+  "raw_debug_retained": false,
+  "request_id": "b931ac4b-f8cf-4ea0-87cc-e62885ba1dcc",
+  "response_sha256": "sha256:ca3ab9210a688ef01654ce6a0221da3c6d631c3fb8fc6c50116035b2fe0f79ce",
+  "schema_id": "grok_cli_provider_receipt.v1",
+  "session_id": "019f259c-7605-7d72-81cb-390a5aa15d7e",
+  "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "usage": {
+    "cached_input_tokens": 36352,
+    "input_tokens": 36812,
+    "output_tokens": 451,
+    "reasoning_tokens": 102
+  },
+  "usage_raw_sha256": "sha256:63d00f4e0ae9b536dcc8a278dd7ee32dee4e0ebc30dabc22cf094bd5aa500729"
+}

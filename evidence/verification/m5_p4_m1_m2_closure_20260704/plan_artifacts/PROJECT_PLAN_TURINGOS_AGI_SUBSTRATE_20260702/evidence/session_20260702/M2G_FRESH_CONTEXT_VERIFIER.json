@@ -1,0 +1,63 @@
+{
+  "verifier_id": "codex-fresh-context-20260703",
+  "verdict": "PASS",
+  "may_mark_m2g_addressed": true,
+  "checked_commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+  "evidence_checks": {
+    "governance_alignment": "PASS",
+    "status_claim_lint": "PASS",
+    "claim_boundary_lint": "PASS",
+    "active_repo_head_matches_target": true,
+    "active_repo_status_clean": true,
+    "tc0_tc5_statuses": "PASS",
+    "tc01_tc09_local_verdicts": "PASS",
+    "tc10_external_only_not_run": "PASS",
+    "packet_check": "PASS",
+    "packet_manifest_sha256sum": "PASS",
+    "rollup_artifact_paths_and_sha256": "PASS",
+    "claim_boundaries": {
+      "turing_completeness_claim_allowed": false,
+      "tc10_external_artifact_exists": false,
+      "stronger_claims_forbidden": true
+    },
+    "drift_checklist": {
+      "passed": 7,
+      "total": 7,
+      "coherent": true
+    }
+  },
+  "commands": [
+    {
+      "cmd": "bash governance/verify_alignment.sh && bash governance/lint_status_claims.sh && bash governance/lint_claim_boundaries.sh",
+      "result": "PASS"
+    },
+    {
+      "cmd": "git status --short && git rev-parse HEAD",
+      "result": "PASS"
+    },
+    {
+      "cmd": "python3 tools/theory/build_tc5_packet.py --root evidence/theory/turing_completeness_witness_20260703 --check",
+      "result": "PASS"
+    },
+    {
+      "cmd": "sha256sum -c evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+      "result": "PASS"
+    },
+    {
+      "cmd": "read M2.G roll-up, drift checklist, gate verdict, TC-10 slot, packet descriptor, claim boundaries, TC0-TC5 verdicts, TC-01..TC-09 verdicts",
+      "result": "PASS"
+    }
+  ],
+  "blockers": [],
+  "non_claims": [
+    "TC-10 PASS",
+    "G3 success",
+    "Turing-completeness",
+    "M2 enablement",
+    "EXTERNALLY_VERIFIED",
+    "CLOSED",
+    "RELEASED",
+    "RATIFIED",
+    "SHIPPED"
+  ]
+}

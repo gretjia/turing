@@ -1,0 +1,147 @@
+{
+  "schema": "GateVerdict.v1",
+  "gate": "M1e Python routing through owner",
+  "verifier_context": "fresh sub-agent, disk-derived",
+  "status": "ADDRESSED",
+  "verdict": "PASS",
+  "commands_run": [
+    {
+      "cmd": "bash PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "git status --short",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "git diff --stat",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "git diff -- tests src tools Cargo.toml Cargo.lock",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "rg -n \"\\\\| M1e \\\\||\\\\| M1c \\\\||\\\\| M1\\\\.G \\\\||M1e|M1c|M1\\\\.G\" /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "rg -n \"Drift-Check|Drift Check|drift-check|Python routing|canonical owner|CostEvent|PPUT|Stage11|Stage 11\" /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "PYTHONPATH=src python3 -m pytest -q tests",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash tools/ci/run_m1a_gates.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "cargo fmt --check",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "cargo test --quiet",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/lint_status_claims.sh",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    }
+  ],
+  "inputs_checked": [
+    "/home/zephryj/turingos_backup/work/turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-GOV-001-governance-map.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/lint_status_claims.sh",
+    "/home/zephryj/turingos_backup/work/turing/src/turingos/codec.py",
+    "/home/zephryj/turingos_backup/work/turing/src/turingos/tape.py",
+    "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/src/main.rs",
+    "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/tests/cli_gates.rs",
+    "/home/zephryj/turingos_backup/work/turing/crates/turing-daemons/src/lib.rs",
+    "/home/zephryj/turingos_backup/work/turing/crates/turing-daemons/tests/turingd_rpc.rs",
+    "/home/zephryj/turingos_backup/work/turing/tools/ci/run_m1a_gates.sh",
+    "/home/zephryj/turingos_backup/work/turing/tools/gates/xcheck_emit.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_loop_until_pass.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_market_router.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_micro_tape_decision_dag.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_native_api_worker.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_stage12_release.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_stage16_sealed_campaign.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_stage16r_repair.py",
+    "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_tool_receipt_conservation.py",
+    "/home/zephryj/turingos_backup/work/turing/tests/test_codec.py",
+    "/home/zephryj/turingos_backup/work/turing/tests/test_stage11_loop_until_pass.py"
+  ],
+  "tracker_observations": {
+    "m1e": "Tracker row M1e is still IN_PROGRESS and records the prior full-suite Stage11+ CostEvent/PPUT token-accounting blocker. Fresh verification in this artifact resolves that blocker for the M1e gate: full pytest now exits 0, M1a guardrails exit 0, Rust checks exit 0, and governance/status lints exit 0.",
+    "m1c": "Tracker row M1c remains BLOCKED on the required durable real provider/worker-call CostEvent.v2 tape segment and fresh strict cost-provenance verification. This verdict does not alter M1c.",
+    "m1_g": "Tracker row M1.G remains PLANNED as the module roll-up over M1a-M1e. This verdict does not assert the parent module gate."
+  },
+  "drift_check": [
+    {
+      "question": "Does the deliverable serve one of G1-G7? Which KPI, exactly?",
+      "answer": "PASS. M1e serves the G2/M1 canonical-substrate KPI by routing Python canonical bytes through the Rust owner while preserving M1a cross-implementation equality.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "status": "PASS"
+    },
+    {
+      "question": "Does it violate any red line in Intent section 5?",
+      "answer": "PASS. Verification wrote only this evidence artifact, did not edit production code, did not change constitution bytes, did not simulate owner-reserved authority, and did not assert a parent gate.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+      "status": "PASS"
+    },
+    {
+      "question": "Is every claim it makes backed by an artifact path an independent agent can open?",
+      "answer": "PASS. This verdict lists the checked paths and fresh command exit codes for pytest, M1a gates, Rust checks, alignment, and status-claim lint.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1E_FRESH_CONTEXT_VERIFIER.json",
+      "status": "PASS"
+    },
+    {
+      "question": "Is anything labeled real that is a fixture? Anything unlabeled?",
+      "answer": "PASS. The Python cross-check serializer is explicitly named and documented as a derived fixture; the legacy Python Tape compatibility label remains visible; fixture audits remain fixture-scoped.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/src/turingos/codec.py",
+      "status": "PASS"
+    },
+    {
+      "question": "Did scope grow beyond the Atom/Phase spec?",
+      "answer": "PASS. Scope was verification-only plus this evidence artifact. The existing active-repo diff is limited to CostEvent/PPUT audit accounting paths that resolve the prior M1e full-suite blocker.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1E_FRESH_CONTEXT_VERIFIER.json",
+      "status": "PASS"
+    },
+    {
+      "question": "Can the work be replayed/resumed by a fresh agent from tracker plus tape alone?",
+      "answer": "PASS. The tracker M1e row names the prior artifacts and this verdict records the fresh commands, cwd values, checked inputs, and the current active repo HEAD f5d31b86e6027919544dc89774538613502d0af0.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "status": "PASS"
+    },
+    {
+      "question": "Does the status honor the ADDRESSED ceiling?",
+      "answer": "PASS. The verdict is limited to M1e ADDRESSED at implementer ceiling; status lint exits 0; M1c remains BLOCKED and M1.G remains PLANNED.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/lint_status_claims.sh",
+      "status": "PASS"
+    }
+  ],
+  "remaining_blockers": [],
+  "status_ceiling_respected": true,
+  "forbidden_claims_made": false
+}

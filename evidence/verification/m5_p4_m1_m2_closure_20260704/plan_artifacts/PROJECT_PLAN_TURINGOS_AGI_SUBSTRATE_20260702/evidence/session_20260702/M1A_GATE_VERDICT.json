@@ -1,0 +1,61 @@
+{
+  "schema": "GateVerdict.v1",
+  "gate_id": "M1a",
+  "module": "M1",
+  "checklist_results": [
+    {
+      "q": 1,
+      "question": "Does the deliverable serve one of G1-G7? Which KPI, exactly?",
+      "answer": "Serves G2 by installing the canonical-owner and cross-implementation equality wall for M1.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-006-canonical-gate-quartet.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 2,
+      "question": "Does it violate any red line in Intent section 5?",
+      "answer": "No constitution bytes changed; no M2 enablement; no lifecycle status beyond ADDRESSED; no external-verification claim.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-001-single-canonical-jcs-owner.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 3,
+      "question": "Is every claim backed by an artifact path an independent agent can open?",
+      "answer": "ADRs, repo commit, gate runner, corpus, tests, and transcripts are path-bound with sha256 evidence.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1A_GATE_CLEAN_TRANSCRIPT.txt",
+      "verdict": "PASS"
+    },
+    {
+      "q": 4,
+      "question": "Is anything labeled real that is a fixture? Is anything unlabeled?",
+      "answer": "Evidence is deterministic local execution plus a named test corpus; no fixture is labeled as real-world run evidence.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/tools/gates/corpus_jcs_extended.jsonl",
+      "verdict": "PASS"
+    },
+    {
+      "q": 5,
+      "question": "Did scope grow beyond the Atom/Phase spec? If yes, cite the decision.",
+      "answer": "Scope stayed within M1a atoms: ADR drafts, xcheck corpus and harness, gate quartet, CI wiring.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M1_canonical_substrate.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 6,
+      "question": "Can the work be replayed or resumed by a fresh agent from tracker plus tape alone?",
+      "answer": "A fresh agent can use the tracker row, active repo commit, and repo-committed runner to replay the checks.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/tools/ci/run_m1a_gates.sh",
+      "verdict": "PASS"
+    },
+    {
+      "q": 7,
+      "question": "Does the status honor the ADDRESSED ceiling?",
+      "answer": "Yes; implementer artifacts use ADDRESSED ceiling and avoid CLOSED, RELEASED, RATIFIED, SHIPPED, and EXTERNALLY_VERIFIED statuses.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-006-canonical-gate-quartet.md",
+      "verdict": "PASS"
+    }
+  ],
+  "alignment_verify": "GREEN",
+  "status": "ADDRESSED",
+  "status_ceiling_note": "implementer may not set CLOSED; independent verifier only",
+  "auditor_session_distinct_from_implementer": false,
+  "produced": "2026-07-02"
+}

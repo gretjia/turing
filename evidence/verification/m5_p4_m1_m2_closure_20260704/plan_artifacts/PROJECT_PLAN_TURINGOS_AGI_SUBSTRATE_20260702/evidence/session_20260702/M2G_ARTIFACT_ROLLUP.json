@@ -1,0 +1,150 @@
+{
+  "active_repo": {
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "status": "clean after M2.TC5 packet commit"
+  },
+  "child_phase_statuses": {
+    "M2.TC0": "ADDRESSED",
+    "M2.TC1": "ADDRESSED",
+    "M2.TC2": "ADDRESSED",
+    "M2.TC3": "ADDRESSED",
+    "M2.TC4": "ADDRESSED",
+    "M2.TC5": "ADDRESSED"
+  },
+  "date": "2026-07-03",
+  "gate": "M2.G",
+  "g3_kpi_status": {
+    "tc01_tc09_local_verdicts": "PASS",
+    "tc10_external_artifact_exists": false,
+    "tc10_verdict": "NOT_RUN",
+    "turing_completeness_claim_allowed": false,
+    "g3_success_claim_allowed": false
+  },
+  "module": "M2",
+  "required_artifacts": [
+    {
+      "category": "adr",
+      "name": "ADR-M2-001",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-001-machine-class-two-counter-minsky.md",
+      "sha256": "5a2595eab96eb38f1850f58a9ed62d4e6c070001dbab3b08600996ae5d8625ca"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M2-002",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-002-additive-registry-and-append-route.md",
+      "sha256": "f146de511259ee72e103da4127bc101ed7b61e5f884e391aaee0b76c1f582e6b"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M2-003",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-003-universality-claim-boundary.md",
+      "sha256": "bd5619928bf733115df653bf7ffa8e87d390d61b672d21729e12aa75f8edbcf5"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M2-004",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-004-reference-interpreter-derived-view.md",
+      "sha256": "5e77c2febc5b655b03925cf110e2002e9e67dfb1e0d666da1c93c8672f5b5cac"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M2-005",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-005-seed-pinned-fuzz.md",
+      "sha256": "84de034cface0c3d41ea7d3082e768b45f3d8c32572c196baedea2083f517d50"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M2-006",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-006-nonhalting-evidence-taxonomy.md",
+      "sha256": "94a3c5ef6b9ed39f3652cca959feb614d7b59c3955778e2f2961063b07f63dfb"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M2-007",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M2-007-economy-noninterference.md",
+      "sha256": "ad55d5452a0a0b67aa7b505b055c892fafa8eeec5d0c0fedff18610220730cd0"
+    },
+    {
+      "category": "phase_verdict",
+      "name": "M2.TC0",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC0_VERDICT.json",
+      "sha256": "15aa81c24d95a15f19a63f0327f24a552116e7416161f0c42dd75b3159404f0a"
+    },
+    {
+      "category": "phase_verdict",
+      "name": "M2.TC1",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC1_VERDICT.json",
+      "sha256": "2fb823dc5c487d0295d297caf4a4ee25932cc8f56dc4a86442e51a778e8884dc"
+    },
+    {
+      "category": "phase_verdict",
+      "name": "M2.TC2",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC2_VERDICT.json",
+      "sha256": "c32de06514bcfe302de8d993a74e968551a271cfd38dbb9f371f9d30b59f9044"
+    },
+    {
+      "category": "phase_verdict",
+      "name": "M2.TC3",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC3_VERDICT.json",
+      "sha256": "f4aa5cf8266a44825c2b3a4cb7d2bab81082918ec7651655ada79b0bf1b90689"
+    },
+    {
+      "category": "phase_verdict",
+      "name": "M2.TC4",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC4_VERDICT.json",
+      "sha256": "49b5df4c6cd4f400a7a5a54331f077b01f34fd138955841a4f3c894350018e7a"
+    },
+    {
+      "category": "phase_verdict",
+      "name": "M2.TC5",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC5_VERDICT.json",
+      "sha256": "a5c25e8aeb743f23fef3a07e67755c9d3aec5c77a6279f2848d57bf80b91dd4b"
+    },
+    {
+      "category": "evidence_root",
+      "name": "TC4 summary",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/verdicts/TC4_AUDIT_SUMMARY.json",
+      "sha256": "0788b7f9504eb090f5ccd654823bddd71e97913246e21b0a001af47e36234af4",
+      "verdict": "PASS"
+    },
+    {
+      "category": "evidence_root",
+      "name": "TC-10 slot",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/verdicts/TC-10.json",
+      "sha256": "2175df5d72bb6407bb7fb17dea040faa19dd6292c36e97440f0efdf38f0e551c",
+      "verdict": "NOT_RUN"
+    },
+    {
+      "category": "packet",
+      "name": "M2.TC5 packet descriptor",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC5_PACKET_DESCRIPTOR.json",
+      "sha256": "3d4dfff2960704af734831c80b3ec5d617e5e52fe6fecc2c05f0f375c99fd18a"
+    },
+    {
+      "category": "packet",
+      "name": "repo packet manifest",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+      "sha256": "c55311796e4e60df6e2d705b0b28702281fc78ccffc24b38adf1fa8ca60439df"
+    }
+  ],
+  "schema": "turingos.m2_g_artifact_rollup.v1",
+  "ship_gate_claim_boundary": {
+    "m2_g_row_addressed_allowed": true,
+    "g3_success_claim_allowed": false,
+    "external_verification_claim_allowed": false,
+    "closed_released_ratified_shipped_claim_allowed": false,
+    "m2_enablement_claim_allowed": false,
+    "turing_completeness_claim_allowed": false,
+    "notes": "M2.G can only be recorded at the implementer ceiling ADDRESSED unless a later M5-class TC-10 external artifact is produced and cited."
+  },
+  "status_ceiling": "ADDRESSED",
+  "tc10_blocker": {
+    "blocked_on": "M5-class external verifier artifact",
+    "external_verifier_artifact": null,
+    "implementer_may_run": false,
+    "not_run_is_fail": true,
+    "tc10_verdict": "NOT_RUN"
+  }
+}

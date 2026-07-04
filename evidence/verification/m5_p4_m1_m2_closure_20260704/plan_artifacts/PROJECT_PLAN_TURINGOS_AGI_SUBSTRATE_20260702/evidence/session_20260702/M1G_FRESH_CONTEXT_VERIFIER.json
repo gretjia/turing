@@ -1,0 +1,166 @@
+{
+  "schema": "turingos.m1_g_fresh_context_verifier.v1",
+  "verifier_kind": "same_program_fresh_context",
+  "timestamp_utc": "2026-07-03T02:24:50Z",
+  "verdict": "PASS",
+  "may_mark_m1g_addressed": true,
+  "status_ceiling": "ADDRESSED",
+  "explicit_non_claims": {
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "m2_enabled": false
+  },
+  "checked_artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/AGENTS.md",
+      "sha256": "4e2be63efcd1985c4b534e9cb218ec33803b41747f18e226c04eac769f6d3e81",
+      "status": "PASS",
+      "notes": "Read; establishes verify_alignment.sh preflight and ADDRESSED implementer ceiling."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/TOP_ALIGNMENT_PROJECT_BOOK.md",
+      "sha256": "927544a1444c4571a04f1b6bcca36a7ce92a43f9d5575c8ae3668765ef6a0cae",
+      "status": "PASS",
+      "notes": "Read enough to confirm it is subordinated and does not authorize CLOSED/RATIFIED/M2 claims."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M1_canonical_substrate.md",
+      "sha256": "ab3ffbe4fe1aa4a6e6d421c40b5fa9fd2b285e38c6653cd7412d6766bf8401e6",
+      "status": "PASS",
+      "notes": "M1.G requires G2 KPIs, Drift-Check 7/7, all phase verdicts rechecked, NOT_RUN == FAIL, and status ceiling ADDRESSED."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "sha256": "f7bbdd2c9196e7362c1e9f9ebdeaff3f69f58100013b2219e03fea3e0ffa3f72",
+      "status": "PASS",
+      "notes": "M1a, M1b, M1c, M1d, and M1e are recorded ADDRESSED; M1.G remains PLANNED and is not overclaimed."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_ARTIFACT_ROLLUP.json",
+      "sha256": "6404361d230c135bbd3bd735bb79930ec04fde42b033a6d542a282f78eb8de8b",
+      "status": "PASS",
+      "notes": "JSON parses; expected hash matches; 20 required artifact entries checked for existence and digest where applicable."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_DRIFT_CHECKLIST.md",
+      "sha256": "81cc446a3fe7de5be2ca09c2cf4a7424c9f814741e9ef9dd583be69b8b0d6d2d",
+      "status": "PASS",
+      "notes": "Expected hash matches; checklist records 7/7 PASS and explicitly preserves ADDRESSED-only ceiling."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_RECHECK_M1B_STRICT_AUDIT/micro_tape_decision_dag_audit.json",
+      "sha256": "882bdb449d906f789486837e9bd8b1590cb9eecaaac7b0e98c87a32dfd2f9795",
+      "status": "PASS",
+      "notes": "verdict PASS; strict_findings empty; authorization_head, cost_provenance, sandbox_provenance, vpput_accounting, terminal anchor, and cost conservation all PASS."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_RECHECK_M1C_STRICT_AUDIT/micro_tape_decision_dag_audit.json",
+      "sha256": "a5c818d6a83878cee287a67fd98428fba7d6ece06146a44127153cd0485b62f8",
+      "status": "PASS",
+      "notes": "verdict PASS; strict_findings empty; authorization_head, cost_provenance, sandbox_provenance, vpput_accounting, terminal anchor, and cost conservation all PASS."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_REAL_GROK_PROVIDER_RECEIPT/instances/django__django-12039/worker_logs/provider_receipt_sanitized.json",
+      "sha256": "5d28190ed5597a6b64faea17cde9cf8468d099fa7456e7d8c791aeb18c7e4bac",
+      "status": "PASS",
+      "notes": "Sanitized real provider receipt exists: provider xai, model grok-build, request_id present, cost 8633 microusd, raw_debug_retained false."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_FRESH_CONTEXT_VERIFIER_AFTER_RECEIPT.json",
+      "sha256": "50fef83921c700a3bcd46c3a5d548323c419a3765eec5f5f5cf7dc82fbc4d2fb",
+      "status": "PASS",
+      "notes": "Receipt-backed fresh verifier verdict PASS and may_mark_m1c_addressed true at ADDRESSED ceiling."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1D_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "3f8d4e9b9e89e00e4e2eef2ac9127caeb640eaf5e12a3382ebdafe33ad45f04c",
+      "status": "PASS",
+      "notes": "Fresh verifier verdict PASS; status ADDRESSED."
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1E_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "beb012225618e609dc9e78527feac5128a19d43c519e80a46ceba31a1936a454",
+      "status": "PASS",
+      "notes": "Fresh verifier verdict PASS; status ADDRESSED."
+    }
+  ],
+  "gate_commands": [
+    {
+      "command": "bash /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "GREEN: authority chain verified against ADR-GOV-001."
+    },
+    {
+      "command": "cd /home/zephryj/turingos_backup/work/turing && bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "XCHECK, singleton codec, AST codec, and ref-lint self-tests PASS; clean M1A gates PASS."
+    },
+    {
+      "command": "cd /home/zephryj/turingos_backup/work/turing && PYTHONDONTWRITEBYTECODE=1 PYTEST_ADDOPTS='-p no:cacheprovider' PYTHONPATH=src python3 -m pytest -q tests/test_worker_cost_event.py tests/test_schemas.py::TestCostEventV2 tests/test_micro_tape_decision_dag_audit.py",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "34 passed. Bytecode and pytest cache were disabled to preserve the read-only constraint."
+    },
+    {
+      "command": "cd /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702 && bash governance/verify_alignment.sh && bash governance/lint_status_claims.sh && bash governance/lint_claim_boundaries.sh",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "Alignment GREEN; no implementer status ceiling violations; CLAIMS_REGISTRY PASS."
+    },
+    {
+      "command": "rg -n \"EXTERNALLY_VERIFIED|CLOSED|RELEASED|RATIFIED|SHIPPED|M2 enabled|M2_ENABLE|M2 enablement|m2_enabled|OG-10|genesis\" M1G_ARTIFACT_ROLLUP.json M1G_DRIFT_CHECKLIST.md",
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "Matches in candidate M1.G files are explicit non-claims only, not positive status claims."
+    }
+  ],
+  "requirement_results": [
+    {
+      "requirement": "Respect authority boundaries and implementer ceiling.",
+      "status": "PASS",
+      "evidence": "AGENTS.md read; TOP_ALIGNMENT_PROJECT_BOOK.md read as subordinated; verify_alignment.sh returned GREEN; report status_ceiling is ADDRESSED only."
+    },
+    {
+      "requirement": "M1.G ship-gate requirements compared to roll-up and drift checklist.",
+      "status": "PASS",
+      "evidence": "MODULE_M1 requires G2 KPIs, required artifact list, Drift-Check 7/7, and all phase verdicts rechecked. M1G_ARTIFACT_ROLLUP.json and M1G_DRIFT_CHECKLIST.md cover those items with ADDRESSED-only boundary."
+    },
+    {
+      "requirement": "Roll-up JSON parses and cited artifact paths/hashes exist and match where feasible.",
+      "status": "PASS",
+      "evidence": "M1G_ARTIFACT_ROLLUP.json parsed with schema turingos.m1_g_artifact_rollup.v1; all 20 required_artifacts exist or are valid git refs; every sha256-cited artifact matched."
+    },
+    {
+      "requirement": "M1a-M1e recorded ADDRESSED; M1.G not overclaimed.",
+      "status": "PASS",
+      "evidence": "PROGRESS_TRACKER.md records M1a, M1b, M1c, M1d, and M1e as ADDRESSED; M1.G row remains PLANNED with no EXTERNALLY_VERIFIED/CLOSED/RELEASED/RATIFIED/SHIPPED/M2 claim."
+    },
+    {
+      "requirement": "M1B and M1C strict audit JSONs show PASS, empty strict findings, and required statuses.",
+      "status": "PASS",
+      "evidence": "Both M1G_RECHECK_M1B_STRICT_AUDIT and M1G_RECHECK_M1C_STRICT_AUDIT have verdict PASS, strict_findings [], overall PASS, and PASS for authorization_head, cost_provenance, sandbox_provenance, vpput_accounting, terminal_golden_path_anchors_to_accepted_head, and cost_conservation_all_branches."
+    },
+    {
+      "requirement": "M1C has provider receipt evidence and receipt-backed fresh verifier passed.",
+      "status": "PASS",
+      "evidence": "provider_receipt_sanitized.json records xai/grok-build request_id b931ac4b-f8cf-4ea0-87cc-e62885ba1dcc and computed cost 8633 microusd; M1C_FRESH_CONTEXT_VERIFIER_AFTER_RECEIPT.json verdict PASS and may_mark_m1c_addressed true."
+    },
+    {
+      "requirement": "Deterministic gates are run or inspected.",
+      "status": "PASS",
+      "evidence": "M1a gates exited 0; targeted pytest slice exited 0 with 34 passed; governance verify/lints exited 0; strict audits were inspected and had PASS verdicts."
+    },
+    {
+      "requirement": "Candidate M1.G artifacts avoid claim-boundary violations.",
+      "status": "PASS",
+      "evidence": "Forbidden-status grep over M1G_ARTIFACT_ROLLUP.json and M1G_DRIFT_CHECKLIST.md found only explicit non-claims; lint_status_claims.sh and lint_claim_boundaries.sh exited 0."
+    }
+  ],
+  "blocking_findings": [],
+  "notes": "This same-program fresh-context verifier supports marking M1.G ADDRESSED only. It does not claim EXTERNALLY_VERIFIED, CLOSED, RELEASED, RATIFIED, SHIPPED, OG-10/genesis signature, or M2 enablement. The active repo was clean before and after the gate commands; the plan root is not a git repository. The pytest command was run with bytecode and pytest cache disabled to preserve the read-only constraint."
+}

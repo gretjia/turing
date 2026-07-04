@@ -1,0 +1,79 @@
+{
+  "schema": "turingos.m2_g_verdict.v1",
+  "module": "M2",
+  "gate": "M2.G",
+  "date": "2026-07-03",
+  "verdict": "PASS",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+    "status": "clean"
+  },
+  "requirements": {
+    "tc0_tc5_child_rows_addressed": true,
+    "tc01_tc09_local_verdicts": "PASS",
+    "tc10_verdict": "NOT_RUN",
+    "tc10_external_artifact_exists": false,
+    "tc5_packet_present": true,
+    "drift_checklist_passed": 7,
+    "drift_checklist_total": 7,
+    "claim_boundary_false": true,
+    "fresh_context_verifier_verdict": "PASS"
+  },
+  "g3_kpi": {
+    "tc01_tc09_local_verdicts": "PASS",
+    "tc10_verdict": "NOT_RUN",
+    "tc10_external_artifact_exists": false,
+    "g3_success_claim_allowed": false,
+    "turing_completeness_claim_allowed": false
+  },
+  "evidence": [
+    {
+      "name": "M2G_ARTIFACT_ROLLUP",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2G_ARTIFACT_ROLLUP.json",
+      "sha256": "e230cffb0297a141a8eba31d9c144db8cf98ff52e23343532d7621f1c2f2cb23"
+    },
+    {
+      "name": "M2G_DRIFT_CHECKLIST",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2G_DRIFT_CHECKLIST.md",
+      "sha256": "3f9c0ccbd68119864dc50030010b0ed990a14d6cf81f021d3ad7f5777c77c1d6"
+    },
+    {
+      "name": "M2G_GATE_VERDICT",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2G_GATE_VERDICT.json",
+      "sha256": "18eaf873274e23c8d77415971d2f097b56857879660ddf0e0d444bc914df39f0"
+    },
+    {
+      "name": "M2G_FRESH_CONTEXT_VERIFIER",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2G_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "a7341fd3c79afce2058fd922988c82b799f9efbc77187877d424f9e97e0ca173"
+    },
+    {
+      "name": "M2_TC5_PACKET_DESCRIPTOR",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC5_PACKET_DESCRIPTOR.json",
+      "sha256": "3d4dfff2960704af734831c80b3ec5d617e5e52fe6fecc2c05f0f375c99fd18a"
+    },
+    {
+      "name": "TC-10 slot",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/verdicts/TC-10.json",
+      "sha256": "2175df5d72bb6407bb7fb17dea040faa19dd6292c36e97440f0efdf38f0e551c"
+    }
+  ],
+  "non_claims": {
+    "tc10_passed": false,
+    "g3_success": false,
+    "turing_completeness": false,
+    "m2_enabled": false,
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "constitution_bytes_changed": false,
+    "og10_or_genesis_signature_present": false
+  },
+  "next_blocker_for_stronger_status": "A later M5-class TC-10 external verifier artifact is required before any stronger claim."
+}

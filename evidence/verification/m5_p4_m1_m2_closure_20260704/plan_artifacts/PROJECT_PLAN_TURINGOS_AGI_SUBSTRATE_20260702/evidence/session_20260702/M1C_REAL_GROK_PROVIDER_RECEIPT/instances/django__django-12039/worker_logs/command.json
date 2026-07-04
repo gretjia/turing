@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "grok",
+    "-p",
+    "<visible_capsule_prompt>",
+    "--cwd",
+    "/tmp/turingos_substrate_worktrees_m1c/4aa1a1a8066e600a",
+    "--output-format",
+    "plain",
+    "--model",
+    "grok-build",
+    "--always-approve",
+    "--permission-mode",
+    "bypassPermissions",
+    "--disable-web-search",
+    "--no-plan",
+    "--no-memory",
+    "--no-subagents",
+    "--max-turns",
+    "50",
+    "--debug",
+    "--debug-file",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_REAL_GROK_PROVIDER_RECEIPT/instances/django__django-12039/worker_logs/grok_debug_raw.log",
+    "--verbatim"
+  ]
+}

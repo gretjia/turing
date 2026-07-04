@@ -1,0 +1,61 @@
+{
+  "schema": "GateVerdict.v1",
+  "gate_id": "M1.G",
+  "module": "M1",
+  "checklist_results": [
+    {
+      "q": 1,
+      "question": "Does the deliverable serve one of G1-G7? Which KPI, exactly?",
+      "answer": "Serves G2 Canonical Substrate Integrity: single canonical-bytes owner, real-run authorization, tape-canonical cost provenance, sandbox provenance, and owner-routed Python canonicalization.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M1_canonical_substrate.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 2,
+      "question": "Does it violate any red line in Intent section 5?",
+      "answer": "No. M1.G roll-up uses existing evidence and a same-program ADDRESSED ceiling. It does not alter constitution bytes, claim external verification, use genesis/OG-10 signatures, enable M2, or declare closed/released/ratified/shipped status.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 3,
+      "question": "Is every claim backed by an artifact path an independent agent can open?",
+      "answer": "Yes. The roll-up artifact lists ADRs, active repo commits, phase manifests/verifiers, real-run coverage, real provider receipt, refreshed tape bundle, strict audit artifacts, and tracker paths by absolute path and digest where applicable.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_ARTIFACT_ROLLUP.json",
+      "verdict": "PASS"
+    },
+    {
+      "q": 4,
+      "question": "Is anything labeled real that is a fixture? Is anything unlabeled?",
+      "answer": "The M1b and M1c real-run evidence roots are real worker runs with strict all-flags audit PASS. Historical/pre-M1c fixture or legacy evidence is not relabeled as real-provider receipt evidence.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_RECHECK_M1C_STRICT_AUDIT/micro_tape_decision_dag_audit.json",
+      "verdict": "PASS"
+    },
+    {
+      "q": 5,
+      "question": "Did scope grow beyond the Atom/Phase spec? If yes, cite the decision.",
+      "answer": "No. This gate assembles the MODULE_M1 §3 artifact list, reruns §4 gate slices, rechecks child phase statuses, and asks for fresh verifier review. It does not perform M5.P4 external closure or FCE work.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M1_canonical_substrate.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 6,
+      "question": "Can the work be replayed or resumed by a fresh agent from tracker plus tape alone?",
+      "answer": "Yes. The tracker M1 rows and M1G roll-up cite the repo SHA, exact audit commands, real tape bundles, receipt file, verifier artifacts, and session-state resume commands.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "verdict": "PASS"
+    },
+    {
+      "q": 7,
+      "question": "Does the status honor the ADDRESSED ceiling?",
+      "answer": "Yes. This checklist supports only the implementer/program-internal ADDRESSED ceiling. Any EXTERNALLY_VERIFIED status for M1.G requires a later M5-class custody-separated ClosureCertificate artifact.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M5_independent_verification.md",
+      "verdict": "PASS"
+    }
+  ],
+  "alignment_verify": "GREEN",
+  "status": "ADDRESSED",
+  "status_ceiling_note": "implementer may not set CLOSED; independent verifier only",
+  "auditor_session_distinct_from_implementer": false,
+  "produced": "2026-07-03"
+}
