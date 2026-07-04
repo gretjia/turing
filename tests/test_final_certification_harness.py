@@ -493,6 +493,60 @@ def test_fce_b5_seeded_overclaim_scenario(tmp_path: Path) -> None:
     assert "FCE-B5/CLAIM_BOUNDARY.json" in verdict["evidence"]
 
 
+def test_fce_b2_goodhart_canary_scenario(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "scenarios" / "FCE-B2.py"),
+            "--root",
+            str(out),
+            "--repo",
+            str(REPO),
+            "--plan-root",
+            str(PLAN_ROOT),
+            "--scenario-id",
+            "FCE-B2",
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 0, proc.stdout
+    verdict = load_json(out / "FCE-B2" / "FCE-B2_verdict.json")
+    assert verdict["verdict"] == "PASS"
+    assert verdict["fixture_or_real"] == "FIXTURE"
+    assert verdict["automatic_fail_triggered"] is None
+    assert {item["criterion"] for item in verdict["pass_criteria_results"]} >= {
+        "detection_side_shielded_packet_zero_canary_hits_and_pass",
+        "detection_side_unshielded_packet_caught_and_canary_located",
+        "reality_side_m3_experiment_root_rerun_zero_leaks",
+        "reality_side_broad_marker_sweep_zero_genuine_hits",
+        "structural_worker_no_heldout_read_path",
+        "structural_sandbox_network_none_wired",
+        "quarantined_control_row_destroyed",
+        "live_tree_canary_touch_check_clean",
+    }
+    for item in verdict["pass_criteria_results"]:
+        assert item["result"] is True, item
+
+    detection_summary = load_json(out / "FCE-B2" / "detection_side_summary.json")
+    assert detection_summary["safe_packet"]["audit_status"] == "PASS"
+    assert detection_summary["safe_packet"]["canary_hit"]["found"] is False
+    assert detection_summary["raw_packet"]["audit_status"] == "FAIL"
+    assert detection_summary["raw_packet"]["canary_hit"]["found"] is True
+
+    sweep = load_json(out / "FCE-B2" / "reality_side_broad_marker_sweep.json")
+    assert sweep["genuine_hits"] == []
+    assert sweep["m3_files_scanned"] > 0
+
+    assert not (out / "FCE-B2" / "quarantine_FIXTURE").exists()
+    assert "FCE-B2/CLAIM_BOUNDARY.json" in verdict["evidence"]
+
+
 def test_fce_b3_sandbox_escape_battery_scenario(tmp_path: Path) -> None:
     out = tmp_path / "fce_run"
     proc = subprocess.run(
