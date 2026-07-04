@@ -1,0 +1,149 @@
+{
+  "schema_id": "m3.p1.verdict.v1",
+  "module_atom": "M3.P1",
+  "recorded_at_utc": "2026-07-03T00:00:00Z",
+  "overall_status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "scope": "Pre-registration freeze only. No M3 worker calls, worker-safe packet materialization, pilot, harness scoring, analysis on real outputs, or M3.G roll-up.",
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "head": "5adc7b3398bd15be498957933645942fe9fd97fe",
+    "m1c_costevent_commit": "6a86418ba99389e9ac60d2f04503644db80eda2a"
+  },
+  "preregistration_digest": {
+    "sha256": "692fa796df9a4d605afc416a776b0ca018de2124344fa7990e784e9e4aab82fa",
+    "path": "m3_uplift_lab/PREREGISTRATION.sha256",
+    "target": "m3_uplift_lab/M3_P1_FREEZE_RECORD.json"
+  },
+  "addressed_atoms": [
+    "ATOM-M3.P1-1 ADR-M3-01..05 accepted-addressed and frozen preregistration authored",
+    "ATOM-M3.P1-2 stdlib-only analyze_uplift.py frozen; FIXTURE dry-run reproduces byte-identical UPLIFT_REPORT.json/md",
+    "ATOM-M3.P1-3 freeze record hashed, independent ACK PASS, and preregistration digest recorded on a stable SHA-256 Micro Tape observation event"
+  ],
+  "blocked_follow_on_atoms": [
+    {
+      "atom": "M3.P2",
+      "reason": "worker-safe packets must be materialized from S01 and pass leakage/gold-patch gates before any worker call"
+    },
+    {
+      "atom": "M3.P4",
+      "reason": "provider canary calls must record provider-reported model strings before S02 pilot calls"
+    },
+    {
+      "atom": "M3.G",
+      "reason": "requires P1-P7 measurement artifacts; no pilot, arm run, harness scoring, or real uplift report exists"
+    }
+  ],
+  "primary_artifacts": [
+    {
+      "path": "adr/ADR-M3-01-worker-policy-receipts.md",
+      "sha256": "f0fc1b06a46937beebf6ecad561762356de69c966e82652c75235191ca68de4c"
+    },
+    {
+      "path": "adr/ADR-M3-02-preregistered-four-arm-s01.md",
+      "sha256": "1ae17984978f64b0192ec8fb1a8804fdcc34260b6488f8aedfd04ff23086c751"
+    },
+    {
+      "path": "adr/ADR-M3-03-statistical-analysis-plan.md",
+      "sha256": "5dc35bc17e485f327c8c5f355b76b488038164f70396fbaa2c0612f43f59867b"
+    },
+    {
+      "path": "adr/ADR-M3-04-weak-worker-roster.md",
+      "sha256": "a4c4ebf2fd637e6ce2868de919e3e314fb48b6272511e936d9fc3888fd08a1b8"
+    },
+    {
+      "path": "adr/ADR-M3-05-upstream-harness-sole-scorer.md",
+      "sha256": "add7f52cc5f5b8677620ebe8faceb7f6302a4c87999b166183dfb6dc6f5cbd8d"
+    },
+    {
+      "path": "m3_uplift_lab/PREREGISTRATION.md",
+      "sha256": "0846e4d1e1f42e6e6374a39f73e7c2ced531441c4aa50ebdb3758a5b3d966f89"
+    },
+    {
+      "path": "m3_uplift_lab/PRICE_TABLE.json",
+      "sha256": "c2583e5120cbbaf2b06179e865f19ea5d466e7ed2ecb760244007c48538d5791"
+    },
+    {
+      "path": "m3_uplift_lab/M3_P1_FREEZE_RECORD.json",
+      "sha256": "692fa796df9a4d605afc416a776b0ca018de2124344fa7990e784e9e4aab82fa"
+    },
+    {
+      "path": "m3_uplift_lab/M3_P1_INDEPENDENT_ACK.json",
+      "sha256": "9d5ba80bb7ed35f0004e9f3ca358c52df35f94c996b6f334825a830e985e0043"
+    },
+    {
+      "path": "m3_uplift_lab/M3_P1_DIGEST_TAPE_EVENT.json",
+      "sha256": "cef5e87ebd963c5f6eb078e29f6ecf563240b7ccc0c19b569dcac4e5803bd9af"
+    },
+    {
+      "path": "m3_uplift_lab/tape/preregistration_digest_tape",
+      "sha256": "directory; event summary and payload hashes are pinned separately"
+    },
+    {
+      "path": "m3_uplift_lab/tape/M3_P1_TAPE_MANIFEST.sha256",
+      "sha256": "86f627f456e7e76860a86948737f2f0130695690af0406ee7e35a48f83e80d18"
+    },
+    {
+      "path": "m3_uplift_lab/analysis/analyze_uplift.py",
+      "sha256": "8abd1b2c902bf100913e0c6e950988d2e06046607cb055f46d79de9e7d5462ec"
+    },
+    {
+      "path": "m3_uplift_lab/analysis/dryrun_fixture/out/UPLIFT_REPORT.json",
+      "sha256": "08d139b58e43225c6f26371ddd7098ebc6e16646ce7507b856f87bfd24a850b4"
+    },
+    {
+      "path": "m3_uplift_lab/analysis/dryrun_fixture/out/UPLIFT_REPORT.md",
+      "sha256": "1d8c60b04d42ee650f88e710100517777e9d51261c2355fb785f93c98b885be3"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P1_PRICE_SOURCE_VERIFICATION.md",
+      "sha256": "b29b90260c658e75a767f2b75f7390379b1e9064ecee54fda9117223db17e299"
+    }
+  ],
+  "verified_commands": [
+    {
+      "command": "bash m3_uplift_lab/tests/test_m3_p1_freeze.sh",
+      "exit_code": 0
+    },
+    {
+      "command": "sha256sum -c m3_uplift_lab/PREREGISTRATION.sha256",
+      "exit_code": 0
+    },
+    {
+      "command": "env PYTHONPYCACHEPREFIX=/tmp/m3_p1_pycache python3 -m py_compile m3_uplift_lab/analysis/analyze_uplift.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m json.tool over M3.P1 JSON artifacts",
+      "exit_code": 0
+    },
+    {
+      "command": "bash governance/verify_alignment.sh && bash governance/lint_status_claims.sh && bash governance/lint_claim_boundaries.sh",
+      "exit_code": 0
+    }
+  ],
+  "evidence": [
+    {
+      "path": "evidence/session_20260702/M3_P1_FREEZE_GATE_TRANSCRIPT.txt",
+      "sha256": "d0f93df49fcbb8217ba8b2d90238670b55edf73c9d548ce2b38e5d4f6e3c474b"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P1_PY_COMPILE_TRANSCRIPT.txt",
+      "sha256": "223880c07ff1c7ee247581f4308c6585acfae7ac42900395c24279a094a46a09"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P1_JSON_VALIDATION_TRANSCRIPT.txt",
+      "sha256": "7c8d499366b763f8df196a37bad9525fd5c236493c8388464f3a5e468c40b823"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P1_GOVERNANCE_TRANSCRIPT.txt",
+      "sha256": "7d7587ef76d38b7276687676c8216fc9770e3629bf33c2b8f2f235131e8dc84e"
+    }
+  ],
+  "non_claims": [
+    "No M3 worker call was made.",
+    "No S01 or S02 worker-safe packet was materialized.",
+    "No pilot, arm run, harness scoring, uplift result, M3.G roll-up, external audit, release, ratification, M2 enablement, OG-10 signature, or constitution-byte change is claimed.",
+    "The price table is a frozen official-document price table, not a provider receipt."
+  ]
+}

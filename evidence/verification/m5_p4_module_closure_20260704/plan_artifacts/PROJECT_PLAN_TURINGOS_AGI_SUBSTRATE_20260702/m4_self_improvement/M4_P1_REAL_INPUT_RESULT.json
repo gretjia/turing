@@ -1,0 +1,147 @@
+{
+  "artifacts": [
+    {
+      "label": "freeze_record",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_FREEZE_RECORD.json",
+      "sha256": "b038cc261b43377bf59038da013bb1cd5f820c7e7397598258eceb31cbc04c47"
+    },
+    {
+      "label": "metric_correction_record",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_METRIC_CORRECTION_RECORD.json",
+      "sha256": "96030f2422ce3bc5fb368621c9b9b61e5c7f7e0baa4279442e8a7ce5d99187e2"
+    },
+    {
+      "label": "corrected_metric_script",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/compute_hvpput.py",
+      "sha256": "0f0e17ca298afca8df64ab8264a3e2fd9a8e568366fe957783ead2e9378ab967"
+    },
+    {
+      "label": "real_input_builder",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/build_m3_real_inputs.py",
+      "sha256": "aef31247ad3d04264727be7296f694748093514ed702e15e90a047bb800ec928"
+    },
+    {
+      "label": "hvpput_assembler",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/assemble_hvpput_report.py",
+      "sha256": "1778061ace7dccde4ebf3913c1365e9ef780c5b555a3fe117b67ee3c0a65e096"
+    },
+    {
+      "label": "heldout_registry",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/heldout_task_registry.v1.json",
+      "sha256": "7ab612f5f310a5efc869ad8f1193ced23608de52abb9459af86eab568a79d8cb"
+    },
+    {
+      "label": "input_digests",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/INPUT_DIGESTS.json",
+      "sha256": "79ecbc12d78398c37797c2dc69a5d20cc5272ccef01233d87a836f9da40c80d8"
+    },
+    {
+      "label": "receipt_binding_note",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/RECEIPT_BINDING_NOTE.json",
+      "sha256": "5d65a0d0878761da98161963bfc8c32ad5f6c5b2aac7d19470ff10a8f5780c15"
+    },
+    {
+      "label": "hvpput_report",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/hvpput_report.v1.json",
+      "sha256": "809d08ad01436b511ca7539e8dfb295a3ad79d7d8d9e681e3f49dda64e0810ed"
+    },
+    {
+      "label": "worker_visible_marker_sweep",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/worker_visible_marker_sweep.json",
+      "sha256": "8e64e0c1650d9d5daebf28e7ec5c84b294f323202bb6a672c468c3938b0e9c73"
+    },
+    {
+      "label": "conservation_reconciliation",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/conservation_reconciliation.json",
+      "sha256": "40c45a4e2f8864adcafc6027c8f66572dd26ab39a841afe708bafd7ee6848df2"
+    },
+    {
+      "label": "no_float_tokens",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/no_float_tokens.json",
+      "sha256": "7e42cd984e807552bbeb01250a9beaee120b52dbacbedbb200494cf6361f525a"
+    },
+    {
+      "label": "recompute_check",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/recompute_check.json",
+      "sha256": "53daaa5edeb655112bbd2a19364d4fd745b8366ffabf5ecb1add51d9030b0072"
+    }
+  ],
+  "class_breakdown": {
+    "n_billing_complete": 150,
+    "n_bounded": 0,
+    "n_excluded": 0
+  },
+  "freeze_deviation": {
+    "correction_record_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_METRIC_CORRECTION_RECORD.json",
+    "correction_record_sha256": "96030f2422ce3bc5fb368621c9b9b61e5c7f7e0baa4279442e8a7ce5d99187e2",
+    "status": "RECORDED_DETERMINISTIC_CORRECTION",
+    "summary": "Original metric freeze predated M3 output reads, but valid M3 CostEvent.v2 receipts exposed an aggregate-ceiling recomputation bug. The corrected script is digest-recorded; the correction uses no solved/unresolved outcome values."
+  },
+  "gates": {
+    "conservation_reconciliation": "PASS",
+    "m4_freeze_test_with_correction": "PASS",
+    "m4_real_input_adapter_test": "PASS",
+    "no_float_tokens": "PASS",
+    "receipt_binding_verification": "PASS",
+    "registry_generated": "PASS",
+    "same_path_recompute": "PASS",
+    "worker_visible_marker_sweep": "PASS"
+  },
+  "module_atom": "M4.P1",
+  "non_claims": [
+    "M4.P1 is implementer-addressed only, not externally verified.",
+    "The deterministic metric correction is recorded as a deviation from the original freeze; the original freeze bytes are not claimed unchanged.",
+    "This result does not allow a failure-memory efficacy claim and does not change M3's null H2 result.",
+    "No release, ship, ratification, M2 enablement, OG-10/genesis signature, or constitution byte change is claimed."
+  ],
+  "per_arm_summary": {
+    "A": {
+      "class_breakdown": {
+        "n_billing_complete": 50,
+        "n_bounded": 0,
+        "n_excluded": 0
+      },
+      "hvpput_m_str": "0.000236136",
+      "total_cost_microusd": 224316,
+      "total_solves": 14,
+      "total_wall_ms": 264305
+    },
+    "B": {
+      "class_breakdown": {
+        "n_billing_complete": 50,
+        "n_bounded": 0,
+        "n_excluded": 0
+      },
+      "hvpput_m_str": "0.000401378",
+      "total_cost_microusd": 162196,
+      "total_solves": 16,
+      "total_wall_ms": 245768
+    },
+    "C": {
+      "class_breakdown": {
+        "n_billing_complete": 50,
+        "n_bounded": 0,
+        "n_excluded": 0
+      },
+      "hvpput_m_str": "0.000669797",
+      "total_cost_microusd": 95808,
+      "total_solves": 16,
+      "total_wall_ms": 249330
+    }
+  },
+  "recorded_at_utc": "2026-07-03T16:20:00Z",
+  "schema_id": "turingos.m4.p1.real_input_result.v1",
+  "scope": {
+    "analysis_label": "real_s01_deepseek_20260703",
+    "arms": [
+      "A",
+      "B",
+      "C"
+    ],
+    "heldout_shard": "S01",
+    "task_arm_runs": 150,
+    "worker_family": "DeepSeek-only continuation"
+  },
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}

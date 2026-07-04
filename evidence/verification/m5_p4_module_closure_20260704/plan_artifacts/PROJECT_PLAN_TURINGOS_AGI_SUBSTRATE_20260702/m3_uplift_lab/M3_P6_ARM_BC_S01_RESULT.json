@@ -1,0 +1,242 @@
+{
+  "artifacts": [
+    {
+      "label": "m3_p6_continuation_addendum",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P6_DEEPSEEK_LOOP_CONTINUATION.md",
+      "sha256": "227b92d389e10b54d4ff6a4897bffff0aea550dd2d74b7d4042aa5c3e561e5e6"
+    },
+    {
+      "label": "arm_b_predictions",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions.jsonl",
+      "sha256": "4c41414ee38d09709cc14a63baab81a062fd3a41758241dd062cdf2b574d59b8"
+    },
+    {
+      "label": "arm_b_predictions_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions_report.json",
+      "sha256": "ea4f86052341fbcd2204c1f1d9e7661c4a03983a3eae4c6ea0b618a196b672c3"
+    },
+    {
+      "label": "arm_c_predictions",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armC_predictions.jsonl",
+      "sha256": "9d52240803f83f84ae7350fa6c5784fc099e6ae193b2ef677934a4eb476719fe"
+    },
+    {
+      "label": "arm_c_predictions_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armC_predictions_report.json",
+      "sha256": "3d56e85165893b9ceb4bb3a69881b899ec9d4f267badbd3d590f3760fb842d92"
+    },
+    {
+      "label": "arm_bc_worker_policy_audit",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armBC_worker_policy_audit.json",
+      "sha256": "862d6c2af8f0523fc29a80f291433f4e6542ca013569407b8f12d6167ceb7456"
+    },
+    {
+      "label": "ablation_capsule_audit",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/m3_p6_ablation_capsule_audit.json",
+      "sha256": "0d9d55728f7fc8df8a16f1ea963f1751066ad8a83dfcaf9021a75c128ee08870"
+    },
+    {
+      "label": "arm_b_shard_run_packet",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/shard_run_packet.json",
+      "sha256": "7e1c0fe615f20c3072051cbf5bc7ac33f4859a959e9731929e3cecfc7f84f46a"
+    },
+    {
+      "label": "arm_b_shard_run_command",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/shard_run_command.txt",
+      "sha256": "45067af20db37746841e6ad510ab0ecd4f60ca3160938b5e50bd986230582733"
+    },
+    {
+      "label": "arm_b_official_upstream_swebench_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+      "sha256": "85c3cfd9b23345538869fa68706dd13be92a2143b7b2126fab54088dd7d888cc"
+    },
+    {
+      "label": "arm_c_shard_run_packet",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/shard_run_packet.json",
+      "sha256": "fc57c23786a73f89c4eaa4a378247deb857d3ec7e7b41e8d008af6b9c1daedfa"
+    },
+    {
+      "label": "arm_c_shard_run_command",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/shard_run_command.txt",
+      "sha256": "0d85cb5f79517b354edc4851e3c3dc807e6da0cfc453d65cd901f7f1a2fca104"
+    },
+    {
+      "label": "arm_c_official_upstream_swebench_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+      "sha256": "dbd8b5324ef91893dfb4f6440106aa2bca6e17229bb76d5ddb188c04ae9c06d7"
+    }
+  ],
+  "gates": {
+    "ablation_capsule_audit_status": "PASS",
+    "arm_b_window_summaries_pass": true,
+    "arm_c_window_summaries_pass": true,
+    "candidate_patch_audits_pass": "PASS for all 50 B tasks and all 50 C tasks",
+    "official_harness_errors": 0,
+    "official_harness_process_exit_code": 0,
+    "secret_values_recorded": false,
+    "worker_policy_audit_status": "PASS"
+  },
+  "module_atom": "M3.P6",
+  "non_claims": [
+    "This record addresses M3.P6 Arms B/C S01 only at implementer ceiling.",
+    "This is not the original heterogeneous-worker preregistration; it is the DeepSeek-only continuation.",
+    "No M3.P7 uplift-positive result, M3.G roll-up, external audit, release, ratification, M2 enablement, OG-10 signature, genesis signature, or constitution-byte change is claimed."
+  ],
+  "recorded_at_utc": "2026-07-03T15:18:00Z",
+  "schema_id": "turingos.m3.p6.arm_bc_s01_result.v1",
+  "scope": {
+    "continuation_authority_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P6_DEEPSEEK_LOOP_CONTINUATION_RECORD.json",
+    "measurement_label": "DeepSeek-only same-provider source-context loop measurement",
+    "model_requested": "deepseek-v4-pro",
+    "provider": "deepseek",
+    "shard": "S01"
+  },
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "upstream_swebench_scores": {
+    "arm_B": {
+      "completed_instances": 50,
+      "empty_patch_instances": 0,
+      "error_instances": 0,
+      "incomplete_ids_interpretation": "Non-submitted complement of the 500-task Verified split, not incomplete submitted S01 tasks.",
+      "report_incomplete_ids_count": 450,
+      "report_total_instances_field": 500,
+      "resolved_ids": [
+        "astropy__astropy-13579",
+        "astropy__astropy-14309",
+        "django__django-11066",
+        "django__django-11095",
+        "django__django-11099",
+        "matplotlib__matplotlib-20859",
+        "matplotlib__matplotlib-22719",
+        "pydata__xarray-4075",
+        "pydata__xarray-4629",
+        "pylint-dev__pylint-7277",
+        "pytest-dev__pytest-5809",
+        "pytest-dev__pytest-6202",
+        "scikit-learn__scikit-learn-11578",
+        "scikit-learn__scikit-learn-12585",
+        "scikit-learn__scikit-learn-12973",
+        "sympy__sympy-13480"
+      ],
+      "resolved_instances": 16,
+      "run_id": "turingos_m3_s01_armB_deepseek_source_context_loop_20260703",
+      "submitted_instances": 50,
+      "submitted_solve_rate": 0.32,
+      "unresolved_instances": 34
+    },
+    "arm_C": {
+      "completed_instances": 50,
+      "empty_patch_instances": 0,
+      "error_instances": 0,
+      "incomplete_ids_interpretation": "Non-submitted complement of the 500-task Verified split, not incomplete submitted S01 tasks.",
+      "report_incomplete_ids_count": 450,
+      "report_total_instances_field": 500,
+      "resolved_ids": [
+        "astropy__astropy-14309",
+        "django__django-11066",
+        "django__django-11095",
+        "django__django-11099",
+        "matplotlib__matplotlib-20859",
+        "pydata__xarray-4075",
+        "pydata__xarray-4356",
+        "pydata__xarray-4629",
+        "pylint-dev__pylint-6903",
+        "pylint-dev__pylint-7277",
+        "pytest-dev__pytest-5809",
+        "pytest-dev__pytest-6202",
+        "scikit-learn__scikit-learn-11578",
+        "scikit-learn__scikit-learn-12585",
+        "scikit-learn__scikit-learn-13135",
+        "sympy__sympy-13480"
+      ],
+      "resolved_instances": 16,
+      "run_id": "turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703",
+      "submitted_instances": 50,
+      "submitted_solve_rate": 0.32,
+      "unresolved_instances": 34
+    }
+  },
+  "window_artifacts": [
+    {
+      "arm": "B",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/final_repair/S01-W00/worker_run_summary.json",
+      "sha256": "a094a90a8a66800de166a7545fc207101238bb7a78d4851232bc17be06f91dda",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W00"
+    },
+    {
+      "arm": "B",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/final_repair/S01-W01/worker_run_summary.json",
+      "sha256": "f364250bce909d630b217e313d8d32dc141259549172a08ecd84da10b138fa04",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W01"
+    },
+    {
+      "arm": "B",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/final_repair/S01-W02/worker_run_summary.json",
+      "sha256": "97edb73e8f9619ae2bfd470c120442bf4c3fbe7b94615efadba29c27ae1cb3f7",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W02"
+    },
+    {
+      "arm": "B",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/final_repair/S01-W03/worker_run_summary.json",
+      "sha256": "f209ecaa41d6d62d7a42292cea559fc3e3ff511d3eb442b7db9ab0a2fba6f035",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W03"
+    },
+    {
+      "arm": "B",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/final_repair/S01-W04/worker_run_summary.json",
+      "sha256": "6d2b7ff841ceda88f5f0e6a7e55246cec8e1d7588bd7b3b70fbf0470d6e53f63",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W04"
+    },
+    {
+      "arm": "C",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/final_repair/S01-W00/worker_run_summary.json",
+      "sha256": "2b2f12aa139af07df5395be20fb4bbad8d649cf55dff12acae9b98af066bd153",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W00"
+    },
+    {
+      "arm": "C",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/final_repair/S01-W01/worker_run_summary.json",
+      "sha256": "1314f243dfc347f76840ce706086f666b1a240b48ef4875e9ac183b812eaf128",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W01"
+    },
+    {
+      "arm": "C",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/final_repair/S01-W02/worker_run_summary.json",
+      "sha256": "2d087af1756387bad7fe558617e262c3dae59c3331e808c8728ec7d65a1bd84e",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W02"
+    },
+    {
+      "arm": "C",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/final_repair/S01-W03/worker_run_summary.json",
+      "sha256": "903c5413ce70b548d0bff861fe8b126e77289d301ad999264bb633199b75e8a6",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W03"
+    },
+    {
+      "arm": "C",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/final_repair/S01-W04/worker_run_summary.json",
+      "sha256": "a84ba8b31d58695f8b0b1c5f0da19ec1b032f6a77e674143428949868110ad62",
+      "status": "PASS",
+      "task_count_completed": 10,
+      "window": "S01-W04"
+    }
+  ]
+}

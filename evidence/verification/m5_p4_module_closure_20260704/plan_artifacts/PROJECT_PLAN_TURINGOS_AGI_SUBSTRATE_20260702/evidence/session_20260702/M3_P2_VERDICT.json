@@ -1,0 +1,174 @@
+{
+  "schema_id": "turingos.m3.p2.verdict.v1",
+  "module_atom": "M3.P2",
+  "recorded_at_utc": "2026-07-03T00:00:00Z",
+  "overall_status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "scope": "S01 worker-safe packet materialization, leakage audit, gold-patch guard, sha256 table, and prediction-policy lint readiness. No M3 worker call or prediction scoring.",
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "8669d3dd545f7aff204c4dfb2428562327efff02",
+    "commit_subject": "m3: materialize s01 worker safe packets"
+  },
+  "source_inputs": {
+    "campaign_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629",
+    "dataset_descriptor_sha256": "8dde6fef97ef978d5e973a6c3e75cd46f464b5681e85e6b8f7b86edeb269d1e2",
+    "dataset_descriptor_source_dataset_digest": "sha256:43ed5a3d1d98da36472c1ade65ddd2085d7b4ff694fcaf6a023a07c5c1f32f21",
+    "s01_shard_manifest_sha256": "68261be554042a3ca38454211d98014fc305b77ebff200414d9bb3d0e7c3a3ec",
+    "local_arrow_file_sha256": "0d119efe73413554335bd410a04d82fd4a586bfd312cee677ee40af5de2ac46e"
+  },
+  "results": {
+    "windows": [
+      "S01-W00",
+      "S01-W01",
+      "S01-W02",
+      "S01-W03",
+      "S01-W04"
+    ],
+    "materialization_status": "PASS",
+    "window_count": 5,
+    "task_count_total": 50,
+    "written_count_total": 50,
+    "packet_leakage_audit_status": "PASS",
+    "packet_leakage_audit_packet_count": 50,
+    "gold_patch_guard_status": "PASS",
+    "gold_patch_shortcut_allowed": false,
+    "worker_safe_artifact_manifest_entries": 110,
+    "worker_policy_lint_readiness_status": "READY_NO_REAL_M3_PREDICTIONS_YET"
+  },
+  "primary_repo_artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/materialize_swebench_worker_safe_tasks.py",
+      "sha256": "90bd6a3ecacfc10ad512bed5d8ae6278ef4a42d81adc2950c71071bcfeade36d"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_worker_safe_task_packets.py",
+      "sha256": "19c0ca74fbf5b07810b0376e968ed7a2eddeef4f04fd21781c9ffac26a2cb377"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_worker_policy_predictions.py",
+      "sha256": "bd5d68a3269733e69a903dec967f5d46bd62eb10fb6cdac67ef848cb77b3b2d4"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/bench/audit_gold_patch_guard.py",
+      "sha256": "53b3127b5c6a8c882950f3a95942e13038225fcb5ba06f2547f3c0f17c36517a"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_swebench_worker_safe_materializer.py",
+      "sha256": "0f5569ca5f61860d57c9a09756ac13d3c2f7e0edd0731790a208f2c13c18d46c"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_swebench_worker_safe_task_packet_audit.py",
+      "sha256": "80219e3c3e8eb9cfc10a03154b3a894f2209d8efc4e7decb27207ff1f48e86a9"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_swebench_worker_policy_predictions.py",
+      "sha256": "ae19c49d548166185cb7aff64288a2670170dcdd5aa95db92261728fcca4b247"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/gold_patch_guard_audit.json",
+      "sha256": "74c4f4c2b0d6c0c4b766e921bd5055e706a2363ec70c487750ff4099390aaddc"
+    }
+  ],
+  "plan_artifacts": [
+    {
+      "path": "evidence/session_20260702/M3_P2_WORKER_SAFE_ARTIFACTS.sha256",
+      "sha256": "f63410ccd7c0ff9411c5df3567b8a9ecde9a9a27c386988bb71435ace65514da"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_WORKER_POLICY_LINT_READINESS.json",
+      "sha256": "3e3442de32b91f44f0735b7e5d2a00b20478bfd0e3cd948042540fa76506b8c8"
+    },
+    {
+      "path": "m3_uplift_lab/tests/test_m3_p2_packets.sh",
+      "sha256": "d685853c8cc4ad8c56c8592cd8e123e8b0f3c020de3a29184cbc0f233e0d2ac3"
+    }
+  ],
+  "verified_commands": [
+    {
+      "command": "env PYTHONDONTWRITEBYTECODE=1 python3 -m pytest tests/test_swebench_worker_safe_materializer.py tests/test_swebench_worker_safe_task_packet_audit.py tests/test_swebench_gold_patch_guard.py tests/test_swebench_worker_candidate_audit.py tests/test_swebench_worker_policy_predictions.py -q",
+      "exit_code": 0
+    },
+    {
+      "command": "env PYTHONPYCACHEPREFIX=/tmp/m3_p2_pycache python3 -m py_compile tools/bench/materialize_swebench_worker_safe_tasks.py tools/bench/audit_worker_safe_task_packets.py tools/bench/audit_gold_patch_guard.py tools/bench/audit_worker_policy_predictions.py",
+      "exit_code": 0
+    },
+    {
+      "command": "bash m3_uplift_lab/tests/test_m3_p2_packets.sh",
+      "exit_code": 0
+    },
+    {
+      "command": "sha256sum -c evidence/session_20260702/M3_P2_WORKER_SAFE_ARTIFACTS.sha256",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "command": "bash governance/verify_alignment.sh && bash governance/lint_status_claims.sh && bash governance/lint_claim_boundaries.sh",
+      "exit_code": 0
+    }
+  ],
+  "evidence": [
+    {
+      "path": "evidence/session_20260702/M3_P2_MATERIALIZATION_TRANSCRIPT.txt",
+      "sha256": "2d83ed784b7fccbcf4448c1a12b2abf7f04c833d588224abe9bb52e75c390bbf"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_PACKET_LEAKAGE_AUDIT_TRANSCRIPT.txt",
+      "sha256": "94235b9f7bab55e92022b34f8c2626d6c80150d88caa324073f8a88473eccd90"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_GOLD_PATCH_GUARD_TRANSCRIPT.txt",
+      "sha256": "c9d58dab3ddaa1e1a455733dcbedea9b0abe495407bc6cd2e567b1dd721b3729"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_SHA256_VERIFY_TRANSCRIPT.txt",
+      "sha256": "2ecb32237992a17d074e379874c887d7109e2f99eeae4cbedcb91fe1059afc29"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_PACKET_GATE_TRANSCRIPT.txt",
+      "sha256": "21936fef70269930fcd6d9fe7f7f67ebbeafc38ecf731c2cc5edd9dacf7d0c83"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_REPO_TEST_TRANSCRIPT.txt",
+      "sha256": "341d5dca33250b815baddbafb6001e174c20bf1716bb74f3d612e77777db8938"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_PY_COMPILE_TRANSCRIPT.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_M1A_GUARDRAIL_TRANSCRIPT.txt",
+      "sha256": "c70742c54905bb790bd2ce33f54333a14c7c8820412a459bd565ad3364d822e9"
+    },
+    {
+      "path": "evidence/session_20260702/M3_P2_GOVERNANCE_TRANSCRIPT.txt",
+      "sha256": "7600482ccfc27e896067d597dd19e0bbce34eac5ae03c64c5071e3d4b2bcb068"
+    }
+  ],
+  "blocked_follow_on_atoms": [
+    {
+      "atom": "M3.P3",
+      "reason": "deterministic floor must run first and assert 0 resolved before pilot or arm calls"
+    },
+    {
+      "atom": "M3.P4",
+      "reason": "provider canary calls must record provider-reported model strings before S02 pilot calls"
+    },
+    {
+      "atom": "M3.P5-M3.P7",
+      "reason": "no M3 worker calls, predictions, harness scoring, or frozen analysis outputs exist yet"
+    }
+  ],
+  "non_claims": [
+    "No M3 worker call was made.",
+    "No S02 pilot packet or S02 worker call was made.",
+    "No prediction JSONL from M3.P5 or M3.P6 exists yet; the worker-policy lint is implemented and tested, and must run before scoring real predictions.",
+    "No deterministic floor, pilot, arm run, harness scoring, uplift result, M3.G roll-up, external audit, release, ratification, M2 enablement, OG-10 signature, or constitution-byte change is claimed."
+  ]
+}

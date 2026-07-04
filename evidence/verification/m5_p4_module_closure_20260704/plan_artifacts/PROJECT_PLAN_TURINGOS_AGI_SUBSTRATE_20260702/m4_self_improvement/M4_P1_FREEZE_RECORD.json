@@ -1,0 +1,47 @@
+{
+  "artifact_class": "freeze_digest_record",
+  "artifacts": [
+    {
+      "path": "metric/compute_hvpput.py",
+      "sha256": "sha256:1ed79135db5b740e80401c80ef0a7d48cf3db3930eded27147abe8f346d95fb0"
+    },
+    {
+      "path": "metric/gen_registry.py",
+      "sha256": "sha256:e54609b5215a690974f01e05c1732fca9f3a93a770b38421e54cdb19855c16ba"
+    },
+    {
+      "path": "metric/selftest_fixture/registry.json",
+      "sha256": "sha256:66d09bc9dbcfbf535add410de74c485961dbda167e0f43987011056fe550ab95"
+    },
+    {
+      "path": "metric/selftest_fixture/results.json",
+      "sha256": "sha256:cfba109d798b7e93b7bf873a99918899ca28bb08479aeb447e3dc1d32bd104b5"
+    },
+    {
+      "path": "metric/selftest_fixture/price_table.json",
+      "sha256": "sha256:c461e2886bf2493647790fa07b578eb019784a890e78bd354b2e322a197fe0bf"
+    },
+    {
+      "path": "metric/selftest_fixture/receipts.json",
+      "sha256": "sha256:8093b8a24d1237899782f380ddcddffd63ad3a805e8af6e28298c1a3928fb93c"
+    },
+    {
+      "path": "metric/selftest_fixture/expected_hvpput_report.v1.json",
+      "sha256": "sha256:25d82d331de5c824df3eb7d427197594c4df0019caec849c5169b0e93f2d86b4"
+    },
+    {
+      "path": "NORTHSTAR_REPORT.skeleton.md",
+      "sha256": "sha256:e7ef3e24cb34c6280b123ab6b6540e31fde9f9e17b80635603da9a7c0f66391b"
+    },
+    {
+      "path": "CLAIM_BOUNDARY.template.json",
+      "sha256": "sha256:cbe29aa533b37d0e01edff1101f18d7614e12157b7f6b1c4838a5833d0f0c8ab"
+    }
+  ],
+  "created_at_utc": "2026-07-03T06:24:46Z",
+  "freeze_scope": "FIXTURE_ONLY_NO_M3_OUTPUT_READ",
+  "m3_output_read_status": "not_read_for_this_freeze_record",
+  "module_atom": "M4.P1-2/M4.P1-3",
+  "schema_id": "m4.p1.freeze_record.v1",
+  "status_ceiling": "ADDRESSED"
+}

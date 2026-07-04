@@ -1,0 +1,316 @@
+{
+  "all_required_items_present": true,
+  "child_phase_statuses": {
+    "M4.P0": "ADDRESSED",
+    "M4.P0b": "ADDRESSED",
+    "M4.P1": "ADDRESSED",
+    "M4.P2": "ADDRESSED",
+    "M4.P3": "ADDRESSED"
+  },
+  "closure_queue": {
+    "m5_p4_queue_status": "BLOCKED_ON_OWNER_AUDITOR_CHANNEL",
+    "owner_channel_decision_log_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+    "unblock": "Owner records a custody-separated external/cross-family auditor channel for M5.P4."
+  },
+  "digest_bound_artifacts": [
+    {
+      "label": "1_adrs:ADR-M4-001-hvpput-definition.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-001-hvpput-definition.md",
+      "sha256": "87050e97d221b0fc520d254e942171c6f78efcd268b277e670aca3b5ddc2cc43"
+    },
+    {
+      "label": "1_adrs:ADR-M4-002-cost-classes.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-002-cost-classes.md",
+      "sha256": "2104692b8567e0e57a32c2991caaf9db73eac9c97e54876c1191587c3a0179dd"
+    },
+    {
+      "label": "1_adrs:ADR-M4-003-failure-memory-causality.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-003-failure-memory-causality.md",
+      "sha256": "a6d802627bce34d15adb43172334d36ee9c52995e04e9111269900f17dcc0e37"
+    },
+    {
+      "label": "1_adrs:ADR-M4-004-heldout-registry.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-004-heldout-registry.md",
+      "sha256": "fedbe280b7002b13b728014d6924e2d6acd08b90a1bbe14c6a3d7708d2d95468"
+    },
+    {
+      "label": "1_adrs:ADR-M4-005-honest-null-reporting.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-005-honest-null-reporting.md",
+      "sha256": "089d7ad14ca14ca0d1400f3e0ce70392e3c2d3a94500df5fec4a398674730d9c"
+    },
+    {
+      "label": "1_adrs:ADR-M4-006-broadcast-rule-lifecycle.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-006-broadcast-rule-lifecycle.md",
+      "sha256": "febadcb50f7e20484f266eb1701490d03b725c795b4ce9341a854c2f2f119ea6"
+    },
+    {
+      "label": "1_adrs:ADR-M4-007-provider-receipt-binding.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-007-provider-receipt-binding.md",
+      "sha256": "d896c7c406dcc45f0d2d4a67ece447d10a665dd3cbff552cda0eb4550f2661d5"
+    },
+    {
+      "label": "2_freeze_predates_read:M4_P1_FREEZE_RECORD.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_FREEZE_RECORD.json",
+      "sha256": "b038cc261b43377bf59038da013bb1cd5f820c7e7397598258eceb31cbc04c47"
+    },
+    {
+      "label": "2_freeze_predates_read:M4_P1_METRIC_CORRECTION_RECORD.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_METRIC_CORRECTION_RECORD.json",
+      "sha256": "96030f2422ce3bc5fb368621c9b9b61e5c7f7e0baa4279442e8a7ce5d99187e2"
+    },
+    {
+      "label": "2_freeze_predates_read:compute_hvpput.py",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/compute_hvpput.py",
+      "sha256": "0f0e17ca298afca8df64ab8264a3e2fd9a8e568366fe957783ead2e9378ab967"
+    },
+    {
+      "label": "2_freeze_predates_read:gen_registry.py",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/gen_registry.py",
+      "sha256": "e54609b5215a690974f01e05c1732fca9f3a93a770b38421e54cdb19855c16ba"
+    },
+    {
+      "label": "2_freeze_predates_read:NORTHSTAR_REPORT.skeleton.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/NORTHSTAR_REPORT.skeleton.md",
+      "sha256": "e7ef3e24cb34c6280b123ab6b6540e31fde9f9e17b80635603da9a7c0f66391b"
+    },
+    {
+      "label": "2_freeze_predates_read:CLAIM_BOUNDARY.template.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/CLAIM_BOUNDARY.template.json",
+      "sha256": "cbe29aa533b37d0e01edff1101f18d7614e12157b7f6b1c4838a5833d0f0c8ab"
+    },
+    {
+      "label": "2_freeze_predates_read:test_m4_p1_freeze.sh",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p1_freeze.sh",
+      "sha256": "04d633568da8f964a9d24c5dfa54bc57c1237e79c26c3841820fa0be4a47ffe7"
+    },
+    {
+      "label": "3_registry_and_sweep:heldout_task_registry.v1.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/heldout_task_registry.v1.json",
+      "sha256": "7ab612f5f310a5efc869ad8f1193ced23608de52abb9459af86eab568a79d8cb"
+    },
+    {
+      "label": "3_registry_and_sweep:worker_visible_marker_sweep.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/worker_visible_marker_sweep.json",
+      "sha256": "8e64e0c1650d9d5daebf28e7ec5c84b294f323202bb6a672c468c3938b0e9c73"
+    },
+    {
+      "label": "3_registry_and_sweep:test_m4_p1_real_inputs.sh",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p1_real_inputs.sh",
+      "sha256": "c6ee8c6d62c7099dcb9ce29abe6266d8c95cf614651275cadb6a97916ce07fe3"
+    },
+    {
+      "label": "4_input_digests:INPUT_DIGESTS.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/INPUT_DIGESTS.json",
+      "sha256": "79ecbc12d78398c37797c2dc69a5d20cc5272ccef01233d87a836f9da40c80d8"
+    },
+    {
+      "label": "4_input_digests:RECEIPT_BINDING_NOTE.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/RECEIPT_BINDING_NOTE.json",
+      "sha256": "5d65a0d0878761da98161963bfc8c32ad5f6c5b2aac7d19470ff10a8f5780c15"
+    },
+    {
+      "label": "5_hvpput_report:M4_P1_REAL_INPUT_RESULT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_REAL_INPUT_RESULT.json",
+      "sha256": "279062225a95f263bcc35d838cb5cd16b04b075f303e82b18783c5fe9c1281ec"
+    },
+    {
+      "label": "5_hvpput_report:hvpput_report.v1.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/hvpput_report.v1.json",
+      "sha256": "809d08ad01436b511ca7539e8dfb295a3ad79d7d8d9e681e3f49dda64e0810ed"
+    },
+    {
+      "label": "5_hvpput_report:conservation_reconciliation.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/conservation_reconciliation.json",
+      "sha256": "40c45a4e2f8864adcafc6027c8f66572dd26ab39a841afe708bafd7ee6848df2"
+    },
+    {
+      "label": "5_hvpput_report:no_float_tokens.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/no_float_tokens.json",
+      "sha256": "7e42cd984e807552bbeb01250a9beaee120b52dbacbedbb200494cf6361f525a"
+    },
+    {
+      "label": "5_hvpput_report:recompute_check.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/recompute_check.json",
+      "sha256": "53daaa5edeb655112bbd2a19364d4fd745b8366ffabf5ecb1add51d9030b0072"
+    },
+    {
+      "label": "6_causal_lifecycle:M4_P2_CAUSAL_LIFECYCLE_RESULT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P2_CAUSAL_LIFECYCLE_RESULT.json",
+      "sha256": "f25b3981aecc9aecae1abf97e3288d6bf3cf77b93dd3cf55b8ea13b5c986a7b4"
+    },
+    {
+      "label": "6_causal_lifecycle:h2_consumption_note.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/h2_consumption_note.json",
+      "sha256": "1b7b9b41f67f8543339038fb31209f5a28bfb04fe8fe993df87be609be3f6e6f"
+    },
+    {
+      "label": "6_causal_lifecycle:dose_response.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/dose_response.json",
+      "sha256": "bd9482f42e40e7256ffd1d4d85accf817314ed02dc046d00eeeaad804e696dd3"
+    },
+    {
+      "label": "6_causal_lifecycle:memory_cost.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/memory_cost.json",
+      "sha256": "52264c13ad648d145ba2e879bd029a10a238dcd2a59341c51385388836defe3c"
+    },
+    {
+      "label": "6_causal_lifecycle:lineage_table.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/lineage_table.json",
+      "sha256": "493efe60628873af702df5afaae58c13996243d7bb9f657b55365d7262ecdcb4"
+    },
+    {
+      "label": "6_causal_lifecycle:rule_lifecycle_table.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/rule_lifecycle_table.json",
+      "sha256": "88f184f98f56ef3a6d62fe84eb66506b8a44620f980a27abf9a28cd4ddc686a6"
+    },
+    {
+      "label": "6_causal_lifecycle:stamp_assertion.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/stamp_assertion.json",
+      "sha256": "bf477db8a65cffc99967e7a2f8bd512e725726efbb0f82be20f8a56dd3d9d31d"
+    },
+    {
+      "label": "6_causal_lifecycle:legacy_lifecycle_auditors_not_applicable.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/legacy_lifecycle_auditors_not_applicable.json",
+      "sha256": "c7089592b82e78a13c39d466d53e2d85bda64478531dbb0e28fdfadc8159d767"
+    },
+    {
+      "label": "6_causal_lifecycle:BroadcastRuleRetired_PROPOSAL.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/proposals/BroadcastRuleRetired_PROPOSAL.json",
+      "sha256": "534d8f114857dd4beb6dd9c2558260741f073a87b78e14e15171181f7df344f4"
+    },
+    {
+      "label": "6_causal_lifecycle:test_m4_p2_causal_lifecycle.sh",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p2_causal_lifecycle.sh",
+      "sha256": "fb0b325c388ec165eed1013836fb4ca7f661f8dd27f3d4763163e690c2602ea7"
+    },
+    {
+      "label": "7_report_and_boundary:M4_P3_NORTHSTAR_RESULT.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P3_NORTHSTAR_RESULT.json",
+      "sha256": "6ab97dbf7f2defb33473cb428c5e699db8c4d8925aef0030fc91be0524c1cd26"
+    },
+    {
+      "label": "7_report_and_boundary:NORTHSTAR_REPORT.md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/NORTHSTAR_REPORT.md",
+      "sha256": "919dff5871f57ec135dcb5d810f5c2afca8413d8b9136e36056a4e2c54d3befc"
+    },
+    {
+      "label": "7_report_and_boundary:CLAIM_BOUNDARY.json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/CLAIM_BOUNDARY.json",
+      "sha256": "7192b99ca6d6494d27e755c48730b209a108b6ee80a848c063522f81eb03452f"
+    },
+    {
+      "label": "7_report_and_boundary:assemble_northstar_report.py",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/assemble_northstar_report.py",
+      "sha256": "9eae439517d61f30deeeec3e73e06bacd35fb4e6e14aac2cb32b917d3ae032f8"
+    },
+    {
+      "label": "7_report_and_boundary:test_m4_p3_northstar.sh",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p3_northstar.sh",
+      "sha256": "2d16bdad6df8c58c3ae72789dda5e086fa7de6b507470f5181df65576d809388"
+    }
+  ],
+  "gate_id": "M4.G",
+  "module": "M4",
+  "recorded_at_utc": "2026-07-03T17:05:00Z",
+  "required_artifacts": [
+    {
+      "id": 1,
+      "name": "1_adrs",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-001-hvpput-definition.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-002-cost-classes.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-003-failure-memory-causality.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-004-heldout-registry.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-005-honest-null-reporting.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-006-broadcast-rule-lifecycle.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M4-007-provider-receipt-binding.md"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 2,
+      "name": "2_freeze_predates_read",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_FREEZE_RECORD.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_METRIC_CORRECTION_RECORD.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/compute_hvpput.py",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/gen_registry.py",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/NORTHSTAR_REPORT.skeleton.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/CLAIM_BOUNDARY.template.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p1_freeze.sh"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 3,
+      "name": "3_registry_and_sweep",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/heldout_task_registry.v1.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/worker_visible_marker_sweep.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p1_real_inputs.sh"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 4,
+      "name": "4_input_digests",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/INPUT_DIGESTS.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/RECEIPT_BINDING_NOTE.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 5,
+      "name": "5_hvpput_report",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_REAL_INPUT_RESULT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/hvpput_report.v1.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/conservation_reconciliation.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/no_float_tokens.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/recompute_check.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 6,
+      "name": "6_causal_lifecycle",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P2_CAUSAL_LIFECYCLE_RESULT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/h2_consumption_note.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/dose_response.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/memory_cost.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/lineage_table.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/rule_lifecycle_table.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/stamp_assertion.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/legacy_lifecycle_auditors_not_applicable.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/proposals/BroadcastRuleRetired_PROPOSAL.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p2_causal_lifecycle.sh"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 7,
+      "name": "7_report_and_boundary",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P3_NORTHSTAR_RESULT.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/NORTHSTAR_REPORT.md",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/CLAIM_BOUNDARY.json",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/metric/assemble_northstar_report.py",
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/tests/test_m4_p3_northstar.sh"
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": 8,
+      "name": "8_tracker_update",
+      "paths": [
+        "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "schema": "turingos.m4_g_artifact_rollup.v1",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}

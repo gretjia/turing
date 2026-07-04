@@ -1,0 +1,114 @@
+{
+  "artifacts": [
+    {
+      "label": "frozen_analyzer_script",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/analyze_uplift.py",
+      "sha256": "8abd1b2c902bf100913e0c6e950988d2e06046607cb055f46d79de9e7d5462ec"
+    },
+    {
+      "label": "analysis_manifest",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/experiment_manifest.json",
+      "sha256": "eab7929ecd4a2e54795f23b4a82a6ae9e259b78f0e3de67f9a827a7062e4b02a"
+    },
+    {
+      "label": "analysis_input_derivation_record",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/ANALYSIS_INPUT_DERIVATION_RECORD.json",
+      "sha256": "f4e627bdf5d2df8c171d31e86db90815e133b274ef466ba584bdd0193ed8a695"
+    },
+    {
+      "label": "derived_arm_a_result",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armA/evaluation_results.json",
+      "sha256": "c58eee8d2f29788453f728e079b3747c2ae4e631a6e396889a6af74ed7114a76"
+    },
+    {
+      "label": "derived_arm_b_result",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armB/evaluation_results.json",
+      "sha256": "ce0cce30419542258aa010339f325a78b5608900abf99de3a67a69252f6b21a8"
+    },
+    {
+      "label": "derived_arm_c_result",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armC/evaluation_results.json",
+      "sha256": "8a88678b2a047621de6492cb7c521bdc4535828e058552685d67b251d5e01601"
+    },
+    {
+      "label": "uplift_report_json",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.json",
+      "sha256": "9a3862fa76381187cef83ffbbdaec5c777c739750e02b2d103f377763456c0c4"
+    },
+    {
+      "label": "uplift_report_md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.md",
+      "sha256": "f2aaaf935c3b2a3fec53d9ba37354754b9d1bb905a2800e3a4f7953db5932f72"
+    },
+    {
+      "label": "deviations_md",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/DEVIATIONS.md",
+      "sha256": "a5106fa37184f23af23108b22dca842c150386ab6861895147b4d7f82ffd09ca"
+    },
+    {
+      "label": "arm_a_official_upstream_swebench_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+      "sha256": "a9cdb57d7bdb77435b90b24f338a1813049a1e630548c6d17890638137a1f452"
+    },
+    {
+      "label": "arm_b_official_upstream_swebench_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+      "sha256": "85c3cfd9b23345538869fa68706dd13be92a2143b7b2126fab54088dd7d888cc"
+    },
+    {
+      "label": "arm_c_official_upstream_swebench_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+      "sha256": "dbd8b5324ef91893dfb4f6440106aa2bca6e17229bb76d5ddb188c04ae9c06d7"
+    }
+  ],
+  "claim_boundary": {
+    "absolute_rate_is_capability_claim": false,
+    "fixture_outputs_are_not_performance_evidence": false,
+    "full_score_claim_allowed": false,
+    "turingos_improves_workers_claim_allowed": false
+  },
+  "confirmatory_results": {
+    "H1_B_gt_A": {
+      "arm1_resolved": 14,
+      "arm2_resolved": 16,
+      "ci95_high": 0.16,
+      "ci95_low": -0.06,
+      "delta": 0.04,
+      "exact_mcnemar_two_sided_p": 0.7265625,
+      "holm_alpha": 0.025,
+      "holm_reject": false,
+      "positive_direction": true
+    },
+    "H2_B_gt_C": {
+      "arm1_resolved": 16,
+      "arm2_resolved": 16,
+      "blocked_by_h1": true,
+      "ci95_high": 0.1,
+      "ci95_low": -0.1,
+      "delta": 0.0,
+      "exact_mcnemar_two_sided_p": 1.0,
+      "holm_alpha": null,
+      "holm_reject": false,
+      "positive_direction": false
+    }
+  },
+  "mde_statement": "Pre-registered design is powered for large effects: one worker on 50 paired tasks has roughly 15-23 percentage point MDE depending on harm rate; pooling 2-3 workers targets roughly 6-14 percentage points before task-clustering inflation.",
+  "module_atom": "M3.P7",
+  "non_claims": [
+    "M3.P7 is addressed at implementer ceiling only.",
+    "No positive uplift/improvement claim is made.",
+    "No M3.G roll-up, external audit, release, ratification, M2 enablement, OG-10 signature, genesis signature, or constitution-byte change is claimed."
+  ],
+  "recorded_at_utc": "2026-07-03T15:20:00Z",
+  "result_interpretation": "Null measurement: H1 had positive direction but did not reject under alpha 0.025; H2 was blocked by H1 and had zero delta. The TuringOS-improves-workers claim is not allowed.",
+  "schema_id": "turingos.m3.p7.frozen_analysis_result.v1",
+  "scope": {
+    "analysis_label": "DeepSeek-only same-provider source-context loop measurement",
+    "analysis_root": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703",
+    "pairwise_exclusions": 0,
+    "script_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/analyze_uplift.py",
+    "script_was_modified_for_real_analysis": false
+  },
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}

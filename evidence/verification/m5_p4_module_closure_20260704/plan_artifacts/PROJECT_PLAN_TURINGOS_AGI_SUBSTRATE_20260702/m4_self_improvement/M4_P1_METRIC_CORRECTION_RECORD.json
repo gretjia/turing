@@ -1,0 +1,26 @@
+{
+  "corrected_artifacts": [
+    {
+      "path": "metric/compute_hvpput.py",
+      "previous_sha256": "sha256:1ed79135db5b740e80401c80ef0a7d48cf3db3930eded27147abe8f346d95fb0",
+      "sha256": "sha256:0f0e17ca298afca8df64ab8264a3e2fd9a8e568366fe957783ead2e9378ab967"
+    }
+  ],
+  "correction_class": "DETERMINISTIC_COSTEVENT_V2_SEMANTIC_FIX",
+  "correction_reason": "aggregate_ceiling_costevent_v2_recompute",
+  "m3_output_read_status": "M3 receipt shapes had been inspected before this correction. The change uses no solved/unresolved outcome values and only aligns M4 read-side recomputation with the existing M3 CostEvent.v2 producer semantics: one ceiling over the aggregate token-price numerator.",
+  "module_atom": "M4.P1-2/M4.P1-5",
+  "non_claims": [
+    "This record does not claim the original freeze bytes were unchanged.",
+    "This record does not claim M4.P1 is externally verified.",
+    "This record does not permit a failure-memory efficacy claim."
+  ],
+  "original_freeze_record_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_FREEZE_RECORD.json",
+  "recorded_at_utc": "2026-07-03T16:10:00Z",
+  "regression_tests": [
+    "m4_self_improvement/tests/test_m4_p1_freeze.sh::aggregate_ceiling",
+    "m4_self_improvement/tests/test_m4_p1_real_inputs.sh"
+  ],
+  "schema_id": "m4.p1.metric_correction_record.v1",
+  "status_ceiling": "ADDRESSED"
+}
