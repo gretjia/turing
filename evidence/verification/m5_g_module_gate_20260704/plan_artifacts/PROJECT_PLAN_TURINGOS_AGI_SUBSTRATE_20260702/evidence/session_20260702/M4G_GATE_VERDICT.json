@@ -1,0 +1,88 @@
+{
+  "alignment_verify": "GREEN",
+  "auditor_session_distinct_from_implementer": false,
+  "checklist_results": [
+    {
+      "answer": "Serves G5: H-VPPUT is computed on held-out S01 tasks with billing-complete cost, M3 H2 is consumed verbatim, and worker-visible metric leakage is checked.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M4_self_improvement.md",
+      "q": 1,
+      "question": "Does the deliverable serve one of G1-G7? Which KPI, exactly?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. The roll-up is analysis-only, changes no constitution bytes, uses no genesis/OG-10 signature, claims no external verification, and leaves M2 enablement unchanged.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+      "q": 2,
+      "question": "Does it violate any red line in Intent section 5?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. The roll-up indexes every required M4.G artifact group by openable path, with digests for all non-tracker file artifacts.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M4G_ARTIFACT_ROLLUP.json",
+      "q": 3,
+      "question": "Is every claim backed by an artifact path an independent agent can open?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. Real evidence is limited to M3 S01 harness outputs and provider receipts; fixture-only metric tests remain fixture tests.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P1_REAL_INPUT_RESULT.json",
+      "q": 4,
+      "question": "Is anything labeled real that is a fixture? Is anything unlabeled?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. This gate assembles MODULE_M4 section 3 artifacts, reruns focused section 4 checks, and prepares the M5.P4 hand-off packet without running external closure.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M4_self_improvement.md",
+      "q": 5,
+      "question": "Did scope grow beyond the Atom/Phase spec? If yes, cite the decision.",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. The tracker rows, M4 result manifests, and roll-up paths identify all inputs and checks needed for replay; M5.P4 remains queued until an owner-provided auditor channel exists.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "q": 6,
+      "question": "Can the work be replayed or resumed by a fresh agent from tracker plus tape alone?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. M4.G is implementer ADDRESSED only; external verification requires a later M5.P4 custody-separated ClosureCertificate or FAIL artifact.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/CLAIM_BOUNDARY.json",
+      "q": 7,
+      "question": "Does the status honor the ADDRESSED ceiling?",
+      "verdict": "PASS"
+    }
+  ],
+  "closure_queue": {
+    "handoff_packet": {
+      "label": "m5_p4_handoff_packet",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M4G_M5_P4_HANDOFF_PACKET.json",
+      "sha256": "330bdcfcb285d98f03d1e2691ff00d6acff111728ae24bf273cfba67b92e7ccc"
+    },
+    "m5_p4_queue_status": "BLOCKED_ON_OWNER_AUDITOR_CHANNEL",
+    "owner_channel_decision_log_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+    "unblock": "Owner records a custody-separated external/cross-family auditor channel for M5.P4."
+  },
+  "evidence": [
+    {
+      "label": "artifact_rollup",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M4G_ARTIFACT_ROLLUP.json",
+      "sha256": "b343d40c88aec948292332ac12ee1f792b27d7b91f0ecd35ca28becca98237da"
+    },
+    {
+      "label": "drift_checklist",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M4G_DRIFT_CHECKLIST.md",
+      "sha256": "0283af6c8d2e58c95accc5401f47d44df165fac7dc68ea6d92bf79e0937d4cc4"
+    },
+    {
+      "label": "m5_p4_handoff_packet",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M4G_M5_P4_HANDOFF_PACKET.json",
+      "sha256": "330bdcfcb285d98f03d1e2691ff00d6acff111728ae24bf273cfba67b92e7ccc"
+    }
+  ],
+  "gate_id": "M4.G",
+  "module": "M4",
+  "produced": "2026-07-03T17:05:00Z",
+  "schema": "GateVerdict.v1",
+  "status": "ADDRESSED",
+  "status_ceiling_note": "implementer ceiling ADDRESSED; no external verification without M5.P4 certificate-or-FAIL artifact"
+}

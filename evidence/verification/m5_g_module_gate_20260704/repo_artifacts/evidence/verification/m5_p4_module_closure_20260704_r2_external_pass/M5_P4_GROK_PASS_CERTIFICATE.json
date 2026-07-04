@@ -1,0 +1,112 @@
+{
+  "schema_id": "turingos.closure_certificate.v1",
+  "subject": {
+    "gate_id": "M5.P4",
+    "module_targets": [
+      "M3.G",
+      "M4.G"
+    ],
+    "repo_url": "https://github.com/gretjia/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit_sha": "1b54ca40820294e56fb4218946531633cf180745",
+    "packet_root": "evidence/verification/m5_p4_module_closure_20260704_r2",
+    "repair_of_packet_root": "evidence/verification/m5_p4_module_closure_20260704",
+    "prior_audit_certificate": "evidence/verification/m5_p4_module_closure_20260704_r2/prior_audit/M5_P4_GROK_FAIL_CERTIFICATE.json"
+  },
+  "verifier": {
+    "kind": "external_cross_family_model",
+    "identity": "grok-cursor-external-auditor",
+    "custody": {
+      "fresh_clone": true,
+      "no_shared_conversation_state": true,
+      "no_implementer_transcript": true,
+      "own_credentials": true,
+      "cross_family_or_human": true,
+      "own_custody_output": true
+    }
+  },
+  "status_semantics": {
+    "certified_closure_level": "EXTERNALLY_VERIFIED",
+    "certified_for_module_targets": [
+      "M3.G",
+      "M4.G"
+    ],
+    "implementer_ceiling_was": "ADDRESSED",
+    "does_not_grant": [
+      "SHIPPED",
+      "RELEASED",
+      "RATIFIED",
+      "M2 enablement",
+      "release eligibility",
+      "OG-10/genesis signature",
+      "constitution-byte change"
+    ]
+  },
+  "verification": {
+    "commands_run": [
+      {
+        "command": "rm -rf /tmp/turing-m5p4-r2-audit && git clone https://github.com/gretjia/turing.git /tmp/turing-m5p4-r2-audit",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p4-r2-audit && git checkout 1b54ca40820294e56fb4218946531633cf180745",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p4-r2-audit/evidence/verification/m5_p4_module_closure_20260704_r2 && sha256sum -c PACKET_MANIFEST.sha256",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p4-r2-audit/evidence/verification/m5_p4_module_closure_20260704_r2 && bash packet_checks/run_m3_analysis_recheck.sh",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p4-r2-audit/evidence/verification/m5_p4_module_closure_20260704_r2 && bash packet_checks/run_m4_p3_northstar_check.sh",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 independent verify SOURCE_MAP.json (89 entries) and REPO_ARTIFACTS.json (7 entries)",
+        "exit_code": 0
+      }
+    ],
+    "digest_manifest_result": "PASS",
+    "gate_predicate_result": "PASS",
+    "prior_fail_repair": {
+      "prior_commit_sha": "713ca849f80874e4540fe88d4874bca625a579c0",
+      "prior_verdict": "FAIL",
+      "reason_codes_closed": [
+        {
+          "code": "M3_MISSING_ANALYSIS_REEXECUTION_INPUTS",
+          "closed": true,
+          "evidence": "Five derived analysis inputs now in SOURCE_MAP; run_m3_analysis_recheck.sh recomputes UPLIFT_REPORT.json with semantic equality to the published report sha256 9a3862fa76381187cef83ffbbdaec5c777c739750e02b2d103f377763456c0c4 after source_root normalization"
+        },
+        {
+          "code": "M4_MISSING_P3_ARTIFACT_MANIFEST",
+          "closed": true,
+          "evidence": "M4_P3_NORTHSTAR_ARTIFACTS.sha256 now in SOURCE_MAP; run_m4_p3_northstar_check.sh passes with SOURCE_MAP digest cross-check"
+        }
+      ]
+    },
+    "module_assessments": {
+      "M3.G": {
+        "status_supported": "ADDRESSED at implementer ceiling; null measurement with holm_reject=false",
+        "drift_check_pass_count": 7,
+        "independent_recompute": "PASS via packet_checks/run_m3_analysis_recheck.sh",
+        "overclaims_detected": false
+      },
+      "M4.G": {
+        "status_supported": "ADDRESSED at implementer ceiling; failure_memory_causal_claim_allowed=false",
+        "drift_check_pass_count": 7,
+        "section_4_eval_rerun": "PASS via packet_checks/run_m4_p3_northstar_check.sh",
+        "overclaims_detected": false
+      }
+    }
+  },
+  "findings": {
+    "digest_integrity": "PACKET_MANIFEST.sha256 all OK. SOURCE_MAP 89/89 and REPO_ARTIFACTS 7/7 sha256 values match on-disk files at pinned commit.",
+    "status_ceiling": "M3G/M4G gate verdicts, rollups, handoff packets, UPLIFT_REPORT.json, and CLAIM_BOUNDARY.json honor ADDRESSED implementer ceiling. No improper authority overclaims in target artifacts.",
+    "measurement_consistency": "M3 frozen-script recomputation from in-packet derived scoring inputs reproduces published UPLIFT_REPORT.json modulo source_root normalization. M4 northstar report, claim boundary, and artifact manifest conform to skeleton and forbidden-claim rules."
+  },
+  "verdict": "PASS",
+  "issued_at_utc": "2026-07-04T00:00:00Z"
+}

@@ -1,0 +1,89 @@
+{
+  "alignment_verify": "GREEN",
+  "checklist_results": [
+    {
+      "answer": "Serves G6: independent verification and release machinery have a custody-separated exact-SHA PASS, negative controls, and release blocking.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M5_independent_verification.md",
+      "q": 1,
+      "question": "Does the deliverable serve one of G1-G7? Which KPI, exactly?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. The roll-up does not change constitution bytes, does not provide genesis/OG-10 signature, and does not enable M2.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+      "q": 2,
+      "question": "Does it violate any red line in Intent section 5?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. M5G_ARTIFACT_ROLLUP.json digest-binds every non-tracker source artifact.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5G_ARTIFACT_ROLLUP.json",
+      "q": 3,
+      "question": "Is every claim backed by an artifact path an independent agent can open?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. Fixture corpora remain explicitly fixture-labeled; external certificates remain owner-provided external audit mirrors.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704_external_pass/M5_P3_GROK_PASS_CERTIFICATE.json",
+      "q": 4,
+      "question": "Is anything labeled real that is a fixture? Is anything unlabeled?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. This assembles MODULE_M5 section 3 artifacts and does not run new module-closure jobs.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M5_independent_verification.md",
+      "q": 5,
+      "question": "Did scope grow beyond the Atom/Phase spec? If yes, cite the decision.",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. The tracker and roll-up paths identify every input, digest, and external certificate mirror needed for replay.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "q": 6,
+      "question": "Can the work be replayed or resumed by a fresh agent from tracker plus tape alone?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. The gate verdict remains ADDRESSED and explicitly says M5.G is not externally verified.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p4_module_closure_20260704_r2_external_pass/M5_P4_GROK_PASS_CERTIFICATE.json",
+      "q": 7,
+      "question": "Does the status honor the ADDRESSED ceiling?",
+      "verdict": "PASS"
+    }
+  ],
+  "evidence": [
+    {
+      "label": "artifact_rollup",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5G_ARTIFACT_ROLLUP.json",
+      "sha256": "3d9adb750b765778f4f04828457b91fbab619eb3e2991dbd53a13ff2ab7be5e6"
+    },
+    {
+      "label": "drift_checklist",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5G_DRIFT_CHECKLIST.md",
+      "sha256": "560e7636b3601f5b5a9ba4ea19d203162bd576560401d11dbe23c8df1326cad7"
+    },
+    {
+      "label": "external_handoff_packet",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5G_EXTERNAL_HANDOFF_PACKET.json",
+      "sha256": "b784fc45f119ca2e41d6aa2d38bdc2acd05ad3dff7accb04805058680be1baf4"
+    }
+  ],
+  "external_pass_artifact": {
+    "gate_id": "M5.P3",
+    "path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704_external_pass/M5_P3_GROK_PASS_CERTIFICATE.json",
+    "sha256": "8be75cf0f62c217bc9dd8eccbdc0b0f1e1337ee98e88c04e8fda60edf232e7cf",
+    "verifier_identity": "grok-cursor-external-auditor",
+    "verifier_kind": "external_cross_family_model"
+  },
+  "gate_id": "M5.G",
+  "module": "M5",
+  "non_claims": [
+    "M5.G is not externally verified",
+    "No SHIPPED, RELEASED, RATIFIED, M2 enablement, release eligibility, FCE.RUN, OG-10/genesis signature, or constitution-byte change is claimed.",
+    "P4 queue jobs for M1.G, M2.TC5/G, and M6.G remain pending."
+  ],
+  "produced": "2026-07-04T03:35:00Z",
+  "schema": "GateVerdict.v1",
+  "status": "ADDRESSED",
+  "status_ceiling_note": "implementer ceiling ADDRESSED; external verification for M5.G itself requires a later custody-separated exact-SHA audit"
+}

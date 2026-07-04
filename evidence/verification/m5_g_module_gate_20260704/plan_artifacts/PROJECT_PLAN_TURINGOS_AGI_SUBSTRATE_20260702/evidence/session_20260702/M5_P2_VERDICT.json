@@ -1,0 +1,96 @@
+{
+  "schema": "turingos.m5_p2_verdict.v1",
+  "module": "M5",
+  "phase": "M5.P2",
+  "date": "2026-07-03",
+  "verdict": "PASS",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "requirements": {
+    "auditor_runbook_present": true,
+    "six_custody_booleans_documented": [
+      "fresh_clone",
+      "no_shared_conversation_state",
+      "no_implementer_transcript",
+      "own_credentials",
+      "cross_family_or_human",
+      "own_custody_output"
+    ],
+    "base_fixture_dry_run": {
+      "verdict": "PASS",
+      "reason": "certificate_handoff_reached",
+      "out_of_packet_inputs_required": false
+    },
+    "negative_control_corpus": {
+      "evidence_class": "FIXTURE",
+      "packets": [
+        "NC-1",
+        "NC-2",
+        "NC-3",
+        "NC-4",
+        "NC-5"
+      ],
+      "corpus_pins_sha256sum": "PASS",
+      "pin_entries_ok": 72
+    },
+    "negative_control_calibration": {
+      "result": "PASS",
+      "failed_controls": 5,
+      "total_controls": 5,
+      "machine_readable_reasons": {
+        "NC-1": "manifest_digest_mismatch",
+        "NC-2": "recomputed_verdict_contradiction",
+        "NC-3": "fixture_mislabeled_real",
+        "NC-4": "missing_declared_artifact",
+        "NC-5": "repo_sha_mismatch"
+      }
+    },
+    "fresh_context_verifier": "PASS"
+  },
+  "evidence": [
+    {
+      "name": "M5_P2_ARTIFACT_MANIFEST",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P2_ARTIFACT_MANIFEST.sha256"
+    },
+    {
+      "name": "AUDITOR_RUNBOOK",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m5_verification/AUDITOR_RUNBOOK.md",
+      "sha256": "178f466bfcbc9f6a0ecf6ede713ad2c198bc2cdfee21c4a1b509f450c029bad4"
+    },
+    {
+      "name": "negative control corpus pins",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m5_verification/corpus/negative_controls/corpus_pins.sha256",
+      "sha256": "23f1acdb20ebf8b5f10a9c35ca5135334fb44873168871c5c98620c92a247ca2"
+    },
+    {
+      "name": "runbook dry-run transcript",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P2_RUNBOOK_DRYRUN_TRANSCRIPT.txt",
+      "sha256": "58bf4203239d0f9171cf09fa93dfe1955b9795f5e297b8b76c98e65fb2368711"
+    },
+    {
+      "name": "negative-control calibration transcript",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P2_NEGATIVE_CONTROL_CALIBRATION_TRANSCRIPT.txt",
+      "sha256": "9bdbbeffbf9fc035fe7caa92993240c8ee54437967d83cdcc8412a026000eff6"
+    },
+    {
+      "name": "fresh-context verifier",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P2_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "9f1490c266944412adb512fb9d1d3051e49c93a08ad062bc217780bf6a507879"
+    }
+  ],
+  "non_claims": {
+    "external_custody_certificate_issued": false,
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "m2_enabled": false,
+    "final_certification": false
+  },
+  "next_unblocked_phase": "M5.P5",
+  "owner_blocked_phases": [
+    "M5.P3",
+    "M5.P4"
+  ]
+}

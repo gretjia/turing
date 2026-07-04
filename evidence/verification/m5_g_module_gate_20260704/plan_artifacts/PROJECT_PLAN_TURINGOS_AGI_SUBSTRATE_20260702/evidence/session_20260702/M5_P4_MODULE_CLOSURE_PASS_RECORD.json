@@ -1,0 +1,64 @@
+{
+  "schema_id": "turingos.m5.p4.module_closure_pass_record.v1",
+  "evidence_class": "EXTERNAL_CUSTODY_SEPARATED_AUDIT_MIRROR",
+  "recorded_at_utc": "2026-07-04T00:00:00Z",
+  "gate_id": "M5.P4",
+  "module_targets": [
+    "M3.G",
+    "M4.G"
+  ],
+  "status_effect": {
+    "M3.G": "EXTERNALLY_VERIFIED",
+    "M4.G": "EXTERNALLY_VERIFIED",
+    "M5.P4": "IN_PROGRESS_STANDING_QUEUE"
+  },
+  "repository": {
+    "url": "https://github.com/gretjia/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "audited_commit_sha": "1b54ca40820294e56fb4218946531633cf180745",
+    "certificate_mirror_commit_sha": "84a4c5319b0e46917d2333df6033781d3939a23d"
+  },
+  "packet": {
+    "root": "evidence/verification/m5_p4_module_closure_20260704_r2",
+    "repair_of_packet_root": "evidence/verification/m5_p4_module_closure_20260704",
+    "prior_fail_certificate": "evidence/verification/m5_p4_module_closure_20260704_r2/prior_audit/M5_P4_GROK_FAIL_CERTIFICATE.json"
+  },
+  "external_certificate": {
+    "repo_path": "evidence/verification/m5_p4_module_closure_20260704_r2_external_pass/M5_P4_GROK_PASS_CERTIFICATE.json",
+    "absolute_path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p4_module_closure_20260704_r2_external_pass/M5_P4_GROK_PASS_CERTIFICATE.json",
+    "sha256": "00d9c6a7594fafe1b4c38046110046aed3dc8337b68e62606c40584498896a4f",
+    "verdict": "PASS",
+    "verifier": {
+      "kind": "external_cross_family_model",
+      "identity": "grok-cursor-external-auditor"
+    },
+    "custody_booleans_all_true": true
+  },
+  "checks_reported_by_verifier": {
+    "fresh_clone": true,
+    "packet_manifest": "PASS",
+    "source_map_entries": 89,
+    "repo_artifact_entries": 7,
+    "m3_packet_recheck": "PASS",
+    "m4_packet_recheck": "PASS",
+    "gate_predicate_result": "PASS",
+    "prior_fail_findings_closed": [
+      "M3_MISSING_ANALYSIS_REEXECUTION_INPUTS",
+      "M4_MISSING_P3_ARTIFACT_MANIFEST"
+    ]
+  },
+  "does_not_grant": [
+    "SHIPPED",
+    "RELEASED",
+    "RATIFIED",
+    "M2 enablement",
+    "release eligibility",
+    "OG-10/genesis signature",
+    "constitution-byte change",
+    "FCE.RUN",
+    "M5.P3",
+    "M1.G closure",
+    "M2.TC5/G closure",
+    "M6.G closure"
+  ]
+}

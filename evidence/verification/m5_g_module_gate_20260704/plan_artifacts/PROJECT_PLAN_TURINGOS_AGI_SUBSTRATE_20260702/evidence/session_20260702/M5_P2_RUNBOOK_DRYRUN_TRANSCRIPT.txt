@@ -1,0 +1,9 @@
+$ python3 m5_verification/tools/audit_packet_fixture.py m5_verification/corpus/negative_controls/base_fixture_packet
+{
+  "details": {
+    "gate_id": "M5.P2.FIXTURE"
+  },
+  "reason": "certificate_handoff_reached",
+  "schema": "turingos.m5_p2.fixture_audit.v1",
+  "verdict": "PASS"
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "turingos.m5_p3.first_audit_pass_record.v1",
+  "module": "M5",
+  "phase": "M5.P3",
+  "recorded_at_utc": "2026-07-04T00:00:00Z",
+  "status_after_record": {
+    "M5.P3": "EXTERNALLY_VERIFIED",
+    "M5.G": "PLANNED"
+  },
+  "certificate": {
+    "path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704_external_pass/M5_P3_GROK_PASS_CERTIFICATE.json",
+    "sha256": "8be75cf0f62c217bc9dd8eccbdc0b0f1e1337ee98e88c04e8fda60edf232e7cf",
+    "schema_id": "turingos.closure_certificate.v1",
+    "verdict": "PASS",
+    "certified_closure_level": "EXTERNALLY_VERIFIED",
+    "certified_for_gate": "M5.P3"
+  },
+  "repo": {
+    "url": "https://github.com/gretjia/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "audited_commit": "5383e6919590d84fafc46b07e52af1c282dfdc75",
+    "mirror_commit": "072673ad38734f7e2b33ac7198ae6438b669abe4",
+    "packet_root": "evidence/verification/m5_p3_first_external_audit_20260704",
+    "certificate_mirror_root": "evidence/verification/m5_p3_first_external_audit_20260704_external_pass"
+  },
+  "packet": {
+    "packet_sha256": "sha256:6442d1e1773b3f4385e75767c22dfff6469984dbf0ceff2a90f7c56a99b0618c",
+    "packet_repo_sha_pin": "84a4c5319b0e46917d2333df6033781d3939a23d",
+    "packet_manifest_sha256": "fc3fa098d8aa881d562ad075ada7760add5fedd9b7715c6596867cf3170faade",
+    "digest_manifest_sha256": "239ac55218ffcf88589581dcf3366e4db23cfcf6890b56c65d0b43358870270b"
+  },
+  "verifier": {
+    "kind": "external_cross_family_model",
+    "identity": "grok-cursor-external-auditor",
+    "custody": {
+      "fresh_clone": true,
+      "no_shared_conversation_state": true,
+      "no_implementer_transcript": true,
+      "own_credentials": true,
+      "cross_family_or_human": true,
+      "own_custody_output": true
+    }
+  },
+  "tier_observation": {
+    "spec_note": "ADR-M5-002 states tier E1 external_human_operator is required for the first external audit.",
+    "owner_channel_recorded": "Owner supplied an owner-commissioned external_cross_family_model audit result for M5.P3 and explicitly noted custody boolean cross_family_or_human is true.",
+    "recording_disposition": "Record as owner-provided custody-separated external verifier artifact for M5.P3, with the tier observation preserved in certificate findings and tracker notes."
+  },
+  "verification": {
+    "commands_exit_0": [
+      "git clone https://github.com/gretjia/turing.git /tmp/turing-m5p3-audit",
+      "git checkout 5383e6919590d84fafc46b07e52af1c282dfdc75",
+      "sha256sum -c MANIFEST.sha256",
+      "bash tools/release/build_packet.sh --validate evidence/verification/m5_p3_first_external_audit_20260704",
+      "python3 tools/bench/audit_official_harness_qualification.py --root evidence/verification/m5_p3_first_external_audit_20260704/evidence --out /tmp/m5p3_fresh_official_harness_audit.json"
+    ],
+    "digest_manifest_result": "PASS",
+    "gate_predicate_result": "PASS",
+    "full_docker_replay": "NOT_RUN",
+    "computed_before_historical_prompt": true
+  },
+  "does_not_grant": [
+    "SHIPPED",
+    "RELEASED",
+    "RATIFIED",
+    "M2 enablement",
+    "release eligibility",
+    "OG-10/genesis signature",
+    "constitution-byte change",
+    "full SWE-bench score claim",
+    "leaderboard equivalence claim",
+    "FCE.RUN",
+    "M5.G"
+  ],
+  "next_required_work": [
+    "Run M5.G roll-up only after updating tracker and verifying M5 ship-gate artifacts.",
+    "Process remaining M5.P4 queue jobs for M1.G, M2.TC5/G, and future M6.G.",
+    "Complete M6 owner route decision and M6 module work before FCE.ENTRY.",
+    "Run FCE.ENTRY and FCE.RUN with their own required external audit path."
+  ]
+}
