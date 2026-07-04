@@ -19,6 +19,13 @@ pub enum AttestorKind {
     Simulated,
     Tpm,
     Tee,
+    /// Real TPM 2.0 hardware reached via `/dev/tpmrm0` (HW-SW-011). This
+    /// vTPM is hypervisor-backed, not silicon-rooted — `Vtpm` never implies
+    /// a manufacturer EK certificate chain.
+    Vtpm,
+    /// A user-space `swtpm` simulator instance (HW-SW-010/011): real
+    /// TPM2_Quote semantics, no hardware root of trust whatsoever.
+    TpmSimulator,
 }
 
 /// A quote produced by an [`Attestor`]: the qualifying data it was bound to

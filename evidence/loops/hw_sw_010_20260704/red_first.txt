@@ -1,0 +1,68 @@
+# HW-SW-010..013 red-first evidence
+#
+# State captured: `crates/turing-attest/src/tpm.rs` is still the exact
+# Phase-3 stub (unit struct `TpmAttestor`, `kind() -> AttestorKind::Tpm`,
+# `quote()` always `Err(AttestError::NotYetImplemented { phase: "phase04" })`).
+# `crates/turing-attest/src/lib.rs` already carries the additive
+# `AttestorKind::{Vtpm, TpmSimulator}` variants (harmless/backward-compatible
+# on its own). New test files (`tests/tpm.rs`, `tests/divergence.rs`,
+# `tests/common/mod.rs`) and the updated `tests/attestor.rs` already target
+# the FINAL API shape (`TpmAttestor::simulator(..)`, `::device(..)`,
+# `TpmError`, `.quote()`/`.verify()`/`.read_pcrs()`) that HW-SW-011 will add.
+# `scripts/attest-tpm.sh` exists only as a mode-dispatch skeleton; every
+# mode body is `echo TODO; exit 1`.
+#
+# Command 1: cargo test -p turing-attest --no-fail-fast
+# Cargo.lock diff: EMPTY (checked via `git diff Cargo.lock` immediately
+# after this run — zero new deps; sha2/hex/toml-family packages visible in
+# the build log are turing-contracts's/Phase-3's pre-existing dependencies,
+# not anything added this phase).
+
+   Compiling turing-attest v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-010/crates/turing-attest)
+error[E0432]: unresolved import `turing_attest::tpm::TpmError`
+ --> crates/turing-attest/tests/tpm.rs:8:39
+  |
+8 | use turing_attest::tpm::{TpmAttestor, TpmError};
+  |                                       ^^^^^^^^ no `TpmError` in `tpm`
+
+error[E0599]: no associated function or constant named `simulator` found for struct `TpmAttestor` in the current scope
+  --> crates/turing-attest/tests/attestor.rs:47:28
+   |
+47 |     let sim = TpmAttestor::simulator("swtpm:host=localhost,port=0");
+   |                            ^^^^^^^^^ associated function or constant not found in `TpmAttestor`
+
+error[E0599]: no associated function or constant named `device` found for struct `TpmAttestor` in the current scope
+  --> crates/turing-attest/tests/attestor.rs:51:29
+   |
+51 |     let real = TpmAttestor::device("/dev/tpmrm0");
+   |                             ^^^^^^ associated function or constant not found in `TpmAttestor`
+
+error[E0599]: no associated function or constant named `simulator` found for struct `TpmAttestor` in the current scope
+  --> crates/turing-attest/tests/tpm.rs:21:33
+   |
+21 |     let attestor = TpmAttestor::simulator(guard.tcti());
+   |                                 ^^^^^^^^^ associated function or constant not found in `TpmAttestor`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `turing-attest` (test "attestor") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error[E0599]: no associated function or constant named `simulator` found for struct `TpmAttestor` in the current scope
+  --> crates/turing-attest/tests/tpm.rs:68:33
+   |
+68 |     let attestor = TpmAttestor::simulator(guard.tcti());
+   |                                 ^^^^^^^^^ associated function or constant not found in `TpmAttestor`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `turing-attest` (test "tpm") due to 3 previous errors
+
+# exit=101 (cargo test compile failure — expected red)
+
+# Command 2: ./scripts/attest-tpm.sh --simulator
+
+TODO: HW-SW-010 not yet implemented
+# exit=1 (expected red — skeleton, no implementation yet)
+
+# Never squashed: this red state and its two failure captures above are
+# preserved verbatim in this file; HW-SW-010/011/012/013 turn each red into
+# green atom-by-atom (separate commits), not by rewriting this evidence.
