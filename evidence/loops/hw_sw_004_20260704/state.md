@@ -36,5 +36,15 @@ Ceiling: ADDRESSED (pending sovereign accept).
   --test prop_approval_byte_surfaces run; script exit 0.
 - B3: git diff 4cedcdb -- Cargo.lock EMPTY (zero-dep discipline held).
 
-## Checkpoint 3 — HW-SW-006 : PENDING
+## Checkpoint 3 — HW-SW-006 : DONE
+- Cargo.toml: [features] yubikey = [] (empty, no deps).
+- src/yubikey.rs behind #[cfg(feature="yubikey")]: YubiKeySigningBackend impl
+  SigningBackend; route()=HardwareFuture; supported_algorithms()=[Ed25519,EcdsaP256];
+  sign/authority_key_record/verify all Err(HardwareBackendUnavailable), never panic.
+  Feature-gated tests: unavailable path; negotiate(HardwareFuture,EcdsaP256,&yubikey)=Ok;
+  negotiate(_,EcdsaP256,&InMemoryTest)=Err (no silent swap).
+- lib.rs additive: #[cfg(feature="yubikey")] pub mod yubikey; (diff 31 add, 0 del).
+- C3: default suite green; --features yubikey +3 tests green; build --features
+  yubikey green. Cargo.lock zero-diff.
+
 ## REPIN + PHASE GATE : PENDING

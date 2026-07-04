@@ -22,6 +22,9 @@ use std::os::unix::fs::PermissionsExt;
 mod route_negotiation;
 pub use route_negotiation::{negotiate, NegotiatedRoute, SignatureAlgorithm};
 
+#[cfg(feature = "yubikey")]
+pub mod yubikey;
+
 pub const APPROVAL_PAYLOAD_SCHEMA_ID: &str = "approval_payload.v2";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
