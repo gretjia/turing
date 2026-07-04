@@ -69,6 +69,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results, write_evidence_labels  # noqa: E402
 
 CERT_SHARD = "S02"
 # Same pilot-exclusion rule as FCE-S1/FCE-S4 (PREREGISTRATION.md: S02-W00 is
@@ -257,7 +259,7 @@ def resolve_daemon_bin_dir(repo: Path, scenario_root: Path) -> dict[str, Any]:
         name="cargo_build_workspace",
         argv=["cargo", "build", "--workspace"],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=1800,
     )
     if build_command["exit_code"] != 0:
@@ -337,7 +339,7 @@ def materialize_single_task(repo: Path, scenario_root: Path, selection: dict[str
             str(dataset_arrow),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report_path = (
@@ -409,7 +411,7 @@ def run_real_loop(
         name="run_mini_swe_bench_substrate_smoke",
         argv=argv,
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         env=env,
         timeout=600,
     )
@@ -725,6 +727,23 @@ def main() -> int:
         criteria = [
             {"criterion": "deepseek_api_key_present", "result": False, "evidence": f"{scenario_id}/deepseek_api_key_provenance.json"}
         ]
+        write_command_results(scenario_root, scenario_id, commands)
+        write_evidence_labels(
+            scenario_root,
+            scenario_id=scenario_id,
+            title="FCE-S5 Console Truthfulness and No-Write Proof",
+            evidence_class="REAL",
+            summary_lines=[
+                "This run did not execute: NOT_RUN.",
+                f"Reason: missing {DEEPSEEK_API_KEY_ENV}: not in environment and not found in {SECRETS_ENV_PATH}",
+            ],
+            claims=["FCE-S5 did not run to completion; see not_run_reason in the verdict JSON."],
+            non_claims=[
+                "no console no-write claim of any kind on this NOT_RUN path",
+                "not a release decision",
+                "not SHIPPED",
+            ],
+        )
         verdict = build_verdict(
             root=root,
             scenario_id=scenario_id,
@@ -785,7 +804,7 @@ def main() -> int:
             name="m1a_gates",
             argv=["bash", "tools/ci/run_m1a_gates.sh"],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=300,
         )
         commands.append(m1a_command)
@@ -801,22 +820,25 @@ def main() -> int:
             name="console_status_json",
             argv=[str(turing_bin), "status", "--micro-git", repo_arg, "--json"],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=60,
         )
         commands.append(snapshot_command)
-        snapshot_path = console_dir / "operator_snapshot.json"
-        snapshot_path.write_text(snapshot_command["stdout_text"], encoding="utf-8")
+        # Reuse the run_command-produced stdout files directly (already
+        # classifiable by FCE-R3 via command_results.json) instead of
+        # duplicating their content into separately-named files, which would
+        # otherwise be unclassified zero-byte files if a command's stdout
+        # were ever empty.
+        snapshot_path = scenario_root / snapshot_command["stdout"]
         text_command = run_command(
             name="console_status_text",
             argv=[str(turing_bin), "status", "--micro-git", repo_arg],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=60,
         )
         commands.append(text_command)
-        text_path = console_dir / "operator_status.txt"
-        text_path.write_text(text_command["stdout_text"], encoding="utf-8")
+        text_path = scenario_root / text_command["stdout"]
 
         integrity_command = run_command(
             name="projection_integrity_audit",
@@ -837,7 +859,7 @@ def main() -> int:
                 str(integrity_verdict_path),
             ],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=120,
         )
         commands.append(integrity_command)
@@ -861,7 +883,7 @@ def main() -> int:
             name="console_help_commands",
             argv=[str(turing_bin), "help", "commands"],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=30,
         )
         commands.append(help_commands_command)
@@ -874,7 +896,7 @@ def main() -> int:
         matrix = build_console_command_matrix(repo_arg, bundle_arg, event_id)
         writable_heads_before = read_heads(micro_git)
         writable_tree_before = tree_manifest_sha256(micro_git)
-        writable_results = run_console_matrix(turing_bin, matrix, scenario_root / "commands" / "writable_matrix", "writable")
+        writable_results = run_console_matrix(turing_bin, matrix, scenario_root, "writable")
         for result in writable_results:
             commands.append(result["command"])
         writable_heads_after = read_heads(micro_git)
@@ -920,7 +942,7 @@ def main() -> int:
             chmod_recursive(readonly_scratch, writable=False)
             readonly_matrix = build_console_command_matrix(str(readonly_micro_git), str(readonly_bundle), event_id)
             readonly_results = run_console_matrix(
-                turing_bin, readonly_matrix, scenario_root / "commands" / "readonly_matrix", "readonly"
+                turing_bin, readonly_matrix, scenario_root, "readonly"
             )
             for result in readonly_results:
                 commands.append(result["command"])
@@ -995,7 +1017,9 @@ def main() -> int:
         {
             "criterion": "console_points_at_real_tape_not_demo_fixture",
             "result": tape_is_real_snapshot,
-            "evidence": rel(root, scenario_root / "console" / "operator_snapshot.json"),
+            "evidence": rel(root, scenario_root / "console_status_json.stdout.txt")
+            if (scenario_root / "console_status_json.stdout.txt").is_file()
+            else "",
         },
         {
             "criterion": "provenance_closure_100_percent",
@@ -1134,6 +1158,9 @@ def main() -> int:
         },
     )
     evidence_files.extend([readme, claim_boundary])
+
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
 
     automatic_fail = None
     if loop_ok and (not writable_heads_unchanged or not readonly_heads_unchanged):

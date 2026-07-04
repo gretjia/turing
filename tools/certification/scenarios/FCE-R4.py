@@ -74,6 +74,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results, write_evidence_labels  # noqa: E402
 
 SCENARIOS_DIR = Path(__file__).resolve().parent
 S4_SCRIPT_PATH = SCENARIOS_DIR / "FCE-S4.py"
@@ -419,7 +421,7 @@ def run_m6_console(repo: Path, scenario_root: Path, daemon_bin_dir: Path) -> dic
         name="turing_status_json_demo",
         argv=[str(turing_bin), "status", "--json", "--demo"],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
     )
     snapshot: dict[str, Any] | None = None
     schema_valid = False
@@ -466,14 +468,39 @@ def build_verdict(
     }
 
 
-def write_not_run(root: Path, scenario_id: str, started: float, reason: str) -> dict[str, Any]:
+def write_not_run(
+    root: Path,
+    scenario_id: str,
+    started: float,
+    reason: str,
+    commands: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    scenario_root = root / scenario_id
+    commands = commands or []
+    write_command_results(scenario_root, scenario_id, commands)
+    write_evidence_labels(
+        scenario_root,
+        scenario_id=scenario_id,
+        title="FCE-R4 Cost Dashboard From Tape Projections",
+        evidence_class="REAL",
+        summary_lines=[
+            "This run did not execute: NOT_RUN.",
+            f"Reason: {reason}",
+        ],
+        claims=["FCE-R4 did not run to completion; see not_run_reason in the verdict JSON."],
+        non_claims=[
+            "no cost-dashboard claim of any kind on this NOT_RUN path",
+            "not a release decision",
+            "not SHIPPED",
+        ],
+    )
     verdict = {
         "schema_id": "turingos.fce_scenario_verdict.v1",
         "scenario_id": scenario_id,
         "verdict": "NOT_RUN",
         "not_run_is_fail": True,
         "goals_served": ["G5", "G7"],
-        "commands_executed": [],
+        "commands_executed": [{"cmd": command["cmd"], "exit_code": command["exit_code"]} for command in commands],
         "pass_criteria_results": [],
         "evidence": [],
         "evidence_sha256": {},
@@ -483,7 +510,7 @@ def write_not_run(root: Path, scenario_id: str, started: float, reason: str) -> 
         "wall_clock_ms": int((time.monotonic() - started) * 1000),
         "timestamp_utc": utc_now(),
     }
-    write_json(root / scenario_id / f"{scenario_id}_verdict.json", verdict)
+    write_json(scenario_root / f"{scenario_id}_verdict.json", verdict)
     return verdict
 
 
@@ -527,6 +554,7 @@ def main() -> int:
                 started,
                 f"no existing certification tapes found under {root} and missing DeepSeek credentials "
                 f"(checked process environment and {SECRETS_ENV_PATH}) to mint one",
+                commands,
             )
             print(json.dumps({"scenario_id": scenario_id, "verdict": "NOT_RUN"}, sort_keys=True))
             return 2
@@ -806,6 +834,9 @@ def main() -> int:
         },
     )
     evidence_files.extend([readme, claim_boundary])
+
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
 
     verdict = build_verdict(
         root=root,

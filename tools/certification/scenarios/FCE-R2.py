@@ -52,11 +52,14 @@ import hashlib
 import json
 import shutil
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results  # noqa: E402
 
 ROUNDS = 3
 PROBE_EXAMPLE = "fce_r2_replay_probe"
@@ -214,7 +217,7 @@ def shadow_rebuild_consistent(snapshot: dict[str, Any]) -> tuple[bool, str | Non
 
 def layer1_replay_probe(repo: Path, scenario_root: Path) -> dict[str, Any]:
     commands: list[dict[str, Any]] = []
-    cmd_dir = scenario_root / "commands"
+    cmd_dir = scenario_root
 
     build_probe = run_command(
         name="cargo_build_replay_probe",
@@ -329,7 +332,7 @@ def layer1_replay_probe(repo: Path, scenario_root: Path) -> dict[str, Any]:
 
 def layer2_console_probe(repo: Path, scenario_root: Path) -> dict[str, Any]:
     commands: list[dict[str, Any]] = []
-    cmd_dir = scenario_root / "commands"
+    cmd_dir = scenario_root
 
     build_cli = run_command(
         name="cargo_build_turing_cli",
@@ -346,7 +349,6 @@ def layer2_console_probe(repo: Path, scenario_root: Path) -> dict[str, Any]:
 
     rounds: list[dict[str, Any]] = []
     for index in range(1, ROUNDS + 1):
-        snapshot_path = layer2_root / f"console_round_{index}.json"
         status_command = run_command(
             name=f"console_status_json_demo_round_{index}",
             argv=[str(turing_bin), "status", "--json", "--demo"],
@@ -355,7 +357,12 @@ def layer2_console_probe(repo: Path, scenario_root: Path) -> dict[str, Any]:
             timeout=60,
         )
         commands.append(status_command)
-        snapshot_path.write_text(status_command["stdout_text"], encoding="utf-8")
+        # Reuse the run_command-produced stdout file directly (it already carries
+        # this command's raw stdout and is already classifiable by FCE-R3 via
+        # command_results.json) instead of duplicating its content into a
+        # separately-named file, which would otherwise be an unclassified
+        # zero-byte file if the command's stdout were ever empty.
+        snapshot_path = cmd_dir / status_command["stdout"]
         snapshot: dict[str, Any] | None
         try:
             snapshot = load_json(snapshot_path)
@@ -649,6 +656,9 @@ def main() -> int:
         },
     )
     evidence_files.extend([readme, claim_boundary])
+
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
 
     automatic_fail = None if all_digests_stable else "evidence_tampering"
 
