@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / "evidence/verification/m5_p4_module_closure_20260704"
 REPAIR_PACKET = ROOT / "evidence/verification/m5_p4_module_closure_20260704_r2"
+PASS_CERT = ROOT / "evidence/verification/m5_p4_module_closure_20260704_r2_external_pass/M5_P4_GROK_PASS_CERTIFICATE.json"
 
 
 def sha256(path: Path) -> str:
@@ -119,3 +120,49 @@ def test_m5_p4_repair_packet_includes_external_fail_and_missing_rerun_inputs() -
     prompt = (REPAIR_PACKET / "AUDITOR_PROMPT_TEMPLATE.md").read_text(encoding="utf-8")
     assert "packet_checks/run_m3_analysis_recheck.sh" in prompt
     assert "packet_checks/run_m4_p3_northstar_check.sh" in prompt
+
+
+def test_m5_p4_external_pass_certificate_is_narrow_and_custody_separated() -> None:
+    assert PASS_CERT.exists()
+    cert = json.loads(PASS_CERT.read_text(encoding="utf-8"))
+
+    assert cert["schema_id"] == "turingos.closure_certificate.v1"
+    assert cert["verdict"] == "PASS"
+    assert cert["subject"]["gate_id"] == "M5.P4"
+    assert cert["subject"]["module_targets"] == ["M3.G", "M4.G"]
+    assert cert["subject"]["repo_url"] == "https://github.com/gretjia/turing"
+    assert cert["subject"]["branch"] == "goal/mini-swe-bench-grok-worker"
+    assert cert["subject"]["commit_sha"] == "1b54ca40820294e56fb4218946531633cf180745"
+    assert cert["subject"]["packet_root"] == "evidence/verification/m5_p4_module_closure_20260704_r2"
+
+    assert cert["verifier"]["kind"] == "external_cross_family_model"
+    assert cert["verifier"]["identity"] == "grok-cursor-external-auditor"
+    assert all(cert["verifier"]["custody"].values())
+
+    semantics = cert["status_semantics"]
+    assert semantics["certified_closure_level"] == "EXTERNALLY_VERIFIED"
+    assert semantics["certified_for_module_targets"] == ["M3.G", "M4.G"]
+    assert semantics["implementer_ceiling_was"] == "ADDRESSED"
+    assert {
+        "SHIPPED",
+        "RELEASED",
+        "RATIFIED",
+        "M2 enablement",
+        "release eligibility",
+        "OG-10/genesis signature",
+        "constitution-byte change",
+    }.issubset(set(semantics["does_not_grant"]))
+
+    verification = cert["verification"]
+    assert verification["digest_manifest_result"] == "PASS"
+    assert verification["gate_predicate_result"] == "PASS"
+    commands = verification["commands_run"]
+    assert commands
+    assert all(command["exit_code"] == 0 for command in commands)
+    command_text = "\n".join(command["command"] for command in commands)
+    assert "sha256sum -c PACKET_MANIFEST.sha256" in command_text
+    assert "packet_checks/run_m3_analysis_recheck.sh" in command_text
+    assert "packet_checks/run_m4_p3_northstar_check.sh" in command_text
+
+    assert "M5.P3" not in cert["subject"]["module_targets"]
+    assert "FCE.RUN" not in cert["subject"]["module_targets"]
