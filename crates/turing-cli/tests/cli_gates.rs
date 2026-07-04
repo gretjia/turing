@@ -1,4 +1,8 @@
+use std::path::{Path, PathBuf};
 use std::process::Command;
+
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
 
 use serde_json::json;
 use turing_git_tape::{
@@ -8,6 +12,331 @@ use turing_git_tape::{
 
 fn turing() -> Command {
     Command::new(env!("CARGO_BIN_EXE_turing"))
+}
+
+const SAMPLE_EVENT_ID: &str = "mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const REF_NAMES: [&str; 3] = [
+    "refs/turingos/tape_tip",
+    "refs/turingos/authorization_head",
+    "refs/turingos/accepted_head",
+];
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct HeadTriplet(Vec<Option<String>>);
+
+#[derive(Debug, Clone)]
+struct OperatorCommandCase {
+    label: &'static str,
+    args: Vec<String>,
+    stdin: Option<String>,
+    expected: &'static str,
+}
+
+impl OperatorCommandCase {
+    fn argv(label: &'static str, args: Vec<String>, expected: &'static str) -> Self {
+        OperatorCommandCase {
+            label,
+            args,
+            stdin: None,
+            expected,
+        }
+    }
+
+    fn stdin(
+        label: &'static str,
+        args: Vec<String>,
+        stdin: impl Into<String>,
+        expected: &'static str,
+    ) -> Self {
+        OperatorCommandCase {
+            label,
+            args,
+            stdin: Some(stdin.into()),
+            expected,
+        }
+    }
+}
+
+fn read_ref(repo: &Path, ref_name: &str) -> Option<String> {
+    let output = Command::new("git")
+        .args([
+            "-C",
+            repo.to_str().expect("UTF-8 repo path"),
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            "--end-of-options",
+            ref_name,
+        ])
+        .output()
+        .expect("git rev-parse ref");
+    if !output.status.success() {
+        assert!(
+            output.stdout.is_empty(),
+            "unexpected rev-parse failure for {ref_name}: {output:?}"
+        );
+        return None;
+    }
+    Some(
+        String::from_utf8(output.stdout)
+            .expect("rev-parse stdout UTF-8")
+            .trim()
+            .to_string(),
+    )
+}
+
+fn read_heads(repo: &Path) -> HeadTriplet {
+    HeadTriplet(
+        REF_NAMES
+            .iter()
+            .map(|ref_name| read_ref(repo, ref_name))
+            .collect(),
+    )
+}
+
+fn run_operator_case(case: &OperatorCommandCase) -> String {
+    let output = if let Some(stdin) = &case.stdin {
+        let mut child = turing()
+            .args(&case.args)
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .spawn()
+            .unwrap_or_else(|error| panic!("spawn {} failed: {error}", case.label));
+        {
+            use std::io::Write;
+            child
+                .stdin
+                .as_mut()
+                .expect("stdin")
+                .write_all(stdin.as_bytes())
+                .expect("write stdin");
+        }
+        child
+            .wait_with_output()
+            .unwrap_or_else(|error| panic!("wait {} failed: {error}", case.label))
+    } else {
+        turing()
+            .args(&case.args)
+            .output()
+            .unwrap_or_else(|error| panic!("run {} failed: {error}", case.label))
+    };
+    assert!(
+        output.status.success(),
+        "{} failed: stdout={} stderr={}",
+        case.label,
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(
+        stdout.contains(case.expected),
+        "{} missing {:?}: {stdout}",
+        case.label,
+        case.expected
+    );
+    stdout
+}
+
+fn ask_case(
+    label: &'static str,
+    utterance: &'static str,
+    expected: &'static str,
+) -> OperatorCommandCase {
+    OperatorCommandCase::argv(
+        label,
+        vec!["ask".to_string(), utterance.to_string()],
+        expected,
+    )
+}
+
+fn operator_command_matrix(repo: &Path, bundle: &Path) -> Vec<OperatorCommandCase> {
+    let repo_arg = repo.to_str().expect("UTF-8 repo path").to_string();
+    let bundle_arg = bundle.to_str().expect("UTF-8 bundle path").to_string();
+    let digest = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    let mut cases = vec![
+        OperatorCommandCase::argv("help", vec!["--help".to_string()], "Operator Console v1"),
+        OperatorCommandCase::argv(
+            "help commands",
+            vec!["help".to_string(), "commands".to_string()],
+            "operator_tool_manifest.v1",
+        ),
+        OperatorCommandCase::argv(
+            "status micro-git",
+            vec![
+                "status".to_string(),
+                "--micro-git".to_string(),
+                repo_arg.clone(),
+            ],
+            "operator_view_snapshot.v1",
+        ),
+        OperatorCommandCase::argv(
+            "panoview micro-git",
+            vec![
+                "panoview".to_string(),
+                "--micro-git".to_string(),
+                repo_arg.clone(),
+            ],
+            "guarded_micro_tape_read",
+        ),
+        OperatorCommandCase::argv(
+            "explain blocker micro-git",
+            vec![
+                "explain".to_string(),
+                "blocker".to_string(),
+                "--micro-git".to_string(),
+                repo_arg.clone(),
+            ],
+            "EXPLAIN_BLOCKER",
+        ),
+        OperatorCommandCase::argv(
+            "explain event id micro-git",
+            vec![
+                "explain".to_string(),
+                "event".to_string(),
+                SAMPLE_EVENT_ID.to_string(),
+                "--micro-git".to_string(),
+                repo_arg,
+            ],
+            "EXPLAIN_EVENT",
+        ),
+        OperatorCommandCase::argv(
+            "status micro-bundle",
+            vec![
+                "status".to_string(),
+                "--micro-bundle".to_string(),
+                bundle_arg.clone(),
+            ],
+            "guarded_micro_tape_read",
+        ),
+        OperatorCommandCase::argv(
+            "panoview micro-bundle",
+            vec![
+                "panoview".to_string(),
+                "--micro-bundle".to_string(),
+                bundle_arg.clone(),
+            ],
+            "guarded_micro_tape_read",
+        ),
+        OperatorCommandCase::argv(
+            "explain event micro-bundle",
+            vec![
+                "explain".to_string(),
+                "event".to_string(),
+                "--micro-bundle".to_string(),
+                bundle_arg,
+            ],
+            "EXPLAIN_EVENT",
+        ),
+        OperatorCommandCase::stdin(
+            "operator stdin script",
+            vec!["operator".to_string()],
+            format!("status\npanoview\nexplain event {SAMPLE_EVENT_ID}\nquit\n"),
+            "EXPLAIN_EVENT",
+        ),
+        OperatorCommandCase::argv(
+            "approval preview",
+            vec![
+                "approval".to_string(),
+                "preview".to_string(),
+                "--approval-id".to_string(),
+                "ap_m6_p4_preview".to_string(),
+                "--authority-epoch".to_string(),
+                "7".to_string(),
+                "--action".to_string(),
+                "capsule_approve".to_string(),
+                "--subject".to_string(),
+                "wc_m6_p4".to_string(),
+                "--risk".to_string(),
+                "P2".to_string(),
+                "--evidence-digest".to_string(),
+                digest.to_string(),
+                "--signature-route".to_string(),
+                "none".to_string(),
+            ],
+            "writes_micro_truth=false",
+        ),
+    ];
+    cases.extend([
+        ask_case("ask view status", "status", "VIEW_STATUS"),
+        ask_case("ask view panoview", "panoview", "VIEW_PANOVIEW"),
+        ask_case("ask explain event", "event details", "EXPLAIN_EVENT"),
+        ask_case("ask explain blocker", "blocker", "EXPLAIN_BLOCKER"),
+        ask_case("ask replay verify", "replay verify", "REPLAY_VERIFY"),
+        ask_case(
+            "ask audit invariants",
+            "audit invariants",
+            "AUDIT_INVARIANTS",
+        ),
+        ask_case("ask propose intent", "intent proposal", "PROPOSE_INTENT"),
+        ask_case("ask propose goal", "goal proposal", "PROPOSE_GOAL"),
+        ask_case("ask propose capsule", "capsule proposal", "PROPOSE_CAPSULE"),
+        ask_case("ask approve capsule", "approve capsule", "APPROVE_CAPSULE"),
+        ask_case("ask dispatch worker", "dispatch worker", "DISPATCH_WORKER"),
+        ask_case("ask observe capsule", "observe capsule", "OBSERVE_CAPSULE"),
+        ask_case(
+            "ask reject candidate",
+            "reject candidate",
+            "REJECT_CANDIDATE",
+        ),
+        ask_case(
+            "ask request macro auth",
+            "request macro authorization",
+            "REQUEST_MACRO_AUTH",
+        ),
+        ask_case(
+            "ask approve candidate",
+            "approve candidate",
+            "APPROVE_CANDIDATE",
+        ),
+        ask_case("ask help", "help", "HELP"),
+    ]);
+    cases
+}
+
+#[cfg(unix)]
+struct ReadOnlyTree {
+    original_modes: Vec<(PathBuf, u32)>,
+}
+
+#[cfg(unix)]
+impl ReadOnlyTree {
+    fn make(root: &Path) -> Self {
+        let mut paths = Vec::new();
+        collect_paths(root, &mut paths);
+        let mut original_modes = Vec::new();
+        for path in paths {
+            let metadata = std::fs::symlink_metadata(&path).expect("metadata");
+            if metadata.file_type().is_symlink() {
+                continue;
+            }
+            let mode = metadata.permissions().mode();
+            original_modes.push((path.clone(), mode));
+            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(mode & !0o222))
+                .unwrap_or_else(|error| panic!("chmod readonly {}: {error}", path.display()));
+        }
+        ReadOnlyTree { original_modes }
+    }
+}
+
+#[cfg(unix)]
+impl Drop for ReadOnlyTree {
+    fn drop(&mut self) {
+        for (path, mode) in &self.original_modes {
+            let _ = std::fs::set_permissions(path, std::fs::Permissions::from_mode(*mode));
+        }
+    }
+}
+
+#[cfg(unix)]
+fn collect_paths(path: &Path, out: &mut Vec<PathBuf>) {
+    out.push(path.to_path_buf());
+    if let Ok(metadata) = std::fs::symlink_metadata(path) {
+        if metadata.is_dir() {
+            for entry in std::fs::read_dir(path).expect("read dir") {
+                collect_paths(&entry.expect("dir entry").path(), out);
+            }
+        }
+    }
 }
 
 fn sample_micro_repo() -> (tempfile::TempDir, CommittedReceipt) {
@@ -164,6 +493,51 @@ fn status_can_read_micro_tape_bundle_directly() {
     assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
     assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
     assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+}
+
+#[test]
+fn operator_command_matrix_conserves_all_three_micro_tape_heads() {
+    let (repo, bundle, _proposal) = sample_micro_bundle();
+    let before = read_heads(repo.path());
+
+    for case in operator_command_matrix(repo.path(), &bundle) {
+        let stdout = run_operator_case(&case);
+        assert!(
+            !stdout.contains("writes_truth=true") && !stdout.contains("writes_micro_truth=true"),
+            "{} claimed write authority: {stdout}",
+            case.label
+        );
+        let after = read_heads(repo.path());
+        assert_eq!(
+            before, after,
+            "{} moved a MicroTape head; before={before:?} after={after:?}",
+            case.label
+        );
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn operator_command_matrix_passes_on_readonly_micro_tape_filesystem() {
+    let (repo, bundle, _proposal) = sample_micro_bundle();
+    let before = read_heads(repo.path());
+    {
+        let _readonly = ReadOnlyTree::make(repo.path());
+        for case in operator_command_matrix(repo.path(), &bundle) {
+            run_operator_case(&case);
+            let after = read_heads(repo.path());
+            assert_eq!(
+                before, after,
+                "{} moved a MicroTape head on a read-only fixture; before={before:?} after={after:?}",
+                case.label
+            );
+        }
+    }
+    assert_eq!(
+        before,
+        read_heads(repo.path()),
+        "readonly matrix changed heads after permissions restored"
+    );
 }
 
 #[test]
