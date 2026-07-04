@@ -1,0 +1,1845 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index a908b23..e13fb2b 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -467,6 +467,9 @@ dependencies = [
+  "serde_json",
+  "tempfile",
+  "turing-approval",
++ "turing-contracts",
++ "turing-git-tape",
++ "turing-projection",
+  "turing-qualification",
+ ]
+ 
+diff --git a/crates/turing-cli/Cargo.toml b/crates/turing-cli/Cargo.toml
+index eadef3d..e00b915 100644
+--- a/crates/turing-cli/Cargo.toml
++++ b/crates/turing-cli/Cargo.toml
+@@ -12,6 +12,9 @@ path = "src/main.rs"
+ [dependencies]
+ serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+ turing-approval = { path = "../turing-approval" }
++turing-contracts = { path = "../turing-contracts" }
++turing-git-tape = { path = "../turing-git-tape" }
++turing-projection = { path = "../turing-projection" }
+ turing-qualification = { path = "../turing-qualification" }
+ 
+ [dev-dependencies]
+diff --git a/crates/turing-cli/src/main.rs b/crates/turing-cli/src/main.rs
+index 407e75f..48bed48 100644
+--- a/crates/turing-cli/src/main.rs
++++ b/crates/turing-cli/src/main.rs
+@@ -7,6 +7,11 @@ use turing_approval::{
+     HardwareSigningBackend, InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute,
+     SigningBackend,
+ };
++use turing_git_tape::append::Append;
++use turing_projection::{
++    CommandSpec, OperatorHeads, OperatorToolManifest, OperatorTurnTrace, OperatorViewSnapshot,
++    TypedVerb,
++};
+ use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
+ 
+ fn main() -> ExitCode {
+@@ -27,6 +32,77 @@ fn main() -> ExitCode {
+ 
+ fn dispatch(args: &[&str]) -> Result<String, String> {
+     match args {
++        [] | ["--help"] | ["help"] => Ok(operator_help()),
++        ["help", "commands"] => Ok(operator_commands_help()),
++        ["help", _topic] => Ok(operator_help()),
++        ["status"] => render_operator_status(SnapshotInput::Demo),
++        ["status", "--micro-git", repo] => render_operator_status(SnapshotInput::MicroGit(repo)),
++        ["status", "--micro-bundle", bundle] => {
++            render_operator_status(SnapshotInput::MicroBundle(bundle))
++        }
++        ["panoview"] => render_operator_panoview(SnapshotInput::Demo),
++        ["panoview", "--micro-git", repo] => {
++            render_operator_panoview(SnapshotInput::MicroGit(repo))
++        }
++        ["panoview", "--micro-bundle", bundle] => {
++            render_operator_panoview(SnapshotInput::MicroBundle(bundle))
++        }
++        ["explain"] => {
++            render_operator_explain(TypedVerb::EXPLAIN_BLOCKER, SnapshotInput::Demo, None)
++        }
++        ["explain", "blocker"] => {
++            render_operator_explain(TypedVerb::EXPLAIN_BLOCKER, SnapshotInput::Demo, None)
++        }
++        ["explain", "event"] => {
++            render_operator_explain(TypedVerb::EXPLAIN_EVENT, SnapshotInput::Demo, None)
++        }
++        ["explain", "event", event_id] => render_operator_explain(
++            TypedVerb::EXPLAIN_EVENT,
++            SnapshotInput::Demo,
++            Some(event_id),
++        ),
++        ["explain", "--micro-git", repo] => render_operator_explain(
++            TypedVerb::EXPLAIN_BLOCKER,
++            SnapshotInput::MicroGit(repo),
++            None,
++        ),
++        ["explain", "--micro-bundle", bundle] => render_operator_explain(
++            TypedVerb::EXPLAIN_BLOCKER,
++            SnapshotInput::MicroBundle(bundle),
++            None,
++        ),
++        ["explain", "blocker", "--micro-git", repo] => render_operator_explain(
++            TypedVerb::EXPLAIN_BLOCKER,
++            SnapshotInput::MicroGit(repo),
++            None,
++        ),
++        ["explain", "blocker", "--micro-bundle", bundle] => render_operator_explain(
++            TypedVerb::EXPLAIN_BLOCKER,
++            SnapshotInput::MicroBundle(bundle),
++            None,
++        ),
++        ["explain", "event", "--micro-git", repo] => render_operator_explain(
++            TypedVerb::EXPLAIN_EVENT,
++            SnapshotInput::MicroGit(repo),
++            None,
++        ),
++        ["explain", "event", "--micro-bundle", bundle] => render_operator_explain(
++            TypedVerb::EXPLAIN_EVENT,
++            SnapshotInput::MicroBundle(bundle),
++            None,
++        ),
++        ["explain", "event", event_id, "--micro-git", repo] => render_operator_explain(
++            TypedVerb::EXPLAIN_EVENT,
++            SnapshotInput::MicroGit(repo),
++            Some(event_id),
++        ),
++        ["explain", "event", event_id, "--micro-bundle", bundle] => render_operator_explain(
++            TypedVerb::EXPLAIN_EVENT,
++            SnapshotInput::MicroBundle(bundle),
++            Some(event_id),
++        ),
++        ["ask", utterance @ ..] => render_operator_ask(&utterance.join(" ")),
++        ["operator"] => run_operator_console(),
+         ["boot", "--project", project] => boot_project(project),
+         ["replay", "--verify"] => {
+             let report = run_new_project_agent_economy_demo()
+@@ -133,14 +209,452 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
+             risk,
+             evidence_digest,
+             signature_route,
++            false,
++        ),
++        [
++            "approval",
++            "sign",
++            "--key-id",
++            key_id,
++            "--approval-id",
++            approval_id,
++            "--authority-epoch",
++            authority_epoch,
++            "--action",
++            action,
++            "--subject",
++            subject,
++            "--risk",
++            risk,
++            "--evidence-digest",
++            evidence_digest,
++            "--signature-route",
++            signature_route,
++            "--allow-test-signature",
++        ] => approval_sign(
++            key_id,
++            approval_id,
++            authority_epoch,
++            action,
++            subject,
++            risk,
++            evidence_digest,
++            signature_route,
++            true,
+         ),
+         _ => Err(format!(
+-            "unknown turing command: {:?}. supported: boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
++            "unknown turing command: {:?}. supported: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help commands | boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
+             args
+         )),
+     }
+ }
+ 
++fn operator_help() -> String {
++    let verbs = CommandSpec::all()
++        .iter()
++        .map(|spec| spec.verb.as_str())
++        .collect::<Vec<_>>()
++        .join(", ");
++    format!(
++        "Operator Console v1\ncontracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1\ncommands: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help\nfixed verbs: {verbs}\nstatus ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists"
++    )
++}
++
++fn operator_commands_help() -> String {
++    let rows = CommandSpec::all()
++        .iter()
++        .map(|spec| {
++            format!(
++                "verb={} side_effect_class={} approval_required={} writes_truth={} confirmation_route={} source_heads={} expected_receipt={}",
++                spec.verb.as_str(),
++                spec.side_effect_class.as_str(),
++                spec.approval_required,
++                spec.writes_truth,
++                spec.confirmation_route.as_str(),
++                spec.source_heads.join(","),
++                spec.expected_receipt
++            )
++        })
++        .collect::<Vec<_>>()
++        .join("\n");
++    format!(
++        "Operator Console v1 topic=commands\ncontract=operator_tool_manifest.v1 item_contract=typed_command.v1\n{rows}\nstatus_ceiling=IMPLEMENTER_ADDRESSED"
++    )
++}
++
++#[derive(Debug, Clone, Copy)]
++enum SnapshotInput<'a> {
++    Demo,
++    MicroGit(&'a str),
++    MicroBundle(&'a str),
++}
++
++fn operator_snapshot(input: SnapshotInput<'_>) -> Result<OperatorViewSnapshot, String> {
++    match input {
++        SnapshotInput::Demo => demo_snapshot(),
++        SnapshotInput::MicroGit(path) => micro_git_snapshot(path),
++        SnapshotInput::MicroBundle(path) => micro_bundle_snapshot(path),
++    }
++}
++
++fn demo_snapshot() -> Result<OperatorViewSnapshot, String> {
++    let report = run_new_project_agent_economy_demo()
++        .map_err(|error| format!("operator snapshot replay failed: {error}"))?;
++    let heads = OperatorHeads::new(
++        report.tape_tip,
++        report.authorization_head,
++        report.accepted_head,
++    )
++    .map_err(|error| format!("operator snapshot heads invalid: {error}"))?;
++    let project_root = std::env::current_dir()
++        .map_err(|error| format!("cannot read current dir: {error}"))?
++        .display()
++        .to_string();
++    OperatorViewSnapshot::from_deterministic_replay(
++        project_root,
++        "qualification_demo_micro_tape",
++        "turing replay --verify",
++        heads,
++    )
++    .map_err(|error| format!("operator snapshot failed: {error}"))
++}
++
++fn micro_git_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
++    let micro_repo = std::fs::canonicalize(path)
++        .map_err(|error| format!("failed to resolve micro git path {path:?}: {error}"))?;
++    micro_git_snapshot_from_repo(
++        &micro_repo,
++        micro_repo.display().to_string(),
++        format!("turing status --micro-git {}", micro_repo.display()),
++    )
++}
++
++fn micro_bundle_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
++    let bundle = std::fs::canonicalize(path)
++        .map_err(|error| format!("failed to resolve micro bundle path {path:?}: {error}"))?;
++    let scratch = BundleScratch::new()?;
++    run_git(
++        &["init", "--object-format=sha256", "-q", scratch.path_str()?],
++        None,
++    )?;
++    run_git(
++        &[
++            "fetch",
++            "-q",
++            bundle
++                .to_str()
++                .ok_or_else(|| format!("non-UTF-8 bundle path {}", bundle.display()))?,
++            "refs/*:refs/*",
++        ],
++        Some(scratch.path()),
++    )?;
++    micro_git_snapshot_from_repo(
++        scratch.path(),
++        format!("bundle:{}", bundle.display()),
++        format!("turing status --micro-bundle {}", bundle.display()),
++    )
++}
++
++fn micro_git_snapshot_from_repo(
++    micro_repo: &Path,
++    source_micro_repo: String,
++    rebuild_command: String,
++) -> Result<OperatorViewSnapshot, String> {
++    let tape = Append::open(micro_repo)
++        .map_err(|error| format!("cannot open micro tape {}: {error}", micro_repo.display()))?;
++    let heads = tape
++        .head_set_guarded()
++        .map_err(|error| format!("guarded MicroTape head read failed: {error}"))?
++        .ok_or_else(|| "micro tape is not booted; no operator heads are available".to_string())?;
++    let heads = OperatorHeads::new(
++        heads.tape_tip,
++        heads.authorization_head,
++        heads.accepted_head,
++    )
++    .map_err(|error| format!("operator snapshot heads invalid: {error}"))?;
++    let project_root = std::env::current_dir()
++        .map_err(|error| format!("cannot read current dir: {error}"))?
++        .display()
++        .to_string();
++    OperatorViewSnapshot::from_guarded_heads(
++        project_root,
++        source_micro_repo,
++        rebuild_command,
++        heads,
++    )
++    .map_err(|error| format!("operator snapshot failed: {error}"))
++}
++
++struct BundleScratch {
++    path: std::path::PathBuf,
++}
++
++impl BundleScratch {
++    fn new() -> Result<Self, String> {
++        let pid = std::process::id();
++        let nanos = std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH)
++            .map_err(|error| format!("system clock error: {error}"))?
++            .as_nanos();
++        let path = std::env::temp_dir().join(format!("turingos-hci-bundle-{pid}-{nanos}"));
++        std::fs::create_dir(&path).map_err(|error| {
++            format!(
++                "failed to create bundle scratch {}: {error}",
++                path.display()
++            )
++        })?;
++        Ok(BundleScratch { path })
++    }
++
++    fn path(&self) -> &Path {
++        &self.path
++    }
++
++    fn path_str(&self) -> Result<&str, String> {
++        self.path
++            .to_str()
++            .ok_or_else(|| format!("non-UTF-8 scratch path {}", self.path.display()))
++    }
++}
++
++impl Drop for BundleScratch {
++    fn drop(&mut self) {
++        let _ = std::fs::remove_dir_all(&self.path);
++    }
++}
++
++fn run_git(args: &[&str], cwd: Option<&Path>) -> Result<(), String> {
++    let mut command = std::process::Command::new("git");
++    command.args(args);
++    if let Some(cwd) = cwd {
++        command.current_dir(cwd);
++    }
++    let output = command
++        .output()
++        .map_err(|error| format!("failed to execute git {:?}: {error}", args))?;
++    if output.status.success() {
++        return Ok(());
++    }
++    Err(format!(
++        "git {:?} failed: {}",
++        args,
++        String::from_utf8_lossy(&output.stderr).trim()
++    ))
++}
++
++fn render_operator_status(input: SnapshotInput<'_>) -> Result<String, String> {
++    let snapshot = operator_snapshot(input)?;
++    Ok(format!(
++        "operator_view_snapshot.v1 heartbeat source_kind={} operator_state={} tape_tip={} authorization_head={} accepted_head={} can_write_truth={} status_ceiling=IMPLEMENTER_ADDRESSED snapshot_hash={}",
++        snapshot.source.source_kind,
++        snapshot.operator_state.as_str(),
++        snapshot.heads.tape_tip,
++        snapshot
++            .heads
++            .authorization_head
++            .as_deref()
++            .unwrap_or("null"),
++        snapshot.heads.accepted_head,
++        snapshot.source.can_write_truth,
++        snapshot.snapshot_hash
++    ))
++}
++
++fn render_operator_panoview(input: SnapshotInput<'_>) -> Result<String, String> {
++    let snapshot = operator_snapshot(input)?;
++    let mut out = String::new();
++    out.push_str("operator_view_snapshot.v1 panoview\n");
++    out.push_str(&format!(
++        "source={} rebuild={} can_write_truth={}\n",
++        snapshot.source.source_kind,
++        snapshot.source.rebuild_command,
++        snapshot.source.can_write_truth
++    ));
++    out.push_str("heads:\n");
++    out.push_str(&format!("  tape_tip={}\n", snapshot.heads.tape_tip));
++    out.push_str(&format!(
++        "  authorization_head={}\n",
++        snapshot
++            .heads
++            .authorization_head
++            .as_deref()
++            .unwrap_or("null")
++    ));
++    out.push_str(&format!(
++        "  accepted_head={}\n",
++        snapshot.heads.accepted_head
++    ));
++    out.push_str("lanes:\n");
++    for lane in &snapshot.lanes {
++        let label = match lane.name.as_str() {
++            "append" => "tape_tip",
++            "authorization" => "authorization_head",
++            "accepted" => "accepted_head",
++            other => other,
++        };
++        out.push_str(&format!(
++            "  {}={} meaning={}\n",
++            label,
++            lane.head.as_deref().unwrap_or("null"),
++            lane.meaning
++        ));
++    }
++    out.push_str("evidence:\n");
++    for evidence in &snapshot.evidence {
++        out.push_str(&format!("  - {evidence}\n"));
++    }
++    out.push_str("failures:\n");
++    if snapshot.failures.is_empty() {
++        out.push_str("  - none in snapshot\n");
++    }
++    out.push_str("warnings:\n");
++    for warning in &snapshot.warnings {
++        out.push_str(&format!(
++            "  - {} severity={} message={}\n",
++            warning.code, warning.severity, warning.message
++        ));
++    }
++    out.push_str("safe commands:\n");
++    for command in &snapshot.safe_commands {
++        out.push_str(&format!(
++            "  {} approval_required={} side_effect_class={} writes_truth={} confirmation_route={}\n",
++            command.verb.as_str(),
++            command.approval_required,
++            command.side_effect_class.as_str(),
++            command.writes_truth,
++            command.confirmation_route.as_str()
++        ));
++    }
++    Ok(out.trim_end().to_string())
++}
++
++fn render_operator_explain(
++    verb: TypedVerb,
++    input: SnapshotInput<'_>,
++    event_id: Option<&str>,
++) -> Result<String, String> {
++    let snapshot = operator_snapshot(input)?;
++    let spec = CommandSpec::get(verb).ok_or_else(|| "unknown explain verb".to_string())?;
++    let event_text = event_id
++        .map(|id| format!(" event_id={id}"))
++        .unwrap_or_default();
++    Ok(format!(
++        "typed_command.v1 verb={}{} source_kind={} operator_view_snapshot.v1={} source_heads={} evidence_count={} replay={} blocker_policy=human_signature_required approval_required={} writes_truth={} exact_post_approval_state=NeedsApproval_or_AwaitingReceipt",
++        spec.verb.as_str(),
++        event_text,
++        snapshot.source.source_kind,
++        snapshot.snapshot_hash,
++        spec.source_heads.join(","),
++        snapshot.evidence.len(),
++        spec.replay_command,
++        spec.approval_required,
++        spec.writes_truth
++    ))
++}
++
++fn render_operator_ask(utterance: &str) -> Result<String, String> {
++    let verb = route_utterance(utterance);
++    let spec = CommandSpec::get(verb).ok_or_else(|| "unknown routed verb".to_string())?;
++    let _trace = OperatorTurnTrace {
++        schema_id: "operator_turn_trace.v1".to_string(),
++        intent: turing_projection::OperatorIntent {
++            schema_id: "operator_intent.v1".to_string(),
++            utterance_digest: format!(
++                "sha256:{}",
++                turing_contracts::jcs::sha256_hex(utterance.as_bytes())
++            ),
++            selected_verb: verb,
++            confidence_basis: "deterministic keyword router zh_en_v1".to_string(),
++        },
++        typed_command: spec.clone(),
++        manifest: OperatorToolManifest::closed_v1(),
++        advisory_confidence: "0.70".to_string(),
++    };
++    Ok(format!(
++        "operator_turn_trace.v1 selected_verb={} typed_command.v1 approval_required={} writes_truth={} side_effect_class={} confirmation_route={} advisory_confidence=0.70 autonomous_dispatch=false",
++        spec.verb.as_str(),
++        spec.approval_required,
++        spec.writes_truth,
++        spec.side_effect_class.as_str(),
++        spec.confirmation_route.as_str()
++    ))
++}
++
++fn route_utterance(utterance: &str) -> TypedVerb {
++    let lower = utterance.to_lowercase();
++    if lower.contains("reject") && lower.contains("candidate") {
++        TypedVerb::REJECT_CANDIDATE
++    } else if lower.contains("dispatch") || lower.contains("worker") {
++        TypedVerb::DISPATCH_WORKER
++    } else if lower.contains("macro") && (lower.contains("auth") || lower.contains("authorization"))
++    {
++        TypedVerb::REQUEST_MACRO_AUTH
++    } else if lower.contains("approve") && lower.contains("capsule") {
++        TypedVerb::APPROVE_CAPSULE
++    } else if lower.contains("approve")
++        || lower.contains("批准")
++        || lower.contains("接受")
++        || lower.contains("candidate")
++    {
++        TypedVerb::APPROVE_CANDIDATE
++    } else if lower.contains("blocker") || lower.contains("阻塞") {
++        TypedVerb::EXPLAIN_BLOCKER
++    } else if lower.contains("event") {
++        TypedVerb::EXPLAIN_EVENT
++    } else if lower.contains("status") || lower.contains("状态") {
++        TypedVerb::VIEW_STATUS
++    } else if lower.contains("panoview") || lower.contains("全景") {
++        TypedVerb::VIEW_PANOVIEW
++    } else if lower.contains("replay") {
++        TypedVerb::REPLAY_VERIFY
++    } else if lower.contains("audit") {
++        TypedVerb::AUDIT_INVARIANTS
++    } else if lower.contains("intent") {
++        TypedVerb::PROPOSE_INTENT
++    } else if lower.contains("goal") {
++        TypedVerb::PROPOSE_GOAL
++    } else if lower.contains("capsule") {
++        TypedVerb::PROPOSE_CAPSULE
++    } else {
++        TypedVerb::HELP
++    }
++}
++
++fn run_operator_console() -> Result<String, String> {
++    let mut output = String::from("Operator Console v1 interactive wrapper\n");
++    let mut buffer = String::new();
++    use std::io::Read;
++    std::io::stdin()
++        .read_to_string(&mut buffer)
++        .map_err(|error| format!("failed to read operator stdin: {error}"))?;
++    for line in buffer.lines() {
++        match line.trim() {
++            "" => {}
++            "quit" | "exit" => {
++                output.push_str("operator console exit\n");
++                break;
++            }
++            "status" => {
++                output.push_str(&render_operator_status(SnapshotInput::Demo)?);
++                output.push('\n');
++            }
++            "panoview" => {
++                output.push_str(&render_operator_panoview(SnapshotInput::Demo)?);
++                output.push('\n');
++            }
++            "help" => {
++                output.push_str(&operator_help());
++                output.push('\n');
++            }
++            other => {
++                output.push_str(&render_operator_ask(other)?);
++                output.push('\n');
++            }
++        }
++    }
++    Ok(output.trim_end().to_string())
++}
++
+ fn approval_preview(
+     approval_id: &str,
+     authority_epoch: &str,
+@@ -162,12 +676,26 @@ fn approval_preview(
+     let surfaces = card
+         .byte_surfaces()
+         .map_err(|error| format!("invalid approval card: {error}"))?;
++    let snapshot = operator_snapshot(SnapshotInput::Demo)?;
++    let source_head_values = format!(
++        "tape_tip:{},authorization_head:{},accepted_head:{}",
++        snapshot.heads.tape_tip,
++        snapshot
++            .heads
++            .authorization_head
++            .as_deref()
++            .unwrap_or("null"),
++        snapshot.heads.accepted_head
++    );
+     Ok(format!(
+-        "approval preview: approval_id={} action={} subject={} risk={} authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
++        "approval preview: approval_id={} action={} target={} subject={} risk={} source_heads=tape_tip,authorization_head,accepted_head source_head_values={} evidence_digest_count={} approval_required=true expiry=not_present nonce=not_present side_effect_class=sovereign_mutation post_approval_state=NeedsApproval_or_AwaitingReceipt authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
+         approval_id,
+         action,
+         subject,
++        subject,
+         risk,
++        source_head_values,
++        card.payload().evidence_digests.len(),
+         card.payload().authority_epoch,
+         card.payload().signature_route,
+         surfaces.visible_card_hash,
+@@ -184,6 +712,7 @@ fn approval_sign(
+     risk: &str,
+     evidence_digest: &str,
+     signature_route: &str,
++    allow_test_signature: bool,
+ ) -> Result<String, String> {
+     let card = build_approval_card(
+         approval_id,
+@@ -204,6 +733,12 @@ fn approval_sign(
+             (signature, trusted_keys)
+         }
+         SignatureRoute::InMemoryTest => {
++            if !allow_test_signature {
++                return Err(
++                    "in-memory-test signing requires --allow-test-signature and is test-only"
++                        .to_string(),
++                );
++            }
+             let signer = InMemoryTestSigningBackend::new(key_id);
+             let signature = signer.sign(&card);
+             let trusted_keys = signer
+@@ -242,12 +777,15 @@ fn approval_sign(
+         SignatureRoute::LocalFileDev => unreachable!(),
+         SignatureRoute::None => unreachable!(),
+     }
++    let test_signature_only =
++        matches!(card.payload().signature_route, SignatureRoute::InMemoryTest);
+     Ok(format!(
+-        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} signed_payload_hash={} public_key_fingerprint={} verifying_key={} signature={} writes_micro_truth=false",
++        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} test_signature_only={} signed_payload_hash={} public_key_fingerprint={} verifying_key={} signature={} writes_micro_truth=false",
+         approval_id,
+         signature.key_id,
+         signature.authority_epoch,
+         signature.signature_route,
++        test_signature_only,
+         signature.signed_payload_hash,
+         signature.public_key_fingerprint,
+         signature.verifying_key,
+diff --git a/crates/turing-cli/tests/cli_gates.rs b/crates/turing-cli/tests/cli_gates.rs
+index 5ffa3dd..2cff228 100644
+--- a/crates/turing-cli/tests/cli_gates.rs
++++ b/crates/turing-cli/tests/cli_gates.rs
+@@ -1,9 +1,372 @@
+ use std::process::Command;
+ 
++use serde_json::json;
++use turing_git_tape::{
++    append::{Append, AppendRequest, CommittedReceipt},
++    git,
++};
++
+ fn turing() -> Command {
+     Command::new(env!("CARGO_BIN_EXE_turing"))
+ }
+ 
++fn sample_micro_repo() -> (tempfile::TempDir, CommittedReceipt) {
++    let dir = tempfile::tempdir().expect("temp dir");
++    git::init_sha256(dir.path()).expect("sha256 git init");
++    let tape = Append::open(dir.path()).expect("append open");
++    let genesis = tape
++        .append(
++            AppendRequest::new(
++                "SystemConstitutionAccepted",
++                "writer:hci-test",
++                json!({"constitution_digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}),
++            )
++            .predicate_pass(),
++        )
++        .expect("genesis append");
++    let proposal = tape
++        .append(
++            AppendRequest::new(
++                "GoalStateProposed",
++                "writer:hci-test",
++                json!({"goal_id":"goal_hci_real_tape","intent":"exercise operator HCI real MicroTape source"}),
++            )
++            .predicate_pass(),
++        )
++        .expect("proposal append");
++    assert_eq!(proposal.accepted_head_after, genesis.event_id);
++    (dir, proposal)
++}
++
++fn sample_micro_bundle() -> (tempfile::TempDir, std::path::PathBuf, CommittedReceipt) {
++    let (repo, proposal) = sample_micro_repo();
++    let bundle = repo.path().join("micro_tape.bundle");
++    let output = Command::new("git")
++        .args([
++            "-C",
++            repo.path().to_str().expect("UTF-8 path"),
++            "bundle",
++            "create",
++            bundle.to_str().expect("UTF-8 bundle path"),
++            "refs/turingos/tape_tip",
++            "refs/turingos/accepted_head",
++        ])
++        .output()
++        .expect("git bundle create");
++    assert!(output.status.success(), "bundle create failed: {output:?}");
++    (repo, bundle, proposal)
++}
++
++#[test]
++fn help_lists_operator_console_commands() {
++    let output = turing().arg("--help").output().expect("run help");
++    assert!(output.status.success(), "help failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++
++    for text in [
++        "Operator Console v1",
++        "status",
++        "--micro-git",
++        "panoview",
++        "explain",
++        "ask",
++        "operator",
++        "typed_command.v1",
++        "operator_view_snapshot.v1",
++    ] {
++        assert!(stdout.contains(text), "help missing {text:?}: {stdout}");
++    }
++    assert!(!stdout.contains("human approved"));
++    assert!(!stdout.contains("class closed"));
++}
++
++#[test]
++fn help_commands_topic_lists_closed_typed_command_contract() {
++    let help = turing().arg("--help").output().expect("run help");
++    assert!(help.status.success(), "help failed: {help:?}");
++    let default_stdout = String::from_utf8(help.stdout).expect("stdout UTF-8");
++
++    let output = turing()
++        .args(["help", "commands"])
++        .output()
++        .expect("run help commands");
++    assert!(output.status.success(), "help commands failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++
++    assert_ne!(stdout, default_stdout);
++    assert!(stdout.contains("topic=commands"));
++    assert!(stdout.contains("operator_tool_manifest.v1"));
++    assert!(stdout.contains("typed_command.v1"));
++    assert!(stdout.contains("VIEW_STATUS"));
++    assert!(stdout.contains("APPROVE_CANDIDATE"));
++    assert!(stdout.contains("writes_truth=false"));
++}
++
++#[test]
++fn status_and_panoview_can_read_real_micro_git_heads() {
++    let (repo, proposal) = sample_micro_repo();
++    let repo_arg = repo.path().to_str().expect("UTF-8 path");
++
++    let status = turing()
++        .args(["status", "--micro-git", repo_arg])
++        .output()
++        .expect("run status real micro git");
++    assert!(status.status.success(), "status failed: {status:?}");
++    let stdout = String::from_utf8(status.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("operator_view_snapshot.v1"));
++    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
++    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
++    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
++    assert!(stdout.contains("can_write_truth=false"));
++
++    let panoview = turing()
++        .args(["panoview", "--micro-git", repo_arg])
++        .output()
++        .expect("run panoview real micro git");
++    assert!(panoview.status.success(), "panoview failed: {panoview:?}");
++    let stdout = String::from_utf8(panoview.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("source=guarded_micro_tape_read"));
++    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
++    assert!(stdout.contains("authorization_head=null"));
++    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
++    assert!(!stdout.contains("accepted head="));
++}
++
++#[test]
++fn explain_can_use_real_micro_git_snapshot_hash() {
++    let (repo, _proposal) = sample_micro_repo();
++    let repo_arg = repo.path().to_str().expect("UTF-8 path");
++
++    let output = turing()
++        .args(["explain", "blocker", "--micro-git", repo_arg])
++        .output()
++        .expect("run explain real micro git");
++
++    assert!(output.status.success(), "explain failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("typed_command.v1"));
++    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
++    assert!(stdout.contains("operator_view_snapshot.v1=sha256:"));
++}
++
++#[test]
++fn status_can_read_micro_tape_bundle_directly() {
++    let (_repo, bundle, proposal) = sample_micro_bundle();
++    let bundle_arg = bundle.to_str().expect("UTF-8 path");
++
++    let output = turing()
++        .args(["status", "--micro-bundle", bundle_arg])
++        .output()
++        .expect("run status bundle");
++
++    assert!(output.status.success(), "status bundle failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
++    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
++    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
++}
++
++#[test]
++fn status_panoview_and_explain_render_operator_snapshot_contract() {
++    for (args, expected) in [
++        (
++            &["status"][..],
++            vec![
++                "operator_view_snapshot.v1",
++                "operator_state=Healthy",
++                "tape_tip=mu:",
++                "authorization_head=",
++                "accepted_head=mu:",
++                "IMPLEMENTER_ADDRESSED",
++            ],
++        ),
++        (
++            &["panoview"][..],
++            vec![
++                "lanes:",
++                "tape_tip=",
++                "authorization_head=",
++                "accepted_head=",
++                "warnings:",
++                "safe commands:",
++                "VIEW_STATUS",
++                "APPROVE_CANDIDATE approval_required",
++            ],
++        ),
++        (
++            &["explain", "blocker"][..],
++            vec![
++                "typed_command.v1",
++                "EXPLAIN_BLOCKER",
++                "evidence",
++                "replay",
++                "human_signature_required",
++            ],
++        ),
++    ] {
++        let output = turing().args(args).output().expect("run operator command");
++        assert!(
++            output.status.success(),
++            "command {args:?} failed: {output:?}"
++        );
++        let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++        for text in expected {
++            assert!(
++                stdout.contains(text),
++                "command {args:?} missing {text:?}: {stdout}"
++            );
++        }
++        assert!(!stdout.contains("production ready"));
++        assert!(!stdout.contains("human ratified"));
++        assert!(!stdout.contains("class closed"));
++    }
++}
++
++#[test]
++fn ask_routes_natural_language_to_advisory_turn_trace_only() {
++    let output = turing()
++        .args(["ask", "请批准这个 candidate"])
++        .output()
++        .expect("run ask");
++
++    assert!(output.status.success(), "ask failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("operator_turn_trace.v1"));
++    assert!(stdout.contains("APPROVE_CANDIDATE"));
++    assert!(stdout.contains("approval_required=true"));
++    assert!(stdout.contains("writes_truth=false"));
++    assert!(stdout.contains("advisory_confidence="));
++    assert!(stdout.contains("human_signature_required"));
++    assert!(!stdout.contains("shell"));
++    assert!(!stdout.contains("dispatch_executed"));
++}
++
++#[test]
++fn ask_routes_closed_verbs_without_falling_back_to_help() {
++    for (utterance, expected) in [
++        ("replay verify the current view", "REPLAY_VERIFY"),
++        ("audit invariants now", "AUDIT_INVARIANTS"),
++        ("propose intent to rescue the issue", "PROPOSE_INTENT"),
++        ("propose goal repair django", "PROPOSE_GOAL"),
++        ("propose capsule for django fix", "PROPOSE_CAPSULE"),
++        (
++            "explain event mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++            "EXPLAIN_EVENT",
++        ),
++    ] {
++        let output = turing()
++            .args(["ask", utterance])
++            .output()
++            .expect("run ask route");
++        assert!(
++            output.status.success(),
++            "ask {utterance:?} failed: {output:?}"
++        );
++        let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++        assert!(
++            stdout.contains(expected),
++            "utterance {utterance:?} routed wrong: {stdout}"
++        );
++        assert!(
++            !stdout.contains("selected_verb=HELP"),
++            "utterance {utterance:?} fell back to HELP: {stdout}"
++        );
++        assert!(stdout.contains("writes_truth=false"));
++    }
++}
++
++#[test]
++fn ask_routes_reject_candidate_without_inventing_approval() {
++    let output = turing()
++        .args(["ask", "reject candidate cand1"])
++        .output()
++        .expect("run ask reject");
++
++    assert!(output.status.success(), "ask reject failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("REJECT_CANDIDATE"));
++    assert!(!stdout.contains("APPROVE_CANDIDATE"));
++    assert!(stdout.contains("approval_required=true"));
++    assert!(stdout.contains("writes_truth=false"));
++}
++
++#[test]
++fn operator_interactive_wrapper_uses_same_snapshot_contract() {
++    let mut child = turing()
++        .arg("operator")
++        .stdin(std::process::Stdio::piped())
++        .stdout(std::process::Stdio::piped())
++        .spawn()
++        .expect("spawn operator");
++    {
++        use std::io::Write;
++        let stdin = child.stdin.as_mut().expect("stdin");
++        writeln!(stdin, "status").expect("write status");
++        writeln!(stdin, "help").expect("write help");
++        writeln!(stdin, "quit").expect("write quit");
++    }
++    let output = child.wait_with_output().expect("operator output");
++
++    assert!(output.status.success(), "operator failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("operator_view_snapshot.v1"));
++    assert!(stdout.contains("typed_command.v1"));
++    assert!(stdout.contains("VIEW_STATUS"));
++    assert!(stdout.contains("HELP"));
++    assert!(!stdout.contains("accepted because"));
++}
++
++#[test]
++fn operator_interactive_routes_explain_event_without_help_fallback() {
++    let mut child = turing()
++        .arg("operator")
++        .stdin(std::process::Stdio::piped())
++        .stdout(std::process::Stdio::piped())
++        .spawn()
++        .expect("spawn operator");
++    {
++        use std::io::Write;
++        let stdin = child.stdin.as_mut().expect("stdin");
++        writeln!(
++            stdin,
++            "explain event mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
++        )
++        .expect("write explain event");
++        writeln!(stdin, "quit").expect("write quit");
++    }
++    let output = child.wait_with_output().expect("operator output");
++
++    assert!(output.status.success(), "operator failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("EXPLAIN_EVENT"));
++    assert!(!stdout.contains("selected_verb=HELP"));
++}
++
++#[test]
++fn explain_event_can_target_event_id_with_replay_evidence() {
++    let output = turing()
++        .args([
++            "explain",
++            "event",
++            "mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++        ])
++        .output()
++        .expect("run explain event id");
++
++    assert!(output.status.success(), "explain event failed: {output:?}");
++    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
++    assert!(stdout.contains("typed_command.v1"));
++    assert!(stdout.contains("EXPLAIN_EVENT"));
++    assert!(
++        stdout.contains(
++            "event_id=mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
++        )
++    );
++    assert!(stdout.contains("source_heads=tape_tip,authorization_head,accepted_head"));
++    assert!(stdout.contains("replay="));
++    assert!(stdout.contains("writes_truth=false"));
++}
++
+ #[test]
+ fn replay_market_pput_and_audit_commands_are_executable() {
+     for (args, expected) in [
+@@ -100,8 +463,18 @@ fn approval_preview_renders_human_card_without_writing_truth() {
+     assert!(stdout.contains("approval preview:"));
+     assert!(stdout.contains("approval_id=ap_cli_preview"));
+     assert!(stdout.contains("action=capsule_approve"));
++    assert!(stdout.contains("target=wc_cli"));
+     assert!(stdout.contains("subject=wc_cli"));
+     assert!(stdout.contains("risk=P2"));
++    assert!(stdout.contains("source_heads=tape_tip,authorization_head,accepted_head"));
++    assert!(stdout.contains("source_head_values=tape_tip:mu:"));
++    assert!(stdout.contains("accepted_head:mu:"));
++    assert!(stdout.contains("evidence_digest_count=1"));
++    assert!(stdout.contains("approval_required=true"));
++    assert!(stdout.contains("expiry=not_present"));
++    assert!(stdout.contains("nonce=not_present"));
++    assert!(stdout.contains("side_effect_class=sovereign_mutation"));
++    assert!(stdout.contains("post_approval_state=NeedsApproval_or_AwaitingReceipt"));
+     assert!(stdout.contains("signature_route=None"));
+     assert!(stdout.contains("visible_card_hash=sha256:"));
+     assert!(stdout.contains("writes_micro_truth=false"));
+@@ -110,7 +483,43 @@ fn approval_preview_renders_human_card_without_writing_truth() {
+ }
+ 
+ #[test]
+-fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth() {
++fn approval_sign_in_memory_test_route_requires_explicit_test_flag() {
++    let output = turing()
++        .args([
++            "approval",
++            "sign",
++            "--key-id",
++            "operator-local-key",
++            "--approval-id",
++            "ap_cli_sign",
++            "--authority-epoch",
++            "7",
++            "--action",
++            "capsule_approve",
++            "--subject",
++            "wc_cli",
++            "--risk",
++            "P2",
++            "--evidence-digest",
++            "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
++            "--signature-route",
++            "in-memory-test",
++        ])
++        .output()
++        .expect("run approval sign");
++
++    assert!(
++        !output.status.success(),
++        "in-memory-test sign should require explicit flag"
++    );
++    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
++    assert!(stderr.contains("--allow-test-signature"));
++    assert!(stderr.contains("test-only"));
++    assert!(!stderr.contains("signature=ed25519:"));
++}
++
++#[test]
++fn approval_sign_emits_explicit_in_memory_test_signature_with_test_flag_only() {
+     let output = turing()
+         .args([
+             "approval",
+@@ -131,6 +540,7 @@ fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth()
+             "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+             "--signature-route",
+             "in-memory-test",
++            "--allow-test-signature",
+         ])
+         .output()
+         .expect("run approval sign");
+@@ -145,6 +555,7 @@ fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth()
+     assert!(stdout.contains("public_key_fingerprint=sha256:"));
+     assert!(stdout.contains("verifying_key=ed25519-pub:"));
+     assert!(stdout.contains("signature=ed25519:"));
++    assert!(stdout.contains("test_signature_only=true"));
+     assert!(stdout.contains("writes_micro_truth=false"));
+     assert!(!stdout.contains("plaintext"));
+     assert!(!stdout.contains("credential"));
+diff --git a/crates/turing-projection/src/lib.rs b/crates/turing-projection/src/lib.rs
+index fac6f7b..ca4ed51 100644
+--- a/crates/turing-projection/src/lib.rs
++++ b/crates/turing-projection/src/lib.rs
+@@ -91,6 +91,558 @@ impl ProjectionBuilder {
+     }
+ }
+ 
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorSnapshotSource {
++    pub project_root: String,
++    pub micro_repo: String,
++    pub source_kind: String,
++    pub projection_version: String,
++    pub rebuild_command: String,
++    pub can_write_truth: bool,
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorHeads {
++    pub tape_tip: String,
++    pub authorization_head: Option<String>,
++    pub accepted_head: String,
++}
++
++impl OperatorHeads {
++    pub fn new(
++        tape_tip: impl Into<String>,
++        authorization_head: Option<impl Into<String>>,
++        accepted_head: impl Into<String>,
++    ) -> Result<Self, ProjectionError> {
++        let heads = OperatorHeads {
++            tape_tip: tape_tip.into(),
++            authorization_head: authorization_head.map(Into::into),
++            accepted_head: accepted_head.into(),
++        };
++        MicroOid::parse(&heads.tape_tip)
++            .map_err(|_| ProjectionError::InvalidMicroEventId(heads.tape_tip.clone()))?;
++        if let Some(authorization_head) = &heads.authorization_head {
++            MicroOid::parse(authorization_head)
++                .map_err(|_| ProjectionError::InvalidMicroEventId(authorization_head.clone()))?;
++        }
++        MicroOid::parse(&heads.accepted_head)
++            .map_err(|_| ProjectionError::InvalidMicroEventId(heads.accepted_head.clone()))?;
++        Ok(heads)
++    }
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "snake_case")]
++pub enum HeadConsistency {
++    Consistent,
++    Inconsistent,
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
++pub enum OperatorState {
++    NotBooted,
++    Healthy,
++    NeedsApproval,
++    PendingExecution,
++    AwaitingReceipt,
++    EvidenceMissing,
++    Blocked,
++    Failed,
++    StaleProjection,
++    ReplayRequired,
++    OutsideGovernanceObserved,
++    Unknown,
++}
++
++impl OperatorState {
++    #[must_use]
++    pub fn as_str(self) -> &'static str {
++        match self {
++            OperatorState::NotBooted => "NotBooted",
++            OperatorState::Healthy => "Healthy",
++            OperatorState::NeedsApproval => "NeedsApproval",
++            OperatorState::PendingExecution => "PendingExecution",
++            OperatorState::AwaitingReceipt => "AwaitingReceipt",
++            OperatorState::EvidenceMissing => "EvidenceMissing",
++            OperatorState::Blocked => "Blocked",
++            OperatorState::Failed => "Failed",
++            OperatorState::StaleProjection => "StaleProjection",
++            OperatorState::ReplayRequired => "ReplayRequired",
++            OperatorState::OutsideGovernanceObserved => "OutsideGovernanceObserved",
++            OperatorState::Unknown => "Unknown",
++        }
++    }
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorLane {
++    pub name: String,
++    pub head: Option<String>,
++    pub meaning: String,
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorWarning {
++    pub code: String,
++    pub severity: String,
++    pub message: String,
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorViewSnapshot {
++    pub schema_id: String,
++    pub source: OperatorSnapshotSource,
++    pub heads: OperatorHeads,
++    pub head_consistency: HeadConsistency,
++    pub operator_state: OperatorState,
++    pub lanes: Vec<OperatorLane>,
++    pub active_work: Vec<String>,
++    pub evidence: Vec<String>,
++    pub failures: Vec<String>,
++    pub warnings: Vec<OperatorWarning>,
++    pub next_sovereign_action: String,
++    pub safe_commands: Vec<CommandSpec>,
++    pub snapshot_hash: String,
++}
++
++impl OperatorViewSnapshot {
++    pub fn from_guarded_heads(
++        project_root: impl Into<String>,
++        micro_repo: impl Into<String>,
++        rebuild_command: impl Into<String>,
++        heads: OperatorHeads,
++    ) -> Result<Self, ProjectionError> {
++        Self::from_heads_with_source_kind(
++            "guarded_micro_tape_read",
++            project_root,
++            micro_repo,
++            rebuild_command,
++            heads,
++        )
++    }
++
++    pub fn from_deterministic_replay(
++        project_root: impl Into<String>,
++        micro_repo: impl Into<String>,
++        rebuild_command: impl Into<String>,
++        heads: OperatorHeads,
++    ) -> Result<Self, ProjectionError> {
++        Self::from_heads_with_source_kind(
++            "deterministic_replay",
++            project_root,
++            micro_repo,
++            rebuild_command,
++            heads,
++        )
++    }
++
++    pub fn from_projection_events_forbidden(
++        _events: Vec<ProjectionEvent>,
++    ) -> Result<Self, ProjectionError> {
++        Err(ProjectionError::CallerSuppliedProjectionEventsForbidden)
++    }
++
++    fn from_heads_with_source_kind(
++        source_kind: &str,
++        project_root: impl Into<String>,
++        micro_repo: impl Into<String>,
++        rebuild_command: impl Into<String>,
++        heads: OperatorHeads,
++    ) -> Result<Self, ProjectionError> {
++        let lanes = vec![
++            OperatorLane {
++                name: "append".to_string(),
++                head: Some(heads.tape_tip.clone()),
++                meaning: "latest MicroTape append; every event moves this head".to_string(),
++            },
++            OperatorLane {
++                name: "authorization".to_string(),
++                head: heads.authorization_head.clone(),
++                meaning: "latest authorization event; permission, not completion".to_string(),
++            },
++            OperatorLane {
++                name: "accepted".to_string(),
++                head: Some(heads.accepted_head.clone()),
++                meaning: "latest sovereign accept event from replay-derived head movement"
++                    .to_string(),
++            },
++        ];
++        let warnings = vec![OperatorWarning {
++            code: "NO_HITL_STATUS_CEILING".to_string(),
++            severity: "warning".to_string(),
++            message:
++                "local no-HITL gates can report IMPLEMENTER_ADDRESSED only; no human ratification"
++                    .to_string(),
++        }];
++        let source = OperatorSnapshotSource {
++            project_root: project_root.into(),
++            micro_repo: micro_repo.into(),
++            source_kind: source_kind.to_string(),
++            projection_version: "operator_view_snapshot.v1".to_string(),
++            rebuild_command: rebuild_command.into(),
++            can_write_truth: false,
++        };
++        let mut snapshot = OperatorViewSnapshot {
++            schema_id: "operator_view_snapshot.v1".to_string(),
++            source,
++            heads,
++            head_consistency: HeadConsistency::Consistent,
++            operator_state: OperatorState::Healthy,
++            lanes,
++            active_work: vec!["no active worker dispatch in this read-only snapshot".to_string()],
++            evidence: vec![
++                "heads read through guarded MicroTape/replay path".to_string(),
++                "renderer may format snapshot but may not derive new truth".to_string(),
++            ],
++            failures: Vec::new(),
++            warnings,
++            next_sovereign_action: "no human approval pending".to_string(),
++            safe_commands: CommandSpec::all(),
++            snapshot_hash: String::new(),
++        };
++        let preimage = serde_json::json!({
++            "schema_id": snapshot.schema_id,
++            "source": snapshot.source,
++            "heads": snapshot.heads,
++            "head_consistency": snapshot.head_consistency,
++            "operator_state": snapshot.operator_state,
++            "lanes": snapshot.lanes,
++            "active_work": snapshot.active_work,
++            "evidence": snapshot.evidence,
++            "failures": snapshot.failures,
++            "warnings": snapshot.warnings,
++            "next_sovereign_action": snapshot.next_sovereign_action,
++            "safe_commands": snapshot.safe_commands,
++        });
++        let bytes = jcs::canonicalize(&preimage)
++            .map_err(|error| ProjectionError::Canonicalization(error.to_string()))?;
++        snapshot.snapshot_hash = format!("sha256:{}", jcs::sha256_hex(&bytes));
++        Ok(snapshot)
++    }
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
++pub enum TypedVerb {
++    ViewStatus,
++    ViewPanoview,
++    ExplainEvent,
++    ExplainBlocker,
++    ReplayVerify,
++    AuditInvariants,
++    ProposeIntent,
++    ProposeGoal,
++    ProposeCapsule,
++    ApproveCapsule,
++    DispatchWorker,
++    ObserveCapsule,
++    RejectCandidate,
++    RequestMacroAuth,
++    ApproveCandidate,
++    Help,
++}
++
++#[allow(non_upper_case_globals)]
++impl TypedVerb {
++    pub const VIEW_STATUS: Self = Self::ViewStatus;
++    pub const VIEW_PANOVIEW: Self = Self::ViewPanoview;
++    pub const EXPLAIN_EVENT: Self = Self::ExplainEvent;
++    pub const EXPLAIN_BLOCKER: Self = Self::ExplainBlocker;
++    pub const REPLAY_VERIFY: Self = Self::ReplayVerify;
++    pub const AUDIT_INVARIANTS: Self = Self::AuditInvariants;
++    pub const PROPOSE_INTENT: Self = Self::ProposeIntent;
++    pub const PROPOSE_GOAL: Self = Self::ProposeGoal;
++    pub const PROPOSE_CAPSULE: Self = Self::ProposeCapsule;
++    pub const APPROVE_CAPSULE: Self = Self::ApproveCapsule;
++    pub const DISPATCH_WORKER: Self = Self::DispatchWorker;
++    pub const OBSERVE_CAPSULE: Self = Self::ObserveCapsule;
++    pub const REJECT_CANDIDATE: Self = Self::RejectCandidate;
++    pub const REQUEST_MACRO_AUTH: Self = Self::RequestMacroAuth;
++    pub const APPROVE_CANDIDATE: Self = Self::ApproveCandidate;
++    pub const HELP: Self = Self::Help;
++
++    #[must_use]
++    pub fn as_str(self) -> &'static str {
++        match self {
++            TypedVerb::ViewStatus => "VIEW_STATUS",
++            TypedVerb::ViewPanoview => "VIEW_PANOVIEW",
++            TypedVerb::ExplainEvent => "EXPLAIN_EVENT",
++            TypedVerb::ExplainBlocker => "EXPLAIN_BLOCKER",
++            TypedVerb::ReplayVerify => "REPLAY_VERIFY",
++            TypedVerb::AuditInvariants => "AUDIT_INVARIANTS",
++            TypedVerb::ProposeIntent => "PROPOSE_INTENT",
++            TypedVerb::ProposeGoal => "PROPOSE_GOAL",
++            TypedVerb::ProposeCapsule => "PROPOSE_CAPSULE",
++            TypedVerb::ApproveCapsule => "APPROVE_CAPSULE",
++            TypedVerb::DispatchWorker => "DISPATCH_WORKER",
++            TypedVerb::ObserveCapsule => "OBSERVE_CAPSULE",
++            TypedVerb::RejectCandidate => "REJECT_CANDIDATE",
++            TypedVerb::RequestMacroAuth => "REQUEST_MACRO_AUTH",
++            TypedVerb::ApproveCandidate => "APPROVE_CANDIDATE",
++            TypedVerb::Help => "HELP",
++        }
++    }
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "snake_case")]
++pub enum SideEffectClass {
++    ReadOnly,
++    ProposalOnly,
++    Authorization,
++    WorkerDispatch,
++    Observation,
++    SovereignMutation,
++}
++
++impl SideEffectClass {
++    #[must_use]
++    pub fn as_str(self) -> &'static str {
++        match self {
++            SideEffectClass::ReadOnly => "read_only",
++            SideEffectClass::ProposalOnly => "proposal_only",
++            SideEffectClass::Authorization => "authorization",
++            SideEffectClass::WorkerDispatch => "worker_dispatch",
++            SideEffectClass::Observation => "observation",
++            SideEffectClass::SovereignMutation => "sovereign_mutation",
++        }
++    }
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(rename_all = "snake_case")]
++pub enum ConfirmationRoute {
++    None,
++    ApprovalRequired,
++    HumanSignatureRequired,
++}
++
++impl ConfirmationRoute {
++    #[must_use]
++    pub fn as_str(self) -> &'static str {
++        match self {
++            ConfirmationRoute::None => "none",
++            ConfirmationRoute::ApprovalRequired => "approval_required",
++            ConfirmationRoute::HumanSignatureRequired => "human_signature_required",
++        }
++    }
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct CommandSpec {
++    pub schema_id: String,
++    pub verb: TypedVerb,
++    pub side_effect_class: SideEffectClass,
++    pub source_heads: Vec<String>,
++    pub preconditions: Vec<String>,
++    pub risk_class: String,
++    pub confirmation_route: ConfirmationRoute,
++    pub approval_required: bool,
++    pub dry_run_default: bool,
++    pub writes_truth: bool,
++    pub expected_receipt: String,
++    pub replay_command: String,
++}
++
++impl CommandSpec {
++    #[must_use]
++    pub fn all() -> Vec<Self> {
++        vec![
++            spec(
++                TypedVerb::ViewStatus,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ViewPanoview,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ExplainEvent,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ExplainBlocker,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ReplayVerify,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::AuditInvariants,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ProposeIntent,
++                SideEffectClass::ProposalOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ProposeGoal,
++                SideEffectClass::ProposalOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ProposeCapsule,
++                SideEffectClass::ProposalOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::ApproveCapsule,
++                SideEffectClass::SovereignMutation,
++                true,
++                ConfirmationRoute::HumanSignatureRequired,
++            ),
++            spec(
++                TypedVerb::DispatchWorker,
++                SideEffectClass::WorkerDispatch,
++                true,
++                ConfirmationRoute::ApprovalRequired,
++            ),
++            spec(
++                TypedVerb::ObserveCapsule,
++                SideEffectClass::Observation,
++                false,
++                ConfirmationRoute::None,
++            ),
++            spec(
++                TypedVerb::RejectCandidate,
++                SideEffectClass::Authorization,
++                true,
++                ConfirmationRoute::ApprovalRequired,
++            ),
++            spec(
++                TypedVerb::RequestMacroAuth,
++                SideEffectClass::Authorization,
++                true,
++                ConfirmationRoute::HumanSignatureRequired,
++            ),
++            spec(
++                TypedVerb::ApproveCandidate,
++                SideEffectClass::SovereignMutation,
++                true,
++                ConfirmationRoute::HumanSignatureRequired,
++            ),
++            spec(
++                TypedVerb::Help,
++                SideEffectClass::ReadOnly,
++                false,
++                ConfirmationRoute::None,
++            ),
++        ]
++    }
++
++    #[must_use]
++    pub fn get(verb: TypedVerb) -> Option<Self> {
++        Self::all().into_iter().find(|spec| spec.verb == verb)
++    }
++}
++
++fn spec(
++    verb: TypedVerb,
++    side_effect_class: SideEffectClass,
++    approval_required: bool,
++    confirmation_route: ConfirmationRoute,
++) -> CommandSpec {
++    CommandSpec {
++        schema_id: "typed_command.v1".to_string(),
++        verb,
++        side_effect_class,
++        source_heads: vec![
++            "tape_tip".to_string(),
++            "authorization_head".to_string(),
++            "accepted_head".to_string(),
++        ],
++        preconditions: if approval_required {
++            vec![
++                "operator_view_snapshot.v1 is fresh".to_string(),
++                "real approval event exists or command returns approval_required".to_string(),
++            ]
++        } else {
++            vec!["operator_view_snapshot.v1 is fresh".to_string()]
++        },
++        risk_class: if approval_required { "P1" } else { "P0" }.to_string(),
++        confirmation_route,
++        approval_required,
++        dry_run_default: true,
++        writes_truth: false,
++        expected_receipt: if approval_required {
++            "approval_required_or_human_signature_required"
++        } else {
++            "read_only_receipt"
++        }
++        .to_string(),
++        replay_command: "turing replay --verify".to_string(),
++    }
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorToolManifest {
++    pub schema_id: String,
++    pub commands: Vec<CommandSpec>,
++    pub can_evaluate_predicates: bool,
++    pub can_move_heads: bool,
++    pub can_synthesize_approvals: bool,
++    pub can_run_shell: bool,
++    pub can_autonomous_dispatch: bool,
++}
++
++impl OperatorToolManifest {
++    #[must_use]
++    pub fn closed_v1() -> Self {
++        OperatorToolManifest {
++            schema_id: "operator_tool_manifest.v1".to_string(),
++            commands: CommandSpec::all(),
++            can_evaluate_predicates: false,
++            can_move_heads: false,
++            can_synthesize_approvals: false,
++            can_run_shell: false,
++            can_autonomous_dispatch: false,
++        }
++    }
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorIntent {
++    pub schema_id: String,
++    pub utterance_digest: String,
++    pub selected_verb: TypedVerb,
++    pub confidence_basis: String,
++}
++
++#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
++pub struct OperatorTurnTrace {
++    pub schema_id: String,
++    pub intent: OperatorIntent,
++    pub typed_command: CommandSpec,
++    pub manifest: OperatorToolManifest,
++    pub advisory_confidence: String,
++}
++
++pub struct ProductionApprovalRoutePolicy;
++
++impl ProductionApprovalRoutePolicy {
++    #[must_use]
++    pub fn allows(route: &str) -> bool {
++        matches!(route, "os-keyring" | "hardware" | "hardware-future")
++    }
++}
++
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub struct Projection {
+     pub schema_id: String,
+@@ -134,6 +686,7 @@ pub enum TuiCommand {
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub enum ProjectionError {
+     InvalidMicroEventId(String),
++    CallerSuppliedProjectionEventsForbidden,
+     Canonicalization(String),
+ }
+ 
+@@ -141,6 +694,10 @@ impl std::fmt::Display for ProjectionError {
+     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+         match self {
+             ProjectionError::InvalidMicroEventId(id) => write!(f, "invalid Micro event id {id:?}"),
++            ProjectionError::CallerSuppliedProjectionEventsForbidden => write!(
++                f,
++                "operator_view_snapshot.v1 must be built from guarded MicroTape reads or deterministic replay"
++            ),
+             ProjectionError::Canonicalization(message) => write!(f, "{message}"),
+         }
+     }
+diff --git a/crates/turing-projection/tests/projection_builder.rs b/crates/turing-projection/tests/projection_builder.rs
+index c9da503..c6d1256 100644
+--- a/crates/turing-projection/tests/projection_builder.rs
++++ b/crates/turing-projection/tests/projection_builder.rs
+@@ -1,5 +1,8 @@
+ use turing_projection::{
+-    ProjectionBuilder, ProjectionEvent, ProjectionSource, TuiCommand, TuiProjectionClient,
++    CommandSpec, ConfirmationRoute, HeadConsistency, OperatorHeads, OperatorState,
++    OperatorToolManifest, OperatorViewSnapshot, ProductionApprovalRoutePolicy, ProjectionBuilder,
++    ProjectionError, ProjectionEvent, ProjectionSource, SideEffectClass, TuiCommand,
++    TuiProjectionClient, TypedVerb,
+ };
+ 
+ #[test]
+@@ -52,3 +55,149 @@ fn projection_copy_does_not_treat_macro_green_as_accepted() {
+     assert!(!rendered.contains("CI passed therefore accepted"));
+     assert!(rendered.contains("external evidence"));
+ }
++
++#[test]
++fn operator_snapshot_is_shared_contract_from_guarded_heads() {
++    let heads = OperatorHeads::new(
++        "mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++        Some("mu:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"),
++        "mu:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
++    )
++    .expect("valid heads");
++
++    let snapshot = OperatorViewSnapshot::from_guarded_heads(
++        "/workspace/project",
++        "/workspace/project/.turingos/micro.git",
++        "turing replay --verify",
++        heads.clone(),
++    )
++    .expect("snapshot");
++
++    assert_eq!(snapshot.schema_id, "operator_view_snapshot.v1");
++    assert_eq!(snapshot.source.source_kind, "guarded_micro_tape_read");
++    assert_eq!(
++        snapshot.source.projection_version,
++        "operator_view_snapshot.v1"
++    );
++    assert_eq!(snapshot.source.rebuild_command, "turing replay --verify");
++    assert!(!snapshot.source.can_write_truth);
++    assert_eq!(snapshot.heads, heads);
++    assert_eq!(snapshot.head_consistency, HeadConsistency::Consistent);
++    assert_eq!(snapshot.operator_state, OperatorState::Healthy);
++    assert_eq!(
++        snapshot
++            .lanes
++            .iter()
++            .map(|lane| lane.name.as_str())
++            .collect::<Vec<_>>(),
++        vec!["append", "authorization", "accepted"]
++    );
++    assert!(
++        snapshot
++            .warnings
++            .iter()
++            .any(|warning| warning.code == "NO_HITL_STATUS_CEILING")
++    );
++    assert!(
++        snapshot
++            .safe_commands
++            .iter()
++            .any(|command| command.verb == TypedVerb::VIEW_STATUS)
++    );
++    assert_eq!(snapshot.next_sovereign_action, "no human approval pending");
++    assert!(snapshot.snapshot_hash.starts_with("sha256:"));
++}
++
++#[test]
++fn operator_snapshot_rejects_caller_supplied_projection_events() {
++    let error = OperatorViewSnapshot::from_projection_events_forbidden(vec![ProjectionEvent::new(
++        "mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++        "CandidateAccepted",
++        "forged_candidate",
++    )])
++    .expect_err("projection events are not an operator snapshot source");
++
++    assert_eq!(
++        error,
++        ProjectionError::CallerSuppliedProjectionEventsForbidden
++    );
++}
++
++#[test]
++fn typed_commands_cover_closed_verb_set_and_boundaries() {
++    let specs = CommandSpec::all();
++    let verbs = specs.iter().map(|spec| spec.verb).collect::<Vec<_>>();
++
++    assert_eq!(
++        verbs,
++        vec![
++            TypedVerb::VIEW_STATUS,
++            TypedVerb::VIEW_PANOVIEW,
++            TypedVerb::EXPLAIN_EVENT,
++            TypedVerb::EXPLAIN_BLOCKER,
++            TypedVerb::REPLAY_VERIFY,
++            TypedVerb::AUDIT_INVARIANTS,
++            TypedVerb::PROPOSE_INTENT,
++            TypedVerb::PROPOSE_GOAL,
++            TypedVerb::PROPOSE_CAPSULE,
++            TypedVerb::APPROVE_CAPSULE,
++            TypedVerb::DISPATCH_WORKER,
++            TypedVerb::OBSERVE_CAPSULE,
++            TypedVerb::REJECT_CANDIDATE,
++            TypedVerb::REQUEST_MACRO_AUTH,
++            TypedVerb::APPROVE_CANDIDATE,
++            TypedVerb::HELP,
++        ]
++    );
++
++    let view_status = CommandSpec::get(TypedVerb::VIEW_STATUS).expect("VIEW_STATUS");
++    assert_eq!(view_status.side_effect_class, SideEffectClass::ReadOnly);
++    assert!(!view_status.approval_required);
++    assert!(view_status.dry_run_default);
++    assert!(!view_status.writes_truth);
++    assert_eq!(view_status.confirmation_route, ConfirmationRoute::None);
++
++    let approve_candidate =
++        CommandSpec::get(TypedVerb::APPROVE_CANDIDATE).expect("APPROVE_CANDIDATE");
++    assert_eq!(
++        approve_candidate.side_effect_class,
++        SideEffectClass::SovereignMutation
++    );
++    assert!(approve_candidate.approval_required);
++    assert!(approve_candidate.dry_run_default);
++    assert!(!approve_candidate.writes_truth);
++    assert_eq!(
++        approve_candidate.confirmation_route,
++        ConfirmationRoute::HumanSignatureRequired
++    );
++    assert_eq!(
++        approve_candidate.expected_receipt,
++        "approval_required_or_human_signature_required"
++    );
++}
++
++#[test]
++fn tool_manifest_exposes_only_closed_operator_tools() {
++    let manifest = OperatorToolManifest::closed_v1();
++    assert_eq!(manifest.schema_id, "operator_tool_manifest.v1");
++    assert!(!manifest.can_evaluate_predicates);
++    assert!(!manifest.can_move_heads);
++    assert!(!manifest.can_run_shell);
++    let manifest_json = serde_json::to_value(&manifest).expect("manifest JSON");
++    assert_eq!(manifest_json["can_autonomous_dispatch"], false);
++    assert_eq!(manifest.commands.len(), CommandSpec::all().len());
++    assert!(
++        manifest
++            .commands
++            .iter()
++            .all(|command| CommandSpec::get(command.verb).is_some())
++    );
++}
++
++#[test]
++fn production_approval_routes_reject_test_and_local_signing() {
++    assert!(ProductionApprovalRoutePolicy::allows("os-keyring"));
++    assert!(ProductionApprovalRoutePolicy::allows("hardware"));
++    assert!(!ProductionApprovalRoutePolicy::allows("in-memory-test"));
++    assert!(!ProductionApprovalRoutePolicy::allows("local-file-dev"));
++}

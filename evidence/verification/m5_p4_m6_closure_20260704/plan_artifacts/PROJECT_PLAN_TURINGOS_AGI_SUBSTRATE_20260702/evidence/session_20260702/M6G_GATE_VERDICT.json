@@ -1,0 +1,89 @@
+{
+  "alignment_verify": "GREEN",
+  "checklist_results": [
+    {
+      "answer": "Serves G7: HCI-A ADR accepted, displayed values replayable, zero head-moving paths, and branch committed/archived.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M6_hci_console.md",
+      "q": 1,
+      "question": "Does the deliverable serve one of G1-G7? Which KPI, exactly?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. It does not change constitution bytes, enable M2, authorize HCI-B, or authorize write-capable console behavior.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+      "q": 2,
+      "question": "Does it violate any red line in Intent section 5?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. M6G_ARTIFACT_ROLLUP.json digest-binds the required artifacts.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_ARTIFACT_ROLLUP.json",
+      "q": 3,
+      "question": "Is every claim backed by an artifact path an independent agent can open?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. Fixture MicroTape evidence is identified as implementation gate evidence and the original rescue archive is fixture-labeled.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/CLAIM_BOUNDARY.json",
+      "q": 4,
+      "question": "Is anything labeled real that is a fixture? Is anything unlabeled?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "No. This assembles MODULE_M6 section 3 artifacts and prepares an M5.P4 handoff only.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M6_hci_console.md",
+      "q": 5,
+      "question": "Did scope grow beyond the Atom/Phase spec? If yes, cite the decision.",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. The tracker and roll-up cite the pushed branch, exact commit, gate outputs, and manifests.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "q": 6,
+      "question": "Can the work be replayed or resumed by a fresh agent from tracker plus tape alone?",
+      "verdict": "PASS"
+    },
+    {
+      "answer": "Yes. M6.G remains ADDRESSED and requires M5.P4 custody-separated external closure for external verification.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_ARTIFACT_ROLLUP.json",
+      "q": 7,
+      "question": "Does the status honor the ADDRESSED ceiling?",
+      "verdict": "PASS"
+    }
+  ],
+  "evidence": [
+    {
+      "label": "artifact_rollup",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_ARTIFACT_ROLLUP.json",
+      "sha256": "3dd8d223d891e8f373d1a82c570afac7e76fdf4efc92ce5b4e6356bab4f60c8e"
+    },
+    {
+      "label": "drift_checklist",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_DRIFT_CHECKLIST.md",
+      "sha256": "bd169f2eee12b2ea4dc4cc6d7d2b52f7378afee1def3c26c2df976b7aa4b9dec"
+    },
+    {
+      "label": "m5_p4_handoff_packet",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_M5_P4_HANDOFF_PACKET.json",
+      "sha256": "6751ba004630a5ebb6979ea940a08ac5b8a89905863da4e4c2fee3cc1fc98048"
+    }
+  ],
+  "g7_kpi": {
+    "branch_committed_or_archived": true,
+    "displayed_values_replayable": true,
+    "hci_a_adr_accepted": true,
+    "zero_head_moving_paths_static_and_dynamic": true
+  },
+  "gate_id": "M6.G",
+  "module": "M6",
+  "non_claims": [
+    "M6.G is not externally verified",
+    "No HCI-B or write-capable console behavior is authorized.",
+    "No SHIPPED, RELEASED, RATIFIED, M2 enablement, release eligibility, FCE.RUN, OG-10/genesis signature, or constitution-byte change is claimed."
+  ],
+  "not_run_is_fail": true,
+  "recorded_at_utc": "2026-07-04T05:10:00Z",
+  "schema_id": "GateVerdict.v1",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}
