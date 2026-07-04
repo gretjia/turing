@@ -1747,6 +1747,25 @@ def run_substrate_task(
                     if stage12_first_attempt is not None
                     else {}
                 ),
+                # Real fix (found by FCE-W1): broadcast_rules is the list of rules
+                # emitted by EARLIER tasks in this run (accumulated across the main()
+                # loop, see active_broadcast_rules). Before this fix, broadcast_rules
+                # was only ever forwarded into the worker-visible PROMPT text
+                # (deepseek_visible_prompt/visible_grok_prompt) - the capsule itself
+                # never recorded that it had consumed them, so
+                # consumed_broadcast_rule_ids was always absent from every real
+                # (non-fixture) run regardless of --broadcast-rules-file. Only rule_id
+                # strings are recorded here (no cross-repo event-id references,
+                # since each task owns an independent micro.git and a foreign
+                # event id would not resolve inside this task's own DAG).
+                **(
+                    {
+                        "consumed_broadcast_rule_ids": [rule["rule_id"] for rule in broadcast_rules],
+                        "injected_broadcast_rule_ids": [rule["rule_id"] for rule in broadcast_rules],
+                    }
+                    if broadcast_rules
+                    else {}
+                ),
             },
         )
         mark_event(capsule, "WorkCapsuleBuilt")
@@ -2141,7 +2160,9 @@ def run_substrate_task(
         "macro_anchor_id": macro_id,
         "worker_receipt_id": worker_result["receipt_id"],
         "patch_hash": worker_result["patch_hash"],
+        "failure_event_id": failure["event_id"],
         "broadcast_rules_injected": broadcast_rules or [],
+        "consumed_broadcast_rule_ids": [rule["rule_id"] for rule in broadcast_rules] if broadcast_rules else [],
         "broadcast_rules_emitted": [],
         "worker_exit_code": worker_result["exit_code"],
         "worker_token_count_bound_kind": worker_result.get("token_count_bound_kind"),
