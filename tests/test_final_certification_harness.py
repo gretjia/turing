@@ -98,6 +98,7 @@ def test_fce_harness_files_exist_and_self_test() -> None:
     expected = [
         TOOLS / "run_final_certification.sh",
         TOOLS / "score_certification.py",
+        TOOLS / "run_scenarios.py",
         TOOLS / "NORMALIZATION_SPEC.json",
         TOOLS / "checks" / "entry_criteria.py",
         TOOLS / "gen_fixture_tape.py",
@@ -292,3 +293,33 @@ def test_entry_criteria_blocks_without_context_separation(tmp_path: Path) -> Non
     assert manifest["scenarios_default_verdict"] == "NOT_RUN"
     assert any(item["id"] == "E1" and item["verdict"] == "PASS" for item in manifest["entry_criteria"])
     assert any(item["id"] == "E6" and item["verdict"] == "FAIL" for item in manifest["entry_criteria"])
+
+
+def test_scenario_runner_emits_not_run_verdicts_and_scores_failure(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "run_scenarios.py"),
+            "--root",
+            str(out),
+            "--cert-repo-sha",
+            "a" * 40,
+            "--out-final",
+            str(out / "FINAL_CERTIFICATION_VERDICT.json"),
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 1, proc.stdout
+    assert "FCE_SCENARIO_LAYER_EXECUTED" in proc.stdout
+    scenario = load_json(out / "FCE-S1" / "FCE-S1_verdict.json")
+    assert scenario["verdict"] == "NOT_RUN"
+    assert scenario["not_run_is_fail"] is True
+    assert scenario["not_run_reason"] == "scenario_script_missing"
+    final = load_json(out / "FINAL_CERTIFICATION_VERDICT.json")
+    assert final["overall"] == "CERTIFICATION_FAILED"

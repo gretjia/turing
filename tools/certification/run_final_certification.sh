@@ -13,6 +13,7 @@ usage() {
 
 if [ "${1:-}" = "--self-test" ]; then
   python3 "$SCRIPT_DIR/score_certification.py" --self-test
+  python3 "$SCRIPT_DIR/run_scenarios.py" --self-test
   python3 "$SCRIPT_DIR/gen_fixture_tape.py" --self-test
   python3 "$SCRIPT_DIR/gen_fixture_broadcast_rules.py" --self-test
   python3 "$SCRIPT_DIR/checks/entry_criteria.py" --self-test
@@ -93,6 +94,7 @@ if [ "$entry_code" -ne 0 ]; then
   exit "$entry_code"
 fi
 
-echo "FCE_ENTRY_CRITERIA_MET_BUT_SCENARIO_EXECUTION_REQUIRES_W5_MODULE_GATES"
-echo "cert_repo_sha=$CERT_SHA"
-exit 2
+python3 "$SCRIPT_DIR/run_scenarios.py" \
+  --root "$OUT" \
+  --cert-repo-sha "$CERT_SHA" \
+  --out-final "$OUT/FINAL_CERTIFICATION_VERDICT.json"
