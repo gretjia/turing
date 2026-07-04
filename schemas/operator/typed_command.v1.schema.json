@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "typed_command.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "verb",
+    "side_effect_class",
+    "source_heads",
+    "preconditions",
+    "risk_class",
+    "confirmation_route",
+    "approval_required",
+    "dry_run_default",
+    "writes_truth",
+    "expected_receipt",
+    "replay_command"
+  ],
+  "properties": {
+    "schema_id": { "const": "typed_command.v1" },
+    "verb": {
+      "enum": [
+        "VIEW_STATUS",
+        "VIEW_PANOVIEW",
+        "EXPLAIN_EVENT",
+        "EXPLAIN_BLOCKER",
+        "REPLAY_VERIFY",
+        "AUDIT_INVARIANTS",
+        "PROPOSE_INTENT",
+        "PROPOSE_GOAL",
+        "PROPOSE_CAPSULE",
+        "APPROVE_CAPSULE",
+        "DISPATCH_WORKER",
+        "OBSERVE_CAPSULE",
+        "REJECT_CANDIDATE",
+        "REQUEST_MACRO_AUTH",
+        "APPROVE_CANDIDATE",
+        "HELP"
+      ]
+    },
+    "side_effect_class": {
+      "enum": [
+        "read_only",
+        "proposal_only",
+        "authorization",
+        "worker_dispatch",
+        "observation",
+        "sovereign_mutation"
+      ]
+    },
+    "source_heads": { "type": "array", "items": { "enum": ["tape_tip", "authorization_head", "accepted_head"] } },
+    "preconditions": { "type": "array", "items": { "type": "string" } },
+    "risk_class": { "type": "string" },
+    "confirmation_route": { "enum": ["none", "approval_required", "human_signature_required"] },
+    "approval_required": { "type": "boolean" },
+    "dry_run_default": { "type": "boolean" },
+    "writes_truth": { "const": false },
+    "expected_receipt": { "type": "string" },
+    "replay_command": { "type": "string" }
+  }
+}

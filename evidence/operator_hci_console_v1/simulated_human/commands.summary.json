@@ -1,0 +1,535 @@
+{
+  "agent_role": "simulated_human",
+  "commands": [
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "--help"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "help",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/help.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/help.stdout",
+      "stdout_sha256": "6b41cab79b6e9335146b2b3e3bce1bb37caae54d8e2e2c2f6efed948916e8c28"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "help",
+        "commands"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "help_commands",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/help_commands.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/help_commands.stdout",
+      "stdout_sha256": "4557e82846a21950f0642898b9da241116351c83fab035afaf997200183c9b19"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "status"
+      ],
+      "elapsed_ms": 732,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "status_demo",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/status_demo.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/status_demo.stdout",
+      "stdout_sha256": "8dc67992b3273dc18b3c933f0aa8d2d228bb32bcf146ecaaadb881d70c22fa47"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "panoview"
+      ],
+      "elapsed_ms": 692,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "panoview_demo",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/panoview_demo.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/panoview_demo.stdout",
+      "stdout_sha256": "55a9e3748091a45df11248cfdc1aad212fd96f61be3060bd1b4962708034c0b9"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "explain",
+        "blocker"
+      ],
+      "elapsed_ms": 670,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "explain_blocker",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/explain_blocker.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/explain_blocker.stdout",
+      "stdout_sha256": "8cc3dccc9f248cf1efd06726cda0074e6ad2fb298a3e72b1cd75d029eecaee4c"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "explain",
+        "event",
+        "mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "elapsed_ms": 713,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "explain_event",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/explain_event.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/explain_event.stdout",
+      "stdout_sha256": "954db1879ef582e5ba1ccd417bf455211321e82af95eabd843917109984fcb71"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "ask",
+        "\u8bf7\u6279\u51c6\u8fd9\u4e2a candidate"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "ask_approve_zh",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/ask_approve_zh.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/ask_approve_zh.stdout",
+      "stdout_sha256": "e3b9291e45976c97e2c950772f34c6c99e6b5f0a491a8d67cf2eb1971f609420"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "ask",
+        "reject candidate cand1"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "ask_reject",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/ask_reject.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/ask_reject.stdout",
+      "stdout_sha256": "c155b8485e8742e690bc0a3c7f5d63545de5880bd1133951ff45bc7bbf75265a"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "ask",
+        "replay verify"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "ask_replay",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/ask_replay.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/ask_replay.stdout",
+      "stdout_sha256": "a365bb7da823705588c44f086a0dbcac70c4ce05236e2e5198b901d24b098c1b"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "ask",
+        "propose goal repair django"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "ask_propose_goal",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/ask_propose_goal.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/ask_propose_goal.stdout",
+      "stdout_sha256": "15839e8dea372c4a9c85450c9b9024c42f1737c1bdc30c0067a124e74e96f555"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "ask",
+        "propose capsule for django"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "ask_propose_capsule",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/ask_propose_capsule.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/ask_propose_capsule.stdout",
+      "stdout_sha256": "e65a5632bc34189dffadd719606269e90460666f78a92a3805862c7215118c10"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "operator"
+      ],
+      "elapsed_ms": 779,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "operator",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/operator.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/operator.stdout",
+      "stdout_sha256": "40cf8f37e3952e304601e150af2ff3c350bd7e28815a054124cb79dd89753577"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "approval",
+        "preview",
+        "--approval-id",
+        "sim_preview",
+        "--authority-epoch",
+        "7",
+        "--action",
+        "capsule_approve",
+        "--subject",
+        "wc_sim",
+        "--risk",
+        "P2",
+        "--evidence-digest",
+        "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "--signature-route",
+        "none"
+      ],
+      "elapsed_ms": 666,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "approval_preview",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/approval_preview.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/approval_preview.stdout",
+      "stdout_sha256": "4c8f689a9f5e889c24a85d494db8df29136380f3971857c1038401b8ffa1678d"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "approval",
+        "sign",
+        "--key-id",
+        "operator-local-key",
+        "--approval-id",
+        "sim_sign",
+        "--authority-epoch",
+        "7",
+        "--action",
+        "capsule_approve",
+        "--subject",
+        "wc_sim",
+        "--risk",
+        "P2",
+        "--evidence-digest",
+        "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "--signature-route",
+        "in-memory-test"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 2,
+      "expected_exit": 2,
+      "name": "approval_sign_test_rejected",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/approval_sign_test_rejected.stderr",
+      "stderr_sha256": "a19cf3dd0d5526b4339a92f82419c64c0456190a39f3d03b66281c92c1212f30",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/approval_sign_test_rejected.stdout",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "approval",
+        "sign",
+        "--key-id",
+        "operator-local-key",
+        "--approval-id",
+        "sim_sign",
+        "--authority-epoch",
+        "7",
+        "--action",
+        "capsule_approve",
+        "--subject",
+        "wc_sim",
+        "--risk",
+        "P2",
+        "--evidence-digest",
+        "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "--signature-route",
+        "in-memory-test",
+        "--allow-test-signature"
+      ],
+      "elapsed_ms": 17,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "approval_sign_test",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/approval_sign_test.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/approval_sign_test.stdout",
+      "stdout_sha256": "8c31f0bf78f04ab1f813be221d7aa07b92b9bf1307bda39fd2b72541983ea605"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "approval",
+        "sign",
+        "--key-id",
+        "future-hsm-slot-0",
+        "--approval-id",
+        "sim_hardware",
+        "--authority-epoch",
+        "7",
+        "--action",
+        "capsule_approve",
+        "--subject",
+        "wc_sim",
+        "--risk",
+        "P2",
+        "--evidence-digest",
+        "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "--signature-route",
+        "hardware-future"
+      ],
+      "elapsed_ms": 2,
+      "env_delta": {},
+      "exit_code": 2,
+      "expected_exit": 2,
+      "name": "approval_hardware_expected_fail",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/approval_hardware_expected_fail.stderr",
+      "stderr_sha256": "f2e404a655f1397ab0c35ae096ddf4ca30bc1751668f606b6fe7000d8d366fe0",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/approval_hardware_expected_fail.stdout",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "python3",
+        "-c",
+        "import json; from turingos.operator_agent import OperatorAgent; print(json.dumps(OperatorAgent().route_turn('dispatch worker'), sort_keys=True))"
+      ],
+      "elapsed_ms": 83,
+      "env_delta": {
+        "PYTHONPATH": "src"
+      },
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "python_agent",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/python_agent.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/python_agent.stdout",
+      "stdout_sha256": "48a9c27fa3a7ac4d6cc2842a46d560d4414a19da633018cbc0545524f241102b"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/lint_hci_copy.py",
+        "docs/hci"
+      ],
+      "elapsed_ms": 55,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "hci_copy_lint",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/hci_copy_lint.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/hci_copy_lint.stdout",
+      "stdout_sha256": "d718418e0cc4eadd103007d155304576718452c050847ee2bb1610fbebd1daea"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_operator_cli_copy.py"
+      ],
+      "elapsed_ms": 3748,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "cli_copy_audit",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/cli_copy_audit.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/cli_copy_audit.stdout",
+      "stdout_sha256": "a4098e1c7ba04ee932bfa5c8d81b5b063f1c434cd402c3fceeeedd8d3583df50"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/lint_ascii_schema_keys.py",
+        "schemas/operator"
+      ],
+      "elapsed_ms": 50,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "schema_lint",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/schema_lint.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/schema_lint.stdout",
+      "stdout_sha256": "2933e3594089b9e032f1f02b4f6defc137ebf2fff67dc80f5bf1c22605b655e0"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_operator_agent.py"
+      ],
+      "elapsed_ms": 77,
+      "env_delta": {
+        "PYTHONPATH": "src"
+      },
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "operator_audit",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/operator_audit.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/operator_audit.stdout",
+      "stdout_sha256": "569237123d7a3156c541caf5eeb2a0fb533df190e7ceeab353a65decdd238dda"
+    },
+    {
+      "argv": [
+        "bash",
+        "tools/bench/smoke_mini_swe_bench_grok_headless.sh",
+        "/tmp/turingos-hci-swe-smoke"
+      ],
+      "elapsed_ms": 228,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "swe_smoke",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/swe_smoke.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/swe_smoke.stdout",
+      "stdout_sha256": "66d72cadcd12067098b87ee0bae76af0ddd2515893662639725b3ab00592cc90"
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/bench/audit_mini_swe_bench_substrate_coverage.py",
+        "--coverage",
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/evidence/bench/mini_swe_bench_stage2_3task_20260627/turingos/substrate_coverage.json",
+        "--out",
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/evidence/operator_hci_console_v1/simulated_human/swe_stage2_3task_audit.json",
+        "--min-sample-size",
+        "3",
+        "--worker-process",
+        "grok_cli"
+      ],
+      "elapsed_ms": 78,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "swe_stage2_3task_audit",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/swe_stage2_3task_audit.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/swe_stage2_3task_audit.stdout",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "status",
+        "--micro-bundle",
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/evidence/bench/mini_swe_bench_stage2_3task_20260627/turingos/instances/django__django-11790/micro_tape.bundle"
+      ],
+      "elapsed_ms": 59,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "status_swe_bundle",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/status_swe_bundle.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/status_swe_bundle.stdout",
+      "stdout_sha256": "12f6341e866e0e5eaeaf9c3e274a26c708d58b1622f8b501835f925f08686b0b"
+    },
+    {
+      "argv": [
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/target/debug/turing",
+        "panoview",
+        "--micro-bundle",
+        "/home/zephryj/turingos_backup/work/turing-operator-hci-console/evidence/bench/mini_swe_bench_stage2_3task_20260627/turingos/instances/django__django-11790/micro_tape.bundle"
+      ],
+      "elapsed_ms": 54,
+      "env_delta": {},
+      "exit_code": 0,
+      "expected_exit": 0,
+      "name": "panoview_swe_bundle",
+      "required_output_missing": [],
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/simulated_human/panoview_swe_bundle.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/simulated_human/panoview_swe_bundle.stdout",
+      "stdout_sha256": "1e426886abc97c7de136f37fb1ac1ec01d9b1a57d598c6fcab95279ae7a86e7e"
+    }
+  ],
+  "schema_id": "operator_simulated_human_report.v1",
+  "status": "PASS",
+  "status_ceiling": "IMPLEMENTER_ADDRESSED",
+  "swe_bench_sample": {
+    "bundle": "evidence/bench/mini_swe_bench_stage2_3task_20260627/turingos/instances/django__django-11790/micro_tape.bundle",
+    "coverage": "evidence/bench/mini_swe_bench_stage2_3task_20260627/turingos/substrate_coverage.json",
+    "smoke_output": "/tmp/turingos-hci-swe-smoke"
+  },
+  "worktree_path": "/home/zephryj/turingos_backup/work/turing-operator-hci-console"
+}

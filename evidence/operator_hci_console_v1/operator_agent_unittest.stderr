@@ -1,0 +1,12 @@
+test_arbitrary_shell_is_rejected_as_help (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_arbitrary_shell_is_rejected_as_help) ... ok
+test_closed_verb_set_is_exact (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_closed_verb_set_is_exact) ... ok
+test_command_specs_enforce_boundaries (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_command_specs_enforce_boundaries) ... ok
+test_production_routes_reject_test_signers (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_production_routes_reject_test_signers) ... ok
+test_router_selects_non_approval_candidate_and_boundary_verbs (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_router_selects_non_approval_candidate_and_boundary_verbs) ... ok
+test_tool_manifest_matches_agent_boundary_schema (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_tool_manifest_matches_agent_boundary_schema) ... ok
+test_zh_en_router_is_advisory_only (tests.test_operator_agent.TestOperatorAgentIntentRouter.test_zh_en_router_is_advisory_only) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.001s
+
+OK

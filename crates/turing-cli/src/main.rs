@@ -7,6 +7,11 @@ use turing_approval::{
     HardwareSigningBackend, InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute,
     SigningBackend,
 };
+use turing_git_tape::append::Append;
+use turing_projection::{
+    CommandSpec, OperatorHeads, OperatorToolManifest, OperatorTurnTrace, OperatorViewSnapshot,
+    TypedVerb,
+};
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
 
 fn main() -> ExitCode {
@@ -27,6 +32,77 @@ fn main() -> ExitCode {
 
 fn dispatch(args: &[&str]) -> Result<String, String> {
     match args {
+        [] | ["--help"] | ["help"] => Ok(operator_help()),
+        ["help", "commands"] => Ok(operator_commands_help()),
+        ["help", _topic] => Ok(operator_help()),
+        ["status"] => render_operator_status(SnapshotInput::Demo),
+        ["status", "--micro-git", repo] => render_operator_status(SnapshotInput::MicroGit(repo)),
+        ["status", "--micro-bundle", bundle] => {
+            render_operator_status(SnapshotInput::MicroBundle(bundle))
+        }
+        ["panoview"] => render_operator_panoview(SnapshotInput::Demo),
+        ["panoview", "--micro-git", repo] => {
+            render_operator_panoview(SnapshotInput::MicroGit(repo))
+        }
+        ["panoview", "--micro-bundle", bundle] => {
+            render_operator_panoview(SnapshotInput::MicroBundle(bundle))
+        }
+        ["explain"] => {
+            render_operator_explain(TypedVerb::EXPLAIN_BLOCKER, SnapshotInput::Demo, None)
+        }
+        ["explain", "blocker"] => {
+            render_operator_explain(TypedVerb::EXPLAIN_BLOCKER, SnapshotInput::Demo, None)
+        }
+        ["explain", "event"] => {
+            render_operator_explain(TypedVerb::EXPLAIN_EVENT, SnapshotInput::Demo, None)
+        }
+        ["explain", "event", event_id] => render_operator_explain(
+            TypedVerb::EXPLAIN_EVENT,
+            SnapshotInput::Demo,
+            Some(event_id),
+        ),
+        ["explain", "--micro-git", repo] => render_operator_explain(
+            TypedVerb::EXPLAIN_BLOCKER,
+            SnapshotInput::MicroGit(repo),
+            None,
+        ),
+        ["explain", "--micro-bundle", bundle] => render_operator_explain(
+            TypedVerb::EXPLAIN_BLOCKER,
+            SnapshotInput::MicroBundle(bundle),
+            None,
+        ),
+        ["explain", "blocker", "--micro-git", repo] => render_operator_explain(
+            TypedVerb::EXPLAIN_BLOCKER,
+            SnapshotInput::MicroGit(repo),
+            None,
+        ),
+        ["explain", "blocker", "--micro-bundle", bundle] => render_operator_explain(
+            TypedVerb::EXPLAIN_BLOCKER,
+            SnapshotInput::MicroBundle(bundle),
+            None,
+        ),
+        ["explain", "event", "--micro-git", repo] => render_operator_explain(
+            TypedVerb::EXPLAIN_EVENT,
+            SnapshotInput::MicroGit(repo),
+            None,
+        ),
+        ["explain", "event", "--micro-bundle", bundle] => render_operator_explain(
+            TypedVerb::EXPLAIN_EVENT,
+            SnapshotInput::MicroBundle(bundle),
+            None,
+        ),
+        ["explain", "event", event_id, "--micro-git", repo] => render_operator_explain(
+            TypedVerb::EXPLAIN_EVENT,
+            SnapshotInput::MicroGit(repo),
+            Some(event_id),
+        ),
+        ["explain", "event", event_id, "--micro-bundle", bundle] => render_operator_explain(
+            TypedVerb::EXPLAIN_EVENT,
+            SnapshotInput::MicroBundle(bundle),
+            Some(event_id),
+        ),
+        ["ask", utterance @ ..] => render_operator_ask(&utterance.join(" ")),
+        ["operator"] => run_operator_console(),
         ["boot", "--project", project] => boot_project(project),
         ["replay", "--verify"] => {
             let report = run_new_project_agent_economy_demo()
@@ -133,12 +209,450 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             risk,
             evidence_digest,
             signature_route,
+            false,
+        ),
+        [
+            "approval",
+            "sign",
+            "--key-id",
+            key_id,
+            "--approval-id",
+            approval_id,
+            "--authority-epoch",
+            authority_epoch,
+            "--action",
+            action,
+            "--subject",
+            subject,
+            "--risk",
+            risk,
+            "--evidence-digest",
+            evidence_digest,
+            "--signature-route",
+            signature_route,
+            "--allow-test-signature",
+        ] => approval_sign(
+            key_id,
+            approval_id,
+            authority_epoch,
+            action,
+            subject,
+            risk,
+            evidence_digest,
+            signature_route,
+            true,
         ),
         _ => Err(format!(
-            "unknown turing command: {:?}. supported: boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
+            "unknown turing command: {:?}. supported: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help commands | boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
             args
         )),
     }
+}
+
+fn operator_help() -> String {
+    let verbs = CommandSpec::all()
+        .iter()
+        .map(|spec| spec.verb.as_str())
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!(
+        "Operator Console v1\ncontracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1\ncommands: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help\nfixed verbs: {verbs}\nstatus ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists"
+    )
+}
+
+fn operator_commands_help() -> String {
+    let rows = CommandSpec::all()
+        .iter()
+        .map(|spec| {
+            format!(
+                "verb={} side_effect_class={} approval_required={} writes_truth={} confirmation_route={} source_heads={} expected_receipt={}",
+                spec.verb.as_str(),
+                spec.side_effect_class.as_str(),
+                spec.approval_required,
+                spec.writes_truth,
+                spec.confirmation_route.as_str(),
+                spec.source_heads.join(","),
+                spec.expected_receipt
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!(
+        "Operator Console v1 topic=commands\ncontract=operator_tool_manifest.v1 item_contract=typed_command.v1\n{rows}\nstatus_ceiling=IMPLEMENTER_ADDRESSED"
+    )
+}
+
+#[derive(Debug, Clone, Copy)]
+enum SnapshotInput<'a> {
+    Demo,
+    MicroGit(&'a str),
+    MicroBundle(&'a str),
+}
+
+fn operator_snapshot(input: SnapshotInput<'_>) -> Result<OperatorViewSnapshot, String> {
+    match input {
+        SnapshotInput::Demo => demo_snapshot(),
+        SnapshotInput::MicroGit(path) => micro_git_snapshot(path),
+        SnapshotInput::MicroBundle(path) => micro_bundle_snapshot(path),
+    }
+}
+
+fn demo_snapshot() -> Result<OperatorViewSnapshot, String> {
+    let report = run_new_project_agent_economy_demo()
+        .map_err(|error| format!("operator snapshot replay failed: {error}"))?;
+    let heads = OperatorHeads::new(
+        report.tape_tip,
+        report.authorization_head,
+        report.accepted_head,
+    )
+    .map_err(|error| format!("operator snapshot heads invalid: {error}"))?;
+    let project_root = std::env::current_dir()
+        .map_err(|error| format!("cannot read current dir: {error}"))?
+        .display()
+        .to_string();
+    OperatorViewSnapshot::from_deterministic_replay(
+        project_root,
+        "qualification_demo_micro_tape",
+        "turing replay --verify",
+        heads,
+    )
+    .map_err(|error| format!("operator snapshot failed: {error}"))
+}
+
+fn micro_git_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
+    let micro_repo = std::fs::canonicalize(path)
+        .map_err(|error| format!("failed to resolve micro git path {path:?}: {error}"))?;
+    micro_git_snapshot_from_repo(
+        &micro_repo,
+        micro_repo.display().to_string(),
+        format!("turing status --micro-git {}", micro_repo.display()),
+    )
+}
+
+fn micro_bundle_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
+    let bundle = std::fs::canonicalize(path)
+        .map_err(|error| format!("failed to resolve micro bundle path {path:?}: {error}"))?;
+    let scratch = BundleScratch::new()?;
+    run_git(
+        &["init", "--object-format=sha256", "-q", scratch.path_str()?],
+        None,
+    )?;
+    run_git(
+        &[
+            "fetch",
+            "-q",
+            bundle
+                .to_str()
+                .ok_or_else(|| format!("non-UTF-8 bundle path {}", bundle.display()))?,
+            "refs/*:refs/*",
+        ],
+        Some(scratch.path()),
+    )?;
+    micro_git_snapshot_from_repo(
+        scratch.path(),
+        format!("bundle:{}", bundle.display()),
+        format!("turing status --micro-bundle {}", bundle.display()),
+    )
+}
+
+fn micro_git_snapshot_from_repo(
+    micro_repo: &Path,
+    source_micro_repo: String,
+    rebuild_command: String,
+) -> Result<OperatorViewSnapshot, String> {
+    let tape = Append::open(micro_repo)
+        .map_err(|error| format!("cannot open micro tape {}: {error}", micro_repo.display()))?;
+    let heads = tape
+        .head_set_guarded()
+        .map_err(|error| format!("guarded MicroTape head read failed: {error}"))?
+        .ok_or_else(|| "micro tape is not booted; no operator heads are available".to_string())?;
+    let heads = OperatorHeads::new(
+        heads.tape_tip,
+        heads.authorization_head,
+        heads.accepted_head,
+    )
+    .map_err(|error| format!("operator snapshot heads invalid: {error}"))?;
+    let project_root = std::env::current_dir()
+        .map_err(|error| format!("cannot read current dir: {error}"))?
+        .display()
+        .to_string();
+    OperatorViewSnapshot::from_guarded_heads(
+        project_root,
+        source_micro_repo,
+        rebuild_command,
+        heads,
+    )
+    .map_err(|error| format!("operator snapshot failed: {error}"))
+}
+
+struct BundleScratch {
+    path: std::path::PathBuf,
+}
+
+impl BundleScratch {
+    fn new() -> Result<Self, String> {
+        let pid = std::process::id();
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(|error| format!("system clock error: {error}"))?
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("turingos-hci-bundle-{pid}-{nanos}"));
+        std::fs::create_dir(&path).map_err(|error| {
+            format!(
+                "failed to create bundle scratch {}: {error}",
+                path.display()
+            )
+        })?;
+        Ok(BundleScratch { path })
+    }
+
+    fn path(&self) -> &Path {
+        &self.path
+    }
+
+    fn path_str(&self) -> Result<&str, String> {
+        self.path
+            .to_str()
+            .ok_or_else(|| format!("non-UTF-8 scratch path {}", self.path.display()))
+    }
+}
+
+impl Drop for BundleScratch {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.path);
+    }
+}
+
+fn run_git(args: &[&str], cwd: Option<&Path>) -> Result<(), String> {
+    let mut command = std::process::Command::new("git");
+    command.args(args);
+    if let Some(cwd) = cwd {
+        command.current_dir(cwd);
+    }
+    let output = command
+        .output()
+        .map_err(|error| format!("failed to execute git {:?}: {error}", args))?;
+    if output.status.success() {
+        return Ok(());
+    }
+    Err(format!(
+        "git {:?} failed: {}",
+        args,
+        String::from_utf8_lossy(&output.stderr).trim()
+    ))
+}
+
+fn render_operator_status(input: SnapshotInput<'_>) -> Result<String, String> {
+    let snapshot = operator_snapshot(input)?;
+    Ok(format!(
+        "operator_view_snapshot.v1 heartbeat source_kind={} operator_state={} tape_tip={} authorization_head={} accepted_head={} can_write_truth={} status_ceiling=IMPLEMENTER_ADDRESSED snapshot_hash={}",
+        snapshot.source.source_kind,
+        snapshot.operator_state.as_str(),
+        snapshot.heads.tape_tip,
+        snapshot
+            .heads
+            .authorization_head
+            .as_deref()
+            .unwrap_or("null"),
+        snapshot.heads.accepted_head,
+        snapshot.source.can_write_truth,
+        snapshot.snapshot_hash
+    ))
+}
+
+fn render_operator_panoview(input: SnapshotInput<'_>) -> Result<String, String> {
+    let snapshot = operator_snapshot(input)?;
+    let mut out = String::new();
+    out.push_str("operator_view_snapshot.v1 panoview\n");
+    out.push_str(&format!(
+        "source={} rebuild={} can_write_truth={}\n",
+        snapshot.source.source_kind,
+        snapshot.source.rebuild_command,
+        snapshot.source.can_write_truth
+    ));
+    out.push_str("heads:\n");
+    out.push_str(&format!("  tape_tip={}\n", snapshot.heads.tape_tip));
+    out.push_str(&format!(
+        "  authorization_head={}\n",
+        snapshot
+            .heads
+            .authorization_head
+            .as_deref()
+            .unwrap_or("null")
+    ));
+    out.push_str(&format!(
+        "  accepted_head={}\n",
+        snapshot.heads.accepted_head
+    ));
+    out.push_str("lanes:\n");
+    for lane in &snapshot.lanes {
+        let label = match lane.name.as_str() {
+            "append" => "tape_tip",
+            "authorization" => "authorization_head",
+            "accepted" => "accepted_head",
+            other => other,
+        };
+        out.push_str(&format!(
+            "  {}={} meaning={}\n",
+            label,
+            lane.head.as_deref().unwrap_or("null"),
+            lane.meaning
+        ));
+    }
+    out.push_str("evidence:\n");
+    for evidence in &snapshot.evidence {
+        out.push_str(&format!("  - {evidence}\n"));
+    }
+    out.push_str("failures:\n");
+    if snapshot.failures.is_empty() {
+        out.push_str("  - none in snapshot\n");
+    }
+    out.push_str("warnings:\n");
+    for warning in &snapshot.warnings {
+        out.push_str(&format!(
+            "  - {} severity={} message={}\n",
+            warning.code, warning.severity, warning.message
+        ));
+    }
+    out.push_str("safe commands:\n");
+    for command in &snapshot.safe_commands {
+        out.push_str(&format!(
+            "  {} approval_required={} side_effect_class={} writes_truth={} confirmation_route={}\n",
+            command.verb.as_str(),
+            command.approval_required,
+            command.side_effect_class.as_str(),
+            command.writes_truth,
+            command.confirmation_route.as_str()
+        ));
+    }
+    Ok(out.trim_end().to_string())
+}
+
+fn render_operator_explain(
+    verb: TypedVerb,
+    input: SnapshotInput<'_>,
+    event_id: Option<&str>,
+) -> Result<String, String> {
+    let snapshot = operator_snapshot(input)?;
+    let spec = CommandSpec::get(verb).ok_or_else(|| "unknown explain verb".to_string())?;
+    let event_text = event_id
+        .map(|id| format!(" event_id={id}"))
+        .unwrap_or_default();
+    Ok(format!(
+        "typed_command.v1 verb={}{} source_kind={} operator_view_snapshot.v1={} source_heads={} evidence_count={} replay={} blocker_policy=human_signature_required approval_required={} writes_truth={} exact_post_approval_state=NeedsApproval_or_AwaitingReceipt",
+        spec.verb.as_str(),
+        event_text,
+        snapshot.source.source_kind,
+        snapshot.snapshot_hash,
+        spec.source_heads.join(","),
+        snapshot.evidence.len(),
+        spec.replay_command,
+        spec.approval_required,
+        spec.writes_truth
+    ))
+}
+
+fn render_operator_ask(utterance: &str) -> Result<String, String> {
+    let verb = route_utterance(utterance);
+    let spec = CommandSpec::get(verb).ok_or_else(|| "unknown routed verb".to_string())?;
+    let _trace = OperatorTurnTrace {
+        schema_id: "operator_turn_trace.v1".to_string(),
+        intent: turing_projection::OperatorIntent {
+            schema_id: "operator_intent.v1".to_string(),
+            utterance_digest: format!(
+                "sha256:{}",
+                turing_contracts::jcs::sha256_hex(utterance.as_bytes())
+            ),
+            selected_verb: verb,
+            confidence_basis: "deterministic keyword router zh_en_v1".to_string(),
+        },
+        typed_command: spec.clone(),
+        manifest: OperatorToolManifest::closed_v1(),
+        advisory_confidence: "0.70".to_string(),
+    };
+    Ok(format!(
+        "operator_turn_trace.v1 selected_verb={} typed_command.v1 approval_required={} writes_truth={} side_effect_class={} confirmation_route={} advisory_confidence=0.70 autonomous_dispatch=false",
+        spec.verb.as_str(),
+        spec.approval_required,
+        spec.writes_truth,
+        spec.side_effect_class.as_str(),
+        spec.confirmation_route.as_str()
+    ))
+}
+
+fn route_utterance(utterance: &str) -> TypedVerb {
+    let lower = utterance.to_lowercase();
+    if lower.contains("reject") && lower.contains("candidate") {
+        TypedVerb::REJECT_CANDIDATE
+    } else if lower.contains("dispatch") || lower.contains("worker") {
+        TypedVerb::DISPATCH_WORKER
+    } else if lower.contains("macro") && (lower.contains("auth") || lower.contains("authorization"))
+    {
+        TypedVerb::REQUEST_MACRO_AUTH
+    } else if lower.contains("approve") && lower.contains("capsule") {
+        TypedVerb::APPROVE_CAPSULE
+    } else if lower.contains("approve")
+        || lower.contains("批准")
+        || lower.contains("接受")
+        || lower.contains("candidate")
+    {
+        TypedVerb::APPROVE_CANDIDATE
+    } else if lower.contains("blocker") || lower.contains("阻塞") {
+        TypedVerb::EXPLAIN_BLOCKER
+    } else if lower.contains("event") {
+        TypedVerb::EXPLAIN_EVENT
+    } else if lower.contains("status") || lower.contains("状态") {
+        TypedVerb::VIEW_STATUS
+    } else if lower.contains("panoview") || lower.contains("全景") {
+        TypedVerb::VIEW_PANOVIEW
+    } else if lower.contains("replay") {
+        TypedVerb::REPLAY_VERIFY
+    } else if lower.contains("audit") {
+        TypedVerb::AUDIT_INVARIANTS
+    } else if lower.contains("intent") {
+        TypedVerb::PROPOSE_INTENT
+    } else if lower.contains("goal") {
+        TypedVerb::PROPOSE_GOAL
+    } else if lower.contains("capsule") {
+        TypedVerb::PROPOSE_CAPSULE
+    } else {
+        TypedVerb::HELP
+    }
+}
+
+fn run_operator_console() -> Result<String, String> {
+    let mut output = String::from("Operator Console v1 interactive wrapper\n");
+    let mut buffer = String::new();
+    use std::io::Read;
+    std::io::stdin()
+        .read_to_string(&mut buffer)
+        .map_err(|error| format!("failed to read operator stdin: {error}"))?;
+    for line in buffer.lines() {
+        match line.trim() {
+            "" => {}
+            "quit" | "exit" => {
+                output.push_str("operator console exit\n");
+                break;
+            }
+            "status" => {
+                output.push_str(&render_operator_status(SnapshotInput::Demo)?);
+                output.push('\n');
+            }
+            "panoview" => {
+                output.push_str(&render_operator_panoview(SnapshotInput::Demo)?);
+                output.push('\n');
+            }
+            "help" => {
+                output.push_str(&operator_help());
+                output.push('\n');
+            }
+            other => {
+                output.push_str(&render_operator_ask(other)?);
+                output.push('\n');
+            }
+        }
+    }
+    Ok(output.trim_end().to_string())
 }
 
 fn approval_preview(
@@ -162,12 +676,26 @@ fn approval_preview(
     let surfaces = card
         .byte_surfaces()
         .map_err(|error| format!("invalid approval card: {error}"))?;
+    let snapshot = operator_snapshot(SnapshotInput::Demo)?;
+    let source_head_values = format!(
+        "tape_tip:{},authorization_head:{},accepted_head:{}",
+        snapshot.heads.tape_tip,
+        snapshot
+            .heads
+            .authorization_head
+            .as_deref()
+            .unwrap_or("null"),
+        snapshot.heads.accepted_head
+    );
     Ok(format!(
-        "approval preview: approval_id={} action={} subject={} risk={} authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
+        "approval preview: approval_id={} action={} target={} subject={} risk={} source_heads=tape_tip,authorization_head,accepted_head source_head_values={} evidence_digest_count={} approval_required=true expiry=not_present nonce=not_present side_effect_class=sovereign_mutation post_approval_state=NeedsApproval_or_AwaitingReceipt authority_epoch={} signature_route={:?} visible_card_hash={} signed_payload_hash={} writes_micro_truth=false",
         approval_id,
         action,
         subject,
+        subject,
         risk,
+        source_head_values,
+        card.payload().evidence_digests.len(),
         card.payload().authority_epoch,
         card.payload().signature_route,
         surfaces.visible_card_hash,
@@ -184,6 +712,7 @@ fn approval_sign(
     risk: &str,
     evidence_digest: &str,
     signature_route: &str,
+    allow_test_signature: bool,
 ) -> Result<String, String> {
     let card = build_approval_card(
         approval_id,
@@ -204,6 +733,12 @@ fn approval_sign(
             (signature, trusted_keys)
         }
         SignatureRoute::InMemoryTest => {
+            if !allow_test_signature {
+                return Err(
+                    "in-memory-test signing requires --allow-test-signature and is test-only"
+                        .to_string(),
+                );
+            }
             let signer = InMemoryTestSigningBackend::new(key_id);
             let signature = signer.sign(&card);
             let trusted_keys = signer
@@ -242,12 +777,15 @@ fn approval_sign(
         SignatureRoute::LocalFileDev => unreachable!(),
         SignatureRoute::None => unreachable!(),
     }
+    let test_signature_only =
+        matches!(card.payload().signature_route, SignatureRoute::InMemoryTest);
     Ok(format!(
-        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} signed_payload_hash={} public_key_fingerprint={} verifying_key={} signature={} writes_micro_truth=false",
+        "approval signature: approval_id={} key_id={} authority_epoch={} signature_route={:?} test_signature_only={} signed_payload_hash={} public_key_fingerprint={} verifying_key={} signature={} writes_micro_truth=false",
         approval_id,
         signature.key_id,
         signature.authority_epoch,
         signature.signature_route,
+        test_signature_only,
         signature.signed_payload_hash,
         signature.public_key_fingerprint,
         signature.verifying_key,
