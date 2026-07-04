@@ -856,3 +856,115 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 ### end: 2026-07-04T01:36:03Z
 ### exit_code: 0
+==================================================================
+### REFLECT reruns — security audit hardening (tamper class g, advisory notes) — 2026-07-04T01:45:16Z
+------------------------------------------------------------------
+### R1 prop_approval_byte_surfaces (now incl. class g)
+### cmd: cargo test -p turing-approval --test prop_approval_byte_surfaces
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+   Compiling turing-approval v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-approval)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running tests/prop_approval_byte_surfaces.rs (target/debug/deps/prop_approval_byte_surfaces-978bf07d4d961fc9)
+
+running 3 tests
+test mutation_class_g_verifying_key_substitution_is_rejected ... ok
+test mutation_is_rejected ... ok
+test honest_path_identity_holds ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.02s
+
+### exit_code: 0
+------------------------------------------------------------------
+### R2 cargo test -p turing-approval (default features)
+### cmd: cargo test -p turing-approval
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+   Compiling turing-approval v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-approval)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.76s
+     Running unittests src/lib.rs (target/debug/deps/turing_approval-3a2d69caedb5977c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/approval_card.rs (target/debug/deps/approval_card-88f4a031eef9c218)
+
+running 6 tests
+test approval_bytes_four_way_identity ... ok
+test forged_public_key_with_same_key_id_is_rejected_by_trusted_key_registry ... ok
+test signing_backend_has_no_plaintext_default_and_hardware_slot ... ok
+test signature_authority_epoch_must_match_signed_payload_epoch ... ok
+test local_file_signature_verifies_without_private_seed_after_signing ... ok
+test os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/prop_approval_byte_surfaces.rs (target/debug/deps/prop_approval_byte_surfaces-978bf07d4d961fc9)
+
+running 3 tests
+test mutation_class_g_verifying_key_substitution_is_rejected ... ok
+test mutation_is_rejected ... ok
+test honest_path_identity_holds ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.04s
+
+     Running tests/route_negotiation.rs (target/debug/deps/route_negotiation-bc8140fb70d156bf)
+
+running 7 tests
+test default_supported_algorithms_is_ed25519_only ... ok
+test identity_field_binds_route_and_algorithm ... ok
+test assert_matches_card_ok_only_when_route_equals_payload_route ... ok
+test negotiate_none_route_is_rejected ... ok
+test negotiate_os_keyring_ed25519_is_accepted ... ok
+test negotiate_unsupported_algorithm_is_rejected_not_swapped ... ok
+test route_rides_the_signed_canonical_bytes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_approval
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+### exit_code: 0
+------------------------------------------------------------------
+### R3 audit-approval-bytes-equivalence.sh
+### cmd: ./scripts/audit-approval-bytes-equivalence.sh
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+PASS: all four byte-surface fields present on ApprovalByteSurfaces (canonical_bytes, visible_card_hash_bytes, signed_bytes, gate_replay_bytes)
+running: cargo test -p turing-approval --quiet
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+......
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.03s
+
+
+running 7 tests
+.......
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+PASS: cargo test -p turing-approval green
+running: cargo test -p turing-approval --test prop_approval_byte_surfaces
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.01s
+
+PASS: prop_approval_byte_surfaces four-surface mutation suite green
+PASS: audit-approval-bytes-equivalence complete
+### exit_code: 0
