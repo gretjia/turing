@@ -673,6 +673,8 @@ fn route_utterance(utterance: &str) -> TypedVerb {
         TypedVerb::EXPLAIN_BLOCKER
     } else if lower.contains("event") {
         TypedVerb::EXPLAIN_EVENT
+    } else if lower.contains("observe") && lower.contains("capsule") {
+        TypedVerb::OBSERVE_CAPSULE
     } else if lower.contains("status") || lower.contains("状态") {
         TypedVerb::VIEW_STATUS
     } else if lower.contains("panoview") || lower.contains("全景") {
