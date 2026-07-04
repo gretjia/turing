@@ -389,7 +389,12 @@ def main() -> int:
             name=f"{session_id}_verify_alignment",
             argv=["bash", str(verify_alignment_script)],
             cwd=repo,
-            out_dir=session_dir,
+            # Flat at scenario_root (not the nested session_dir): FCE-R3's
+            # harness-log-retention check looks up
+            # root/<scenario_id>/<name>.stdout.txt at that flat depth, and
+            # the command name already encodes the session id so it stays
+            # unique across all three sessions.
+            out_dir=scenario_root,
         )
         commands.append(verify_command)
         green = (

@@ -65,6 +65,7 @@ import importlib.util
 import json
 import os
 import subprocess
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -73,6 +74,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results, write_evidence_labels  # noqa: E402
 
 SCENARIOS_DIR = Path(__file__).resolve().parent
 R5_SCRIPT_PATH = SCENARIOS_DIR / "FCE-R5.py"
@@ -631,7 +634,7 @@ def structural_no_closed_status_check(plan_root: Path, repo: Path, scenario_root
         name="lint_status_claims_real_tracker",
         argv=["bash", str(lint_script), "--root", str(plan_root)],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
     )
     return {
         "command": command,
@@ -656,7 +659,7 @@ def structural_ref_lint_check(repo: Path, scenario_root: Path) -> dict[str, Any]
         name="gate_ref_lint_real_repo",
         argv=["bash", str(ref_lint_script)],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
     )
     return {
         "command": command,
@@ -682,8 +685,8 @@ def build_verdict(
     scenario_root = root / scenario_id
     evidence_paths_set = {rel(root, path) for path in evidence_files if path.is_file()}
     for command in commands:
-        evidence_paths_set.add(f"{scenario_id}/commands/{command['stdout']}")
-        evidence_paths_set.add(f"{scenario_id}/commands/{command['stderr']}")
+        evidence_paths_set.add(f"{scenario_id}/{command['stdout']}")
+        evidence_paths_set.add(f"{scenario_id}/{command['stderr']}")
     evidence_paths = sorted(evidence_paths_set)
     passed = bool(criteria) and all(item["result"] is True for item in criteria)
     return {
@@ -741,6 +744,23 @@ def main() -> int:
                 "checked_secrets_path": str(SECRETS_ENV_PATH),
                 "reason": api_key_source,
             },
+        )
+        write_command_results(scenario_root, scenario_id, commands)
+        write_evidence_labels(
+            scenario_root,
+            scenario_id=scenario_id,
+            title="FCE-W3 Illegitimate-Injection Refusal",
+            evidence_class="REAL",
+            summary_lines=[
+                "This run did not execute: NOT_RUN.",
+                f"Reason: missing environment variable: {DEEPSEEK_API_KEY_ENV} ({api_key_source})",
+            ],
+            claims=["FCE-W3 did not run to completion; see not_run_reason in the verdict JSON."],
+            non_claims=[
+                "no injection-refusal claim of any kind on this NOT_RUN path",
+                "not a release decision",
+                "not SHIPPED",
+            ],
         )
         verdict = build_verdict(
             root=root,
@@ -829,7 +849,7 @@ def main() -> int:
         {
             "criterion": "structural_no_closed_status_written_in_real_tracker",
             "result": closed_status_check["pass"],
-            "evidence": f"{scenario_id}/commands/{closed_status_check['command']['stdout']}",
+            "evidence": f"{scenario_id}/{closed_status_check['command']['stdout']}",
         }
     )
 
@@ -839,7 +859,7 @@ def main() -> int:
         {
             "criterion": "structural_no_update_ref_outside_designated_writer",
             "result": ref_lint_check["pass"],
-            "evidence": f"{scenario_id}/commands/{ref_lint_check['command']['stdout']}",
+            "evidence": f"{scenario_id}/{ref_lint_check['command']['stdout']}",
         }
     )
 
@@ -925,6 +945,9 @@ def main() -> int:
         },
     )
     evidence_files.extend([readme, claim_boundary])
+
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
 
     automatic_fail = None
     if not all_three_genuine:

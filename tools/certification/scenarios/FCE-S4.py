@@ -58,6 +58,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results, write_evidence_labels  # noqa: E402
 
 CERT_SHARD = "S02"
 # Same pilot-exclusion rule as FCE-S1 (PREREGISTRATION.md: S02-W00 is the
@@ -210,7 +212,7 @@ def resolve_daemon_bin_dir(repo: Path, scenario_root: Path) -> dict[str, Any]:
         name="cargo_build_workspace",
         argv=["cargo", "build", "--workspace"],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=1800,
     )
     if build_command["exit_code"] != 0:
@@ -291,7 +293,7 @@ def materialize_single_task(repo: Path, scenario_root: Path, selection: dict[str
             str(dataset_arrow),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report_path = (
@@ -362,7 +364,7 @@ def run_real_loop(
         name="run_mini_swe_bench_substrate_smoke",
         argv=argv,
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         env=env,
         timeout=600,
     )
@@ -490,7 +492,7 @@ def strict_conservation_audit(repo: Path, scenario_root: Path, coverage_path: Pa
             str(audit_dir),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report_path = audit_dir / "micro_tape_decision_dag_audit.json"
@@ -500,7 +502,7 @@ def strict_conservation_audit(repo: Path, scenario_root: Path, coverage_path: Pa
         name="m1a_gates",
         argv=["bash", "tools/ci/run_m1a_gates.sh"],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     return {"command": command, "report_path": report_path, "report": report, "m1a_command": m1a_command}
@@ -564,6 +566,23 @@ def main() -> int:
         criteria = [
             {"criterion": "deepseek_api_key_present", "result": False, "evidence": f"{scenario_id}/task_selection.json"}
         ]
+        write_command_results(scenario_root, scenario_id, commands)
+        write_evidence_labels(
+            scenario_root,
+            scenario_id=scenario_id,
+            title="FCE-S4 Tape-Canonical Cost Conservation",
+            evidence_class="REAL",
+            summary_lines=[
+                "This run did not execute: NOT_RUN.",
+                f"Reason: missing environment variable: {DEEPSEEK_API_KEY_ENV}",
+            ],
+            claims=["FCE-S4 did not run to completion; see not_run_reason in the verdict JSON."],
+            non_claims=[
+                "no cost-conservation claim of any kind on this NOT_RUN path",
+                "not a release decision",
+                "not SHIPPED",
+            ],
+        )
         verdict = build_verdict(
             root=root,
             scenario_id=scenario_id,
@@ -769,6 +788,9 @@ def main() -> int:
         },
     )
     evidence_files.extend([readme, claim_boundary])
+
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
 
     automatic_fail = None
     verdict = build_verdict(

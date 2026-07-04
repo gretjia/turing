@@ -37,6 +37,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results, write_evidence_labels  # noqa: E402
 
 CERT_SHARD = "S02"
 # PREREGISTRATION.md ("S02 is reserved for the deterministic 10-task arm-A pilot"):
@@ -235,7 +237,7 @@ def step1_materialize(repo: Path, scenario_root: Path, cert_slice: dict[str, Any
             str(dataset_arrow),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report_path = (
@@ -319,7 +321,7 @@ def step2_loop_run(repo: Path, plan_root: Path, scenario_root: Path, tasks_jsonl
         name="run_mini_swe_bench_substrate_smoke",
         argv=argv,
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         env=env,
         timeout=3600,
     )
@@ -361,7 +363,7 @@ def step1_prompt_leakage_audit(repo: Path, scenario_root: Path, coverage_path: P
             str(out_path),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report = load_json(out_path) if out_path.is_file() else {"status": "FAIL"}
@@ -390,7 +392,7 @@ def step3_strict_audit(repo: Path, scenario_root: Path, coverage_path: Path) -> 
             str(audit_dir),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report_path = audit_dir / "micro_tape_decision_dag_audit.json"
@@ -400,7 +402,7 @@ def step3_strict_audit(repo: Path, scenario_root: Path, coverage_path: Path) -> 
         name="m1a_gates",
         argv=["bash", "tools/ci/run_m1a_gates.sh"],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     return {"command": command, "report_path": report_path, "report": report, "m1a_command": m1a_command}
@@ -460,7 +462,7 @@ def step4_harness_scoring(
         name="swebench_harness_run_evaluation",
         argv=argv,
         cwd=scoring_dir,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=HARNESS_TIMEOUT_S,
     )
     report_name = f"{WORKER_IDENTITY}.{run_id}.json"
@@ -498,20 +500,23 @@ def step5_console_replay(repo: Path, scenario_root: Path, loop_root: Path, cert_
             name=f"console_status_json_{instance_id}",
             argv=[str(turing_bin), "status", "--micro-git", str(micro_git), "--json"],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=120,
         )
-        snapshot_path = out_dir / "operator_snapshot.json"
-        snapshot_path.write_text(snapshot_command["stdout_text"], encoding="utf-8")
+        # Reuse the run_command-produced stdout files directly (already
+        # classifiable by FCE-R3 via command_results.json) instead of
+        # duplicating their content into separately-named files, which would
+        # otherwise be unclassified zero-byte files if a command's stdout
+        # were ever empty.
+        snapshot_path = scenario_root / snapshot_command["stdout"]
         text_command = run_command(
             name=f"console_status_text_{instance_id}",
             argv=[str(turing_bin), "status", "--micro-git", str(micro_git)],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=120,
         )
-        text_path = out_dir / "operator_status.txt"
-        text_path.write_text(text_command["stdout_text"], encoding="utf-8")
+        text_path = scenario_root / text_command["stdout"]
         verdict_path = out_dir / "projection_integrity_verdict.json"
         integrity_command = run_command(
             name=f"projection_integrity_{instance_id}",
@@ -532,7 +537,7 @@ def step5_console_replay(repo: Path, scenario_root: Path, loop_root: Path, cert_
                 str(verdict_path),
             ],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=120,
         )
         verdict = load_json(verdict_path) if verdict_path.is_file() else {"verdict": "FAIL"}
@@ -572,21 +577,21 @@ def step6_packet_build(repo: Path, scenario_root: Path, cert_repo_sha: str) -> d
             str(packet_dir),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     validate_command = run_command(
         name="validate_packet",
         argv=[sys.executable, str(repo / "tools" / "release" / "build_packet.py"), "--validate", str(packet_dir)],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     sha256sum_command = run_command(
         name="sha256sum_c_manifest",
         argv=["sha256sum", "-c", "MANIFEST.sha256"],
         cwd=packet_dir,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     manifest_path = packet_dir / "PACKET_MANIFEST.json"
@@ -683,6 +688,23 @@ def main() -> int:
                 "evidence": f"{scenario_id}/cert_slice_manifest.json",
             }
         ]
+        write_command_results(scenario_root, scenario_id, commands)
+        write_evidence_labels(
+            scenario_root,
+            scenario_id=scenario_id,
+            title="FCE-S1 Golden Thread",
+            evidence_class="REAL",
+            summary_lines=[
+                "This run did not execute: NOT_RUN.",
+                f"Reason: missing environment variable: {DEEPSEEK_API_KEY_ENV}",
+            ],
+            claims=["FCE-S1 did not run to completion; see not_run_reason in the verdict JSON."],
+            non_claims=[
+                "no golden-thread claim of any kind on this NOT_RUN path",
+                "not a release decision",
+                "not SHIPPED",
+            ],
+        )
         verdict = build_verdict(
             root=root,
             scenario_id=scenario_id,
@@ -919,6 +941,9 @@ def main() -> int:
         },
     )
     evidence_files.extend([readme, claim_boundary])
+
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
 
     automatic_fail = None
     if host_assumed_count > 0:

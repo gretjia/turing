@@ -48,12 +48,15 @@ import hashlib
 import importlib.util
 import json
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_evidence_labels  # noqa: E402
 
 IMPLEMENTER_IDENTITY_MARKERS = {"", "implementer", "self", "certification-agent", "cert-agent-self"}
 
@@ -305,6 +308,23 @@ def main() -> int:
                 "result": False,
                 "evidence": "none: no evidence/theory/turing_completeness_witness_* directory in this clone",
             }
+        )
+        write_evidence_labels(
+            scenario_root,
+            scenario_id=scenario_id,
+            title="FCE-S2 Universality Under Integration",
+            evidence_class="REAL",
+            summary_lines=[
+                "This clone has no evidence/theory/turing_completeness_witness_* directory,",
+                "so the TC witness re-verification could not run; see the FAIL criterion",
+                "'tc_witness_evidence_root_present' in the verdict JSON.",
+            ],
+            claims=["FCE-S2 could not re-verify the M2 Turing-completeness witness in this clone."],
+            non_claims=[
+                "no TC witness claim of any kind on this FAIL path",
+                "not a release decision",
+                "not SHIPPED",
+            ],
         )
         verdict = build_verdict(
             root=root,

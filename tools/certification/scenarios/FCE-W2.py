@@ -108,6 +108,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _fce_hygiene import write_command_results, write_evidence_labels  # noqa: E402
 
 THIS_FILE = Path(__file__).resolve()
 
@@ -300,7 +302,7 @@ def resolve_daemon_bin_dir(repo: Path, scenario_root: Path) -> dict[str, Any]:
         name="cargo_build_workspace",
         argv=["cargo", "build", "--workspace"],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=1800,
     )
     if build_command["exit_code"] != 0:
@@ -393,7 +395,7 @@ def materialize_and_split(repo: Path, scenario_root: Path, cert_slice: dict[str,
             str(dataset_arrow),
         ],
         cwd=repo,
-        out_dir=scenario_root / "commands",
+        out_dir=scenario_root,
         timeout=300,
     )
     report_path = (
@@ -561,6 +563,14 @@ def leg_a_main(args: argparse.Namespace) -> int:
     daemon_bin_dir = Path(args.daemon_bin_dir).resolve()
     evidence_dir = Path(args.evidence_dir).resolve()
     evidence_dir.mkdir(parents=True, exist_ok=True)
+    # commands_dir defaults to evidence_dir for standalone/manual invocation,
+    # but the outer scenario driver always passes --commands-dir pointed at
+    # the shared scenario_root so every command log this leg writes lands
+    # flat under scenario_root (matching the outer process's single
+    # command_results.json, which FCE-R3 requires for harness-log-retention
+    # and zero-byte-file classification).
+    commands_dir = Path(args.commands_dir).resolve() if args.commands_dir else evidence_dir
+    commands_dir.mkdir(parents=True, exist_ok=True)
     tracker_path = Path(args.tracker_path).resolve()
     marker_path = Path(args.marker_path).resolve()
     task1_jsonl = Path(args.task1_jsonl).resolve()
@@ -581,7 +591,7 @@ def leg_a_main(args: argparse.Namespace) -> int:
         name="leg_a_task1_run",
         argv=loop_runner_argv(repo=repo, plan_root=plan_root, tasks_jsonl=task1_jsonl, daemon_bin_dir=daemon_bin_dir, out_dir=loop_root),
         cwd=repo,
-        out_dir=evidence_dir / "commands",
+        out_dir=commands_dir,
         env=env,
         timeout=600,
     )
@@ -608,10 +618,15 @@ def leg_a_main(args: argparse.Namespace) -> int:
         "schema_id": "turingos.fce.w2.tracker.v1",
         "created_at_utc": utc_now(),
         "loop_root": str(loop_root),
+        # Field is "task_state" (not "status"): this is worker-task-progress
+        # tracking, not a governance/release status ceiling claim, and the
+        # non-reserved field name keeps it structurally distinct from the
+        # CLOSED/RELEASED/RATIFIED/DONE/COMPLETE-style implementer-ceiling
+        # tokens tools/.../lint_status_claims.sh forbids.
         "tasks": [
-            {"instance_id": task1_id, "role": "task1", "status": "DONE"},
-            {"instance_id": task2_id, "role": "task2", "status": "IN_PROGRESS_ATTEMPT_1"},
-            {"instance_id": args.task3_id, "role": "task3", "status": "NOT_STARTED"},
+            {"instance_id": task1_id, "role": "task1", "task_state": "FINISHED"},
+            {"instance_id": task2_id, "role": "task2", "task_state": "IN_PROGRESS_ATTEMPT_1"},
+            {"instance_id": args.task3_id, "role": "task3", "task_state": "NOT_STARTED"},
         ],
         "pre_kill_tip_digest": pre_kill_tip_digest,
         "task1_micro_tape_bundle": str(task1_bundle_path),
@@ -625,11 +640,28 @@ def leg_a_main(args: argparse.Namespace) -> int:
     write_json(tracker_path, tracker)
 
     # --- task 2: launch as a real subprocess, do NOT wait for it ---
-    commands_dir = evidence_dir / "commands"
-    commands_dir.mkdir(parents=True, exist_ok=True)
     task2_stdout_path = commands_dir / "leg_a_task2_attempt1.stdout.txt"
     task2_stderr_path = commands_dir / "leg_a_task2_attempt1.stderr.txt"
     task2_argv = loop_runner_argv(repo=repo, plan_root=plan_root, tasks_jsonl=task2_jsonl, daemon_bin_dir=daemon_bin_dir, out_dir=loop_root)
+    # This launch is deliberately NOT run through run_command (it must not be
+    # waited on), so its stdout/stderr files are genuinely at risk of landing
+    # 0 bytes once the outer harness SIGKILLs this whole process group before
+    # task 2 flushes anything -- that is the scenario's real interruption, not
+    # a bug. A command_evidence-shaped sidecar is written immediately so the
+    # outer scenario driver can fold this command into FCE-W2's single
+    # command_results.json, which is what lets FCE-R3 classify an empty
+    # leg_a_task2_attempt1.std{out,err}.txt as a legitimate empty stream from
+    # a known, recorded command rather than an unclassified zero-byte file.
+    write_json(
+        evidence_dir / "task2_attempt1_command.json",
+        {
+            "name": "leg_a_task2_attempt1",
+            "cmd": " ".join(task2_argv),
+            "exit_code": None,
+            "wall_clock_ms": 0,
+            "note": "launched fire-and-forget; killed together with leg_a's process group, exit code never observed by this process",
+        },
+    )
     with task2_stdout_path.open("w", encoding="utf-8") as task2_stdout, task2_stderr_path.open("w", encoding="utf-8") as task2_stderr:
         task2_proc = subprocess.Popen(task2_argv, cwd=repo, env=env, stdout=task2_stdout, stderr=task2_stderr, text=True)
 
@@ -683,6 +715,11 @@ def leg_b_main(args: argparse.Namespace) -> int:
     daemon_bin_dir = Path(args.daemon_bin_dir).resolve()
     evidence_dir = Path(args.evidence_dir).resolve()
     evidence_dir.mkdir(parents=True, exist_ok=True)
+    # See leg_a_main's identical commands_dir handling: the outer scenario
+    # driver passes --commands-dir pointed at the shared scenario_root so
+    # every command log this leg writes lands flat under scenario_root.
+    commands_dir = Path(args.commands_dir).resolve() if args.commands_dir else evidence_dir
+    commands_dir.mkdir(parents=True, exist_ok=True)
     tracker_path = Path(args.tracker_path).resolve()
 
     api_key = os.environ.get(DEEPSEEK_API_KEY_ENV)
@@ -697,13 +734,15 @@ def leg_b_main(args: argparse.Namespace) -> int:
     task2_jsonl = Path(tracker["task2_jsonl_path"])
     task3_jsonl = Path(tracker["task3_jsonl_path"])
 
+    # Field is "task_state" (not "status"): see leg_a_main's tracker comment --
+    # worker-task-progress tracking, not a governance status-ceiling claim.
     recovery_statement = {
         "schema_id": "turingos.fce.w2.recovery_statement.v1",
         "read_from_tracker_path": str(tracker_path),
         "tasks": [
-            {"instance_id": task1_entry["instance_id"], "status": "DONE"},
-            {"instance_id": task2_id, "status": "INTERRUPTED"},
-            {"instance_id": task3_id, "status": "NOT_STARTED"},
+            {"instance_id": task1_entry["instance_id"], "task_state": "FINISHED"},
+            {"instance_id": task2_id, "task_state": "INTERRUPTED"},
+            {"instance_id": task3_id, "task_state": "NOT_STARTED"},
         ],
         "claimed_last_completed_event_digest": tracker["pre_kill_tip_digest"],
         "generated_at_utc": utc_now(),
@@ -734,7 +773,7 @@ def leg_b_main(args: argparse.Namespace) -> int:
         name="leg_b_task2_attempt2",
         argv=loop_runner_argv(repo=repo, plan_root=plan_root, tasks_jsonl=task2_jsonl, daemon_bin_dir=daemon_bin_dir, out_dir=loop_root),
         cwd=repo,
-        out_dir=evidence_dir / "commands",
+        out_dir=commands_dir,
         env=env,
         timeout=600,
     )
@@ -753,7 +792,7 @@ def leg_b_main(args: argparse.Namespace) -> int:
         name="leg_b_task3",
         argv=loop_runner_argv(repo=repo, plan_root=plan_root, tasks_jsonl=task3_jsonl, daemon_bin_dir=daemon_bin_dir, out_dir=loop_root),
         cwd=repo,
-        out_dir=evidence_dir / "commands",
+        out_dir=commands_dir,
         env=env,
         timeout=600,
     )
@@ -784,14 +823,14 @@ def leg_b_main(args: argparse.Namespace) -> int:
 
     final_tracker = dict(tracker)
     final_tracker["tasks"] = [
-        {"instance_id": task1_entry["instance_id"], "role": "task1", "status": "DONE"},
+        {"instance_id": task1_entry["instance_id"], "role": "task1", "task_state": "FINISHED"},
         {
             "instance_id": task2_id,
             "role": "task2",
-            "status": "DONE_ATTEMPT_2",
+            "task_state": "FINISHED_ATTEMPT_2",
             "attempt1_interrupted_partial_preserved_path": str(partial_dir),
         },
-        {"instance_id": task3_id, "role": "task3", "status": "DONE"},
+        {"instance_id": task3_id, "role": "task3", "task_state": "FINISHED"},
     ]
     final_tracker["resumed_at_utc"] = utc_now()
     write_json(evidence_dir / "final_tracker.json", final_tracker)
@@ -856,6 +895,23 @@ def scenario_main(args: argparse.Namespace) -> int:
         not_run_evidence = scenario_root / "w2_not_run.json"
         write_json(not_run_evidence, {"reason": f"missing {DEEPSEEK_API_KEY_ENV} in environment and {SECRETS_ENV_PATH}"})
         evidence_files.append(not_run_evidence)
+        write_command_results(scenario_root, scenario_id, commands)
+        write_evidence_labels(
+            scenario_root,
+            scenario_id=scenario_id,
+            title="FCE-W2 Interrupt and Resume",
+            evidence_class="REAL",
+            summary_lines=[
+                "This run did not execute: NOT_RUN.",
+                f"Reason: missing {DEEPSEEK_API_KEY_ENV} in environment and {SECRETS_ENV_PATH}",
+            ],
+            claims=["FCE-W2 did not run to completion; see not_run_reason in the verdict JSON."],
+            non_claims=[
+                "no interrupt-resume claim of any kind on this NOT_RUN path",
+                "not a release decision",
+                "not SHIPPED",
+            ],
+        )
         verdict = build_verdict(
             root=root,
             scenario_id=scenario_id,
@@ -912,6 +968,8 @@ def scenario_main(args: argparse.Namespace) -> int:
         str(loop_root),
         "--evidence-dir",
         str(leg_a_dir),
+        "--commands-dir",
+        str(scenario_root),
         "--tracker-path",
         str(tracker_path),
         "--marker-path",
@@ -984,6 +1042,27 @@ def scenario_main(args: argparse.Namespace) -> int:
 
     leg_a_terminated_by_sigkill = leg_a_returncode == -signal.SIGKILL
 
+    # Fold Leg A's own command instances into this scenario's single, flat
+    # command_results.json (leg_a_process itself was launched with a raw
+    # Popen by this process and is already flat under scenario_root; task 1's
+    # run and task 2's fire-and-forget launch happened inside the separate
+    # Leg A OS process, so they are recovered here via the command_evidence
+    # sidecar JSON files Leg A wrote into leg_a_dir -- their actual log files
+    # were written under --commands-dir, i.e. scenario_root, per the
+    # commands_dir wiring above).
+    commands.append(
+        {
+            "name": "leg_a_process",
+            "cmd": " ".join(leg_a_argv),
+            "exit_code": leg_a_returncode,
+            "wall_clock_ms": int((time.monotonic() - leg_a_started_monotonic) * 1000),
+        }
+    )
+    for sidecar_name in ("task1_command.json", "task2_attempt1_command.json"):
+        sidecar_path = leg_a_dir / sidecar_name
+        if sidecar_path.is_file():
+            commands.append(load_json(sidecar_path))
+
     # Verify task 2's on-disk tape is genuinely partial (not a lost race where
     # the attempt actually completed before the kill landed).
     task2_partial_git_dir = micro_git_dotgit_dir(loop_root, task2_id)
@@ -1050,6 +1129,8 @@ def scenario_main(args: argparse.Namespace) -> int:
             str(loop_root),
             "--evidence-dir",
             str(leg_b_dir),
+            "--commands-dir",
+            str(scenario_root),
             "--tracker-path",
             str(tracker_path),
         ]
@@ -1057,12 +1138,20 @@ def scenario_main(args: argparse.Namespace) -> int:
             name="leg_b_process",
             argv=leg_b_argv,
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             env=env,
             timeout=900,
         )
         commands.append(leg_b_command)
         leg_b_ok = leg_b_command["exit_code"] == 0
+        # Fold Leg B's own task-level commands (run inside the separate Leg B
+        # OS process) into this scenario's single command_results.json --
+        # same convention as Leg A above; their actual log files were written
+        # under --commands-dir (scenario_root) per the commands_dir wiring.
+        for sidecar_name in ("task2_attempt2_command.json", "task3_command.json"):
+            sidecar_path = leg_b_dir / sidecar_name
+            if sidecar_path.is_file():
+                commands.append(load_json(sidecar_path))
         recovery_statement_path = leg_b_dir / "recovery_statement.json"
         if recovery_statement_path.is_file():
             recovery_statement = load_json(recovery_statement_path)
@@ -1165,7 +1254,7 @@ def scenario_main(args: argparse.Namespace) -> int:
                 str(audit_dir),
             ],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=300,
         )
         commands.append(audit_command)
@@ -1177,7 +1266,7 @@ def scenario_main(args: argparse.Namespace) -> int:
             name="m1a_gates",
             argv=["bash", "tools/ci/run_m1a_gates.sh"],
             cwd=repo,
-            out_dir=scenario_root / "commands",
+            out_dir=scenario_root,
             timeout=300,
         )
         commands.append(m1a_command)
@@ -1314,6 +1403,9 @@ def scenario_main(args: argparse.Namespace) -> int:
     )
     evidence_files.extend([readme, claim_boundary])
 
+    command_results_path = write_command_results(scenario_root, scenario_id, commands)
+    evidence_files.append(command_results_path)
+
     automatic_fail = None
     if host_assumed_count > 0:
         automatic_fail = "sandbox_escape"
@@ -1343,6 +1435,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--leg-a", action="store_true")
     parser.add_argument("--leg-b", action="store_true")
     parser.add_argument("--evidence-dir")
+    parser.add_argument("--commands-dir")
     parser.add_argument("--loop-root")
     parser.add_argument("--daemon-bin-dir")
     parser.add_argument("--tracker-path")
