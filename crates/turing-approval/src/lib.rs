@@ -19,6 +19,12 @@ use turing_contracts::jcs::{self, JcsError};
 #[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 
+mod route_negotiation;
+pub use route_negotiation::{negotiate, NegotiatedRoute, SignatureAlgorithm};
+
+#[cfg(feature = "yubikey")]
+pub mod yubikey;
+
 pub const APPROVAL_PAYLOAD_SCHEMA_ID: &str = "approval_payload.v2";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -184,6 +190,14 @@ pub trait SigningBackend {
 
     fn exports_plaintext_key(&self) -> bool {
         false
+    }
+
+    /// Algorithms this backend will sign with; default is Ed25519-only.
+    ///
+    /// Constraint: `negotiate` treats anything outside this set as unsupported
+    /// and errors rather than silently swapping the algorithm.
+    fn supported_algorithms(&self) -> &'static [SignatureAlgorithm] {
+        &[SignatureAlgorithm::Ed25519]
     }
 
     fn sign(&self, card: &ApprovalCard) -> Result<SignatureEnvelope, SigningError>;
@@ -812,6 +826,14 @@ pub enum SigningError {
     HardwareBackendUnavailable {
         slot_id: String,
     },
+    RouteAlgorithmUnsupported {
+        route: SignatureRoute,
+        algorithm: SignatureAlgorithm,
+    },
+    NegotiationIdentityMismatch {
+        expected: SignatureRoute,
+        observed: SignatureRoute,
+    },
 }
 
 impl std::fmt::Display for SigningError {
@@ -854,6 +876,18 @@ impl std::fmt::Display for SigningError {
                 write!(
                     f,
                     "hardware signing backend slot {slot_id:?} is reserved but unavailable"
+                )
+            }
+            SigningError::RouteAlgorithmUnsupported { route, algorithm } => {
+                write!(
+                    f,
+                    "signature route {route:?} does not support algorithm {algorithm:?}"
+                )
+            }
+            SigningError::NegotiationIdentityMismatch { expected, observed } => {
+                write!(
+                    f,
+                    "negotiated route {expected:?} does not match card route {observed:?}"
                 )
             }
         }

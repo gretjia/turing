@@ -1,0 +1,32 @@
+# TaskCapsule v1.5 — INTENT
+task: HW-SW-001..003 Substrate Lockdown + Art. 0.2 traceability audits (Phase 1, secure OS roadmap)
+route: turing_full (plan lite done: CONTEXT.md + PREDICATE.md)
+eta: 6h / 720 steps
+frontier_mode: auto
+test_mode: auto_full
+autonomy_tier: 3
+human_ux_gate: false
+ipqc_checkpoints: 3   # after each atom (harness formula: max(3, round(6*0.12/1.10)) = 3)
+allowed_files:
+  - scripts/audit-art-0-2-traceability.sh
+  - scripts/audit-approval-bytes-equivalence.sh
+  - scripts/audit-no-macro-as-micro.sh
+  - scripts/audit-forbidden-files.sh
+  - scripts/audit-substrate-freeze.sh
+  - scripts/calc-ipqc-interval.sh
+  - tests/audit/test_art_0_2_traceability.py
+  - tests/audit/__init__.py
+  - docs/loop_harness/README.md
+  - substrate_freeze_manifest.toml
+  - .githooks/pre-commit
+  - .gitignore
+  - evidence/loops/hw_sw_001_20260703/**
+forbidden_files:
+  - "**/00_authority/**"
+  - "*constitution_root_law.md*"
+  - crates/turing-kernel/src/reducer.rs
+  - crates/**  (read-only this atom)
+  - PROGRESS_TRACKER pinned docs
+acceptance_commands: see PREDICATE.md A1..C3
+verifier: independent validator agent (≠ implementer), clean context
+ceiling: ADDRESSED, pending sovereign accept; draft commits on branch turing/hw-sw-001-substrate-lockdown only

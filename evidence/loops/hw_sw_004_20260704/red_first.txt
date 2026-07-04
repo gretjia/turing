@@ -1,0 +1,45 @@
+### RED-FIRST run — HW-SW-004/005
+### date: 2026-07-04T01:25:45Z
+### command: cargo test -p turing-approval --test route_negotiation --test prop_approval_byte_surfaces
+### expectation: FAIL to compile — route_negotiation API does not exist yet
+----------------------------------------------------------------------
+   Compiling turing-approval v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-approval)
+error[E0432]: unresolved imports `turing_approval::negotiate`, `turing_approval::NegotiatedRoute`, `turing_approval::SignatureAlgorithm`
+ --> crates/turing-approval/tests/route_negotiation.rs:5:5
+  |
+5 |     negotiate, ApprovalCard, ApprovalPayload, DisplayCopy, InMemoryTestSigningBackend,
+  |     ^^^^^^^^^ no `negotiate` in the root
+6 |     NegotiatedRoute, OsKeyringSigningBackend, SignatureAlgorithm, SignatureRoute, SigningBackend,
+  |     ^^^^^^^^^^^^^^^                           ^^^^^^^^^^^^^^^^^^ no `SignatureAlgorithm` in the root
+  |     |
+  |     no `NegotiatedRoute` in the root
+
+error[E0599]: no variant named `RouteAlgorithmUnsupported` found for enum `SigningError`
+  --> crates/turing-approval/tests/route_negotiation.rs:61:27
+   |
+61 |         Err(SigningError::RouteAlgorithmUnsupported {
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^ variant not found in `SigningError`
+
+error[E0599]: no variant named `RouteAlgorithmUnsupported` found for enum `SigningError`
+  --> crates/turing-approval/tests/route_negotiation.rs:74:27
+   |
+74 |         Err(SigningError::RouteAlgorithmUnsupported {
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^ variant not found in `SigningError`
+
+error[E0599]: no method named `supported_algorithms` found for struct `InMemoryTestSigningBackend` in the current scope
+  --> crates/turing-approval/tests/route_negotiation.rs:85:17
+   |
+85 |         backend.supported_algorithms(),
+   |                 ^^^^^^^^^^^^^^^^^^^^ method not found in `InMemoryTestSigningBackend`
+
+error[E0599]: no variant named `NegotiationIdentityMismatch` found for enum `SigningError`
+   --> crates/turing-approval/tests/route_negotiation.rs:107:27
+    |
+107 |         Err(SigningError::NegotiationIdentityMismatch {
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^ variant not found in `SigningError`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `turing-approval` (test "route_negotiation") due to 5 previous errors
+----------------------------------------------------------------------
+### cargo exit_code: 101  (nonzero == expected RED)

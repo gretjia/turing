@@ -1,0 +1,970 @@
+# PHASE GATE RECEIPT — HW-SW-004..006 — 2026-07-04T01:34:00Z
+==================================================================
+### G1 replay_determinism (SG-19 untouched)
+### cmd: cargo test -p turing-replay --test replay_determinism
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.45
+   Compiling syn v2.0.118
+   Compiling serde_derive v1.0.228
+   Compiling serde v1.0.228
+   Compiling turing-contracts v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-contracts)
+   Compiling turing-kernel v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-kernel)
+   Compiling turing-git-tape v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-git-tape)
+   Compiling turing-replay v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-replay)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.98s
+     Running tests/replay_determinism.rs (target/debug/deps/replay_determinism-bbdf35417f7dc3fb)
+
+running 3 tests
+test head_effect_is_sourced_from_registry_not_the_envelope ... ok
+test projection_serialization_is_order_stable ... ok
+test frozen_tape_replays_byte_identical_accepted_state_and_head_set ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+### exit_code: 0
+==================================================================
+### G2 audit-approval-bytes-equivalence
+### cmd: ./scripts/audit-approval-bytes-equivalence.sh
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+PASS: all four byte-surface fields present on ApprovalByteSurfaces (canonical_bytes, visible_card_hash_bytes, signed_bytes, gate_replay_bytes)
+running: cargo test -p turing-approval --quiet
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+......
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 2 tests
+..
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.09s
+
+
+running 7 tests
+.......
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+PASS: cargo test -p turing-approval green
+running: cargo test -p turing-approval --test prop_approval_byte_surfaces
+
+running 2 tests
+..
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.69s
+
+PASS: prop_approval_byte_surfaces four-surface mutation suite green
+PASS: audit-approval-bytes-equivalence complete
+### exit_code: 0
+==================================================================
+### G3a audit-substrate-freeze
+### cmd: ./scripts/audit-substrate-freeze.sh
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+PASS: constitution sha256 pinned and verified (a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0)
+PASS: crates/turing-approval/src/lib.rs sha256 verified (c76965a662402a3387b59d995fd7ffef5862db10eeeb3fed61d9c556b591c3a7)
+PASS: crates/turing-replay/src/lib.rs sha256 verified (c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31)
+PASS: crates/turing-git-tape/src/head_set.rs sha256 verified (794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016)
+PASS: crates/turing-git-tape/src/append.rs sha256 verified (c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665)
+PASS: crates/turing-kernel/src/reducer.rs sha256 verified (43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3)
+PASS: audit-substrate-freeze complete (5 pinned files + constitution)
+### exit_code: 0
+==================================================================
+### G3b githooks pre-commit
+### cmd: bash .githooks/pre-commit
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+PASS: no forbidden paths staged
+PASS: constitution sha256 pinned and verified (a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0)
+PASS: crates/turing-approval/src/lib.rs sha256 verified (c76965a662402a3387b59d995fd7ffef5862db10eeeb3fed61d9c556b591c3a7)
+PASS: crates/turing-replay/src/lib.rs sha256 verified (c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31)
+PASS: crates/turing-git-tape/src/head_set.rs sha256 verified (794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016)
+PASS: crates/turing-git-tape/src/append.rs sha256 verified (c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665)
+PASS: crates/turing-kernel/src/reducer.rs sha256 verified (43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3)
+PASS: audit-substrate-freeze complete (5 pinned files + constitution)
+PASS: pre-commit gate (forbidden-files + substrate-freeze)
+### exit_code: 0
+==================================================================
+### G4 audit-forbidden-files --staged
+### cmd: ./scripts/audit-forbidden-files.sh --staged
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+PASS: no forbidden paths staged
+### exit_code: 0
+==================================================================
+### G5 verify_alignment.sh
+### cmd: bash PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh
+### cwd: /home/zephryj/turingos_backup/work
+GREEN: authority chain verified against ADR-GOV-001.
+### exit_code: 0
+==================================================================
+### G6 cargo test --workspace
+### cmd: cargo test --workspace
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+### start: 2026-07-04T01:34:56Z
+   Compiling libc v0.2.186
+   Compiling turing-kernel v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-kernel)
+   Compiling turing-execd v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-execd)
+   Compiling turing-economy v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-economy)
+   Compiling turing-git-tape v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-git-tape)
+   Compiling turing-replay v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-replay)
+   Compiling turing-pput v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-pput)
+   Compiling turing-projection v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-projection)
+   Compiling autocfg v1.5.1
+   Compiling memoffset v0.9.1
+   Compiling turing-predicate v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-predicate)
+   Compiling cfg_aliases v0.2.1
+   Compiling nix v0.30.1
+   Compiling getrandom v0.4.3
+   Compiling tempfile v3.27.0
+   Compiling getrandom v0.2.17
+   Compiling turing-loop v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-loop)
+   Compiling rand_core v0.6.4
+   Compiling ed25519-dalek v2.2.0
+   Compiling turing-failure v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-failure)
+   Compiling turing-approval v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-approval)
+   Compiling turing-witness v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-witness)
+   Compiling turing-daemons v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-daemons)
+   Compiling turing-qualification v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-qualification)
+   Compiling turing-evidence v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-evidence)
+   Compiling turing-integration v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-integration)
+   Compiling turing-cli v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-cli)
+   Compiling turing-contracts v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-contracts)
+   Compiling turing-xcheck v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-xcheck)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.78s
+     Running unittests src/lib.rs (target/debug/deps/turing_approval-4ac880c4bbc4e94f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/approval_card.rs (target/debug/deps/approval_card-840246507816741a)
+
+running 6 tests
+test approval_bytes_four_way_identity ... ok
+test signature_authority_epoch_must_match_signed_payload_epoch ... ok
+test forged_public_key_with_same_key_id_is_rejected_by_trusted_key_registry ... ok
+test signing_backend_has_no_plaintext_default_and_hardware_slot ... ok
+test local_file_signature_verifies_without_private_seed_after_signing ... ok
+test os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/prop_approval_byte_surfaces.rs (target/debug/deps/prop_approval_byte_surfaces-7736e0bdd3a32340)
+
+running 2 tests
+test mutation_is_rejected ... ok
+test honest_path_identity_holds ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.68s
+
+     Running tests/route_negotiation.rs (target/debug/deps/route_negotiation-008a273d89e42890)
+
+running 7 tests
+test assert_matches_card_ok_only_when_route_equals_payload_route ... ok
+test negotiate_none_route_is_rejected ... ok
+test default_supported_algorithms_is_ed25519_only ... ok
+test identity_field_binds_route_and_algorithm ... ok
+test negotiate_os_keyring_ed25519_is_accepted ... ok
+test negotiate_unsupported_algorithm_is_rejected_not_swapped ... ok
+test route_rides_the_signed_canonical_bytes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/turing-379c57387ba567ff)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_gates.rs (target/debug/deps/cli_gates-db17cc0bce8106f5)
+
+running 10 tests
+test approval_sign_hardware_future_fails_closed_without_signature ... ok
+test boot_project_writes_private_local_project_metadata ... ok
+test jcs_canonicalize_batch_emits_indexed_hex_lines ... ok
+test approval_preview_renders_human_card_without_writing_truth ... ok
+test jcs_canonicalize_fails_closed_on_framing_violation ... ok
+test jcs_canonicalize_writes_canonical_bytes_without_trailing_newline ... ok
+test unknown_command_fails_closed ... ok
+test approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth ... ok
+test handoff_generate_writes_real_projection_hashes ... ok
+test replay_market_pput_and_audit_commands_are_executable ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.16s
+
+     Running tests/install_gates.rs (target/debug/deps/install_gates-2811dea24cd53d25)
+
+running 1 test
+test install_local_wires_cli_and_daemon_binaries_into_prefix ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_contracts-b6ed6ff1d6941f84)
+
+running 14 tests
+test failure::tests::all_17_failure_classes_map_to_a_disposition ... ok
+test failure::tests::failure_node_payload_roundtrips_with_const_false_verified ... ok
+test failure::tests::specific_contract_dispositions ... ok
+test payload::tests::authority_transfer_is_a_human_signed_transfer_only_when_signed ... ok
+test failure::tests::disposition_tally_matches_the_frozen_2_6_3_5_1_split ... ok
+test failure::tests::failure_node_payload_rejects_verified_true_and_unknown_fields ... ok
+test payload::tests::other_amendment_is_never_a_human_signed_transfer ... ok
+test payload::tests::rejects_unknown_field ... ok
+test registry::tests::classes_and_head_effects_are_registry_derived ... ok
+test registry::tests::tc_witness_rows_are_in_the_closed_registry ... ok
+test registry::tests::event_names_enumerates_exactly_the_registered_set ... ok
+test registry::tests::the_full_closed_event_set_is_loaded_from_the_pack ... ok
+test registry::tests::unknown_event_type_is_rejected_closed_world ... ok
+test payload::tests::round_trips_through_jcs ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/canonical_vectors.rs (target/debug/deps/canonical_vectors-27fb99d088ef74e5)
+
+running 9 tests
+test ascii_key_linter_rejects_keys_but_allows_localized_values ... ok
+test canonical_codec_acceptance_profile_rejects_forbidden_values ... ok
+test rejects_bom_and_trailing_newline ... ok
+test rejects_head_set_after_in_payload ... ok
+test rejects_non_ascii_object_key ... ok
+test rejects_non_integer_float_and_exponent_numbers ... ok
+test rejects_duplicate_object_keys ... ok
+test rejects_phantom_self_digest_field_closed_world ... ok
+test all_seven_canonical_vectors_match_oracle ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/goal_state.rs (target/debug/deps/goal_state-316b07fddabe9c41)
+
+running 1 test
+test goal_state_requires_machine_predicates ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/identity_profile.rs (target/debug/deps/identity_profile-301020f71af35196)
+
+running 4 tests
+test accepted_prefix_is_byte_exact_ascii_mu_colon ... ok
+test greenfield_is_default_and_rejects_legacy_40_hex ... ok
+test positives_accept_via_parse_and_predicate ... ok
+test negatives_reject_via_parse_and_predicate ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_daemons-3a1cf4bf88f71594)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/turing-execd.rs (target/debug/deps/turing_execd-ce0049acde1176c5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/turing-marketd.rs (target/debug/deps/turing_marketd-405ff89ef8201447)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/turing-mcp.rs (target/debug/deps/turing_mcp-4f8b1c2d2b2cc8f4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/turing-pputd.rs (target/debug/deps/turing_pputd-0b95e6f54cf057f8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/turing-viewd.rs (target/debug/deps/turing_viewd-d3f5f95e427cd8b3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/turingd.rs (target/debug/deps/turingd-21d6fdcbb179b0f0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/daemon_role_rpc.rs (target/debug/deps/daemon_role_rpc-de17d5fe0cbd21c9)
+
+running 12 tests
+turing-marketd serve failed: socket parent /tmp/.tmpHaAKRe/unsafe must be owned by the daemon user and not group/world writable
+test daemons_reject_world_writable_socket_parents ... ok
+test execd_dispatches_fake_worker_without_head_authority ... ok
+test execd_authorizes_scoped_grants_without_head_authority ... ok
+test marketd_serves_shadow_suggestions_without_authority ... ok
+test mcp_lists_read_only_resources_and_typed_commands_without_truth ... ok
+test pputd_serves_hidden_prompt_shield ... ok
+test sidecars_read_project_status_without_truth_authority ... ok
+test marketd_writes_project_scoped_market_snapshot_without_truth_authority ... ok
+test viewd_builds_disposable_projection_without_truth_write ... ok
+test pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage ... ok
+test marketd_writes_project_scoped_wallet_snapshot_without_truth_authority ... ok
+test viewd_writes_project_scoped_projection_snapshot_without_truth_write ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+     Running tests/daemon_topology.rs (target/debug/deps/daemon_topology-064eb15da5bf62d8)
+
+running 2 tests
+test non_authority_daemons_reject_head_movement ... ok
+test daemon_check_reports_process_boundaries ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/turingd_rpc.rs (target/debug/deps/turingd_rpc-25f778695417f799)
+
+running 18 tests
+test turingd_appends_preserve_events_without_moving_accepted_head ... ok
+test turingd_bootstraps_genesis_only_on_empty_micro_tape ... ok
+test turingd_goal_submit_validates_goal_state_before_append ... ok
+test turingd_project_status_reads_boot_metadata_without_truth_authority ... ok
+test turingd_capsule_reject_appends_failure_without_moving_heads ... ok
+test turingd_serves_jsonrpc_health_and_read_only_heads ... ok
+test turingd_rejects_in_memory_test_capsule_approval_without_moving_authorization_head ... ok
+test turingd_rejects_in_memory_test_atom_authorization_without_moving_authorization_head ... ok
+test turingd_verify_write_rejects_caller_supplied_predicate_checks ... ok
+test turingd_reads_real_micro_tape_heads_from_configured_repo ... ok
+test turingd_verify_write_rejects_extra_truthy_candidate_fields ... ok
+test turingd_verify_write_accepts_derived_predicate_pack_without_checks ... ok
+test turingd_verify_write_rejects_micro_id_as_macro_anchor ... ok
+test turingd_verify_write_rejects_missing_macro_anchor_from_derived_predicate_pack ... ok
+test turingd_verify_write_rejects_missing_worker_receipt ... ok
+test turingd_verify_write_rejects_well_formed_refs_absent_from_tape ... ok
+test turingd_verify_write_requires_official_evaluator_evidence_before_accept ... ok
+test turingd_verify_write_routes_predicate_pass_and_fail ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.72s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_economy-6dddff8e94d3dcfa)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/economy_market.rs (target/debug/deps/economy_market-96a47dac8cdd6b3b)
+
+running 4 tests
+test ctf_conservation ... ok
+test market_replay_from_tape_events ... ok
+test amm_cpmm_buy_yes_and_buy_no ... ok
+test wallet_projection_replay_from_tape_events ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/market_router.rs (target/debug/deps/market_router-42967c4cc3035c0d)
+
+running 2 tests
+test market_router_shadow_mode_suggests_without_authority ... ok
+test price_broadcast_is_abstract_statistical_signal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_evidence-60e58b84845a4475)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/evidence_lifecycle.rs (target/debug/deps/evidence_lifecycle-c7cc65f2d0bd6551)
+
+running 3 tests
+test consumed_evidence_upgrades_to_required ... ok
+test evidence_descriptor_digests_profiles_and_state_stamps ... ok
+test evidence_required_immutable ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_execd-c95722d14d11be85)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/capability_grant.rs (target/debug/deps/capability_grant-c61aa56951e9a5af)
+
+running 1 test
+test capability_grant_scope_enforced ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/fake_manual_workers.rs (target/debug/deps/fake_manual_workers-d41afc71933c49d6)
+
+running 1 test
+test fake_worker_receipt_full_provenance ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/grok_headless_worker.rs (target/debug/deps/grok_headless_worker-1c23977a85d3a88b)
+
+running 4 tests
+test grok_headless_rejects_hidden_prompt_markers ... ok
+test grok_headless_command_forces_plain_output_no_planning_memory_or_subagents ... ok
+test grok_headless_rejects_non_hash_worker_id ... ok
+test grok_worker_id_is_content_addressed_hash ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/macro_anchor.rs (target/debug/deps/macro_anchor-c4ee985323d5148c)
+
+running 1 test
+test macro_anchor_never_micro_identity ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/process_group.rs (target/debug/deps/process_group-e5a49f20e52d1566)
+
+running 1 test
+test process_group_term_then_kill_no_orphans ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/worker_profile.rs (target/debug/deps/worker_profile-92e0bf119812d1cc)
+
+running 2 tests
+test worker_profile_requires_hash_worker_id ... ok
+test worker_profile_no_backup_no_worker_role ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/worktree.rs (target/debug/deps/worktree-1515dbf82b02efff)
+
+running 1 test
+test worktree_isolated_per_capsule ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_failure-66e9a6075a5917df)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/failure_memory.rs (target/debug/deps/failure_memory-6e448e229e81e9bf)
+
+running 3 tests
+test broadcast_rule_is_abstract_and_references_failure_nodes ... ok
+test classifier_uses_observed_signals_and_preserves_unknown ... ok
+test failure_memory_is_derived_from_tape_events_only ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_git_tape-b04f3f258a936308)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/append_success.rs (target/debug/deps/append_success-b3a8e1733825d1c6)
+
+running 4 tests
+test append_envelope_requires_seven_fields ... ok
+test predicate_free_event_appends_not_run_and_moves_only_tape_tip ... ok
+test predicate_fail_records_failure_node_and_preserves_heads ... ok
+test three_refs_advance_rules ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/authority_epoch.rs (target/debug/deps/authority_epoch-2c7586637d1c68fe)
+
+running 1 test
+test append_derives_authority_epoch_from_tape_tip ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/git_sha256.rs (target/debug/deps/git_sha256-73317c275d5a28bc)
+
+running 3 tests
+test qualifies_native_sha256_object_store ... ok
+test init_sha256_micro_git ... ok
+test plumbing_allowlist_roundtrips_under_sha256 ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/head_set_snapshot.rs (target/debug/deps/head_set_snapshot-09e81318107580b6)
+
+running 8 tests
+test coherent_tuple_is_accepted_as_q ... ok
+test a_ne_b_torn_read_is_detected_retried_and_settles ... ok
+test no_incoherent_q_ever_escapes_across_injected_torn_states ... ok
+test persistent_a_ne_b_split_fails_closed ... ok
+test persistent_subset_visibility_exhausts_retries_and_fails_closed ... ok
+test subset_visibility_tape_tip_advanced_but_head_not_yet_is_rejected_then_retried ... ok
+test sequence_not_parent_plus_one_is_rejected_then_fails_closed ... ok
+test live_guarded_reader_over_real_git_returns_coherent_q ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/stale_writer.rs (target/debug/deps/stale_writer-c48a26b0d0836389)
+
+running 3 tests
+test append_auto_retry_re_mints_transparently_and_lands_linearly ... ok
+test stale_writer_b_is_rejected_then_re_mints_linearly_against_the_new_tip ... ok
+test append_auto_retry_is_bounded_and_never_forces ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+     Running tests/tc_witness_append.rs (target/debug/deps/tc_witness_append-7da356adef92e9cd)
+
+running 1 test
+test tc_witness_events_append_through_three_ref_writer ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_integration-d41ebbc0e1939d07)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/integration_queue.rs (target/debug/deps/integration_queue-e1fe70ce093de637)
+
+running 3 tests
+test no_auto_merge_main_and_drift_guard ... ok
+test integration_conflict_leaves_head_unchanged ... ok
+test integration_queue_cas_admits_non_conflicting_and_rejects_stale ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_kernel-d6b7854213ef3c49)
+
+running 5 tests
+test failure::tests::classify_covers_every_mode_to_the_contract_class ... ok
+test failure::tests::admission_rejected_is_not_run_and_preserves_heads ... ok
+test failure::tests::failure_node_is_fail_and_preserves_heads_and_disposes ... ok
+test admission::tests::a4_admits_only_the_registry_head_effect ... ok
+test admission::tests::a4_fails_closed_on_unknown_event ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/accepted_head.rs (target/debug/deps/accepted_head-78b382f85f0641d7)
+
+running 3 tests
+test authorization_pass_moves_authorization_head_and_leaves_accepted_head_untouched ... ok
+test sovereign_accept_event_under_fail_or_not_run_never_advances_accepted_head ... ok
+test only_sovereign_accept_advance_pass_advances_accepted_head_over_all_registered_events ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/authorization_head.rs (target/debug/deps/authorization_head-d1304455ea7e78b4)
+
+running 3 tests
+test sovereign_accept_pass_moves_accepted_head_and_leaves_authorization_head_untouched ... ok
+test authorization_event_under_fail_or_not_run_never_advances_authorization_head ... ok
+test only_authorization_advance_pass_advances_authorization_head_over_all_registered_events ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/failure_append.rs (target/debug/deps/failure_append-2393cfef9cb995d0)
+
+running 6 tests
+test every_failure_mode_keeps_the_exact_pre_state_head_oids ... ok
+test parse_failure_appends_admission_rejected_and_preserves_both_heads ... ok
+test observer_mismatch_appends_observer_mismatch_node_and_preserves_heads ... ok
+test predicate_logic_fail_appends_semantic_failure_node_and_preserves_heads ... ok
+test schema_shape_fail_appends_output_schema_violation_node_and_preserves_heads ... ok
+test timeout_failures_append_timeout_class_nodes_and_preserve_heads ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/head_effect_tamper.rs (target/debug/deps/head_effect_tamper-214053f023d926a4)
+
+running 13 tests
+test carried_head_effect_equal_to_registry_row_is_admitted ... ok
+test admission_a4_rejects_an_unknown_event_type_closed_world ... ok
+test advance_class_event_carrying_preserve_is_rejected_head_effect_disagreement ... ok
+test admission_a4_holds_for_every_event_in_the_real_registry ... ok
+test epoch_unchanged_for_any_non_project_law_amended_event_including_another_sovereign_accept ... ok
+test epoch_unchanged_for_non_authority_transfer_project_law_amended ... ok
+test epoch_unchanged_when_new_authority_epoch_is_not_before_plus_one ... ok
+test epoch_unchanged_when_not_human_signed ... ok
+test epoch_unchanged_when_product_is_fail_or_not_run ... ok
+test forged_head_effect_is_rejected_before_the_reducer_so_it_cannot_bump_epoch_or_move_a_head ... ok
+test valid_passed_human_signed_authority_transfer_increments_epoch_exactly_once ... ok
+test preserve_class_event_carrying_advance_is_rejected_head_effect_disagreement ... ok
+test epoch_unchanged_when_no_payload_is_supplied_even_for_project_law_amended ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_loop-71dd896067a0f70a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/capsule.rs (target/debug/deps/capsule-e1b785452e415041)
+
+running 1 test
+test visible_capsule_hides_private_contract ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/rtool.rs (target/debug/deps/rtool-368edaa25dc35a11)
+
+running 1 test
+test rtool_reads_tape_not_projection_truth ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/tick.rs (target/debug/deps/tick-4a26cf1750ef32b5)
+
+running 1 test
+test single_tick_accept_and_reject ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_pput-db2ec063055b79e9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/pput_accounting.rs (target/debug/deps/pput_accounting-c875813523cd5354)
+
+running 3 tests
+test cost_event_counts_tokens_stdout_and_wall_time ... ok
+test failed_branches_count_toward_cost_and_progress_requires_golden_path ... ok
+test pput_projection_rebuilds_from_tape_and_prompt_shield_blocks_leakage ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_predicate-d9530f043ea163e9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/event_registry.rs (target/debug/deps/event_registry-54034de97f4b154c)
+
+running 3 tests
+test event_registry_closed_world_rejects_unknown_events ... ok
+test event_registry_closed_world_enumerates_only_resolvable_events ... ok
+test economy_events_preserve_only ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/predicate_kernel.rs (target/debug/deps/predicate_kernel-8c2cbc832cbeb26c)
+
+running 2 tests
+test market_pput_predicates ... ok
+test predicate_product_deterministic ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_projection-61906cbbdce77d4c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/projection_builder.rs (target/debug/deps/projection_builder-ac7d96cc216a9385)
+
+running 3 tests
+test projection_copy_does_not_treat_macro_green_as_accepted ... ok
+test projection_rebuild_is_stable_and_tape_only ... ok
+test tui_projection_client_emits_typed_commands_only ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_qualification-40c511add1f3ef63)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/agent_economy_e2e.rs (target/debug/deps/agent_economy_e2e-b4ba2acfdc69bed7)
+
+running 2 tests
+test rescue_project_agent_economy_e2e ... ok
+test new_project_agent_economy_e2e ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+
+     Running tests/handoff_contract.rs (target/debug/deps/handoff_contract-2625463a40de07ae)
+
+running 1 test
+test final_handoff_references_heads_replay_market_pput_and_risks ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_replay-e843bd8a99bed26e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/replay_determinism.rs (target/debug/deps/replay_determinism-1856ec60146cd795)
+
+running 3 tests
+test projection_serialization_is_order_stable ... ok
+test head_effect_is_sourced_from_registry_not_the_envelope ... ok
+test frozen_tape_replays_byte_identical_accepted_state_and_head_set ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running unittests src/lib.rs (target/debug/deps/turing_witness-8f870ec87edb2683)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/tc3-export.rs (target/debug/deps/tc3_export-b2ef4ae75eb44f25)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/tc3_export.rs (target/debug/deps/tc3_export-6cd59293c1d789ec)
+
+running 2 tests
+test budget_exhaustion_is_a_tape_terminal_reduced_from_budget_event ... ok
+test tc3_export_writes_eight_bundles_manifest_and_seeded_fuzz ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.33s
+
+     Running tests/witness.rs (target/debug/deps/witness-e2c039166181d13a)
+
+running 3 tests
+test interpreter_core_is_generic_over_counter_count ... ok
+test state_hash_v1_requires_the_two_counter_payload_shape ... ok
+test emitter_uses_three_ref_append_path_and_reducer_conserves_state ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running unittests src/main.rs (target/debug/deps/turing_xcheck-d46d0ee3af2b54f2)
+
+running 1 test
+test tests::lower_hex_encodes_bytes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_approval
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_contracts
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_daemons
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_economy
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_evidence
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_execd
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_failure
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_git_tape
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_integration
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_kernel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_loop
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_pput
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_predicate
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_projection
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_qualification
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_replay
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_witness
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+### end: 2026-07-04T01:36:03Z
+### exit_code: 0
+==================================================================
+### REFLECT reruns — security audit hardening (tamper class g, advisory notes) — 2026-07-04T01:45:16Z
+------------------------------------------------------------------
+### R1 prop_approval_byte_surfaces (now incl. class g)
+### cmd: cargo test -p turing-approval --test prop_approval_byte_surfaces
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+   Compiling turing-approval v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-approval)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running tests/prop_approval_byte_surfaces.rs (target/debug/deps/prop_approval_byte_surfaces-978bf07d4d961fc9)
+
+running 3 tests
+test mutation_class_g_verifying_key_substitution_is_rejected ... ok
+test mutation_is_rejected ... ok
+test honest_path_identity_holds ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.02s
+
+### exit_code: 0
+------------------------------------------------------------------
+### R2 cargo test -p turing-approval (default features)
+### cmd: cargo test -p turing-approval
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+   Compiling turing-approval v0.0.0 (/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004/crates/turing-approval)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.76s
+     Running unittests src/lib.rs (target/debug/deps/turing_approval-3a2d69caedb5977c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/approval_card.rs (target/debug/deps/approval_card-88f4a031eef9c218)
+
+running 6 tests
+test approval_bytes_four_way_identity ... ok
+test forged_public_key_with_same_key_id_is_rejected_by_trusted_key_registry ... ok
+test signing_backend_has_no_plaintext_default_and_hardware_slot ... ok
+test signature_authority_epoch_must_match_signed_payload_epoch ... ok
+test local_file_signature_verifies_without_private_seed_after_signing ... ok
+test os_keyring_signatures_are_real_signatures_and_verify_against_payload_bytes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/prop_approval_byte_surfaces.rs (target/debug/deps/prop_approval_byte_surfaces-978bf07d4d961fc9)
+
+running 3 tests
+test mutation_class_g_verifying_key_substitution_is_rejected ... ok
+test mutation_is_rejected ... ok
+test honest_path_identity_holds ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.04s
+
+     Running tests/route_negotiation.rs (target/debug/deps/route_negotiation-bc8140fb70d156bf)
+
+running 7 tests
+test default_supported_algorithms_is_ed25519_only ... ok
+test identity_field_binds_route_and_algorithm ... ok
+test assert_matches_card_ok_only_when_route_equals_payload_route ... ok
+test negotiate_none_route_is_rejected ... ok
+test negotiate_os_keyring_ed25519_is_accepted ... ok
+test negotiate_unsupported_algorithm_is_rejected_not_swapped ... ok
+test route_rides_the_signed_canonical_bytes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests turing_approval
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+### exit_code: 0
+------------------------------------------------------------------
+### R3 audit-approval-bytes-equivalence.sh
+### cmd: ./scripts/audit-approval-bytes-equivalence.sh
+### cwd: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-004
+PASS: all four byte-surface fields present on ApprovalByteSurfaces (canonical_bytes, visible_card_hash_bytes, signed_bytes, gate_replay_bytes)
+running: cargo test -p turing-approval --quiet
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+......
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.03s
+
+
+running 7 tests
+.......
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+PASS: cargo test -p turing-approval green
+running: cargo test -p turing-approval --test prop_approval_byte_surfaces
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.01s
+
+PASS: prop_approval_byte_surfaces four-surface mutation suite green
+PASS: audit-approval-bytes-equivalence complete
+### exit_code: 0
