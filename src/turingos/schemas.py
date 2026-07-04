@@ -187,6 +187,11 @@ _CONTEXT_REQUIRED = ("tape_tip", "accepted_head")
 _CONTEXT_ALLOWED = frozenset({"tape_tip", "accepted_head"})
 _INJECTED_RULE_REQUIRED = ("failure_class", "rule")
 _INJECTED_RULE_ALLOWED = frozenset({"failure_class", "rule"})
+# Pre-registered injection budget (ADR-M4-006 / RES_M4 §2.8 P12; mirrors
+# capsule.schema.json's injected_rules.maxItems and capsule.py's FailureMemory default
+# max_active_rules). Enforced here too (defense in depth) so an out-of-budget capsule can
+# never validate even if a caller bypasses capsule.build_capsule's own cap.
+_MAX_INJECTED_RULES = 4
 
 
 def validate_capsule(capsule: dict) -> None:
@@ -231,6 +236,11 @@ def validate_capsule(capsule: dict) -> None:
         rules = capsule["injected_rules"]
         if not isinstance(rules, list):
             _fail(f"{where}.injected_rules: expected array, got {type(rules).__name__}")
+        if len(rules) > _MAX_INJECTED_RULES:
+            _fail(
+                f"{where}.injected_rules: {len(rules)} exceeds the pre-registered injection "
+                f"budget of {_MAX_INJECTED_RULES} (ADR-M4-006)"
+            )
         for i, rule in enumerate(rules):
             rwhere = f"{where}.injected_rules[{i}]"
             _require_dict(rule, rwhere)

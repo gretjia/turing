@@ -52,6 +52,21 @@ _CAPSULE_EVENT = "WorkCapsuleBuilt"
 _DEFAULT_WALL_SECONDS = 900
 _DEFAULT_MAX_RETRIES = 1
 
+# Pre-registered failure-memory injection budget (ADR-M4-006 / RES_M4 §2.8 P12; the exact
+# numbers are pinned in
+# PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/
+# proposals/BroadcastRuleRetired_PROPOSAL.json's pre_registered_capsule_budget). Landed here as
+# the FCE-B4 long-horizon fix for audit finding P12 "rule pile-up without retirement": before
+# this change, FailureMemory.relevant_rules() returned EVERY relevant abstract rule with no
+# ceiling, so a long-running session accumulating many distinct FailureClasses against the same
+# atom/module produced an unbounded, ever-growing injected_rules list — exactly the Art. II.1
+# context-pollution / cost-inflation hazard the ADR-M4-006 proposal was written to prevent.
+# capsule.schema.json mirrors this with injected_rules.maxItems; schemas.py enforces it too
+# (defense in depth) so an out-of-budget capsule can never validate even if a caller bypasses
+# build_capsule's default.
+_DEFAULT_MAX_ACTIVE_RULES = 4
+_DEFAULT_MAX_RULE_CHARS = 4000
+
 
 # --- FailureMemory: the shield's lift-and-filter -----------------------------
 
@@ -105,11 +120,25 @@ class FailureMemory:
     _UNKNOWN_CLASS = "Unclassified"
     _UNKNOWN_RULE = "review the recorded FailureNode evidence and tighten the declared acceptance"
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        max_active_rules: int = _DEFAULT_MAX_ACTIVE_RULES,
+        max_rule_chars: int = _DEFAULT_MAX_RULE_CHARS,
+    ) -> None:
         # Each remembered entry: {failure_class, rule, atom_id, module_id}. atom_id/module_id are
         # the shield's RELEVANCE keys (internal filter axis) — they are NOT copied into a capsule's
         # injected_rules (which is strictly {failure_class, rule}); they only decide what is relevant.
         self._memory: list = []
+        # Injection budget (ADR-M4-006 pre-registered numbers, ceilings not gate logic): caps how
+        # many distinct abstract rules — and how many rule-text characters — a single capsule may
+        # carry, so the active-rule pile can never grow without bound.
+        if max_active_rules < 0:
+            raise ValueError("max_active_rules must be non-negative")
+        if max_rule_chars < 0:
+            raise ValueError("max_rule_chars must be non-negative")
+        self._max_active_rules = max_active_rules
+        self._max_rule_chars = max_rule_chars
 
     @staticmethod
     def _reason_code(failure_node: dict) -> str:
@@ -167,24 +196,39 @@ class FailureMemory:
         return False
 
     def relevant_rules(self, atom: dict) -> list:
-        """Return ONLY the abstract rules relevant to `atom` (de-duplicated, deterministic order).
+        """Return the abstract rules relevant to `atom` (de-duplicated, deterministic order),
+        capped by the pre-registered injection budget (max_active_rules / max_rule_chars).
 
         Filters the remembered failures to those that occurred on the same atom or module, lifts
         each to its {failure_class, rule} pair, and de-duplicates by (failure_class, rule). The
         returned list is exactly the capsule's injected_rules: NO raw payload, NO relevance keys,
         NO unrelated class. Given a history with >=2 UNRELATED classes, only the relevant class(es)
         survive this filter.
+
+        Budget (ADR-M4-006): selection is top-N in first-seen order — the first
+        `max_active_rules` distinct relevant pairs, stopping early if the next candidate would
+        push the cumulative rule-text length over `max_rule_chars`. This bounds injected_rules
+        (and its prompt-token cost) even when the remembered history holds far more distinct
+        relevant classes than the budget allows; it never truncates a rule's text mid-string —
+        a rule that would not fit is simply not selected.
         """
         out: list = []
         seen = set()
+        total_chars = 0
         for entry in self._memory:
+            if len(out) >= self._max_active_rules:
+                break
             if not self._is_relevant(entry, atom):
                 continue
             pair = (entry["failure_class"], entry["rule"])
             if pair in seen:
                 continue
+            rule_chars = len(entry["rule"])
+            if total_chars + rule_chars > self._max_rule_chars:
+                continue
             seen.add(pair)
             out.append({"failure_class": entry["failure_class"], "rule": entry["rule"]})
+            total_chars += rule_chars
         return out
 
 
