@@ -46,7 +46,7 @@ BASE_REQUIRED_PROCESSES = [
     "turing-viewd",
 ]
 
-REAL_WORKER_PROCESSES = {"grok_cli"}
+REAL_WORKER_PROCESSES = {"grok_cli", "deepseek_native_api_call"}
 
 REQUIRED_EVENTS = [
     "GoalStateProposed",
