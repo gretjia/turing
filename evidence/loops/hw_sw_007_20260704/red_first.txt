@@ -1,0 +1,212 @@
+# HW-SW-007..009 red-first evidence
+# Command: cargo test -p turing-attest --no-fail-fast
+# Context: crate skeleton (lib.rs/manifest.rs/policy.rs/identity.rs/qt_quote.rs/
+# tpm.rs/tee.rs) + all test files written first; hardware_manifest.toml,
+# attestation_policy.toml, device_identity.json, and fixtures/q_t_quote.*.json
+# do not exist yet, so every test that reads a data file panics (red).
+# attestor.rs tests are self-contained (Attestor trait + SimulatedAttestor +
+# stubs need no external data file) and already pass; this is expected and
+# does not contradict red-first, since manifest/policy/identity/qt_quote are
+# the not-yet-existing-API/data surfaces this loop still has to build.
+#
+# Cargo.lock new packages after this resolution (toml-family only):
+#   serde_spanned, toml, toml_datetime, toml_parser, toml_writer, winnow,
+#   turing-attest (the crate itself).
+#
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running unittests src/lib.rs (target/debug/deps/turing_attest-31040db87865e5e4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/attestor.rs (target/debug/deps/attestor-a8e5c4bd83cceb37)
+
+running 2 tests
+test simulated_attestor_quote_is_marked_fake ... ok
+test stub_backends_typed_error_never_panics ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/identity.rs (target/debug/deps/identity-0011dce364672ee6)
+
+running 3 tests
+test identity_non_ascii_key_rejected ... FAILED
+test identity_unknown_route_rejected ... FAILED
+test identity_real_file_parses_and_validates ... FAILED
+
+failures:
+
+---- identity_non_ascii_key_rejected stdout ----
+
+thread 'identity_non_ascii_key_rejected' (1862515) panicked at crates/turing-attest/tests/identity.rs:12:6:
+device_identity.json must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- identity_unknown_route_rejected stdout ----
+
+thread 'identity_unknown_route_rejected' (1862517) panicked at crates/turing-attest/tests/identity.rs:12:6:
+device_identity.json must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- identity_real_file_parses_and_validates stdout ----
+
+thread 'identity_real_file_parses_and_validates' (1862516) panicked at crates/turing-attest/tests/identity.rs:12:6:
+device_identity.json must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+
+failures:
+    identity_non_ascii_key_rejected
+    identity_real_file_parses_and_validates
+    identity_unknown_route_rejected
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p turing-attest --test identity`
+     Running tests/manifest.rs (target/debug/deps/manifest-3587e2a5064ea7fb)
+
+running 6 tests
+test manifest_bad_schema_version_rejected ... FAILED
+test manifest_missing_signing_section_rejected ... FAILED
+test manifest_non_hex_digest_rejected ... FAILED
+test manifest_non_ascii_device_id_rejected ... FAILED
+test manifest_real_file_parses_and_validates ... FAILED
+test manifest_uppercase_hex_digest_rejected ... FAILED
+
+failures:
+
+---- manifest_bad_schema_version_rejected stdout ----
+
+thread 'manifest_bad_schema_version_rejected' (1862519) panicked at crates/turing-attest/tests/manifest.rs:12:6:
+hardware_manifest.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- manifest_missing_signing_section_rejected stdout ----
+
+thread 'manifest_missing_signing_section_rejected' (1862520) panicked at crates/turing-attest/tests/manifest.rs:12:6:
+hardware_manifest.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- manifest_non_hex_digest_rejected stdout ----
+
+thread 'manifest_non_hex_digest_rejected' (1862522) panicked at crates/turing-attest/tests/manifest.rs:12:6:
+hardware_manifest.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- manifest_non_ascii_device_id_rejected stdout ----
+
+thread 'manifest_non_ascii_device_id_rejected' (1862521) panicked at crates/turing-attest/tests/manifest.rs:12:6:
+hardware_manifest.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- manifest_real_file_parses_and_validates stdout ----
+
+thread 'manifest_real_file_parses_and_validates' (1862523) panicked at crates/turing-attest/tests/manifest.rs:12:6:
+hardware_manifest.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- manifest_uppercase_hex_digest_rejected stdout ----
+
+thread 'manifest_uppercase_hex_digest_rejected' (1862524) panicked at crates/turing-attest/tests/manifest.rs:12:6:
+hardware_manifest.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+
+failures:
+    manifest_bad_schema_version_rejected
+    manifest_missing_signing_section_rejected
+    manifest_non_ascii_device_id_rejected
+    manifest_non_hex_digest_rejected
+    manifest_real_file_parses_and_validates
+    manifest_uppercase_hex_digest_rejected
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p turing-attest --test manifest`
+     Running tests/policy.rs (target/debug/deps/policy-682c86a520e81702)
+
+running 4 tests
+test policy_bad_on_fail_rejected ... FAILED
+test policy_debug_without_simulator_rejected ... FAILED
+test policy_missing_degraded_section_rejected ... FAILED
+test policy_real_file_parses_and_validates ... FAILED
+
+failures:
+
+---- policy_bad_on_fail_rejected stdout ----
+
+thread 'policy_bad_on_fail_rejected' (1862526) panicked at crates/turing-attest/tests/policy.rs:12:6:
+attestation_policy.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- policy_debug_without_simulator_rejected stdout ----
+
+thread 'policy_debug_without_simulator_rejected' (1862527) panicked at crates/turing-attest/tests/policy.rs:12:6:
+attestation_policy.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- policy_missing_degraded_section_rejected stdout ----
+
+thread 'policy_missing_degraded_section_rejected' (1862528) panicked at crates/turing-attest/tests/policy.rs:12:6:
+attestation_policy.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- policy_real_file_parses_and_validates stdout ----
+
+thread 'policy_real_file_parses_and_validates' (1862529) panicked at crates/turing-attest/tests/policy.rs:12:6:
+attestation_policy.toml must exist at worktree root: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+
+failures:
+    policy_bad_on_fail_rejected
+    policy_debug_without_simulator_rejected
+    policy_missing_degraded_section_rejected
+    policy_real_file_parses_and_validates
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p turing-attest --test policy`
+     Running tests/qt_quote.rs (target/debug/deps/qt_quote-326110eb5c6a516d)
+
+running 4 tests
+test qt_quote_invalid_digest_rejected ... FAILED
+test qt_quote_valid_parses_and_digest_self_consistent ... FAILED
+test qt_quote_invalid_nonascii_rejected ... FAILED
+test qt_quote_invalid_schema_rejected ... FAILED
+
+failures:
+
+---- qt_quote_invalid_digest_rejected stdout ----
+
+thread 'qt_quote_invalid_digest_rejected' (1862531) panicked at crates/turing-attest/tests/qt_quote.rs:9:50:
+missing fixture /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-007/crates/turing-attest/../../fixtures/q_t_quote.invalid_digest.json: No such file or directory (os error 2)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- qt_quote_valid_parses_and_digest_self_consistent stdout ----
+
+thread 'qt_quote_valid_parses_and_digest_self_consistent' (1862534) panicked at crates/turing-attest/tests/qt_quote.rs:9:50:
+missing fixture /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-007/crates/turing-attest/../../fixtures/q_t_quote.valid.json: No such file or directory (os error 2)
+
+---- qt_quote_invalid_nonascii_rejected stdout ----
+
+thread 'qt_quote_invalid_nonascii_rejected' (1862532) panicked at crates/turing-attest/tests/qt_quote.rs:9:50:
+missing fixture /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-007/crates/turing-attest/../../fixtures/q_t_quote.invalid_nonascii.json: No such file or directory (os error 2)
+
+---- qt_quote_invalid_schema_rejected stdout ----
+
+thread 'qt_quote_invalid_schema_rejected' (1862533) panicked at crates/turing-attest/tests/qt_quote.rs:9:50:
+missing fixture /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-007/crates/turing-attest/../../fixtures/q_t_quote.invalid_schema.json: No such file or directory (os error 2)
+
+
+failures:
+    qt_quote_invalid_digest_rejected
+    qt_quote_invalid_nonascii_rejected
+    qt_quote_invalid_schema_rejected
+    qt_quote_valid_parses_and_digest_self_consistent
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p turing-attest --test qt_quote`
+   Doc-tests turing_attest
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: 4 targets failed:
+    `-p turing-attest --test identity`
+    `-p turing-attest --test manifest`
+    `-p turing-attest --test policy`
+    `-p turing-attest --test qt_quote`

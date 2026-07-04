@@ -1,0 +1,26 @@
+# turingos attestation_policy.toml — HW-SW-008 (Phase 3, P0 pure software)
+# HOW hardware evidence must be verified. sha256(this file) becomes
+# q_t_quote.quoted.policy_hash (docs/roadmap/secure_os_18_month/
+# 06_boot_gate.md §5.c / §5.e).
+
+[policy]
+schema_version      = "attestation_policy.v1"
+freshness_max_age_s = 300
+nonce_required      = true
+
+[tpm]
+required_pcrs    = []
+allowed_banks    = ["sha256"]
+ak_cert_required = false
+
+[tee]
+allowed_enclave_measurements = []
+allow_debug                  = false
+
+[degraded]
+# P0: swtpm/gramine-direct receipts admissible (marked "simulated"). P1 MUST
+# flip this to false on real-TPM devices.
+simulator_allowed = true
+# tape_tip may still append (failure appends too); authorization_head is
+# frozen until GREEN or human sudo.
+on_fail           = "halt_authorization"
