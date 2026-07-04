@@ -73,3 +73,27 @@ PlanLoop grilling item. Until then, algorithm identity binds out-of-band via:
 
 When schema v3 lands, the negotiated algorithm should move into the signed
 payload so it rides the same bytes as the route.
+
+## One algorithm per route (invariant until schema v3)
+
+The trusted-key registry lookup `(key_id, authority_epoch, signature_route)`
+MUST map to **exactly one algorithm**. Because the algorithm does not ride the
+signed payload bytes today, algorithm identity is carried entirely by the
+registry record — so **no EcdsaP256 (or any second-algorithm) key may enter the
+`AuthorityKeySet` on any route** until schema v3 binds the algorithm into the
+signed payload bytes. Admitting a second algorithm under the same lookup key
+would let a verifier be steered between algorithms without the signed bytes
+changing. Every current route is Ed25519-only; the YubiKey skeleton *offers*
+EcdsaP256 via `supported_algorithms()` but cannot enroll a key, so the
+invariant holds by construction.
+
+## Advisory status of negotiation (no runtime enforcement yet)
+
+`negotiate()` / `NegotiatedRoute::assert_matches_card()` are currently
+**ADVISORY**: `SigningBackend::sign()` does not require a `NegotiatedRoute`, so
+a caller can skip negotiation entirely and nothing at runtime forces the
+negotiated algorithm onto the signing call. The planned additive close is a
+`sign_negotiated(&NegotiatedRoute, card)` wrapper that makes negotiation a
+precondition of signing — **deferred**. Until then, treat negotiation as a
+policy checkpoint enforced by call-site discipline and review, not a
+cryptographic control.

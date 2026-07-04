@@ -4,9 +4,10 @@
 //! PRNG (const SEED below), so Cargo.lock stays byte-identical. Two invariants:
 //!   1. honest cards: the four byte surfaces are identical and a real signature
 //!      verifies (Completeness = 1, ZERO honest rejections).
-//!   2. tampered cards: every tamper class (a)-(f) is rejected (Soundness, ZERO
+//!   2. tampered cards: every tamper class (a)-(g) is rejected (Soundness, ZERO
 //!      tamper acceptances), and no verification path ever panics (a panic
-//!      fails the test).
+//!      fails the test). Class (g) is a verifying-key substitution (security
+//!      audit REFLECT item), caught by the trusted-key registry cross-check.
 
 use turing_approval::{
     ApprovalCard, ApprovalPayload, AuthorityKeySet, DisplayCopy, InMemoryTestSigningBackend,
@@ -202,6 +203,37 @@ fn mutation_is_rejected() {
             result.is_err(),
             "case {i}: tamper class ({}) was ACCEPTED",
             (b'a' + class as u8) as char
+        );
+    }
+}
+
+#[test]
+fn mutation_class_g_verifying_key_substitution_is_rejected() {
+    // (g) envelope verifying-key substitution: an attacker with their own
+    // keypair swaps the envelope's verifying_key (and fingerprint) while
+    // keeping key_id/epoch/route unchanged. The trusted-key registry
+    // cross-check — record fields vs envelope fields — must reject every case.
+    let mut rng = Rng::new(SEED ^ 0x00F0_0F00);
+    for i in 0..CASES {
+        let card = random_valid_card(&mut rng);
+        let (mut signature, trusted, key_id) = sign_and_trust(&mut rng, &card);
+
+        // A SECOND in-memory keypair (the in-memory keyring is keyed by
+        // key_id, so a distinct key_id yields a distinct keypair).
+        let attacker_backend =
+            InMemoryTestSigningBackend::new(format!("attacker-{}", rng.ascii_word(4, 12)));
+        let attacker_record = attacker_backend
+            .authority_key_record(card.payload().authority_epoch)
+            .expect("attacker key record");
+
+        // Substitute verifying key + fingerprint; key_id/epoch/route untouched.
+        signature.verifying_key = attacker_record.verifying_key;
+        signature.public_key_fingerprint = attacker_record.public_key_fingerprint;
+
+        let result = verify_signature_with_authority_keys(&card, &signature, &trusted, &key_id);
+        assert!(
+            result.is_err(),
+            "case {i}: tamper class (g) verifying-key substitution was ACCEPTED"
         );
     }
 }

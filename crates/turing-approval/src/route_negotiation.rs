@@ -67,6 +67,10 @@ impl NegotiatedRoute {
 /// Constraint: a `None` route, a backend that does not own `route`, or an
 /// unsupported `requested_algorithm` is a hard `Err(RouteAlgorithmUnsupported)`
 /// — never a silent downgrade or route change.
+///
+/// ADVISORY: `sign()` does not require a `NegotiatedRoute`, so this is not yet
+/// a runtime control; a `sign_negotiated(&NegotiatedRoute, card)` wrapper is
+/// the planned additive close (deferred, see docs/security/key_hierarchy.md).
 pub fn negotiate(
     route: SignatureRoute,
     requested_algorithm: SignatureAlgorithm,
