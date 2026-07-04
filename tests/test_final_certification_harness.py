@@ -418,3 +418,37 @@ verdict = {
     assert s1["verdict"] == "NOT_RUN"
     final = load_json(out / "FINAL_CERTIFICATION_VERDICT.json")
     assert final["overall"] == "CERTIFICATION_FAILED"
+
+
+def test_fce_s6_release_blocker_scenario(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "scenarios" / "FCE-S6.py"),
+            "--root",
+            str(out),
+            "--repo",
+            str(REPO),
+            "--plan-root",
+            str(PLAN_ROOT),
+            "--scenario-id",
+            "FCE-S6",
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 0, proc.stdout
+    verdict = load_json(out / "FCE-S6" / "FCE-S6_verdict.json")
+    assert verdict["verdict"] == "PASS"
+    assert verdict["fixture_or_real"] == "FIXTURE"
+    assert {item["criterion"] for item in verdict["pass_criteria_results"]} >= {
+        "missing_certificate_refused",
+        "implementer_family_refused",
+        "digest_mismatch_refused",
+        "positive_fixture_control_accepted",
+    }
