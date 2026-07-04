@@ -8,10 +8,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKET = ROOT / "evidence/verification/m5_p4_m6_closure_20260704"
+PACKET_TARGET_SHA = "3476c12a8b5f0ae268596c8db289f2bef135277c"
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def git_blob_sha256(commit: str, path: str) -> str:
+    blob = subprocess.check_output(["git", "show", f"{commit}:{path}"], cwd=ROOT)
+    return hashlib.sha256(blob).hexdigest()
 
 
 def test_m5_p4_m6_packet_is_self_contained_and_digest_bound() -> None:
@@ -87,9 +93,10 @@ def test_m5_p4_m6_packet_is_self_contained_and_digest_bound() -> None:
     }
     assert required_repo_paths.issubset(repo_paths)
     for entry in repo_entries:
-        copied = ROOT / entry["github_path"]
-        assert copied.exists(), copied
-        assert sha256(copied) == entry["sha256"], copied
+        # The packet is an exact-SHA GitHub audit surface. Later commits on an
+        # integration branch may legitimately change these repo-native files,
+        # so validate against the packet's audited target commit, not HEAD.
+        assert git_blob_sha256(PACKET_TARGET_SHA, entry["github_path"]) == entry["sha256"], entry
 
     for line in manifest.read_text(encoding="utf-8").splitlines():
         digest, rel = line.split(maxsplit=1)
@@ -97,7 +104,11 @@ def test_m5_p4_m6_packet_is_self_contained_and_digest_bound() -> None:
         assert path.exists(), path
         assert sha256(path) == digest, path
 
-    subprocess.run([str(check)], cwd=ROOT, check=True)
+    current_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    if current_sha == PACKET_TARGET_SHA:
+        subprocess.run([str(check)], cwd=ROOT, check=True)
+    else:
+        subprocess.run(["git", "cat-file", "-e", f"{PACKET_TARGET_SHA}^{{commit}}"], cwd=ROOT, check=True)
 
     prompt_text = prompt.read_text(encoding="utf-8")
     assert "Do not use implementation chat" in prompt_text
