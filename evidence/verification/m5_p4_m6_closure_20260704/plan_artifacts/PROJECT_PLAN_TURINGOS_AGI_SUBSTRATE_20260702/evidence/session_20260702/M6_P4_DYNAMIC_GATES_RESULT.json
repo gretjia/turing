@@ -1,0 +1,150 @@
+{
+  "schema_id": "turingos.m6_p4_dynamic_gates_result.v1",
+  "module": "M6",
+  "phase": "M6.P4",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "recorded_at_utc": "2026-07-04T04:50:00Z",
+  "repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "remote": "https://github.com/gretjia/turing.git",
+    "branch": "hci/operator-console-v1-rebased",
+    "commit_sha": "e2944cd512794e0f5cd677dc444ba3dd36119d41",
+    "pushed": true,
+    "excluded_untracked_paths": [
+      "evidence/verification/"
+    ]
+  },
+  "scope": {
+    "atom_m6_p4_1": "Three-head conservation test across the HCI-A operator command matrix.",
+    "atom_m6_p4_2": "Read-only filesystem matrix over the same command matrix.",
+    "command_matrix": {
+      "micro_git_commands": [
+        "status --micro-git <fixture>",
+        "panoview --micro-git <fixture>",
+        "explain blocker --micro-git <fixture>",
+        "explain event <event_id> --micro-git <fixture>"
+      ],
+      "micro_bundle_commands": [
+        "status --micro-bundle <fixture.bundle>",
+        "panoview --micro-bundle <fixture.bundle>",
+        "explain event --micro-bundle <fixture.bundle>"
+      ],
+      "preview_and_router_commands": [
+        "help",
+        "help commands",
+        "operator <stdin script>",
+        "approval preview --signature-route none",
+        "ask VIEW_STATUS",
+        "ask VIEW_PANOVIEW",
+        "ask EXPLAIN_EVENT",
+        "ask EXPLAIN_BLOCKER",
+        "ask REPLAY_VERIFY",
+        "ask AUDIT_INVARIANTS",
+        "ask PROPOSE_INTENT",
+        "ask PROPOSE_GOAL",
+        "ask PROPOSE_CAPSULE",
+        "ask APPROVE_CAPSULE",
+        "ask DISPATCH_WORKER",
+        "ask OBSERVE_CAPSULE",
+        "ask REJECT_CANDIDATE",
+        "ask REQUEST_MACRO_AUTH",
+        "ask APPROVE_CANDIDATE",
+        "ask HELP"
+      ]
+    },
+    "refs_asserted_identical": [
+      "refs/turingos/tape_tip",
+      "refs/turingos/authorization_head",
+      "refs/turingos/accepted_head"
+    ]
+  },
+  "red_before_repair": {
+    "observed": true,
+    "command": "cargo test -p turing-cli --test cli_gates operator_command_matrix -- --nocapture",
+    "exit_code": 101,
+    "finding": "ask observe capsule routed to PROPOSE_CAPSULE before the repair, so the closed 16-verb preview surface was incomplete."
+  },
+  "repair": {
+    "production_change": "route_utterance now maps utterances containing observe+capsule to OBSERVE_CAPSULE.",
+    "test_change": "cli_gates.rs now independently reads the three MicroTape refs, runs the HCI command matrix, asserts no write-authority claims, asserts byte-identical heads after every command, and repeats the matrix after chmod removes write bits from the fixture tree."
+  },
+  "commands_run": [
+    {
+      "command": "cargo test -p turing-cli --test cli_gates operator_command_matrix_conserves_all_three_micro_tape_heads --quiet",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_HEAD_CONSERVATION_TEST_TRANSCRIPT.txt",
+      "sha256": "511a7be7e13916a35df58c33a0cfbcc3360e4c55af7f9ff8f02e3069c842c30c"
+    },
+    {
+      "command": "cargo test -p turing-cli --test cli_gates operator_command_matrix_passes_on_readonly_micro_tape_filesystem --quiet",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_READONLY_FS_TEST_TRANSCRIPT.txt",
+      "sha256": "a7348b31b58ffb2fbdab510da838e2ba13fda7186aa1330a1c768d820b1d9542"
+    },
+    {
+      "command": "cargo test -p turing-cli --test cli_gates --quiet",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_CLI_GATES_TRANSCRIPT.txt",
+      "sha256": "99ae31dac06a329bd06c61f09cf9a29a7bcca5eea14b3aaf483849c1fe1b6a07"
+    },
+    {
+      "command": "cargo test -p turing-cli -p turing-projection --tests --quiet",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_CARGO_TEST_TRANSCRIPT.txt",
+      "sha256": "08854b2924a94d6de67756a99f2478380c82d9e79c8ee169f76bf29e842d3f88"
+    },
+    {
+      "command": "bash tools/hci/gate_hci_no_write.sh",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_STATIC_NO_WRITE_REGRESSION_TRANSCRIPT.txt",
+      "sha256": "bfba9dd1e8e10bf2da227275a3a73f972cf8ebccae8d4c3ebf05a1f83bed4350"
+    },
+    {
+      "command": "cargo clippy -p turing-projection --all-targets -- -D clippy::disallowed_methods -D clippy::disallowed_types",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_CLIPPY_REGRESSION_TRANSCRIPT.txt",
+      "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P4_GIT_DIFF_CHECK_TRANSCRIPT.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "code_artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/src/main.rs",
+      "sha256": "7f8980435e421d39b29699a865e1953e18e25b191fb3e68e38657d617b8fcd4a"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/tests/cli_gates.rs",
+      "sha256": "0ef7f36259250101d6a182e00f051ae5184f09ac53b98d2e2980a18224a64e1a"
+    }
+  ],
+  "drift_check": {
+    "serves_goal": "G7: zero head-moving UI paths by static plus dynamic check.",
+    "red_lines": "No HCI-B, no write-capable console behavior, no constitution-byte change, no M2 enablement, no OG-10/genesis signature.",
+    "artifact_backing": "All post-repair commands have transcript paths and sha256 digests in this result.",
+    "fixture_labeling": "The MicroTape is a Rust test fixture created by sample_micro_repo/sample_micro_bundle; evidence kind is implementation gate evidence, not external verification.",
+    "scope": "M6.P4 dynamic gates only; projection-integrity audit remains M6.P5.",
+    "fresh_replay": "A fresh checkout can rerun the cargo test commands at the pinned commit.",
+    "status_ceiling": "ADDRESSED only."
+  },
+  "verdict": "PASS",
+  "does_not_grant": [
+    "EXTERNALLY_VERIFIED",
+    "M6.G",
+    "FCE.ENTRY",
+    "FCE.RUN",
+    "SHIPPED",
+    "RELEASED",
+    "RATIFIED",
+    "M2 enablement",
+    "HCI-B",
+    "write-capable console behavior",
+    "OG-10/genesis signature",
+    "constitution-byte change"
+  ]
+}

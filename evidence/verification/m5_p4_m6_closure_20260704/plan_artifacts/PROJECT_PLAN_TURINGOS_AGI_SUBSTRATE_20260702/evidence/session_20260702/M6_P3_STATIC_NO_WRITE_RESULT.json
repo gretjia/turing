@@ -1,0 +1,69 @@
+{
+  "branch": "hci/operator-console-v1-rebased",
+  "commands": [
+    {
+      "command": "PYTHONPATH=src python3 -m pytest tests/test_hci_no_write_gate.py -q",
+      "exit_code": 0,
+      "name": "focused_pytest",
+      "sha256": "99db33d5c94c6f7da021687c7391181685cc33299c5435b1c861e2db3be3ec87",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P3_NO_WRITE_GATE_PYTEST_TRANSCRIPT.txt"
+    },
+    {
+      "command": "bash tools/hci/gate_hci_no_write.sh --self-test",
+      "exit_code": 0,
+      "name": "self_test",
+      "sha256": "f9b50661c18a4b146bdf8ab378f750cfd533b1d04ba14c3d008cabd50553f23e",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P3_NO_WRITE_SELF_TEST_TRANSCRIPT.txt"
+    },
+    {
+      "command": "bash tools/hci/gate_hci_no_write.sh",
+      "exit_code": 0,
+      "name": "clean_gate",
+      "sha256": "bfba9dd1e8e10bf2da227275a3a73f972cf8ebccae8d4c3ebf05a1f83bed4350",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P3_NO_WRITE_GATE_TRANSCRIPT.txt"
+    },
+    {
+      "command": "cargo clippy -p turing-projection --all-targets -- -D clippy::disallowed_methods -D clippy::disallowed_types",
+      "exit_code": 0,
+      "name": "projection_clippy",
+      "sha256": "8f1598b5f0b1d8e3bb2bba7053c0bea10746dc20da2ec43e82f968dd504c28ce",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P3_PROJECTION_CLIPPY_TRANSCRIPT.txt"
+    }
+  ],
+  "commit_sha": "7192f12a55ef0e834e24d68e8e6f3550cc55026e",
+  "dependency_direction_check": "PASS via gate_hci_no_write.sh cargo metadata check",
+  "gate_files": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/hci/gate_hci_no_write.sh",
+      "sha256": "f0b93edf39954c3feef17441c8e2923dbe43a00799d2cef35400a84bb65b50f9"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/crates/turing-projection/clippy.toml",
+      "sha256": "fee1b8b211a4258d74bb0726af75b15fbe334ceb1e2993505e2a241401fc13c7"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_hci_no_write_gate.py",
+      "sha256": "10a2f0a8ba874b1034603d6500f3df958fd47e58559d80ee0de3460c3df0322d"
+    }
+  ],
+  "non_claims": [
+    "M6.P3 static gates are not a zero-head-moving proof; dynamic M6.P4 remains required.",
+    "M6.P3 does not authorize HCI-B or write-capable console behavior.",
+    "M6.P3 does not grant M6.G, external verification, release eligibility, FCE.RUN, SHIPPED, RELEASED, RATIFIED, M2 enablement, OG-10/genesis signature, or constitution-byte change."
+  ],
+  "phase": "M6.P3",
+  "recorded_at_utc": "2026-07-04T04:34:00Z",
+  "remote_branch": "origin/hci/operator-console-v1-rebased",
+  "repo": "/home/zephryj/turingos_backup/work/turing",
+  "repo_status_after_push": [
+    "## hci/operator-console-v1-rebased...origin/hci/operator-console-v1-rebased",
+    "?? evidence/verification/"
+  ],
+  "repo_url": "https://github.com/gretjia/turing",
+  "schema_id": "turingos.m6.p3.static_no_write_gates.v1",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "untracked_unrelated_paths": [
+    "evidence/verification/"
+  ]
+}

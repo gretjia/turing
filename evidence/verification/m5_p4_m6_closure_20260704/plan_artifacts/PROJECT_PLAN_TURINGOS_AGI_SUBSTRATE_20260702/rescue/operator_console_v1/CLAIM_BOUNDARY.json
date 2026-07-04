@@ -1,0 +1,24 @@
+{
+  "schema_id": "turingos.hci_rescue_claim_boundary.v1",
+  "scope": "M6.P0a operator console v1 rescue archive",
+  "status_ceiling": "IMPLEMENTER_ADDRESSED",
+  "evidence_kind": "FIXTURE_AND_SELF_RUN",
+  "claims_allowed": [
+    "uncommitted console diff preserved in plan-directory archive",
+    "tracked patch digest recorded",
+    "untracked files archived with digest manifest"
+  ],
+  "claims_forbidden": [
+    "command console exists",
+    "HCI-B enabled",
+    "CLOSED",
+    "RELEASED",
+    "RATIFIED",
+    "OG10_SIGNED",
+    "M2_ENABLED"
+  ],
+  "source_clone": "/home/zephryj/turingos_backup/work/turing-operator-hci-console",
+  "archive_root": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1",
+  "expected_tracked_patch_sha256": "ca61116816ce7c3b661f3594fdf91b9d2ee35886aa4dfe38c5b7750e262182af",
+  "not_run_is_fail": true
+}

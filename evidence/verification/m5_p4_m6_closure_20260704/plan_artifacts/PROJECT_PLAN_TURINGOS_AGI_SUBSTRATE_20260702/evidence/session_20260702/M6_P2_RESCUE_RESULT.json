@@ -1,0 +1,82 @@
+{
+  "base_sha": "bed759777f9cb21c53e5701c8070654ad4dc4212",
+  "branch": "hci/operator-console-v1-rebased",
+  "commands": [
+    {
+      "command": "cargo test -p turing-cli -p turing-projection --tests --quiet",
+      "exit_code": 0,
+      "name": "cargo_tests",
+      "sha256": "da37007bc75edd96c4ac6536838e1a685dc052ce65c6522287b5314526787e52",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P2_CARGO_TEST_TRANSCRIPT.txt"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest tests/test_operator_agent.py tests/audit tests/e2e -q",
+      "exit_code": 0,
+      "name": "operator_pytest",
+      "sha256": "fe9dca0451129aaabdd76ea13e310b61a52091a146a1f9fe5b72b851eb33547f",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P2_PYTEST_TRANSCRIPT.txt"
+    },
+    {
+      "command": "PYTHONPATH=src python3 scripts/audit_operator_agent.py",
+      "exit_code": 0,
+      "name": "operator_agent_audit",
+      "sha256": "569237123d7a3156c541caf5eeb2a0fb533df190e7ceeab353a65decdd238dda",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P2_OPERATOR_AUDIT_TRANSCRIPT.txt"
+    },
+    {
+      "command": "python3 scripts/lint_hci_copy.py docs/hci",
+      "exit_code": 0,
+      "name": "hci_copy_lint",
+      "sha256": "d718418e0cc4eadd103007d155304576718452c050847ee2bb1610fbebd1daea",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P2_HCI_COPY_LINT_TRANSCRIPT.txt"
+    },
+    {
+      "command": "python3 scripts/audit_operator_cli_copy.py",
+      "exit_code": 0,
+      "name": "operator_cli_copy_audit",
+      "sha256": "a4098e1c7ba04ee932bfa5c8d81b5b063f1c434cd402c3fceeeedd8d3583df50",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P2_CLI_COPY_AUDIT_TRANSCRIPT.txt"
+    },
+    {
+      "command": "python3 scripts/lint_ascii_schema_keys.py schemas/operator",
+      "exit_code": 0,
+      "name": "schema_ascii_lint",
+      "sha256": "2933e3594089b9e032f1f02b4f6defc137ebf2fff67dc80f5bf1c22605b655e0",
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P2_SCHEMA_ASCII_LINT_TRANSCRIPT.txt"
+    }
+  ],
+  "commit_sha": "22e98e4bb262f077eb9dd1a8d390c8ac7e9db8cf",
+  "non_claims": [
+    "M6.P2 rescue commit does not authorize HCI-B.",
+    "M6.P2 rescue commit does not authorize write-capable console behavior.",
+    "M6.P2 rescue commit does not grant M6.G, external verification, release eligibility, FCE.RUN, SHIPPED, RELEASED, RATIFIED, M2 enablement, OG-10/genesis signature, or constitution-byte change."
+  ],
+  "original_bundle": {
+    "claim_boundary": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/CLAIM_BOUNDARY.json",
+    "evidence_kind": "FIXTURE_AND_SELF_RUN_ARCHIVE",
+    "manifest": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/MANIFEST.sha256",
+    "preserved": true
+  },
+  "owner_route_acceptance": {
+    "acceptance_result": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m6_hci/M6_P1_ROUTE_ACCEPTANCE_RESULT.json",
+    "acceptance_result_sha256": "084c6f1bdbffbed04ff3439f34a0fb11ab35b4ca279b10ed11ff2536a3548a75",
+    "adr": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M6-001-adopt-hci-a-projection-route.md",
+    "adr_sha256": "bab1344c2f28434ad0d5bc4d789cf1c1d7cfd4499bbf7529c020a2bd1cbeaa80"
+  },
+  "phase": "M6.P2",
+  "recorded_at_utc": "2026-07-04T04:25:00Z",
+  "remote_branch": "origin/hci/operator-console-v1-rebased",
+  "repo": "/home/zephryj/turingos_backup/work/turing",
+  "repo_status_after_commit": [
+    "## hci/operator-console-v1-rebased...origin/hci/operator-console-v1-rebased",
+    "?? evidence/verification/"
+  ],
+  "repo_url": "https://github.com/gretjia/turing",
+  "route": "HCI-A projection-only",
+  "schema_id": "turingos.m6.p2.rescue_commit.v1",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "untracked_unrelated_paths": [
+    "evidence/verification/"
+  ]
+}
