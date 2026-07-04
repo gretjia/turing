@@ -97,6 +97,16 @@ def source_files(root: Path, artifact_list: Path | None) -> list[Path]:
     return sorted(out, key=lambda path: path.relative_to(root).as_posix())
 
 
+def copy_template(src_raw: str | None, dst: Path) -> bool:
+    if src_raw is None:
+        return False
+    src = Path(src_raw).resolve()
+    if not src.is_file():
+        fail("template_missing", path=str(src))
+    shutil.copy2(src, dst)
+    return True
+
+
 def packet_files(packet: Path) -> list[Path]:
     return sorted(
         [path for path in packet.rglob("*") if path.is_file() and path.name != "MANIFEST.sha256"],
@@ -165,19 +175,21 @@ def build_packet(args: argparse.Namespace) -> None:
         )
 
     (out / "repo_head.txt").write_text(args.sha + "\n", encoding="utf-8")
-    (out / "REEXECUTION.md").write_text(
-        "\n".join(
-            [
-                f"# REEXECUTION - {args.gate}",
-                "",
-                "1. `sha256sum -c MANIFEST.sha256` must exit 0 from this packet directory.",
-                "2. `bash tools/release/build_packet.sh --validate <packet_dir>` must exit 0 before submission.",
-                "3. The verifier computes any gate verdict before reading historical EXPECTED_VERDICT text.",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
+    if not copy_template(args.reexecution_template, out / "REEXECUTION.md"):
+        (out / "REEXECUTION.md").write_text(
+            "\n".join(
+                [
+                    f"# REEXECUTION - {args.gate}",
+                    "",
+                    "1. `sha256sum -c MANIFEST.sha256` must exit 0 from this packet directory.",
+                    "2. `bash tools/release/build_packet.sh --validate <packet_dir>` must exit 0 before submission.",
+                    "3. The verifier computes any gate verdict before reading historical EXPECTED_VERDICT text.",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+    has_auditor_runbook = copy_template(args.auditor_runbook_template, out / "AUDITOR_RUNBOOK.md")
 
     required = [
         "PACKET_MANIFEST.json",
@@ -186,6 +198,8 @@ def build_packet(args: argparse.Namespace) -> None:
         "repo_head.txt",
         *evidence_required,
     ]
+    if has_auditor_runbook:
+        required.insert(3, "AUDITOR_RUNBOOK.md")
     manifest = {
         "schema_id": "turingos.release_packet.v1",
         "gate_id": args.gate,
@@ -326,6 +340,8 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--gate", default="M5.P5.FIXTURE")
     p.add_argument("--artifact-list")
     p.add_argument("--out")
+    p.add_argument("--reexecution-template")
+    p.add_argument("--auditor-runbook-template")
     p.add_argument("--validate", nargs="?", const=".")
     return p
 

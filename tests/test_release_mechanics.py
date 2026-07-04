@@ -162,6 +162,52 @@ def test_build_packet_closes_manifest_and_rejects_tamper_and_removed_keys(tmp_pa
     assert "removed_legacy_key:release_next_stage" in removed_key_proc.stdout
 
 
+def test_build_packet_can_include_custom_reexecution_and_auditor_runbook(tmp_path: Path) -> None:
+    source = make_evidence_root(tmp_path)
+    reexecution = tmp_path / "custom_REEXECUTION.md"
+    runbook = tmp_path / "custom_AUDITOR_RUNBOOK.md"
+    reexecution.write_text(
+        "# REEXECUTION - custom gate\n\n"
+        "1. Compute your verdict before reading historical EXPECTED_VERDICT text.\n"
+        "2. `sha256sum -c MANIFEST.sha256` must exit 0.\n",
+        encoding="utf-8",
+    )
+    runbook.write_text(
+        "# AUDITOR_RUNBOOK - custom gate\n\n"
+        "Use the packet only; do not use implementer chat or local working trees.\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "custom_packet"
+
+    proc = run_cmd(
+        [
+            str(BUILD_PACKET),
+            "--root",
+            str(source),
+            "--sha",
+            REPO_SHA,
+            "--gate",
+            "M5.P3",
+            "--out",
+            str(out),
+            "--reexecution-template",
+            str(reexecution),
+            "--auditor-runbook-template",
+            str(runbook),
+        ]
+    )
+    assert proc.returncode == 0, proc.stderr + proc.stdout
+
+    manifest = json.loads((out / "PACKET_MANIFEST.json").read_text(encoding="utf-8"))
+    assert "REEXECUTION.md" in manifest["required_artifacts"]
+    assert "AUDITOR_RUNBOOK.md" in manifest["required_artifacts"]
+    assert (out / "REEXECUTION.md").read_text(encoding="utf-8") == reexecution.read_text(encoding="utf-8")
+    assert (out / "AUDITOR_RUNBOOK.md").read_text(encoding="utf-8") == runbook.read_text(encoding="utf-8")
+
+    validate_proc = run_cmd([str(BUILD_PACKET), "--validate", str(out)])
+    assert validate_proc.returncode == 0, validate_proc.stderr + validate_proc.stdout
+
+
 def test_assert_release_eligible_refuses_bad_inputs_and_writes_positive_control(tmp_path: Path) -> None:
     packet = build_fixture_packet(tmp_path)
 
