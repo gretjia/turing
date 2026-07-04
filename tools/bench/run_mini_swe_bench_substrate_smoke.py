@@ -27,6 +27,15 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[2]
 AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_substrate_coverage.py"
 MICRO_TAPE_AUDITOR = REPO / "tools" / "bench" / "audit_micro_tape_decision_dag.py"
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import run_deepseek_provider_canary as ds_provider  # noqa: E402
+
+DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-flash"
+DEEPSEEK_DEFAULT_API_KEY_ENV = "DEEPSEEK_API_KEY"
+DEEPSEEK_DEFAULT_PRICE_TABLE = (
+    REPO.parent / "PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702" / "m3_uplift_lab" / "PRICE_TABLE.json"
+)
 REQUIRED_MODULES = [
     "M0_law_goal_harness",
     "M1_canonical_codec",
@@ -412,7 +421,10 @@ def cost_event_payload_for_worker_result(
     run_id = f"run_{task['instance_id']}"
     branch_id = f"branch_{worker_mode}"
     provider_receipt = worker_result.get("provider_receipt")
-    if isinstance(provider_receipt, dict) and provider_receipt.get("schema_id") == "grok_cli_provider_receipt.v1":
+    if isinstance(provider_receipt, dict) and provider_receipt.get("schema_id") in {
+        "grok_cli_provider_receipt.v1",
+        "deepseek_native_api_provider_receipt.v1",
+    }:
         receipt_seed = f"{run_id}:{branch_id}:{capsule_id}:{provider_receipt['request_id']}"
         usage = dict(provider_receipt["usage"])
         usage["provider_usage_raw_sha256"] = provider_receipt["usage_raw_sha256"]
@@ -478,7 +490,9 @@ def worker_result_total_tokens(worker_result: dict[str, Any]) -> int:
     provider_receipt = worker_result.get("provider_receipt")
     if isinstance(provider_receipt, dict) and isinstance(provider_receipt.get("usage"), dict):
         usage = provider_receipt["usage"]
-        return int(usage.get("input_tokens", 0)) + int(usage.get("output_tokens", 0))
+        input_tokens = usage.get("input_tokens", usage.get("prompt_tokens", 0))
+        output_tokens = usage.get("output_tokens", usage.get("completion_tokens", 0))
+        return int(input_tokens) + int(output_tokens)
     return (
         worker_result["prompt_tokens_estimate"]
         + worker_result["completion_tokens_estimate"]
@@ -711,6 +725,19 @@ def worker_id_for_grok(model: str) -> str:
         "schema_id": "worker_identity_seed.v1",
         "provider": "grok",
         "kind": "CommandTemplate",
+        "model": model,
+        "thinking_mode": "no_plan_no_memory_no_subagents_plain_output",
+    }
+    return "worker:sha256:" + hashlib.sha256(
+        json.dumps(seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def worker_id_for_deepseek(model: str) -> str:
+    seed = {
+        "schema_id": "worker_identity_seed.v1",
+        "provider": "deepseek",
+        "kind": "NativeApiWorker",
         "model": model,
         "thinking_mode": "no_plan_no_memory_no_subagents_plain_output",
     }
@@ -964,6 +991,223 @@ def run_grok_worker(
     }
 
 
+def deepseek_visible_prompt(
+    task: dict[str, Any],
+    capsule_id: str,
+    broadcast_rules: list[dict[str, Any]] | None = None,
+) -> str:
+    broadcast_section = ""
+    if broadcast_rules:
+        lines = ["Known failures to avoid:"]
+        for rule in broadcast_rules:
+            lines.append(
+                f"- {rule['failure_class']}: {rule['guidance']} (source rule {rule['rule_id']})"
+            )
+        broadcast_section = "\n".join(lines) + "\n"
+    return (
+        "You are a TuringOS native-API worker operating on a SWE-bench-shaped task.\n"
+        "TuringOS Micro Tape is the external execution trace; acceptance is predicate-only.\n"
+        "Do not request or use credentials. Do not edit benchmark/official test files.\n"
+        f"{broadcast_section}"
+        f"Capsule: {capsule_id}\n"
+        f"Instance: {task['instance_id']}\n"
+        f"Repo: {task['repo']}\n"
+        f"Base commit: {task['base_commit']}\n"
+        "Task:\n"
+        f"{task['problem_statement']}\n\n"
+        "Your first characters must be: diff --git \n"
+        "Return only a source-code unified diff against the repository at the base commit. "
+        "Do not wrap the diff in markdown fences and do not add explanation before or after it.\n"
+    )
+
+
+def deepseek_native_api_provider_receipt(
+    *,
+    model_requested: str,
+    response: dict[str, Any],
+    response_raw: str,
+    stderr_text: str,
+    price_table: dict[str, Any],
+) -> dict[str, Any]:
+    message = ds_provider._message_from_response(response)
+    raw_usage = response.get("usage")
+    if not isinstance(raw_usage, dict):
+        raise ValueError("DeepSeek response.usage must be an object")
+    usage = ds_provider.normalize_deepseek_usage(raw_usage)
+    model_reported = str(response.get("model") or "")
+    cost_microusd = ds_provider.deepseek_cost_microusd(
+        model=model_requested,
+        usage=usage,
+        price_table=price_table,
+    )
+    return {
+        "schema_id": "deepseek_native_api_provider_receipt.v1",
+        "provider": "deepseek",
+        "endpoint": ds_provider.DEFAULT_BASE_URL.rstrip("/") + ds_provider.DEFAULT_ENDPOINT,
+        "request_id": str(response.get("id") or ""),
+        "model_id_requested": model_requested,
+        "model_id_resolved": model_reported or model_requested,
+        "usage": usage,
+        "usage_raw_sha256": digest_text(json.dumps(raw_usage, sort_keys=True, separators=(",", ":"))),
+        "response_sha256": digest_text(response_raw),
+        "stderr_sha256": digest_text(stderr_text),
+        "cost": {
+            "computed_cost_microusd": cost_microusd,
+            "price_table_digest": ds_provider.codec.content_digest(price_table),
+            "pricing_model": "deepseek_native_api_20260703",
+        },
+        "raw_debug_retained": False,
+        "content_length_chars": len(str(message.get("content") or "")),
+        "reasoning_content_length_chars": len(str(message.get("reasoning_content") or "")),
+    }
+
+
+def run_deepseek_worker(
+    task: dict[str, Any],
+    instance_dir: Path,
+    worker_id: str,
+    model: str,
+    timeout_s: int,
+    capsule_id: str,
+    *,
+    api_key: str,
+    api_key_env: str,
+    price_table: dict[str, Any],
+    max_tokens: int = 12000,
+    broadcast_rules: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Real DeepSeek native-API worker: one chat-completion call, applied to the checkout via `git apply`.
+
+    Unlike the CLI-driven worker (grok), the candidate arrives as unified-diff TEXT in the
+    provider response, not as edits a headless CLI already made in the worktree. This function
+    applies that text to the checked-out worktree with `git apply` (recount fallback) so the
+    recorded diff reflects the ACTUAL worktree state, not the model's self-report (Art. III's
+    "worker self-report is never the gate" applies just as much to a native-API worker as a CLI one).
+    """
+    worktree_root = Path(os.environ.get("TURINGOS_SUBSTRATE_WORKTREE_ROOT", "/tmp/turingos_substrate_worktrees"))
+    worktree = worktree_root / hashlib.sha256(
+        f"{instance_dir}:{task['instance_id']}:{model}".encode("utf-8")
+    ).hexdigest()[:16]
+    checkout_task(task, worktree)
+    worktree_abs = worktree.resolve()
+    log_dir = instance_dir / "worker_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    prompt = deepseek_visible_prompt(task, capsule_id, broadcast_rules=broadcast_rules)
+    request_payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are a weak Arm-B TuringOS native-API SWE-bench worker. "
+                    "Use only the worker-safe capsule. Return only a source-code unified diff. "
+                    "Do not edit tests. Do not mention hidden tests, gold patches, or evaluator labels."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ],
+        "thinking": {"type": "disabled"},
+        "stream": False,
+        "max_tokens": max_tokens,
+    }
+    started = time.monotonic()
+    response, response_raw, wall_time_ms = ds_provider.call_deepseek(
+        base_url=ds_provider.DEFAULT_BASE_URL,
+        endpoint=ds_provider.DEFAULT_ENDPOINT,
+        api_key=api_key,
+        request_payload=request_payload,
+        timeout_s=timeout_s,
+    )
+    elapsed_ms = max(1, int((time.monotonic() - started) * 1000))
+    message = ds_provider._message_from_response(response)
+    content = message.get("content") or ""
+    if not isinstance(content, str):
+        raise ValueError("DeepSeek response content must be a string or null")
+
+    from run_deepseek_arm_a_worker import extract_unified_diff  # local import: sibling script, avoid import cost when unused
+
+    candidate_patch = extract_unified_diff(content)
+    apply_stderr = ""
+    apply_exit_code = 1
+    diff_text = ""
+    if candidate_patch:
+        patch_path = worktree / ".turingos_candidate.patch"
+        patch_path.write_text(candidate_patch, encoding="utf-8")
+        apply = run_cmd(["git", "apply", "--verbose", str(patch_path)], cwd=worktree, timeout=120)
+        if apply.returncode != 0:
+            apply = run_cmd(["git", "apply", "--verbose", "--recount", str(patch_path)], cwd=worktree, timeout=120)
+        patch_path.unlink(missing_ok=True)
+        # git apply writes its diagnostic output (including error reasons like "corrupt
+        # patch at line N") to stderr, not stdout; capture both so a failed apply is
+        # actually diagnosable in the recorded log instead of an empty stderr.txt.
+        apply_stderr = (apply.stdout or "") + (apply.stderr or "")
+        apply_exit_code = apply.returncode
+        if apply.returncode == 0:
+            diff = run_cmd(["git", "diff", "--binary"], cwd=worktree, timeout=120)
+            diff_text = diff.stdout if diff.returncode == 0 else ""
+
+    stdout_hash = digest_text(content)
+    stderr_hash = digest_text(apply_stderr)
+    patch_hash = digest_text(diff_text)
+    provider_receipt = deepseek_native_api_provider_receipt(
+        model_requested=model,
+        response=response,
+        response_raw=response_raw,
+        stderr_text=apply_stderr,
+        price_table=price_table,
+    )
+    done = {
+        "schema_id": "deepseek_worker_done.v1",
+        "instance_id": task["instance_id"],
+        "worker_id": worker_id,
+        "model": model,
+        "exit_code": apply_exit_code,
+        "elapsed_ms": elapsed_ms,
+        "patch_hash": patch_hash,
+        "provider_receipt_id": provider_receipt["request_id"],
+        "cost_source_kind": "provider_receipt_inline",
+        "cost_microusd": provider_receipt["cost"]["computed_cost_microusd"],
+    }
+    done_json = json.dumps(done, sort_keys=True, separators=(",", ":"))
+    receipt_id = "rcp_" + hashlib.sha256(
+        f"{task['instance_id']}:{worker_id}:{stdout_hash}:{stderr_hash}:{patch_hash}".encode("utf-8")
+    ).hexdigest()[:32]
+
+    (log_dir / "command.json").write_text(
+        json.dumps({"argv": ["<deepseek_native_api_call>", model]}, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (log_dir / "visible_prompt.txt").write_text(prompt, encoding="utf-8")
+    (log_dir / "stdout.txt").write_text(content, encoding="utf-8")
+    (log_dir / "stderr.txt").write_text(apply_stderr, encoding="utf-8")
+    (log_dir / "diff.patch").write_text(diff_text, encoding="utf-8")
+    (log_dir / "done.json").write_text(done_json + "\n", encoding="utf-8")
+    write_json(log_dir / "provider_receipt_sanitized.json", provider_receipt)
+
+    usage = provider_receipt["usage"]
+    return {
+        "receipt_id": receipt_id,
+        "capsule_id": capsule_id,
+        "worker_id": worker_id,
+        "exit_code": apply_exit_code,
+        "stdout_hash": stdout_hash,
+        "stderr_hash": stderr_hash,
+        "done_json_hash": digest_text(done_json),
+        "patch_hash": patch_hash,
+        "credential_material_absent": True,
+        "micro_refs_moved": False,
+        "elapsed_ms": elapsed_ms,
+        "token_count_bound_kind": None,
+        "prompt_tokens_estimate": int(usage.get("prompt_tokens", 0)),
+        "completion_tokens_estimate": int(usage.get("completion_tokens", 0)),
+        "tool_stdout_tokens_estimate": 0,
+        "worktree": str(worktree_abs),
+        "log_dir": str(log_dir),
+        "provider_receipt": provider_receipt,
+    }
+
+
 def grant_json(capsule_id: str, market_id: str, worker_id: str) -> dict[str, Any]:
     return {
         "grant_id": f"grant_{capsule_id}",
@@ -1179,6 +1423,10 @@ def run_substrate_task(
     authorization_mode: str = "auto",
     authority_provider: str = "os-keyring",
     stage12_real_loop: bool = False,
+    deepseek_api_key: str | None = None,
+    deepseek_api_key_env: str = DEEPSEEK_DEFAULT_API_KEY_ENV,
+    deepseek_price_table: dict[str, Any] | None = None,
+    deepseek_max_tokens: int = 12000,
 ) -> dict[str, Any]:
     instance_dir = out_dir / "instances" / task["instance_id"]
     project = instance_dir / "project"
@@ -1202,7 +1450,12 @@ def run_substrate_task(
         increment(event_calls, event_type or str(result.get("event_type") or result.get("write_event_type")))
         receipts.append(result)
 
-    worker_id = "worker:sha256:" + "f" * 64 if worker_mode == "fake" else worker_id_for_grok(model)
+    if worker_mode == "fake":
+        worker_id = "worker:sha256:" + "f" * 64
+    elif worker_mode == "deepseek":
+        worker_id = worker_id_for_deepseek(model)
+    else:
+        worker_id = worker_id_for_grok(model)
     sandbox = runsc_sandbox_block()
 
     with Daemon("turingd", bin_dir, runtime / "turingd.sock", micro_git=micro_git, project=project) as turingd:
@@ -1475,6 +1728,16 @@ def run_substrate_task(
                 "capsule_id": capsule_id,
                 "private_contract_hash": digest_text(capsule_id + ":private"),
                 "acceptance_commands": ["swebench.harness.run_evaluation"],
+                # These four self-declaration flags are what audit_prompt_leakage.py's real
+                # (non-fixture) capsule check requires (Art. III.4 shield rule). The real loop's
+                # capsule never carried them before (only the FIXTURE generators did), so a real
+                # certification-grade run always failed the leakage audit with
+                # "WorkCapsuleBuilt missing <flag>=true" regardless of worker_mode. Real bug found
+                # by FCE-S1; all four are true statements about this capsule's actual contents.
+                "pput_formula_absent": True,
+                "heldout_ids_absent": True,
+                "hidden_predicates_absent": True,
+                "raw_failure_logs_absent": True,
                 **(
                     {
                         "attempt_index": 2,
@@ -1637,6 +1900,22 @@ def run_substrate_task(
                 worker_result["patch_hash"] = digest_text("fake diff")
                 worker_result["worktree"] = None
                 worker_result["log_dir"] = None
+            elif worker_mode == "deepseek":
+                if not deepseek_api_key:
+                    raise RuntimeError(f"missing environment variable: {deepseek_api_key_env}")
+                worker_result = run_deepseek_worker(
+                    task,
+                    instance_dir,
+                    worker_id,
+                    model,
+                    worker_timeout_s,
+                    capsule_id,
+                    api_key=deepseek_api_key,
+                    api_key_env=deepseek_api_key_env,
+                    price_table=deepseek_price_table or {},
+                    max_tokens=deepseek_max_tokens,
+                    broadcast_rules=broadcast_rules,
+                )
             else:
                 worker_result = run_grok_worker(
                     task,
@@ -1650,7 +1929,12 @@ def run_substrate_task(
                 )
         mark_module("M6_worker_profiles")
         mark_module("M7_executor_broker")
-        increment(process_calls, "fake_worker" if worker_mode == "fake" else "grok_cli")
+        if worker_mode == "fake":
+            increment(process_calls, "fake_worker")
+        elif worker_mode == "deepseek":
+            increment(process_calls, "deepseek_native_api_call")
+        else:
+            increment(process_calls, "grok_cli")
 
         if sandbox.get("kind") == "HOST_ASSUMED" and not any(
             item.get("event_type") == "SandboxBoundaryAssumed" for item in receipts
@@ -1869,6 +2153,14 @@ def run_substrate_task(
         "sandbox": sandbox,
         "worker_log_dir": worker_result["log_dir"],
         "worker_worktree": worker_result["worktree"],
+        # audit_prompt_leakage.py scans this field (its FIXTURE-generator-shaped input contract);
+        # a real (non-fixture) loop run must populate it too or the leakage audit silently no-ops
+        # ("native_api_worker metadata missing") on every real worker_mode. Real bug found by FCE-S1.
+        "native_api_worker": (
+            {"visible_prompt_path": str(Path(worker_result["log_dir"]) / "visible_prompt.txt")}
+            if worker_result.get("log_dir")
+            else None
+        ),
         "predicate_write_event_type": accepted["write_event_type"],
         "module_calls": module_calls,
         "process_calls": process_calls,
@@ -6058,13 +6350,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--tasks-jsonl")
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--limit", type=int, default=1)
-    parser.add_argument("--worker-mode", choices=["fake", "grok"], default="fake")
+    parser.add_argument("--worker-mode", choices=["fake", "grok", "deepseek"], default="fake")
     parser.add_argument("--model", default="grok-build")
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--worker-timeout-s", type=int, default=1200)
     parser.add_argument("--authorization-mode", choices=["auto", "required", "off"], default="auto")
     parser.add_argument("--authority-provider", choices=["os-keyring", "test-local"], default="os-keyring")
     parser.add_argument("--daemon-bin-dir", default=str(REPO / "target" / "debug"))
+    parser.add_argument("--deepseek-api-key-env", default=DEEPSEEK_DEFAULT_API_KEY_ENV)
+    parser.add_argument("--deepseek-price-table", default=str(DEEPSEEK_DEFAULT_PRICE_TABLE))
+    parser.add_argument("--deepseek-max-tokens", type=int, default=12000)
     parser.add_argument("--broadcast-rules-file")
     parser.add_argument("--stage12-real-loop", action="store_true")
     parser.add_argument("--strict-microtape-fixture", action="store_true")
@@ -6209,6 +6504,24 @@ def main(argv: list[str] | None = None) -> int:
         Path(args.broadcast_rules_file) if args.broadcast_rules_file else None
     )
 
+    deepseek_api_key = None
+    deepseek_price_table: dict[str, Any] = {}
+    if args.worker_mode == "deepseek":
+        deepseek_api_key = os.environ.get(args.deepseek_api_key_env)
+        if not deepseek_api_key:
+            summary = {
+                "schema_id": "MiniSweBenchSubstrateSmokeResult.v1",
+                "coverage": None,
+                "worker_process": "deepseek_native_api_call",
+                "auditor_exit_code": None,
+                "scientific_status": "NOT_RUN",
+                "missing_env": [args.deepseek_api_key_env],
+                "model": args.model,
+            }
+            write_json(out_dir / "substrate_smoke_result.json", summary)
+            return 2
+        deepseek_price_table = ds_provider.load_json(Path(args.deepseek_price_table))
+
     runs = []
     for task in tasks:
         run = run_substrate_task(
@@ -6223,6 +6536,10 @@ def main(argv: list[str] | None = None) -> int:
             authorization_mode=args.authorization_mode,
             authority_provider=args.authority_provider,
             stage12_real_loop=args.stage12_real_loop,
+            deepseek_api_key=deepseek_api_key,
+            deepseek_api_key_env=args.deepseek_api_key_env,
+            deepseek_price_table=deepseek_price_table,
+            deepseek_max_tokens=args.deepseek_max_tokens,
         )
         runs.append(run)
         active_broadcast_rules.extend(run.get("broadcast_rules_emitted", []))
@@ -6235,7 +6552,12 @@ def main(argv: list[str] | None = None) -> int:
     coverage_path = out_dir / "substrate_coverage.json"
     write_json(coverage_path, coverage)
     audit_path = out_dir / "substrate_coverage_audit.json"
-    worker_process = "fake_worker" if args.worker_mode == "fake" else "grok_cli"
+    if args.worker_mode == "fake":
+        worker_process = "fake_worker"
+    elif args.worker_mode == "deepseek":
+        worker_process = "deepseek_native_api_call"
+    else:
+        worker_process = "grok_cli"
     proc = run_cmd(
         [
             "python3",
@@ -6259,9 +6581,9 @@ def main(argv: list[str] | None = None) -> int:
         "worker_process": worker_process,
         "auditor_exit_code": proc.returncode,
         "scientific_status": "REAL_WORKER_SUBSTRATE_SMOKE"
-        if args.worker_mode == "grok"
+        if args.worker_mode in ("grok", "deepseek")
         else "SUBSTRATE_INSTRUMENTATION_ONLY_NOT_REAL_WORKER",
-        "model": args.model if args.worker_mode == "grok" else None,
+        "model": args.model if args.worker_mode in ("grok", "deepseek") else None,
     }
     write_json(out_dir / "substrate_smoke_result.json", summary)
     if proc.returncode != 0:

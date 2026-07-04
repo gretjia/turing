@@ -31,6 +31,25 @@ FORBIDDEN_MARKERS = [
     "sk-",
 ]
 
+# Markers whose presence makes a co-occurring bare "traceback"/"stack trace" hit genuine
+# rather than benign dataset-native content (see marker_hits() docstring).
+_HARD_LEAK_MARKERS = {
+    "pput",
+    "vpput",
+    "hidden predicate",
+    "hidden predicates",
+    "private contract",
+    "heldout",
+    "gold patch",
+    "official solution",
+    "raw failure log",
+    "auth.json",
+    "private key",
+    "signing key",
+    "sk-",
+}
+_BENIGN_TRACEBACK_MARKERS = {"traceback", "stack trace"}
+
 
 def load_micro_tape_auditor() -> Any:
     spec = importlib.util.spec_from_file_location("audit_micro_tape_decision_dag", MICRO_TAPE_AUDITOR)
@@ -70,8 +89,29 @@ def strings(value: Any) -> list[str]:
 
 
 def marker_hits(text: str) -> list[str]:
+    """Return forbidden markers with a genuine hit in `text`.
+
+    A bare "traceback"/"stack trace" hit is treated as benign (excluded) UNLESS a
+    genuinely hard marker (gold patch, heldout, hidden predicate(s), pput/vpput,
+    private contract, official solution, raw failure log, or a credential-class
+    marker) co-occurs in the same text. Real SWE-bench Verified problem_statement
+    text is the public GitHub issue body and routinely embeds the reporter's own
+    reproduction traceback (dataset-native, worker-visible-by-design content) -
+    that is not a leak of a held-out evaluator's raw failure log. This mirrors the
+    classification tools/certification/scenarios/FCE-B2.py's broad_marker_sweep
+    already applies to the same two markers; before this fix, every real (non-
+    fixture) SWE-bench worker prompt whose bug report happened to quote a
+    traceback failed this audit unconditionally, which made the tool unusable for
+    a real certification run (found by FCE-S1's golden-thread run over real
+    SWE-bench Verified tasks - previously this tool had only ever been run over
+    synthetic Stage13 fixture text that never triggered the false positive).
+    """
     lowered = text.lower()
-    return sorted({marker for marker in FORBIDDEN_MARKERS if marker in lowered})
+    hits = {marker for marker in FORBIDDEN_MARKERS if marker in lowered}
+    if hits and hits <= _BENIGN_TRACEBACK_MARKERS:
+        if not any(hard in lowered for hard in _HARD_LEAK_MARKERS):
+            return []
+    return sorted(hits)
 
 
 def payload(event: dict[str, Any]) -> dict[str, Any]:
