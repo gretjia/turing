@@ -493,6 +493,54 @@ def test_fce_b5_seeded_overclaim_scenario(tmp_path: Path) -> None:
     assert "FCE-B5/CLAIM_BOUNDARY.json" in verdict["evidence"]
 
 
+def test_fce_r5_alignment_drift_and_redline_sweep_scenario(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "scenarios" / "FCE-R5.py"),
+            "--root",
+            str(out),
+            "--repo",
+            str(REPO),
+            "--plan-root",
+            str(PLAN_ROOT),
+            "--scenario-id",
+            "FCE-R5",
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 0, proc.stdout
+    verdict = load_json(out / "FCE-R5" / "FCE-R5_verdict.json")
+    assert verdict["verdict"] == "PASS"
+    assert verdict["fixture_or_real"] == "REAL"
+    assert verdict["automatic_fail_triggered"] is None
+    assert {item["criterion"] for item in verdict["pass_criteria_results"]} >= {
+        "constitution_digest_matches_pin",
+        "frozen_pack_manifest_sweep_clean",
+        "m0_verify_alignment_green",
+        "secret_marker_scan_clean",
+        "self_ratification_automation_absent",
+        "intent_section8_checklist_answered_item_by_item_with_citations",
+    }
+    digest_sweep = load_json(out / "FCE-R5" / "constitution_and_frozen_pack_digest_sweep.json")
+    assert digest_sweep["constitution_matches_pin"] is True
+    assert digest_sweep["frozen_pack_manifest_sweep_exit_code"] == 0
+    secret_scan = load_json(out / "FCE-R5" / "secret_marker_scan.json")
+    assert secret_scan["clean"] is True
+    ratify_scan = load_json(out / "FCE-R5" / "self_ratification_scan.json")
+    assert ratify_scan["clean"] is True
+    checklist = load_json(out / "FCE-R5" / "intent_section8_drift_checklist.json")
+    assert len(checklist["items"]) == 7
+    assert all(item["citations"] for item in checklist["items"])
+    assert "FCE-R5/CLAIM_BOUNDARY.json" in verdict["evidence"]
+
+
 def test_fce_b2_goodhart_canary_scenario(tmp_path: Path) -> None:
     out = tmp_path / "fce_run"
     proc = subprocess.run(
