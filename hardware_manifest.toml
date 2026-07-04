@@ -8,7 +8,7 @@ schema_version = "hardware_manifest.v1"
 [device]
 id       = "dev-zephryj-01"
 platform = "x86_64-linux"
-tpm      = { present = false, version = "2.0" }
+tpm      = { present = true, version = "2.0" }
 tee      = { kind = "none" }
 
 [measurements]

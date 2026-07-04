@@ -31,6 +31,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 EVIDENCE_DIR="$REPO_ROOT/evidence/loops/hw_sw_010_20260704"
 PCR_SELECTION="sha256:0,7"
+# Fixed 32-byte qualifying value, IDENTICAL across --simulator and --real
+# so the divergence test (HW-SW-013 D2) has something meaningful to
+# compare: same qualifying data through both backends, structurally equal
+# quotes modulo signer. Not a sovereign-tape nonce.
+QUALIFYING_VALUE="turingos-hw-sw-010-qualifying-32"
 
 usage() {
   cat <<'EOF'
@@ -157,9 +162,7 @@ run_simulator() {
     || { echo "FAIL: tpm2_createak" >&2; return 1; }
   flush_transient
 
-  # Caller-supplied 32-byte qualifying value (fixed/deterministic for this
-  # local evidence artifact — not a sovereign-tape nonce).
-  printf '%s' "turingos-hw-sw-010-simulator-qq" > "$WORKDIR/qualifying.bin"
+  printf '%s' "$QUALIFYING_VALUE" > "$WORKDIR/qualifying.bin"
   local QUAL_HEX
   QUAL_HEX="$(hex_of_file "$WORKDIR/qualifying.bin")"
 
@@ -292,9 +295,80 @@ EOF
 
 # --- --real ----------------------------------------------------------------
 
+# Real /dev/tpmrm0 quote roundtrip, run under `sudo -n` (root-only device;
+# this script never assumes interactive sudo is available). Read-only with
+# respect to PCR state: no tpm2_pcrextend here (unlike --seal-test's
+# simulator-only state, /dev/tpmrm0's PCRs are this workspace's shared,
+# persistent hardware state). No seal/unseal, no turing-approval /
+# sovereign key material touched.
 run_real() {
-  echo "TODO: HW-SW-013 not yet implemented" >&2
-  return 1
+  if [ ! -e /dev/tpmrm0 ]; then
+    echo "FAIL: /dev/tpmrm0 not present on this host" >&2
+    return 1
+  fi
+  if ! sudo -n true 2>/dev/null; then
+    echo "NOTE: sudo -n unavailable in this shell -- receipt_real.json is" >&2
+    echo "      orchestrator-produced in that case, not faked here. Deferring." >&2
+    return 1
+  fi
+
+  local WORKDIR
+  WORKDIR="$(mktemp -d)"
+  CLEANUP_DIRS+=("$WORKDIR")
+  # root (via sudo) must be able to write context files into a directory
+  # this uid owns; this script's own uid must be able to read them back
+  # afterward (base64/od below also run under the same sudo env for the
+  # same reason -- no assumption about root's umask).
+  chmod 777 "$WORKDIR"
+
+  local -a stpm=(sudo -n env "TPM2TOOLS_TCTI=device:/dev/tpmrm0")
+
+  "${stpm[@]}" tpm2_flushcontext -t >/dev/null 2>&1 || true
+  "${stpm[@]}" tpm2_flushcontext -s >/dev/null 2>&1 || true
+  "${stpm[@]}" tpm2_flushcontext -l >/dev/null 2>&1 || true
+
+  "${stpm[@]}" tpm2_createek -c "$WORKDIR/ek.ctx" -G rsa -u "$WORKDIR/ek.pub" >/dev/null \
+    || { echo "FAIL: tpm2_createek (real)" >&2; return 1; }
+  "${stpm[@]}" tpm2_flushcontext -t >/dev/null 2>&1 || true
+  "${stpm[@]}" tpm2_createak -C "$WORKDIR/ek.ctx" -c "$WORKDIR/ak.ctx" -G rsa -g sha256 -s rsassa \
+    -u "$WORKDIR/ak.pub" -r "$WORKDIR/ak.priv" -n "$WORKDIR/ak.name" >/dev/null \
+    || { echo "FAIL: tpm2_createak (real)" >&2; return 1; }
+  "${stpm[@]}" tpm2_flushcontext -t >/dev/null 2>&1 || true
+
+  printf '%s' "$QUALIFYING_VALUE" > "$WORKDIR/qualifying.bin"
+  local QUAL_HEX
+  QUAL_HEX="$(hex_of_file "$WORKDIR/qualifying.bin")"
+
+  "${stpm[@]}" tpm2_quote -c "$WORKDIR/ak.ctx" -l "$PCR_SELECTION" -q "$WORKDIR/qualifying.bin" \
+    -m "$WORKDIR/quote.msg" -s "$WORKDIR/quote.sig" -o "$WORKDIR/pcrs.out" -g sha256 \
+    >/dev/null \
+    || { echo "FAIL: tpm2_quote (real)" >&2; return 1; }
+  "${stpm[@]}" tpm2_flushcontext -t >/dev/null 2>&1 || true
+
+  "${stpm[@]}" tpm2_checkquote -u "$WORKDIR/ak.pub" -m "$WORKDIR/quote.msg" -s "$WORKDIR/quote.sig" \
+    -f "$WORKDIR/pcrs.out" -q "$QUAL_HEX" >/dev/null \
+    || { echo "FAIL: tpm2_checkquote (real, self-verify)" >&2; return 1; }
+
+  local AK_PUB_B64 QUOTE_SIG_B64 PRODUCED_AT PCR_DIGEST
+  AK_PUB_B64="$(sudo -n base64 -w0 "$WORKDIR/ak.pub")"
+  QUOTE_SIG_B64="$(sudo -n base64 -w0 "$WORKDIR/quote.sig")"
+  PCR_DIGEST="$(sudo -n od -v -An -tx1 "$WORKDIR/pcrs.out" | tr -d ' \n')"
+  PRODUCED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  mkdir -p "$EVIDENCE_DIR"
+  cat > "$EVIDENCE_DIR/receipt_real.json" <<EOF
+{
+  "kind": "Vtpm",
+  "pcr_selection": "$PCR_SELECTION",
+  "pcr_digest": "$PCR_DIGEST",
+  "quote_sig_b64": "$QUOTE_SIG_B64",
+  "ak_pub_b64": "$AK_PUB_B64",
+  "qualifying_hex": "$QUAL_HEX",
+  "produced_at": "$PRODUCED_AT",
+  "verified": true
+}
+EOF
+  echo "PASS: receipt_real.json written ($EVIDENCE_DIR/receipt_real.json)"
 }
 
 # --- mode dispatch --------------------------------------------------------
