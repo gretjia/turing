@@ -452,3 +452,42 @@ def test_fce_s6_release_blocker_scenario(tmp_path: Path) -> None:
         "digest_mismatch_refused",
         "positive_fixture_control_accepted",
     }
+
+
+def test_fce_b5_seeded_overclaim_scenario(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "scenarios" / "FCE-B5.py"),
+            "--root",
+            str(out),
+            "--repo",
+            str(REPO),
+            "--plan-root",
+            str(PLAN_ROOT),
+            "--scenario-id",
+            "FCE-B5",
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 0, proc.stdout
+    verdict = load_json(out / "FCE-B5" / "FCE-B5_verdict.json")
+    assert verdict["verdict"] == "PASS"
+    assert verdict["fixture_or_real"] == "FIXTURE"
+    assert {item["criterion"] for item in verdict["pass_criteria_results"]} >= {
+        "seeded_overclaim_catch_rate_6_of_6",
+        "quarantined_probe_copy_destroyed",
+        "live_tree_probe_touch_check_clean",
+    }
+    summary = load_json(out / "FCE-B5" / "probe_summary.json")
+    assert summary["planted"] == 6
+    assert summary["caught"] == 6
+    assert summary["quarantine_destroyed"] is True
+    assert len(summary["probe_results"]) == 6
+    assert "FCE-B5/CLAIM_BOUNDARY.json" in verdict["evidence"]
