@@ -1,0 +1,150 @@
+{
+  "schema_id": "operator_view_snapshot.v1.provenance_manifest.v1",
+  "snapshot_schema_id": "operator_view_snapshot.v1",
+  "rules": [
+    {
+      "pointer": "/schema_id",
+      "source": "projection_schema_constant"
+    },
+    {
+      "pointer": "/source/project_root",
+      "source": "runtime_current_working_directory"
+    },
+    {
+      "pointer": "/source/micro_repo",
+      "source": "operator_cli_source_argument"
+    },
+    {
+      "pointer": "/source/source_kind",
+      "source": "operator_snapshot_builder_mode"
+    },
+    {
+      "pointer": "/source/projection_version",
+      "source": "projection_schema_constant"
+    },
+    {
+      "pointer": "/source/rebuild_command",
+      "source": "operator_cli_source_argument"
+    },
+    {
+      "pointer": "/source/can_write_truth",
+      "source": "hci_a_projection_only_policy"
+    },
+    {
+      "pointer": "/heads/tape_tip",
+      "source": "guarded_micro_tape_head_read"
+    },
+    {
+      "pointer": "/heads/authorization_head",
+      "source": "guarded_micro_tape_head_read"
+    },
+    {
+      "pointer": "/heads/accepted_head",
+      "source": "guarded_micro_tape_head_read"
+    },
+    {
+      "pointer": "/head_consistency",
+      "source": "projection_builder_consistency_check"
+    },
+    {
+      "pointer": "/operator_state",
+      "source": "projection_builder_state_machine"
+    },
+    {
+      "pattern": "/lanes/*/name",
+      "source": "projection_lane_constant"
+    },
+    {
+      "pattern": "/lanes/*/head",
+      "source": "guarded_micro_tape_head_read"
+    },
+    {
+      "pattern": "/lanes/*/meaning",
+      "source": "projection_lane_constant"
+    },
+    {
+      "pattern": "/active_work/*",
+      "source": "projection_builder_read_only_summary"
+    },
+    {
+      "pattern": "/evidence/*",
+      "source": "projection_builder_read_only_summary"
+    },
+    {
+      "pointer": "/failures",
+      "source": "projection_builder_failure_list"
+    },
+    {
+      "pattern": "/failures/*",
+      "source": "projection_builder_failure_list"
+    },
+    {
+      "pattern": "/warnings/*/code",
+      "source": "projection_warning_constant"
+    },
+    {
+      "pattern": "/warnings/*/severity",
+      "source": "projection_warning_constant"
+    },
+    {
+      "pattern": "/warnings/*/message",
+      "source": "projection_warning_constant"
+    },
+    {
+      "pointer": "/next_sovereign_action",
+      "source": "projection_builder_state_machine"
+    },
+    {
+      "pattern": "/safe_commands/*/schema_id",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/verb",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/side_effect_class",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/source_heads/*",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/preconditions/*",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/risk_class",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/confirmation_route",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/approval_required",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/dry_run_default",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/writes_truth",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/expected_receipt",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pattern": "/safe_commands/*/replay_command",
+      "source": "closed_operator_tool_manifest"
+    },
+    {
+      "pointer": "/snapshot_hash",
+      "source": "jcs_sha256_of_snapshot_preimage"
+    }
+  ]
+}

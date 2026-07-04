@@ -108,16 +108,37 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         ["help", "commands"] => Ok(operator_commands_help()),
         ["help", _topic] => Ok(operator_help()),
         ["status"] => render_operator_status(SnapshotInput::Demo),
+        ["status", "--json"] | ["status", "--json", "--demo"] => {
+            render_operator_snapshot_json(SnapshotInput::Demo)
+        }
         ["status", "--micro-git", repo] => render_operator_status(SnapshotInput::MicroGit(repo)),
+        ["status", "--micro-git", repo, "--json"] | ["status", "--json", "--micro-git", repo] => {
+            render_operator_snapshot_json(SnapshotInput::MicroGit(repo))
+        }
         ["status", "--micro-bundle", bundle] => {
             render_operator_status(SnapshotInput::MicroBundle(bundle))
         }
+        ["status", "--micro-bundle", bundle, "--json"]
+        | ["status", "--json", "--micro-bundle", bundle] => {
+            render_operator_snapshot_json(SnapshotInput::MicroBundle(bundle))
+        }
         ["panoview"] => render_operator_panoview(SnapshotInput::Demo),
+        ["panoview", "--json"] | ["panoview", "--json", "--demo"] => {
+            render_operator_snapshot_json(SnapshotInput::Demo)
+        }
         ["panoview", "--micro-git", repo] => {
             render_operator_panoview(SnapshotInput::MicroGit(repo))
         }
+        ["panoview", "--micro-git", repo, "--json"]
+        | ["panoview", "--json", "--micro-git", repo] => {
+            render_operator_snapshot_json(SnapshotInput::MicroGit(repo))
+        }
         ["panoview", "--micro-bundle", bundle] => {
             render_operator_panoview(SnapshotInput::MicroBundle(bundle))
+        }
+        ["panoview", "--micro-bundle", bundle, "--json"]
+        | ["panoview", "--json", "--micro-bundle", bundle] => {
+            render_operator_snapshot_json(SnapshotInput::MicroBundle(bundle))
         }
         ["explain"] => {
             render_operator_explain(TypedVerb::EXPLAIN_BLOCKER, SnapshotInput::Demo, None)
@@ -315,7 +336,7 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             true,
         ),
         _ => Err(format!(
-            "unknown turing command: {:?}. supported: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help commands | boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
+            "unknown turing command: {:?}. supported: status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help commands | boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
             args
         )),
     }
@@ -328,7 +349,7 @@ fn operator_help() -> String {
         .collect::<Vec<_>>()
         .join(", ");
     format!(
-        "Operator Console v1\ncontracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1\ncommands: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help\nfixed verbs: {verbs}\nstatus ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists"
+        "Operator Console v1\ncontracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1\ncommands: status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help\nfixed verbs: {verbs}\nstatus ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists"
     )
 }
 
@@ -517,8 +538,9 @@ fn run_git(args: &[&str], cwd: Option<&Path>) -> Result<(), String> {
 fn render_operator_status(input: SnapshotInput<'_>) -> Result<String, String> {
     let snapshot = operator_snapshot(input)?;
     Ok(format!(
-        "operator_view_snapshot.v1 heartbeat source_kind={} operator_state={} tape_tip={} authorization_head={} accepted_head={} can_write_truth={} status_ceiling=IMPLEMENTER_ADDRESSED snapshot_hash={}",
+        "operator_view_snapshot.v1 heartbeat source_kind={} micro_repo={} operator_state={} tape_tip={} authorization_head={} accepted_head={} can_write_truth={} status_ceiling=IMPLEMENTER_ADDRESSED snapshot_hash={}",
         snapshot.source.source_kind,
+        snapshot.source.micro_repo,
         snapshot.operator_state.as_str(),
         snapshot.heads.tape_tip,
         snapshot
@@ -532,13 +554,20 @@ fn render_operator_status(input: SnapshotInput<'_>) -> Result<String, String> {
     ))
 }
 
+fn render_operator_snapshot_json(input: SnapshotInput<'_>) -> Result<String, String> {
+    let snapshot = operator_snapshot(input)?;
+    serde_json::to_string(&snapshot)
+        .map_err(|error| format!("operator snapshot JSON serialization failed: {error}"))
+}
+
 fn render_operator_panoview(input: SnapshotInput<'_>) -> Result<String, String> {
     let snapshot = operator_snapshot(input)?;
     let mut out = String::new();
     out.push_str("operator_view_snapshot.v1 panoview\n");
     out.push_str(&format!(
-        "source={} rebuild={} can_write_truth={}\n",
+        "source={} micro_repo={} rebuild={} can_write_truth={}\n",
         snapshot.source.source_kind,
+        snapshot.source.micro_repo,
         snapshot.source.rebuild_command,
         snapshot.source.can_write_truth
     ));
