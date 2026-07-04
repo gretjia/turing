@@ -3,12 +3,10 @@
 //! ZERO external dependencies: the randomness is a seeded in-file xorshift64*
 //! PRNG (const SEED below), so Cargo.lock stays byte-identical. Two invariants:
 //!   1. honest cards: the four byte surfaces are identical and a real signature
-//!      verifies (Completeness = 1, zero honest rejections).
-//!   2. tampered cards: every tamper class is rejected (Soundness, zero tamper
-//!      acceptances), and no verification path ever panics.
-//!
-//! RED-FIRST skeleton: honest-path property + tamper class (a). The remaining
-//! tamper classes (b)-(f) and the ≥1024 mutation-case sweep land in HW-SW-005.
+//!      verifies (Completeness = 1, ZERO honest rejections).
+//!   2. tampered cards: every tamper class (a)-(f) is rejected (Soundness, ZERO
+//!      tamper acceptances), and no verification path ever panics (a panic
+//!      fails the test).
 
 use turing_approval::{
     ApprovalCard, ApprovalPayload, AuthorityKeySet, DisplayCopy, InMemoryTestSigningBackend,
@@ -66,6 +64,21 @@ impl Rng {
     }
 }
 
+/// Flips exactly one hex character after `prefix`, keeping valid hex and length
+/// (so the field still decodes but is a different value). Never panics.
+fn flip_one_hex(field: &str, prefix: &str, rng: &mut Rng) -> String {
+    let hex = field.strip_prefix(prefix).unwrap_or(field);
+    let mut chars: Vec<char> = hex.chars().collect();
+    if chars.is_empty() {
+        return field.to_string();
+    }
+    let idx = rng.below(chars.len() as u64) as usize;
+    // Guarantee a real change: '0' -> '1', anything else -> '0'.
+    chars[idx] = if chars[idx] == '0' { '1' } else { '0' };
+    let flipped: String = chars.into_iter().collect();
+    format!("{prefix}{flipped}")
+}
+
 /// Builds a random but VALID approval card: schema fixed at v2, route
 /// InMemoryTest, valid sha256 digests, random contents everywhere else.
 fn random_valid_card(rng: &mut Rng) -> ApprovalCard {
@@ -91,7 +104,10 @@ fn random_valid_card(rng: &mut Rng) -> ApprovalCard {
 }
 
 /// Signs a card and returns (signature, trusted key set, key_id) for verifying.
-fn sign_and_trust(rng: &mut Rng, card: &ApprovalCard) -> (SignatureEnvelope, AuthorityKeySet, String) {
+fn sign_and_trust(
+    rng: &mut Rng,
+    card: &ApprovalCard,
+) -> (SignatureEnvelope, AuthorityKeySet, String) {
     let key_id = format!("prop-{}", rng.ascii_word(4, 12));
     let backend = InMemoryTestSigningBackend::new(&key_id);
     let signature = backend.sign(card).expect("honest in-memory signature");
@@ -124,29 +140,68 @@ fn honest_path_identity_holds() {
         );
 
         let (signature, trusted, key_id) = sign_and_trust(&mut rng, &card);
+        // Completeness = 1: an honest card MUST verify.
         verify_signature_with_authority_keys(&card, &signature, &trusted, &key_id)
             .unwrap_or_else(|error| panic!("case {i}: honest card rejected: {error}"));
     }
 }
 
 #[test]
-fn mutation_class_a_payload_field_is_rejected() {
-    let mut rng = Rng::new(SEED ^ 0x00A);
+fn mutation_is_rejected() {
+    let mut rng = Rng::new(SEED ^ 0xDEAD_BEEF);
+    // Cover all six tamper classes; cycle through them across >=1024 cases.
     for i in 0..CASES {
         let card = random_valid_card(&mut rng);
-        let (signature, trusted, key_id) = sign_and_trust(&mut rng, &card);
+        let (mut signature, trusted, key_id) = sign_and_trust(&mut rng, &card);
 
-        // (a) payload string field tamper: rebuild the card with a mutated
-        // `action`, verify the ORIGINAL signature against the tampered card.
-        let mut tampered_payload = card.payload().clone();
-        tampered_payload.action = format!("{}!tampered", tampered_payload.action);
-        let tampered = ApprovalCard::new(tampered_payload, card.display_copy().clone());
+        // Default candidate is the honest one; each class perturbs exactly one
+        // surface. `cand_card` is what we hand to verify (some classes rebuild
+        // the card, others tamper the envelope in place).
+        let class = i % 6;
+        let cand_card: ApprovalCard = match class {
+            0 => {
+                // (a) payload string field tamper -> rebuild card, verify old sig.
+                let mut p = card.payload().clone();
+                p.action = format!("{}!x", p.action);
+                ApprovalCard::new(p, card.display_copy().clone())
+            }
+            1 => {
+                // (b) envelope signed_payload_hash tamper.
+                signature.signed_payload_hash =
+                    flip_one_hex(&signature.signed_payload_hash, "sha256:", &mut rng);
+                card.clone()
+            }
+            2 => {
+                // (c) signature byte flip.
+                signature.signature = flip_one_hex(&signature.signature, "ed25519:", &mut rng);
+                card.clone()
+            }
+            3 => {
+                // (d) authority_epoch mismatch (envelope drifts from payload).
+                signature.authority_epoch = signature.authority_epoch.wrapping_add(1);
+                card.clone()
+            }
+            4 => {
+                // (e) route swap: payload.signature_route changed post-sign.
+                let mut p = card.payload().clone();
+                p.signature_route = SignatureRoute::OsKeyring;
+                ApprovalCard::new(p, card.display_copy().clone())
+            }
+            _ => {
+                // (f) key_id swap on the envelope.
+                signature.key_id = format!("{}-swapped", signature.key_id);
+                card.clone()
+            }
+        };
 
         let result =
-            verify_signature_with_authority_keys(&tampered, &signature, &trusted, &key_id);
+            verify_signature_with_authority_keys(&cand_card, &signature, &trusted, &key_id);
+        // Soundness: ZERO tampered candidates may be accepted. All rejections
+        // are `Err` (any panic in verify would already have failed the test).
         assert!(
             result.is_err(),
-            "case {i}: tamper class (a) payload field was ACCEPTED"
+            "case {i}: tamper class ({}) was ACCEPTED",
+            (b'a' + class as u8) as char
         );
     }
 }

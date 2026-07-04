@@ -25,6 +25,16 @@ Ceiling: ADDRESSED (pending sovereign accept).
   signing key / never on tape / rotation / AK / enclave / schema v3).
 - A1 route_negotiation 7 passed; A4 approval_card 6 passed; A2 additive-only verified.
 
-## Checkpoint 2 — HW-SW-005 : PENDING
+## Checkpoint 2 — HW-SW-005 : DONE
+- tests/prop_approval_byte_surfaces.rs complete: SEED=0x5347313941503150,
+  xorshift64* PRNG, no external crate. honest_path_identity_holds (1024 cases:
+  four surfaces identical + honest verify Ok, zero rejections). mutation_is_rejected
+  (1024 cases cycling all six tamper classes (a) payload field, (b) signed_payload_hash,
+  (c) signature byte flip, (d) authority_epoch, (e) route swap, (f) key_id swap;
+  zero acceptances, no panic).
+- scripts/audit-approval-bytes-equivalence.sh extended with an explicit
+  --test prop_approval_byte_surfaces run; script exit 0.
+- B3: git diff 4cedcdb -- Cargo.lock EMPTY (zero-dep discipline held).
+
 ## Checkpoint 3 — HW-SW-006 : PENDING
 ## REPIN + PHASE GATE : PENDING

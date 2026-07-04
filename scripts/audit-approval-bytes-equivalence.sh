@@ -55,4 +55,13 @@ if ! ( cd "$REPO_ROOT" && cargo test -p turing-approval --quiet ); then
 fi
 echo "PASS: cargo test -p turing-approval green"
 
+# HW-SW-005 B2 — explicitly exercise the four-surface mutation property suite
+# (seeded in-file PRNG, >=1024 honest + >=1024 tampered cases across all six
+# tamper classes; zero honest rejections, zero tamper acceptances, no panics).
+echo "running: cargo test -p turing-approval --test prop_approval_byte_surfaces"
+if ! ( cd "$REPO_ROOT" && cargo test -p turing-approval --test prop_approval_byte_surfaces --quiet ); then
+  fail "prop_approval_byte_surfaces (four-surface mutation suite) failed"
+fi
+echo "PASS: prop_approval_byte_surfaces four-surface mutation suite green"
+
 echo "PASS: audit-approval-bytes-equivalence complete"
