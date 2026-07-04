@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 from pathlib import Path
+from types import ModuleType
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -50,6 +52,46 @@ def load_json(path: Path) -> dict:
 def write_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def load_entry_criteria_module() -> ModuleType:
+    path = TOOLS / "checks" / "entry_criteria.py"
+    spec = importlib.util.spec_from_file_location("entry_criteria", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def write_minimal_tracker(plan_root: Path, statuses: dict[str, str]) -> None:
+    rows = [
+        "| Phase | Deliverable | Exit | Verifier | Depends | Status | Evidence | Notes |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for gate, status in statuses.items():
+        rows.append(f"| {gate} | gate | exit | verifier | deps | {status} | evidence | notes |")
+    (plan_root / "PROGRESS_TRACKER.md").write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+
+def external_cert(targets: list[str]) -> dict:
+    return {
+        "schema_id": "turingos.closure_certificate.v1",
+        "subject": {"module_targets": targets},
+        "verifier": {
+            "kind": "external_cross_family_model",
+            "identity": "test-external-auditor",
+            "custody": {
+                "fresh_clone": True,
+                "no_shared_conversation_state": True,
+                "no_implementer_transcript": True,
+                "own_credentials": True,
+                "cross_family_or_human": True,
+                "own_custody_output": True,
+            },
+        },
+        "status_semantics": {"certified_for_module_targets": targets},
+        "verdict": "PASS",
+    }
 
 
 def test_fce_harness_files_exist_and_self_test() -> None:
@@ -181,7 +223,55 @@ def test_score_certification_accepts_clean_fixture_and_rejects_tamper(tmp_path: 
     assert "evidence_digest_mismatch" in tamper_proc.stdout
 
 
-def test_entry_criteria_blocks_current_incomplete_program(tmp_path: Path) -> None:
+def test_entry_gate_accepts_external_certificate_evidence_for_stale_rows(tmp_path: Path) -> None:
+    entry_criteria = load_entry_criteria_module()
+    assert hasattr(entry_criteria, "evaluate_gate_entry_status")
+    plan_root = tmp_path / "plan"
+    plan_root.mkdir()
+    write_minimal_tracker(
+        plan_root,
+        {
+            "M0.G": "ADDRESSED",
+            "M1.G": "ADDRESSED",
+            "M2.G": "ADDRESSED",
+            "M3.G": "EXTERNALLY_VERIFIED",
+            "M4.G": "EXTERNALLY_VERIFIED",
+            "M5.G": "ADDRESSED",
+            "M6.G": "ADDRESSED",
+        },
+    )
+    session = plan_root / "evidence" / "session_20260702"
+    write_json(session / "M5_P4_REMAINING_M1_M2_CLAUDE_PASS_CERTIFICATE.json", external_cert(["M1.G", "M2.TC5", "M2.G"]))
+    write_json(session / "M5_G_CLAUDE_PASS_CERTIFICATE.json", external_cert(["M5.G"]))
+    write_json(session / "M5_P4_M6_CLAUDE_PASS_CERTIFICATE.json", external_cert(["M6.G"]))
+
+    passed, evidence = entry_criteria.evaluate_gate_entry_status(plan_root)
+
+    assert passed is True
+    assert evidence["effective_gate_statuses"]["M0.G"] == "ADDRESSED"
+    for gate in ["M1.G", "M2.G", "M3.G", "M4.G", "M5.G", "M6.G"]:
+        assert evidence["effective_gate_statuses"][gate] == "EXTERNALLY_VERIFIED"
+        assert evidence["external_required_gates"][gate]["satisfied"] is True
+
+
+def test_entry_gate_rejects_external_certificate_without_custody(tmp_path: Path) -> None:
+    entry_criteria = load_entry_criteria_module()
+    assert hasattr(entry_criteria, "evaluate_gate_entry_status")
+    plan_root = tmp_path / "plan"
+    plan_root.mkdir()
+    write_minimal_tracker(plan_root, {gate: "ADDRESSED" for gate in ["M0.G", "M1.G", "M2.G", "M3.G", "M4.G", "M5.G", "M6.G"]})
+    bad_cert = external_cert(["M1.G", "M2.G", "M3.G", "M4.G", "M5.G", "M6.G"])
+    bad_cert["verifier"]["custody"]["own_custody_output"] = False
+    write_json(plan_root / "evidence" / "session_20260702" / "M5_P4_REMAINING_M1_M2_CLAUDE_PASS_CERTIFICATE.json", bad_cert)
+
+    passed, evidence = entry_criteria.evaluate_gate_entry_status(plan_root)
+
+    assert passed is False
+    assert evidence["effective_gate_statuses"]["M1.G"] == "ADDRESSED"
+    assert evidence["external_required_gates"]["M1.G"]["satisfied"] is False
+
+
+def test_entry_criteria_blocks_without_context_separation(tmp_path: Path) -> None:
     out = tmp_path / "FCE_RUN_MANIFEST.json"
     proc = run_cmd(
         "python3",
@@ -200,4 +290,5 @@ def test_entry_criteria_blocks_current_incomplete_program(tmp_path: Path) -> Non
     assert manifest["schema_id"] == "turingos.fce_run_manifest.v1"
     assert manifest["entry_criteria_met"] is False
     assert manifest["scenarios_default_verdict"] == "NOT_RUN"
-    assert any(item["id"] == "E1" and item["verdict"] == "FAIL" for item in manifest["entry_criteria"])
+    assert any(item["id"] == "E1" and item["verdict"] == "PASS" for item in manifest["entry_criteria"])
+    assert any(item["id"] == "E6" and item["verdict"] == "FAIL" for item in manifest["entry_criteria"])

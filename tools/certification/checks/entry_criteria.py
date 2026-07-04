@@ -17,6 +17,8 @@ from typing import Any
 
 CONSTITUTION_SHA256 = "a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0"
 GATES = ["M0.G", "M1.G", "M2.G", "M3.G", "M4.G", "M5.G", "M6.G"]
+AT_LEAST_ADDRESSED = {"ADDRESSED", "EXTERNALLY_VERIFIED"}
+EXTERNAL_REQUIRED_GATES = {"M1.G", "M2.G", "M3.G", "M4.G", "M5.G", "M6.G"}
 
 
 def utc_now() -> str:
@@ -61,6 +63,123 @@ def tracker_gate_statuses(tracker: Path) -> dict[str, str]:
     return statuses
 
 
+def load_json_file(path: Path) -> dict[str, Any] | None:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def certificate_targets(certificate: dict[str, Any]) -> set[str]:
+    targets: set[str] = set()
+    subject = certificate.get("subject")
+    if isinstance(subject, dict):
+        for key in ("module_targets", "certified_for_module_targets"):
+            values = subject.get(key)
+            if isinstance(values, list):
+                targets.update(value for value in values if isinstance(value, str))
+        for key in ("gate_id", "module_target"):
+            value = subject.get(key)
+            if isinstance(value, str):
+                targets.add(value)
+
+    semantics = certificate.get("status_semantics")
+    if isinstance(semantics, dict):
+        values = semantics.get("certified_for_module_targets")
+        if isinstance(values, list):
+            targets.update(value for value in values if isinstance(value, str))
+        value = semantics.get("certified_for_gate")
+        if isinstance(value, str):
+            targets.add(value)
+    return targets
+
+
+def collect_custody_booleans(certificate: dict[str, Any]) -> dict[str, bool]:
+    values: dict[str, bool] = {}
+    for source in (
+        certificate.get("custody"),
+        certificate.get("verifier"),
+        certificate.get("verifier", {}).get("custody") if isinstance(certificate.get("verifier"), dict) else None,
+    ):
+        if not isinstance(source, dict):
+            continue
+        for key, value in source.items():
+            if isinstance(value, bool):
+                values[key] = value
+    return values
+
+
+def certificate_custody_ok(certificate: dict[str, Any]) -> bool:
+    values = collect_custody_booleans(certificate)
+    if not values or any(value is False for value in values.values()):
+        return False
+    required_groups = [
+        ("fresh_clone", "fresh_clone_from_github"),
+        ("no_shared_conversation_state", "no_implementation_chat_used", "no_local_plan_directory_used"),
+        ("own_credentials", "own_credentials_session", "own_cli_credentials_session"),
+        ("cross_family_or_human", "cross_family_or_human_verifier", "cross_family_relative_to_implementer"),
+        ("own_custody_output",),
+    ]
+    return all(any(values.get(key) is True for key in group) for group in required_groups)
+
+
+def external_certificate_index(plan_root: Path) -> dict[str, dict[str, Any]]:
+    session = plan_root / "evidence" / "session_20260702"
+    certificates: dict[str, dict[str, Any]] = {}
+    for path in sorted(session.glob("*CERTIFICATE*.json")):
+        certificate = load_json_file(path)
+        if certificate is None:
+            continue
+        if certificate.get("schema_id") != "turingos.closure_certificate.v1":
+            continue
+        if certificate.get("verdict") != "PASS":
+            continue
+        if not certificate_custody_ok(certificate):
+            continue
+        for target in certificate_targets(certificate):
+            if target in GATES:
+                certificates.setdefault(
+                    target,
+                    {
+                        "path": str(path),
+                        "verdict": "PASS",
+                        "verifier": certificate.get("verifier", {}),
+                        "subject": certificate.get("subject", {}),
+                    },
+                )
+    return certificates
+
+
+def evaluate_gate_entry_status(plan_root: Path) -> tuple[bool, dict[str, Any]]:
+    tracker = plan_root / "PROGRESS_TRACKER.md"
+    table_statuses = tracker_gate_statuses(tracker)
+    certs = external_certificate_index(plan_root)
+    effective_statuses = {gate: table_statuses.get(gate, "MISSING") for gate in GATES}
+    external_required: dict[str, dict[str, Any]] = {}
+
+    all_at_least_addressed = all(effective_statuses[gate] in AT_LEAST_ADDRESSED for gate in GATES)
+    for gate in EXTERNAL_REQUIRED_GATES:
+        table_external = table_statuses.get(gate) == "EXTERNALLY_VERIFIED"
+        certificate = certs.get(gate)
+        if certificate is not None:
+            effective_statuses[gate] = "EXTERNALLY_VERIFIED"
+        satisfied = table_external or certificate is not None
+        external_required[gate] = {
+            "satisfied": satisfied,
+            "source": "tracker" if table_external else ("certificate" if certificate is not None else "missing"),
+            "certificate": certificate,
+        }
+
+    passed = all_at_least_addressed and all(item["satisfied"] for item in external_required.values())
+    return passed, {
+        "tracker": str(tracker),
+        "table_gate_statuses": {gate: table_statuses.get(gate, "MISSING") for gate in GATES},
+        "effective_gate_statuses": effective_statuses,
+        "external_required_gates": external_required,
+    }
+
+
 def criterion(item_id: str, description: str, passed: bool, evidence: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": item_id,
@@ -72,15 +191,13 @@ def criterion(item_id: str, description: str, passed: bool, evidence: dict[str, 
 
 def build_manifest(repo: Path, plan_root: Path, budget_ceiling_microusd: int) -> dict[str, Any]:
     entry: list[dict[str, Any]] = []
-    tracker = plan_root / "PROGRESS_TRACKER.md"
-    statuses = tracker_gate_statuses(tracker)
-    e1_pass = all(statuses.get(gate) == "ADDRESSED" for gate in GATES)
+    e1_pass, e1_evidence = evaluate_gate_entry_status(plan_root)
     entry.append(
         criterion(
             "E1",
-            "All module gates M0.G-M6.G addressed with required verifier artifacts",
+            "All module gates M0.G-M6.G at least ADDRESSED; external-required gates are EXTERNALLY_VERIFIED",
             e1_pass,
-            {"gate_statuses": {gate: statuses.get(gate, "MISSING") for gate in GATES}, "tracker": str(tracker)},
+            e1_evidence,
         )
     )
 
