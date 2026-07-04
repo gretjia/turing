@@ -26,7 +26,8 @@
     },
     "injected_rules": {
       "type": "array",
-      "description": "ONLY the relevant abstract FailureClass rules (shield). Raw failure payloads / worker stdout / unrelated rules are FORBIDDEN here.",
+      "description": "ONLY the relevant abstract FailureClass rules (shield). Raw failure payloads / worker stdout / unrelated rules are FORBIDDEN here. Capped at the pre-registered injection budget (ADR-M4-006: max_active_rules=4) so the active-rule pile can never grow without bound (audit finding P12).",
+      "maxItems": 4,
       "items": {
         "type": "object",
         "additionalProperties": false,

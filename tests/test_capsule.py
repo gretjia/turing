@@ -237,6 +237,65 @@ class TestRelevantRulesFilter(CapsuleTestBase):
             self.assertEqual(set(r.keys()), {"failure_class", "rule"})
 
 
+# --- injection budget (ADR-M4-006 / FCE-B4 fix for audit finding P12) -------
+#
+# Before this fix, relevant_rules() returned EVERY relevant abstract rule with no ceiling: a
+# long-running session that accumulated many distinct FailureClasses against the same atom or
+# module would grow injected_rules without bound (Art. II.1 context-pollution / cost-inflation
+# hazard). These tests pin the pre-registered budget numbers
+# (BroadcastRuleRetired_PROPOSAL.json's pre_registered_capsule_budget: max_broadcast_rules_per_
+# capsule=4, max_broadcast_rule_chars_per_capsule=4000) landed as FailureMemory's defaults.
+
+
+class TestInjectionBudget(CapsuleTestBase):
+    def _classify_many_unrelated_classes(self, fm, atom_id="M3-A1", module_id="M3"):
+        # _CLASS_BY_REASON has >4 distinct FailureClasses; classify one failure per reason_code,
+        # all relevant to the same atom/module, so relevant_rules() sees more distinct relevant
+        # (failure_class, rule) pairs than the default budget allows.
+        reason_codes = list(capsule_mod.FailureMemory._CLASS_BY_REASON.keys())
+        self.assertGreater(len(reason_codes), capsule_mod._DEFAULT_MAX_ACTIVE_RULES)
+        for reason_code in reason_codes:
+            fm.classify(_failure_node(atom_id=atom_id, module_id=module_id, reason_code=reason_code))
+        return reason_codes
+
+    def test_relevant_rules_capped_at_default_max_active_rules(self):
+        fm = capsule_mod.FailureMemory()
+        self._classify_many_unrelated_classes(fm)
+        rules = fm.relevant_rules(_atom(atom_id="M3-A1", module_id="M3"))
+        self.assertEqual(len(rules), capsule_mod._DEFAULT_MAX_ACTIVE_RULES)
+
+    def test_built_capsule_respects_injection_budget_under_scale(self):
+        # End-to-end: even with far more distinct relevant rules available than the budget,
+        # the built (and schema-validated) capsule never exceeds the pre-registered ceiling.
+        fm = capsule_mod.FailureMemory()
+        self._classify_many_unrelated_classes(fm)
+        cap = capsule_mod.build_capsule(self.tape, _atom(atom_id="M3-A1", module_id="M3"), failure_memory=fm)
+        schemas.validate_capsule(cap)  # must not raise -- capsule is within budget
+        self.assertLessEqual(len(cap["injected_rules"]), capsule_mod._DEFAULT_MAX_ACTIVE_RULES)
+
+    def test_custom_budget_override_narrows_selection(self):
+        fm = capsule_mod.FailureMemory(max_active_rules=2, max_rule_chars=4000)
+        self._classify_many_unrelated_classes(fm)
+        rules = fm.relevant_rules(_atom(atom_id="M3-A1", module_id="M3"))
+        self.assertEqual(len(rules), 2)
+
+    def test_char_budget_excludes_rules_that_would_overflow(self):
+        fm = capsule_mod.FailureMemory(max_active_rules=10, max_rule_chars=1)
+        self._classify_many_unrelated_classes(fm)
+        rules = fm.relevant_rules(_atom(atom_id="M3-A1", module_id="M3"))
+        # every real rule string is longer than 1 char, so none fit the char budget
+        self.assertEqual(rules, [])
+
+    def test_schema_rejects_capsule_over_injection_budget(self):
+        cap = capsule_mod.build_capsule(self.tape, _atom(), failure_memory=capsule_mod.FailureMemory())
+        cap["injected_rules"] = [
+            {"failure_class": f"C{i}", "rule": f"rule {i}"}
+            for i in range(capsule_mod._DEFAULT_MAX_ACTIVE_RULES + 1)
+        ]
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_capsule(cap)
+
+
 # --- SHIELD: no raw failure / no gate logic leaks into the capsule ----------
 
 
