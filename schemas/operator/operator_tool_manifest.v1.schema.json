@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "operator_tool_manifest.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "commands",
+    "can_evaluate_predicates",
+    "can_move_heads",
+    "can_synthesize_approvals",
+    "can_run_shell",
+    "can_autonomous_dispatch"
+  ],
+  "properties": {
+    "schema_id": { "const": "operator_tool_manifest.v1" },
+    "commands": { "type": "array", "items": { "$ref": "typed_command.v1.schema.json" } },
+    "can_evaluate_predicates": { "const": false },
+    "can_move_heads": { "const": false },
+    "can_synthesize_approvals": { "const": false },
+    "can_run_shell": { "const": false },
+    "can_autonomous_dispatch": { "const": false }
+  }
+}

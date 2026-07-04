@@ -1,0 +1,226 @@
+{
+  "active_constraints": [
+    "TOP_ALIGNMENT_PROJECT_BOOK.md is proposed only",
+    "NO_OG10",
+    "M2_DISABLED",
+    "no human-ratified, class-closure, production-ready, or M2 claims",
+    "operator snapshots read guarded heads or deterministic replay only",
+    "no-HITL local ceiling is IMPLEMENTER_ADDRESSED"
+  ],
+  "base_sha": "6b9daadc607268f700c67bca5ff80f6d2d0fe560",
+  "branch": "hci/operator-console-v1",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_cli",
+        "tests.test_panorama",
+        "tests.test_loop",
+        "tests.test_worker_cli",
+        "-v"
+      ],
+      "elapsed_ms": 44084,
+      "env_delta": {
+        "PYTHONPATH": "src"
+      },
+      "exit_code": 0,
+      "name": "baseline_python_cli_projection_loop_worker",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/baseline_python_cli_projection_loop_worker.stderr",
+      "stderr_sha256": "03409a63a2fa43f8a494ba4cb9198b874a9688fa12643c7cc757fdd797482dd1",
+      "stdout_path": "evidence/operator_hci_console_v1/baseline_python_cli_projection_loop_worker.stdout",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "turing-cli",
+        "-p",
+        "turing-projection",
+        "-p",
+        "turing-daemons",
+        "--tests",
+        "--quiet"
+      ],
+      "elapsed_ms": 13116,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "baseline_cargo_cli_projection_daemons",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/baseline_cargo_cli_projection_daemons.stderr",
+      "stderr_sha256": "2f5037a0a93037e4b5dae11f01031f31c618d94c3248b910eef8bed3cdd2d300",
+      "stdout_path": "evidence/operator_hci_console_v1/baseline_cargo_cli_projection_daemons.stdout",
+      "stdout_sha256": "07071862b3be9d99eaf122eddaf626b879c86997f45d11d7c215df71495139e1"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/lint_hci_copy.py",
+        "docs/hci"
+      ],
+      "elapsed_ms": 54,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "hci_copy_lint",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/hci_copy_lint.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/hci_copy_lint.stdout",
+      "stdout_sha256": "d718418e0cc4eadd103007d155304576718452c050847ee2bb1610fbebd1daea"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/lint_ascii_schema_keys.py",
+        "schemas/operator"
+      ],
+      "elapsed_ms": 47,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "operator_schema_ascii_lint",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/operator_schema_ascii_lint.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/operator_schema_ascii_lint.stdout",
+      "stdout_sha256": "2933e3594089b9e032f1f02b4f6defc137ebf2fff67dc80f5bf1c22605b655e0"
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_operator_agent",
+        "-v"
+      ],
+      "elapsed_ms": 82,
+      "env_delta": {
+        "PYTHONPATH": "src"
+      },
+      "exit_code": 0,
+      "name": "operator_agent_unittest",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/operator_agent_unittest.stderr",
+      "stderr_sha256": "7fc910cbb7a0715936bf0ac93d880a94477b6311541f71a5426f1e9ccb943b36",
+      "stdout_path": "evidence/operator_hci_console_v1/operator_agent_unittest.stdout",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "pytest",
+        "tests/e2e/test_operator_console.py",
+        "tests/audit/test_operator_boundaries.py",
+        "-q"
+      ],
+      "elapsed_ms": 6923,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "operator_e2e_and_audit_pytest",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/operator_e2e_and_audit_pytest.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/operator_e2e_and_audit_pytest.stdout",
+      "stdout_sha256": "83a1593c5b5783693fe3006d1f6597bcb4f3a5968f23b59481ee09a0477f910a"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_operator_agent.py"
+      ],
+      "elapsed_ms": 68,
+      "env_delta": {
+        "PYTHONPATH": "src"
+      },
+      "exit_code": 0,
+      "name": "operator_agent_audit",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/operator_agent_audit.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/operator_agent_audit.stdout",
+      "stdout_sha256": "569237123d7a3156c541caf5eeb2a0fb533df190e7ceeab353a65decdd238dda"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_operator_cli_copy.py"
+      ],
+      "elapsed_ms": 4045,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "operator_cli_copy_audit",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/operator_cli_copy_audit.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/operator_cli_copy_audit.stdout",
+      "stdout_sha256": "a4098e1c7ba04ee932bfa5c8d81b5b063f1c434cd402c3fceeeedd8d3583df50"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/run_operator_simulated_human.py"
+      ],
+      "elapsed_ms": 9053,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "operator_simulated_human",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/operator_simulated_human.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_path": "evidence/operator_hci_console_v1/operator_simulated_human.stdout",
+      "stdout_sha256": "ac5dc71cbcd75ba604b3d6519121aa713df345484871a8ec8076c1d66325c1b3"
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--quiet"
+      ],
+      "elapsed_ms": 15706,
+      "env_delta": {},
+      "exit_code": 0,
+      "name": "final_cargo_workspace",
+      "status": "PASS",
+      "stderr_path": "evidence/operator_hci_console_v1/final_cargo_workspace.stderr",
+      "stderr_sha256": "1c8bfab6ae3ba4e427c389cd474b5f604bb57751e63c82324ed38aa308294829",
+      "stdout_path": "evidence/operator_hci_console_v1/final_cargo_workspace.stdout",
+      "stdout_sha256": "93f1ec6e4fde483ecc5bfd77236cff79b88ec75a81a95575a23c8171367c4770"
+    }
+  ],
+  "dirty_file_disposition": {
+    "entries": [
+      " M Cargo.lock",
+      " M crates/turing-cli/Cargo.toml",
+      " M crates/turing-cli/src/main.rs",
+      " M crates/turing-cli/tests/cli_gates.rs",
+      " M crates/turing-projection/src/lib.rs",
+      " M crates/turing-projection/tests/projection_builder.rs",
+      "?? docs/hci/",
+      "?? evidence/operator_hci_console_v1/",
+      "?? schemas/operator/",
+      "?? scripts/audit_operator_agent.py",
+      "?? scripts/audit_operator_cli_copy.py",
+      "?? scripts/lint_ascii_schema_keys.py",
+      "?? scripts/lint_hci_copy.py",
+      "?? scripts/run_operator_simulated_human.py",
+      "?? src/turingos/operator_agent.py",
+      "?? tests/audit/",
+      "?? tests/e2e/",
+      "?? tests/test_operator_agent.py"
+    ],
+    "reason": "fresh independent worktree; dirty and untracked files are operator HCI implementation, tests, docs, schemas, scripts, simulated-human evidence, and refreshed evidence package",
+    "scope": "INCLUDED"
+  },
+  "head_sha": "6b9daadc607268f700c67bca5ff80f6d2d0fe560",
+  "not_run": [],
+  "schema_id": "operator_hci_evidence_package.v1",
+  "simulated_human": {
+    "status": "PASS",
+    "summary_path": "evidence/operator_hci_console_v1/simulated_human/commands.summary.json"
+  },
+  "status": "IMPLEMENTER_ADDRESSED",
+  "worktree_path": "/home/zephryj/turingos_backup/work/turing-operator-hci-console"
+}

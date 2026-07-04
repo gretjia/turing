@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "operator_view_snapshot.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "source",
+    "heads",
+    "head_consistency",
+    "operator_state",
+    "lanes",
+    "active_work",
+    "evidence",
+    "failures",
+    "warnings",
+    "next_sovereign_action",
+    "safe_commands",
+    "snapshot_hash"
+  ],
+  "properties": {
+    "schema_id": { "const": "operator_view_snapshot.v1" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_root",
+        "micro_repo",
+        "source_kind",
+        "projection_version",
+        "rebuild_command",
+        "can_write_truth"
+      ],
+      "properties": {
+        "project_root": { "type": "string" },
+        "micro_repo": { "type": "string" },
+        "source_kind": { "enum": ["guarded_micro_tape_read", "deterministic_replay"] },
+        "projection_version": { "const": "operator_view_snapshot.v1" },
+        "rebuild_command": { "type": "string" },
+        "can_write_truth": { "const": false }
+      }
+    },
+    "heads": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tape_tip", "authorization_head", "accepted_head"],
+      "properties": {
+        "tape_tip": { "type": "string" },
+        "authorization_head": { "type": ["string", "null"] },
+        "accepted_head": { "type": "string" }
+      }
+    },
+    "head_consistency": { "enum": ["consistent", "inconsistent"] },
+    "operator_state": {
+      "enum": [
+        "NotBooted",
+        "Healthy",
+        "NeedsApproval",
+        "PendingExecution",
+        "AwaitingReceipt",
+        "EvidenceMissing",
+        "Blocked",
+        "Failed",
+        "StaleProjection",
+        "ReplayRequired",
+        "OutsideGovernanceObserved",
+        "Unknown"
+      ]
+    },
+    "lanes": { "type": "array", "items": { "type": "object" } },
+    "active_work": { "type": "array", "items": { "type": "string" } },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "failures": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "object" } },
+    "next_sovereign_action": { "type": "string" },
+    "safe_commands": { "type": "array", "items": { "type": "object" } },
+    "snapshot_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

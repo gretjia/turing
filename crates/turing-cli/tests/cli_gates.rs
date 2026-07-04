@@ -1,8 +1,371 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
+use serde_json::json;
+use turing_git_tape::{
+    append::{Append, AppendRequest, CommittedReceipt},
+    git,
+};
+
 fn turing() -> Command {
     Command::new(env!("CARGO_BIN_EXE_turing"))
+}
+
+fn sample_micro_repo() -> (tempfile::TempDir, CommittedReceipt) {
+    let dir = tempfile::tempdir().expect("temp dir");
+    git::init_sha256(dir.path()).expect("sha256 git init");
+    let tape = Append::open(dir.path()).expect("append open");
+    let genesis = tape
+        .append(
+            AppendRequest::new(
+                "SystemConstitutionAccepted",
+                "writer:hci-test",
+                json!({"constitution_digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}),
+            )
+            .predicate_pass(),
+        )
+        .expect("genesis append");
+    let proposal = tape
+        .append(
+            AppendRequest::new(
+                "GoalStateProposed",
+                "writer:hci-test",
+                json!({"goal_id":"goal_hci_real_tape","intent":"exercise operator HCI real MicroTape source"}),
+            )
+            .predicate_pass(),
+        )
+        .expect("proposal append");
+    assert_eq!(proposal.accepted_head_after, genesis.event_id);
+    (dir, proposal)
+}
+
+fn sample_micro_bundle() -> (tempfile::TempDir, std::path::PathBuf, CommittedReceipt) {
+    let (repo, proposal) = sample_micro_repo();
+    let bundle = repo.path().join("micro_tape.bundle");
+    let output = Command::new("git")
+        .args([
+            "-C",
+            repo.path().to_str().expect("UTF-8 path"),
+            "bundle",
+            "create",
+            bundle.to_str().expect("UTF-8 bundle path"),
+            "refs/turingos/tape_tip",
+            "refs/turingos/accepted_head",
+        ])
+        .output()
+        .expect("git bundle create");
+    assert!(output.status.success(), "bundle create failed: {output:?}");
+    (repo, bundle, proposal)
+}
+
+#[test]
+fn help_lists_operator_console_commands() {
+    let output = turing().arg("--help").output().expect("run help");
+    assert!(output.status.success(), "help failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+
+    for text in [
+        "Operator Console v1",
+        "status",
+        "--micro-git",
+        "panoview",
+        "explain",
+        "ask",
+        "operator",
+        "typed_command.v1",
+        "operator_view_snapshot.v1",
+    ] {
+        assert!(stdout.contains(text), "help missing {text:?}: {stdout}");
+    }
+    assert!(!stdout.contains("human approved"));
+    assert!(!stdout.contains("class closed"));
+}
+
+#[test]
+fn help_commands_topic_lists_closed_typed_command_contract() {
+    let help = turing().arg("--help").output().expect("run help");
+    assert!(help.status.success(), "help failed: {help:?}");
+    let default_stdout = String::from_utf8(help.stdout).expect("stdout UTF-8");
+
+    let output = turing()
+        .args(["help", "commands"])
+        .output()
+        .expect("run help commands");
+    assert!(output.status.success(), "help commands failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+
+    assert_ne!(stdout, default_stdout);
+    assert!(stdout.contains("topic=commands"));
+    assert!(stdout.contains("operator_tool_manifest.v1"));
+    assert!(stdout.contains("typed_command.v1"));
+    assert!(stdout.contains("VIEW_STATUS"));
+    assert!(stdout.contains("APPROVE_CANDIDATE"));
+    assert!(stdout.contains("writes_truth=false"));
+}
+
+#[test]
+fn status_and_panoview_can_read_real_micro_git_heads() {
+    let (repo, proposal) = sample_micro_repo();
+    let repo_arg = repo.path().to_str().expect("UTF-8 path");
+
+    let status = turing()
+        .args(["status", "--micro-git", repo_arg])
+        .output()
+        .expect("run status real micro git");
+    assert!(status.status.success(), "status failed: {status:?}");
+    let stdout = String::from_utf8(status.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("operator_view_snapshot.v1"));
+    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
+    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
+    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+    assert!(stdout.contains("can_write_truth=false"));
+
+    let panoview = turing()
+        .args(["panoview", "--micro-git", repo_arg])
+        .output()
+        .expect("run panoview real micro git");
+    assert!(panoview.status.success(), "panoview failed: {panoview:?}");
+    let stdout = String::from_utf8(panoview.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("source=guarded_micro_tape_read"));
+    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
+    assert!(stdout.contains("authorization_head=null"));
+    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+    assert!(!stdout.contains("accepted head="));
+}
+
+#[test]
+fn explain_can_use_real_micro_git_snapshot_hash() {
+    let (repo, _proposal) = sample_micro_repo();
+    let repo_arg = repo.path().to_str().expect("UTF-8 path");
+
+    let output = turing()
+        .args(["explain", "blocker", "--micro-git", repo_arg])
+        .output()
+        .expect("run explain real micro git");
+
+    assert!(output.status.success(), "explain failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("typed_command.v1"));
+    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
+    assert!(stdout.contains("operator_view_snapshot.v1=sha256:"));
+}
+
+#[test]
+fn status_can_read_micro_tape_bundle_directly() {
+    let (_repo, bundle, proposal) = sample_micro_bundle();
+    let bundle_arg = bundle.to_str().expect("UTF-8 path");
+
+    let output = turing()
+        .args(["status", "--micro-bundle", bundle_arg])
+        .output()
+        .expect("run status bundle");
+
+    assert!(output.status.success(), "status bundle failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
+    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
+    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+}
+
+#[test]
+fn status_panoview_and_explain_render_operator_snapshot_contract() {
+    for (args, expected) in [
+        (
+            &["status"][..],
+            vec![
+                "operator_view_snapshot.v1",
+                "operator_state=Healthy",
+                "tape_tip=mu:",
+                "authorization_head=",
+                "accepted_head=mu:",
+                "IMPLEMENTER_ADDRESSED",
+            ],
+        ),
+        (
+            &["panoview"][..],
+            vec![
+                "lanes:",
+                "tape_tip=",
+                "authorization_head=",
+                "accepted_head=",
+                "warnings:",
+                "safe commands:",
+                "VIEW_STATUS",
+                "APPROVE_CANDIDATE approval_required",
+            ],
+        ),
+        (
+            &["explain", "blocker"][..],
+            vec![
+                "typed_command.v1",
+                "EXPLAIN_BLOCKER",
+                "evidence",
+                "replay",
+                "human_signature_required",
+            ],
+        ),
+    ] {
+        let output = turing().args(args).output().expect("run operator command");
+        assert!(
+            output.status.success(),
+            "command {args:?} failed: {output:?}"
+        );
+        let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+        for text in expected {
+            assert!(
+                stdout.contains(text),
+                "command {args:?} missing {text:?}: {stdout}"
+            );
+        }
+        assert!(!stdout.contains("production ready"));
+        assert!(!stdout.contains("human ratified"));
+        assert!(!stdout.contains("class closed"));
+    }
+}
+
+#[test]
+fn ask_routes_natural_language_to_advisory_turn_trace_only() {
+    let output = turing()
+        .args(["ask", "请批准这个 candidate"])
+        .output()
+        .expect("run ask");
+
+    assert!(output.status.success(), "ask failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("operator_turn_trace.v1"));
+    assert!(stdout.contains("APPROVE_CANDIDATE"));
+    assert!(stdout.contains("approval_required=true"));
+    assert!(stdout.contains("writes_truth=false"));
+    assert!(stdout.contains("advisory_confidence="));
+    assert!(stdout.contains("human_signature_required"));
+    assert!(!stdout.contains("shell"));
+    assert!(!stdout.contains("dispatch_executed"));
+}
+
+#[test]
+fn ask_routes_closed_verbs_without_falling_back_to_help() {
+    for (utterance, expected) in [
+        ("replay verify the current view", "REPLAY_VERIFY"),
+        ("audit invariants now", "AUDIT_INVARIANTS"),
+        ("propose intent to rescue the issue", "PROPOSE_INTENT"),
+        ("propose goal repair django", "PROPOSE_GOAL"),
+        ("propose capsule for django fix", "PROPOSE_CAPSULE"),
+        (
+            "explain event mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "EXPLAIN_EVENT",
+        ),
+    ] {
+        let output = turing()
+            .args(["ask", utterance])
+            .output()
+            .expect("run ask route");
+        assert!(
+            output.status.success(),
+            "ask {utterance:?} failed: {output:?}"
+        );
+        let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+        assert!(
+            stdout.contains(expected),
+            "utterance {utterance:?} routed wrong: {stdout}"
+        );
+        assert!(
+            !stdout.contains("selected_verb=HELP"),
+            "utterance {utterance:?} fell back to HELP: {stdout}"
+        );
+        assert!(stdout.contains("writes_truth=false"));
+    }
+}
+
+#[test]
+fn ask_routes_reject_candidate_without_inventing_approval() {
+    let output = turing()
+        .args(["ask", "reject candidate cand1"])
+        .output()
+        .expect("run ask reject");
+
+    assert!(output.status.success(), "ask reject failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("REJECT_CANDIDATE"));
+    assert!(!stdout.contains("APPROVE_CANDIDATE"));
+    assert!(stdout.contains("approval_required=true"));
+    assert!(stdout.contains("writes_truth=false"));
+}
+
+#[test]
+fn operator_interactive_wrapper_uses_same_snapshot_contract() {
+    let mut child = turing()
+        .arg("operator")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .expect("spawn operator");
+    {
+        use std::io::Write;
+        let stdin = child.stdin.as_mut().expect("stdin");
+        writeln!(stdin, "status").expect("write status");
+        writeln!(stdin, "help").expect("write help");
+        writeln!(stdin, "quit").expect("write quit");
+    }
+    let output = child.wait_with_output().expect("operator output");
+
+    assert!(output.status.success(), "operator failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("operator_view_snapshot.v1"));
+    assert!(stdout.contains("typed_command.v1"));
+    assert!(stdout.contains("VIEW_STATUS"));
+    assert!(stdout.contains("HELP"));
+    assert!(!stdout.contains("accepted because"));
+}
+
+#[test]
+fn operator_interactive_routes_explain_event_without_help_fallback() {
+    let mut child = turing()
+        .arg("operator")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .expect("spawn operator");
+    {
+        use std::io::Write;
+        let stdin = child.stdin.as_mut().expect("stdin");
+        writeln!(
+            stdin,
+            "explain event mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        )
+        .expect("write explain event");
+        writeln!(stdin, "quit").expect("write quit");
+    }
+    let output = child.wait_with_output().expect("operator output");
+
+    assert!(output.status.success(), "operator failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("EXPLAIN_EVENT"));
+    assert!(!stdout.contains("selected_verb=HELP"));
+}
+
+#[test]
+fn explain_event_can_target_event_id_with_replay_evidence() {
+    let output = turing()
+        .args([
+            "explain",
+            "event",
+            "mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        ])
+        .output()
+        .expect("run explain event id");
+
+    assert!(output.status.success(), "explain event failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("typed_command.v1"));
+    assert!(stdout.contains("EXPLAIN_EVENT"));
+    assert!(
+        stdout.contains(
+            "event_id=mu:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        )
+    );
+    assert!(stdout.contains("source_heads=tape_tip,authorization_head,accepted_head"));
+    assert!(stdout.contains("replay="));
+    assert!(stdout.contains("writes_truth=false"));
 }
 
 #[test]
@@ -197,8 +560,18 @@ fn approval_preview_renders_human_card_without_writing_truth() {
     assert!(stdout.contains("approval preview:"));
     assert!(stdout.contains("approval_id=ap_cli_preview"));
     assert!(stdout.contains("action=capsule_approve"));
+    assert!(stdout.contains("target=wc_cli"));
     assert!(stdout.contains("subject=wc_cli"));
     assert!(stdout.contains("risk=P2"));
+    assert!(stdout.contains("source_heads=tape_tip,authorization_head,accepted_head"));
+    assert!(stdout.contains("source_head_values=tape_tip:mu:"));
+    assert!(stdout.contains("accepted_head:mu:"));
+    assert!(stdout.contains("evidence_digest_count=1"));
+    assert!(stdout.contains("approval_required=true"));
+    assert!(stdout.contains("expiry=not_present"));
+    assert!(stdout.contains("nonce=not_present"));
+    assert!(stdout.contains("side_effect_class=sovereign_mutation"));
+    assert!(stdout.contains("post_approval_state=NeedsApproval_or_AwaitingReceipt"));
     assert!(stdout.contains("signature_route=None"));
     assert!(stdout.contains("visible_card_hash=sha256:"));
     assert!(stdout.contains("writes_micro_truth=false"));
@@ -207,7 +580,7 @@ fn approval_preview_renders_human_card_without_writing_truth() {
 }
 
 #[test]
-fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth() {
+fn approval_sign_in_memory_test_route_requires_explicit_test_flag() {
     let output = turing()
         .args([
             "approval",
@@ -232,6 +605,43 @@ fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth()
         .output()
         .expect("run approval sign");
 
+    assert!(
+        !output.status.success(),
+        "in-memory-test sign should require explicit flag"
+    );
+    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+    assert!(stderr.contains("--allow-test-signature"));
+    assert!(stderr.contains("test-only"));
+    assert!(!stderr.contains("signature=ed25519:"));
+}
+
+#[test]
+fn approval_sign_emits_explicit_in_memory_test_signature_with_test_flag_only() {
+    let output = turing()
+        .args([
+            "approval",
+            "sign",
+            "--key-id",
+            "operator-local-key",
+            "--approval-id",
+            "ap_cli_sign",
+            "--authority-epoch",
+            "7",
+            "--action",
+            "capsule_approve",
+            "--subject",
+            "wc_cli",
+            "--risk",
+            "P2",
+            "--evidence-digest",
+            "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "--signature-route",
+            "in-memory-test",
+            "--allow-test-signature",
+        ])
+        .output()
+        .expect("run approval sign");
+
     assert!(output.status.success(), "sign failed: {output:?}");
     let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
     assert!(stdout.contains("approval signature:"));
@@ -242,6 +652,7 @@ fn approval_sign_emits_explicit_in_memory_test_signature_without_writing_truth()
     assert!(stdout.contains("public_key_fingerprint=sha256:"));
     assert!(stdout.contains("verifying_key=ed25519-pub:"));
     assert!(stdout.contains("signature=ed25519:"));
+    assert!(stdout.contains("test_signature_only=true"));
     assert!(stdout.contains("writes_micro_truth=false"));
     assert!(!stdout.contains("plaintext"));
     assert!(!stdout.contains("credential"));
