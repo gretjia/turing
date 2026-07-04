@@ -96,5 +96,7 @@ fi
 
 python3 "$SCRIPT_DIR/run_scenarios.py" \
   --root "$OUT" \
+  --repo "$REPO" \
+  --plan-root "$PLAN_ROOT" \
   --cert-repo-sha "$CERT_SHA" \
   --out-final "$OUT/FINAL_CERTIFICATION_VERDICT.json"

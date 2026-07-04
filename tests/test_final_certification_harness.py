@@ -297,12 +297,16 @@ def test_entry_criteria_blocks_without_context_separation(tmp_path: Path) -> Non
 
 def test_scenario_runner_emits_not_run_verdicts_and_scores_failure(tmp_path: Path) -> None:
     out = tmp_path / "fce_run"
+    scenarios = tmp_path / "empty_scenarios"
+    scenarios.mkdir()
     proc = subprocess.run(
         [
             "python3",
             str(TOOLS / "run_scenarios.py"),
             "--root",
             str(out),
+            "--scenarios-dir",
+            str(scenarios),
             "--cert-repo-sha",
             "a" * 40,
             "--out-final",
@@ -321,5 +325,77 @@ def test_scenario_runner_emits_not_run_verdicts_and_scores_failure(tmp_path: Pat
     assert scenario["verdict"] == "NOT_RUN"
     assert scenario["not_run_is_fail"] is True
     assert scenario["not_run_reason"] == "scenario_script_missing"
+    final = load_json(out / "FINAL_CERTIFICATION_VERDICT.json")
+    assert final["overall"] == "CERTIFICATION_FAILED"
+
+
+def test_scenario_runner_executes_available_scenario_script(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    scenarios = tmp_path / "scenarios"
+    scenarios.mkdir()
+    script = scenarios / "FCE-R1.py"
+    script.write_text(
+        """
+import argparse, hashlib, json, pathlib
+parser = argparse.ArgumentParser()
+parser.add_argument("--root")
+parser.add_argument("--repo")
+parser.add_argument("--plan-root")
+parser.add_argument("--scenario-id")
+args = parser.parse_args()
+root = pathlib.Path(args.root)
+scenario = root / args.scenario_id
+scenario.mkdir(parents=True, exist_ok=True)
+evidence = scenario / "evidence.json"
+evidence.write_text(json.dumps({"ok": True}) + "\\n", encoding="utf-8")
+digest = "sha256:" + hashlib.sha256(evidence.read_bytes()).hexdigest()
+verdict = {
+    "schema_id": "turingos.fce_scenario_verdict.v1",
+    "scenario_id": args.scenario_id,
+    "verdict": "PASS",
+    "not_run_is_fail": True,
+    "goals_served": ["G2"],
+    "commands_executed": [{"cmd": "fixture", "exit_code": 0}],
+    "pass_criteria_results": [{"criterion": "fixture", "result": True, "evidence": f"{args.scenario_id}/evidence.json"}],
+    "evidence": [f"{args.scenario_id}/evidence.json"],
+    "evidence_sha256": {f"{args.scenario_id}/evidence.json": digest},
+    "fixture_or_real": "FIXTURE",
+    "automatic_fail_triggered": None,
+    "wall_clock_ms": 0,
+    "timestamp_utc": "2026-07-04T00:00:00Z"
+}
+(scenario / f"{args.scenario_id}_verdict.json").write_text(json.dumps(verdict, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+""".lstrip(),
+        encoding="utf-8",
+    )
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "run_scenarios.py"),
+            "--root",
+            str(out),
+            "--repo",
+            str(REPO),
+            "--plan-root",
+            str(PLAN_ROOT),
+            "--scenarios-dir",
+            str(scenarios),
+            "--cert-repo-sha",
+            "a" * 40,
+            "--out-final",
+            str(out / "FINAL_CERTIFICATION_VERDICT.json"),
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 1, proc.stdout
+    r1 = load_json(out / "FCE-R1" / "FCE-R1_verdict.json")
+    assert r1["verdict"] == "PASS"
+    s1 = load_json(out / "FCE-S1" / "FCE-S1_verdict.json")
+    assert s1["verdict"] == "NOT_RUN"
     final = load_json(out / "FINAL_CERTIFICATION_VERDICT.json")
     assert final["overall"] == "CERTIFICATION_FAILED"
