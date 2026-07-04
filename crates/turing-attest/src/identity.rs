@@ -74,8 +74,12 @@ impl DeviceIdentity {
     /// Parse raw JSON, rejecting non-ASCII / duplicate object keys anywhere
     /// via the workspace's `turingos.jcs.v1` strict grammar (reused from
     /// `turing-contracts`, not reimplemented here) before the typed decode.
+    /// A single trailing newline (normal on-disk JSON file convention) is
+    /// stripped first: `jcs::parse_strict` enforces the canonical-envelope
+    /// no-trailing-newline framing rule, which is not a load-bearing schema
+    /// concern for a plain data file on disk.
     pub fn parse(text: &str) -> Result<Self, IdentityError> {
-        jcs::parse_strict(text).map_err(|e| match e {
+        jcs::parse_strict(text.trim_end_matches('\n')).map_err(|e| match e {
             JcsError::NonAsciiKey(k) => IdentityError::NonAsciiKey(k),
             other => IdentityError::Parse(other.to_string()),
         })?;

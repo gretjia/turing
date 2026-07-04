@@ -84,9 +84,12 @@ pub struct QtQuote {
 impl QtQuote {
     /// Parse raw JSON, rejecting non-ASCII / duplicate object keys anywhere
     /// via the workspace's `turingos.jcs.v1` strict grammar before the typed
-    /// decode.
+    /// decode. A single trailing newline (normal on-disk JSON file
+    /// convention) is stripped first: `jcs::parse_strict` enforces the
+    /// canonical-envelope no-trailing-newline framing rule, which is not a
+    /// load-bearing schema concern for a plain fixture file on disk.
     pub fn parse(text: &str) -> Result<Self, QtQuoteError> {
-        jcs::parse_strict(text).map_err(|e| match e {
+        jcs::parse_strict(text.trim_end_matches('\n')).map_err(|e| match e {
             JcsError::NonAsciiKey(k) => QtQuoteError::NonAsciiKey(k),
             other => QtQuoteError::Parse(other.to_string()),
         })?;
