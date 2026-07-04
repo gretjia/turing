@@ -47,4 +47,20 @@ Ceiling: ADDRESSED (pending sovereign accept).
 - C3: default suite green; --features yubikey +3 tests green; build --features
   yubikey green. Cargo.lock zero-diff.
 
-## REPIN + PHASE GATE : PENDING
+## REPIN + PHASE GATE : DONE
+- REPIN: substrate_freeze_manifest.toml lib.rs sha256
+  ce9d46...20751 -> c76965...c3a7 (commit dd32754, body has "REPIN:"). Cargo.toml
+  left unpinned (out of REPIN scope; manifest pins no Cargo.toml today).
+- Phase gate (transcript in gate_receipt.txt), all exit 0:
+  G1 replay_determinism (SG-19) ok; G2 audit-approval-bytes-equivalence ok;
+  G3a audit-substrate-freeze + G3b .githooks/pre-commit ok; G4 forbidden-files
+  --staged ok; G5 verify_alignment.sh (cwd=work root) GREEN; G6 cargo test
+  --workspace ok, 0 failures.
+- Cargo.lock zero-diff vs 4cedcdb throughout.
+
+## Commit SHAs
+- a4c9bd2 test: hw-sw-004-005 red-first signing tests
+- 69d0bb3 feat: hw-sw-004 route negotiation
+- 1ca8e2b feat: hw-sw-005 four-surface mutation suite
+- 77a5d12 feat: hw-sw-006 yubikey skeleton
+- dd32754 chore: hw-sw-004..006 repin approval lib.rs (REPIN:)
