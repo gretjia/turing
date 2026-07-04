@@ -491,3 +491,41 @@ def test_fce_b5_seeded_overclaim_scenario(tmp_path: Path) -> None:
     assert summary["quarantine_destroyed"] is True
     assert len(summary["probe_results"]) == 6
     assert "FCE-B5/CLAIM_BOUNDARY.json" in verdict["evidence"]
+
+
+def test_fce_b3_sandbox_escape_battery_scenario(tmp_path: Path) -> None:
+    out = tmp_path / "fce_run"
+    proc = subprocess.run(
+        [
+            "python3",
+            str(TOOLS / "scenarios" / "FCE-B3.py"),
+            "--root",
+            str(out),
+            "--repo",
+            str(REPO),
+            "--plan-root",
+            str(PLAN_ROOT),
+            "--scenario-id",
+            "FCE-B3",
+        ],
+        cwd=REPO,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+
+    assert proc.returncode == 0, proc.stdout
+    verdict = load_json(out / "FCE-B3" / "FCE-B3_verdict.json")
+    assert verdict["verdict"] == "PASS"
+    assert verdict["fixture_or_real"] == "FIXTURE"
+    assert {item["criterion"] for item in verdict["pass_criteria_results"]} >= {
+        "runsc_selftest_exit_zero",
+        "network_egress_blocked",
+        "host_mutation_not_persistent",
+        "host_assumed_absent_in_current_cert_root",
+    }
+    report = load_json(out / "FCE-B3" / "sandbox_battery_report.json")
+    assert report["network"]["listener_contact_count"] == 0
+    assert report["host_mutation"]["sentinel_digest_unchanged"] is True
+    assert report["host_assumed_scan"]["hits"] == []
