@@ -385,11 +385,10 @@ def test_build_verdict_pass_requires_every_criterion_true_and_auto_includes_comm
 
     scenario_root = tmp_path / "FCE-W3"
     scenario_root.mkdir()
-    (scenario_root / "commands").mkdir()
     evidence_file = scenario_root / "evidence.json"
     evidence_file.write_text(json.dumps({"ok": True}), encoding="utf-8")
-    (scenario_root / "commands" / "cmd.stdout.txt").write_text("out", encoding="utf-8")
-    (scenario_root / "commands" / "cmd.stderr.txt").write_text("", encoding="utf-8")
+    (scenario_root / "cmd.stdout.txt").write_text("out", encoding="utf-8")
+    (scenario_root / "cmd.stderr.txt").write_text("", encoding="utf-8")
 
     verdict = scenario.build_verdict(
         root=tmp_path,
@@ -408,8 +407,8 @@ def test_build_verdict_pass_requires_every_criterion_true_and_auto_includes_comm
     assert verdict["fixture_or_real"] == "REAL"
     assert verdict["not_run_is_fail"] is True
     assert "FCE-W3/evidence.json" in verdict["evidence"]
-    assert "FCE-W3/commands/cmd.stdout.txt" in verdict["evidence"]
-    assert "FCE-W3/commands/cmd.stderr.txt" in verdict["evidence"]
+    assert "FCE-W3/cmd.stdout.txt" in verdict["evidence"]
+    assert "FCE-W3/cmd.stderr.txt" in verdict["evidence"]
     assert verdict["evidence_sha256"]["FCE-W3/evidence.json"] == scenario.sha256_file(evidence_file)
 
 

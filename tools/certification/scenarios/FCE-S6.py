@@ -433,6 +433,23 @@ def main() -> int:
         },
     )
     extra_evidence.append(scenario_root / "CLAIM_BOUNDARY.json")
+    readme_path = scenario_root / "README.md"
+    readme_path.write_text(
+        "\n".join(
+            [
+                "# FCE-S6 Release-Blocker Mechanics Negative Test",
+                "",
+                "Evidence label: FIXTURE.",
+                "This scenario exercises release-gate refusal paths (missing certificate,",
+                "implementer-family verifier, digest mismatch, tampered packet, removed",
+                "legacy manifest key) plus one positive fixture control, all against",
+                "fixture packets and fixture certificates built under this scenario root.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    extra_evidence.append(readme_path)
     verdict = build_verdict(
         root=root,
         scenario_id=scenario_id,
