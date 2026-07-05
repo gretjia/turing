@@ -145,6 +145,38 @@
     {
       "pointer": "/snapshot_hash",
       "source": "jcs_sha256_of_snapshot_preimage"
+    },
+    {
+      "pattern": "/work_items/*/id",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/title",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/stage",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/claimed_complete",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/receipt",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/receipt/receipt_id",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/receipt/matched",
+      "source": "projection_builder_work_item_derivation"
+    },
+    {
+      "pattern": "/work_items/*/blocked_reason",
+      "source": "projection_builder_work_item_derivation"
     }
   ]
 }

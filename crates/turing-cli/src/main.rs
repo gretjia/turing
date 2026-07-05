@@ -161,7 +161,11 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         }
         ["panoview", "--help"] => Ok(panoview_help()),
         ["panoview"] => match resolve_default_micro_git() {
-            Some(path) => render_operator_panoview(SnapshotInput::MicroGit(&path)),
+            Some(path) => render_operator_panoview(SnapshotInput::MicroGit(&path), false),
+            None => Err(no_tape_configured_error("panoview")),
+        },
+        ["panoview", "--ascii"] => match resolve_default_micro_git() {
+            Some(path) => render_operator_panoview(SnapshotInput::MicroGit(&path), true),
             None => Err(no_tape_configured_error("panoview")),
         },
         ["panoview", "--json"] => match resolve_default_micro_git() {
@@ -170,14 +174,22 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         },
         ["panoview", "--json", "--demo"] => render_operator_snapshot_json(SnapshotInput::Demo),
         ["panoview", "--micro-git", repo] => {
-            render_operator_panoview(SnapshotInput::MicroGit(repo))
+            render_operator_panoview(SnapshotInput::MicroGit(repo), false)
+        }
+        ["panoview", "--micro-git", repo, "--ascii"]
+        | ["panoview", "--ascii", "--micro-git", repo] => {
+            render_operator_panoview(SnapshotInput::MicroGit(repo), true)
         }
         ["panoview", "--micro-git", repo, "--json"]
         | ["panoview", "--json", "--micro-git", repo] => {
             render_operator_snapshot_json(SnapshotInput::MicroGit(repo))
         }
         ["panoview", "--micro-bundle", bundle] => {
-            render_operator_panoview(SnapshotInput::MicroBundle(bundle))
+            render_operator_panoview(SnapshotInput::MicroBundle(bundle), false)
+        }
+        ["panoview", "--micro-bundle", bundle, "--ascii"]
+        | ["panoview", "--ascii", "--micro-bundle", bundle] => {
+            render_operator_panoview(SnapshotInput::MicroBundle(bundle), true)
         }
         ["panoview", "--micro-bundle", bundle, "--json"]
         | ["panoview", "--json", "--micro-bundle", bundle] => {
@@ -188,7 +200,8 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         ["demo", "--help"] => Ok(demo_help()),
         ["demo", "status"] => render_operator_status_demo(),
         ["demo", "status", "--json"] => render_operator_snapshot_json(SnapshotInput::Demo),
-        ["demo", "panoview"] => render_operator_panoview_demo(),
+        ["demo", "panoview"] => render_operator_panoview_demo(false),
+        ["demo", "panoview", "--ascii"] => render_operator_panoview_demo(true),
         ["demo", "panoview", "--json"] => render_operator_snapshot_json(SnapshotInput::Demo),
         ["demo", "replay"] => demo_replay_verify(),
         ["doctor", "--help"] => Ok(doctor_help()),
@@ -499,13 +512,19 @@ fn status_help() -> String {
 fn panoview_help() -> String {
     "turing panoview — read-only multi-lane view (heads, evidence, warnings, safe commands).\n\
      \n\
-     Usage: turing panoview [--micro-git <path> | --micro-bundle <path>] [--json]\n\
+     Usage: turing panoview [--micro-git <path> | --micro-bundle <path>] [--json] [--ascii]\n\
      \n\
      Same resolution order as turing status: TURING_MICRO_GIT, then a project-configured\n\
      default, else it fails closed and prints the next command to run.\n\
      \n\
+     If the tape carries capsule-dispatch events, panoview also renders a per-item\n\
+     work_items view: closed glyph+label per stage (authorized/pending execution/awaiting\n\
+     receipt/receipt matched/accepted), a claimed-vs-accepted header, and a roll-up\n\
+     sentence. --ascii selects the plain-ASCII glyph column instead of unicode.\n\
+     \n\
      Examples:\n  \
      turing panoview --micro-git ./my-project\n  \
+     turing panoview --micro-git ./my-project --ascii\n  \
      turing demo panoview   (synthetic fixture tape — never your real tape)"
         .to_string()
 }
@@ -589,11 +608,22 @@ fn demo_snapshot() -> Result<OperatorViewSnapshot, String> {
         .map_err(|error| format!("cannot read current dir: {error}"))?
         .display()
         .to_string();
+    // No per-item work_items derivation for the synthetic demo tape (deliberate scope
+    // decision, F3): `run_new_project_agent_economy_demo` mints and immediately drops a
+    // private tempdir, so there is no repo left on disk to walk after it returns, and its
+    // internal `ProjectionEvent` record uses a `subject_id` that isn't a stable capsule_id
+    // across steps (a `WorkCapsuleBuilt`/`WorkerReceiptImported` pair share "wc_hello_cli",
+    // but the `CandidateAccepted` step's subject is "cand_hello_cli" — a different string).
+    // Wiring real per-item derivation into the demo would mean reshaping
+    // `turing-qualification`'s shared demo builder, out of this atom's scope. The demo stays
+    // a legacy-shaped snapshot (`work_items: None`), which is exactly the fallback the F3
+    // contract asks renderers to honor.
     OperatorViewSnapshot::from_deterministic_replay(
         project_root,
         "qualification_demo_micro_tape",
         "turing replay --verify",
         heads,
+        Vec::new(),
     )
     .map_err(|error| format!("operator snapshot failed: {error}"))
 }
@@ -666,11 +696,17 @@ fn micro_git_snapshot_from_repo(
     source_micro_repo: String,
     rebuild_command: String,
 ) -> Result<OperatorViewSnapshot, String> {
-    let heads = open_guarded_heads(micro_repo)?;
+    let head_set = open_guarded_heads(micro_repo)?;
+    // Real per-item derivation (F3): walk the whole guarded tape once and fold it into
+    // work_items. A tape with no capsule-dispatch-shaped events (e.g. the plain 2-event
+    // default HCI fixture) derives an empty Vec, which `from_guarded_heads` turns into
+    // `None` — the exact legacy shape existing callers already exercise.
+    let raw_events = read_all_tape_events(micro_repo, &head_set.tape_tip)?;
+    let work_items = turing_projection::derive_work_items(&raw_events);
     let heads = OperatorHeads::new(
-        heads.tape_tip,
-        heads.authorization_head,
-        heads.accepted_head,
+        head_set.tape_tip,
+        head_set.authorization_head,
+        head_set.accepted_head,
     )
     .map_err(|error| format!("operator snapshot heads invalid: {error}"))?;
     let project_root = std::env::current_dir()
@@ -682,8 +718,66 @@ fn micro_git_snapshot_from_repo(
         source_micro_repo,
         rebuild_command,
         heads,
+        work_items,
     )
     .map_err(|error| format!("operator snapshot failed: {error}"))
+}
+
+/// Walk every event on the guarded tape (genesis → `tape_tip`) and return it as a
+/// [`turing_projection::RawTapeEvent`] — the read-only input [`turing_projection::
+/// derive_work_items`] folds over. Same non-merge-chain walk `turing-daemons`'
+/// `load_tape_envelopes` uses (`commit_parents` / `committed_body_bytes`); duplicated here
+/// rather than adding a `turing-cli` → `turing-daemons` dependency for one helper.
+fn read_all_tape_events(
+    repo: &Path,
+    tape_tip: &str,
+) -> Result<Vec<turing_projection::RawTapeEvent>, String> {
+    let mut cursor = normalize_mu_oid(tape_tip);
+    let mut event_ids = Vec::new();
+    loop {
+        event_ids.push(cursor.clone());
+        let parents = turing_git_tape::append::commit_parents(repo, &cursor)
+            .map_err(|error| format!("cannot read tape parents for {cursor}: {error}"))?;
+        match parents.as_slice() {
+            [] => break,
+            [parent] => cursor = normalize_mu_oid(parent),
+            many => {
+                return Err(format!(
+                    "tape event {cursor} is a merge commit with {} parents",
+                    many.len()
+                ));
+            }
+        }
+    }
+    event_ids.reverse();
+
+    event_ids
+        .into_iter()
+        .map(|event_id| {
+            let bytes = turing_git_tape::append::committed_body_bytes(repo, &event_id)
+                .map_err(|error| format!("cannot read committed body for {event_id}: {error}"))?;
+            let value: Value = serde_json::from_slice(&bytes)
+                .map_err(|error| format!("committed body {event_id} is not JSON: {error}"))?;
+            let envelope = turing_contracts::envelope::MicroEventEnvelope::from_jcs_value(&value)
+                .map_err(|error| {
+                    format!("committed body {event_id} is not a MicroEventEnvelope: {error}")
+                })?;
+            Ok(turing_projection::RawTapeEvent {
+                event_type: envelope.event_type,
+                payload: envelope.payload,
+            })
+        })
+        .collect()
+}
+
+/// `mu:`-prefix a bare hex OID (`commit_parents` returns bare hex; a `HeadSet.tape_tip` is
+/// already `mu:`-prefixed) — idempotent either way.
+fn normalize_mu_oid(id: &str) -> String {
+    if id.starts_with("mu:") {
+        id.to_string()
+    } else {
+        format!("mu:{id}")
+    }
 }
 
 /// Open a MicroTape at `repo` and read its guarded coherent [`HeadSet`] — the shared, friendly-
@@ -823,8 +917,8 @@ fn render_operator_status_demo() -> Result<String, String> {
     Ok(format!("{}\n{body}", demo_header()))
 }
 
-fn render_operator_panoview_demo() -> Result<String, String> {
-    let body = render_operator_panoview(SnapshotInput::Demo)?;
+fn render_operator_panoview_demo(ascii: bool) -> Result<String, String> {
+    let body = render_operator_panoview(SnapshotInput::Demo, ascii)?;
     Ok(format!("{}\n{body}", demo_header()))
 }
 
@@ -863,7 +957,7 @@ fn audit_invariants_real(path: &str) -> Result<String, String> {
     ))
 }
 
-fn render_operator_panoview(input: SnapshotInput<'_>) -> Result<String, String> {
+fn render_operator_panoview(input: SnapshotInput<'_>, ascii: bool) -> Result<String, String> {
     let snapshot = operator_snapshot(input)?;
     let mut out = String::new();
     out.push_str("operator_view_snapshot.v1 panoview\n");
@@ -929,7 +1023,108 @@ fn render_operator_panoview(input: SnapshotInput<'_>) -> Result<String, String> 
             command.confirmation_route.as_str()
         ));
     }
+    // PER-ITEM SNAPSHOT CONTRACT (design spec §2): only rendered when the builder actually
+    // derived per-item state. A legacy snapshot (`work_items: None` — no capsule-dispatch
+    // events on the source tape, or the demo path, which deliberately skips derivation)
+    // renders none of this, byte-identical to before this atom.
+    if let Some(work_items) = &snapshot.work_items {
+        out.push_str(&render_work_items(work_items, ascii));
+    }
     Ok(out.trim_end().to_string())
+}
+
+/// Render the additive `work_items` block: the two-numbers header (spec 2.2), a spatial
+/// split between not-yet-accepted and accepted lanes (2.3), one glyph line per item (2.1),
+/// and the roll-up sentence (2.4). `ascii` selects the closed enum's ASCII column and an
+/// ASCII-safe arrow/separator instead of unicode — the label is always printed either way,
+/// so no information is lost in either mode (color is never emitted at all by this CLI, so
+/// `NO_COLOR` is honored trivially: there is no color to suppress).
+fn render_work_items(items: &[turing_projection::WorkItem], ascii: bool) -> String {
+    let claimed_complete = items.iter().filter(|item| item.claimed_complete).count();
+    let accepted = items
+        .iter()
+        .filter(|item| item.stage == turing_projection::WorkItemStage::Accepted)
+        .count();
+    let no_receipt = items
+        .iter()
+        .filter(|item| item.claimed_complete && item.receipt.is_none())
+        .count();
+    let arrow = if ascii { "->" } else { "\u{2192}" };
+    let dot = if ascii { " * " } else { " \u{b7} " };
+
+    let mut out = String::new();
+    out.push_str("work_items:\n");
+    out.push_str(&format!(
+        "  CLAIMED COMPLETE: {claimed_complete}    ACCEPTED WORLD STATE: {accepted}"
+    ));
+    if no_receipt > 0 {
+        let plural = if no_receipt == 1 {
+            "claim has"
+        } else {
+            "claims have"
+        };
+        out.push_str(&format!("    {arrow} {no_receipt} {plural} no receipt"));
+    }
+    out.push('\n');
+
+    let roll_up: Vec<String> = turing_projection::WorkItemStage::all()
+        .into_iter()
+        .filter_map(|stage| {
+            let count = items.iter().filter(|item| item.stage == stage).count();
+            (count > 0).then(|| format!("{count} {}", stage.as_str().replace('_', " ")))
+        })
+        .collect();
+    out.push_str(&format!("  Plan: {}\n", roll_up.join(dot)));
+
+    // Spatial split (spec 2.3): not-yet-accepted work in its own lane, separated by a
+    // dotted rule from accepted state. `Vec::partition` preserves each side's relative
+    // (tape) order.
+    let (accepted_items, pending_items): (Vec<_>, Vec<_>) = items
+        .iter()
+        .partition(|item| item.stage == turing_projection::WorkItemStage::Accepted);
+    if !pending_items.is_empty() {
+        out.push_str("  not yet accepted:\n");
+        for item in &pending_items {
+            out.push_str(&render_work_item_line(item, ascii, dot));
+        }
+    }
+    if !pending_items.is_empty() && !accepted_items.is_empty() {
+        out.push_str(&format!("  {}\n", ".".repeat(20)));
+    }
+    if !accepted_items.is_empty() {
+        out.push_str("  accepted:\n");
+        for item in &accepted_items {
+            out.push_str(&render_work_item_line(item, ascii, dot));
+        }
+    }
+    out
+}
+
+/// One item's collapsed one-line summary (spec 2.5: "the collapsed line IS the product" —
+/// it must be trustworthy on its own, never a bare heading requiring expansion).
+fn render_work_item_line(item: &turing_projection::WorkItem, ascii: bool, dot: &str) -> String {
+    let glyph = if ascii {
+        item.stage.ascii_glyph()
+    } else {
+        item.stage.glyph()
+    };
+    let mut line = format!(
+        "    {glyph} {label} id={} title={:?} claimed_complete={}",
+        item.id,
+        item.title,
+        item.claimed_complete,
+        label = item.stage.label(),
+    );
+    if let Some(receipt) = &item.receipt {
+        line.push_str(&format!("{dot}receipt {} matched", receipt.receipt_id));
+    } else if item.claimed_complete {
+        line.push_str(&format!("{dot}no receipt on tape"));
+    }
+    if let Some(reason) = &item.blocked_reason {
+        line.push_str(&format!("{dot}BLOCKED: {reason}"));
+    }
+    line.push('\n');
+    line
 }
 
 fn render_operator_explain(
@@ -1045,7 +1240,7 @@ fn run_operator_console() -> Result<String, String> {
                 output.push('\n');
             }
             "panoview" => {
-                output.push_str(&render_operator_panoview(SnapshotInput::Demo)?);
+                output.push_str(&render_operator_panoview(SnapshotInput::Demo, false)?);
                 output.push('\n');
             }
             "help" => {
