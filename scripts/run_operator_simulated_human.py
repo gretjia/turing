@@ -129,8 +129,16 @@ def main() -> int:
     steps = [
         Step("help", [turing, "--help"], require=("Operator Console v1",)),
         Step("help_commands", [turing, "help", "commands"], require=("topic=commands",)),
-        Step("status_demo", [turing, "status"], require=("operator_view_snapshot.v1",)),
-        Step("panoview_demo", [turing, "panoview"], require=("safe commands:",)),
+        Step(
+            "status_demo",
+            [turing, "demo", "status"],
+            require=("operator_view_snapshot.v1", "DEMO FIXTURE"),
+        ),
+        Step(
+            "panoview_demo",
+            [turing, "demo", "panoview"],
+            require=("safe commands:", "DEMO FIXTURE"),
+        ),
         Step("explain_blocker", [turing, "explain", "blocker"], require=("EXPLAIN_BLOCKER",)),
         Step(
             "explain_event",

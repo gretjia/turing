@@ -13,8 +13,11 @@ def run_turing(*args):
 
 
 def test_operator_panoview_and_replay_journey():
-    panoview = run_turing("panoview")
+    # F1: bare `panoview` no longer silently runs the demo — it is now explicit
+    # (`turing demo panoview`), honestly labeled as a demo fixture.
+    panoview = run_turing("demo", "panoview")
     assert panoview.returncode == 0, panoview.stderr
+    assert "DEMO FIXTURE" in panoview.stdout
     assert "operator_view_snapshot.v1" in panoview.stdout
     assert "safe commands:" in panoview.stdout
     assert "APPROVE_CANDIDATE approval_required" in panoview.stdout
@@ -23,6 +26,13 @@ def test_operator_panoview_and_replay_journey():
     replay = run_turing("replay", "--verify")
     assert replay.returncode == 0, replay.stderr
     assert "replay:" in replay.stdout
+
+
+def test_bare_panoview_fails_closed_without_a_configured_tape():
+    panoview = run_turing("panoview")
+    assert panoview.returncode == 2
+    assert "No tape configured." in panoview.stderr
+    assert "Run: turing demo panoview" in panoview.stderr
 
 
 def test_operator_approval_boundary_journey():

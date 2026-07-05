@@ -545,8 +545,9 @@ fn operator_command_matrix_passes_on_readonly_micro_tape_filesystem() {
 fn status_panoview_and_explain_render_operator_snapshot_contract() {
     for (args, expected) in [
         (
-            &["status"][..],
+            &["demo", "status"][..],
             vec![
+                "DEMO FIXTURE",
                 "operator_view_snapshot.v1",
                 "operator_state=Healthy",
                 "tape_tip=mu:",
@@ -556,8 +557,9 @@ fn status_panoview_and_explain_render_operator_snapshot_contract() {
             ],
         ),
         (
-            &["panoview"][..],
+            &["demo", "panoview"][..],
             vec![
+                "DEMO FIXTURE",
                 "lanes:",
                 "tape_tip=",
                 "authorization_head=",
@@ -780,7 +782,279 @@ fn unknown_command_fails_closed() {
         .expect("run unknown command");
     assert!(!output.status.success());
     let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
-    assert!(stderr.contains("unknown turing command"));
+    // F2: the ~500-char grammar dump is gone from error output; every parse error is 3 lines
+    // (what failed / why / the one next command), and the full grammar moves behind
+    // `turing help commands` only.
+    assert!(stderr.contains("Unknown command: market-loop"));
+    assert!(stderr.contains("Run: turing help commands"));
+    assert_eq!(stderr.trim_end().lines().count(), 3, "stderr: {stderr:?}");
+    assert!(!stderr.contains("supported: status ["));
+    assert!(!stderr.contains("os error"));
+}
+
+#[test]
+fn bare_status_and_panoview_fail_closed_without_a_configured_tape() {
+    // F1 default-command honesty: with no --micro-git/--micro-bundle, no TURING_MICRO_GIT, and
+    // no configured project default, bare `status`/`panoview` must NOT silently run the
+    // synthetic economy demo — they fail closed with the 3-line pattern and exit 2.
+    let scratch_cwd = tempfile::tempdir().expect("scratch cwd");
+    for args in [&["status"][..], &["panoview"][..]] {
+        let output = turing()
+            .args(args)
+            .current_dir(scratch_cwd.path())
+            .env_remove("TURING_MICRO_GIT")
+            .output()
+            .unwrap_or_else(|error| panic!("run {args:?} failed: {error}"));
+        assert!(!output.status.success(), "{args:?} unexpectedly succeeded");
+        assert_eq!(output.status.code(), Some(2), "{args:?} exit code");
+        assert!(output.stdout.is_empty(), "{args:?} stdout: {output:?}");
+        let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+        assert!(stderr.contains("No tape configured."));
+        assert!(stderr.contains(&format!("turing demo {}", args[0])));
+        assert!(stderr.contains(&format!("turing {} --micro-git <path>", args[0])));
+        assert_eq!(stderr.trim_end().lines().count(), 3, "stderr: {stderr:?}");
+    }
+}
+
+#[test]
+fn bare_status_resolves_turing_micro_git_env_instead_of_the_demo() {
+    let (repo, proposal) = sample_micro_repo();
+    let output = turing()
+        .arg("status")
+        .env("TURING_MICRO_GIT", repo.path())
+        .output()
+        .expect("run status with TURING_MICRO_GIT");
+    assert!(output.status.success(), "status failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
+    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
+    assert!(!stdout.contains("DEMO FIXTURE"));
+}
+
+#[test]
+fn demo_subcommands_render_the_same_contract_with_an_honest_header() {
+    for args in [
+        &["demo", "status"][..],
+        &["demo", "panoview"][..],
+        &["demo", "replay"][..],
+    ] {
+        let output = turing()
+            .args(args)
+            .output()
+            .unwrap_or_else(|error| panic!("run {args:?} failed: {error}"));
+        assert!(output.status.success(), "{args:?} failed: {output:?}");
+        let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+        assert!(
+            stdout.starts_with("DEMO FIXTURE"),
+            "{args:?} missing demo header: {stdout}"
+        );
+        assert!(stdout.to_lowercase().contains("demo"));
+    }
+}
+
+#[test]
+fn per_subcommand_help_is_scoped_and_discoverable() {
+    for (args, expected) in [
+        (&["status", "--help"][..], "turing status"),
+        (&["panoview", "--help"][..], "turing panoview"),
+        (&["explain", "--help"][..], "turing explain"),
+        (&["ask", "--help"][..], "turing ask"),
+        (&["demo", "--help"][..], "turing demo"),
+        (&["doctor", "--help"][..], "turing doctor"),
+    ] {
+        let output = turing()
+            .args(args)
+            .output()
+            .unwrap_or_else(|error| panic!("run {args:?} failed: {error}"));
+        assert!(output.status.success(), "{args:?} failed: {output:?}");
+        let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+        assert!(stdout.contains(expected), "{args:?} stdout: {stdout}");
+        assert!(stdout.contains("Usage:"), "{args:?} stdout: {stdout}");
+    }
+
+    // `ask --help` must not be swallowed by the `ask <utterance>` catch-all.
+    let output = turing().args(["ask", "--help"]).output().expect("run ask --help");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(!stdout.contains("operator_turn_trace.v1"));
+}
+
+#[test]
+fn doctor_passes_against_a_healthy_real_tape_and_supports_ci_mode() {
+    let (repo, proposal) = sample_micro_repo();
+    let repo_arg = repo.path().to_str().expect("UTF-8 repo path");
+
+    let output = turing()
+        .args(["doctor", "--micro-git", repo_arg])
+        .output()
+        .expect("run doctor");
+    assert!(output.status.success(), "doctor failed: {output:?}");
+    let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("PASS  binary_deps"));
+    assert!(stdout.contains("PASS  tape_resolved"));
+    assert!(stdout.contains("PASS  replay_verify"));
+    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+    assert!(stdout.contains("doctor: PASS (3/3 checks)"));
+
+    let ci_output = turing()
+        .args(["doctor", "--micro-git", repo_arg, "--ci"])
+        .output()
+        .expect("run doctor --ci");
+    assert!(ci_output.status.success(), "doctor --ci failed: {ci_output:?}");
+    let ci_stdout = String::from_utf8(ci_output.stdout).expect("stdout UTF-8");
+    for line in ci_stdout.lines() {
+        assert!(
+            line.starts_with("check=") || line.starts_with("doctor:"),
+            "unexpected --ci line: {line:?}"
+        );
+    }
+    assert!(ci_stdout.contains("check=binary_deps status=PASS"));
+    assert!(ci_stdout.contains("check=tape_resolved status=PASS"));
+    assert!(ci_stdout.contains("check=replay_verify status=PASS"));
+}
+
+#[test]
+fn doctor_fails_loud_and_nonzero_on_a_tampered_tape() {
+    let (repo, _proposal) = sample_micro_repo();
+    let repo_arg = repo.path().to_str().expect("UTF-8 repo path");
+
+    // Tamper: point refs/turingos/tape_tip at a commit that is not a real MicroTape event (a
+    // bare empty-tree commit) — the guarded HeadSet read fails closed on the incoherent ref
+    // before replay ever gets a chance to run.
+    let empty_tree = Command::new("git")
+        .args(["-C", repo_arg, "hash-object", "-w", "-t", "tree", "/dev/null"])
+        .output()
+        .expect("hash-object");
+    assert!(empty_tree.status.success(), "hash-object failed: {empty_tree:?}");
+    let tree_oid = String::from_utf8(empty_tree.stdout).expect("UTF-8 oid");
+    let tree_oid = tree_oid.trim();
+    let bogus_commit = Command::new("git")
+        .args([
+            "-C",
+            repo_arg,
+            "commit-tree",
+            tree_oid,
+            "-m",
+            "fix: tampered commit is not a MicroTape event",
+        ])
+        .output()
+        .expect("commit-tree");
+    assert!(bogus_commit.status.success(), "commit-tree failed: {bogus_commit:?}");
+    let bogus_oid = String::from_utf8(bogus_commit.stdout).expect("UTF-8 oid");
+    let bogus_oid = bogus_oid.trim();
+    let update_ref = Command::new("git")
+        .args([
+            "-C",
+            repo_arg,
+            "update-ref",
+            "refs/turingos/tape_tip",
+            bogus_oid,
+        ])
+        .output()
+        .expect("update-ref");
+    assert!(update_ref.status.success(), "update-ref failed: {update_ref:?}");
+
+    let output = turing()
+        .args(["doctor", "--micro-git", repo_arg, "--ci"])
+        .output()
+        .expect("run doctor on tampered tape");
+    assert!(!output.status.success(), "doctor unexpectedly passed: {output:?}");
+    assert_eq!(output.status.code(), Some(2));
+    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+    // The guarded HeadSet read (Ring-2, SG-18) catches the torn/incoherent ref before replay
+    // ever runs — an even earlier, stricter tamper detection than the replay fold itself.
+    assert!(stderr.contains("check=binary_deps status=PASS"));
+    assert!(stderr.contains("check=tape_resolved status=FAIL"));
+    assert!(stderr.contains("doctor: FAIL"));
+    assert!(!stderr.contains("os error"));
+}
+
+#[test]
+fn replay_verify_and_audit_invariants_support_micro_git_against_a_real_tape() {
+    let (repo, proposal) = sample_micro_repo();
+    let repo_arg = repo.path().to_str().expect("UTF-8 repo path");
+
+    let replay = turing()
+        .args(["replay", "--verify", "--micro-git", repo_arg])
+        .output()
+        .expect("run replay --verify --micro-git");
+    assert!(replay.status.success(), "replay failed: {replay:?}");
+    let stdout = String::from_utf8(replay.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("replay: verified"));
+    assert!(stdout.contains("source=guarded_micro_tape_read"));
+    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+
+    let audit = turing()
+        .args(["audit", "invariants", "--micro-git", repo_arg])
+        .output()
+        .expect("run audit invariants --micro-git");
+    assert!(audit.status.success(), "audit failed: {audit:?}");
+    let stdout = String::from_utf8(audit.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("audit invariants: pass"));
+    assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+}
+
+#[test]
+fn bad_micro_git_path_fails_closed_with_friendly_copy_not_raw_errno() {
+    let output = turing()
+        .args(["status", "--micro-git", "/does/not/exist/anywhere"])
+        .output()
+        .expect("run status with bad micro-git path");
+    assert!(!output.status.success());
+    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+    assert!(stderr.contains("Can't find a tape at"));
+    assert!(stderr.contains("Run: turing status --micro-git <valid-path>"));
+    assert!(!stderr.contains("os error"));
+    assert!(!stderr.contains("No such file or directory"));
+}
+
+#[test]
+fn boot_with_micro_git_configures_a_default_bare_status_then_resolves() {
+    let project = tempfile::tempdir().expect("temp project dir");
+    let (repo, proposal) = sample_micro_repo();
+    let repo_arg = repo.path().to_str().expect("UTF-8 repo path");
+
+    let boot = turing()
+        .args([
+            "boot",
+            "--project",
+            project.path().to_str().expect("UTF-8 project path"),
+            "--micro-git",
+            repo_arg,
+        ])
+        .output()
+        .expect("run boot with micro-git");
+    assert!(boot.status.success(), "boot failed: {boot:?}");
+
+    let status = turing()
+        .arg("status")
+        .current_dir(project.path())
+        .env_remove("TURING_MICRO_GIT")
+        .output()
+        .expect("run bare status from booted project dir");
+    assert!(status.status.success(), "status failed: {status:?}");
+    let stdout = String::from_utf8(status.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("source_kind=guarded_micro_tape_read"));
+    assert!(stdout.contains(&format!("tape_tip={}", proposal.event_id)));
+}
+
+#[test]
+fn panoview_survives_a_reader_closing_the_pipe_early() {
+    // F2: the historical bug was a `println!`-on-broken-pipe panic (the `turing panoview | head`
+    // shape). Closing our read end right after spawn — before the child necessarily finishes
+    // writing — reproduces the same "no reader left" condition without a shell pipe.
+    let mut child = turing()
+        .args(["demo", "panoview"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn demo panoview");
+    drop(child.stdout.take().expect("stdout"));
+    let output = child.wait_with_output().expect("wait for demo panoview");
+    let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
+    assert!(
+        !stderr.contains("panicked"),
+        "process panicked on broken pipe: {stderr}"
+    );
 }
 
 #[test]

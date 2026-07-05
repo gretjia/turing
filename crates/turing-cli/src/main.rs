@@ -1,13 +1,14 @@
 use std::io::{self, Read, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use serde_json::json;
+use serde_json::{Value, json};
 use turing_approval::{
     APPROVAL_PAYLOAD_SCHEMA_ID, ApprovalCard, ApprovalPayload, AuthorityKeySet, DisplayCopy,
     HardwareSigningBackend, InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute,
     SigningBackend,
 };
+use turing_contracts::envelope::HeadSet;
 use turing_contracts::jcs;
 use turing_git_tape::append::Append;
 use turing_projection::{
@@ -15,6 +16,11 @@ use turing_projection::{
     TypedVerb,
 };
 use turing_qualification::{run_new_project_agent_economy_demo, run_rescue_agent_economy_demo};
+use turing_replay::Reconstruction;
+
+/// The env var an operator can set so bare `turing status`/`panoview`/`doctor` resolve a real
+/// MicroTape instead of failing closed (F1: default-command honesty).
+const MICRO_GIT_ENV: &str = "TURING_MICRO_GIT";
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -24,7 +30,7 @@ fn main() -> ExitCode {
         return match run_jcs_command(&words) {
             Ok(()) => ExitCode::SUCCESS,
             Err(message) => {
-                eprintln!("{message}");
+                write_stderr(&message);
                 ExitCode::from(2)
             }
         };
@@ -32,14 +38,35 @@ fn main() -> ExitCode {
 
     match dispatch(&words) {
         Ok(message) => {
-            println!("{message}");
+            write_stdout(&message);
             ExitCode::SUCCESS
         }
         Err(message) => {
-            eprintln!("{message}");
+            write_stderr(&message);
             ExitCode::from(2)
         }
     }
+}
+
+/// Write `text` plus a trailing newline to stdout. A broken pipe (the reader closed early —
+/// e.g. `turing panoview | head`) is treated as a quiet, successful exit rather than the panic
+/// `println!`/`writeln!` would raise on a stdout write failure.
+fn write_stdout(text: &str) {
+    let stdout = io::stdout();
+    let mut handle = stdout.lock();
+    if let Err(error) = writeln!(handle, "{text}")
+        && error.kind() != io::ErrorKind::BrokenPipe
+    {
+        write_stderr(&format!("turing: failed to write stdout: {error}"));
+    }
+}
+
+/// Write `text` plus a trailing newline to stderr, with the same broken-pipe tolerance as
+/// [`write_stdout`].
+fn write_stderr(text: &str) {
+    let stderr = io::stderr();
+    let mut handle = stderr.lock();
+    let _ = writeln!(handle, "{text}");
 }
 
 fn run_jcs_command(args: &[&str]) -> Result<(), String> {
@@ -107,10 +134,20 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         [] | ["--help"] | ["help"] => Ok(operator_help()),
         ["help", "commands"] => Ok(operator_commands_help()),
         ["help", _topic] => Ok(operator_help()),
-        ["status"] => render_operator_status(SnapshotInput::Demo),
-        ["status", "--json"] | ["status", "--json", "--demo"] => {
-            render_operator_snapshot_json(SnapshotInput::Demo)
-        }
+        ["status", "--help"] => Ok(status_help()),
+        // F1 default-command honesty: bare `status` (with or without --json) never silently
+        // runs the synthetic economy demo. It resolves TURING_MICRO_GIT / a configured project
+        // default, else fails closed with the 3-line pattern. `--demo` stays an explicit,
+        // backward-compatible escape hatch (kept for existing FCE certification scenarios).
+        ["status"] => match resolve_default_micro_git() {
+            Some(path) => render_operator_status(SnapshotInput::MicroGit(&path)),
+            None => Err(no_tape_configured_error("status")),
+        },
+        ["status", "--json"] => match resolve_default_micro_git() {
+            Some(path) => render_operator_snapshot_json(SnapshotInput::MicroGit(&path)),
+            None => Err(no_tape_configured_error("status")),
+        },
+        ["status", "--json", "--demo"] => render_operator_snapshot_json(SnapshotInput::Demo),
         ["status", "--micro-git", repo] => render_operator_status(SnapshotInput::MicroGit(repo)),
         ["status", "--micro-git", repo, "--json"] | ["status", "--json", "--micro-git", repo] => {
             render_operator_snapshot_json(SnapshotInput::MicroGit(repo))
@@ -122,10 +159,16 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         | ["status", "--json", "--micro-bundle", bundle] => {
             render_operator_snapshot_json(SnapshotInput::MicroBundle(bundle))
         }
-        ["panoview"] => render_operator_panoview(SnapshotInput::Demo),
-        ["panoview", "--json"] | ["panoview", "--json", "--demo"] => {
-            render_operator_snapshot_json(SnapshotInput::Demo)
-        }
+        ["panoview", "--help"] => Ok(panoview_help()),
+        ["panoview"] => match resolve_default_micro_git() {
+            Some(path) => render_operator_panoview(SnapshotInput::MicroGit(&path)),
+            None => Err(no_tape_configured_error("panoview")),
+        },
+        ["panoview", "--json"] => match resolve_default_micro_git() {
+            Some(path) => render_operator_snapshot_json(SnapshotInput::MicroGit(&path)),
+            None => Err(no_tape_configured_error("panoview")),
+        },
+        ["panoview", "--json", "--demo"] => render_operator_snapshot_json(SnapshotInput::Demo),
         ["panoview", "--micro-git", repo] => {
             render_operator_panoview(SnapshotInput::MicroGit(repo))
         }
@@ -140,6 +183,17 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
         | ["panoview", "--json", "--micro-bundle", bundle] => {
             render_operator_snapshot_json(SnapshotInput::MicroBundle(bundle))
         }
+        // Demo becomes an explicit, honestly-labeled subcommand (F1): same render path, but the
+        // header line says plainly that this is a synthetic fixture, not the operator's tape.
+        ["demo", "--help"] => Ok(demo_help()),
+        ["demo", "status"] => render_operator_status_demo(),
+        ["demo", "status", "--json"] => render_operator_snapshot_json(SnapshotInput::Demo),
+        ["demo", "panoview"] => render_operator_panoview_demo(),
+        ["demo", "panoview", "--json"] => render_operator_snapshot_json(SnapshotInput::Demo),
+        ["demo", "replay"] => demo_replay_verify(),
+        ["doctor", "--help"] => Ok(doctor_help()),
+        ["doctor", rest @ ..] => run_doctor(rest),
+        ["explain", "--help"] => Ok(explain_help()),
         ["explain"] => {
             render_operator_explain(TypedVerb::EXPLAIN_BLOCKER, SnapshotInput::Demo, None)
         }
@@ -194,9 +248,13 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             SnapshotInput::MicroBundle(bundle),
             Some(event_id),
         ),
+        ["ask", "--help"] => Ok(ask_help()),
         ["ask", utterance @ ..] => render_operator_ask(&utterance.join(" ")),
         ["operator"] => run_operator_console(),
         ["boot", "--project", project] => boot_project(project),
+        ["boot", "--project", project, "--micro-git", micro_git] => {
+            boot_project_with_micro_git(project, micro_git)
+        }
         ["replay", "--verify"] => {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("replay verify failed: {error}"))?;
@@ -205,6 +263,7 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
                 report.tape_tip, report.accepted_head
             ))
         }
+        ["replay", "--verify", "--micro-git", repo] => replay_verify_real(repo),
         ["market", "replay", "--verify"] => {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("market replay failed: {error}"))?;
@@ -231,6 +290,7 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
                 new_project.accepted_head, rescue.accepted_head_after_failure
             ))
         }
+        ["audit", "invariants", "--micro-git", repo] => audit_invariants_real(repo),
         ["audit", "market"] => {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("market audit failed: {error}"))?;
@@ -335,11 +395,48 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             signature_route,
             true,
         ),
-        _ => Err(format!(
-            "unknown turing command: {:?}. supported: status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help commands | boot --project <path> | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify | market replay --verify | pput replay --verify | audit invariants|market|pput | handoff generate --output <path>",
-            args
-        )),
+        _ => Err(unknown_command_error(args)),
     }
+}
+
+/// The closed-form 3-line error for any input `dispatch` does not recognize: what failed, why,
+/// and the exact next command — never the historical ~500-char grammar dump (that full grammar
+/// is still available, but only on request, under `turing help commands`).
+fn unknown_command_error(args: &[&str]) -> String {
+    format!(
+        "Unknown command: {}\nturing does not recognize this input.\nRun: turing help commands   (or: turing --help)",
+        args.join(" ")
+    )
+}
+
+/// `TURING_MICRO_GIT`, else a `.turingos/project.json` `micro_git` field configured by `turing
+/// boot --project <path> --micro-git <path>` in the current directory — the F1 default-command
+/// resolution order for bare `status`/`panoview`/`doctor`. Returns `None` if neither is set, so
+/// the caller can fail closed instead of silently running the demo.
+fn resolve_default_micro_git() -> Option<String> {
+    if let Ok(value) = std::env::var(MICRO_GIT_ENV) {
+        let trimmed = value.trim();
+        if !trimmed.is_empty() {
+            return Some(trimmed.to_string());
+        }
+    }
+    let config_path = Path::new(".turingos").join("project.json");
+    let text = std::fs::read_to_string(config_path).ok()?;
+    let value: Value = serde_json::from_str(&text).ok()?;
+    let micro_git = value.get("micro_git")?.as_str()?;
+    if micro_git.is_empty() {
+        return None;
+    }
+    Some(micro_git.to_string())
+}
+
+/// The F1 3-line failure pattern for a `verb` that needs a tape but has none configured: what's
+/// missing, why, and the exact next command (the demo escape hatch first, the real-tape flag
+/// second) — never a silent demo run and never a raw errno.
+fn no_tape_configured_error(verb: &str) -> String {
+    format!(
+        "No tape configured.\nturing {verb} doesn't know which tape to read.\nRun: turing demo {verb}   (or: turing {verb} --micro-git <path>)"
+    )
 }
 
 fn operator_help() -> String {
@@ -349,7 +446,7 @@ fn operator_help() -> String {
         .collect::<Vec<_>>()
         .join(", ");
     format!(
-        "Operator Console v1\ncontracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1\ncommands: status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help\nfixed verbs: {verbs}\nstatus ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists"
+        "Operator Console v1\ncontracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1\ncommands: status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | demo status|panoview|replay | doctor [--ci] [--micro-git <path>] | help\nfixed verbs: {verbs}\nstatus ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists\nper-subcommand help: turing <status|panoview|explain|ask|demo|doctor> --help\nfull grammar: turing help commands"
     )
 }
 
@@ -371,8 +468,97 @@ fn operator_commands_help() -> String {
         .collect::<Vec<_>>()
         .join("\n");
     format!(
-        "Operator Console v1 topic=commands\ncontract=operator_tool_manifest.v1 item_contract=typed_command.v1\n{rows}\nstatus_ceiling=IMPLEMENTER_ADDRESSED"
+        "Operator Console v1 topic=commands\ncontract=operator_tool_manifest.v1 item_contract=typed_command.v1\n{rows}\nstatus_ceiling=IMPLEMENTER_ADDRESSED\nfull_grammar: {}",
+        full_cli_grammar()
     )
+}
+
+/// The complete CLI invocation grammar. Historically this string was dumped on every parse
+/// error (~500 chars); it now lives in exactly one reachable place (`turing help commands`) so
+/// operators can still find it without every mistake reading like a stack trace (F2).
+fn full_cli_grammar() -> &'static str {
+    "status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | demo status|panoview|replay [--json] | doctor [--ci] [--micro-git <path>|--micro-bundle <path>] | help commands | boot --project <path> [--micro-git <path>] | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify [--micro-git <path>] | market replay --verify | pput replay --verify | audit invariants [--micro-git <path>]|market|pput | handoff generate --output <path>"
+}
+
+fn status_help() -> String {
+    "turing status — read-only operator heartbeat (heads + snapshot hash) of one MicroTape.\n\
+     \n\
+     Usage: turing status [--micro-git <path> | --micro-bundle <path>] [--json]\n\
+     \n\
+     With no path, turing status resolves TURING_MICRO_GIT or a project-configured default\n\
+     (see: turing boot --project <path> --micro-git <path>); if neither is set it fails\n\
+     closed and prints the next command to run.\n\
+     \n\
+     Examples:\n  \
+     turing status --micro-git ./my-project\n  \
+     turing status --micro-git ./my-project --json\n  \
+     turing demo status   (synthetic fixture tape — never your real tape)"
+        .to_string()
+}
+
+fn panoview_help() -> String {
+    "turing panoview — read-only multi-lane view (heads, evidence, warnings, safe commands).\n\
+     \n\
+     Usage: turing panoview [--micro-git <path> | --micro-bundle <path>] [--json]\n\
+     \n\
+     Same resolution order as turing status: TURING_MICRO_GIT, then a project-configured\n\
+     default, else it fails closed and prints the next command to run.\n\
+     \n\
+     Examples:\n  \
+     turing panoview --micro-git ./my-project\n  \
+     turing demo panoview   (synthetic fixture tape — never your real tape)"
+        .to_string()
+}
+
+fn explain_help() -> String {
+    "turing explain — typed_command.v1 explanation of a blocker or a specific tape event.\n\
+     \n\
+     Usage: turing explain blocker|event [event_id] [--micro-git <path> | --micro-bundle <path>]\n\
+     \n\
+     Examples:\n  \
+     turing explain blocker --micro-git ./my-project\n  \
+     turing explain event mu:aaaa... --micro-git ./my-project"
+        .to_string()
+}
+
+fn ask_help() -> String {
+    "turing ask — route a natural-language utterance to a typed_command.v1 (advisory only;\n\
+     never dispatches, never writes truth).\n\
+     \n\
+     Usage: turing ask <utterance>\n\
+     \n\
+     Example: turing ask \"what is blocking this\""
+        .to_string()
+}
+
+fn demo_help() -> String {
+    "turing demo — the synthetic economy demo fixture, explicitly labeled as a demo.\n\
+     \n\
+     Usage: turing demo status|panoview|replay [--json]\n\
+     \n\
+     This mints a private-local demo Tape every run; it is never the operator's real tape.\n\
+     For a real tape, use: turing status --micro-git <path> (or configure a default —\n\
+     see: turing boot --project <path> --micro-git <path>)."
+        .to_string()
+}
+
+fn doctor_help() -> String {
+    "turing doctor — checks the configured/passed tape and reports PASS/FAIL per check.\n\
+     \n\
+     Usage: turing doctor [--ci] [--micro-git <path> | --micro-bundle <path>]\n\
+     \n\
+     Checks: (1) binary + dependency availability (git on PATH), (2) replay verify of the\n\
+     real tape via turing-replay::replay_tape. Any FAIL exits nonzero and names the failing\n\
+     check with its typed corruption detail.\n\
+     \n\
+     --ci: no color, one machine-parseable `check=<name> status=<PASS|FAIL> detail=<...>`\n\
+     line per check.\n\
+     \n\
+     With no path, turing doctor resolves TURING_MICRO_GIT or a project-configured default,\n\
+     same as turing status.\n\
+     \n\
+     Example: turing doctor --micro-git ./my-project --ci"
+        .to_string()
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -413,8 +599,7 @@ fn demo_snapshot() -> Result<OperatorViewSnapshot, String> {
 }
 
 fn micro_git_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
-    let micro_repo = std::fs::canonicalize(path)
-        .map_err(|error| format!("failed to resolve micro git path {path:?}: {error}"))?;
+    let micro_repo = canonicalize_micro_git(path)?;
     micro_git_snapshot_from_repo(
         &micro_repo,
         micro_repo.display().to_string(),
@@ -423,8 +608,39 @@ fn micro_git_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
 }
 
 fn micro_bundle_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
-    let bundle = std::fs::canonicalize(path)
-        .map_err(|error| format!("failed to resolve micro bundle path {path:?}: {error}"))?;
+    let (bundle, scratch_path, _scratch) = materialize_bundle_scratch(path)?;
+    micro_git_snapshot_from_repo(
+        &scratch_path,
+        format!("bundle:{}", bundle.display()),
+        format!("turing status --micro-bundle {}", bundle.display()),
+    )
+}
+
+/// Resolve `--micro-git <path>` without leaking a raw errno (F2): a bad path becomes the
+/// 3-line pattern, never `format!("{error}")` of a `std::io::Error` like "os error 2".
+fn canonicalize_micro_git(path: &str) -> Result<PathBuf, String> {
+    std::fs::canonicalize(path).map_err(|_| {
+        format!(
+            "Can't find a tape at {path}.\n{path} does not exist or isn't readable as a MicroTape.\nRun: turing status --micro-git <valid-path>   (or: turing demo status)"
+        )
+    })
+}
+
+/// Resolve `--micro-bundle <path>`, same no-raw-errno rule as [`canonicalize_micro_git`].
+fn canonicalize_micro_bundle(path: &str) -> Result<PathBuf, String> {
+    std::fs::canonicalize(path).map_err(|_| {
+        format!(
+            "Can't find a tape bundle at {path}.\n{path} does not exist or isn't readable.\nRun: turing status --micro-bundle <valid-path>   (or: turing demo status)"
+        )
+    })
+}
+
+/// Materialize a `--micro-bundle` into a scratch MicroTape repo. Returns the canonicalized
+/// bundle path (for display), the scratch repo path, and the [`BundleScratch`] guard — the
+/// caller must keep the guard alive for as long as the scratch path is read (its `Drop` removes
+/// the directory).
+fn materialize_bundle_scratch(path: &str) -> Result<(PathBuf, PathBuf, BundleScratch), String> {
+    let bundle = canonicalize_micro_bundle(path)?;
     let scratch = BundleScratch::new()?;
     run_git(
         &["init", "--object-format=sha256", "-q", scratch.path_str()?],
@@ -441,11 +657,8 @@ fn micro_bundle_snapshot(path: &str) -> Result<OperatorViewSnapshot, String> {
         ],
         Some(scratch.path()),
     )?;
-    micro_git_snapshot_from_repo(
-        scratch.path(),
-        format!("bundle:{}", bundle.display()),
-        format!("turing status --micro-bundle {}", bundle.display()),
-    )
+    let scratch_path = scratch.path().to_path_buf();
+    Ok((bundle, scratch_path, scratch))
 }
 
 fn micro_git_snapshot_from_repo(
@@ -453,12 +666,7 @@ fn micro_git_snapshot_from_repo(
     source_micro_repo: String,
     rebuild_command: String,
 ) -> Result<OperatorViewSnapshot, String> {
-    let tape = Append::open(micro_repo)
-        .map_err(|error| format!("cannot open micro tape {}: {error}", micro_repo.display()))?;
-    let heads = tape
-        .head_set_guarded()
-        .map_err(|error| format!("guarded MicroTape head read failed: {error}"))?
-        .ok_or_else(|| "micro tape is not booted; no operator heads are available".to_string())?;
+    let heads = open_guarded_heads(micro_repo)?;
     let heads = OperatorHeads::new(
         heads.tape_tip,
         heads.authorization_head,
@@ -478,8 +686,52 @@ fn micro_git_snapshot_from_repo(
     .map_err(|error| format!("operator snapshot failed: {error}"))
 }
 
+/// Open a MicroTape at `repo` and read its guarded coherent [`HeadSet`] — the shared, friendly-
+/// error path used by status/panoview/explain, `replay --verify --micro-git`, `audit invariants
+/// --micro-git`, and `turing doctor`'s `tape_resolved` check. Never a raw errno; every failure
+/// names the next command (F2).
+fn open_guarded_heads(repo: &Path) -> Result<HeadSet, String> {
+    let tape = Append::open(repo).map_err(|error| {
+        format!(
+            "Can't open the tape at {}.\n{error}\nRun: turing doctor --micro-git {}",
+            repo.display(),
+            repo.display()
+        )
+    })?;
+    tape.head_set_guarded()
+        .map_err(|error| {
+            format!(
+                "The tape at {} looks torn or unreadable.\n{error}\nRun: turing doctor --micro-git {}",
+                repo.display(),
+                repo.display()
+            )
+        })?
+        .ok_or_else(|| {
+            format!(
+                "This tape has never been initialized.\nNo operator heads exist yet at {}.\nRun: turing boot --project {}",
+                repo.display(),
+                repo.display()
+            )
+        })
+}
+
+/// Open a MicroTape at `repo` and replay it end-to-end via [`turing_replay::replay_tape`] — the
+/// shared real-tape path for `replay --verify --micro-git`, `audit invariants --micro-git`, and
+/// `turing doctor`'s `replay_verify` check. A corrupt tape fails closed with the typed
+/// [`turing_replay::ReplayError`] detail, never a raw errno.
+fn replay_guarded(repo: &Path) -> Result<Reconstruction, String> {
+    let heads = open_guarded_heads(repo)?;
+    turing_replay::replay_tape(repo, &heads.tape_tip).map_err(|error| {
+        format!(
+            "The tape at {} does not replay cleanly.\n{error}\nRun: turing doctor --micro-git {}",
+            repo.display(),
+            repo.display()
+        )
+    })
+}
+
 struct BundleScratch {
-    path: std::path::PathBuf,
+    path: PathBuf,
 }
 
 impl BundleScratch {
@@ -558,6 +810,57 @@ fn render_operator_snapshot_json(input: SnapshotInput<'_>) -> Result<String, Str
     let snapshot = operator_snapshot(input)?;
     serde_json::to_string(&snapshot)
         .map_err(|error| format!("operator snapshot JSON serialization failed: {error}"))
+}
+
+/// The header every `turing demo` text render carries (F1): plainly, unmissably, this is a
+/// synthetic fixture, not the operator's real tape.
+fn demo_header() -> &'static str {
+    "DEMO FIXTURE: a synthetic economy demo tape, minted fresh this run — never your real MicroTape."
+}
+
+fn render_operator_status_demo() -> Result<String, String> {
+    let body = render_operator_status(SnapshotInput::Demo)?;
+    Ok(format!("{}\n{body}", demo_header()))
+}
+
+fn render_operator_panoview_demo() -> Result<String, String> {
+    let body = render_operator_panoview(SnapshotInput::Demo)?;
+    Ok(format!("{}\n{body}", demo_header()))
+}
+
+fn demo_replay_verify() -> Result<String, String> {
+    let report = run_new_project_agent_economy_demo()
+        .map_err(|error| format!("demo replay failed: {error}"))?;
+    Ok(format!(
+        "{}\nreplay: verified tape_tip={} accepted_head={} qualification=private-local",
+        demo_header(),
+        report.tape_tip,
+        report.accepted_head
+    ))
+}
+
+/// `turing replay --verify --micro-git <path>`: the same replay-verify contract as the demo
+/// command, but against the operator's real tape (F4).
+fn replay_verify_real(path: &str) -> Result<String, String> {
+    let repo = canonicalize_micro_git(path)?;
+    let reconstruction = replay_guarded(&repo)?;
+    Ok(format!(
+        "replay: verified tape_tip={} accepted_head={} source=guarded_micro_tape_read",
+        reconstruction.head_set().tape_tip,
+        reconstruction.head_set().accepted_head
+    ))
+}
+
+/// `turing audit invariants --micro-git <path>`: replay a single real tape end-to-end and
+/// confirm it produced a coherent accepted-state sequence (F4).
+fn audit_invariants_real(path: &str) -> Result<String, String> {
+    let repo = canonicalize_micro_git(path)?;
+    let reconstruction = replay_guarded(&repo)?;
+    Ok(format!(
+        "audit invariants: pass accepted_head={} source=guarded_micro_tape_read event_count={}",
+        reconstruction.head_set().accepted_head,
+        reconstruction.event_count()
+    ))
 }
 
 fn render_operator_panoview(input: SnapshotInput<'_>) -> Result<String, String> {
@@ -940,8 +1243,28 @@ fn parse_signature_route(value: &str) -> Result<SignatureRoute, String> {
 }
 
 fn boot_project(project: &str) -> Result<String, String> {
-    let project_root = std::fs::canonicalize(project)
-        .map_err(|error| format!("failed to resolve project path {project:?}: {error}"))?;
+    let project_root = canonicalize_project(project)?;
+    write_boot_metadata(&project_root, None)
+}
+
+/// `turing boot --project <path> --micro-git <path>`: boots the project AND records a
+/// configured default MicroTape, so a bare `turing status`/`panoview`/`doctor` run later from
+/// this same directory resolves it instead of failing closed (F1 "configured default").
+fn boot_project_with_micro_git(project: &str, micro_git: &str) -> Result<String, String> {
+    let project_root = canonicalize_project(project)?;
+    let micro_git_path = canonicalize_micro_git(micro_git)?;
+    write_boot_metadata(&project_root, Some(micro_git_path.display().to_string()))
+}
+
+fn canonicalize_project(project: &str) -> Result<PathBuf, String> {
+    std::fs::canonicalize(project).map_err(|_| {
+        format!(
+            "Can't find a project directory at {project}.\n{project} does not exist or isn't readable.\nRun: turing boot --project <valid-path>"
+        )
+    })
+}
+
+fn write_boot_metadata(project_root: &Path, micro_git: Option<String>) -> Result<String, String> {
     let state_dir = project_root.join(".turingos");
     std::fs::create_dir_all(&state_dir)
         .map_err(|error| format!("failed to create {}: {error}", state_dir.display()))?;
@@ -952,12 +1275,207 @@ fn boot_project(project: &str) -> Result<String, String> {
         "truth_source": "micro_tape",
         "can_write_micro_truth": false,
         "credential_material_included": false,
+        "micro_git": micro_git,
     });
     let text = serde_json::to_string(&metadata)
         .map_err(|error| format!("failed to serialize project metadata: {error}"))?;
     std::fs::write(&metadata_path, text)
         .map_err(|error| format!("failed to write {}: {error}", metadata_path.display()))?;
     Ok(format!("boot: wrote {}", metadata_path.display()))
+}
+
+/// One named check `turing doctor` ran, and whether it passed.
+struct DoctorCheck {
+    name: &'static str,
+    passed: bool,
+    detail: String,
+}
+
+/// A tape repo `turing doctor` resolved to check — either a real `--micro-git` path or a
+/// scratch repo materialized from `--micro-bundle`. The `_scratch` guard (when present) must
+/// outlive every read of `path` (its `Drop` removes the scratch directory).
+struct ResolvedTapeRepo {
+    path: PathBuf,
+    _scratch: Option<BundleScratch>,
+}
+
+/// `turing doctor [--ci] [--micro-git <path> | --micro-bundle <path>]`. Manual flag parsing
+/// (order-independent) rather than combinatorial match arms, since doctor has two independent
+/// optional flags.
+fn run_doctor(args: &[&str]) -> Result<String, String> {
+    let mut ci = false;
+    let mut micro_git: Option<&str> = None;
+    let mut micro_bundle: Option<&str> = None;
+    let mut index = 0;
+    while index < args.len() {
+        match args[index] {
+            "--ci" => {
+                ci = true;
+                index += 1;
+            }
+            "--micro-git" => {
+                let value = args.get(index + 1).ok_or_else(|| {
+                    "turing doctor --micro-git needs a path.\n--micro-git was given with no value.\nRun: turing doctor --micro-git <path>"
+                        .to_string()
+                })?;
+                micro_git = Some(value);
+                index += 2;
+            }
+            "--micro-bundle" => {
+                let value = args.get(index + 1).ok_or_else(|| {
+                    "turing doctor --micro-bundle needs a path.\n--micro-bundle was given with no value.\nRun: turing doctor --micro-bundle <path>"
+                        .to_string()
+                })?;
+                micro_bundle = Some(value);
+                index += 2;
+            }
+            other => {
+                return Err(format!(
+                    "Unknown doctor flag: {other}.\nturing doctor does not recognize this flag.\nRun: turing doctor --help"
+                ));
+            }
+        }
+    }
+    doctor_report(micro_git, micro_bundle, ci)
+}
+
+fn resolve_doctor_repo(
+    micro_git: Option<&str>,
+    micro_bundle: Option<&str>,
+) -> Result<ResolvedTapeRepo, String> {
+    if let Some(path) = micro_git {
+        let canon = canonicalize_micro_git(path)?;
+        return Ok(ResolvedTapeRepo {
+            path: canon,
+            _scratch: None,
+        });
+    }
+    if let Some(bundle_path) = micro_bundle {
+        let (_bundle, scratch_path, scratch) = materialize_bundle_scratch(bundle_path)?;
+        return Ok(ResolvedTapeRepo {
+            path: scratch_path,
+            _scratch: Some(scratch),
+        });
+    }
+    match resolve_default_micro_git() {
+        Some(path) => {
+            let canon = canonicalize_micro_git(&path)?;
+            Ok(ResolvedTapeRepo {
+                path: canon,
+                _scratch: None,
+            })
+        }
+        None => Err(no_tape_configured_error("doctor")),
+    }
+}
+
+fn check_binary_deps() -> DoctorCheck {
+    match std::process::Command::new("git").arg("--version").output() {
+        Ok(output) if output.status.success() => DoctorCheck {
+            name: "binary_deps",
+            passed: true,
+            detail: format!(
+                "git available ({})",
+                String::from_utf8_lossy(&output.stdout).trim()
+            ),
+        },
+        Ok(output) => DoctorCheck {
+            name: "binary_deps",
+            passed: false,
+            detail: format!(
+                "git exited {} — turing needs a working git on PATH. Install git, then re-run: turing doctor",
+                output.status
+            ),
+        },
+        Err(_) => DoctorCheck {
+            name: "binary_deps",
+            passed: false,
+            detail: "git is not on PATH — turing needs a working git binary. Install git, then re-run: turing doctor".to_string(),
+        },
+    }
+}
+
+/// Render every check as one named PASS/FAIL line. `--ci` emits a single machine-parseable
+/// `check=<name> status=<PASS|FAIL> detail=<...>` line per check with no header and no
+/// decoration; the interactive form keeps a FAIL line louder than a PASS line (anomaly louder
+/// than checkmark).
+fn render_doctor_checks(checks: &[DoctorCheck], ci: bool) -> String {
+    let mut lines = Vec::new();
+    if !ci {
+        lines.push("turing doctor".to_string());
+    }
+    for check in checks {
+        if ci {
+            lines.push(format!(
+                "check={} status={} detail={}",
+                check.name,
+                if check.passed { "PASS" } else { "FAIL" },
+                check.detail.replace('\n', " ")
+            ));
+        } else if check.passed {
+            lines.push(format!("PASS  {}: {}", check.name, check.detail));
+        } else {
+            lines.push(format!("FAIL  {}: {}", check.name, check.detail));
+        }
+    }
+    lines.join("\n")
+}
+
+/// `turing doctor`'s two checks (F4): (1) binary + dependency availability, (2) a real replay
+/// verify of the configured/passed tape via [`turing_replay::replay_tape`]. Any FAIL exits
+/// nonzero (mapped through `Err`) and names the failing check with its typed corruption detail.
+fn doctor_report(
+    micro_git: Option<&str>,
+    micro_bundle: Option<&str>,
+    ci: bool,
+) -> Result<String, String> {
+    let mut checks = vec![check_binary_deps()];
+    let repo = resolve_doctor_repo(micro_git, micro_bundle)?;
+
+    match open_guarded_heads(&repo.path) {
+        Ok(heads) => {
+            checks.push(DoctorCheck {
+                name: "tape_resolved",
+                passed: true,
+                detail: repo.path.display().to_string(),
+            });
+            match turing_replay::replay_tape(&repo.path, &heads.tape_tip) {
+                Ok(reconstruction) => checks.push(DoctorCheck {
+                    name: "replay_verify",
+                    passed: true,
+                    detail: format!(
+                        "tape_tip={} accepted_head={} event_count={}",
+                        reconstruction.head_set().tape_tip,
+                        reconstruction.head_set().accepted_head,
+                        reconstruction.event_count()
+                    ),
+                }),
+                Err(error) => checks.push(DoctorCheck {
+                    name: "replay_verify",
+                    passed: false,
+                    detail: error.to_string(),
+                }),
+            }
+        }
+        Err(message) => checks.push(DoctorCheck {
+            name: "tape_resolved",
+            passed: false,
+            detail: message,
+        }),
+    }
+
+    let total = checks.len();
+    let failed = checks.iter().filter(|check| !check.passed).count();
+    let report = render_doctor_checks(&checks, ci);
+    if failed == 0 {
+        Ok(format!("{report}\ndoctor: PASS ({total}/{total} checks)"))
+    } else {
+        Err(format!(
+            "{report}\ndoctor: FAIL ({failed}/{total} checks failed)\nturing doctor found a problem with this tape — see the FAIL line above.\nRun: turing explain blocker --micro-git {}   (or fix it, then re-run: turing doctor --micro-git {})",
+            repo.path.display(),
+            repo.path.display()
+        ))
+    }
 }
 
 fn generate_handoff(output: &str) -> Result<String, String> {
