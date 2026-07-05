@@ -304,14 +304,15 @@ def test_entry_criteria_blocks_without_context_separation(tmp_path: Path) -> Non
     assert any(item["id"] == "E6" and item["verdict"] == "FAIL" for item in manifest["entry_criteria"])
 
 
-def test_fce_r1_pytest_env_does_not_inherit_context_separation(monkeypatch) -> None:
+def test_fce_r1_pytest_env_does_not_inherit_context_separation(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setenv("FCE_CONTEXT_SEPARATED", "yes")
     module = load_fce_r1_module()
 
-    env = module.pytest_env()
+    env = module.pytest_env(tmp_path)
 
     assert env["PYTHONPATH"] == "src"
     assert "FCE_CONTEXT_SEPARATED" not in env
+    assert env["TMPDIR"] == str(tmp_path)
 
 
 def test_scenario_runner_emits_not_run_verdicts_and_scores_failure(tmp_path: Path) -> None:
