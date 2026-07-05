@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import subprocess
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,17 +29,24 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 def secure_private_tmp_dir(scenario_root: Path) -> Path:
-    """Create a private (0700, owned-by-invoker) tmp root under the scenario
-    root and return it. Daemon-spawning tests (Rust's tempfile::tempdir() and
-    Python's tempfile module) both honor $TMPDIR; pointing it here means every
-    per-test/per-daemon temp dir nests under an already-private directory
-    instead of directly under the shared, world-writable (mode 1777) ambient
-    /tmp -- hardening against umask/ambient-/tmp permission flakes in
-    marketd's (and every other daemon's) socket-parent security check without
-    weakening that check.
+    """Create a private (0700, owned-by-invoker) tmp root and return it.
+    Daemon-spawning tests (Rust's tempfile::tempdir() and Python's tempfile
+    module) both honor $TMPDIR; pointing it here means every per-test/per-daemon
+    temp dir nests under an already-private directory instead of directly under
+    the shared, world-writable (mode 1777) ambient /tmp -- hardening against
+    umask/ambient-/tmp permission flakes in marketd's (and every other daemon's)
+    socket-parent security check without weakening that check.
+
+    Created OUTSIDE the scenario evidence root (mkdtemp is 0700 by design): if it
+    lived under scenario_root, pytest fixtures written into it (e.g.
+    test_stage12_contract_secret's `sk-` placeholder, or 0-byte temp files) would
+    be swept into the FCE evidence tree that FCE-R5's secret-marker scan and
+    FCE-R3's ops-inventory walk -- producing false redline/hygiene violations for
+    another scenario's transient test data. `scenario_root` is retained for the
+    signature/callsite but the dir is deliberately not nested under it.
     """
-    private_tmp = scenario_root / "private_tmp"
-    private_tmp.mkdir(parents=True, exist_ok=True)
+    del scenario_root  # intentionally not nested under the evidence root; see docstring
+    private_tmp = Path(tempfile.mkdtemp(prefix="fce-r1-privtmp-"))
     os.chmod(private_tmp, 0o700)
     return private_tmp
 
