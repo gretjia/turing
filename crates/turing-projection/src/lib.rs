@@ -181,6 +181,264 @@ pub struct OperatorLane {
     pub meaning: String,
 }
 
+/// The closed per-item lifecycle enum (design spec `m6_hci/DESIGN_UX_UI_DETAIL_20260705.md`
+/// §2.1). Fixed glyph + fixed ASCII fallback + fixed verbatim label per stage; ordered by
+/// lifecycle progression so [`WorkItemStage::rank`] can decide "did this item advance".
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WorkItemStage {
+    Authorized,
+    PendingExecution,
+    AwaitingReceipt,
+    ReceiptMatched,
+    Accepted,
+}
+
+impl WorkItemStage {
+    #[must_use]
+    pub fn as_str(self) -> &'static str {
+        match self {
+            WorkItemStage::Authorized => "authorized",
+            WorkItemStage::PendingExecution => "pending_execution",
+            WorkItemStage::AwaitingReceipt => "awaiting_receipt",
+            WorkItemStage::ReceiptMatched => "receipt_matched",
+            WorkItemStage::Accepted => "accepted",
+        }
+    }
+
+    /// The closed-bucket unicode glyph (spec 2.1 table, column 2).
+    #[must_use]
+    pub fn glyph(self) -> &'static str {
+        match self {
+            WorkItemStage::Authorized => "\u{25cf}",
+            WorkItemStage::PendingExecution => "\u{25d0}",
+            WorkItemStage::AwaitingReceipt => "\u{25cc}",
+            WorkItemStage::ReceiptMatched => "\u{2713}",
+            WorkItemStage::Accepted => "\u{25a0}",
+        }
+    }
+
+    /// The closed-bucket ASCII fallback (spec 2.1 table, column 3).
+    #[must_use]
+    pub fn ascii_glyph(self) -> &'static str {
+        match self {
+            WorkItemStage::Authorized => "*",
+            WorkItemStage::PendingExecution => "o",
+            WorkItemStage::AwaitingReceipt => ".",
+            WorkItemStage::ReceiptMatched => "v",
+            WorkItemStage::Accepted => "#",
+        }
+    }
+
+    /// The fixed, verbatim label (spec 2.1 table, column 4) — always printed; a renderer may
+    /// add color as a third channel but never color-only (color is never load-bearing).
+    #[must_use]
+    pub fn label(self) -> &'static str {
+        match self {
+            WorkItemStage::Authorized => "AUTHORIZED",
+            WorkItemStage::PendingExecution => "PENDING EXECUTION",
+            WorkItemStage::AwaitingReceipt => "AWAITING RECEIPT",
+            WorkItemStage::ReceiptMatched => "RECEIPT MATCHED",
+            WorkItemStage::Accepted => "ACCEPTED WORLD STATE",
+        }
+    }
+
+    /// Every closed stage, lifecycle order — the fold order for the roll-up sentence (spec
+    /// 2.4) so a stage with zero items is skippable without hand-sorting.
+    #[must_use]
+    pub fn all() -> [WorkItemStage; 5] {
+        [
+            WorkItemStage::Authorized,
+            WorkItemStage::PendingExecution,
+            WorkItemStage::AwaitingReceipt,
+            WorkItemStage::ReceiptMatched,
+            WorkItemStage::Accepted,
+        ]
+    }
+}
+
+/// The `receipt` field of a [`WorkItem`] — present only once a `WorkerReceiptImported` event
+/// matching this item's `capsule_id` is on tape (`matched` is always `true` when this is
+/// `Some`; there is no modeled "receipt present but unmatched" state).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorkItemReceipt {
+    pub receipt_id: String,
+    pub matched: bool,
+}
+
+/// One row of the PER-ITEM SNAPSHOT CONTRACT — `operator_view_snapshot.v1`'s additive
+/// `work_items` array (design spec §1 atom F3, §2, §6).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorkItem {
+    pub id: String,
+    pub title: String,
+    pub stage: WorkItemStage,
+    pub claimed_complete: bool,
+    pub receipt: Option<WorkItemReceipt>,
+    pub blocked_reason: Option<String>,
+}
+
+/// One raw Micro Tape event, as read by a guarded tape walk (event_type + payload only —
+/// heads/hashes/predicate-product are the reducer's business, not the per-item derivation's).
+/// This is the input [`derive_work_items`] folds over; callers build it from a real tape walk
+/// (never caller-synthesized truth — the walk itself must come from a guarded MicroTape read).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RawTapeEvent {
+    pub event_type: String,
+    pub payload: serde_json::Value,
+}
+
+/// Derive the closed per-item `work_items` view from a raw Micro Tape walk (design spec §1
+/// atom F3; receipt-matching raw material: `tape_has_worker_receipt`,
+/// `turing-daemons/src/lib.rs:1732` — same field semantics reused here, not reinvented).
+///
+/// **Event-type mapping (documented per the task's "no new event types" rule):**
+/// - `authorized`: `WorkerDispatchAuthorized` (AUTHORIZATION class; the registry's real
+///   authorization-head-moving event for a capsule dispatch).
+/// - `pending_execution`: `WorkerRunStarted` (RECEIPT class; the worker's run has begun, no
+///   completion has been claimed yet).
+/// - `awaiting_receipt` / `claimed_complete`: **`WorkerDispatched`** — the registry has no
+///   dedicated "worker claims completion" event. `WorkerDispatched` is a real closed-registry
+///   event (RECEIPT class) that today is only ever used as an off-tape JSON-RPC
+///   `receipt_type` label (`crates/turing-daemons/src/lib.rs:979`), never actually appended
+///   to a tape. It is the closest existing event whose registry class already models "the
+///   worker's own report" as distinct from the verified counterparty import
+///   (`WorkerReceiptImported`), so this atom repurposes it as the tape-visible "claimed
+///   complete, no receipt yet" record (spec §6's "the liar" capsule).
+/// - `receipt_matched`: `WorkerReceiptImported` carrying `capsule_id` + `receipt_id` — the
+///   same fields `tape_has_worker_receipt` matches on.
+/// - `accepted`: `CandidateAccepted` (SOVEREIGN_ACCEPT class) carrying `capsule_id`.
+/// - `title`: an optional `title` field on `WorkCapsuleBuilt`'s payload (falls back to the
+///   bare `capsule_id` — the closed registry payload for `WorkCapsuleBuilt` has no title
+///   field today, so this is additive/optional, never a hard requirement).
+/// - `blocked_reason`: `FailureNode` carrying `capsule_id` and `blocked_reason` (or
+///   `failure_class` as a fallback) on its payload. **Known limitation**: the real
+///   `failure_node_payload.v1` schema (`turing_contracts::failure::FailureNodePayload`) has
+///   no `capsule_id` field, so correlating a production `FailureNode` to one work item needs
+///   that field added to the schema in a future atom; this derivation only picks up a
+///   `FailureNode` when the field happens to be present (as the liar fixture's blocked item
+///   carries it), and is a no-op otherwise (never a guess, never a crash).
+///
+/// An item is only emitted once at least one of the five stage-mapped events above has been
+/// seen for its `capsule_id` — a bare `WorkCapsuleBuilt` proposal with no further progress
+/// never appears (there is no valid closed-enum stage below `authorized`). Items are returned
+/// in first-stage-reached (tape) order.
+#[must_use]
+pub fn derive_work_items(events: &[RawTapeEvent]) -> Vec<WorkItem> {
+    #[derive(Default)]
+    struct Builder {
+        title: Option<String>,
+        stage: Option<WorkItemStage>,
+        claimed_complete: bool,
+        receipt: Option<WorkItemReceipt>,
+        blocked_reason: Option<String>,
+    }
+
+    fn get_or_insert<'a>(
+        builders: &'a mut std::collections::HashMap<String, Builder>,
+        order: &mut Vec<String>,
+        capsule_id: &str,
+    ) -> &'a mut Builder {
+        if !builders.contains_key(capsule_id) {
+            order.push(capsule_id.to_string());
+        }
+        builders.entry(capsule_id.to_string()).or_default()
+    }
+
+    fn upgrade(current: &mut Option<WorkItemStage>, candidate: WorkItemStage) {
+        let should_upgrade = match current {
+            None => true,
+            Some(existing) => candidate > *existing,
+        };
+        if should_upgrade {
+            *current = Some(candidate);
+        }
+    }
+
+    let mut order: Vec<String> = Vec::new();
+    let mut builders: std::collections::HashMap<String, Builder> = std::collections::HashMap::new();
+
+    for event in events {
+        let Some(capsule_id) = event.payload.get("capsule_id").and_then(serde_json::Value::as_str)
+        else {
+            continue;
+        };
+        match event.event_type.as_str() {
+            "WorkCapsuleBuilt" => {
+                let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                if let Some(title) = event.payload.get("title").and_then(serde_json::Value::as_str)
+                {
+                    entry.title = Some(title.to_string());
+                }
+            }
+            "WorkerDispatchAuthorized" => {
+                let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                upgrade(&mut entry.stage, WorkItemStage::Authorized);
+            }
+            "WorkerRunStarted" => {
+                let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                upgrade(&mut entry.stage, WorkItemStage::PendingExecution);
+            }
+            "WorkerDispatched" => {
+                let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                upgrade(&mut entry.stage, WorkItemStage::AwaitingReceipt);
+                entry.claimed_complete = true;
+            }
+            "WorkerReceiptImported" => {
+                if let Some(receipt_id) =
+                    event.payload.get("receipt_id").and_then(serde_json::Value::as_str)
+                {
+                    let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                    upgrade(&mut entry.stage, WorkItemStage::ReceiptMatched);
+                    entry.claimed_complete = true;
+                    entry.receipt = Some(WorkItemReceipt {
+                        receipt_id: receipt_id.to_string(),
+                        matched: true,
+                    });
+                }
+            }
+            "CandidateAccepted" => {
+                let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                upgrade(&mut entry.stage, WorkItemStage::Accepted);
+                entry.claimed_complete = true;
+            }
+            "FailureNode" => {
+                let reason = event
+                    .payload
+                    .get("blocked_reason")
+                    .and_then(serde_json::Value::as_str)
+                    .or_else(|| {
+                        event
+                            .payload
+                            .get("failure_class")
+                            .and_then(serde_json::Value::as_str)
+                    });
+                if let Some(reason) = reason {
+                    let entry = get_or_insert(&mut builders, &mut order, capsule_id);
+                    entry.blocked_reason = Some(reason.to_string());
+                }
+            }
+            _ => {}
+        }
+    }
+
+    order
+        .into_iter()
+        .filter_map(|id| {
+            let builder = builders.remove(&id)?;
+            let stage = builder.stage?;
+            Some(WorkItem {
+                title: builder.title.unwrap_or_else(|| id.clone()),
+                id,
+                stage,
+                claimed_complete: builder.claimed_complete,
+                receipt: builder.receipt,
+                blocked_reason: builder.blocked_reason,
+            })
+        })
+        .collect()
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct OperatorWarning {
     pub code: String,
@@ -202,6 +460,15 @@ pub struct OperatorViewSnapshot {
     pub warnings: Vec<OperatorWarning>,
     pub next_sovereign_action: String,
     pub safe_commands: Vec<CommandSpec>,
+    /// PER-ITEM SNAPSHOT CONTRACT v1 (additive, optional): per-capsule lifecycle state
+    /// derived by [`derive_work_items`] from a raw tape walk. `None` — the field is omitted
+    /// from JSON entirely (`skip_serializing_if`) — means *legacy snapshot*: either the
+    /// source tape carried no derivable per-item events, or the caller didn't attempt
+    /// derivation (e.g. the synthetic qualification demo tape, whose events don't share a
+    /// stable capsule-id across its dispatch/receipt/accept steps). Renderers must fall back
+    /// to today's single-track view whenever this is `None`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub work_items: Option<Vec<WorkItem>>,
     pub snapshot_hash: String,
 }
 
@@ -211,6 +478,7 @@ impl OperatorViewSnapshot {
         micro_repo: impl Into<String>,
         rebuild_command: impl Into<String>,
         heads: OperatorHeads,
+        work_items: Vec<WorkItem>,
     ) -> Result<Self, ProjectionError> {
         Self::from_heads_with_source_kind(
             "guarded_micro_tape_read",
@@ -218,6 +486,7 @@ impl OperatorViewSnapshot {
             micro_repo,
             rebuild_command,
             heads,
+            work_items,
         )
     }
 
@@ -226,6 +495,7 @@ impl OperatorViewSnapshot {
         micro_repo: impl Into<String>,
         rebuild_command: impl Into<String>,
         heads: OperatorHeads,
+        work_items: Vec<WorkItem>,
     ) -> Result<Self, ProjectionError> {
         Self::from_heads_with_source_kind(
             "deterministic_replay",
@@ -233,6 +503,7 @@ impl OperatorViewSnapshot {
             micro_repo,
             rebuild_command,
             heads,
+            work_items,
         )
     }
 
@@ -248,7 +519,13 @@ impl OperatorViewSnapshot {
         micro_repo: impl Into<String>,
         rebuild_command: impl Into<String>,
         heads: OperatorHeads,
+        work_items: Vec<WorkItem>,
     ) -> Result<Self, ProjectionError> {
+        let work_items = if work_items.is_empty() {
+            None
+        } else {
+            Some(work_items)
+        };
         let lanes = vec![
             OperatorLane {
                 name: "append".to_string(),
@@ -298,9 +575,10 @@ impl OperatorViewSnapshot {
             warnings,
             next_sovereign_action: "no human approval pending".to_string(),
             safe_commands: CommandSpec::all(),
+            work_items,
             snapshot_hash: String::new(),
         };
-        let preimage = serde_json::json!({
+        let mut preimage = serde_json::json!({
             "schema_id": snapshot.schema_id,
             "source": snapshot.source,
             "heads": snapshot.heads,
@@ -314,6 +592,17 @@ impl OperatorViewSnapshot {
             "next_sovereign_action": snapshot.next_sovereign_action,
             "safe_commands": snapshot.safe_commands,
         });
+        // Mirror the `skip_serializing_if` on `work_items` exactly: a legacy (`None`)
+        // snapshot must hash byte-identically to before this atom (the preimage above is
+        // untouched), and a populated snapshot's preimage must contain exactly the key the
+        // JSON serialization carries — never a phantom `"work_items": null` the wire format
+        // never emits (that would desync `tools/hci/audit_projection_integrity.py`'s and
+        // `FCE-R2`'s shadow-rebuild self-consistency check, both of which hash "the whole
+        // JSON object minus `snapshot_hash`").
+        if let Some(work_items) = &snapshot.work_items {
+            preimage["work_items"] = serde_json::to_value(work_items)
+                .map_err(|error| ProjectionError::Canonicalization(error.to_string()))?;
+        }
         let bytes = jcs::canonicalize(&preimage)
             .map_err(|error| ProjectionError::Canonicalization(error.to_string()))?;
         snapshot.snapshot_hash = format!("sha256:{}", jcs::sha256_hex(&bytes));
