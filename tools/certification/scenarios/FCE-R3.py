@@ -46,6 +46,35 @@ from typing import Any
 
 REQUEST_SHA256_RE = re.compile(r'"request_sha256"\s*:\s*"([0-9a-fA-F]{16,64})"')
 TAPE_FILENAME_HINTS = ("tape", "bundle")
+EMPTY_FILE_SHA256 = "sha256:" + hashlib.sha256(b"").hexdigest()
+
+# Known byproduct stream-file basenames a specific, recorded top-level
+# command is known (by reading its generating script) to write into its own
+# out-dir subdirectory. This is deliberately a closed, explicit allowlist
+# keyed by the recorded command's own `name` -- NOT "any empty file under a
+# directory named after a recorded command" -- so an unrelated empty file
+# dropped into that same subdirectory (a genuine orphan) still gets flagged
+# as unclassified below.
+KNOWN_SUBCOMMAND_BYPRODUCT_NAMES: dict[str, frozenset[str]] = {
+    # tools/hci/run_hci_gates.sh (out-dir == this "hci_gates" recorded
+    # command's own --out-dir): six `run_logged` sub-steps, two direct
+    # `cargo run ... status` redirects, and the audit_projection_integrity.py
+    # invocation, all writing stdout/stderr byproducts directly into the
+    # out-dir.
+    "hci_gates": frozenset(
+        {
+            "hci_no_write_self_test",
+            "hci_no_write_gate",
+            "projection_clippy",
+            "cli_dynamic_gates",
+            "cli_projection_tests",
+            "python_hci_tests",
+            "operator_snapshot",
+            "operator_status",
+            "hci_projection_integrity",
+        }
+    ),
+}
 
 
 def utc_now() -> str:
@@ -151,6 +180,32 @@ def load_command_results(scenario_root: Path) -> list[dict[str, Any]]:
     return commands if isinstance(commands, list) else []
 
 
+def load_command_results_recursive(scenario_root: Path) -> list[dict[str, Any]]:
+    """Recorded commands gathered from every `command_results.json` under a
+    scenario root (rglob), not just the top-level one. Every scenario script
+    in this suite currently emits a single top-level manifest, so this is
+    presently equivalent to `load_command_results` for the top-level file
+    plus a (currently empty) scan for nested ones -- but a scenario is free
+    to delegate part of its run to a sub-tool that writes its own nested
+    command_results.json, and that sub-tool's recorded, successful commands'
+    empty stdout/stderr must not be falsely flagged as unclassified below
+    just because the lookup only ever checked the scenario root. Used by
+    `zero_byte_scan` only; `harness_logs_retained` intentionally keeps using
+    the flat top-level lookup since it assumes each recorded command's logs
+    sit directly under the scenario root.
+    """
+    commands: list[dict[str, Any]] = []
+    for manifest_path in sorted(scenario_root.rglob("command_results.json")):
+        try:
+            data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        manifest_commands = data.get("commands")
+        if isinstance(manifest_commands, list):
+            commands.extend(manifest_commands)
+    return commands
+
+
 def inventory_verdict(scenario_root: Path) -> dict[str, Any]:
     verdict_path = scenario_root / f"{scenario_root.name}_verdict.json"
     present = verdict_path.is_file()
@@ -245,6 +300,80 @@ def zero_byte_scan(
                     legit = True
                     reason = f"empty_{stream}_from_recorded_command_exit_{command.get('exit_code')}"
                     break
+        if not legit and cmd_name is not None and path.parent != root / scenario_dir:
+            # A stdout/stderr byproduct nested one or more directories below
+            # the scenario root (e.g. FCE-R1/hci_gates/cli_dynamic_gates.stderr.txt,
+            # written by tools/hci/run_hci_gates.sh's internal `run_logged`
+            # sub-steps) can be a legitimate byproduct of a recorded,
+            # top-level command's own run rather than an orphan -- the parent
+            # script's own command_results.json entry is the closest recorded
+            # manifest, and (for the shell scripts in this suite) each
+            # internal step runs under `set -e`, so the outer command's own
+            # recorded exit status already accounts for every sub-step. This
+            # is deliberately narrower than "any empty file under a directory
+            # named after a recorded command": both the directory name AND
+            # the specific byproduct basename must match the closed,
+            # source-derived allowlist above, so an unrelated empty file
+            # dropped into the same subdirectory still lands in unclassified.
+            allowed_names = KNOWN_SUBCOMMAND_BYPRODUCT_NAMES.get(path.parent.name)
+            if allowed_names and cmd_name in allowed_names:
+                for command in command_results_by_scenario.get(scenario_dir, []):
+                    if command.get("name") == path.parent.name:
+                        legit = True
+                        reason = (
+                            f"empty_{stream}_byproduct_of_recorded_subcommand_"
+                            f"{path.parent.name}_exit_{command.get('exit_code')}"
+                        )
+                        break
+        if not legit and path.name == "diff.patch" and path.parent.name == "worker_logs":
+            # FCE-S1 (and its downstream scenarios FCE-S4/S5/W1/W2) already
+            # treat an empty diff.patch as a valid, non-fabricated worker
+            # outcome: the weak DeepSeek worker legitimately produced no
+            # patch for some instances (tools/certification/scenarios/FCE-S1.py
+            # reads `diff_path.read_text() if diff_path.is_file() else ""`).
+            # Rather than pattern-match on path shape alone, verify it against
+            # the worker's own structured completion record: sibling
+            # `done.json` (schema_id deepseek_worker_done.v1) records a
+            # `patch_hash` of the patch it actually wrote. Only classify when
+            # that recorded hash equals the SHA-256 of empty content -- i.e.
+            # the worker itself, not just this scan, attests the patch was
+            # empty. A patch that went missing/corrupted after being recorded
+            # as non-empty will NOT match and stays unclassified.
+            done_path = path.parent / "done.json"
+            if done_path.is_file():
+                try:
+                    done_data = json.loads(done_path.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    done_data = {}
+                if (
+                    done_data.get("schema_id") == "deepseek_worker_done.v1"
+                    and done_data.get("patch_hash") == EMPTY_FILE_SHA256
+                ):
+                    legit = True
+                    reason = "empty_worker_patch_no_diff_hash_verified"
+        if not legit and rel_path == f"{scenario_dir}/scenario_script.stdout.txt":
+            # tools/certification/run_scenarios.py captures the whole scenario
+            # subprocess's stdout (stderr merged in) into this file. Several
+            # scenario scripts (e.g. FCE-R1, FCE-S6) never print anything on
+            # their own -- all real output is their own command_results.json
+            # and *_verdict.json artifacts -- so this file is genuinely always
+            # 0 bytes on a completed run, not evidence of a silently swallowed
+            # failure. Verify that against the scenario's own recorded verdict
+            # (present, schema-valid, and actually PASS/FAIL rather than
+            # NOT_RUN) so a scenario whose script crashed before producing any
+            # output stays unclassified.
+            verdict_path = root / scenario_dir / f"{scenario_dir}_verdict.json"
+            if verdict_path.is_file():
+                try:
+                    verdict_data = json.loads(verdict_path.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    verdict_data = {}
+                if (
+                    verdict_data.get("schema_id") == "turingos.fce_scenario_verdict.v1"
+                    and verdict_data.get("verdict") in {"PASS", "FAIL"}
+                ):
+                    legit = True
+                    reason = "empty_scenario_script_stdout_verdict_completed"
         if legit:
             classified.append({"path": rel_path, "reason": reason})
         else:
@@ -457,7 +586,16 @@ def main() -> int:
     command_results_by_scenario[scenario_id] = [
         {"name": item["name"], "exit_code": item["exit_code"]} for item in commands
     ]
-    zero_byte_report = zero_byte_scan(root, command_results_by_scenario)
+    # zero_byte_scan gets the rglob'd (not just top-level) command lookup so
+    # a nested command_results.json's recorded commands are visible too (see
+    # load_command_results_recursive); harness_logs_retained below keeps the
+    # flat, top-level-only lookup since it assumes each recorded command's
+    # logs sit directly under the scenario root.
+    command_results_by_scenario_recursive: dict[str, list[dict[str, Any]]] = {
+        item.name: load_command_results_recursive(item) for item in sibling_roots
+    }
+    command_results_by_scenario_recursive[scenario_id] = command_results_by_scenario[scenario_id]
+    zero_byte_report = zero_byte_scan(root, command_results_by_scenario_recursive)
 
     # Step 4: harness logs retained per instance (every command that any
     # scenario root under --root, including this one, recorded still has
