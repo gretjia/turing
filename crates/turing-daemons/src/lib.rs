@@ -23,9 +23,9 @@ use turing_contracts::goal::GoalState;
 use turing_contracts::jcs;
 use turing_contracts::registry;
 use turing_economy::{
-    AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay, MarketRouter,
-    MarketRouterMode, MarketSettled, PositionMinted, PriceSignal, RewardDistributed,
-    WalletProjection,
+    AmmPool, AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay,
+    MarketRouter, MarketRouterMode, MarketSettled, PositionMinted, PriceSignal, RewardDistributed,
+    WalletProjection, check_principal_position_cap, check_proposer_conflict, check_self_trade,
 };
 use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
@@ -36,7 +36,10 @@ use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
 use turing_pput::{
     CostAmount, CostEvent, CostUsage, CostWorker, PputProjection, Split, WorkerPromptShield,
 };
-use turing_predicate::{PredicateCheck, PredicateKernel};
+use turing_predicate::{
+    MarketSettlementGateInput, PredicateCheck, PredicateKernel, SettlementReference,
+    candidate_predicate_set_hash, market_event_preserves_truth, market_settlement_gate_g_mkt_06,
+};
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -297,6 +300,15 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         }
         Some("wallet.snapshot.write") if runtime.contract.role == "turing-marketd" => {
             wallet_snapshot_write_response(runtime, request, id)
+        }
+        Some("market.mint") if runtime.contract.role == "turing-marketd" => {
+            market_mint_response(runtime, request, id)
+        }
+        Some("market.swap") if runtime.contract.role == "turing-marketd" => {
+            market_swap_response(runtime, request, id)
+        }
+        Some("market.settle") if runtime.contract.role == "turing-marketd" => {
+            market_settle_response(runtime, request, id)
         }
         Some("pput.prompt.validate") if runtime.contract.role == "turing-pputd" => {
             pput_prompt_validate_response(request, id)
@@ -1305,6 +1317,453 @@ fn wallet_snapshot_write_response(runtime: &DaemonRuntime, _request: &Value, id:
             "head_effect": snapshot["head_effect"],
             "wallet_projection_hash": wallet_projection_hash,
             "snapshot_path": snapshot_path.to_string_lossy(),
+        }
+    })
+}
+
+/// Maps a D5/G-MKT-06 check's `Result` onto a [`PredicateCheck`], carrying the error's
+/// `Display` text as the reject_class so a refusal is self-explanatory in the RPC response.
+fn predicate_check_from_result<E: std::fmt::Display>(
+    check_id: &str,
+    result: Result<(), E>,
+) -> PredicateCheck {
+    match result {
+        Ok(()) => PredicateCheck::pass(check_id),
+        Err(error) => PredicateCheck::fail(check_id, error.to_string()),
+    }
+}
+
+fn predicate_refused(id: Value, report: &turing_predicate::PredicateReport) -> Value {
+    jsonrpc_error(
+        id,
+        -32000,
+        format!(
+            "refused: failed_predicates={:?} reject_class={:?}",
+            report.failed_predicates, report.reject_class
+        ),
+    )
+}
+
+fn find_market_created_by_id(events: &[EconomyEvent], market_id: &str) -> Option<MarketCreated> {
+    events.iter().find_map(|event| match event {
+        EconomyEvent::MarketCreated(created) if created.market_id == market_id => {
+            Some(created.clone())
+        }
+        _ => None,
+    })
+}
+
+/// `market.mint` (E1.rpc / D7): a PRESERVE-class `PositionMinted` append routed through the
+/// existing turingd append path. `marketd` stays `can_move_accepted_head=false` -- this can
+/// never move a sovereign head, only append tape-tip history. Gated by the D5 principal
+/// position cap (proposer-conflict is a mathematical no-op for mint, since a CTF mint always
+/// yields `yes_out == no_out`; see `check_proposer_conflict`'s doc comment).
+fn market_mint_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "market.mint requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let market_id = match required_str(params, "market_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let agent_id = match required_str(params, "agent_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let coin_in = match required_str(params, "coin_in") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let principal_position_cap = match required_str(params, "principal_position_cap") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    let events = match load_economy_events_from_tape(repo) {
+        Ok(events) => events,
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
+    };
+    if find_market_created_by_id(&events, &market_id).is_none() {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    }
+
+    let mint = match EconomyEvent::position_minted(&market_id, &agent_id, &coin_in) {
+        Ok(EconomyEvent::PositionMinted(mint)) => mint,
+        Ok(_) => unreachable!("position_minted always returns EconomyEvent::PositionMinted"),
+        Err(error) => return jsonrpc_error(id, -32000, format!("position_minted failed: {error}")),
+    };
+
+    let checks = vec![predicate_check_from_result(
+        "principal_position_cap",
+        check_principal_position_cap(
+            &events,
+            &market_id,
+            &agent_id,
+            &mint.yes_out,
+            &mint.no_out,
+            &principal_position_cap,
+        ),
+    )];
+    let report = match PredicateKernel.run("PositionMinted", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    if report.product != PredicateProduct::Pass {
+        return predicate_refused(id, &report);
+    }
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}")),
+    };
+    let payload = serde_json::to_value(&mint).expect("PositionMinted serializes");
+    let receipt = match tape
+        .append(AppendRequest::new("PositionMinted", writer_id, payload).predicate_pass())
+    {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "PositionMinted",
+            "event_id": receipt.event_id,
+            "market_id": market_id,
+            "agent_id": agent_id,
+            "yes_out": mint.yes_out,
+            "no_out": mint.no_out,
+            "predicate_report_hash": report.report_hash,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+/// `market.swap` (E1.rpc / D5 / D6): reuses `AmmPool::buy_yes`/`buy_no` (the missing
+/// production call site for the built CPMM) rebuilt from the real tape's current pool state,
+/// then gates the resulting `AmmSwapExecuted` on the D5 defenses (self-trade, principal
+/// position cap, proposer-conflict) before appending. D6 (`pool_y' * pool_n' >= k`) is
+/// already a hard assertion inside `buy_yes`/`buy_no` itself (E1.wallet/E1a); a swap that
+/// would violate it never reaches this function's checks at all.
+fn market_swap_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "market.swap requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let market_id = match required_str(params, "market_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let trader_id = match required_str(params, "trader_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let side = match required_str(params, "side") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let pay_coin = match required_str(params, "pay_coin") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let principal_position_cap = match required_str(params, "principal_position_cap") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let proposer_no_deminimis_cap = match required_str(params, "proposer_no_deminimis_cap") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    if side != "BUY_YES" && side != "BUY_NO" {
+        return invalid_params(id, format!("side must be BUY_YES or BUY_NO, got {side:?}"));
+    }
+
+    let events = match load_economy_events_from_tape(repo) {
+        Ok(events) => events,
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
+    };
+    let Some(market_created) = find_market_created_by_id(&events, &market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    let replay = match MarketReplay::from_tape_events(&events) {
+        Ok(replay) => replay,
+        Err(error) => return jsonrpc_error(id, -32000, format!("market replay failed: {error}")),
+    };
+    let Some(projection) = replay.markets.get(&market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    if projection.status != "open" {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!(
+                "market {market_id:?} is not open (status={:?})",
+                projection.status
+            ),
+        );
+    }
+
+    let pool = match AmmPool::new(&market_id, &projection.pool_y, &projection.pool_n) {
+        Ok(pool) => pool,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot rebuild pool: {error}")),
+    };
+    let swap = match side.as_str() {
+        "BUY_YES" => pool.buy_yes(&trader_id, &pay_coin),
+        "BUY_NO" => pool.buy_no(&trader_id, &pay_coin),
+        _ => unreachable!("side already validated above"),
+    };
+    let swap = match swap {
+        Ok(swap) => swap,
+        Err(error) => return jsonrpc_error(id, -32000, format!("swap failed: {error}")),
+    };
+
+    let checks = vec![
+        predicate_check_from_result(
+            "self_trade",
+            check_self_trade(&events, &market_id, &trader_id, &side),
+        ),
+        predicate_check_from_result(
+            "principal_position_cap",
+            check_principal_position_cap(
+                &events,
+                &market_id,
+                &trader_id,
+                &swap.get_y,
+                &swap.get_n,
+                &principal_position_cap,
+            ),
+        ),
+        predicate_check_from_result(
+            "proposer_conflict",
+            check_proposer_conflict(
+                &events,
+                &market_id,
+                &market_created.proposer_id,
+                &trader_id,
+                &swap.get_y,
+                &swap.get_n,
+                &proposer_no_deminimis_cap,
+            ),
+        ),
+    ];
+    let report = match PredicateKernel.run("AMMSwapExecuted", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    if report.product != PredicateProduct::Pass {
+        return predicate_refused(id, &report);
+    }
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}")),
+    };
+    let payload = serde_json::to_value(&swap).expect("AmmSwapExecuted serializes");
+    let receipt = match tape
+        .append(AppendRequest::new("AMMSwapExecuted", writer_id, payload).predicate_pass())
+    {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "AMMSwapExecuted",
+            "event_id": receipt.event_id,
+            "market_id": market_id,
+            "trader_id": trader_id,
+            "side": swap.side,
+            "get_y": swap.get_y,
+            "get_n": swap.get_n,
+            "invariant_k_before": swap.invariant_k_before,
+            "invariant_k_after": swap.invariant_k_after,
+            "predicate_report_hash": report.report_hash,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+/// `market.settle` (E1.rpc / D4 / G-MKT-06): the kernel-as-oracle wiring. Gathers the tape
+/// facts G-MKT-06 needs (the market's frozen `capsule_id`/`predicate_set_hash`, what
+/// `settlement_event_id` resolves to, and tape-order positions for both) and refuses the
+/// append if the gate fails -- no `MarketSettled` (and no alternate event) is ever written
+/// for an invalid settlement.
+fn market_settle_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "market.settle requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let market_id = match required_str(params, "market_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let result = match required_str(params, "result") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let settlement_event_id = match required_str(params, "settlement_event_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    let envelopes = match load_tape_envelopes(repo) {
+        Ok(envelopes) => envelopes,
+        Err(message) => return jsonrpc_error(id, -32000, format!("tape read failed: {message}")),
+    };
+    let events = match load_economy_events_from_tape(repo) {
+        Ok(events) => events,
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
+    };
+    let Some(market_created) = find_market_created_by_id(&events, &market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    let replay = match MarketReplay::from_tape_events(&events) {
+        Ok(replay) => replay,
+        Err(error) => return jsonrpc_error(id, -32000, format!("market replay failed: {error}")),
+    };
+    let Some(projection) = replay.markets.get(&market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    if projection.status != "open" {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!(
+                "market {market_id:?} is already settled or not open (status={:?})",
+                projection.status
+            ),
+        );
+    }
+
+    let market_created_tape_index = envelopes.iter().position(|(_, envelope)| {
+        envelope.event_type == "MarketCreated"
+            && envelope.payload.get("market_id").and_then(Value::as_str) == Some(market_id.as_str())
+    });
+    let normalized_settlement_id = normalize_mu(&settlement_event_id);
+    let settlement_index = envelopes
+        .iter()
+        .position(|(event_id, _)| event_id == &normalized_settlement_id);
+    let reference = match settlement_index {
+        Some(index) => match envelopes[index].1.event_type.as_str() {
+            "CandidateAccepted" => SettlementReference::CandidateAccepted {
+                capsule_id: envelopes[index]
+                    .1
+                    .payload
+                    .get("capsule_id")
+                    .and_then(Value::as_str),
+            },
+            "FailureNode" => SettlementReference::FailureNode,
+            other => SettlementReference::OtherType(other),
+        },
+        None => SettlementReference::Missing,
+    };
+
+    let current_predicate_set_hash = candidate_predicate_set_hash();
+    let gate_input = MarketSettlementGateInput {
+        result: &result,
+        settlement_event_id: &settlement_event_id,
+        market_capsule_id: &market_created.capsule_id,
+        market_predicate_set_hash: &market_created.predicate_set_hash,
+        current_predicate_set_hash: &current_predicate_set_hash,
+        reference,
+        market_created_tape_index,
+        settlement_tape_index: settlement_index,
+    };
+    let checks = vec![
+        predicate_check_from_result("g_mkt_06", market_settlement_gate_g_mkt_06(&gate_input)),
+        predicate_check_from_result(
+            "event_class.preserve",
+            market_event_preserves_truth("MarketSettled"),
+        ),
+    ];
+    let report = match PredicateKernel.run("MarketSettled", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    if report.product != PredicateProduct::Pass {
+        return predicate_refused(id, &report);
+    }
+
+    let settled = match EconomyEvent::market_settled(&market_id, &result, &settlement_event_id) {
+        Ok(EconomyEvent::MarketSettled(settled)) => settled,
+        Ok(_) => unreachable!("market_settled always returns EconomyEvent::MarketSettled"),
+        Err(error) => return jsonrpc_error(id, -32000, format!("market_settled failed: {error}")),
+    };
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}")),
+    };
+    let payload = serde_json::to_value(&settled).expect("MarketSettled serializes");
+    let receipt = match tape
+        .append(AppendRequest::new("MarketSettled", writer_id, payload).predicate_pass())
+    {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "MarketSettled",
+            "event_id": receipt.event_id,
+            "market_id": market_id,
+            "result": settled.result,
+            "settlement_event_id": settled.settlement_event_id,
+            "predicate_report_hash": report.report_hash,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
         }
     })
 }

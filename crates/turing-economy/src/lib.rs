@@ -36,7 +36,33 @@ impl EconomyEvent {
             initial_pool_n: pool.pool_n.to_decimal_string(),
             k,
             truth_status: "statistical_signal_only".to_string(),
+            capsule_id: String::new(),
+            proposer_id: String::new(),
+            predicate_set_hash: String::new(),
         }))
+    }
+
+    /// D4/G-MKT-06 constructor: `MarketCreated` with the capsule binding and frozen
+    /// predicate-set hash pinned at creation, so a proposer cannot weaken predicates after
+    /// betting YES. Additive over [`Self::market_created`] (which leaves these three fields
+    /// at their `#[serde(default)]` empty-string value for backward compatibility with every
+    /// existing `MarketCreated` fixture that predates this design).
+    pub fn market_created_for_capsule(
+        market_id: impl Into<String>,
+        pool_y: &str,
+        pool_n: &str,
+        capsule_id: impl Into<String>,
+        proposer_id: impl Into<String>,
+        predicate_set_hash: impl Into<String>,
+    ) -> Result<Self, EconomyError> {
+        let event = Self::market_created(market_id, pool_y, pool_n)?;
+        let EconomyEvent::MarketCreated(mut created) = event else {
+            unreachable!("market_created always returns EconomyEvent::MarketCreated")
+        };
+        created.capsule_id = capsule_id.into();
+        created.proposer_id = proposer_id.into();
+        created.predicate_set_hash = predicate_set_hash.into();
+        Ok(EconomyEvent::MarketCreated(created))
     }
 
     pub fn position_minted(
@@ -98,6 +124,23 @@ pub struct MarketCreated {
     pub initial_pool_n: String,
     pub k: String,
     pub truth_status: String,
+    /// D4/G-MKT-06: the capsule this market resolves ("will capsule X land
+    /// `CandidateAccepted` by tick T?"). Empty string on markets predating this field
+    /// (`#[serde(default)]`) -- those markets are simply not G-MKT-06-gate-eligible.
+    #[serde(default)]
+    pub capsule_id: String,
+    /// D5 proposer-conflict rule: the capsule's proposer, frozen at market creation so
+    /// `market.swap`/`market.mint` can enforce the "no self-shorting your own capsule"
+    /// defense without an external principal registry. Empty string means "no proposer
+    /// bound" (proposer-conflict check is a no-op for such markets).
+    #[serde(default)]
+    pub proposer_id: String,
+    /// D4/G-MKT-06: `sha256:` + hex over the capsule's predicate-check-id set as of market
+    /// creation (see `turing_predicate::candidate_predicate_set_hash`). Frozen here so
+    /// `MarketSettled` can be refused if the predicate set was weakened between market
+    /// creation and settlement. Empty string means "not frozen" (pre-dates this field).
+    #[serde(default)]
+    pub predicate_set_hash: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -570,6 +613,142 @@ pub fn check_conservation(
         .collect())
 }
 
+// --- D5 defenses (agent-market, built day one, all checkable pre-append) -------------------
+
+/// D5 self-trade prevention. A CPMM has no literal order-book counterparty (every trade is
+/// against the pool, not another named principal), so the design's "existing opposite-side
+/// principal in the same batch" rule is realized here as: a trader may not take the opposite
+/// side of the SAME market immediately after their own most recent swap on it, with no other
+/// principal's swap interposed (that interposition is what defines a fresh "clearing round").
+/// This is exactly the wash-trade pattern D5 targets: paying the pool's slippage to yourself
+/// on both sides extracts subsidized k-growth with zero genuine directional signal. Trading
+/// the SAME side again, or trading opposite AFTER another principal has traded, is allowed.
+pub fn check_self_trade(
+    events: &[EconomyEvent],
+    market_id: &str,
+    trader_id: &str,
+    side: &str,
+) -> Result<(), EconomyError> {
+    let mut last: Option<(String, String)> = None;
+    for event in events {
+        if let EconomyEvent::AmmSwapExecuted(swap) = event
+            && swap.market_id == market_id
+        {
+            last = Some((swap.trader_id.clone(), swap.side.clone()));
+        }
+    }
+    if let Some((last_trader, last_side)) = last
+        && last_trader == trader_id
+        && last_side != side
+    {
+        return Err(EconomyError::SelfTradeRejected(format!(
+            "{trader_id} already holds {last_side} in the open clearing round for {market_id}; cannot also take {side} against the same pool with no other principal trading in between"
+        )));
+    }
+    Ok(())
+}
+
+/// D5 principal-level position cap: aggregates a principal's total minted + swapped exposure
+/// on `market_id` (existing on-tape positions plus the pending `pending_yes`/`pending_no` a
+/// caller is about to add) and rejects if either side would exceed `cap`.
+///
+/// **Sybil-splitting limitation (recorded, not solved):** this codebase has no
+/// principal/account-grouping concept distinct from `agent_id` (confirmed: no `principal`
+/// identifier exists anywhere else in the workspace), so `principal_id` here is `agent_id`.
+/// A Sybil that spreads the same economic actor across multiple `agent_id`s formally defeats
+/// this cap, exactly as D5 warns ("Sybil-splitting formally defeats per-account caps") -- a
+/// real principal registry is a prerequisite for closing this gap, not something this
+/// function can paper over.
+pub fn check_principal_position_cap(
+    events: &[EconomyEvent],
+    market_id: &str,
+    principal_id: &str,
+    pending_yes: &str,
+    pending_no: &str,
+    cap: &str,
+) -> Result<(), EconomyError> {
+    let cap = DecimalAmount::parse_non_negative(cap)?;
+    let (mut yes, mut no) = principal_position(events, market_id, principal_id)?;
+    yes += DecimalAmount::parse_non_negative(pending_yes)?;
+    no += DecimalAmount::parse_non_negative(pending_no)?;
+    if yes > cap || no > cap {
+        return Err(EconomyError::PrincipalPositionCapExceeded(format!(
+            "{principal_id} would hold yes={} no={} on {market_id}, exceeding principal cap {}",
+            yes.to_decimal_string(),
+            no.to_decimal_string(),
+            cap.to_decimal_string()
+        )));
+    }
+    Ok(())
+}
+
+/// D5 proposer-conflict rule: a capsule's proposer may not hold NO on its own market above a
+/// de-minimis cap ("betting against your own claimed work is the honest-signal direction;
+/// betting YES on it is fine and is the point"). Measured as NET NO exposure (`no - yes`,
+/// floored at zero) rather than raw `no_position`, so the proposer's own CTF mint -- which by
+/// construction always yields `yes_out == no_out` (see [`EconomyEvent::position_minted`]) --
+/// never trips this on its own; only a directional swap into NO creates net NO exposure. A
+/// no-op (`Ok`) when `trader_id != proposer_id` or `proposer_id` is empty (market not bound
+/// to a proposer, e.g. a pre-D4 fixture).
+pub fn check_proposer_conflict(
+    events: &[EconomyEvent],
+    market_id: &str,
+    proposer_id: &str,
+    trader_id: &str,
+    pending_yes: &str,
+    pending_no: &str,
+    de_minimis_cap: &str,
+) -> Result<(), EconomyError> {
+    if proposer_id.is_empty() || trader_id != proposer_id {
+        return Ok(());
+    }
+    let cap = DecimalAmount::parse_non_negative(de_minimis_cap)?;
+    let (mut yes, mut no) = principal_position(events, market_id, proposer_id)?;
+    yes += DecimalAmount::parse_non_negative(pending_yes)?;
+    no += DecimalAmount::parse_non_negative(pending_no)?;
+    let net_no = if no > yes {
+        no - yes
+    } else {
+        DecimalAmount::default()
+    };
+    if net_no > cap {
+        return Err(EconomyError::ProposerConflictRejected(format!(
+            "proposer {proposer_id} would hold net NO {} on its own market {market_id}, exceeding de-minimis {}",
+            net_no.to_decimal_string(),
+            cap.to_decimal_string()
+        )));
+    }
+    Ok(())
+}
+
+/// Shared aggregation for the two principal-scoped D5 checks above: existing minted +
+/// swapped (yes, no) exposure for `principal_id` on `market_id`, from the tape alone.
+fn principal_position(
+    events: &[EconomyEvent],
+    market_id: &str,
+    principal_id: &str,
+) -> Result<(DecimalAmount, DecimalAmount), EconomyError> {
+    let (mut yes, mut no) = (DecimalAmount::default(), DecimalAmount::default());
+    for event in events {
+        match event {
+            EconomyEvent::PositionMinted(mint)
+                if mint.market_id == market_id && mint.agent_id == principal_id =>
+            {
+                yes += DecimalAmount::parse_non_negative(&mint.yes_out)?;
+                no += DecimalAmount::parse_non_negative(&mint.no_out)?;
+            }
+            EconomyEvent::AmmSwapExecuted(swap)
+                if swap.market_id == market_id && swap.trader_id == principal_id =>
+            {
+                yes += DecimalAmount::parse_non_negative(&swap.get_y)?;
+                no += DecimalAmount::parse_non_negative(&swap.get_n)?;
+            }
+            _ => {}
+        }
+    }
+    Ok((yes, no))
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MarketRouterMode {
     Shadow,
@@ -884,6 +1063,9 @@ pub enum EconomyError {
     InvalidSettlementResult(String),
     PostTradeInvariantViolated { k_before: String, k_after: String },
     MintInvariantViolated(String),
+    SelfTradeRejected(String),
+    PrincipalPositionCapExceeded(String),
+    ProposerConflictRejected(String),
 }
 
 impl std::fmt::Display for EconomyError {
@@ -913,6 +1095,15 @@ impl std::fmt::Display for EconomyError {
                     f,
                     "mint invariant violated for market {market_id:?}: coin_in != yes_out or yes_out != no_out"
                 )
+            }
+            EconomyError::SelfTradeRejected(detail) => {
+                write!(f, "D5 self-trade prevention: {detail}")
+            }
+            EconomyError::PrincipalPositionCapExceeded(detail) => {
+                write!(f, "D5 principal position cap: {detail}")
+            }
+            EconomyError::ProposerConflictRejected(detail) => {
+                write!(f, "D5 proposer-conflict rule: {detail}")
             }
         }
     }
