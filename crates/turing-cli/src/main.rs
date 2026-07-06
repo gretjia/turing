@@ -10,7 +10,10 @@ use turing_approval::{
 };
 use turing_contracts::envelope::{HeadSet, MicroEventEnvelope};
 use turing_contracts::jcs;
-use turing_economy::{EconomyEvent, MarketReplay};
+use turing_economy::{
+    EconomyEvent, MarketConservationReport, MarketReplay, check_conservation,
+    verify_swap_post_trade_invariant,
+};
 use turing_git_tape::append::Append;
 use turing_projection::{
     CommandSpec, OperatorHeads, OperatorToolManifest, OperatorTurnTrace, OperatorViewSnapshot,
@@ -964,44 +967,81 @@ fn audit_invariants_real(path: &str) -> Result<String, String> {
 /// (E0.3 — before this, `turing market replay --verify` always ran the private demo and printed
 /// its literal `market_settled_count`, never the operator's tape). `market_settled_count` here
 /// is COMPUTED by replaying the real tape's `MarketCreated`/`MarketSettled` events, mirroring the
-/// F4 `--micro-git` pattern already used by `replay --verify` / `audit invariants`.
+/// F4 `--micro-git` pattern already used by `replay --verify` / `audit invariants`. E1.conservation
+/// additionally hard-fails on any D6 post-trade-invariant or D7 conservation violation found on
+/// the real tape (see [`verify_real_market_economy`]) rather than only reporting counts.
 fn market_replay_verify_real(path: &str) -> Result<String, String> {
     let repo = canonicalize_micro_git(path)?;
     let _reconstruction = replay_guarded(&repo)?;
-    let market_replay = real_market_replay(&repo)?;
+    let (market_replay, _conservation) = verify_real_market_economy(&repo)?;
     let settled_count = market_replay
         .markets
         .values()
         .filter(|market| market.status == "settled")
         .count();
     Ok(format!(
-        "market replay: verified market_count={} market_settled_count={} price_not_truth=true source=guarded_micro_tape_read",
+        "market replay: verified market_count={} market_settled_count={} price_not_truth=true source=guarded_micro_tape_read conservation=pass",
         market_replay.markets.len(),
         settled_count
     ))
 }
 
 /// `turing audit market --micro-git <path>`: the same real-tape fix as
-/// [`market_replay_verify_real`] for the `audit market` verb (E0.3).
+/// [`market_replay_verify_real`] for the `audit market` verb (E0.3), plus the E1.conservation D6/D7
+/// predicates (post-trade invariant per swap, conservation per market) via
+/// [`verify_real_market_economy`].
 fn audit_market_real(path: &str) -> Result<String, String> {
     let repo = canonicalize_micro_git(path)?;
     let _reconstruction = replay_guarded(&repo)?;
-    let market_replay = real_market_replay(&repo)?;
+    let (market_replay, _conservation) = verify_real_market_economy(&repo)?;
     let settled_count = market_replay
         .markets
         .values()
         .filter(|market| market.status == "settled")
         .count();
     Ok(format!(
-        "audit market: pass settled={settled_count} accepted_head_not_market_settlement=true source=guarded_micro_tape_read"
+        "audit market: pass settled={settled_count} accepted_head_not_market_settlement=true source=guarded_micro_tape_read conservation=pass"
     ))
 }
 
-/// Replay a real tape's ECONOMY-class events into a [`MarketReplay`] projection.
-fn real_market_replay(repo: &Path) -> Result<MarketReplay, String> {
+/// E1.conservation: replay a real tape's economy events and enforce the D6/D7 predicates before
+/// handing back the [`MarketReplay`] projection, so `market replay --verify` and `audit market`
+/// can never report `pass`/`verified` over a tape that violates them.
+///
+/// - **D6 post-trade invariant**: every recorded `AmmSwapExecuted` must satisfy
+///   `pool_y' * pool_n' >= k` (checked via [`verify_swap_post_trade_invariant`], the same
+///   assertion `AmmPool::buy_yes`/`buy_no` already enforce at emission time — this re-checks a
+///   tape's committed record, catching a forged or corrupted event).
+/// - **D7 conservation**: for every market, redeemed Coin at settlement must not exceed minted
+///   Coin plus the declared governance subsidy (checked via [`check_conservation`]).
+fn verify_real_market_economy(
+    repo: &Path,
+) -> Result<(MarketReplay, Vec<MarketConservationReport>), String> {
     let events = load_economy_events_from_tape(repo)?;
-    MarketReplay::from_tape_events(&events)
-        .map_err(|error| format!("market replay failed: {error}"))
+    for event in &events {
+        if let EconomyEvent::AmmSwapExecuted(swap) = event {
+            verify_swap_post_trade_invariant(swap).map_err(|error| {
+                format!(
+                    "market {} swap by {} violates the D6 post-trade invariant: {error}",
+                    swap.market_id, swap.trader_id
+                )
+            })?;
+        }
+    }
+    let market_replay = MarketReplay::from_tape_events(&events)
+        .map_err(|error| format!("market replay failed: {error}"))?;
+    let conservation = check_conservation(&events)
+        .map_err(|error| format!("conservation check failed: {error}"))?;
+    if let Some(violation) = conservation.iter().find(|report| !report.holds) {
+        return Err(format!(
+            "market {} violates the D7 conservation predicate: redeemed_coin={} > minted_coin={} + declared_subsidy={}",
+            violation.market_id,
+            violation.redeemed_coin,
+            violation.minted_coin,
+            violation.declared_subsidy
+        ));
+    }
+    Ok((market_replay, conservation))
 }
 
 /// Walk a real MicroTape genesis→tip and parse every ECONOMY-class committed body into an

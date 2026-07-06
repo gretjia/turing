@@ -187,6 +187,7 @@ impl AmmPool {
         let d_y_abs = pay.mul_div(self.pool_y, pay + self.pool_n)?;
         let pool_y_after = self.pool_y - d_y_abs;
         let pool_n_after = self.pool_n + pay;
+        assert_k_non_decreasing(self.pool_y, self.pool_n, pool_y_after, pool_n_after)?;
         let get_y = pay + d_y_abs;
         Ok(AmmSwapExecuted {
             schema_id: "amm_swap_executed.v1".to_string(),
@@ -220,6 +221,7 @@ impl AmmPool {
         let d_n_abs = pay.mul_div(self.pool_n, pay + self.pool_y)?;
         let pool_y_after = self.pool_y + pay;
         let pool_n_after = self.pool_n - d_n_abs;
+        assert_k_non_decreasing(self.pool_y, self.pool_n, pool_y_after, pool_n_after)?;
         let get_n = pay + d_n_abs;
         Ok(AmmSwapExecuted {
             schema_id: "amm_swap_executed.v1".to_string(),
@@ -244,6 +246,43 @@ impl AmmPool {
     fn k_string(&self) -> String {
         DecimalAmount::mul(self.pool_y, self.pool_n).to_decimal_string()
     }
+}
+
+/// D6 post-trade predicate: `pool_y' * pool_n' >= k` (equality up to pool-favoring dust).
+/// Rounding in `mul_div` truncates toward zero, and every operand here is non-negative
+/// (`DecimalAmount::parse_non_negative` rejects negatives at every call site), so truncation is
+/// always a floor: the trader never receives more than the exact rational output, and the
+/// invariant can only grow (or hold exactly), never shrink. This function re-derives `k` from the
+/// before/after pool states and hard-fails a swap that would violate that direction — the
+/// in-process assertion call site for the money-pump defense.
+fn assert_k_non_decreasing(
+    pool_y_before: DecimalAmount,
+    pool_n_before: DecimalAmount,
+    pool_y_after: DecimalAmount,
+    pool_n_after: DecimalAmount,
+) -> Result<(), EconomyError> {
+    let k_before = DecimalAmount::mul(pool_y_before, pool_n_before);
+    let k_after = DecimalAmount::mul(pool_y_after, pool_n_after);
+    if k_after < k_before {
+        return Err(EconomyError::PostTradeInvariantViolated {
+            k_before: k_before.to_decimal_string(),
+            k_after: k_after.to_decimal_string(),
+        });
+    }
+    Ok(())
+}
+
+/// Checkable audit-path form of [`assert_k_non_decreasing`]: re-verifies the D6 post-trade
+/// predicate against an already-recorded [`AmmSwapExecuted`] event (e.g. one read back off a
+/// tape), so `turing audit market` can catch a forged or corrupted swap event whose recorded
+/// `pool_*_after` fields would have violated pool-favoring rounding, even though the in-process
+/// assertion in `buy_yes`/`buy_no` already prevents this crate from ever emitting one.
+pub fn verify_swap_post_trade_invariant(swap: &AmmSwapExecuted) -> Result<(), EconomyError> {
+    let pool_y_before = DecimalAmount::parse_non_negative(&swap.pool_y_before)?;
+    let pool_n_before = DecimalAmount::parse_non_negative(&swap.pool_n_before)?;
+    let pool_y_after = DecimalAmount::parse_non_negative(&swap.pool_y_after)?;
+    let pool_n_after = DecimalAmount::parse_non_negative(&swap.pool_n_after)?;
+    assert_k_non_decreasing(pool_y_before, pool_n_before, pool_y_after, pool_n_after)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -334,12 +373,53 @@ impl WalletProjection {
                         DecimalAmount::parse_non_negative(&mint.no_out)?,
                     );
                 }
+                EconomyEvent::AmmSwapExecuted(swap) => {
+                    // D7: a swap debits the trader's Coin (the pay side) and credits whichever
+                    // outcome side they bought (the get side). `get_y`/`get_n` already carry the
+                    // full amount the trader ends up holding for this trade (pay-side tokens
+                    // implicitly minted then swapped into the pool never land in the trader's own
+                    // position — see AmmPool::buy_yes/buy_no), so no separate pay-side token debit
+                    // is needed beyond the Coin debit.
+                    let wallet = balances.entry(swap.trader_id.clone()).or_default();
+                    wallet.coin -= DecimalAmount::parse_non_negative(&swap.pay_coin)?;
+                    wallet.add_yes(
+                        &swap.market_id,
+                        DecimalAmount::parse_non_negative(&swap.get_y)?,
+                    );
+                    wallet.add_no(
+                        &swap.market_id,
+                        DecimalAmount::parse_non_negative(&swap.get_n)?,
+                    );
+                }
+                EconomyEvent::MarketSettled(settled) => {
+                    // D7: winning outcome tokens redeem 1:1 to Coin; losing tokens go to 0. An
+                    // "INVALID" result has no winning side (per the constructor's validated
+                    // result set: YES | NO | INVALID) — conservatively, no side is redeemed rather
+                    // than inventing an unspecified refund mechanism; this can only ever
+                    // under-redeem relative to minted Coin, never over-redeem, so it cannot
+                    // violate the conservation predicate below.
+                    for wallet in balances.values_mut() {
+                        let yes_amount = wallet
+                            .yes_positions
+                            .remove(&settled.market_id)
+                            .unwrap_or_default();
+                        let no_amount = wallet
+                            .no_positions
+                            .remove(&settled.market_id)
+                            .unwrap_or_default();
+                        match settled.result.as_str() {
+                            "YES" => wallet.coin += yes_amount,
+                            "NO" => wallet.coin += no_amount,
+                            _ => {}
+                        }
+                    }
+                }
                 EconomyEvent::RewardDistributed(reward) => {
                     let wallet = balances.entry(reward.agent_id.clone()).or_default();
                     wallet.coin += DecimalAmount::parse_non_negative(&reward.reward_coin)?;
                     wallet.coin -= DecimalAmount::parse_non_negative(&reward.slash_coin)?;
                 }
-                _ => {}
+                EconomyEvent::MarketCreated(_) => {}
             }
         }
 
@@ -360,6 +440,134 @@ impl WalletProjection {
             wallets,
         })
     }
+}
+
+/// D7 conservation report for a single market: `minted_coin` is the sum of every
+/// `PositionMinted.coin_in` on that market (the trader-backed Coin actually locked into CTF
+/// mints); `declared_subsidy` is the governance liquidity seeded at `MarketCreated`
+/// (`initial_pool_y + initial_pool_n` — D2's "subsidy is the verification-attention budget", not
+/// agent capital); `redeemed_coin` is the total Coin actually paid out across all wallets at the
+/// market's `MarketSettled` event (winning-side positions only, per D7). `holds` is
+/// `redeemed_coin <= minted_coin + declared_subsidy`; markets never settled have no redemption
+/// yet, so they trivially hold.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MarketConservationReport {
+    pub market_id: String,
+    pub minted_coin: String,
+    pub declared_subsidy: String,
+    pub redeemed_coin: String,
+    pub holds: bool,
+}
+
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+struct MarketConservationInternal {
+    minted_coin: DecimalAmount,
+    minted_yes: DecimalAmount,
+    minted_no: DecimalAmount,
+    declared_subsidy: DecimalAmount,
+    redeemed_coin: DecimalAmount,
+}
+
+/// The D7 conservation predicate, checkable over a raw event slice (real tape or fixture) so
+/// `turing audit market` (E0.3) can call it directly instead of re-implementing the bookkeeping.
+///
+/// Two things are verified:
+/// 1. **Mint invariant, aggregated** (defense in depth — `EconomyEvent::position_minted`
+///    already enforces `coin_in == yes_out == no_out` per event at construction time, but a tape
+///    is untrusted input, so this re-derives and checks the aggregate per market too, hard-failing
+///    on `MintInvariantViolated` if a forged/corrupted event slipped the per-event check).
+/// 2. **Settlement conservation**: for every `MarketSettled` event, the Coin redeemed to winning
+///    positions so far must not exceed `minted_coin + declared_subsidy` for that market. This is
+///    reported per market (`holds: bool`) rather than hard-erroring, so a caller can report every
+///    market's status rather than stopping at the first failure.
+pub fn check_conservation(
+    events: &[EconomyEvent],
+) -> Result<Vec<MarketConservationReport>, EconomyError> {
+    let mut markets: BTreeMap<String, MarketConservationInternal> = BTreeMap::new();
+    let mut yes_positions: BTreeMap<(String, String), DecimalAmount> = BTreeMap::new();
+    let mut no_positions: BTreeMap<(String, String), DecimalAmount> = BTreeMap::new();
+    let mut order: Vec<String> = Vec::new();
+
+    for event in events {
+        match event {
+            EconomyEvent::MarketCreated(created) => {
+                if !markets.contains_key(&created.market_id) {
+                    order.push(created.market_id.clone());
+                }
+                let pool_y = DecimalAmount::parse_non_negative(&created.initial_pool_y)?;
+                let pool_n = DecimalAmount::parse_non_negative(&created.initial_pool_n)?;
+                markets
+                    .entry(created.market_id.clone())
+                    .or_default()
+                    .declared_subsidy = pool_y + pool_n;
+            }
+            EconomyEvent::PositionMinted(mint) => {
+                let coin_in = DecimalAmount::parse_non_negative(&mint.coin_in)?;
+                let yes_out = DecimalAmount::parse_non_negative(&mint.yes_out)?;
+                let no_out = DecimalAmount::parse_non_negative(&mint.no_out)?;
+                if coin_in != yes_out || yes_out != no_out {
+                    return Err(EconomyError::MintInvariantViolated(mint.market_id.clone()));
+                }
+                let market = markets.entry(mint.market_id.clone()).or_default();
+                market.minted_coin += coin_in;
+                market.minted_yes += yes_out;
+                market.minted_no += no_out;
+                if market.minted_coin != market.minted_yes || market.minted_yes != market.minted_no
+                {
+                    return Err(EconomyError::MintInvariantViolated(mint.market_id.clone()));
+                }
+                *yes_positions
+                    .entry((mint.market_id.clone(), mint.agent_id.clone()))
+                    .or_default() += yes_out;
+                *no_positions
+                    .entry((mint.market_id.clone(), mint.agent_id.clone()))
+                    .or_default() += no_out;
+            }
+            EconomyEvent::AmmSwapExecuted(swap) => {
+                let get_y = DecimalAmount::parse_non_negative(&swap.get_y)?;
+                let get_n = DecimalAmount::parse_non_negative(&swap.get_n)?;
+                *yes_positions
+                    .entry((swap.market_id.clone(), swap.trader_id.clone()))
+                    .or_default() += get_y;
+                *no_positions
+                    .entry((swap.market_id.clone(), swap.trader_id.clone()))
+                    .or_default() += get_n;
+            }
+            EconomyEvent::MarketSettled(settled) => {
+                let mut redeemed = DecimalAmount::default();
+                let side_positions = match settled.result.as_str() {
+                    "YES" => Some(&yes_positions),
+                    "NO" => Some(&no_positions),
+                    _ => None,
+                };
+                if let Some(side_positions) = side_positions {
+                    for ((market_id, _agent_id), amount) in side_positions {
+                        if market_id == &settled.market_id {
+                            redeemed += *amount;
+                        }
+                    }
+                }
+                let market = markets.entry(settled.market_id.clone()).or_default();
+                market.redeemed_coin += redeemed;
+            }
+            EconomyEvent::RewardDistributed(_) => {}
+        }
+    }
+
+    Ok(order
+        .into_iter()
+        .filter_map(|market_id| markets.remove(&market_id).map(|market| (market_id, market)))
+        .map(|(market_id, market)| {
+            let holds = market.redeemed_coin <= market.minted_coin + market.declared_subsidy;
+            MarketConservationReport {
+                market_id,
+                minted_coin: market.minted_coin.to_decimal_string(),
+                declared_subsidy: market.declared_subsidy.to_decimal_string(),
+                redeemed_coin: market.redeemed_coin.to_decimal_string(),
+                holds,
+            }
+        })
+        .collect())
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -674,6 +882,8 @@ pub enum EconomyError {
     NoCandidateRoutes,
     InvalidMicroEventId(String),
     InvalidSettlementResult(String),
+    PostTradeInvariantViolated { k_before: String, k_after: String },
+    MintInvariantViolated(String),
 }
 
 impl std::fmt::Display for EconomyError {
@@ -691,6 +901,18 @@ impl std::fmt::Display for EconomyError {
             EconomyError::InvalidMicroEventId(id) => write!(f, "invalid Micro event id {id:?}"),
             EconomyError::InvalidSettlementResult(result) => {
                 write!(f, "invalid settlement result {result:?}")
+            }
+            EconomyError::PostTradeInvariantViolated { k_before, k_after } => {
+                write!(
+                    f,
+                    "post-trade invariant violated: k_after {k_after} < k_before {k_before} (rounding favored the trader)"
+                )
+            }
+            EconomyError::MintInvariantViolated(market_id) => {
+                write!(
+                    f,
+                    "mint invariant violated for market {market_id:?}: coin_in != yes_out or yes_out != no_out"
+                )
             }
         }
     }
