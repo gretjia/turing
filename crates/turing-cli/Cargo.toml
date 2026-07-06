@@ -13,6 +13,7 @@ path = "src/main.rs"
 serde_json = { version = "=1.0.150", features = ["preserve_order"] }
 turing-approval = { path = "../turing-approval" }
 turing-contracts = { path = "../turing-contracts" }
+turing-economy = { path = "../turing-economy" }
 turing-git-tape = { path = "../turing-git-tape" }
 turing-projection = { path = "../turing-projection" }
 turing-qualification = { path = "../turing-qualification" }

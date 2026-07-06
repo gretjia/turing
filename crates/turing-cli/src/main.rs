@@ -8,8 +8,9 @@ use turing_approval::{
     HardwareSigningBackend, InMemoryTestSigningBackend, OsKeyringSigningBackend, SignatureRoute,
     SigningBackend,
 };
-use turing_contracts::envelope::HeadSet;
+use turing_contracts::envelope::{HeadSet, MicroEventEnvelope};
 use turing_contracts::jcs;
+use turing_economy::{EconomyEvent, MarketReplay};
 use turing_git_tape::append::Append;
 use turing_projection::{
     CommandSpec, OperatorHeads, OperatorToolManifest, OperatorTurnTrace, OperatorViewSnapshot,
@@ -281,10 +282,11 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("market replay failed: {error}"))?;
             Ok(format!(
-                "market replay: verified status={} market_settled_count={} price_not_truth=true",
+                "market replay: verified status={} market_settled_count={} price_not_truth=true qualification=private-local",
                 report.market_projection_status, report.market_settled_count
             ))
         }
+        ["market", "replay", "--verify", "--micro-git", repo] => market_replay_verify_real(repo),
         ["pput", "replay", "--verify"] => {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("pput replay failed: {error}"))?;
@@ -308,10 +310,11 @@ fn dispatch(args: &[&str]) -> Result<String, String> {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("market audit failed: {error}"))?;
             Ok(format!(
-                "audit market: pass settled={} accepted_head_not_market_settlement=true",
+                "audit market: pass settled={} accepted_head_not_market_settlement=true qualification=private-local",
                 report.market_settled_count
             ))
         }
+        ["audit", "market", "--micro-git", repo] => audit_market_real(repo),
         ["audit", "pput"] => {
             let report = run_new_project_agent_economy_demo()
                 .map_err(|error| format!("pput audit failed: {error}"))?;
@@ -490,7 +493,7 @@ fn operator_commands_help() -> String {
 /// error (~500 chars); it now lives in exactly one reachable place (`turing help commands`) so
 /// operators can still find it without every mistake reading like a stack trace (F2).
 fn full_cli_grammar() -> &'static str {
-    "status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | demo status|panoview|replay [--json] | doctor [--ci] [--micro-git <path>|--micro-bundle <path>] | help commands | boot --project <path> [--micro-git <path>] | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify [--micro-git <path>] | market replay --verify | pput replay --verify | audit invariants [--micro-git <path>]|market|pput | handoff generate --output <path>"
+    "status [--micro-git <path>|--micro-bundle <path>] [--json] | panoview [--micro-git <path>|--micro-bundle <path>] [--json] | explain blocker|event [event_id] [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | demo status|panoview|replay [--json] | doctor [--ci] [--micro-git <path>|--micro-bundle <path>] | help commands | boot --project <path> [--micro-git <path>] | approval preview --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route <none|os-keyring|hardware-future> | approval sign --key-id <id> --approval-id <id> --authority-epoch <n> --action <action> --subject <id> --risk <risk> --evidence-digest <sha256> --signature-route os-keyring | approval sign ... --signature-route in-memory-test --allow-test-signature | replay --verify [--micro-git <path>] | market replay --verify [--micro-git <path>] | pput replay --verify | audit invariants [--micro-git <path>]|market [--micro-git <path>]|pput | handoff generate --output <path>"
 }
 
 fn status_help() -> String {
@@ -760,8 +763,8 @@ fn read_all_tape_events(
                 .map_err(|error| format!("committed body {event_id} is not JSON: {error}"))?;
             let envelope = turing_contracts::envelope::MicroEventEnvelope::from_jcs_value(&value)
                 .map_err(|error| {
-                    format!("committed body {event_id} is not a MicroEventEnvelope: {error}")
-                })?;
+                format!("committed body {event_id} is not a MicroEventEnvelope: {error}")
+            })?;
             Ok(turing_projection::RawTapeEvent {
                 event_type: envelope.event_type,
                 payload: envelope.payload,
@@ -955,6 +958,158 @@ fn audit_invariants_real(path: &str) -> Result<String, String> {
         reconstruction.head_set().accepted_head,
         reconstruction.event_count()
     ))
+}
+
+/// `turing market replay --verify --micro-git <path>`: verify a REAL tape's economy events
+/// (E0.3 — before this, `turing market replay --verify` always ran the private demo and printed
+/// its literal `market_settled_count`, never the operator's tape). `market_settled_count` here
+/// is COMPUTED by replaying the real tape's `MarketCreated`/`MarketSettled` events, mirroring the
+/// F4 `--micro-git` pattern already used by `replay --verify` / `audit invariants`.
+fn market_replay_verify_real(path: &str) -> Result<String, String> {
+    let repo = canonicalize_micro_git(path)?;
+    let _reconstruction = replay_guarded(&repo)?;
+    let market_replay = real_market_replay(&repo)?;
+    let settled_count = market_replay
+        .markets
+        .values()
+        .filter(|market| market.status == "settled")
+        .count();
+    Ok(format!(
+        "market replay: verified market_count={} market_settled_count={} price_not_truth=true source=guarded_micro_tape_read",
+        market_replay.markets.len(),
+        settled_count
+    ))
+}
+
+/// `turing audit market --micro-git <path>`: the same real-tape fix as
+/// [`market_replay_verify_real`] for the `audit market` verb (E0.3).
+fn audit_market_real(path: &str) -> Result<String, String> {
+    let repo = canonicalize_micro_git(path)?;
+    let _reconstruction = replay_guarded(&repo)?;
+    let market_replay = real_market_replay(&repo)?;
+    let settled_count = market_replay
+        .markets
+        .values()
+        .filter(|market| market.status == "settled")
+        .count();
+    Ok(format!(
+        "audit market: pass settled={settled_count} accepted_head_not_market_settlement=true source=guarded_micro_tape_read"
+    ))
+}
+
+/// Replay a real tape's ECONOMY-class events into a [`MarketReplay`] projection.
+fn real_market_replay(repo: &Path) -> Result<MarketReplay, String> {
+    let events = load_economy_events_from_tape(repo)?;
+    MarketReplay::from_tape_events(&events)
+        .map_err(|error| format!("market replay failed: {error}"))
+}
+
+/// Walk a real MicroTape genesis→tip and parse every ECONOMY-class committed body into an
+/// [`EconomyEvent`]. This mirrors `turing-daemons::load_economy_events_from_tape` (not exported
+/// from that crate — the CLI intentionally doesn't take a dependency edge on the daemons crate)
+/// with the E0.1/E0.2 fixes already applied: filter on the committed envelope's own canonical
+/// `event_type` (registry-cased, e.g. `"AMMSwapExecuted"`), never an inner `payload.event_type`
+/// key that only `MarketCreated`'s payload happens to carry.
+fn load_economy_events_from_tape(repo: &Path) -> Result<Vec<EconomyEvent>, String> {
+    let tape = Append::open(repo).map_err(|error| format!("cannot open micro tape: {error}"))?;
+    let head_set = tape
+        .head_set_guarded()
+        .map_err(|error| format!("tape looks torn or unreadable: {error}"))?
+        .ok_or_else(|| "this tape has never been initialized".to_string())?;
+
+    let mut cursor = head_set.tape_tip;
+    let mut event_ids = Vec::new();
+    loop {
+        event_ids.push(cursor.clone());
+        let parents = turing_git_tape::append::commit_parents(repo, &cursor)
+            .map_err(|error| format!("cannot read tape parents for {cursor}: {error}"))?;
+        match parents.as_slice() {
+            [] => break,
+            [parent] => cursor = parent.clone(),
+            many => {
+                return Err(format!(
+                    "tape event {cursor} is a merge commit with {} parents",
+                    many.len()
+                ));
+            }
+        }
+    }
+    event_ids.reverse();
+
+    event_ids
+        .into_iter()
+        .filter_map(|event_id| {
+            let bytes = match turing_git_tape::append::committed_body_bytes(repo, &event_id) {
+                Ok(bytes) => bytes,
+                Err(error) => {
+                    return Some(Err(format!(
+                        "cannot read committed body for {event_id}: {error}"
+                    )));
+                }
+            };
+            let value: Value = match serde_json::from_slice(&bytes) {
+                Ok(value) => value,
+                Err(error) => {
+                    return Some(Err(format!(
+                        "committed body {event_id} is not JSON: {error}"
+                    )));
+                }
+            };
+            let envelope = match MicroEventEnvelope::from_jcs_value(&value) {
+                Ok(envelope) => envelope,
+                Err(error) => {
+                    return Some(Err(format!(
+                        "committed body {event_id} is not a MicroEventEnvelope: {error}"
+                    )));
+                }
+            };
+            if !matches!(
+                envelope.event_type.as_str(),
+                "MarketCreated"
+                    | "PositionMinted"
+                    | "AMMSwapExecuted"
+                    | "MarketSettled"
+                    | "RewardDistributed"
+            ) {
+                return None;
+            }
+            let mut payload = envelope.payload;
+            if let Value::Object(map) = &mut payload {
+                map.insert(
+                    "event_type".to_string(),
+                    Value::String(envelope.event_type.clone()),
+                );
+            }
+            Some(parse_economy_event(&payload))
+        })
+        .collect()
+}
+
+/// Dispatch a stamped economy payload (guaranteed `event_type` key, see
+/// [`load_economy_events_from_tape`]) into the matching [`EconomyEvent`] variant.
+fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
+    let event_type = value
+        .get("event_type")
+        .and_then(Value::as_str)
+        .ok_or_else(|| "economy event payload missing event_type".to_string())?;
+    match event_type {
+        "MarketCreated" => serde_json::from_value(value.clone())
+            .map(EconomyEvent::MarketCreated)
+            .map_err(|error| format!("invalid MarketCreated: {error}")),
+        "PositionMinted" => serde_json::from_value(value.clone())
+            .map(EconomyEvent::PositionMinted)
+            .map_err(|error| format!("invalid PositionMinted: {error}")),
+        "AMMSwapExecuted" => serde_json::from_value(value.clone())
+            .map(EconomyEvent::AmmSwapExecuted)
+            .map_err(|error| format!("invalid AMMSwapExecuted: {error}")),
+        "MarketSettled" => serde_json::from_value(value.clone())
+            .map(EconomyEvent::MarketSettled)
+            .map_err(|error| format!("invalid MarketSettled: {error}")),
+        "RewardDistributed" => serde_json::from_value(value.clone())
+            .map(EconomyEvent::RewardDistributed)
+            .map_err(|error| format!("invalid RewardDistributed: {error}")),
+        other => Err(format!("unknown economy event_type {other:?}")),
+    }
 }
 
 fn render_operator_panoview(input: SnapshotInput<'_>, ascii: bool) -> Result<String, String> {

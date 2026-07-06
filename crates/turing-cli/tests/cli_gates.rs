@@ -873,7 +873,10 @@ fn per_subcommand_help_is_scoped_and_discoverable() {
     }
 
     // `ask --help` must not be swallowed by the `ask <utterance>` catch-all.
-    let output = turing().args(["ask", "--help"]).output().expect("run ask --help");
+    let output = turing()
+        .args(["ask", "--help"])
+        .output()
+        .expect("run ask --help");
     let stdout = String::from_utf8(output.stdout).expect("stdout UTF-8");
     assert!(!stdout.contains("operator_turn_trace.v1"));
 }
@@ -899,7 +902,10 @@ fn doctor_passes_against_a_healthy_real_tape_and_supports_ci_mode() {
         .args(["doctor", "--micro-git", repo_arg, "--ci"])
         .output()
         .expect("run doctor --ci");
-    assert!(ci_output.status.success(), "doctor --ci failed: {ci_output:?}");
+    assert!(
+        ci_output.status.success(),
+        "doctor --ci failed: {ci_output:?}"
+    );
     let ci_stdout = String::from_utf8(ci_output.stdout).expect("stdout UTF-8");
     for line in ci_stdout.lines() {
         assert!(
@@ -921,10 +927,21 @@ fn doctor_fails_loud_and_nonzero_on_a_tampered_tape() {
     // bare empty-tree commit) — the guarded HeadSet read fails closed on the incoherent ref
     // before replay ever gets a chance to run.
     let empty_tree = Command::new("git")
-        .args(["-C", repo_arg, "hash-object", "-w", "-t", "tree", "/dev/null"])
+        .args([
+            "-C",
+            repo_arg,
+            "hash-object",
+            "-w",
+            "-t",
+            "tree",
+            "/dev/null",
+        ])
         .output()
         .expect("hash-object");
-    assert!(empty_tree.status.success(), "hash-object failed: {empty_tree:?}");
+    assert!(
+        empty_tree.status.success(),
+        "hash-object failed: {empty_tree:?}"
+    );
     let tree_oid = String::from_utf8(empty_tree.stdout).expect("UTF-8 oid");
     let tree_oid = tree_oid.trim();
     let bogus_commit = Command::new("git")
@@ -938,7 +955,10 @@ fn doctor_fails_loud_and_nonzero_on_a_tampered_tape() {
         ])
         .output()
         .expect("commit-tree");
-    assert!(bogus_commit.status.success(), "commit-tree failed: {bogus_commit:?}");
+    assert!(
+        bogus_commit.status.success(),
+        "commit-tree failed: {bogus_commit:?}"
+    );
     let bogus_oid = String::from_utf8(bogus_commit.stdout).expect("UTF-8 oid");
     let bogus_oid = bogus_oid.trim();
     let update_ref = Command::new("git")
@@ -951,13 +971,19 @@ fn doctor_fails_loud_and_nonzero_on_a_tampered_tape() {
         ])
         .output()
         .expect("update-ref");
-    assert!(update_ref.status.success(), "update-ref failed: {update_ref:?}");
+    assert!(
+        update_ref.status.success(),
+        "update-ref failed: {update_ref:?}"
+    );
 
     let output = turing()
         .args(["doctor", "--micro-git", repo_arg, "--ci"])
         .output()
         .expect("run doctor on tampered tape");
-    assert!(!output.status.success(), "doctor unexpectedly passed: {output:?}");
+    assert!(
+        !output.status.success(),
+        "doctor unexpectedly passed: {output:?}"
+    );
     assert_eq!(output.status.code(), Some(2));
     let stderr = String::from_utf8(output.stderr).expect("stderr UTF-8");
     // The guarded HeadSet read (Ring-2, SG-18) catches the torn/incoherent ref before replay
@@ -991,6 +1017,145 @@ fn replay_verify_and_audit_invariants_support_micro_git_against_a_real_tape() {
     let stdout = String::from_utf8(audit.stdout).expect("stdout UTF-8");
     assert!(stdout.contains("audit invariants: pass"));
     assert!(stdout.contains(&format!("accepted_head={}", proposal.accepted_head_after)));
+}
+
+/// E0.3 regression guard: `turing market replay --verify` / `turing audit market` must verify a
+/// REAL tape when `--micro-git` is passed, and `market_settled_count` must be COMPUTED from that
+/// tape — never the hardcoded `settled=1` literal `run_new_project_agent_economy_demo()` always
+/// produces. This tape carries THREE markets (two settled, one still open) specifically so a
+/// hardcoded "1" cannot accidentally pass the assertion.
+#[test]
+fn market_replay_and_audit_market_support_micro_git_against_a_real_tape() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path();
+    git::init_sha256(repo).expect("sha256 git init");
+    let tape = Append::open(repo).expect("append open");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:cli-test",
+            json!({"constitution_digest": "sha256:".to_string() + &"7".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+
+    for (market_id, pool) in [("mkt_a", "100"), ("mkt_b", "100"), ("mkt_c", "100")] {
+        tape.append(
+            AppendRequest::new(
+                "MarketCreated",
+                "writer:cli-test",
+                json!({
+                    "schema_id": "market_created.v1",
+                    "event_type": "MarketCreated",
+                    "head_effect": "PRESERVE",
+                    "market_id": market_id,
+                    "initial_pool_y": pool,
+                    "initial_pool_n": pool,
+                    "k": "10000",
+                    "truth_status": "statistical_signal_only"
+                }),
+            )
+            .predicate_pass(),
+        )
+        .expect("append market created");
+    }
+
+    // An AMMSwapExecuted against mkt_a: E0.1/E0.2 regression guard, exercising the
+    // registry-canonical "AMMSwapExecuted" cased event on the real replay path.
+    tape.append(
+        AppendRequest::new(
+            "AMMSwapExecuted",
+            "writer:cli-test",
+            json!({
+                "schema_id": "amm_swap_executed.v1",
+                "market_id": "mkt_a",
+                "trader_id": "agent_trader",
+                "side": "BUY_YES",
+                "pay_coin": "100",
+                "d_y": "-50",
+                "d_n": "100",
+                "get_y": "150",
+                "get_n": "0",
+                "pool_y_before": "100",
+                "pool_n_before": "100",
+                "pool_y_after": "50",
+                "pool_n_after": "200",
+                "invariant_k_before": "10000",
+                "invariant_k_after": "10000",
+                "effective_price": "0.666666667"
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append amm swap");
+
+    for market_id in ["mkt_a", "mkt_b"] {
+        tape.append(
+            AppendRequest::new(
+                "MarketSettled",
+                "writer:cli-test",
+                json!({
+                    "schema_id": "market_settled.v1",
+                    "market_id": market_id,
+                    "result": "YES",
+                    "settlement_event_id": "mu:".to_string() + &"9".repeat(64),
+                    "price_not_truth_ack": true
+                }),
+            )
+            .predicate_pass(),
+        )
+        .expect("append market settled");
+    }
+    // mkt_c is deliberately left open (no MarketSettled) so settled_count must be 2, not 3.
+
+    let repo_arg = repo.to_str().expect("UTF-8 repo path");
+
+    let replay = turing()
+        .args(["market", "replay", "--verify", "--micro-git", repo_arg])
+        .output()
+        .expect("run market replay --verify --micro-git");
+    assert!(replay.status.success(), "market replay failed: {replay:?}");
+    let stdout = String::from_utf8(replay.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("market replay: verified"));
+    assert!(stdout.contains("source=guarded_micro_tape_read"));
+    assert!(stdout.contains("market_count=3"));
+    assert!(
+        stdout.contains("market_settled_count=2"),
+        "expected computed settled count 2, got: {stdout}"
+    );
+
+    let audit = turing()
+        .args(["audit", "market", "--micro-git", repo_arg])
+        .output()
+        .expect("run audit market --micro-git");
+    assert!(audit.status.success(), "audit market failed: {audit:?}");
+    let stdout = String::from_utf8(audit.stdout).expect("stdout UTF-8");
+    assert!(stdout.contains("audit market: pass"));
+    assert!(stdout.contains("source=guarded_micro_tape_read"));
+    assert!(
+        stdout.contains("settled=2"),
+        "expected computed settled count 2, got: {stdout}"
+    );
+
+    // Bare (no --micro-git) still runs the labeled demo, never the real tape above.
+    let bare_replay = turing()
+        .args(["market", "replay", "--verify"])
+        .output()
+        .expect("run bare market replay --verify");
+    assert!(bare_replay.status.success());
+    let bare_stdout = String::from_utf8(bare_replay.stdout).expect("stdout UTF-8");
+    assert!(bare_stdout.contains("qualification=private-local"));
+    assert!(!bare_stdout.contains("market_settled_count=2"));
+
+    let bare_audit = turing()
+        .args(["audit", "market"])
+        .output()
+        .expect("run bare audit market");
+    assert!(bare_audit.status.success());
+    let bare_audit_stdout = String::from_utf8(bare_audit.stdout).expect("stdout UTF-8");
+    assert!(bare_audit_stdout.contains("qualification=private-local"));
+    assert!(!bare_audit_stdout.contains("settled=2"));
 }
 
 #[test]
