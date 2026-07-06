@@ -2256,19 +2256,31 @@ fn load_economy_events_from_tape(repo: &Path) -> Result<Vec<EconomyEvent>, Strin
     envelopes
         .into_iter()
         .filter_map(|(_, envelope)| {
-            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
-            if matches!(
-                event_type,
+            // Filter on the ENVELOPE's event_type (registry-canonical, e.g.
+            // "AMMSwapExecuted"), not an inner `payload.event_type` key: only
+            // MarketCreated's payload carries that key, so the other four
+            // economy event payloads were silently dropped before this fix.
+            let event_type = envelope.event_type.clone();
+            if !matches!(
+                event_type.as_str(),
                 "MarketCreated"
                     | "PositionMinted"
-                    | "AmmSwapExecuted"
+                    | "AMMSwapExecuted"
                     | "MarketSettled"
                     | "RewardDistributed"
             ) {
-                Some(envelope.payload)
-            } else {
-                None
+                return None;
             }
+            let mut payload = envelope.payload;
+            if let Value::Object(map) = &mut payload {
+                // parse_economy_event dispatches on an inner `event_type` key;
+                // stamp the envelope's canonical event_type onto the payload so
+                // dispatch works even for payload schemas that don't carry
+                // their own event_type field (PositionMinted, AMMSwapExecuted,
+                // MarketSettled, RewardDistributed).
+                map.insert("event_type".to_string(), Value::String(event_type));
+            }
+            Some(payload)
         })
         .map(|payload| parse_economy_event(&payload))
         .collect()

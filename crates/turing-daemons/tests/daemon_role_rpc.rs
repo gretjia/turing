@@ -351,7 +351,25 @@ fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
         std::fs::read_to_string(state_dir.join("wallet_projection.json")).expect("wallet snapshot");
     assert!(snapshot.contains(r#""schema_id":"wallet_projection_snapshot.v1""#));
     assert!(snapshot.contains(r#""agent_tape""#));
-    assert!(snapshot.contains(r#""yes_positions":{"mkt_tape_wallet":"5"}"#));
+    // E0.1 regression guard: the tape carries TWO PositionMinted events (the
+    // second, deliberately, without an inner `payload.event_type` key — that
+    // is exactly the shape real tape payloads have) plus a RewardDistributed.
+    // A filter keyed on the inner payload's event_type drops the second mint
+    // and the reward silently; both must survive into the projection.
+    assert!(
+        snapshot.contains(r#""yes_positions":{"mkt_tape_wallet":"5","mkt_wallet_tape":"5"}"#),
+        "expected both mints in yes_positions, got: {snapshot}"
+    );
+    assert!(
+        snapshot.contains(r#""no_positions":{"mkt_tape_wallet":"5","mkt_wallet_tape":"5"}"#),
+        "expected both mints in no_positions, got: {snapshot}"
+    );
+    // coin_balance = -5 (mint 1) - 5 (mint 2) + 2 (reward) - 1 (slash) = -9;
+    // this only lands at -9 if the reward event also survived the filter.
+    assert!(
+        snapshot.contains(r#""coin_balance":"-9""#),
+        "expected reward-adjusted coin_balance -9, got: {snapshot}"
+    );
     assert!(!snapshot.contains(r#""agent_forged""#));
     assert!(snapshot.contains(r#""credential_material_included":false"#));
     assert!(!snapshot.contains(r#""accepted_head""#));
