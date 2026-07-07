@@ -5,6 +5,12 @@
 # (WP6 row); ADR-ECON-003 Decision 5 ("Art III.4 的保密通过投影过滤实现"). This gate is
 # mechanical (identifier-name grep) and machine-judged; it does not evaluate semantics.
 #
+# Scan granularity (ADR-ECON-003 Decision 5, granularity amendment 2026-07-07): for .rs
+# surface files the leak surface is what can REACH an agent -- string literals (error/
+# format/serde-rename text) and struct-field declaration lines (serde serialization
+# names) -- comments and code identifiers (type/fn/variant names) are kernel-internal
+# and are NOT agent-visible. JSON manifests remain whole-file scans.
+#
 # It scans the fixed set of agent-visible economy leak surfaces named in the design doc:
 #   - daemons failed_predicates return channel
 #   - error-message construction sites (Display impls / jsonrpc_error / format! sites)
@@ -86,6 +92,81 @@ collect_targets() {
   done
 }
 
+# Extract the agent-reachable text of a Rust source file: string-literal contents and
+# struct-field declaration lines, with // and /* */ comments stripped. Deterministic
+# character-state-machine; emits "LINENO:text" for grep.
+extract_rs_surface() {
+  python3 - "$1" <<'PY'
+import re, sys
+src = open(sys.argv[1], encoding='utf-8').read()
+out = {}
+def emit(line, text):
+    if text.strip():
+        out.setdefault(line, []).append(text)
+i, line, n = 0, 1, len(src)
+state = 'code'          # code | str | rawstr | line_comment | block_comment
+code_line = []          # comment-stripped code text of the current line
+cur = []                # current string literal
+raw_hashes = 0
+while i < n:
+    c = src[i]
+    if c == '\n':
+        if state == 'line_comment':
+            state = 'code'
+        stripped = ''.join(code_line)
+        if re.match(r'^\s*(pub(\([^)]*\))?\s+)?[A-Za-z_][A-Za-z0-9_]*\s*:\s', stripped) \
+           and not re.search(r'\b(fn|let|const|static|impl|use|mod)\b', stripped):
+            emit(line, stripped)
+        code_line = []
+        line += 1
+        i += 1
+        continue
+    if state == 'code':
+        if c == '/' and i + 1 < n and src[i+1] == '/':
+            state = 'line_comment'; i += 2; continue
+        if c == '/' and i + 1 < n and src[i+1] == '*':
+            state = 'block_comment'; i += 2; continue
+        if c == 'r' and i + 1 < n and src[i+1] in '#"':
+            j = i + 1; h = 0
+            while j < n and src[j] == '#':
+                h += 1; j += 1
+            if j < n and src[j] == '"':
+                state = 'rawstr'; raw_hashes = h; cur = []; i = j + 1; continue
+        if c == '"':
+            state = 'str'; cur = []; i += 1; continue
+        if c == "'" and i + 2 < n and src[i+1] == '\\':
+            i += 2  # char escape like '\n'
+            while i < n and src[i] != "'":
+                i += 1
+            i += 1; continue
+        if c == "'" and i + 2 < n and src[i+2] == "'":
+            i += 3; continue  # plain char literal
+        code_line.append(c); i += 1; continue
+    if state == 'str':
+        if c == '\\':
+            cur.append(src[i:i+2]); i += 2; continue
+        if c == '"':
+            emit(line, ''.join(cur)); state = 'code'; i += 1; continue
+        cur.append(c); i += 1; continue
+    if state == 'rawstr':
+        if c == '"':
+            j = i + 1; h = 0
+            while j < n and h < raw_hashes and src[j] == '#':
+                h += 1; j += 1
+            if h == raw_hashes:
+                emit(line, ''.join(cur)); state = 'code'; i = j; continue
+        cur.append(c); i += 1; continue
+    if state == 'block_comment':
+        if c == '*' and i + 1 < n and src[i+1] == '/':
+            state = 'code'; i += 2; continue
+        i += 1; continue
+    i += 1
+for ln in sorted(out):
+    for t in out[ln]:
+        print(f"{ln}:{t}")
+PY
+}
+
 gate_scan() {
   local root="$1"
   local pattern
@@ -97,9 +178,18 @@ gate_scan() {
     return 3
   fi
 
-  local hits
+  local hits t
   hits="$(mktemp)"
-  grep -HinE "$pattern" "${targets[@]}" >>"$hits" 2>/dev/null || true
+  for t in "${targets[@]}"; do
+    case "$t" in
+      *.rs)
+        extract_rs_surface "$t" | grep -iE "$pattern" | sed "s|^|$t:|" >>"$hits" || true
+        ;;
+      *)
+        grep -HinE "$pattern" "$t" >>"$hits" 2>/dev/null || true
+        ;;
+    esac
+  done
 
   if [[ -s "$hits" ]]; then
     while IFS= read -r hit; do
@@ -147,6 +237,17 @@ EOF
 
   if ! gate_scan "$work" >/dev/null; then
     echo "F4_LEAK_SELF_TEST_FAIL clean fixture tree was rejected" >&2
+    return 1
+  fi
+
+  # Granularity check: a comment / code-identifier mention in a .rs surface is kernel-
+  # internal, NOT a leak (ADR Decision 5 granularity amendment) -- must still PASS.
+  printf '%s\n' \
+    '// internal note: anneal schedule tau_hi/tau_lo and n_eff_floor live in B-zone' \
+    'pub struct TauQ32Internal(u64);' \
+    >>"$work/crates/turing-economy/src/lib.rs"
+  if ! gate_scan "$work" >/dev/null; then
+    echo "F4_LEAK_SELF_TEST_FAIL comment/identifier mention was wrongly flagged" >&2
     return 1
   fi
 

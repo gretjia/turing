@@ -598,8 +598,9 @@ mod tests {
     // -- Decision 4/6: τ(N) annealing ----------------------------------------------
 
     fn test_anneal_cfg() -> AnnealConfig {
-        // Fixture-only concrete numbers (test code, not production doc/error/schema
-        // surface -- these are NOT the real ADR-ECON-003 Decision 5 B-zone values).
+        // Test-only constants, numerically equal to the ADR-ECON-003 Decision 5
+        // EXPERIMENTAL STARTING values (plan-directory documented, not secrets).
+        // Production code never hardcodes them: AnnealConfig is caller-supplied.
         AnnealConfig {
             tau_hi_q32: q32_from_ratio(2, 1).unwrap(),
             tau_lo_q32: q32_from_ratio(1, 4).unwrap(),
@@ -654,7 +655,9 @@ mod tests {
     // -- Decision 3: N_eff floor arbitration hook, "floor wins" -------------------
 
     fn test_floor_cfg() -> FloorConfig {
-        // Fixture-only; NOT the real ADR-ECON-003 Decision 3 A-zone floor values.
+        // Deliberately the ADR-ECON-003 Decision 3 A-zone floor values -- the A-zone
+        // floor is fixed and PUBLIC by design (Art III.3), so testing with the real
+        // values is correct, not a leak.
         FloorConfig {
             pause_at_or_below_q32: q32_from_ratio(2, 1).unwrap(),
             resume_at_or_above_q32: q32_from_ratio(9, 4).unwrap(), // 2.0 + 0.25 hysteresis band

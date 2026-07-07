@@ -1330,14 +1330,14 @@ fn weighted_inverse_cdf_select<'a>(
 /// the deterministic seed (ADR-ECON-003 Decision 4).
 fn softmax_select<'a>(
     priced_routes: &[(&'a CandidateRoute, DecimalAmount)],
-    tau: TauQ32,
+    temperature: TauQ32,
     price_signal_hash: &str,
     pput_prior_hash: &str,
 ) -> &'a CandidateRoute {
     let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
     sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
 
-    let tau_q32 = tau.raw_q32();
+    let tau_q32 = temperature.raw_q32();
     let x_values: Vec<i128> = sorted
         .iter()
         .map(|(_, price)| q32_div(decimal_to_q32(*price), tau_q32))
