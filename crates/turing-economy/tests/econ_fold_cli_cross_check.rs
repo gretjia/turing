@@ -17,6 +17,7 @@ use std::process::{Command, Stdio};
 
 use serde_json::{json, Value};
 
+use turing_economy::diversity_metrics::{compute_n_eff_and_h_lineage, LineageSettlement, NEffHLineage};
 use turing_economy::routing_fold::fold_routing_state_from_tape;
 use turing_economy::EconomyEvent;
 
@@ -223,5 +224,66 @@ fn cli_derive_keys_matches_direct_library_calls() {
     assert_eq!(
         response["scaffold_ids"][0]["scaffold_id"].as_str().unwrap(),
         expected_scaffold_id
+    );
+}
+
+/// WP9a lineage-expansion update (PREREG Appendix A, frozen): `econ_fold_cli
+/// diversity-metrics` must match `diversity_metrics::compute_n_eff_and_h_lineage` called
+/// directly, byte-for-byte, on an identical 4-lineage settlement history (the shape this
+/// task's driver now produces: deepseek/qwen/glm/kimi).
+#[test]
+fn cli_diversity_metrics_matches_direct_library_call() {
+    let mut history: Vec<LineageSettlement> = Vec::new();
+    let lineages = ["deepseek", "qwen", "glm", "kimi"];
+    for i in 0..8u64 {
+        for (li, &lineage) in lineages.iter().enumerate() {
+            // A simple deterministic pattern that varies by lineage so the 4 lineages are
+            // not all identical (would otherwise collapse to a degenerate N_eff=1 case).
+            let verdict = ((i as usize) + li) % 2 == 0;
+            history.push(LineageSettlement {
+                lineage_id: lineage.to_string(),
+                settlement_index: i,
+                verdict,
+            });
+        }
+    }
+
+    let direct = compute_n_eff_and_h_lineage(&history).expect("direct call must succeed");
+    let (expected_status, expected_n_eff, expected_h_lineage) = match direct {
+        NEffHLineage::NotEnoughData => ("NOT_ENOUGH_DATA".to_string(), None, None),
+        NEffHLineage::Computed {
+            n_eff_q32,
+            h_lineage_q32,
+        } => (
+            "COMPUTED".to_string(),
+            Some(n_eff_q32.to_string()),
+            Some(h_lineage_q32.to_string()),
+        ),
+    };
+
+    let history_json: Vec<Value> = history
+        .iter()
+        .map(|entry| {
+            json!({
+                "lineage_id": entry.lineage_id,
+                "settlement_index": entry.settlement_index,
+                "verdict": entry.verdict,
+            })
+        })
+        .collect();
+    let request = json!({
+        "schema": "econ_fold_cli.diversity_metrics.request.v1",
+        "history": history_json,
+    });
+    let response = run_cli("diversity-metrics", &request);
+
+    assert_eq!(response["status"].as_str().unwrap(), expected_status);
+    assert_eq!(
+        response["n_eff_q32"].as_str().map(str::to_string),
+        expected_n_eff
+    );
+    assert_eq!(
+        response["h_lineage_q32"].as_str().map(str::to_string),
+        expected_h_lineage
     );
 }

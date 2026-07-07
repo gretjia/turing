@@ -23,15 +23,24 @@
 //! configuration a caller supplies on stdin for the `SoftmaxFinite` regime is consumed only
 //! to construct a `TauQ32`, never reflected in any output or error text.
 //!
+//! WP9a lineage-expansion update (spec: PREREG_ECON_emergence_experiments_20260707.md
+//! Appendix A, frozen 2026-07-07 -- 4 independent worker lineages via SiliconFlow +
+//! DeepSeek-direct fallback): added the `diversity-metrics` subcommand, a thin wrapper
+//! around `turing_economy::diversity_metrics::compute_n_eff_and_h_lineage` (WP5, already
+//! merged) so the Python driver never re-derives N_eff/H_lineage itself, exactly the same
+//! "single source of truth" discipline as the two subcommands above.
+//!
 //! Usage:
-//!   echo '<derive-keys request JSON>'      | econ_fold_cli derive-keys
-//!   echo '<fold-and-suggest request JSON>' | econ_fold_cli fold-and-suggest
+//!   echo '<derive-keys request JSON>'        | econ_fold_cli derive-keys
+//!   echo '<fold-and-suggest request JSON>'   | econ_fold_cli fold-and-suggest
+//!   echo '<diversity-metrics request JSON>'  | econ_fold_cli diversity-metrics
 
 use std::collections::BTreeMap;
 use std::io::Read;
 
 use serde::{Deserialize, Serialize};
 
+use turing_economy::diversity_metrics::{compute_n_eff_and_h_lineage, LineageSettlement, NEffHLineage};
 use turing_economy::routing_fold::{
     domain_bucket, fold_routing_state_from_tape, scaffold_id, NodeState, RoutingKey,
     ScaffoldDescriptor, Q32_ONE,
@@ -356,6 +365,76 @@ fn run_fold_and_suggest(input: &str) -> Result<String, String> {
 }
 
 // ---------------------------------------------------------------------------
+// diversity-metrics (WP5 bridge; PREREG Appendix A lineage-expansion update)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct LineageSettlementInput {
+    lineage_id: String,
+    settlement_index: u64,
+    verdict: bool,
+}
+
+#[derive(Deserialize)]
+struct DiversityMetricsRequest {
+    schema: String,
+    history: Vec<LineageSettlementInput>,
+}
+
+#[derive(Serialize)]
+struct DiversityMetricsResponse {
+    schema: &'static str,
+    status: &'static str,
+    n_eff_q32: Option<String>,
+    h_lineage_q32: Option<String>,
+}
+
+fn run_diversity_metrics(input: &str) -> Result<String, String> {
+    let request: DiversityMetricsRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid diversity-metrics request JSON: {e}"))?;
+    if request.schema != "econ_fold_cli.diversity_metrics.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.diversity_metrics.request.v1, got {})",
+            request.schema
+        ));
+    }
+
+    let history: Vec<LineageSettlement> = request
+        .history
+        .into_iter()
+        .map(|entry| LineageSettlement {
+            lineage_id: entry.lineage_id,
+            settlement_index: entry.settlement_index,
+            verdict: entry.verdict,
+        })
+        .collect();
+
+    // Single source of truth: turing_economy::diversity_metrics::compute_n_eff_and_h_lineage
+    // (WP5) -- the N_eff/H_lineage estimator itself is never reimplemented here.
+    let result = compute_n_eff_and_h_lineage(&history)
+        .map_err(|e| format!("diversity metrics computation failed: {e:?}"))?;
+
+    let response = match result {
+        NEffHLineage::NotEnoughData => DiversityMetricsResponse {
+            schema: "econ_fold_cli.diversity_metrics.response.v1",
+            status: "NOT_ENOUGH_DATA",
+            n_eff_q32: None,
+            h_lineage_q32: None,
+        },
+        NEffHLineage::Computed {
+            n_eff_q32,
+            h_lineage_q32,
+        } => DiversityMetricsResponse {
+            schema: "econ_fold_cli.diversity_metrics.response.v1",
+            status: "COMPUTED",
+            n_eff_q32: Some(n_eff_q32.to_string()),
+            h_lineage_q32: Some(h_lineage_q32.to_string()),
+        },
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
 // entry point
 // ---------------------------------------------------------------------------
 
@@ -370,8 +449,9 @@ fn main() {
     let result = match subcommand.as_str() {
         "derive-keys" => run_derive_keys(&input),
         "fold-and-suggest" => run_fold_and_suggest(&input),
+        "diversity-metrics" => run_diversity_metrics(&input),
         other => Err(format!(
-            "unknown subcommand {other:?} (expected derive-keys or fold-and-suggest)"
+            "unknown subcommand {other:?} (expected derive-keys, fold-and-suggest, or diversity-metrics)"
         )),
     };
 
