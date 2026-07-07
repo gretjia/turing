@@ -349,16 +349,25 @@ impl MarketReplay {
         for event in events {
             match event {
                 EconomyEvent::MarketCreated(created) => {
-                    markets.insert(
-                        created.market_id.clone(),
+                    // CONFIRMED-bug-#3 fix (INV-11/INV-2 boundary, "duplicate MarketCreated
+                    // revives a settled market"): this used to be an unconditional
+                    // `BTreeMap::insert`, so a second `MarketCreated` for the same market_id
+                    // (e.g. re-appended by a writer with tape access, since no uniqueness check
+                    // exists anywhere upstream) silently discarded the first projection --
+                    // including a prior `status = "settled"` -- and reset it back to "open".
+                    // That let a market be settled a second time with a conflicting result
+                    // (direct INV-2 double-redemption hazard). A `MarketCreated` is a one-time
+                    // per-market event by design (D2); replay now keeps the FIRST one only,
+                    // making a duplicate a harmless no-op instead of a status-reopening write.
+                    markets.entry(created.market_id.clone()).or_insert_with(|| {
                         MarketProjection {
                             market_id: created.market_id.clone(),
                             pool_y: created.initial_pool_y.clone(),
                             pool_n: created.initial_pool_n.clone(),
                             status: "open".to_string(),
                             settlement_result: None,
-                        },
-                    );
+                        }
+                    });
                 }
                 EconomyEvent::AmmSwapExecuted(swap) => {
                     let market = markets

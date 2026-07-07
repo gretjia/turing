@@ -383,6 +383,42 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
         );
     }
 
+    // CONFIRMED-bug-#3 fix, defense-in-depth layer 2 (INV-11/INV-2 boundary, "duplicate
+    // MarketCreated revives a settled market"): this generic PRESERVE-append path never
+    // checked `market_id` uniqueness for `MarketCreated`, despite the registry marking it
+    // `predicate_required: true` (never consulted here — this path hardcodes
+    // `.predicate_pass()`). A writer with tape access could re-append `MarketCreated` for an
+    // already-existing market_id and (before the companion `MarketReplay` fix) reopen an
+    // already-settled market. Refuse a second `MarketCreated` for a market_id that already has
+    // one on the real tape, independent of whatever `MarketReplay::from_tape_events` does with
+    // it downstream.
+    if event_type == "MarketCreated" {
+        if let Some(market_id) = payload.get("market_id").and_then(Value::as_str) {
+            match load_economy_events_from_tape(repo) {
+                Ok(events) => {
+                    if find_market_created_by_id(&events, market_id).is_some() {
+                        return jsonrpc_error(
+                            id,
+                            -32000,
+                            format!(
+                                "MarketCreated market_id {market_id:?} already exists on this tape \
+                                 (duplicate MarketCreated is refused: it must not be able to \
+                                 reopen or reset an existing market's projection)"
+                            ),
+                        );
+                    }
+                }
+                Err(error) => {
+                    return jsonrpc_error(
+                        id,
+                        -32000,
+                        format!("market replay failed while checking market_id uniqueness: {error}"),
+                    );
+                }
+            }
+        }
+    }
+
     let tape = match Append::open(repo) {
         Ok(tape) => tape,
         Err(error) => {
