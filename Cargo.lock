@@ -566,6 +566,7 @@ name = "turing-economy"
 version = "0.0.0"
 dependencies = [
  "serde",
+ "sha2",
  "turing-contracts",
 ]
 
