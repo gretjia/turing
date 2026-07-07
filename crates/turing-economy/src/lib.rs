@@ -509,20 +509,60 @@ struct MarketConservationInternal {
     minted_no: DecimalAmount,
     declared_subsidy: DecimalAmount,
     redeemed_coin: DecimalAmount,
+    /// CONFIRMED-bug-#2 fix (candidate 1): sum of every `AmmSwapExecuted.pay_coin` on this
+    /// market. A swap's `pay_coin` is genuine trader-backed Coin locked into the pool (an
+    /// implicit CTF mint per `WalletProjection::from_tape_events`'s own doc comment), so it is
+    /// real backing that `holds` must count, on top of `minted_coin`/`declared_subsidy`.
+    /// Omitting it previously made `check_conservation` strictly more pessimistic than reality:
+    /// a perfectly healthy, high-swap-volume market could be false-positive-flagged as broken.
+    swap_pay_coin: DecimalAmount,
+    /// CONFIRMED-bug-#2 fix (candidate 2, headline): sum of every
+    /// `RewardDistributed.reward_coin` on this market. `reward_coin` becomes real spendable
+    /// `Coin` in `WalletProjection` with no constructor invariant, no cap, and (before this fix)
+    /// no conservation visibility at all — a completely unconstrained, audit-invisible
+    /// Coin-creation channel that defeats INV-3 ("Σ赎回 ≤ Σ铸造 + Σ补贴"). It is now folded into
+    /// the same "Coin paid out must be backed" side of the ledger as `redeemed_coin`, so an
+    /// unbacked reward now surfaces as `holds == false` instead of being invisible.
+    reward_coin: DecimalAmount,
+    /// CONFIRMED-bug-#2 fix (candidate 2): sum of every `RewardDistributed.slash_coin` on this
+    /// market. A slash destroys real spendable Coin (`WalletProjection` debits it), so it is
+    /// counted as backing symmetrically with `minted_coin`/`declared_subsidy`/`swap_pay_coin`.
+    slash_coin: DecimalAmount,
+}
+
+/// CONFIRMED-bug-#2 fix (candidate 3): ensures every `market_id` this function ever observes —
+/// from *any* event variant, not only `MarketCreated` — is tracked in both `order` (so it is
+/// never silently dropped from the returned report) and `markets` (so its ledger exists to be
+/// mutated). Before this fix, `order` was only pushed to inside the `MarketCreated` match arm,
+/// so a market minted/swapped/settled without its `MarketCreated` event present in the given
+/// slice (forged tape, truncated/paginated read, or any upstream loader bug) evaded the audit
+/// entirely: not `holds == false`, but completely absent from the output.
+fn ensure_tracked<'a>(
+    order: &mut Vec<String>,
+    markets: &'a mut BTreeMap<String, MarketConservationInternal>,
+    market_id: &str,
+) -> &'a mut MarketConservationInternal {
+    if !markets.contains_key(market_id) {
+        order.push(market_id.to_string());
+    }
+    markets.entry(market_id.to_string()).or_default()
 }
 
 /// The D7 conservation predicate, checkable over a raw event slice (real tape or fixture) so
 /// `turing audit market` (E0.3) can call it directly instead of re-implementing the bookkeeping.
 ///
-/// Two things are verified:
+/// Three things are verified:
 /// 1. **Mint invariant, aggregated** (defense in depth — `EconomyEvent::position_minted`
 ///    already enforces `coin_in == yes_out == no_out` per event at construction time, but a tape
 ///    is untrusted input, so this re-derives and checks the aggregate per market too, hard-failing
 ///    on `MintInvariantViolated` if a forged/corrupted event slipped the per-event check).
-/// 2. **Settlement conservation**: for every `MarketSettled` event, the Coin redeemed to winning
-///    positions so far must not exceed `minted_coin + declared_subsidy` for that market. This is
-///    reported per market (`holds: bool`) rather than hard-erroring, so a caller can report every
-///    market's status rather than stopping at the first failure.
+/// 2. **Settlement conservation**: for every `MarketSettled` event, the Coin paid out (winning
+///    redemptions plus any `RewardDistributed.reward_coin`) must not exceed the Coin backed into
+///    the market (`minted_coin + declared_subsidy + swap_pay_coin + slash_coin`) for that market.
+///    This is reported per market (`holds: bool`) rather than hard-erroring, so a caller can
+///    report every market's status rather than stopping at the first failure.
+/// 3. **Every observed market_id is reported** (candidate 3 fix): a market is never silently
+///    dropped from the output just because its `MarketCreated` event is missing from the slice.
 pub fn check_conservation(
     events: &[EconomyEvent],
 ) -> Result<Vec<MarketConservationReport>, EconomyError> {
@@ -534,15 +574,10 @@ pub fn check_conservation(
     for event in events {
         match event {
             EconomyEvent::MarketCreated(created) => {
-                if !markets.contains_key(&created.market_id) {
-                    order.push(created.market_id.clone());
-                }
                 let pool_y = DecimalAmount::parse_non_negative(&created.initial_pool_y)?;
                 let pool_n = DecimalAmount::parse_non_negative(&created.initial_pool_n)?;
-                markets
-                    .entry(created.market_id.clone())
-                    .or_default()
-                    .declared_subsidy = pool_y + pool_n;
+                ensure_tracked(&mut order, &mut markets, &created.market_id).declared_subsidy =
+                    pool_y + pool_n;
             }
             EconomyEvent::PositionMinted(mint) => {
                 let coin_in = DecimalAmount::parse_non_negative(&mint.coin_in)?;
@@ -551,7 +586,7 @@ pub fn check_conservation(
                 if coin_in != yes_out || yes_out != no_out {
                     return Err(EconomyError::MintInvariantViolated(mint.market_id.clone()));
                 }
-                let market = markets.entry(mint.market_id.clone()).or_default();
+                let market = ensure_tracked(&mut order, &mut markets, &mint.market_id);
                 market.minted_coin += coin_in;
                 market.minted_yes += yes_out;
                 market.minted_no += no_out;
@@ -569,12 +604,15 @@ pub fn check_conservation(
             EconomyEvent::AmmSwapExecuted(swap) => {
                 let get_y = DecimalAmount::parse_non_negative(&swap.get_y)?;
                 let get_n = DecimalAmount::parse_non_negative(&swap.get_n)?;
+                let pay_coin = DecimalAmount::parse_non_negative(&swap.pay_coin)?;
                 *yes_positions
                     .entry((swap.market_id.clone(), swap.trader_id.clone()))
                     .or_default() += get_y;
                 *no_positions
                     .entry((swap.market_id.clone(), swap.trader_id.clone()))
                     .or_default() += get_n;
+                ensure_tracked(&mut order, &mut markets, &swap.market_id).swap_pay_coin +=
+                    pay_coin;
             }
             EconomyEvent::MarketSettled(settled) => {
                 let mut redeemed = DecimalAmount::default();
@@ -590,10 +628,16 @@ pub fn check_conservation(
                         }
                     }
                 }
-                let market = markets.entry(settled.market_id.clone()).or_default();
-                market.redeemed_coin += redeemed;
+                ensure_tracked(&mut order, &mut markets, &settled.market_id).redeemed_coin +=
+                    redeemed;
             }
-            EconomyEvent::RewardDistributed(_) => {}
+            EconomyEvent::RewardDistributed(reward) => {
+                let reward_coin = DecimalAmount::parse_non_negative(&reward.reward_coin)?;
+                let slash_coin = DecimalAmount::parse_non_negative(&reward.slash_coin)?;
+                let market = ensure_tracked(&mut order, &mut markets, &reward.market_id);
+                market.reward_coin += reward_coin;
+                market.slash_coin += slash_coin;
+            }
         }
     }
 
@@ -601,7 +645,12 @@ pub fn check_conservation(
         .into_iter()
         .filter_map(|market_id| markets.remove(&market_id).map(|market| (market_id, market)))
         .map(|(market_id, market)| {
-            let holds = market.redeemed_coin <= market.minted_coin + market.declared_subsidy;
+            let paid_out = market.redeemed_coin + market.reward_coin;
+            let backed = market.minted_coin
+                + market.declared_subsidy
+                + market.swap_pay_coin
+                + market.slash_coin;
+            let holds = paid_out <= backed;
             MarketConservationReport {
                 market_id,
                 minted_coin: market.minted_coin.to_decimal_string(),
