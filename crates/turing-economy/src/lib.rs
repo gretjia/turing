@@ -9,6 +9,10 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use turing_contracts::identity::MicroOid;
 
+/// WP3 (design doc R1.1 §7; ADR-ECON-003 Decisions 1/3/4/6): `(Q, N, P)` tape fold, τ(N)
+/// annealing, N_eff floor arbitration hook. See module docs for scope.
+pub mod routing_fold;
+
 const SCALE: i128 = 1_000_000_000;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -1622,6 +1626,22 @@ pub enum EconomyError {
     /// `TauQ32::new` rejected a zero mantissa (ADR-ECON-003 Decision 4: τ=0 must go through
     /// `SoftmaxTemperature::ArgmaxBypass`, not `Finite`). Carries no numeric value (F4).
     InvalidSoftmaxTemperature,
+    /// WP3 (ADR-ECON-003 Decision 1): `scaffold_id`'s JCS canonicalization rejected the
+    /// descriptor. Carries only the generic codec diagnostic, never a routing-key value.
+    InvalidRoutingKeyDescriptor(String),
+    /// WP3 (ADR-ECON-003 Decision 6.3): a `RoutingFoldEvent::PriorUpdated` reused an
+    /// `event_hash` already seen (either still outstanding or already clawed back).
+    RoutingFoldDuplicateEventHash,
+    /// WP3 (ADR-ECON-003 Decision 6.3): a `RoutingFoldEvent::Clawback` referenced an
+    /// `event_hash` that was never applied, or was already clawed back once.
+    RoutingFoldUnknownClawbackTarget,
+    /// WP3 (ADR-ECON-003 Decision 6.4): a fold counter (`N`/`S`) would go negative.
+    RoutingFoldNegativeCounter,
+    /// WP3: a fold counter (`N`/`S`) would overflow its integer width.
+    RoutingFoldCounterOverflow,
+    /// WP3 (ADR-ECON-003 Decision 5/6): `AnnealConfig` was degenerate (zero `N_anneal`, or
+    /// a non-positive τ bound). Carries no numeric value (F4).
+    RoutingFoldInvalidAnnealConfig,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -1667,6 +1687,24 @@ impl std::fmt::Display for EconomyError {
             }
             EconomyError::InvalidSoftmaxTemperature => {
                 write!(f, "invalid softmax temperature configuration")
+            }
+            EconomyError::InvalidRoutingKeyDescriptor(detail) => {
+                write!(f, "invalid routing-key descriptor: {detail}")
+            }
+            EconomyError::RoutingFoldDuplicateEventHash => {
+                write!(f, "routing fold: duplicate event_hash")
+            }
+            EconomyError::RoutingFoldUnknownClawbackTarget => {
+                write!(f, "routing fold: unknown or already-applied clawback target")
+            }
+            EconomyError::RoutingFoldNegativeCounter => {
+                write!(f, "routing fold: counter would go negative")
+            }
+            EconomyError::RoutingFoldCounterOverflow => {
+                write!(f, "routing fold: counter overflow")
+            }
+            EconomyError::RoutingFoldInvalidAnnealConfig => {
+                write!(f, "routing fold: invalid annealing configuration")
             }
         }
     }

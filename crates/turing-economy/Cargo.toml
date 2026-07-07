@@ -11,6 +11,11 @@ serde = { version = "=1.0.228", features = ["derive"] }
 # sha2: SHA-256 for the ADR-ECON-003 Decision 4 deterministic softmax-selection seed
 # derivation (`MarketRouterMode::Softmax`). Same pinned version as turing-contracts.
 sha2 = "=0.10.9"
+# serde_json: build the scaffold_descriptor.v1 JSON value for jcs::canonicalize (WP3,
+# ADR-ECON-003 Decision 1). Pinned to the same version already used workspace-wide.
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+# unicode-normalization: NFC normalization for domain_bucket (WP3, ADR-ECON-003 Decision 1).
+unicode-normalization = "=0.1.25"
 
 [lints]
 workspace = true
