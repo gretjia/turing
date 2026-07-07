@@ -1,0 +1,104 @@
+diff --git a/astropy/io/ascii/connect.py b/astropy/io/ascii/connect.py
+index 0000000000..0000000000
+--- a/astropy/io/ascii/connect.py
++++ b/astropy/io/ascii/connect.py
+@@ -23,7 +23,10 @@
+ def io_write(table, filename, fast_writer=True, **kwargs):
+     from .ui import write
+-    return write(table, filename, fast_writer=fast_writer, **kwargs)
++    format = kwargs.get('format')
++    if format == 'ascii.rst':
++        kwargs['header_rows'] = kwargs.get('header_rows', ['name', 'unit'])
++    return write(table, filename, fast_writer=fast_writer, **kwargs)
+ 
+ 
+ @async_to_sync
+ 
+diff --git a/astropy/io/ascii/ui.py b/astropy/io/ascii/ui.py
+index 0000000000..0000000000
+--- a/astropy/io/ascii/ui.py
++++ b/astropy/io/ascii/ui.py
+@@ -168,9 +168,8 @@
+ 
+     if Writer is None:
+         if fmt is not None:
+-            writer = get_writer(Writer=Writer, fast_writer=fast_writer,
++            writer = get_writer(Writer=Writer, fast_writer=fast_writer,
+                                 **kwargs)
+         else:
+             # Check if a filename with an extension was provided and use
+             # that to determine the format.
+@@ -798,6 +797,7 @@
+     if writer is None:
+         writer = core._get_writer(Writer, fast_writer, **kwargs)
+ 
++    kwargs.setdefault('header_rows', ['name'])
+     writer = writer(**kwargs)
+ 
+     # Passing None as the filename means write to stdout
+ 
+diff --git a/astropy/io/ascii/writer.py b/astropy/io/ascii/writer.py
+index 0000000000..0000000000
+--- a/astropy/io/ascii/writer.py
++++ b/astropy/io/ascii/writer.py
+@@ -459,6 +459,20 @@
+         """
+         return {
+             'delimiter': ' | ',
++            'header_rows': ['name'],
+         }
+ 
++    def _write_header(self, lines):
++        """Write the header rows for RST format."""
++        if 'header_rows' in self.kwargs:
++            header_rows = self.kwargs['header_rows']
++            names = self.names
++            units = self._get_units()
++
++            for i, row_type in enumerate(header_rows):
++                if row_type.lower() == 'name':
++                    line = ' '.join(names)
++                elif row_type.lower() == 'unit':
++                    line = ' '.join(units if u is not None else '' for u in units)
++                else:
++                    raise ValueError(f"Unknown header row type: {row_type}")
++                lines.append(line)
++        super()._write_header(lines)
+ 
+ 
+ class RST(Basic):
+@@ -578,6 +592,22 @@
+         self._write_header(lines)
+ 
+         if self.header_rows is not None and self.header_rows[0]:
++            if isinstance(self.header_rows[0], str):
++                # Handle header_rows as a list of row types
++                for row_type in self.header_rows:
++                    if row_type.lower() == 'name':
++                        lines.append(' '.join(self.names))
++                    elif row_type.lower() == 'unit':
++                        lines.append(' '.join(
++                            unit if unit is not None else ''
++                            for unit in self._get_units()
++                        ))
++                    else:
++                        raise ValueError(f"Unknown header row type: {row_type}")
++            else:
++                # Original behavior for header_rows as a list of content
++                for row in self.header_rows:
++                    lines.append(' '.join(row))
+             lines.append(self.delimiter.join(self.header_row_format))
+ 
+         for row in self.data:
+diff --git a/astropy/io/ascii/core.py b/astropy/io/ascii/core.py
+index 0000000000..0000000000
+--- a/astropy/io/ascii/core.py
++++ b/astropy/io/ascii/core.py
+@@ -1716,6 +1716,7 @@
+         self.write_header = write_header
+         self.header_rows = header_rows
+         self.header_row_format = header_row_format
++        self.header_rows = kwargs.get('header_rows', ['name'])
+ 
+     def _get_table_type(self):
+         return 'table' if self.strip_lines else 'table_no_border'

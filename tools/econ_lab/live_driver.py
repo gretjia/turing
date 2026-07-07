@@ -318,6 +318,8 @@ def fold_and_select(
 
     if tau_config is None:
         router_mode = {"kind": "SoftmaxArgmaxBypass"}
+    elif tau_config.get("kind") == "uniform":
+        router_mode = {"kind": "SoftmaxUniform"}
     else:
         router_mode = {"kind": "SoftmaxFinite", "tau_q32_mantissa": tau_config["tau_hi_q32_mantissa"]}
 
@@ -1042,7 +1044,16 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
         real_call_cap = 4
     else:
         max_tasks = args.max_tasks if args.max_tasks is not None else len(packets)
-        tau_config = None  # this driver invocation never runs Stage A; see module doc.
+        # Stage A arm invocation (--tau): maps the PREREG tau grid onto the three Rust
+        # router modes. Mantissa = floor(tau * 2^32) per ADR-ECON-003 Decision 4; the
+        # values below are the frozen experiment arms, not B-zone production constants.
+        tau_arg = getattr(args, "tau", None)
+        if tau_arg is None or tau_arg == "0":
+            tau_config = None  # tau=0 argmax-bypass (Decision 4 mode bypass)
+        elif tau_arg == "inf":
+            tau_config = {"kind": "uniform"}
+        else:
+            tau_config = {"tau_hi_q32_mantissa": int(float(tau_arg) * (1 << 32))}
         real_call_cap = None  # caller's responsibility outside --smoke; no batch runs here.
 
     task_dir_root = args.task_dir_root or (Path(args.out).resolve().parent / "task_runs")
@@ -1204,6 +1215,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         "broken in that environment; see module doc's environment note)",
     )
     parser.add_argument("--scoring-timeout-s", type=int, default=1800)
+    parser.add_argument(
+        "--tau",
+        choices=["0", "0.5", "1", "2", "inf"],
+        default=None,
+        help="Stage A arm temperature (PREREG E-price-tau grid); ignored under --smoke",
+    )
     parser.add_argument("--task-dir-root", type=Path, default=None)
     parser.add_argument("--report-dir", type=Path, default=None)
     args = parser.parse_args(argv)

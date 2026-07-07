@@ -1,0 +1,15 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -42,8 +42,10 @@ class RST(FixedWidth):
+     _format_name = 'rst'
+     _description = 'reStructuredText simple table'
+     data_class = RSTData
+     header_class = RSTHeader
+ 
+-    def __init__(self, header_char='=', delimiter=' ', bookend=''):
++    def __init__(self, header_char='=', delimiter=' ', bookend='',
++                 header_rows=['name']):
+         super().__init__(header_char=header_char, delimiter=delimiter,
+-                         bookend=bookend)
++                         bookend=bookend, header_rows=header_rows)
