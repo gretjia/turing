@@ -8,7 +8,8 @@
 
 use turing_economy::{
     check_principal_position_cap, check_proposer_conflict, check_self_trade, BudgetSuggestion,
-    CandidateRoute, EconomyEvent, MarketRouter, MarketRouterMode, PriceSignal,
+    CandidateRoute, EconomyEvent, MarketRouter, MarketRouterMode, PriceSignal, SoftmaxTemperature,
+    TauQ32,
 };
 
 const SEED: u64 = 0x0B0A_DA71_0000_0006u64; // fixed, distinct per-lens seed.
@@ -54,14 +55,30 @@ fn assert_authority_fields_locked(suggestion: &BudgetSuggestion, mode: MarketRou
     assert_eq!(suggestion.mode, mode);
 }
 
-/// Attack 1: fuzz `MarketRouter::suggest` across BOTH `MarketRouterMode` variants, with
-/// adversarial route counts, adversarial (huge/zero/many-decimal) price strings, and
-/// signals that self-declare an elevated `truth_status` (e.g. "ground_truth",
-/// "verified_price", "oracle_confirmed", a near-miss case/whitespace variant of the only
-/// legal value) to see whether any input can flip `emits_authorization` /
-/// `can_move_accepted_head` / `head_effect` away from their hard-coded PRESERVE values,
-/// or whether a self-declared elevated truth_status can smuggle a price into the argmax
-/// that a legitimately-labeled signal would have lost to.
+/// Every `MarketRouter` construction this lens fuzzes, covering both pre-Softmax modes and
+/// `Softmax` under all three ADR-ECON-003 Decision 4 temperature regimes (τ=0 bypass, a
+/// finite τ, and τ=∞ uniform). `TauQ32::new` never fails here (both mantissas are nonzero
+/// literals), so `.expect` cannot spuriously fail this attack loop.
+fn all_router_configurations_under_test() -> Vec<MarketRouter> {
+    vec![
+        MarketRouter::new(MarketRouterMode::Shadow),
+        MarketRouter::new(MarketRouterMode::AssistedFuture),
+        MarketRouter::new_softmax(SoftmaxTemperature::ArgmaxBypass),
+        MarketRouter::new_softmax(SoftmaxTemperature::Finite(
+            TauQ32::new(1u64 << 31).expect("nonzero mantissa"),
+        )),
+        MarketRouter::new_softmax(SoftmaxTemperature::Uniform),
+    ]
+}
+
+/// Attack 1: fuzz `MarketRouter::suggest` across every `MarketRouterMode` variant (including
+/// `Softmax` under all three Decision 4 temperature regimes), with adversarial route counts,
+/// adversarial (huge/zero/many-decimal) price strings, and signals that self-declare an
+/// elevated `truth_status` (e.g. "ground_truth", "verified_price", "oracle_confirmed", a
+/// near-miss case/whitespace variant of the only legal value) to see whether any input can
+/// flip `emits_authorization` / `can_move_accepted_head` / `head_effect` away from their
+/// hard-coded PRESERVE values, or whether a self-declared elevated truth_status can smuggle
+/// a price into the selection that a legitimately-labeled signal would have lost to.
 #[test]
 fn market_router_suggest_never_unlocks_authority_under_adversarial_signals() {
     let mut rng = Xorshift64(SEED);
@@ -76,7 +93,8 @@ fn market_router_suggest_never_unlocks_authority_under_adversarial_signals() {
         "statistical_signal_only",  // the one legal value, mixed in as control
     ];
 
-    for mode in [MarketRouterMode::Shadow, MarketRouterMode::AssistedFuture] {
+    for router in all_router_configurations_under_test() {
+        let mode = router.mode();
         for round in 0..500 {
             let route_count = rng.next_range(1, 6) as usize;
             let mut routes = Vec::with_capacity(route_count);
@@ -107,12 +125,7 @@ fn market_router_suggest_never_unlocks_authority_under_adversarial_signals() {
             let price_signal_hash = format!("sha256:{:064x}", rng.next_u64());
             let pput_prior_hash = format!("sha256:{:064x}", rng.next_u64());
 
-            let result = MarketRouter::new(mode).suggest(
-                &routes,
-                &signals,
-                &price_signal_hash,
-                &pput_prior_hash,
-            );
+            let result = router.suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash);
             // A malformed digest never happens here (we always mint valid sha256:-prefixed
             // 64-hex strings), so this must always be Ok.
             let suggestion = result.expect("suggest must succeed on well-formed inputs");

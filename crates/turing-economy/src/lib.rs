@@ -6,6 +6,7 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use turing_contracts::identity::MicroOid;
 
 const SCALE: i128 = 1_000_000_000;
@@ -927,6 +928,48 @@ fn principal_position(
 pub enum MarketRouterMode {
     Shadow,
     AssistedFuture,
+    /// ADR-ECON-003 (design doc R1.1 §1.2/§4 G1): deterministic seeded softmax(Q/τ)
+    /// selection. τ configuration lives on `MarketRouter` (see `new_softmax`), never on
+    /// this marker -- the mode label itself is A-zone ("a softmax route exists" is public
+    /// per ADR-ECON-003 Decision 5), while the τ value stays B-zone (Art III.4).
+    Softmax,
+}
+
+/// Q32.32 fixed-point τ mantissa for `SoftmaxTemperature::Finite` (ADR-ECON-003 Decision 4).
+/// B-zone (Art III.4): the wrapped value must never be echoed into any agent-visible
+/// surface (error message / log / `BudgetSuggestion` field / tool schema / doc).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TauQ32(u64);
+
+impl TauQ32 {
+    /// `raw_q32_mantissa` = round(τ · 2^32); must be strictly positive. τ=0 is not a valid
+    /// `Finite` value -- use `SoftmaxTemperature::ArgmaxBypass` instead (ADR-ECON-003
+    /// Decision 4 "τ=0 = 模式旁路"), so "bypass" is a type-level state, not a runtime check
+    /// against a magic zero.
+    pub fn new(raw_q32_mantissa: u64) -> Result<Self, EconomyError> {
+        if raw_q32_mantissa == 0 {
+            return Err(EconomyError::InvalidSoftmaxTemperature);
+        }
+        Ok(TauQ32(raw_q32_mantissa))
+    }
+
+    fn raw_q32(self) -> i128 {
+        self.0 as i128
+    }
+}
+
+/// Selection temperature for `MarketRouterMode::Softmax` (ADR-ECON-003 Decision 4 extreme
+/// -- and limit-- semantics). B-zone (Art III.4): callers must never echo the wrapped
+/// configuration into any agent-visible surface.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SoftmaxTemperature {
+    /// τ=0: mode-bypass -- routes through the exact same argmax code path as
+    /// `Shadow`/`AssistedFuture` (ADR-ECON-003 Decision 4).
+    ArgmaxBypass,
+    /// 0 < τ < ∞.
+    Finite(TauQ32),
+    /// τ=∞: uniform distribution over the sorted `route_id` order (ADR-ECON-003 Decision 4).
+    Uniform,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -963,12 +1006,37 @@ pub struct BudgetSuggestion {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MarketRouter {
     mode: MarketRouterMode,
+    /// Only consulted when `mode == MarketRouterMode::Softmax`; ignored otherwise. Defaults
+    /// to `ArgmaxBypass` (ADR-ECON-003's own τ=0 mode-bypass semantics) so an unconfigured
+    /// `Softmax` router has a safe, spec-defined default rather than a fabricated τ value
+    /// (ADR-ECON-003 Decision 5 B-zone mechanism).
+    softmax_temperature: SoftmaxTemperature,
 }
 
 impl MarketRouter {
     #[must_use]
     pub fn new(mode: MarketRouterMode) -> Self {
-        MarketRouter { mode }
+        MarketRouter {
+            mode,
+            softmax_temperature: SoftmaxTemperature::ArgmaxBypass,
+        }
+    }
+
+    /// Construct a `Softmax`-mode router with an explicit τ configuration (ADR-ECON-003
+    /// Decision 4/5). The `temperature` value is B-zone (Art III.4): callers must never
+    /// echo it back through any agent-visible surface.
+    #[must_use]
+    pub fn new_softmax(temperature: SoftmaxTemperature) -> Self {
+        MarketRouter {
+            mode: MarketRouterMode::Softmax,
+            softmax_temperature: temperature,
+        }
+    }
+
+    /// The router's mode label. A-zone (ADR-ECON-003 Decision 5): safe to surface.
+    #[must_use]
+    pub fn mode(&self) -> MarketRouterMode {
+        self.mode
     }
 
     pub fn suggest(
@@ -984,7 +1052,8 @@ impl MarketRouter {
             return Err(EconomyError::NoCandidateRoutes);
         }
 
-        let mut best: Option<(&CandidateRoute, DecimalAmount)> = None;
+        let mut priced_routes: Vec<(&CandidateRoute, DecimalAmount)> =
+            Vec::with_capacity(routes.len());
         for route in routes {
             let yes_price = signals
                 .iter()
@@ -995,16 +1064,22 @@ impl MarketRouter {
                 .map(|signal| DecimalAmount::parse_non_negative(&signal.yes_price))
                 .transpose()?
                 .unwrap_or_default();
-            if best
-                .as_ref()
-                .is_none_or(|(_, best_price)| yes_price > *best_price)
-            {
-                best = Some((route, yes_price));
-            }
+            priced_routes.push((route, yes_price));
         }
-        let route = best
-            .map(|(route, _)| route)
-            .ok_or(EconomyError::NoCandidateRoutes)?;
+
+        // Mode branch (ADR-ECON-003 Decision 4): `Shadow`/`AssistedFuture` and the
+        // `Softmax`+`ArgmaxBypass` (τ=0) case all run the *identical* argmax code path, so
+        // τ=0 is byte-for-byte equivalent to the pre-existing argmax behavior by
+        // construction, not by separately re-implemented logic that merely agrees on paper.
+        let route = match (self.mode, self.softmax_temperature) {
+            (MarketRouterMode::Softmax, SoftmaxTemperature::Finite(tau)) => {
+                softmax_select(&priced_routes, tau, price_signal_hash, pput_prior_hash)
+            }
+            (MarketRouterMode::Softmax, SoftmaxTemperature::Uniform) => {
+                uniform_select(&priced_routes, price_signal_hash, pput_prior_hash)
+            }
+            _ => argmax_select(&priced_routes),
+        };
         Ok(BudgetSuggestion {
             schema_id: "budget_allocated.v1".to_string(),
             mode: self.mode,
@@ -1021,6 +1096,208 @@ impl MarketRouter {
             head_effect: "PRESERVE".to_string(),
         })
     }
+}
+
+/// Exact pre-Softmax argmax selection (unchanged logic, factored out so the `Softmax`
+/// `ArgmaxBypass` (τ=0) branch calls the *same* code, guaranteeing byte-for-byte parity
+/// rather than a separately-maintained lookalike).
+fn argmax_select<'a>(priced_routes: &[(&'a CandidateRoute, DecimalAmount)]) -> &'a CandidateRoute {
+    let mut best: Option<(&CandidateRoute, DecimalAmount)> = None;
+    for &(route, yes_price) in priced_routes {
+        if best
+            .as_ref()
+            .is_none_or(|(_, best_price)| yes_price > *best_price)
+        {
+            best = Some((route, yes_price));
+        }
+    }
+    best.map(|(route, _)| route)
+        .expect("priced_routes is non-empty: suggest() rejects empty routes before calling this")
+}
+
+/// ADR-ECON-003 Decision 4 domain separator for the deterministic softmax-selection seed.
+/// B-zone (Art III.4): must never be echoed into an error/log/schema/doc surface.
+const ROUTING_SELECT_SEED_DOMAIN: &str = "routing-select.v1";
+
+/// `u64 = LE(SHA256(domain ‖ price_signal_hash ‖ pput_prior_hash ‖ join(sorted(route_ids),
+/// "\x00"))[0..8])` (ADR-ECON-003 Decision 4). All inputs are already-committed
+/// caller-supplied literals, so identical inputs reproduce identical bytes (Art 0.2).
+fn derive_selection_seed_u64(
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+    sorted_route_ids: &[&str],
+) -> u64 {
+    let mut hasher = Sha256::new();
+    hasher.update(ROUTING_SELECT_SEED_DOMAIN.as_bytes());
+    hasher.update(price_signal_hash.as_bytes());
+    hasher.update(pput_prior_hash.as_bytes());
+    hasher.update(sorted_route_ids.join("\0").as_bytes());
+    let digest = hasher.finalize();
+    u64::from_le_bytes(
+        digest[0..8]
+            .try_into()
+            .expect("sha256 digest is always >= 8 bytes"),
+    )
+}
+
+/// Q32.32 fixed-point unit (ADR-ECON-003 Decision 4: "全程 Q32.32 定点(i128 中间量,向零截断)").
+const Q32_ONE: i128 = 1i128 << 32;
+
+/// floor(1.4426950408889634 * 2^32); `exp(x)` is computed as `exp2(x * log2(e))`
+/// (ADR-ECON-003 Decision 4). log2(e) is a public math constant, not a B-zone coefficient.
+const LOG2E_Q32: i128 = 6_196_328_018;
+
+/// Pinned `exp2f` polynomial coefficients (ADR-ECON-003 Decision 4), fixed-pointed via the
+/// pinned truncation rule `floor(c_i * 2^32)`. `exp2f(f) = 1 + f*(c1 + f*(c2 + f*c3))`.
+const EXP2F_C1_Q32: i128 = 2_977_044_471;
+const EXP2F_C2_Q32: i128 = 1_031_477_962;
+const EXP2F_C3_Q32: i128 = 239_780_565;
+
+fn decimal_to_q32(amount: DecimalAmount) -> i128 {
+    amount
+        .units
+        .checked_mul(Q32_ONE)
+        .map(|scaled| scaled / SCALE)
+        .unwrap_or(i128::MAX)
+}
+
+/// Q32.32 multiply, truncating toward zero (ADR-ECON-003 Decision 4), saturating instead of
+/// panicking on the (practically unreachable at realistic magnitudes) overflow case.
+fn q32_mul(a: i128, b: i128) -> i128 {
+    match a.checked_mul(b) {
+        Some(product) => product / Q32_ONE,
+        None if (a >= 0) == (b >= 0) => i128::MAX,
+        None => i128::MIN,
+    }
+}
+
+/// Q32.32 divide, truncating toward zero (ADR-ECON-003 Decision 4); `b` is always a
+/// strictly-positive τ mantissa here (`TauQ32` rejects zero at construction).
+fn q32_div(a: i128, b: i128) -> i128 {
+    if b == 0 {
+        return i128::MAX;
+    }
+    match a.checked_mul(Q32_ONE) {
+        Some(scaled) => scaled / b,
+        None if (a >= 0) == (b >= 0) => i128::MAX,
+        None => i128::MIN,
+    }
+}
+
+/// `exp2f(f) = 1 + f*(c1 + f*(c2 + f*c3))` for `f` in Q32.32 `[0, Q32_ONE)` (ADR-ECON-003
+/// Decision 4 pinned polynomial).
+fn exp2f_q32(f: i128) -> i128 {
+    let t2 = EXP2F_C2_Q32 + q32_mul(f, EXP2F_C3_Q32);
+    let t1 = EXP2F_C1_Q32 + q32_mul(f, t2);
+    Q32_ONE + q32_mul(f, t1)
+}
+
+/// `exp2(y) = 2^floor(y) * exp2f(frac(y))` for `y` in Q32.32 (ADR-ECON-003 Decision 4).
+/// Total function: saturates to 0 / `i128::MAX` at the (unreachable in the softmax
+/// max-subtracted usage below, since `y <= 0` there) extreme ends rather than panicking.
+fn exp2_q32(y: i128) -> i128 {
+    let floor_part = y.div_euclid(Q32_ONE);
+    let frac = y.rem_euclid(Q32_ONE);
+    let base = exp2f_q32(frac);
+    if floor_part >= 0 {
+        if floor_part >= 96 {
+            i128::MAX
+        } else {
+            base << (floor_part as u32)
+        }
+    } else {
+        let negated = -floor_part;
+        if negated >= 127 {
+            0
+        } else {
+            base >> (negated as u32)
+        }
+    }
+}
+
+/// Inverse-CDF sample over `weighted` (already in the sorted-`route_id` accumulation order
+/// required by ADR-ECON-003 Decision 4) against the deterministic seed `u64_seed`. Total
+/// function: the last element's cumulative weight always equals the total, and
+/// `total * 2^64 > u64_seed * total` always holds for `u64_seed < 2^64`, so the loop always
+/// returns from inside; the trailing `expect` is unreachable given non-empty input.
+fn weighted_inverse_cdf_select<'a>(
+    weighted: &[(&'a CandidateRoute, i128)],
+    u64_seed: u64,
+) -> &'a CandidateRoute {
+    let total: i128 = weighted.iter().map(|(_, weight)| *weight).sum();
+    let mut cumulative: i128 = 0;
+    for &(route, weight) in weighted {
+        cumulative += weight;
+        let lhs = cumulative.checked_mul(1i128 << 64);
+        let rhs = (u64_seed as i128).checked_mul(total);
+        match (lhs, rhs) {
+            (Some(lhs), Some(rhs)) if lhs > rhs => return route,
+            (None, _) | (_, None) => return route,
+            _ => {}
+        }
+    }
+    weighted
+        .last()
+        .map(|(route, _)| *route)
+        .expect("weighted is non-empty: suggest() rejects empty routes before calling this")
+}
+
+/// `MarketRouterMode::Softmax` with `SoftmaxTemperature::Finite(tau)`: `Q_eff = yes_price`
+/// (WP1 scope -- the (Q,N,P) tape fold is WP3; selection here reuses the same price basis
+/// the pre-existing argmax path already used), `selection = softmax(Q_eff/τ)` sampled via
+/// the deterministic seed (ADR-ECON-003 Decision 4).
+fn softmax_select<'a>(
+    priced_routes: &[(&'a CandidateRoute, DecimalAmount)],
+    tau: TauQ32,
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+) -> &'a CandidateRoute {
+    let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
+    sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
+
+    let tau_q32 = tau.raw_q32();
+    let x_values: Vec<i128> = sorted
+        .iter()
+        .map(|(_, price)| q32_div(decimal_to_q32(*price), tau_q32))
+        .collect();
+    let max_x = x_values.iter().copied().max().unwrap_or(0);
+
+    let weighted: Vec<(&CandidateRoute, i128)> = sorted
+        .iter()
+        .zip(x_values.iter())
+        .map(|((route, _), &x)| {
+            let shifted = x - max_x; // <= 0: softmax(x) == softmax(x - max(x)), exact identity
+            let exponent = q32_mul(shifted, LOG2E_Q32);
+            (*route, exp2_q32(exponent))
+        })
+        .collect();
+
+    let route_ids: Vec<&str> = sorted
+        .iter()
+        .map(|(route, _)| route.route_id.as_str())
+        .collect();
+    let seed = derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids);
+    weighted_inverse_cdf_select(&weighted, seed)
+}
+
+/// `MarketRouterMode::Softmax` with `SoftmaxTemperature::Uniform` (τ=∞): uniform
+/// distribution over the sorted `route_id` order, sampled via the same deterministic seed
+/// derivation (ADR-ECON-003 Decision 4).
+fn uniform_select<'a>(
+    priced_routes: &[(&'a CandidateRoute, DecimalAmount)],
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+) -> &'a CandidateRoute {
+    let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
+    sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
+    let weighted: Vec<(&CandidateRoute, i128)> =
+        sorted.iter().map(|(route, _)| (*route, Q32_ONE)).collect();
+    let route_ids: Vec<&str> = sorted
+        .iter()
+        .map(|(route, _)| route.route_id.as_str())
+        .collect();
+    let seed = derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids);
+    weighted_inverse_cdf_select(&weighted, seed)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -1264,6 +1541,9 @@ pub enum EconomyError {
     SelfTradeRejected(String),
     PrincipalPositionCapExceeded(String),
     ProposerConflictRejected(String),
+    /// `TauQ32::new` rejected a zero mantissa (ADR-ECON-003 Decision 4: τ=0 must go through
+    /// `SoftmaxTemperature::ArgmaxBypass`, not `Finite`). Carries no numeric value (F4).
+    InvalidSoftmaxTemperature,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -1306,6 +1586,9 @@ impl std::fmt::Display for EconomyError {
             }
             EconomyError::ProposerConflictRejected(detail) => {
                 write!(f, "D5 proposer-conflict rule: {detail}")
+            }
+            EconomyError::InvalidSoftmaxTemperature => {
+                write!(f, "invalid softmax temperature configuration")
             }
         }
     }
