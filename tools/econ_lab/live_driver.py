@@ -35,12 +35,16 @@ for keeping `--max-tasks` bounded -- this file does not gate a production batch,
 production batch was never authorized in this task and none is invoked here.
 
 Single source of truth for the deterministic math: every routing-key derivation
-(domain_bucket/scaffold_id), every fold/selection decision, and the N_eff/H_lineage
-diversity-metrics estimate is a subprocess call into `econ_fold_cli`
-(crates/turing-economy/src/bin/econ_fold_cli.rs), never re-derived in Python. The only
-Python-side "formula" in this file is the held-out accept/verify split
-(`tools/econ_lab/verifier/split.py`, already WP7's own pinned v0 implementation, imported
-verbatim, not re-implemented); the DeepSeek-direct dispatch is imported from
+(domain_bucket/scaffold_id), every fold/selection decision, the N_eff/H_lineage
+diversity-metrics estimate, and every `RoutingPriorUpdated` event's `event_hash` (WP9b) is a
+subprocess call into `econ_fold_cli` (crates/turing-economy/src/bin/econ_fold_cli.rs), never
+re-derived in Python. The only Python-side "formula" reachable from this file is the
+held-out accept/verify split (`tools/econ_lab/verifier/split.py`'s pinned v0
+`SHA256("heldout-split.v1" + id)` first-byte-parity implementation, WP7's own), now applied
+at **test_id** granularity by `tools/econ_lab/verifier/live_split_verifier.py` (WP9b,
+ADR-ECON-003 Decision 2 point 4) rather than at this file's own `instance_id` granularity --
+see that module's docstring and `_settle_one` below; the DeepSeek-direct dispatch is imported
+from
 `tools/bench/run_deepseek_arm_a_worker.py` (WP9a's own M3 precedent, not re-implemented),
 and the 3 new SiliconFlow-routed lineages' dispatch reuses that same module's prompt-text
 and response-parsing helpers (`response_message`, `extract_unified_diff`) -- only the actual
@@ -74,14 +78,19 @@ Known, reported (not silently patched) spec gaps:
     placeholder plumbing point, used only for a `--router-mode softmax-finite` invocation
     this driver never actually takes in this task (`--smoke` hardcodes tau=0 argmax-bypass,
     and no Stage A batch runs at all).
-  * ADR-ECON-003 Decision 2's independent-verifier v0 (`tools/econ_lab/verifier/
-    independent_verifier.py`) is fixture-only: it judges a synthetic `verify_witnesses`
-    array that does not exist for a real SWE-bench task. This driver does NOT invent a live
-    differential checker. A task whose case_id lands on the held-out split's VERIFY side
-    still gets a real worker dispatch + real score, but the driver does not emit a
-    `RoutingPriorUpdated` event for it -- recorded as
-    `backup_update.reason = "BLOCKED_NO_LIVE_INDEPENDENT_VERIFIER"`. Unchanged by the
-    lineage-expansion update (only the worker-lineage constraint was frozen).
+  * SUPERSEDED (WP9b, ADR-ECON-003 Decision 2 point 4, 2026-07-07 增补): this driver used to
+    have no live independent verifier -- `tools/econ_lab/verifier/independent_verifier.py`
+    is fixture-only (it judges a synthetic `verify_witnesses` array that does not exist for
+    a real SWE-bench task), and the driver used to split on the whole task's `instance_id`
+    (`verifier.split.split_side`), recording every VERIFY-side task's backup update as
+    `BLOCKED_NO_LIVE_INDEPENDENT_VERIFIER` and every ACCEPT-side task's as
+    `accept_side_no_backup_update_by_design` -- i.e. Q never updated, ever. Decision 2.4
+    replaces the instance_id-level split entirely with a **test_id-level** split
+    (`tools/econ_lab/verifier/live_split_verifier.py`, reusing `verifier.split.split_side`'s
+    same hash/domain-separator at test_id granularity): every scored (task, arm, lineage)
+    dispatch now gets BOTH an `accept_verdict` (market settlement) and a `verify_verdict`
+    (backup/RoutingPriorUpdated) read independently from the same harness execution's
+    per-test report. See `_settle_one` and `run_driver` below for the wiring.
   * The frozen Appendix A text pins DeepSeek-direct as "fallback" for the deepseek lineage
     but does not pin an exact trigger condition (e.g. a specific HTTP status). This driver
     treats "SiliconFlow dispatch returned NOT_RUN (missing SILICONFLOW_API_KEY) or ERROR
@@ -111,7 +120,7 @@ ECON_LAB_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ECON_LAB_DIR))
 sys.path.insert(0, str(REPO_ROOT / "tools" / "bench"))
 
-from verifier.split import ACCEPT_SIDE, VERIFY_SIDE, split_side  # noqa: E402
+from verifier import live_split_verifier  # noqa: E402
 import run_deepseek_arm_a_worker as arm_a_worker  # noqa: E402
 
 SHARD_ROOT = REPO_ROOT / "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01"
@@ -669,6 +678,62 @@ def dispatch_worker_for_lineage(
 # ---------------------------------------------------------------------------
 
 
+# WP9b orchestrator addendum (2026-07-07, "基于刚完成的真实评分链验证,实证锚点在盘上"):
+# the aggregated report this function reads back (`{model_name}.{run_id}.json`, written by
+# `swebench.harness.reporting.make_run_report`) is `schema_version: 2` -- per-outcome
+# instance_id *lists* (`resolved_ids`/`unresolved_ids`/`error_ids`/`empty_patch_ids`/
+# `incomplete_ids`), never a `{instance_id: {...}}` mapping. The real per-test `tests_status`
+# block lives in a second, separate per-instance report file
+# (`swebench.harness.run_evaluation`'s own `report_path`, confirmed against
+# `~/.turingos/swebench-venv/lib/python3.11/site-packages/swebench/harness/{run_evaluation,
+# reporting,constants}.py`, v4.1.0 -- never guessed from memory): `<report_dir>/
+# logs/run_evaluation/<run_id>/<model_name>/<instance_id>/report.json`, which exists only
+# when the patch applied and the eval script actually ran (RESOLVED/UNRESOLVED outcomes).
+RUN_EVALUATION_LOG_DIR_NAME = "logs/run_evaluation"
+PER_INSTANCE_REPORT_FILENAME = "report.json"
+PER_INSTANCE_LOG_FILENAME = "run_instance.log"
+# `swebench.harness.constants.APPLY_PATCH_FAIL`'s literal marker string (v4.1.0): the one
+# `error_ids` cause the orchestrator addendum pins a specific reason for.
+APPLY_PATCH_FAIL_MARKER = ">>>>> Patch Apply Failed"
+
+
+def _per_instance_report_dir(report_dir: Path, *, run_id: str, model_name: str, instance_id: str) -> Path:
+    return report_dir / RUN_EVALUATION_LOG_DIR_NAME / run_id / model_name / instance_id
+
+
+def _read_per_instance_tests_status(instance_dir: Path, instance_id: str) -> Optional[dict[str, Any]]:
+    """Read the real per-test `tests_status` block (RESOLVED/UNRESOLVED outcomes only --
+    caller guards this). Returns `None` if the file is unexpectedly absent/malformed, which
+    `live_split_verifier.judge` already treats defensively (not_enough_tests=True), not as a
+    crash."""
+    report_path = instance_dir / PER_INSTANCE_REPORT_FILENAME
+    if not report_path.exists():
+        return None
+    try:
+        per_instance_report = json.loads(report_path.read_text(encoding="utf-8"))
+        return (per_instance_report.get(instance_id) or {}).get("tests_status")
+    except (json.JSONDecodeError, AttributeError):
+        return None
+
+
+def _classify_harness_error_reason(instance_dir: Path) -> str:
+    """Distinguish the one `error_ids` cause the orchestrator addendum (2026-07-07, point 3)
+    pins a specific reason for (`EvaluationError: Patch Apply Failed`, swebench's own
+    `APPLY_PATCH_FAIL` marker in `run_instance.log`) from every other `error_ids` cause
+    (timeout, build failure, an empty/malformed report file, ...) -- reported generically as
+    `"harness_error"` for the latter, never invented as a specific reason this driver was not
+    given."""
+    log_path = instance_dir / PER_INSTANCE_LOG_FILENAME
+    if log_path.exists():
+        try:
+            log_text = log_path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            log_text = ""
+        if APPLY_PATCH_FAIL_MARKER in log_text:
+            return "patch_apply_failed"
+    return "harness_error"
+
+
 def score_with_official_harness(
     *,
     python_bin: str,
@@ -740,20 +805,132 @@ def score_with_official_harness(
             "returncode": proc.returncode,
             "log_path": str(log_path),
         }
-    report = json.loads(report_path.read_text(encoding="utf-8"))
-    instance_report = report.get(instance_id, {})
+    # Aggregated report, schema_version 2 (see this function's module-level doc comment
+    # above): per-outcome instance_id lists, not a `{instance_id: {...}}` mapping.
+    aggregated_report = json.loads(report_path.read_text(encoding="utf-8"))
+    instance_dir = _per_instance_report_dir(
+        report_dir, run_id=run_id, model_name=model_name, instance_id=instance_id
+    )
+
+    if instance_id in (aggregated_report.get("resolved_ids") or []):
+        outcome = "RESOLVED"
+    elif instance_id in (aggregated_report.get("unresolved_ids") or []):
+        outcome = "UNRESOLVED"
+    elif instance_id in (aggregated_report.get("empty_patch_ids") or []):
+        outcome = "EMPTY_PATCH"
+    elif instance_id in (aggregated_report.get("incomplete_ids") or []):
+        outcome = "INCOMPLETE"
+    else:
+        # swebench's own catch-all bucket (`make_run_report`): no report.json ever existed,
+        # or the report file was empty/malformed -- includes, but is not limited to,
+        # `EvaluationError: Patch Apply Failed` (orchestrator addendum point 3).
+        outcome = "ERROR"
+
+    tests_status: Optional[dict[str, Any]] = None
+    harness_error_reason: Optional[str] = None
+    if outcome in ("RESOLVED", "UNRESOLVED"):
+        tests_status = _read_per_instance_tests_status(instance_dir, instance_id)
+    else:
+        harness_error_reason = _classify_harness_error_reason(instance_dir)
+
     return {
         "status": "COMPLETED",
-        "resolved": bool(instance_report.get("resolved", False)),
+        "outcome": outcome,
+        # Kept for back-compat/diagnostics only: this is the harness's own whole-test-suite
+        # verdict, no longer what market settlement uses (Decision 2.4: settlement uses
+        # `live_split_verdict.accept_verdict`, computed independently by `_settle_one` below).
+        "resolved": outcome == "RESOLVED",
+        "tests_status": tests_status,
+        "harness_error_reason": harness_error_reason,
         "report_path": str(report_path),
         "log_path": str(log_path),
-        "raw_report": instance_report,
+        "raw_report": aggregated_report,
     }
 
 
 # ---------------------------------------------------------------------------
 # Main per-task loop
 # ---------------------------------------------------------------------------
+
+# Opaque verifier-instance identifier (ADR-ECON-003 Decision 2.2: structurally separate from
+# the accept predicate; carries no formula/threshold value, only labels which independent
+# reading script produced the verdict).
+LIVE_SPLIT_VERIFIER_SOURCE_ID = "verifier:live_split_verifier.v1"
+
+
+def _verifier_attestation_hash(*, instance_id: str, arm: str, lineage: str, live_split_result: dict[str, Any]) -> str:
+    """`sha256:`-prefixed 64-hex attestation digest over exactly what the independent
+    verifier read (the verify-side test_id set and its own verdict, or the harness-error
+    reason when there was no per-test data at all) -- not a re-derivation of any
+    routing/selection formula, just an evidence digest so a later audit can recompute and
+    check it against the same fixed inputs (Art 0.2 style discipline)."""
+    payload = {
+        "schema": "live_split_verifier.attestation.v1",
+        "instance_id": instance_id,
+        "arm": arm,
+        "lineage": lineage,
+        "verify_test_ids": live_split_result["verify_test_ids"],
+        "verify_verdict": live_split_result["verify_verdict"],
+        "harness_error_reason": live_split_result["harness_error_reason"],
+    }
+    return digest(json.dumps(payload, sort_keys=True))
+
+
+def _apply_live_split_verifier(
+    *,
+    cli_bin: Path,
+    instance_id: str,
+    arm: str,
+    lineage: str,
+    route_domain: str,
+    route_scaffold: str,
+    tests_status: Optional[dict[str, Any]],
+    harness_error_reason: Optional[str],
+) -> tuple[dict[str, Any], dict[str, Any], Optional[dict[str, Any]]]:
+    """ADR-ECON-003 Decision 2.4 wiring: independently judge this (task, arm, lineage)
+    settlement's harness report, then -- unless NOT_ENOUGH_TESTS -- ask `econ_fold_cli` to
+    build the fully-hashed `RoutingPriorUpdated` event for the verify-side verdict (never
+    recomputed in Python).
+
+    `harness_error_reason` (orchestrator addendum, 2026-07-07, point 3): when set, this
+    (task, arm, lineage) settlement never produced a per-instance report.json at all (the
+    harness's own `error_ids` bucket), so `judge_harness_error` is used instead of `judge` --
+    there is no `tests_status` to independently read.
+
+    Returns `(live_split_result, backup_update, routing_prior_updated_event_or_none)`. The
+    caller is responsible for appending the returned event onto its own
+    `committed_routing_events` tape (this function has no tape-mutation side effect, to keep
+    it a pure-ish, independently testable unit)."""
+    if harness_error_reason is not None:
+        live_split_result = live_split_verifier.judge_harness_error(harness_error_reason)
+    else:
+        live_split_result = live_split_verifier.judge(tests_status)
+
+    if live_split_result["not_enough_tests"]:
+        # Decision 2.4: "verify 侧为空(测试太少)⇒ NOT_ENOUGH_TESTS,不回灌,计数上报" --
+        # no RoutingPriorUpdated event, but the caller still counts this in the verdict JSON.
+        backup_update = {"applied": False, "reason": "NOT_ENOUGH_TESTS"}
+        return live_split_result, backup_update, None
+
+    attestation_hash = _verifier_attestation_hash(
+        instance_id=instance_id, arm=arm, lineage=lineage, live_split_result=live_split_result
+    )
+    build_response = call_cli(
+        cli_bin,
+        "build-routing-prior-updated",
+        {
+            "schema": "econ_fold_cli.build_routing_prior_updated.request.v1",
+            "route_domain": route_domain,
+            "route_scaffold": route_scaffold,
+            "verdict": bool(live_split_result["verify_verdict"]),
+            "verdict_source_id": LIVE_SPLIT_VERIFIER_SOURCE_ID,
+            "verifier_attestation_hash": attestation_hash,
+        },
+    )
+    event = build_response["event"]
+    event_hash = event["RoutingPriorUpdated"]["event_hash"]
+    backup_update = {"applied": True, "routing_prior_updated_event_hash": event_hash}
+    return live_split_result, backup_update, event
 
 
 def _settle_one(
@@ -765,10 +942,19 @@ def _settle_one(
     task_dir_root: Path,
     report_root: Path,
     deepseek_native_provider_config: dict[str, Any],
+    cli_bin: Path,
+    route_domain: str,
+    route_scaffold: str,
 ) -> dict[str, Any]:
-    """Dispatch one (arm, lineage) pair for one task and score it if a patch was produced.
-    Never fabricates a verdict: `settlement_verdict_resolved` stays `None` unless the real
-    scorer actually completed."""
+    """Dispatch one (arm, lineage) pair for one task, score it if a patch was produced, and
+    -- if scoring completed -- independently re-judge the harness's per-test report (WP9b,
+    ADR-ECON-003 Decision 2.4). Never fabricates a verdict: `settlement_verdict_resolved`
+    and `live_split_verdict` stay `None` unless the real scorer actually completed.
+
+    Market settlement uses `accept_verdict` (Decision 2.4: "accept 裁决(市场结算侧)"),
+    **not** the harness's own whole-test-suite `resolved` boolean -- the two differ whenever
+    any grading-relevant test lands on the verify side of the held-out split.
+    """
     instance_id = packet["instance_id"]
     worker_result = dispatch_worker_for_lineage(
         arm=arm,
@@ -781,6 +967,9 @@ def _settle_one(
 
     scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
     settlement_verdict: Optional[bool] = None
+    live_split_result: Optional[dict[str, Any]] = None
+    backup_update: dict[str, Any] = {"applied": False, "reason": "SCORING_NOT_COMPLETED"}
+    routing_prior_updated_event: Optional[dict[str, Any]] = None
     if worker_result.get("status") == "COMPLETED":
         provider_path = worker_result.get("provider_path", "siliconflow")
         if provider_path == "deepseek_direct_fallback":
@@ -798,7 +987,17 @@ def _settle_one(
                 timeout_s=args.scoring_timeout_s,
             )
             if scoring_result.get("status") == "COMPLETED":
-                settlement_verdict = scoring_result["resolved"]
+                live_split_result, backup_update, routing_prior_updated_event = _apply_live_split_verifier(
+                    cli_bin=cli_bin,
+                    instance_id=instance_id,
+                    arm=arm,
+                    lineage=lineage,
+                    route_domain=route_domain,
+                    route_scaffold=route_scaffold,
+                    tests_status=scoring_result.get("tests_status"),
+                    harness_error_reason=scoring_result.get("harness_error_reason"),
+                )
+                settlement_verdict = live_split_result["accept_verdict"]
 
     return {
         "lineage": lineage,
@@ -807,6 +1006,9 @@ def _settle_one(
         "worker_result": {k: v for k, v in worker_result.items() if k != "usage_raw_sha256"},
         "scoring_result": {k: v for k, v in scoring_result.items() if k != "command"},
         "settlement_verdict_resolved": settlement_verdict,
+        "live_split_verdict": live_split_result,
+        "backup_update": backup_update,
+        "_routing_prior_updated_event": routing_prior_updated_event,
     }
 
 
@@ -826,14 +1028,15 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
         # lineages dispatched for that arm (<= 4 real calls total, <= 1 per lineage) -- the
         # point of the smoke test is to prove every provider path is independently reachable
         # through this driver, not just DeepSeek's (per the lineage-expansion update).
-        selected = None
-        for packet in sorted(packets, key=lambda p: p["instance_id"]):
-            if split_side(packet["instance_id"]) == ACCEPT_SIDE:
-                selected = packet
-                break
-        if selected is None:
-            raise SystemExit("no task in this shard lands on the held-out ACCEPT side (unexpected)")
-        packets = [selected]
+        #
+        # NOTE (Decision 2.4 supersession): this used to filter for a task whose *instance_id*
+        # landed on the held-out ACCEPT side (`verifier.split.split_side`), because that
+        # instance_id-level split used to be the sole accept/verify partition this driver
+        # knew about. Decision 2.4 retires that instance_id-level split entirely -- the split
+        # now happens per *test_id*, inside `live_split_verifier`, once a real harness report
+        # exists (see `_settle_one`) -- so smoke-mode task selection is simply "first task by
+        # instance_id": deterministic, but carries no leftover accept/verify meaning.
+        packets = sorted(packets, key=lambda p: p["instance_id"])[:1]
         max_tasks = 1
         tau_config = None  # tau=0 argmax-bypass, per --smoke's own contract
         real_call_cap = 4
@@ -848,6 +1051,13 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     committed_routing_events: list[dict[str, Any]] = []
     task_results: list[dict[str, Any]] = []
     real_worker_calls = 0
+    # E-soundness data source (ADR-ECON-003 Decision 2.3/2.4): counted, never gated on here --
+    # a rising canary/round trend is an owner/Veto-AI review signal, not something this driver
+    # judges or reacts to.
+    not_enough_tests_count = 0
+    canary_count = 0
+    settled_dispatch_count = 0
+    routing_prior_updated_applied_count = 0
     # Per-domain_bucket settlement history for the N_eff/H_lineage estimator (WP5), lineage
     # labels only (module doc's lineage-label discipline). `settlement_index` is shared
     # across lineages settled on the *same* task/round (ADR-ECON-003 Decision 3: "对齐到
@@ -870,8 +1080,6 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
         selected_route_id = selection["budget_suggestion"]["route_id"]
         _instance, selected_arm, selected_lineage = selected_route_id.split("::")
 
-        side = split_side(instance_id)
-
         if args.smoke:
             dispatch_mode = "smoke_all_lineages_for_winning_arm"
             lineages_to_dispatch = list(LINEAGES)
@@ -890,6 +1098,8 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                         "worker_result": {"status": "SKIPPED_SPEND_CAP"},
                         "scoring_result": {"status": "SKIPPED_NO_PATCH"},
                         "settlement_verdict_resolved": None,
+                        "live_split_verdict": None,
+                        "backup_update": {"applied": False, "reason": "SKIPPED_SPEND_CAP"},
                     }
                 )
                 continue
@@ -901,10 +1111,28 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 task_dir_root=task_dir_root,
                 report_root=report_root,
                 deepseek_native_provider_config=deepseek_native_provider_config,
+                cli_bin=cli_bin,
+                route_domain=domain_bucket,
+                route_scaffold=scaffold_ids[selected_arm][lineage],
             )
             if settled["worker_result_status"] == "COMPLETED":
                 real_worker_calls += 1
+
+            # Decision 2.4 backup-update wiring: feed the independent verifier's
+            # RoutingPriorUpdated event (if one was built) back onto the tape this same
+            # driver run folds over for every subsequent task's selection -- this is the
+            # live "回灌" (feedback) WP9a lacked entirely.
+            routing_prior_updated_event = settled.pop("_routing_prior_updated_event", None)
+            if routing_prior_updated_event is not None:
+                committed_routing_events.append(routing_prior_updated_event)
+                routing_prior_updated_applied_count += 1
             dispatches.append(settled)
+
+            live_split_verdict = settled.get("live_split_verdict")
+            if live_split_verdict is not None:
+                settled_dispatch_count += 1
+                not_enough_tests_count += int(live_split_verdict["not_enough_tests"])
+                canary_count += int(live_split_verdict["canary"])
 
             if settled["settlement_verdict_resolved"] is not None:
                 diversity_history.setdefault(domain_bucket, []).append(
@@ -915,14 +1143,6 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     }
                 )
 
-        backup_update: dict[str, Any] = {"applied": False}
-        if side == ACCEPT_SIDE:
-            backup_update = {"applied": False, "reason": "accept_side_no_backup_update_by_design"}
-        elif side == VERIFY_SIDE:
-            # See module doc's independent-verifier gap: no live differential checker is
-            # wired for real SWE-bench tasks, so no RoutingPriorUpdated is fabricated here.
-            backup_update = {"applied": False, "reason": "BLOCKED_NO_LIVE_INDEPENDENT_VERIFIER"}
-
         task_results.append(
             {
                 "instance_id": instance_id,
@@ -932,9 +1152,7 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 "selected_lineage": selected_lineage,
                 "dispatch_mode": dispatch_mode,
                 "budget_suggestion": selection["budget_suggestion"],
-                "held_out_split_side": side,
                 "dispatches": dispatches,
-                "backup_update": backup_update,
                 "evidence_class": evidence_class,
             }
         )
@@ -955,6 +1173,15 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
         "task_count": len(task_results),
         "tasks": task_results,
         "diversity_metrics_by_domain_bucket": diversity_metrics_by_bucket,
+        # ADR-ECON-003 Decision 2.4 live-verifier summary (E-soundness data source): counts
+        # only, never a τ/λ/floor value (Art III.4/F4) -- see `gate_f4_econ_leakage.sh`.
+        "verifier_summary": {
+            "schema": "econ_lab.live_split_verifier.summary.v1",
+            "settled_dispatch_count": settled_dispatch_count,
+            "not_enough_tests_count": not_enough_tests_count,
+            "canary_count": canary_count,
+            "routing_prior_updated_applied_count": routing_prior_updated_applied_count,
+        },
         "generated_at_unix": int(time.time()),
     }
     return verdict
@@ -972,7 +1199,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         "--scoring-python",
         default=sys.executable,
         help="python interpreter with a working `swebench` package (numpy<2-ABI compatible; "
-        "see module doc's environment note if the current interpreter's swebench import is broken)",
+        "the real evaluation environment's own interpreter is "
+        "~/.turingos/swebench-venv/bin/python -- the system python's swebench import is "
+        "broken in that environment; see module doc's environment note)",
     )
     parser.add_argument("--scoring-timeout-s", type=int, default=1800)
     parser.add_argument("--task-dir-root", type=Path, default=None)
