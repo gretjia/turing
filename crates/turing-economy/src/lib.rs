@@ -988,6 +988,84 @@ pub struct PriceSignal {
     pub truth_status: String,
 }
 
+/// G2 (`RES_ECON_emergence_toplevel_design_20260707.md` §4 "价格活化" row; spec source
+/// `ADR-ECON-003` Decision 6.1): `AmmSwapExecuted.effective_price` is a `pub` field that
+/// (per the design doc's full-repo audit) has zero downstream readers today -- every
+/// `PriceSignal` consumed by `MarketRouter::suggest` is instead hand-built from an
+/// RPC-supplied static input (see `turing-daemons::parse_signals` and
+/// `turing-qualification`'s `PriceSignal` construction). This function makes the AMM pool
+/// state already committed to the tape into a second, tape-derived price source, without
+/// touching either existing call site: both keep constructing `PriceSignal` exactly as
+/// before, so this is purely additive (RPC static-input path remains the fallback per the
+/// design doc's WP2 row and ADR-ECON-003 Decision 6.1's `P = 0.5` no-information branch for
+/// markets this function has no opinion on).
+///
+/// Pure function, deterministic fold over `events` in tape order (Art 0.2: no I/O, no
+/// live-random, no wall-clock, no map/set iteration-order dependence -- the intermediate
+/// accumulator is a `BTreeMap` keyed by `market_id` and the final `Vec` is emitted in that
+/// same sorted key order). For each `market_id` that has at least one `AmmSwapExecuted` in
+/// `events`, the *last such event in tape order* determines the derived yes-side price
+/// (ADR-ECON-003 Decision 6.1: "取最近一次 AmmSwapExecuted.effective_price 的 yes
+/// 侧"): a `BUY_YES` swap's `effective_price` already denominates the yes side directly;
+/// a `BUY_NO` swap's `effective_price` denominates the no side, so it is complemented
+/// (`1 - price`) to read as a yes-side price. Both readings are clamped to `[0, 1]`
+/// (Decision 6.1: "clamp 到 [0,1]") because a late-stage swap that nearly drains one side of
+/// the pool can otherwise push the raw ratio outside the unit interval. `no_price` is
+/// reported as the clamped complement of `yes_price`, and `truth_status` is always
+/// `"statistical_signal_only"` -- the same literal `MarketCreated`/`PriceBroadcast` already
+/// use everywhere else in this crate to mark a price as a statistical signal, never ground
+/// truth (Art I.1). Markets with no `AmmSwapExecuted` in `events` emit no signal at all
+/// (absence, not a zero/default price) so callers can distinguish "no AMM-derived price yet"
+/// from "AMM says 0".
+///
+/// Because this is a pure fold over already-committed tape events with no hidden state, it
+/// satisfies the conservation invariant the design doc requires verbatim: calling it twice
+/// on the same tape slice -- i.e. re-deriving it as if the tape had been read back out of
+/// storage and replayed -- always produces the identical `Vec<PriceSignal>`
+/// (`tests/economy_market.rs::derive_price_signals_conservation_replay_equality`).
+pub fn derive_price_signals(events: &[EconomyEvent]) -> Result<Vec<PriceSignal>, EconomyError> {
+    let mut latest_yes_price: BTreeMap<String, DecimalAmount> = BTreeMap::new();
+    for event in events {
+        if let EconomyEvent::AmmSwapExecuted(swap) = event {
+            let price = DecimalAmount::parse_non_negative(&swap.effective_price)?;
+            let yes_price = match swap.side.as_str() {
+                "BUY_NO" => clamp_unit_interval(unit_amount() - price),
+                _ => clamp_unit_interval(price),
+            };
+            latest_yes_price.insert(swap.market_id.clone(), yes_price);
+        }
+    }
+    Ok(latest_yes_price
+        .into_iter()
+        .map(|(market_id, yes_price)| {
+            let no_price = clamp_unit_interval(unit_amount() - yes_price);
+            PriceSignal {
+                market_id,
+                yes_price: yes_price.to_decimal_string(),
+                no_price: no_price.to_decimal_string(),
+                truth_status: "statistical_signal_only".to_string(),
+            }
+        })
+        .collect())
+}
+
+/// `DecimalAmount` representation of `1.0`, used only by [`derive_price_signals`]'s
+/// yes/no-complement and `[0, 1]` clamp arithmetic.
+fn unit_amount() -> DecimalAmount {
+    DecimalAmount { units: SCALE }
+}
+
+/// Clamps a `DecimalAmount` into `[0, 1]` (see [`derive_price_signals`]).
+fn clamp_unit_interval(amount: DecimalAmount) -> DecimalAmount {
+    if amount.units < 0 {
+        DecimalAmount { units: 0 }
+    } else if amount.units > SCALE {
+        unit_amount()
+    } else {
+        amount
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BudgetSuggestion {
     pub schema_id: String,
