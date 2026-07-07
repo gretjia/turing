@@ -1733,7 +1733,28 @@ fn market_settle_response(runtime: &DaemonRuntime, request: &Value, id: Value) -
                     .get("capsule_id")
                     .and_then(Value::as_str),
             },
-            "FailureNode" => SettlementReference::FailureNode,
+            // ADR-ECON-002: `FailureNodePayload` itself (frozen, unmodified) carries no
+            // `capsule_id`, so the capsule this FailureNode is bound to (if any) is recovered
+            // from a separate, additive `FailureNodeCapsuleBound` tape event referencing this
+            // same `settlement_event_id` -- symmetric to how the YES path above reads
+            // `capsule_id` straight off the referenced `CandidateAccepted`'s own payload.
+            "FailureNode" => SettlementReference::FailureNode {
+                bound_capsule_id: envelopes.iter().find_map(|(_, envelope)| {
+                    if envelope.event_type == "FailureNodeCapsuleBound"
+                        && envelope
+                            .payload
+                            .get("settlement_event_id")
+                            .and_then(Value::as_str)
+                            .map(normalize_mu)
+                            .as_deref()
+                            == Some(normalized_settlement_id.as_str())
+                    {
+                        envelope.payload.get("capsule_id").and_then(Value::as_str)
+                    } else {
+                        None
+                    }
+                }),
+            },
             other => SettlementReference::OtherType(other),
         },
         None => SettlementReference::Missing,

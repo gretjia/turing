@@ -172,7 +172,9 @@ fn g_mkt_06_repeated_call_determinism_property() {
         let current_predicate_set_hash = if hashes_match { "sha256:hash_a" } else { "sha256:hash_b" };
         let reference = match rng.range(0, 4) {
             0 => SettlementReference::CandidateAccepted { capsule_id: Some("capsule_1") },
-            1 => SettlementReference::FailureNode,
+            1 => SettlementReference::FailureNode {
+                bound_capsule_id: if rng.range(0, 2) == 0 { Some("capsule_1") } else { None },
+            },
             2 => SettlementReference::Missing,
             _ => SettlementReference::OtherType("MarketCreated"),
         };

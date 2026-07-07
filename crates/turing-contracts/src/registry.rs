@@ -56,8 +56,9 @@ impl EventClass {
 /// Original Phase-0 Greenfield registry cardinality.
 pub const BASELINE_EVENT_COUNT: usize = 46;
 
-/// Additive Agent Economy events introduced by the Greenfield v1.0 upgrade.
-pub const ECONOMY_EVENT_COUNT: usize = 15;
+/// Additive Agent Economy events introduced by the Greenfield v1.0 upgrade, plus the
+/// ADR-ECON-002 `FailureNodeCapsuleBound` binding event.
+pub const ECONOMY_EVENT_COUNT: usize = 16;
 
 /// Additive benchmark evidence events introduced by the mini-SWE-bench Gate A loop.
 pub const BENCHMARK_EVENT_COUNT: usize = 1;

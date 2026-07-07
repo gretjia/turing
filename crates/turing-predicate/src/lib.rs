@@ -179,8 +179,10 @@ pub enum MarketPputPredicateError {
     /// predicate-check-id set -- the predicate set was weakened (or code drifted) between
     /// market creation and settlement.
     PredicateSetWeakened(String),
-    /// G-MKT-06: the referenced `CandidateAccepted`'s `capsule_id` does not match the
-    /// market's frozen `capsule_id` (or the market has no `capsule_id` bound at all).
+    /// G-MKT-06: the referenced `CandidateAccepted`'s `capsule_id` (YES path) or the
+    /// referenced `FailureNode`'s additive `bound_capsule_id` (NO path, ADR-ECON-002) does not
+    /// match the market's frozen `capsule_id` -- or the market has no `capsule_id` bound at
+    /// all, or (NO path) no `FailureNodeCapsuleBound` binding exists at all.
     SettlementCapsuleMismatch(String),
     /// G-MKT-06: `settlement_event_id` is missing from the tape, or resolves to an event
     /// type other than the one required for this settlement `result` (`CandidateAccepted`
@@ -295,11 +297,14 @@ pub enum SettlementReference<'a> {
     /// The referenced event is an on-tape `CandidateAccepted` carrying this `capsule_id`
     /// (`None` if the `CandidateAccepted` payload has no `capsule_id` field).
     CandidateAccepted { capsule_id: Option<&'a str> },
-    /// The referenced event is an on-tape `FailureNode`. `FailureNodePayload` (per its closed
-    /// schema) has no `capsule_id` field, so a direct capsule cross-check is not recoverable
-    /// from the tape event alone -- a known, documented limitation of this gate's NO path
-    /// (existence, type, and ordering are still enforced).
-    FailureNode,
+    /// The referenced event is an on-tape `FailureNode`. `FailureNodePayload` itself (per its
+    /// closed, frozen schema) carries no `capsule_id` field and is never modified to add one
+    /// (ADR-ECON-002). Instead, `bound_capsule_id` is the `capsule_id` recovered by the caller
+    /// from a separate, additive `FailureNodeCapsuleBound` tape event that references this same
+    /// `settlement_event_id` (`None` if no such binding event exists on the tape for it). This
+    /// gives the NO path a capsule cross-check symmetric to the YES path's `CandidateAccepted
+    /// { capsule_id }` without altering the frozen `FailureNodePayload` wire format.
+    FailureNode { bound_capsule_id: Option<&'a str> },
     /// `settlement_event_id` does not resolve to any event on the tape.
     Missing,
     /// `settlement_event_id` resolves to an on-tape event of a type other than
@@ -326,11 +331,15 @@ pub struct MarketSettlementGateInput<'a> {
 /// if (1) `settlement_event_id` is a well-formed Micro event id, (2) it references an on-tape
 /// `CandidateAccepted` (for `result == "YES"`) or `FailureNode` (for `result == "NO"`) --
 /// wrong type or missing reference refuses the settlement, (3) for the `YES` path, that
-/// `CandidateAccepted`'s `capsule_id` matches the market's frozen `capsule_id`, (4) the
-/// market's frozen `predicate_set_hash` still matches the current predicate-check-id set (no
-/// post-hoc weakening), and (5) the referenced event's tape position is strictly after the
-/// market's own `MarketCreated` (deadline/causal ordering: a market cannot be settled by an
-/// event that predates its own creation).
+/// `CandidateAccepted`'s `capsule_id` matches the market's frozen `capsule_id`, and for the
+/// `NO` path (ADR-ECON-002), the `FailureNode`'s additive `bound_capsule_id` (recovered by the
+/// caller from a `FailureNodeCapsuleBound` tape event) matches the market's frozen
+/// `capsule_id` -- an unbound `FailureNode` (`bound_capsule_id: None`) is refused, exactly like
+/// an empty `market_capsule_id` on the YES path, (4) the market's frozen `predicate_set_hash`
+/// still matches the current predicate-check-id set (no post-hoc weakening), and (5) the
+/// referenced event's tape position is strictly after the market's own `MarketCreated`
+/// (deadline/causal ordering: a market cannot be settled by an event that predates its own
+/// creation).
 pub fn market_settlement_gate_g_mkt_06(
     input: &MarketSettlementGateInput,
 ) -> Result<(), MarketPputPredicateError> {
@@ -354,8 +363,18 @@ pub fn market_settlement_gate_g_mkt_06(
                 ));
             }
         }
-        ("NO", SettlementReference::FailureNode) => {
-            // Capsule cross-check is not recoverable here -- see SettlementReference::FailureNode.
+        ("NO", SettlementReference::FailureNode { bound_capsule_id }) => {
+            // ADR-ECON-002: symmetric to the YES path above. `bound_capsule_id` comes from an
+            // additive `FailureNodeCapsuleBound` tape event (not from `FailureNodePayload`,
+            // which stays untouched); no binding at all (`None`) is refused, same as an empty
+            // `market_capsule_id` would be on the YES path.
+            if bound_capsule_id != Some(input.market_capsule_id) || input.market_capsule_id.is_empty()
+            {
+                return Err(MarketPputPredicateError::SettlementCapsuleMismatch(format!(
+                    "FailureNode bound_capsule_id {bound_capsule_id:?} != market capsule_id {:?}",
+                    input.market_capsule_id
+                )));
+            }
         }
         ("YES" | "NO", other) => {
             return Err(MarketPputPredicateError::SettlementWrongReferenceType(
