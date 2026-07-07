@@ -47,16 +47,38 @@ def _load_module_from_source(*, source_text: str, module_path: Path, module_name
         module_path.unlink(missing_ok=True)
 
 
+def _head_commit_ref() -> str:
+    """The commit whose driver Stage A's already-running processes actually loaded --
+    *not* literally `HEAD`. This test's own branch (`wp9c/resume`) accumulates its own
+    commits (this file's own WP9c work), so plain `HEAD` drifts forward with every commit
+    made here and would eventually make this test compare the new driver against itself.
+    The stable anchor is this branch's fork point from `hci/software3-20260705` (the branch
+    Stage A is running against) -- `git merge-base HEAD hci/software3-20260705` -- which
+    stays pinned to the exact pre-WP9c commit regardless of how many commits either branch
+    gains afterwards, as long as this branch never merges hci/software3-20260705's later
+    commits back into itself."""
+    return subprocess.run(
+        ["git", "merge-base", "HEAD", "hci/software3-20260705"],
+        cwd=REPO,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+        text=True,
+    ).stdout.strip()
+
+
 def _load_head_driver():
-    """Loads `tools/econ_lab/live_driver.py` exactly as committed at HEAD (`git show
-    HEAD:...`), not this worktree's (modified) working copy -- the "old driver" side of the
-    parity check. Written to a throwaway file *inside* `tools/econ_lab/` (not `tmp_path`) so
-    the loaded module's own `REPO_ROOT = Path(__file__).resolve().parents[2]` still resolves
-    to this repo's actual root (the module derives every repo-relative path from its own file
-    location at import time); the temp file is removed immediately after `exec_module` whether
-    or not the import succeeds."""
+    """Loads `tools/econ_lab/live_driver.py` exactly as committed at the pinned pre-WP9c
+    anchor commit (see `_head_commit_ref`), not this worktree's (modified) working copy --
+    the "old driver" side of the parity check. Written to a throwaway file *inside*
+    `tools/econ_lab/` (not `tmp_path`) so the loaded module's own
+    `REPO_ROOT = Path(__file__).resolve().parents[2]` still resolves to this repo's actual
+    root (the module derives every repo-relative path from its own file location at import
+    time); the temp file is removed immediately after `exec_module` whether or not the
+    import succeeds."""
+    head_ref = _head_commit_ref()
     head_source = subprocess.run(
-        ["git", "show", "HEAD:tools/econ_lab/live_driver.py"],
+        ["git", "show", f"{head_ref}:tools/econ_lab/live_driver.py"],
         cwd=REPO,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
