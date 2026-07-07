@@ -441,7 +441,7 @@ def dispatch_worker(
             api_key=api_key,
             price_table=price_table,
             max_tokens=12000,
-            timeout_s=240,
+            timeout_s=600,
             thinking_type="disabled",
             reasoning_effort=None,
             source_context_name=ARM_DESCRIPTORS[arm]["source_context_name"],
@@ -536,7 +536,7 @@ def dispatch_via_siliconflow(
     lineage: str,
     packet: dict[str, Any],
     task_dir_root: Path,
-    timeout_s: int = 240,
+    timeout_s: int = 600,
 ) -> dict[str, Any]:
     """Generic OpenAI-compatible dispatch (SiliconFlow primary path for all 4 lineages)."""
     import os
@@ -678,6 +678,10 @@ def score_with_official_harness(
     report_dir: Path,
     timeout_s: int = 1800,
 ) -> dict[str, Any]:
+    # The harness subprocess runs with cwd=report_dir; every path handed to it
+    # (and every path this function reads back) must therefore be absolute, or
+    # a relative --predictions_path re-resolves against report_dir itself.
+    report_dir = report_dir.resolve()
     report_dir.mkdir(parents=True, exist_ok=True)
     predictions_path = report_dir / "predictions.jsonl"
     model_name = "wp9a-live-driver"
