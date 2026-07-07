@@ -13,6 +13,11 @@ use turing_contracts::identity::MicroOid;
 /// annealing, N_eff floor arbitration hook. See module docs for scope.
 pub mod routing_fold;
 
+/// WP5 (design doc R1.1 §7; ADR-ECON-003 Decision 3): N_eff / H_lineage measurement --
+/// the always-on monoculture guardrail *input* that feeds `routing_fold`'s existing floor
+/// arbitration hook. See module docs for scope.
+pub mod diversity_metrics;
+
 const SCALE: i128 = 1_000_000_000;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -1233,6 +1238,29 @@ fn clamp_unit_interval(amount: DecimalAmount) -> DecimalAmount {
     }
 }
 
+/// ADR-ECON-003 Decision 5 A-zone artifact (design doc §7 WP5): the committed public
+/// diversity policy document whose SHA-256 digest replaces the previous all-zero
+/// `diversity_policy_hash` placeholder. Embedded at compile time (same `include_str!`
+/// pattern already used by `turing-contracts` for its pinned pack registries), so the
+/// hash below is always computed from the exact bytes of this file, never hand-typed.
+///
+/// Deliberately A-zone only: this document states that the monoculture guardrail exists
+/// and is enforced, without restating any B-zone quantity (Art III.4) -- see the
+/// document's own text for the exact scope boundary.
+const DIVERSITY_POLICY_DOCUMENT: &str =
+    include_str!("../../../docs/policy/DIVERSITY-POLICY-v1.md");
+
+/// `"sha256:" + hex(SHA256(DIVERSITY_POLICY_DOCUMENT))` (design doc §7 WP5 acceptance:
+/// "hash == 公开策略文档 sha256"). A pure function of the embedded document bytes only,
+/// so it is deterministic and tape-reconstructable (Art 0.2) exactly like every other
+/// digest in this module.
+#[must_use]
+pub fn diversity_policy_hash() -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(DIVERSITY_POLICY_DOCUMENT.as_bytes());
+    format!("sha256:{:x}", hasher.finalize())
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BudgetSuggestion {
     pub schema_id: String,
@@ -1332,9 +1360,7 @@ impl MarketRouter {
             market_id: route.market_id.clone(),
             price_signal_hash: price_signal_hash.to_string(),
             pput_prior_hash: pput_prior_hash.to_string(),
-            diversity_policy_hash:
-                "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-                    .to_string(),
+            diversity_policy_hash: diversity_policy_hash(),
             max_tokens: route.requested_tokens,
             emits_authorization: false,
             can_move_accepted_head: false,
@@ -1813,6 +1839,11 @@ pub enum EconomyError {
     /// found a `RoutingPriorUpdated`/`RoutingPriorClawback` hash field that does not parse
     /// as 32 raw bytes (i.e. is not a `sha256:` + 64-hex digest of the expected width).
     RoutingFoldMalformedEventHash,
+    /// WP5 (ADR-ECON-003 Decision 3): the same `(lineage_id, settlement_index)` pair
+    /// appeared twice in a `diversity_metrics` estimation window with two different
+    /// verdicts -- a malformed/contradictory input, never silently resolved by
+    /// last-write-wins.
+    DiversityMetricConflictingSettlement,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -1882,6 +1913,12 @@ impl std::fmt::Display for EconomyError {
             }
             EconomyError::RoutingFoldMalformedEventHash => {
                 write!(f, "routing fold: malformed event hash")
+            }
+            EconomyError::DiversityMetricConflictingSettlement => {
+                write!(
+                    f,
+                    "diversity metrics: conflicting settlement verdicts for the same lineage/index"
+                )
             }
         }
     }
