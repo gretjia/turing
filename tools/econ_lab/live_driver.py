@@ -736,6 +736,67 @@ def _classify_harness_error_reason(instance_dir: Path) -> str:
     return "harness_error"
 
 
+def _read_scoring_report(
+    *,
+    report_dir: Path,
+    run_id: str,
+    instance_id: str,
+    model_name: str = "wp9a-live-driver",
+) -> Optional[dict[str, Any]]:
+    """Pure read-back of an already-completed `score_with_official_harness` run's on-disk
+    artifacts -- no subprocess, no mutation. Returns `None` when the aggregated report file
+    does not exist yet (the caller's cue that the harness must actually be run first, or run
+    again). Factored out of `score_with_official_harness` (WP9c) so the fresh path and the
+    resume "评分产物在 -> 复用报告重算裁决" path (`--resume`, ADR-ECON-003 Decision 2.4 wiring
+    unaffected) share one reader and can never disagree on how a report is interpreted --
+    this refactor changes `score_with_official_harness`'s call shape, not its output, so
+    fresh-run verdicts are unaffected (see `tests/test_live_driver_head_parity.py`)."""
+    report_path = report_dir / f"{model_name}.{run_id}.json"
+    if not report_path.exists():
+        return None
+    # Aggregated report, schema_version 2 (see this module's WP9b orchestrator addendum doc
+    # comment above): per-outcome instance_id lists, not a `{instance_id: {...}}` mapping.
+    aggregated_report = json.loads(report_path.read_text(encoding="utf-8"))
+    instance_dir = _per_instance_report_dir(
+        report_dir, run_id=run_id, model_name=model_name, instance_id=instance_id
+    )
+
+    if instance_id in (aggregated_report.get("resolved_ids") or []):
+        outcome = "RESOLVED"
+    elif instance_id in (aggregated_report.get("unresolved_ids") or []):
+        outcome = "UNRESOLVED"
+    elif instance_id in (aggregated_report.get("empty_patch_ids") or []):
+        outcome = "EMPTY_PATCH"
+    elif instance_id in (aggregated_report.get("incomplete_ids") or []):
+        outcome = "INCOMPLETE"
+    else:
+        # swebench's own catch-all bucket (`make_run_report`): no report.json ever existed,
+        # or the report file was empty/malformed -- includes, but is not limited to,
+        # `EvaluationError: Patch Apply Failed` (orchestrator addendum point 3).
+        outcome = "ERROR"
+
+    tests_status: Optional[dict[str, Any]] = None
+    harness_error_reason: Optional[str] = None
+    if outcome in ("RESOLVED", "UNRESOLVED"):
+        tests_status = _read_per_instance_tests_status(instance_dir, instance_id)
+    else:
+        harness_error_reason = _classify_harness_error_reason(instance_dir)
+
+    return {
+        "status": "COMPLETED",
+        "outcome": outcome,
+        # Kept for back-compat/diagnostics only: this is the harness's own whole-test-suite
+        # verdict, no longer what market settlement uses (Decision 2.4: settlement uses
+        # `live_split_verdict.accept_verdict`, computed independently by `_settle_one` below).
+        "resolved": outcome == "RESOLVED",
+        "tests_status": tests_status,
+        "harness_error_reason": harness_error_reason,
+        "report_path": str(report_path),
+        "log_path": str(report_dir / "run_evaluation.log"),
+        "raw_report": aggregated_report,
+    }
+
+
 def score_with_official_harness(
     *,
     python_bin: str,
@@ -807,47 +868,11 @@ def score_with_official_harness(
             "returncode": proc.returncode,
             "log_path": str(log_path),
         }
-    # Aggregated report, schema_version 2 (see this function's module-level doc comment
-    # above): per-outcome instance_id lists, not a `{instance_id: {...}}` mapping.
-    aggregated_report = json.loads(report_path.read_text(encoding="utf-8"))
-    instance_dir = _per_instance_report_dir(
-        report_dir, run_id=run_id, model_name=model_name, instance_id=instance_id
+    scoring_result = _read_scoring_report(
+        report_dir=report_dir, run_id=run_id, instance_id=instance_id, model_name=model_name
     )
-
-    if instance_id in (aggregated_report.get("resolved_ids") or []):
-        outcome = "RESOLVED"
-    elif instance_id in (aggregated_report.get("unresolved_ids") or []):
-        outcome = "UNRESOLVED"
-    elif instance_id in (aggregated_report.get("empty_patch_ids") or []):
-        outcome = "EMPTY_PATCH"
-    elif instance_id in (aggregated_report.get("incomplete_ids") or []):
-        outcome = "INCOMPLETE"
-    else:
-        # swebench's own catch-all bucket (`make_run_report`): no report.json ever existed,
-        # or the report file was empty/malformed -- includes, but is not limited to,
-        # `EvaluationError: Patch Apply Failed` (orchestrator addendum point 3).
-        outcome = "ERROR"
-
-    tests_status: Optional[dict[str, Any]] = None
-    harness_error_reason: Optional[str] = None
-    if outcome in ("RESOLVED", "UNRESOLVED"):
-        tests_status = _read_per_instance_tests_status(instance_dir, instance_id)
-    else:
-        harness_error_reason = _classify_harness_error_reason(instance_dir)
-
-    return {
-        "status": "COMPLETED",
-        "outcome": outcome,
-        # Kept for back-compat/diagnostics only: this is the harness's own whole-test-suite
-        # verdict, no longer what market settlement uses (Decision 2.4: settlement uses
-        # `live_split_verdict.accept_verdict`, computed independently by `_settle_one` below).
-        "resolved": outcome == "RESOLVED",
-        "tests_status": tests_status,
-        "harness_error_reason": harness_error_reason,
-        "report_path": str(report_path),
-        "log_path": str(log_path),
-        "raw_report": aggregated_report,
-    }
+    assert scoring_result is not None  # report_path.exists() was just checked above
+    return scoring_result
 
 
 # ---------------------------------------------------------------------------
@@ -1014,6 +1039,225 @@ def _settle_one(
     }
 
 
+# ---------------------------------------------------------------------------
+# WP9c -- `--resume` support.
+#
+# Spec source (sole authority; a missing detail is reported BLOCKED, never guessed): this
+# task's own orchestrator brief (2026-07-07, "语义规则(orchestrator 钉死)" points 1-2), since
+# neither ADR-ECON-003 nor PREREG Appendix A names a resume/checkpoint mechanism -- the
+# underlying settlement semantics this file reconstructs from disk (accept/verify split,
+# Q/N/P fold, RoutingPriorUpdated) remain exactly Decision 2.4/6's, unchanged by this section.
+#
+# Hard constraint A (this file's caller): resume must be able to reconstruct purely from
+# what a driver run *already wrote to disk* -- per task, only
+# `task_runs/<instance>/<lineage>/{candidate.patch, worker_receipt.json}` (worker artifacts)
+# and the scoring artifacts under `report-dir/<instance>/<lineage>/` (aggregated report +
+# `logs/run_evaluation/<run_id>/<model>/<instance>/report.json`); the committed_routing_events
+# tape and per-domain_bucket diversity history are process-local and never persisted on their
+# own, so this section's own `settlement.json` checkpoint (point 2 below) is the only
+# additional on-disk state this file introduces to make that reconstruction cheap (skip
+# `econ_fold_cli` subprocess calls entirely for already-settled tasks) rather than merely
+# possible (the coarser artifact-level reconstruction below remains correct without it, e.g.
+# after a kill between "scoring completed" and "checkpoint written").
+# ---------------------------------------------------------------------------
+
+SETTLEMENT_CHECKPOINT_SCHEMA = "econ_lab.live_driver.settlement_checkpoint.v1"
+SETTLEMENT_CHECKPOINT_FILENAME = "settlement.json"
+
+
+def _settlement_checkpoint_path(task_dir_root: Path, instance_id: str) -> Path:
+    return task_dir_root / instance_id / SETTLEMENT_CHECKPOINT_FILENAME
+
+
+def _load_settlement_checkpoint(task_dir_root: Path, instance_id: str) -> Optional[dict[str, Any]]:
+    path = _settlement_checkpoint_path(task_dir_root, instance_id)
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _write_settlement_checkpoint(task_dir_root: Path, instance_id: str, checkpoint: dict[str, Any]) -> None:
+    """Point 2 of the resume semantics: written after *every* task's settlement, fresh or
+    resumed alike -- never conditioned on `--resume`. This write has no return value read by
+    `run_driver` and touches no key of the `verdict` dict it builds, so it cannot change
+    `verdict.json`'s bytes by construction (guarded by
+    `tests/test_live_driver_head_parity.py`, which never passes `--resume` and still exercises
+    this write path once WP9c's fresh-run call site below runs)."""
+    path = _settlement_checkpoint_path(task_dir_root, instance_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(checkpoint, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _reconstruct_worker_result_from_artifacts(
+    *,
+    task_dir_root: Path,
+    instance_id: str,
+    arm: str,
+    lineage: str,
+) -> Optional[dict[str, Any]]:
+    """Hard constraint A's resume rule ("若有 candidate.patch/worker_receipt -> 绝不重调
+    worker"): read back a prior worker dispatch's on-disk artifacts and reconstruct the same
+    `worker_result` shape `dispatch_worker_for_lineage` would have returned, so the downstream
+    scoring/settlement code below (shared verbatim with `_settle_one`) is byte-identical
+    whether or not the worker was actually re-invoked this process.
+
+    Returns `None` when either artifact is missing at every candidate path this file's own
+    dispatch paths ever write to -- a partial write from a killed process (e.g. candidate.patch
+    written, then killed before worker_receipt.json) is deliberately treated the same as "no
+    artifact" (matching the fresh-dispatch contract, which always writes both files as one
+    unit), so the caller falls back to a full re-dispatch rather than settling on a
+    possibly-truncated patch.
+
+    Checks the siliconflow path first (`task_dir_root/<instance>/<lineage>/`), then -- only
+    for the deepseek lineage -- the native-fallback path
+    (`task_dir_root/deepseek_direct_fallback/<instance>/`), mirroring `_settle_one`'s own
+    patch-path resolution by `provider_path`.
+    """
+    siliconflow_dir = task_dir_root / instance_id / lineage
+    if (siliconflow_dir / "candidate.patch").exists() and (siliconflow_dir / "worker_receipt.json").exists():
+        receipt = json.loads((siliconflow_dir / "worker_receipt.json").read_text(encoding="utf-8"))
+        patch_bytes = len((siliconflow_dir / "candidate.patch").read_text(encoding="utf-8").encode("utf-8"))
+        return {
+            "status": "COMPLETED",
+            "instance_id": receipt.get("instance_id", instance_id),
+            "arm": receipt.get("arm", arm),
+            "lineage": lineage,
+            "provider_path": "siliconflow",
+            "candidate_patch_sha256": receipt.get("candidate_patch_sha256"),
+            "candidate_patch_bytes": patch_bytes,
+            "wall_time_ms": receipt.get("wall_time_ms"),
+        }
+    if lineage == "deepseek":
+        fallback_dir = task_dir_root / "deepseek_direct_fallback" / instance_id
+        if (fallback_dir / "candidate.patch").exists() and (fallback_dir / "worker_receipt.json").exists():
+            receipt = json.loads((fallback_dir / "worker_receipt.json").read_text(encoding="utf-8"))
+            patch_bytes = len((fallback_dir / "candidate.patch").read_text(encoding="utf-8").encode("utf-8"))
+            # Known, reported gap (this module's own "known spec gaps" discipline, see the
+            # module docstring): `candidate_audit_status`/`candidate_audit_problems` live in a
+            # third artifact (`worker_candidate_audit.json`) that hard constraint A's own
+            # resume-anchor list does not name (only candidate.patch/worker_receipt.json) --
+            # best-effort reconstruction from the receipt alone; these two fields are `None`
+            # when resume is reconstructing this rare fallback path (the deepseek lineage's
+            # SiliconFlow-primary path covers the overwhelming majority of Stage A dispatches;
+            # see the module docstring's fallback-trigger note).
+            return {
+                "instance_id": receipt.get("instance_id", instance_id),
+                "status": receipt.get("status", "COMPLETED"),
+                "model_reported": receipt.get("model_reported"),
+                "candidate_patch_sha256": receipt.get("candidate_patch_sha256"),
+                "candidate_patch_bytes": patch_bytes,
+                "candidate_audit_status": None,
+                "candidate_audit_problems": None,
+                "cost_microusd": (receipt.get("cost_event") or {}).get("cost", {}).get("cost_microusd"),
+                "usage": receipt.get("usage"),
+                "lineage": lineage,
+                "provider_path": "deepseek_direct_fallback",
+                "primary_attempt_status": "RECONSTRUCTED_FROM_ARTIFACTS",
+            }
+    return None
+
+
+def _settle_one_resume(
+    *,
+    args: argparse.Namespace,
+    packet: dict[str, Any],
+    arm: str,
+    lineage: str,
+    task_dir_root: Path,
+    report_root: Path,
+    deepseek_native_provider_config: dict[str, Any],
+    cli_bin: Path,
+    route_domain: str,
+    route_scaffold: str,
+) -> dict[str, Any]:
+    """Resume-aware counterpart of `_settle_one` for one (task, lineage): reuses on-disk
+    worker/scoring artifacts when present instead of recalling the worker or (when the
+    aggregated scoring report already exists) the harness. Judgment code (`_apply_live_split_
+    verifier`) and return shape are shared verbatim with `_settle_one` -- this function differs
+    only in *how* `worker_result`/`scoring_result` are obtained, never in how they are judged,
+    so a resumed settlement and a fresh settlement of the same underlying artifacts are
+    byte-identical (`tests/test_live_driver_resume.py`).
+    """
+    instance_id = packet["instance_id"]
+
+    worker_result = _reconstruct_worker_result_from_artifacts(
+        task_dir_root=task_dir_root, instance_id=instance_id, arm=arm, lineage=lineage
+    )
+    if worker_result is None:
+        # Hard constraint A: "全缺 -> 正常全流程" -- no worker artifact at all, so this task's
+        # settlement takes the exact same path a fresh (non-resume) run would.
+        return _settle_one(
+            args=args,
+            packet=packet,
+            arm=arm,
+            lineage=lineage,
+            task_dir_root=task_dir_root,
+            report_root=report_root,
+            deepseek_native_provider_config=deepseek_native_provider_config,
+            cli_bin=cli_bin,
+            route_domain=route_domain,
+            route_scaffold=route_scaffold,
+        )
+
+    scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
+    settlement_verdict: Optional[bool] = None
+    live_split_result: Optional[dict[str, Any]] = None
+    backup_update: dict[str, Any] = {"applied": False, "reason": "SCORING_NOT_COMPLETED"}
+    routing_prior_updated_event: Optional[dict[str, Any]] = None
+
+    provider_path = worker_result.get("provider_path", "siliconflow")
+    if provider_path == "deepseek_direct_fallback":
+        patch_path = task_dir_root / "deepseek_direct_fallback" / instance_id / "candidate.patch"
+    else:
+        patch_path = task_dir_root / instance_id / lineage / "candidate.patch"
+    model_patch = patch_path.read_text(encoding="utf-8") if patch_path.exists() else ""
+
+    if model_patch.strip():
+        run_id = f"wp9a-live-driver-{instance_id}-{lineage}"
+        report_dir = (report_root / instance_id / lineage).resolve()
+        reused_scoring_result = _read_scoring_report(report_dir=report_dir, run_id=run_id, instance_id=instance_id)
+        if reused_scoring_result is not None:
+            # "评分产物在 -> 复用报告重算裁决" -- `live_split_verifier.judge` is a pure function,
+            # so re-judging an already-produced report is exactly what a fresh run's own single
+            # judge call would have computed; no harness subprocess, no worker call.
+            scoring_result = reused_scoring_result
+        else:
+            # "评分产物缺 -> 用既有补丁重跑评分" -- local docker only, zero API spend (the patch
+            # itself is reused verbatim; only the harness, never the worker, runs again).
+            scoring_result = score_with_official_harness(
+                python_bin=args.scoring_python,
+                instance_id=instance_id,
+                model_patch=model_patch,
+                run_id=run_id,
+                report_dir=report_root / instance_id / lineage,
+                timeout_s=args.scoring_timeout_s,
+            )
+        if scoring_result.get("status") == "COMPLETED":
+            live_split_result, backup_update, routing_prior_updated_event = _apply_live_split_verifier(
+                cli_bin=cli_bin,
+                instance_id=instance_id,
+                arm=arm,
+                lineage=lineage,
+                route_domain=route_domain,
+                route_scaffold=route_scaffold,
+                tests_status=scoring_result.get("tests_status"),
+                harness_error_reason=scoring_result.get("harness_error_reason"),
+            )
+            settlement_verdict = live_split_result["accept_verdict"]
+
+    return {
+        "lineage": lineage,
+        "worker_result_status": worker_result.get("status"),
+        "provider_path": worker_result.get("provider_path"),
+        "worker_result": {k: v for k, v in worker_result.items() if k != "usage_raw_sha256"},
+        "scoring_result": {k: v for k, v in scoring_result.items() if k != "command"},
+        "settlement_verdict_resolved": settlement_verdict,
+        "live_split_verdict": live_split_result,
+        "backup_update": backup_update,
+        "_routing_prior_updated_event": routing_prior_updated_event,
+    }
+
+
 def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     cli_bin = args.econ_fold_cli or find_default_cli_bin()
     evidence_class = EVIDENCE_CLASS_SMOKE if args.smoke else EVIDENCE_CLASS_REAL
@@ -1075,34 +1319,80 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     #共同结算索引"), incremented once per task processed, not per lineage.
     diversity_history: dict[str, list[dict[str, Any]]] = {}
 
+    resume_mode = bool(getattr(args, "resume", False))
+
     for task_index, packet in enumerate(packets[:max_tasks]):
         instance_id = packet["instance_id"]
-        task_family = task_family_for_packet(packet)
-        domain_bucket = derive_domain_bucket(cli_bin, task_family)
 
-        selection = fold_and_select(
-            cli_bin,
-            committed_routing_events=committed_routing_events,
-            domain_bucket=domain_bucket,
-            scaffold_ids=scaffold_ids,
-            instance_id=instance_id,
-            tau_config=tau_config,
-        )
-        selected_route_id = selection["budget_suggestion"]["route_id"]
-        _instance, selected_arm, selected_lineage = selected_route_id.split("::")
+        # WP9c point 1: "若该题存在增量检查点 settlement.json -> 逐字节采用其中的 fold 事件
+        # 与结算记录,不重算" -- when a checkpoint exists, this task's entire settlement
+        # (domain_bucket, selection, every dispatch) is replayed verbatim from disk: no
+        # `econ_fold_cli` subprocess call, no worker dispatch, no scoring re-read.
+        checkpoint = _load_settlement_checkpoint(task_dir_root, instance_id) if resume_mode else None
 
-        if args.smoke:
-            dispatch_mode = "smoke_all_lineages_for_winning_arm"
-            lineages_to_dispatch = list(LINEAGES)
+        if checkpoint is not None:
+            domain_bucket = checkpoint["domain_bucket"]
+            selected_route_id = checkpoint["selected_route_id"]
+            selected_arm = checkpoint["selected_arm"]
+            selected_lineage = checkpoint["selected_lineage"]
+            dispatch_mode = checkpoint["dispatch_mode"]
+            budget_suggestion = checkpoint["budget_suggestion"]
+            task_evidence_class = checkpoint.get("evidence_class", evidence_class)
+            dispatches = []
+            for stored_dispatch in checkpoint["dispatches"]:
+                settled = dict(stored_dispatch)
+                routing_prior_updated_event = settled.pop("routing_prior_updated_event", None)
+                if routing_prior_updated_event is not None:
+                    committed_routing_events.append(routing_prior_updated_event)
+                    routing_prior_updated_applied_count += 1
+                dispatches.append(settled)
+
+                if settled.get("worker_result_status") == "COMPLETED":
+                    real_worker_calls += 1
+
+                live_split_verdict = settled.get("live_split_verdict")
+                if live_split_verdict is not None:
+                    settled_dispatch_count += 1
+                    not_enough_tests_count += int(live_split_verdict["not_enough_tests"])
+                    canary_count += int(live_split_verdict["canary"])
+
+                if settled.get("settlement_verdict_resolved") is not None:
+                    diversity_history.setdefault(domain_bucket, []).append(
+                        {
+                            "lineage_id": settled["lineage"],
+                            "settlement_index": task_index,
+                            "verdict": bool(settled["settlement_verdict_resolved"]),
+                        }
+                    )
         else:
-            dispatch_mode = "single_winner"
-            lineages_to_dispatch = [selected_lineage]
+            task_family = task_family_for_packet(packet)
+            domain_bucket = derive_domain_bucket(cli_bin, task_family)
 
-        dispatches: list[dict[str, Any]] = []
-        for lineage in lineages_to_dispatch:
-            if real_call_cap is not None and real_worker_calls >= real_call_cap:
-                dispatches.append(
-                    {
+            selection = fold_and_select(
+                cli_bin,
+                committed_routing_events=committed_routing_events,
+                domain_bucket=domain_bucket,
+                scaffold_ids=scaffold_ids,
+                instance_id=instance_id,
+                tau_config=tau_config,
+            )
+            selected_route_id = selection["budget_suggestion"]["route_id"]
+            _instance, selected_arm, selected_lineage = selected_route_id.split("::")
+            budget_suggestion = selection["budget_suggestion"]
+            task_evidence_class = evidence_class
+
+            if args.smoke:
+                dispatch_mode = "smoke_all_lineages_for_winning_arm"
+                lineages_to_dispatch = list(LINEAGES)
+            else:
+                dispatch_mode = "single_winner"
+                lineages_to_dispatch = [selected_lineage]
+
+            dispatches = []
+            checkpoint_dispatches: list[dict[str, Any]] = []
+            for lineage in lineages_to_dispatch:
+                if real_call_cap is not None and real_worker_calls >= real_call_cap:
+                    settled = {
                         "lineage": lineage,
                         "worker_result_status": "SKIPPED_SPEND_CAP",
                         "provider_path": None,
@@ -1112,47 +1402,73 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                         "live_split_verdict": None,
                         "backup_update": {"applied": False, "reason": "SKIPPED_SPEND_CAP"},
                     }
+                    dispatches.append(settled)
+                    checkpoint_dispatches.append({**settled, "routing_prior_updated_event": None})
+                    continue
+
+                settle_fn = _settle_one_resume if resume_mode else _settle_one
+                settled = settle_fn(
+                    args=args,
+                    packet=packet,
+                    arm=selected_arm,
+                    lineage=lineage,
+                    task_dir_root=task_dir_root,
+                    report_root=report_root,
+                    deepseek_native_provider_config=deepseek_native_provider_config,
+                    cli_bin=cli_bin,
+                    route_domain=domain_bucket,
+                    route_scaffold=scaffold_ids[selected_arm][lineage],
                 )
-                continue
-            settled = _settle_one(
-                args=args,
-                packet=packet,
-                arm=selected_arm,
-                lineage=lineage,
-                task_dir_root=task_dir_root,
-                report_root=report_root,
-                deepseek_native_provider_config=deepseek_native_provider_config,
-                cli_bin=cli_bin,
-                route_domain=domain_bucket,
-                route_scaffold=scaffold_ids[selected_arm][lineage],
+                if settled["worker_result_status"] == "COMPLETED":
+                    real_worker_calls += 1
+
+                # Decision 2.4 backup-update wiring: feed the independent verifier's
+                # RoutingPriorUpdated event (if one was built) back onto the tape this same
+                # driver run folds over for every subsequent task's selection -- this is the
+                # live "回灌" (feedback) WP9a lacked entirely.
+                routing_prior_updated_event = settled.pop("_routing_prior_updated_event", None)
+                if routing_prior_updated_event is not None:
+                    committed_routing_events.append(routing_prior_updated_event)
+                    routing_prior_updated_applied_count += 1
+                dispatches.append(settled)
+                checkpoint_dispatches.append({**settled, "routing_prior_updated_event": routing_prior_updated_event})
+
+                live_split_verdict = settled.get("live_split_verdict")
+                if live_split_verdict is not None:
+                    settled_dispatch_count += 1
+                    not_enough_tests_count += int(live_split_verdict["not_enough_tests"])
+                    canary_count += int(live_split_verdict["canary"])
+
+                if settled["settlement_verdict_resolved"] is not None:
+                    diversity_history.setdefault(domain_bucket, []).append(
+                        {
+                            "lineage_id": lineage,
+                            "settlement_index": task_index,
+                            "verdict": bool(settled["settlement_verdict_resolved"]),
+                        }
+                    )
+
+            # WP9c point 2: written for every freshly-settled task, fresh run or resume alike
+            # (never for a task replayed from an existing checkpoint above) -- see
+            # `_write_settlement_checkpoint`'s own docstring for why this cannot perturb
+            # `verdict.json`'s bytes.
+            _write_settlement_checkpoint(
+                task_dir_root,
+                instance_id,
+                {
+                    "schema": SETTLEMENT_CHECKPOINT_SCHEMA,
+                    "instance_id": instance_id,
+                    "task_index": task_index,
+                    "domain_bucket": domain_bucket,
+                    "selected_route_id": selected_route_id,
+                    "selected_arm": selected_arm,
+                    "selected_lineage": selected_lineage,
+                    "dispatch_mode": dispatch_mode,
+                    "budget_suggestion": budget_suggestion,
+                    "evidence_class": task_evidence_class,
+                    "dispatches": checkpoint_dispatches,
+                },
             )
-            if settled["worker_result_status"] == "COMPLETED":
-                real_worker_calls += 1
-
-            # Decision 2.4 backup-update wiring: feed the independent verifier's
-            # RoutingPriorUpdated event (if one was built) back onto the tape this same
-            # driver run folds over for every subsequent task's selection -- this is the
-            # live "回灌" (feedback) WP9a lacked entirely.
-            routing_prior_updated_event = settled.pop("_routing_prior_updated_event", None)
-            if routing_prior_updated_event is not None:
-                committed_routing_events.append(routing_prior_updated_event)
-                routing_prior_updated_applied_count += 1
-            dispatches.append(settled)
-
-            live_split_verdict = settled.get("live_split_verdict")
-            if live_split_verdict is not None:
-                settled_dispatch_count += 1
-                not_enough_tests_count += int(live_split_verdict["not_enough_tests"])
-                canary_count += int(live_split_verdict["canary"])
-
-            if settled["settlement_verdict_resolved"] is not None:
-                diversity_history.setdefault(domain_bucket, []).append(
-                    {
-                        "lineage_id": lineage,
-                        "settlement_index": task_index,
-                        "verdict": bool(settled["settlement_verdict_resolved"]),
-                    }
-                )
 
         task_results.append(
             {
@@ -1162,9 +1478,9 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 "selected_arm": selected_arm,
                 "selected_lineage": selected_lineage,
                 "dispatch_mode": dispatch_mode,
-                "budget_suggestion": selection["budget_suggestion"],
+                "budget_suggestion": budget_suggestion,
                 "dispatches": dispatches,
-                "evidence_class": evidence_class,
+                "evidence_class": task_evidence_class,
             }
         )
 
@@ -1223,6 +1539,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     )
     parser.add_argument("--task-dir-root", type=Path, default=None)
     parser.add_argument("--report-dir", type=Path, default=None)
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="WP9c: reconstruct already-settled tasks from on-disk checkpoints/artifacts "
+        "(task_runs/<instance>/settlement.json, or candidate.patch+worker_receipt.json plus "
+        "scoring reports) instead of recomputing; never re-invokes a worker when a prior "
+        "candidate.patch/worker_receipt.json pair exists for a task -- --task-dir-root/"
+        "--report-dir must point at the same directories the interrupted run used",
+    )
     args = parser.parse_args(argv)
 
     verdict = run_driver(args)
