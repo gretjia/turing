@@ -56,7 +56,17 @@ impl PredicateKernel {
         event_registry_closed_world(event_type)?;
 
         let mut checks = checks;
-        checks.sort_by(|a, b| a.check_id.cmp(&b.check_id));
+        // CONFIRMED-bug-#4 fix (INV-4 class): sorting by `check_id` alone is a STABLE sort, so
+        // two checks sharing the same `check_id` kept their *input* construction order on ties
+        // -- meaning `reject_class` (and therefore `report_hash`) could differ for the exact
+        // same multiset of checks depending only on caller-side ordering. Breaking the tie by
+        // `reject_class` too makes the sort (and therefore `reject_class`/`report_hash`) a pure
+        // function of the check contents, never of input order, even when `check_id` repeats.
+        checks.sort_by(|a, b| {
+            a.check_id
+                .cmp(&b.check_id)
+                .then_with(|| a.reject_class.cmp(&b.reject_class))
+        });
 
         let mut passed_predicates = Vec::new();
         let mut failed_predicates = Vec::new();
@@ -165,6 +175,22 @@ pub enum MarketPputPredicateError {
     EconomyEventCanMoveTruth(String),
     InvalidSettlementEventId(String),
     PputLeakage(String),
+    /// G-MKT-06: the market's frozen `predicate_set_hash` no longer matches the current
+    /// predicate-check-id set -- the predicate set was weakened (or code drifted) between
+    /// market creation and settlement.
+    PredicateSetWeakened(String),
+    /// G-MKT-06: the referenced `CandidateAccepted`'s `capsule_id` (YES path) or the
+    /// referenced `FailureNode`'s additive `bound_capsule_id` (NO path, ADR-ECON-002) does not
+    /// match the market's frozen `capsule_id` -- or the market has no `capsule_id` bound at
+    /// all, or (NO path) no `FailureNodeCapsuleBound` binding exists at all.
+    SettlementCapsuleMismatch(String),
+    /// G-MKT-06: `settlement_event_id` is missing from the tape, or resolves to an event
+    /// type other than the one required for this settlement `result` (`CandidateAccepted`
+    /// for YES, `FailureNode` for NO).
+    SettlementWrongReferenceType(String),
+    /// G-MKT-06: the referenced settlement event is not strictly after the market's own
+    /// `MarketCreated` in tape order.
+    SettlementOrderingViolated(String),
 }
 
 impl std::fmt::Display for MarketPputPredicateError {
@@ -184,6 +210,18 @@ impl std::fmt::Display for MarketPputPredicateError {
             }
             MarketPputPredicateError::PputLeakage(marker) => {
                 write!(f, "worker prompt leaks hidden PPUT marker {marker:?}")
+            }
+            MarketPputPredicateError::PredicateSetWeakened(detail) => {
+                write!(f, "G-MKT-06 predicate set weakened: {detail}")
+            }
+            MarketPputPredicateError::SettlementCapsuleMismatch(detail) => {
+                write!(f, "G-MKT-06 capsule mismatch: {detail}")
+            }
+            MarketPputPredicateError::SettlementWrongReferenceType(detail) => {
+                write!(f, "G-MKT-06 settlement reference invalid: {detail}")
+            }
+            MarketPputPredicateError::SettlementOrderingViolated(detail) => {
+                write!(f, "G-MKT-06 ordering violated: {detail}")
             }
         }
     }
@@ -217,6 +255,148 @@ pub fn market_settlement_event_is_micro(
         .map_err(|_| {
             MarketPputPredicateError::InvalidSettlementEventId(settlement_event_id.to_string())
         })
+}
+
+// --- G-MKT-06 (D4): market_settlement_requires_predicate --------------------------------
+
+/// The candidate predicate-check-id set as of this build, sorted for stable hashing --
+/// mirrors the check_ids `derive_candidate_predicate_checks` in `turing-daemons` evaluates
+/// for every `CandidateAccepted`/`FailureNode` decision. `MarketCreated.predicate_set_hash`
+/// pins a hash of this list at market-creation time; G-MKT-06 recomputes it at settlement
+/// time and refuses the settlement if the two disagree, i.e. if the predicate set changed
+/// out from under a market that was already open (D4's "no post-hoc predicate weakening").
+pub const CANDIDATE_PREDICATE_CHECK_IDS: &[&str] = &[
+    "budget.within_limit",
+    "capsule_contract",
+    "macro_anchor",
+    "official_evaluator_evidence",
+    "provenance.checked",
+    "replay.ready",
+    "scope.allowed",
+    "worker_receipt",
+];
+
+/// `sha256:` + hex over the current [`CANDIDATE_PREDICATE_CHECK_IDS`], JCS-canonicalized.
+#[must_use]
+pub fn candidate_predicate_set_hash() -> String {
+    let value = serde_json::json!({
+        "schema_id": "candidate_predicate_set.v1",
+        "check_ids": CANDIDATE_PREDICATE_CHECK_IDS,
+    });
+    let bytes =
+        jcs::canonicalize(&value).expect("candidate predicate set hash uses valid JCS values");
+    format!("sha256:{}", jcs::sha256_hex(&bytes))
+}
+
+/// What `MarketSettled.settlement_event_id` resolved to on-tape, as gathered by the caller
+/// (`turing-daemons`, which owns tape access) before calling [`market_settlement_gate_g_mkt_06`].
+/// This crate stays tape-access-free by design (see the module doc), so all tape facts are
+/// passed in as plain data.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SettlementReference<'a> {
+    /// The referenced event is an on-tape `CandidateAccepted` carrying this `capsule_id`
+    /// (`None` if the `CandidateAccepted` payload has no `capsule_id` field).
+    CandidateAccepted { capsule_id: Option<&'a str> },
+    /// The referenced event is an on-tape `FailureNode`. `FailureNodePayload` itself (per its
+    /// closed, frozen schema) carries no `capsule_id` field and is never modified to add one
+    /// (ADR-ECON-002). Instead, `bound_capsule_id` is the `capsule_id` recovered by the caller
+    /// from a separate, additive `FailureNodeCapsuleBound` tape event that references this same
+    /// `settlement_event_id` (`None` if no such binding event exists on the tape for it). This
+    /// gives the NO path a capsule cross-check symmetric to the YES path's `CandidateAccepted
+    /// { capsule_id }` without altering the frozen `FailureNodePayload` wire format.
+    FailureNode { bound_capsule_id: Option<&'a str> },
+    /// `settlement_event_id` does not resolve to any event on the tape.
+    Missing,
+    /// `settlement_event_id` resolves to an on-tape event of a type other than
+    /// `CandidateAccepted`/`FailureNode`.
+    OtherType(&'a str),
+}
+
+/// All facts G-MKT-06 needs, gathered by the caller from the real tape.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MarketSettlementGateInput<'a> {
+    pub result: &'a str,
+    pub settlement_event_id: &'a str,
+    pub market_capsule_id: &'a str,
+    pub market_predicate_set_hash: &'a str,
+    pub current_predicate_set_hash: &'a str,
+    pub reference: SettlementReference<'a>,
+    /// Tape position (lower = earlier) of this market's `MarketCreated` event.
+    pub market_created_tape_index: Option<usize>,
+    /// Tape position of the event `settlement_event_id` resolves to.
+    pub settlement_tape_index: Option<usize>,
+}
+
+/// G-MKT-06 `market_settlement_requires_predicate` (D4): a `MarketSettled` is gate-valid only
+/// if (1) `settlement_event_id` is a well-formed Micro event id, (2) it references an on-tape
+/// `CandidateAccepted` (for `result == "YES"`) or `FailureNode` (for `result == "NO"`) --
+/// wrong type or missing reference refuses the settlement, (3) for the `YES` path, that
+/// `CandidateAccepted`'s `capsule_id` matches the market's frozen `capsule_id`, and for the
+/// `NO` path (ADR-ECON-002), the `FailureNode`'s additive `bound_capsule_id` (recovered by the
+/// caller from a `FailureNodeCapsuleBound` tape event) matches the market's frozen
+/// `capsule_id` -- an unbound `FailureNode` (`bound_capsule_id: None`) is refused, exactly like
+/// an empty `market_capsule_id` on the YES path, (4) the market's frozen `predicate_set_hash`
+/// still matches the current predicate-check-id set (no post-hoc weakening), and (5) the
+/// referenced event's tape position is strictly after the market's own `MarketCreated`
+/// (deadline/causal ordering: a market cannot be settled by an event that predates its own
+/// creation).
+pub fn market_settlement_gate_g_mkt_06(
+    input: &MarketSettlementGateInput,
+) -> Result<(), MarketPputPredicateError> {
+    market_settlement_event_is_micro(input.settlement_event_id)?;
+
+    if input.market_predicate_set_hash != input.current_predicate_set_hash {
+        return Err(MarketPputPredicateError::PredicateSetWeakened(format!(
+            "market predicate_set_hash {:?} != current {:?}",
+            input.market_predicate_set_hash, input.current_predicate_set_hash
+        )));
+    }
+
+    match (input.result, input.reference) {
+        ("YES", SettlementReference::CandidateAccepted { capsule_id }) => {
+            if capsule_id != Some(input.market_capsule_id) || input.market_capsule_id.is_empty() {
+                return Err(MarketPputPredicateError::SettlementCapsuleMismatch(
+                    format!(
+                        "CandidateAccepted capsule_id {capsule_id:?} != market capsule_id {:?}",
+                        input.market_capsule_id
+                    ),
+                ));
+            }
+        }
+        ("NO", SettlementReference::FailureNode { bound_capsule_id }) => {
+            // ADR-ECON-002: symmetric to the YES path above. `bound_capsule_id` comes from an
+            // additive `FailureNodeCapsuleBound` tape event (not from `FailureNodePayload`,
+            // which stays untouched); no binding at all (`None`) is refused, same as an empty
+            // `market_capsule_id` would be on the YES path.
+            if bound_capsule_id != Some(input.market_capsule_id) || input.market_capsule_id.is_empty()
+            {
+                return Err(MarketPputPredicateError::SettlementCapsuleMismatch(format!(
+                    "FailureNode bound_capsule_id {bound_capsule_id:?} != market capsule_id {:?}",
+                    input.market_capsule_id
+                )));
+            }
+        }
+        ("YES" | "NO", other) => {
+            return Err(MarketPputPredicateError::SettlementWrongReferenceType(
+                format!("result {:?} referenced {other:?}", input.result),
+            ));
+        }
+        (other, _) => {
+            return Err(MarketPputPredicateError::SettlementWrongReferenceType(
+                format!("unsupported settlement result {other:?} for G-MKT-06"),
+            ));
+        }
+    }
+
+    match (input.market_created_tape_index, input.settlement_tape_index) {
+        (Some(created), Some(settled)) if settled > created => Ok(()),
+        _ => Err(MarketPputPredicateError::SettlementOrderingViolated(
+            format!(
+                "settlement reference tape_index {:?} is not strictly after MarketCreated tape_index {:?}",
+                input.settlement_tape_index, input.market_created_tape_index
+            ),
+        )),
+    }
 }
 
 pub fn no_pput_in_worker_prompt(prompt: &str) -> Result<(), MarketPputPredicateError> {

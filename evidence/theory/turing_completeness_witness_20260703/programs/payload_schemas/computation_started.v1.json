@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://turingos.local/schemas/computation_started.v1.json",
+  "title": "computation_started.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "program_id",
+    "program_digest",
+    "program",
+    "initial_state",
+    "state_hash",
+    "step_budget",
+    "instruction_registry_digest"
+  ],
+  "properties": {
+    "program_id": {
+      "type": "string"
+    },
+    "program_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "program": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "initial_state": {
+      "$ref": "state.v1"
+    },
+    "state_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "step_budget": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "instruction_registry_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

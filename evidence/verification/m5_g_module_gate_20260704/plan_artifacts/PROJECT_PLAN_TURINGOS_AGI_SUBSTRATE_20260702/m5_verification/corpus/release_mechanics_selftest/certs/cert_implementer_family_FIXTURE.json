@@ -1,0 +1,52 @@
+{
+  "anchoring": {
+    "anchored_digest_reference": "fixture://m5-p5-positive-control",
+    "channel": "auditor_custody"
+  },
+  "certificate_id": "cc-M5P5-implementer-family",
+  "created_at_utc": "2026-07-03T00:00:00Z",
+  "schema_id": "turingos.closure_certificate.v1",
+  "status_semantics": {
+    "implementer_ceiling": "ADDRESSED",
+    "this_certificate_confers": "EXTERNALLY_VERIFIED"
+  },
+  "subject": {
+    "gate_id": "M5.P5.FIXTURE",
+    "packet_manifest_files": 8,
+    "packet_sha256": "sha256:647e10918a4df296e44807bd2687899cd953c40c895d414d8ae3dae764a78a12",
+    "repo_sha": "2300a09cb7efc30b2d13adc6c4a499d672449da4"
+  },
+  "verdict": "PASS",
+  "verdict_enum": [
+    "PASS",
+    "FAIL"
+  ],
+  "verification": {
+    "commands_run": [
+      {
+        "cmd": "sha256sum -c MANIFEST.sha256",
+        "exit_code": 0
+      }
+    ],
+    "digest_manifest_result": "PASS",
+    "gate_predicate_result": "PASS",
+    "inputs_checked": [
+      "MANIFEST.sha256",
+      "PACKET_MANIFEST.json"
+    ]
+  },
+  "verifier": {
+    "credentials_class": "own_account",
+    "custody": {
+      "cross_family_or_human": true,
+      "fresh_clone": true,
+      "no_implementer_transcript": true,
+      "no_shared_conversation_state": true,
+      "own_credentials": true,
+      "own_custody_output": true
+    },
+    "kind": "external_cross_family_model",
+    "model_family": "gpt-5",
+    "operator_label": "codex-orchestrator"
+  }
+}

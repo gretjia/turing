@@ -1,0 +1,11 @@
+{
+  "audit_ref": "TURINGOS_RETROSPECTIVE_AUDIT_FINDINGS_20260702.md F4/R8 and section 7 answer 5",
+  "label": "MIXED",
+  "rationale": "G12 contains real gate result/log artifacts plus seeded clean/tampered fixtures; use subpaths before making claims.",
+  "real_subpaths": [
+    "gate_results",
+    "logs",
+    "goal_run_handoff.json"
+  ],
+  "root": "turing/evidence/g12"
+}

@@ -23,9 +23,10 @@ use turing_contracts::goal::GoalState;
 use turing_contracts::jcs;
 use turing_contracts::registry;
 use turing_economy::{
-    AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay, MarketRouter,
-    MarketRouterMode, MarketSettled, PositionMinted, PriceSignal, RewardDistributed,
-    WalletProjection,
+    AmmPool, AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay,
+    MarketRouter, MarketRouterMode, MarketSettled, PositionMinted, PrincipalDeclared, PriceSignal,
+    RewardDistributed, WalletProjection, check_principal_position_cap, check_proposer_conflict,
+    check_self_trade,
 };
 use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
@@ -33,8 +34,13 @@ use turing_execd::capability::{
 };
 use turing_execd::{FakeWorker, WorkerRunRequest};
 use turing_git_tape::append::{Append, AppendRequest, HeadMoved};
-use turing_pput::{CostEvent, PputProjection, Split, WorkerPromptShield};
-use turing_predicate::{PredicateCheck, PredicateKernel};
+use turing_pput::{
+    CostAmount, CostEvent, CostUsage, CostWorker, PputProjection, Split, WorkerPromptShield,
+};
+use turing_predicate::{
+    MarketSettlementGateInput, PredicateCheck, PredicateKernel, SettlementReference,
+    candidate_predicate_set_hash, market_event_preserves_truth, market_settlement_gate_g_mkt_06,
+};
 use turing_projection::{ProjectionBuilder, ProjectionEvent, ProjectionSource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -260,6 +266,9 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         Some("event.append_preserve") if runtime.contract.role == "turingd" => {
             append_preserve_response(runtime, request, id)
         }
+        Some("project.bootstrap_genesis") if runtime.contract.role == "turingd" => {
+            project_bootstrap_genesis_response(runtime, request, id)
+        }
         Some("candidate.verify_write") if runtime.contract.role == "turingd" => {
             candidate_verify_write_response(runtime, request, id)
         }
@@ -292,6 +301,15 @@ fn jsonrpc_response(runtime: &DaemonRuntime, request: &Value) -> Value {
         }
         Some("wallet.snapshot.write") if runtime.contract.role == "turing-marketd" => {
             wallet_snapshot_write_response(runtime, request, id)
+        }
+        Some("market.mint") if runtime.contract.role == "turing-marketd" => {
+            market_mint_response(runtime, request, id)
+        }
+        Some("market.swap") if runtime.contract.role == "turing-marketd" => {
+            market_swap_response(runtime, request, id)
+        }
+        Some("market.settle") if runtime.contract.role == "turing-marketd" => {
+            market_settle_response(runtime, request, id)
         }
         Some("pput.prompt.validate") if runtime.contract.role == "turing-pputd" => {
             pput_prompt_validate_response(request, id)
@@ -366,6 +384,42 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
         );
     }
 
+    // CONFIRMED-bug-#3 fix, defense-in-depth layer 2 (INV-11/INV-2 boundary, "duplicate
+    // MarketCreated revives a settled market"): this generic PRESERVE-append path never
+    // checked `market_id` uniqueness for `MarketCreated`, despite the registry marking it
+    // `predicate_required: true` (never consulted here — this path hardcodes
+    // `.predicate_pass()`). A writer with tape access could re-append `MarketCreated` for an
+    // already-existing market_id and (before the companion `MarketReplay` fix) reopen an
+    // already-settled market. Refuse a second `MarketCreated` for a market_id that already has
+    // one on the real tape, independent of whatever `MarketReplay::from_tape_events` does with
+    // it downstream.
+    if event_type == "MarketCreated" {
+        if let Some(market_id) = payload.get("market_id").and_then(Value::as_str) {
+            match load_economy_events_from_tape(repo) {
+                Ok(events) => {
+                    if find_market_created_by_id(&events, market_id).is_some() {
+                        return jsonrpc_error(
+                            id,
+                            -32000,
+                            format!(
+                                "MarketCreated market_id {market_id:?} already exists on this tape \
+                                 (duplicate MarketCreated is refused: it must not be able to \
+                                 reopen or reset an existing market's projection)"
+                            ),
+                        );
+                    }
+                }
+                Err(error) => {
+                    return jsonrpc_error(
+                        id,
+                        -32000,
+                        format!("market replay failed while checking market_id uniqueness: {error}"),
+                    );
+                }
+            }
+        }
+    }
+
     let tape = match Append::open(repo) {
         Ok(tape) => tape,
         Err(error) => {
@@ -387,6 +441,73 @@ fn append_preserve_response(runtime: &DaemonRuntime, request: &Value, id: Value)
             "head_effect": "PRESERVE",
             "accepted_head_moved": accepted_head_moved,
             "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+fn project_bootstrap_genesis_response(
+    runtime: &DaemonRuntime,
+    request: &Value,
+    id: Value,
+) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(
+            id,
+            -32000,
+            "project.bootstrap_genesis requires --micro-git".to_string(),
+        );
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(writer_id) => writer_id,
+        Err(message) => return invalid_params(id, message),
+    };
+    let constitution_digest = match required_digest(params, "constitution_digest") {
+        Ok(digest) => digest,
+        Err(message) => return invalid_params(id, message),
+    };
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}"));
+        }
+    };
+    match tape.head_set_guarded() {
+        Ok(None) => {}
+        Ok(Some(_)) => {
+            return jsonrpc_error(id, -32000, "micro tape already bootstrapped".to_string());
+        }
+        Err(error) => {
+            return jsonrpc_error(id, -32000, format!("cannot read micro tape heads: {error}"));
+        }
+    }
+    let receipt = match tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            writer_id,
+            json!({"constitution_digest": constitution_digest}),
+        )
+        .predicate_pass(),
+    ) {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "SystemConstitutionAccepted",
+            "event_id": receipt.event_id,
+            "head_effect": "ADVANCE",
+            "accepted_head_moved": matches!(receipt.head_moved, HeadMoved::AcceptedHead),
             "head_set": {
                 "tape_tip": receipt.tape_tip_after,
                 "authorization_head": receipt.authorization_head_after,
@@ -1237,6 +1358,474 @@ fn wallet_snapshot_write_response(runtime: &DaemonRuntime, _request: &Value, id:
     })
 }
 
+/// Maps a D5/G-MKT-06 check's `Result` onto a [`PredicateCheck`], carrying the error's
+/// `Display` text as the reject_class so a refusal is self-explanatory in the RPC response.
+fn predicate_check_from_result<E: std::fmt::Display>(
+    check_id: &str,
+    result: Result<(), E>,
+) -> PredicateCheck {
+    match result {
+        Ok(()) => PredicateCheck::pass(check_id),
+        Err(error) => PredicateCheck::fail(check_id, error.to_string()),
+    }
+}
+
+fn predicate_refused(id: Value, report: &turing_predicate::PredicateReport) -> Value {
+    jsonrpc_error(
+        id,
+        -32000,
+        format!(
+            "refused: failed_predicates={:?} reject_class={:?}",
+            report.failed_predicates, report.reject_class
+        ),
+    )
+}
+
+fn find_market_created_by_id(events: &[EconomyEvent], market_id: &str) -> Option<MarketCreated> {
+    events.iter().find_map(|event| match event {
+        EconomyEvent::MarketCreated(created) if created.market_id == market_id => {
+            Some(created.clone())
+        }
+        _ => None,
+    })
+}
+
+/// `market.mint` (E1.rpc / D7): a PRESERVE-class `PositionMinted` append routed through the
+/// existing turingd append path. `marketd` stays `can_move_accepted_head=false` -- this can
+/// never move a sovereign head, only append tape-tip history. Gated by the D5 principal
+/// position cap (proposer-conflict is a mathematical no-op for mint, since a CTF mint always
+/// yields `yes_out == no_out`; see `check_proposer_conflict`'s doc comment).
+fn market_mint_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "market.mint requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let market_id = match required_str(params, "market_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let agent_id = match required_str(params, "agent_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let coin_in = match required_str(params, "coin_in") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let principal_position_cap = match required_str(params, "principal_position_cap") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    let events = match load_economy_events_from_tape(repo) {
+        Ok(events) => events,
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
+    };
+    if find_market_created_by_id(&events, &market_id).is_none() {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    }
+
+    let mint = match EconomyEvent::position_minted(&market_id, &agent_id, &coin_in) {
+        Ok(EconomyEvent::PositionMinted(mint)) => mint,
+        Ok(_) => unreachable!("position_minted always returns EconomyEvent::PositionMinted"),
+        Err(error) => return jsonrpc_error(id, -32000, format!("position_minted failed: {error}")),
+    };
+
+    let checks = vec![predicate_check_from_result(
+        "principal_position_cap",
+        check_principal_position_cap(
+            &events,
+            &market_id,
+            &agent_id,
+            &mint.yes_out,
+            &mint.no_out,
+            &principal_position_cap,
+        ),
+    )];
+    let report = match PredicateKernel.run("PositionMinted", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    if report.product != PredicateProduct::Pass {
+        return predicate_refused(id, &report);
+    }
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}")),
+    };
+    let payload = serde_json::to_value(&mint).expect("PositionMinted serializes");
+    let receipt = match tape
+        .append(AppendRequest::new("PositionMinted", writer_id, payload).predicate_pass())
+    {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "PositionMinted",
+            "event_id": receipt.event_id,
+            "market_id": market_id,
+            "agent_id": agent_id,
+            "yes_out": mint.yes_out,
+            "no_out": mint.no_out,
+            "predicate_report_hash": report.report_hash,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+/// `market.swap` (E1.rpc / D5 / D6): reuses `AmmPool::buy_yes`/`buy_no` (the missing
+/// production call site for the built CPMM) rebuilt from the real tape's current pool state,
+/// then gates the resulting `AmmSwapExecuted` on the D5 defenses (self-trade, principal
+/// position cap, proposer-conflict) before appending. D6 (`pool_y' * pool_n' >= k`) is
+/// already a hard assertion inside `buy_yes`/`buy_no` itself (E1.wallet/E1a); a swap that
+/// would violate it never reaches this function's checks at all.
+fn market_swap_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "market.swap requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let market_id = match required_str(params, "market_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let trader_id = match required_str(params, "trader_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let side = match required_str(params, "side") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let pay_coin = match required_str(params, "pay_coin") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let principal_position_cap = match required_str(params, "principal_position_cap") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let proposer_no_deminimis_cap = match required_str(params, "proposer_no_deminimis_cap") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    if side != "BUY_YES" && side != "BUY_NO" {
+        return invalid_params(id, format!("side must be BUY_YES or BUY_NO, got {side:?}"));
+    }
+
+    let events = match load_economy_events_from_tape(repo) {
+        Ok(events) => events,
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
+    };
+    let Some(market_created) = find_market_created_by_id(&events, &market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    let replay = match MarketReplay::from_tape_events(&events) {
+        Ok(replay) => replay,
+        Err(error) => return jsonrpc_error(id, -32000, format!("market replay failed: {error}")),
+    };
+    let Some(projection) = replay.markets.get(&market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    if projection.status != "open" {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!(
+                "market {market_id:?} is not open (status={:?})",
+                projection.status
+            ),
+        );
+    }
+
+    let pool = match AmmPool::new(&market_id, &projection.pool_y, &projection.pool_n) {
+        Ok(pool) => pool,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot rebuild pool: {error}")),
+    };
+    let swap = match side.as_str() {
+        "BUY_YES" => pool.buy_yes(&trader_id, &pay_coin),
+        "BUY_NO" => pool.buy_no(&trader_id, &pay_coin),
+        _ => unreachable!("side already validated above"),
+    };
+    let swap = match swap {
+        Ok(swap) => swap,
+        Err(error) => return jsonrpc_error(id, -32000, format!("swap failed: {error}")),
+    };
+
+    let checks = vec![
+        predicate_check_from_result(
+            "self_trade",
+            check_self_trade(&events, &market_id, &trader_id, &side),
+        ),
+        predicate_check_from_result(
+            "principal_position_cap",
+            check_principal_position_cap(
+                &events,
+                &market_id,
+                &trader_id,
+                &swap.get_y,
+                &swap.get_n,
+                &principal_position_cap,
+            ),
+        ),
+        predicate_check_from_result(
+            "proposer_conflict",
+            check_proposer_conflict(
+                &events,
+                &market_id,
+                &market_created.proposer_id,
+                &trader_id,
+                &swap.get_y,
+                &swap.get_n,
+                &proposer_no_deminimis_cap,
+            ),
+        ),
+    ];
+    let report = match PredicateKernel.run("AMMSwapExecuted", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    if report.product != PredicateProduct::Pass {
+        return predicate_refused(id, &report);
+    }
+
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}")),
+    };
+    let payload = serde_json::to_value(&swap).expect("AmmSwapExecuted serializes");
+    let receipt = match tape
+        .append(AppendRequest::new("AMMSwapExecuted", writer_id, payload).predicate_pass())
+    {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "AMMSwapExecuted",
+            "event_id": receipt.event_id,
+            "market_id": market_id,
+            "trader_id": trader_id,
+            "side": swap.side,
+            "get_y": swap.get_y,
+            "get_n": swap.get_n,
+            "invariant_k_before": swap.invariant_k_before,
+            "invariant_k_after": swap.invariant_k_after,
+            "predicate_report_hash": report.report_hash,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
+/// `market.settle` (E1.rpc / D4 / G-MKT-06): the kernel-as-oracle wiring. Gathers the tape
+/// facts G-MKT-06 needs (the market's frozen `capsule_id`/`predicate_set_hash`, what
+/// `settlement_event_id` resolves to, and tape-order positions for both) and refuses the
+/// append if the gate fails -- no `MarketSettled` (and no alternate event) is ever written
+/// for an invalid settlement.
+fn market_settle_response(runtime: &DaemonRuntime, request: &Value, id: Value) -> Value {
+    let Some(repo) = &runtime.micro_git else {
+        return jsonrpc_error(id, -32000, "market.settle requires --micro-git".to_string());
+    };
+    let params = match request.get("params") {
+        Some(params) => params,
+        None => return invalid_params(id, "params object is required"),
+    };
+    let writer_id = match required_str(params, "writer_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let market_id = match required_str(params, "market_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let result = match required_str(params, "result") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+    let settlement_event_id = match required_str(params, "settlement_event_id") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
+
+    let envelopes = match load_tape_envelopes(repo) {
+        Ok(envelopes) => envelopes,
+        Err(message) => return jsonrpc_error(id, -32000, format!("tape read failed: {message}")),
+    };
+    let events = match load_economy_events_from_tape(repo) {
+        Ok(events) => events,
+        Err(message) => {
+            return jsonrpc_error(id, -32000, format!("market replay failed: {message}"));
+        }
+    };
+    let Some(market_created) = find_market_created_by_id(&events, &market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    let replay = match MarketReplay::from_tape_events(&events) {
+        Ok(replay) => replay,
+        Err(error) => return jsonrpc_error(id, -32000, format!("market replay failed: {error}")),
+    };
+    let Some(projection) = replay.markets.get(&market_id) else {
+        return jsonrpc_error(id, -32000, format!("unknown market {market_id:?}"));
+    };
+    if projection.status != "open" {
+        return jsonrpc_error(
+            id,
+            -32000,
+            format!(
+                "market {market_id:?} is already settled or not open (status={:?})",
+                projection.status
+            ),
+        );
+    }
+
+    let market_created_tape_index = envelopes.iter().position(|(_, envelope)| {
+        envelope.event_type == "MarketCreated"
+            && envelope.payload.get("market_id").and_then(Value::as_str) == Some(market_id.as_str())
+    });
+    let normalized_settlement_id = normalize_mu(&settlement_event_id);
+    let settlement_index = envelopes
+        .iter()
+        .position(|(event_id, _)| event_id == &normalized_settlement_id);
+    let reference = match settlement_index {
+        Some(index) => match envelopes[index].1.event_type.as_str() {
+            "CandidateAccepted" => SettlementReference::CandidateAccepted {
+                capsule_id: envelopes[index]
+                    .1
+                    .payload
+                    .get("capsule_id")
+                    .and_then(Value::as_str),
+            },
+            // ADR-ECON-002: `FailureNodePayload` itself (frozen, unmodified) carries no
+            // `capsule_id`, so the capsule this FailureNode is bound to (if any) is recovered
+            // from a separate, additive `FailureNodeCapsuleBound` tape event referencing this
+            // same `settlement_event_id` -- symmetric to how the YES path above reads
+            // `capsule_id` straight off the referenced `CandidateAccepted`'s own payload.
+            "FailureNode" => SettlementReference::FailureNode {
+                bound_capsule_id: envelopes.iter().find_map(|(_, envelope)| {
+                    if envelope.event_type == "FailureNodeCapsuleBound"
+                        && envelope
+                            .payload
+                            .get("settlement_event_id")
+                            .and_then(Value::as_str)
+                            .map(normalize_mu)
+                            .as_deref()
+                            == Some(normalized_settlement_id.as_str())
+                    {
+                        envelope.payload.get("capsule_id").and_then(Value::as_str)
+                    } else {
+                        None
+                    }
+                }),
+            },
+            other => SettlementReference::OtherType(other),
+        },
+        None => SettlementReference::Missing,
+    };
+
+    let current_predicate_set_hash = candidate_predicate_set_hash();
+    let gate_input = MarketSettlementGateInput {
+        result: &result,
+        settlement_event_id: &settlement_event_id,
+        market_capsule_id: &market_created.capsule_id,
+        market_predicate_set_hash: &market_created.predicate_set_hash,
+        current_predicate_set_hash: &current_predicate_set_hash,
+        reference,
+        market_created_tape_index,
+        settlement_tape_index: settlement_index,
+    };
+    let checks = vec![
+        predicate_check_from_result("g_mkt_06", market_settlement_gate_g_mkt_06(&gate_input)),
+        predicate_check_from_result(
+            "event_class.preserve",
+            market_event_preserves_truth("MarketSettled"),
+        ),
+    ];
+    let report = match PredicateKernel.run("MarketSettled", checks) {
+        Ok(report) => report,
+        Err(error) => return jsonrpc_error(id, -32000, format!("predicate failed: {error}")),
+    };
+    if report.product != PredicateProduct::Pass {
+        return predicate_refused(id, &report);
+    }
+
+    let settled = match EconomyEvent::market_settled(&market_id, &result, &settlement_event_id) {
+        Ok(EconomyEvent::MarketSettled(settled)) => settled,
+        Ok(_) => unreachable!("market_settled always returns EconomyEvent::MarketSettled"),
+        Err(error) => return jsonrpc_error(id, -32000, format!("market_settled failed: {error}")),
+    };
+    let tape = match Append::open(repo) {
+        Ok(tape) => tape,
+        Err(error) => return jsonrpc_error(id, -32000, format!("cannot open micro tape: {error}")),
+    };
+    let payload = serde_json::to_value(&settled).expect("MarketSettled serializes");
+    let receipt = match tape
+        .append(AppendRequest::new("MarketSettled", writer_id, payload).predicate_pass())
+    {
+        Ok(receipt) => receipt,
+        Err(error) => return jsonrpc_error(id, -32000, format!("append failed: {error}")),
+    };
+    let accepted_head_moved = matches!(receipt.head_moved, HeadMoved::AcceptedHead);
+    json!({
+        "jsonrpc": "2.0",
+        "id": id,
+        "result": {
+            "event_type": "MarketSettled",
+            "event_id": receipt.event_id,
+            "market_id": market_id,
+            "result": settled.result,
+            "settlement_event_id": settled.settlement_event_id,
+            "predicate_report_hash": report.report_hash,
+            "head_effect": "PRESERVE",
+            "accepted_head_moved": accepted_head_moved,
+            "can_move_accepted_head": false,
+            "head_set": {
+                "tape_tip": receipt.tape_tip_after,
+                "authorization_head": receipt.authorization_head_after,
+                "accepted_head": receipt.accepted_head_after,
+            }
+        }
+    })
+}
+
 fn pput_prompt_validate_response(request: &Value, id: Value) -> Value {
     let params = match request.get("params") {
         Some(params) => params,
@@ -1505,6 +2094,7 @@ fn derive_candidate_predicate_checks(
                 | "macro_anchor_id"
                 | "macro_anchor"
                 | "worker_receipt_id"
+                | "official_evaluator_evidence_id"
         ) {
             return Err(format!("unexpected candidate_payload field {key:?}"));
         }
@@ -1529,6 +2119,9 @@ fn derive_candidate_predicate_checks(
         .and_then(Value::as_str);
     let worker_receipt_id = candidate_payload
         .get("worker_receipt_id")
+        .and_then(Value::as_str);
+    let official_evaluator_evidence_id = candidate_payload
+        .get("official_evaluator_evidence_id")
         .and_then(Value::as_str);
     let capsule_on_tape = capsule_id.is_some_and(|id| {
         tape_has_payload_field(
@@ -1557,6 +2150,23 @@ fn derive_candidate_predicate_checks(
         }
         _ => false,
     };
+    let official_evaluator_evidence_on_tape = match (
+        official_evaluator_evidence_id,
+        capsule_id,
+        macro_anchor_id,
+        worker_receipt_id,
+    ) {
+        (Some(evidence_id), Some(capsule_id), Some(macro_anchor_id), Some(worker_receipt_id)) => {
+            tape_has_official_evaluator_evidence(
+                &envelopes,
+                evidence_id,
+                capsule_id,
+                macro_anchor_id,
+                worker_receipt_id,
+            )
+        }
+        _ => false,
+    };
 
     let checks = vec![
         if candidate_id.is_some() && capsule_id.is_some() && capsule_on_tape {
@@ -1573,6 +2183,14 @@ fn derive_candidate_predicate_checks(
             PredicateCheck::pass("worker_receipt")
         } else {
             PredicateCheck::fail("worker_receipt", "WORKER_RECEIPT_NOT_ON_TAPE")
+        },
+        if official_evaluator_evidence_on_tape {
+            PredicateCheck::pass("official_evaluator_evidence")
+        } else {
+            PredicateCheck::fail(
+                "official_evaluator_evidence",
+                "OFFICIAL_EVALUATOR_EVIDENCE_NOT_ON_TAPE",
+            )
         },
         if candidate_id.is_some() && capsule_id.is_some() && capsule_on_tape {
             PredicateCheck::pass("scope.allowed")
@@ -1637,6 +2255,36 @@ fn tape_has_worker_receipt(
         envelope.event_type == "WorkerReceiptImported"
             && envelope.payload.get("receipt_id").and_then(Value::as_str) == Some(receipt_id)
             && envelope.payload.get("capsule_id").and_then(Value::as_str) == Some(capsule_id)
+    })
+}
+
+fn tape_has_official_evaluator_evidence(
+    envelopes: &[(String, MicroEventEnvelope)],
+    evidence_id: &str,
+    capsule_id: &str,
+    macro_anchor_id: &str,
+    worker_receipt_id: &str,
+) -> bool {
+    envelopes.iter().any(|(_, envelope)| {
+        envelope.event_type == "OfficialEvaluatorEvidenceImported"
+            && envelope.payload.get("evidence_id").and_then(Value::as_str) == Some(evidence_id)
+            && envelope.payload.get("capsule_id").and_then(Value::as_str) == Some(capsule_id)
+            && envelope
+                .payload
+                .get("macro_anchor_id")
+                .and_then(Value::as_str)
+                == Some(macro_anchor_id)
+            && envelope
+                .payload
+                .get("worker_receipt_id")
+                .and_then(Value::as_str)
+                == Some(worker_receipt_id)
+            && envelope.payload.get("result").and_then(Value::as_str) == Some("PASS")
+            && envelope
+                .payload
+                .get("forbidden_test_edit_detected")
+                .and_then(Value::as_bool)
+                == Some(false)
     })
 }
 
@@ -1840,15 +2488,24 @@ fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
         "RewardDistributed" => serde_json::from_value::<RewardDistributed>(value.clone())
             .map(EconomyEvent::RewardDistributed)
             .map_err(|error| format!("invalid RewardDistributed: {error}")),
+        "PrincipalDeclared" => serde_json::from_value::<PrincipalDeclared>(value.clone())
+            .map(EconomyEvent::PrincipalDeclared)
+            .map_err(|error| format!("invalid PrincipalDeclared: {error}")),
         other => Err(format!("unknown economy event_type {other:?}")),
     }
 }
 
 fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
     let schema_id = required_str(value, "schema_id")?;
-    if schema_id != "cost_event.v1" {
-        return Err(format!("unsupported cost event schema_id {schema_id:?}"));
+    match schema_id.as_str() {
+        "cost_event.v1" => parse_cost_event_v1(value),
+        "turingos.cost_event.v2" => parse_cost_event_v2(value),
+        _ => Err(format!("unsupported cost event schema_id {schema_id:?}")),
     }
+}
+
+fn parse_cost_event_v1(value: &Value) -> Result<CostEvent, String> {
+    let schema_id = required_str(value, "schema_id")?;
     let event_type = required_str(value, "event_type")?;
     if event_type != "CostEvent" {
         return Err(format!("unsupported cost event_type {event_type:?}"));
@@ -1878,9 +2535,141 @@ fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
     if !counted_in_total {
         return Err("CostEvent counted_in_total must be true".to_string());
     }
+    let run_id = required_str(value, "run_id")?;
+    let problem_id = required_str(value, "problem_id")?;
+    let branch_id = required_str(value, "branch_id")?;
+    let capsule_id = required_str(value, "capsule_id")?;
+    let tool_stdout_hash = required_digest(value, "tool_stdout_hash")?;
+    let receipt_material = format!("{run_id}:{branch_id}:{tool_stdout_hash}");
+    let receipt_id = format!("rcpt:{}", jcs::sha256_hex(receipt_material.as_bytes()));
 
     Ok(CostEvent {
         schema_id,
+        event_type,
+        head_effect,
+        run_id,
+        problem_id,
+        split: parse_pput_split(&required_str(value, "split")?)?,
+        agent_id: required_str(value, "agent_id")?,
+        branch_id,
+        capsule_id,
+        receipt_id,
+        worker: CostWorker {
+            adapter_kind: "fake".to_string(),
+            provider: "fixture".to_string(),
+            model_id_requested: "legacy-cost-event-v1".to_string(),
+            model_id_resolved: "legacy-cost-event-v1".to_string(),
+            endpoint: "legacy://cost_event.v1".to_string(),
+            request_id: "legacy_cost_event_v1".to_string(),
+            response_sha256: tool_stdout_hash.clone(),
+        },
+        usage: CostUsage {
+            prompt_tokens,
+            completion_tokens,
+            tool_tokens,
+            tool_stdout_tokens,
+            total_tokens,
+            provider_usage_raw_sha256: format!(
+                "sha256:{}",
+                jcs::sha256_hex(
+                    format!(
+                        "{prompt_tokens}:{completion_tokens}:{tool_tokens}:{tool_stdout_tokens}:{total_tokens}"
+                    )
+                    .as_bytes()
+                )
+            ),
+        },
+        cost: CostAmount {
+            cost_source_kind: "fixture".to_string(),
+            cost_microusd: 0,
+            price_table_digest:
+                "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c"
+                    .to_string(),
+            bound_kind: None,
+        },
+        prompt_tokens,
+        completion_tokens,
+        tool_tokens,
+        tool_stdout_tokens,
+        total_tokens,
+        wall_time_ms: required_u64(value, "wall_time_ms")?,
+        tool_stdout_hash,
+        counted_in_total,
+    })
+}
+
+fn parse_cost_event_v2(value: &Value) -> Result<CostEvent, String> {
+    let event_type = match value.get("event_type") {
+        Some(_) => required_str(value, "event_type")?,
+        None => "CostEvent".to_string(),
+    };
+    if event_type != "CostEvent" {
+        return Err(format!("unsupported cost event_type {event_type:?}"));
+    }
+    let head_effect = match value.get("head_effect") {
+        Some(_) => required_str(value, "head_effect")?,
+        None => "PRESERVE".to_string(),
+    };
+    if head_effect != "PRESERVE" {
+        return Err(format!(
+            "CostEvent head_effect must be PRESERVE, got {head_effect:?}"
+        ));
+    }
+    let worker_value = required_object(value, "worker")?;
+    let usage_value = required_object(value, "usage")?;
+    let cost_value = required_object(value, "cost")?;
+
+    let cache_prompt_tokens = optional_u64(usage_value, "prompt_cache_hit_tokens")?
+        .unwrap_or(0)
+        .saturating_add(optional_u64(usage_value, "prompt_cache_miss_tokens")?.unwrap_or(0));
+    let prompt_tokens = optional_u64(usage_value, "prompt_tokens")?
+        .or(optional_u64(usage_value, "input_tokens")?)
+        .unwrap_or(cache_prompt_tokens);
+    let completion_tokens = optional_u64(usage_value, "completion_tokens")?
+        .or(optional_u64(usage_value, "output_tokens")?)
+        .unwrap_or(0);
+    let tool_tokens = optional_u64(usage_value, "tool_tokens")?.unwrap_or(0);
+    let tool_stdout_tokens = optional_u64(usage_value, "tool_stdout_tokens")?.unwrap_or(0);
+    let computed_total = prompt_tokens
+        .checked_add(completion_tokens)
+        .and_then(|count| count.checked_add(tool_tokens))
+        .and_then(|count| count.checked_add(tool_stdout_tokens))
+        .ok_or_else(|| "CostEvent token total overflow".to_string())?;
+    let total_tokens = optional_u64(usage_value, "total_tokens")?.unwrap_or(computed_total);
+    if total_tokens != computed_total {
+        return Err(format!(
+            "CostEvent usage.total_tokens {total_tokens} does not match counted total {computed_total}"
+        ));
+    }
+    let counted_in_total = match value.get("counted_in_total") {
+        Some(_) => required_bool(value, "counted_in_total")?,
+        None => true,
+    };
+    if !counted_in_total {
+        return Err("CostEvent counted_in_total must be true".to_string());
+    }
+    let response_sha256 = required_digest(worker_value, "response_sha256")?;
+    let tool_stdout_hash = match value.get("tool_stdout_hash") {
+        Some(_) => required_digest(value, "tool_stdout_hash")?,
+        None => response_sha256.clone(),
+    };
+    let source = required_str(cost_value, "cost_source_kind")?;
+    if !matches!(
+        source.as_str(),
+        "provider_receipt_inline"
+            | "provider_usage_api_reconciled"
+            | "bounded_estimate"
+            | "fixture"
+    ) {
+        return Err(format!("unsupported cost_source_kind {source:?}"));
+    }
+    let bound_kind = optional_str(cost_value, "bound_kind")?;
+    if source == "bounded_estimate" && bound_kind.as_deref().unwrap_or("").is_empty() {
+        return Err("bounded_estimate CostEvent requires bound_kind".to_string());
+    }
+
+    Ok(CostEvent {
+        schema_id: required_str(value, "schema_id")?,
         event_type,
         head_effect,
         run_id: required_str(value, "run_id")?,
@@ -1889,13 +2678,37 @@ fn parse_cost_event(value: &Value) -> Result<CostEvent, String> {
         agent_id: required_str(value, "agent_id")?,
         branch_id: required_str(value, "branch_id")?,
         capsule_id: required_str(value, "capsule_id")?,
+        receipt_id: required_str(value, "receipt_id")?,
+        worker: CostWorker {
+            adapter_kind: required_str(worker_value, "adapter_kind")?,
+            provider: required_str(worker_value, "provider")?,
+            model_id_requested: required_str(worker_value, "model_id_requested")?,
+            model_id_resolved: required_str(worker_value, "model_id_resolved")?,
+            endpoint: required_str(worker_value, "endpoint")?,
+            request_id: required_str(worker_value, "request_id")?,
+            response_sha256,
+        },
+        usage: CostUsage {
+            prompt_tokens,
+            completion_tokens,
+            tool_tokens,
+            tool_stdout_tokens,
+            total_tokens,
+            provider_usage_raw_sha256: required_digest(usage_value, "provider_usage_raw_sha256")?,
+        },
+        cost: CostAmount {
+            cost_source_kind: source,
+            cost_microusd: required_u64(cost_value, "cost_microusd")?,
+            price_table_digest: required_digest(cost_value, "price_table_digest")?,
+            bound_kind,
+        },
         prompt_tokens,
         completion_tokens,
         tool_tokens,
         tool_stdout_tokens,
         total_tokens,
         wall_time_ms: required_u64(value, "wall_time_ms")?,
-        tool_stdout_hash: required_digest(value, "tool_stdout_hash")?,
+        tool_stdout_hash,
         counted_in_total,
     })
 }
@@ -1963,19 +2776,32 @@ fn load_economy_events_from_tape(repo: &Path) -> Result<Vec<EconomyEvent>, Strin
     envelopes
         .into_iter()
         .filter_map(|(_, envelope)| {
-            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
-            if matches!(
-                event_type,
+            // Filter on the ENVELOPE's event_type (registry-canonical, e.g.
+            // "AMMSwapExecuted"), not an inner `payload.event_type` key: only
+            // MarketCreated's payload carries that key, so the other four
+            // economy event payloads were silently dropped before this fix.
+            let event_type = envelope.event_type.clone();
+            if !matches!(
+                event_type.as_str(),
                 "MarketCreated"
                     | "PositionMinted"
-                    | "AmmSwapExecuted"
+                    | "AMMSwapExecuted"
                     | "MarketSettled"
                     | "RewardDistributed"
+                    | "PrincipalDeclared"
             ) {
-                Some(envelope.payload)
-            } else {
-                None
+                return None;
             }
+            let mut payload = envelope.payload;
+            if let Value::Object(map) = &mut payload {
+                // parse_economy_event dispatches on an inner `event_type` key;
+                // stamp the envelope's canonical event_type onto the payload so
+                // dispatch works even for payload schemas that don't carry
+                // their own event_type field (PositionMinted, AMMSwapExecuted,
+                // MarketSettled, RewardDistributed).
+                map.insert("event_type".to_string(), Value::String(event_type));
+            }
+            Some(payload)
         })
         .map(|payload| parse_economy_event(&payload))
         .collect()
@@ -1986,8 +2812,7 @@ fn load_cost_events_from_tape(repo: &Path) -> Result<Vec<CostEvent>, String> {
     envelopes
         .into_iter()
         .filter_map(|(_, envelope)| {
-            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
-            if event_type == "CostEvent" {
+            if envelope.event_type == "CostEvent" {
                 Some(envelope.payload)
             } else {
                 None
@@ -2002,7 +2827,7 @@ fn load_projection_events_from_tape(repo: &Path) -> Result<Vec<ProjectionEvent>,
     envelopes
         .into_iter()
         .filter_map(|(event_id, envelope)| {
-            let event_type = envelope.payload.get("event_type").and_then(Value::as_str)?;
+            let event_type = envelope.event_type;
             if !(event_type.starts_with("Market")
                 || event_type.starts_with("PPUT")
                 || event_type == "CostEvent")
@@ -2015,9 +2840,9 @@ fn load_projection_events_from_tape(repo: &Path) -> Result<Vec<ProjectionEvent>,
                 .or_else(|| envelope.payload.get("market_id"))
                 .or_else(|| envelope.payload.get("run_id"))
                 .and_then(Value::as_str)
-                .unwrap_or(event_type)
+                .unwrap_or(event_type.as_str())
                 .to_string();
-            Some((event_id, envelope.event_type, subject_id))
+            Some((event_id, event_type, subject_id))
         })
         .map(|(event_id, event_type, subject_id)| {
             Ok(ProjectionEvent::new(event_id, event_type, subject_id))
@@ -2234,6 +3059,23 @@ fn optional_str(value: &Value, key: &str) -> Result<Option<String>, String> {
         Some(Value::Null) | None => Ok(None),
         Some(Value::String(raw)) => Ok(Some(raw.clone())),
         Some(_) => Err(format!("{key} string or null is required")),
+    }
+}
+
+fn required_object<'a>(value: &'a Value, key: &str) -> Result<&'a Value, String> {
+    value
+        .get(key)
+        .filter(|item| item.is_object())
+        .ok_or_else(|| format!("{key} object is required"))
+}
+
+fn optional_u64(value: &Value, key: &str) -> Result<Option<u64>, String> {
+    match value.get(key) {
+        None => Ok(None),
+        Some(raw) => raw
+            .as_u64()
+            .map(Some)
+            .ok_or_else(|| format!("{key} unsigned integer is required")),
     }
 }
 

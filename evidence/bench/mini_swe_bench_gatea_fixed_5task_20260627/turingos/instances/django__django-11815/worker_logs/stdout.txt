@@ -1,0 +1,8 @@
+**Patch applied (only production file edited: [django/db/migrations/serializer.py](/tmp/turingos_substrate_worktrees/86e5b04dbe2286b1/django/db/migrations/serializer.py)).**
+
+Minimal change to `EnumSerializer` (the root of default serialization for `enum.Enum` members passed to fields like `CharField`):
+
+- Switched from `EnumClass(value)` (which baked in `.value`, e.g. translated strings) to stable `EnumClass.NAME` member access (by `.name`).
+- Removed unnecessary value serialization/imports.
+
+Verified via direct execution (produces correct `module.Enum.MEMBER` form + import set). No other files inspected or touched; no test/benchmark files edited. Worktree left with the candidate patch.

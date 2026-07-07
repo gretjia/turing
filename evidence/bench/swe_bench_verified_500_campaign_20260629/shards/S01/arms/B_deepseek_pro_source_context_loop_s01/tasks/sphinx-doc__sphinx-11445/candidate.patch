@@ -1,0 +1,14 @@
+diff --git a/sphinx/transforms/i18n.py b/sphinx/transforms/i18n.py
+index 719f063..3e34352 100644
+--- a/sphinx/transforms/i18n.py
++++ b/sphinx/transforms/i18n.py
+@@ -127,8 +127,8 @@ class _NodeUpdater:
+         if isinstance(self.node, nodes.title) and isinstance(self.node.parent, nodes.section):
+             section_node = self.node.parent
+             new_name = nodes.fully_normalize_name(self.patch.astext())
+-            old_name = nodes.fully_normalize_name(self.node.astext())
+ 
++            old_name = nodes.fully_normalize_name(self.node.astext())
+             if old_name != new_name:
+                 # if name would be changed, replace node names and
+                 # document nameids mapping with new name.

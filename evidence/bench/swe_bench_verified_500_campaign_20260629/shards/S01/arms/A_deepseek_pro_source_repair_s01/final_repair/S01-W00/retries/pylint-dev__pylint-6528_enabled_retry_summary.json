@@ -1,0 +1,57 @@
+{
+  "agent_id": "m3-p5-deepseek-arm-a-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W00/source_snapshots",
+  "branch_id": "branch:m3-p5",
+  "claim_boundary": {
+    "arm": "A",
+    "confirmatory_s01": true,
+    "no_failure_memory": true,
+    "no_turingos_loop": true,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p5",
+  "extra_context_file": null,
+  "ipqc_window_id": "S01-W00",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [
+    "pylint-dev__pylint-6528: candidate audit FAIL"
+  ],
+  "provider": "deepseek",
+  "reasoning_effort": "high",
+  "run_id_prefix": "m3-p5-arm-a-source-repair-retry",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S01",
+  "source_context_name": "source_context.md",
+  "split_label": "s01-confirmatory-source-repair-retry",
+  "status": "FAIL",
+  "task_count_completed": 1,
+  "task_count_requested": 1,
+  "tasks": [
+    {
+      "candidate_audit_problems": [
+        "candidate patch does not apply to source snapshot: error: corrupt patch at line 21"
+      ],
+      "candidate_audit_status": "FAIL",
+      "candidate_patch_bytes": 4400,
+      "candidate_patch_sha256": "sha256:b69b8bb791400100daeaac29bd6a023fbc98eb274222f5355d3e13a65bac14cb",
+      "cost_microusd": 6095,
+      "instance_id": "pylint-dev__pylint-6528",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 7193,
+        "prompt_cache_hit_tokens": 12416,
+        "prompt_cache_miss_tokens": 21,
+        "prompt_tokens": 12437,
+        "total_tokens": 19630
+      }
+    }
+  ],
+  "thinking": {
+    "type": "enabled"
+  },
+  "wall_time_ms": 95780
+}

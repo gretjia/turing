@@ -1,0 +1,31 @@
+{
+  "candidate_source": "worker_derived_repair",
+  "completed_instances": 1,
+  "error_instances": 0,
+  "evidence": {
+    "candidate_patch_path": "phase_f_11885_repair/candidate.patch",
+    "evaluation_results_path": "phase_f_11885_repair/evaluation_results.json",
+    "harness_logs_raw_path": "phase_f_11885_repair/harness_logs_raw.tar.gz",
+    "stderr_path": "phase_f_11885_repair/stderr.txt",
+    "stdout_path": "phase_f_11885_repair/stdout.txt"
+  },
+  "evidence_sha256": {
+    "candidate_patch": "sha256:76d61e70ff5b25dee055fc54029ba754e023198bb322342dce2732d0c3029d28",
+    "evaluation_results": "sha256:1911c186b1760c569f78fb35d4e91afd08cf07d9efd9b550d269d9bacf426885",
+    "harness_logs_raw": "sha256:036bdead9a918e23573c74ef8effab0416f57fb4979581e47df84779e1f01669",
+    "stderr": "sha256:816954f6d4adb25da4b355ea26fb732d7a841c2a3b2c06740d892b755e06f26b",
+    "stdout": "sha256:c0c92d771a8f07b0f47109c5cb66b6cc76eb9bae07199bd790fcf2f9ed7756ba"
+  },
+  "instance_id": "django__django-11885",
+  "official_harness_kind": "upstream_swebench_docker",
+  "resolved_ids": [
+    "django__django-11885"
+  ],
+  "resolved_instances": 1,
+  "run_id": "turingos_phase_f_11885_repair_candidate_20260629",
+  "schema_id": "turingos.phase_f_11885_official_repair_audit.v1",
+  "status": "PASS",
+  "submitted_instances": 1,
+  "supersedes_candidate_patch_sha256": "sha256:714cdc13aff215216d6eb3ff8a2550420b36c4efbd395158cfa59de875566bd5",
+  "unresolved_instances": 0
+}

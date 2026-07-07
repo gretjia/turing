@@ -1,0 +1,41 @@
+{
+  "instance_id": "astropy__astropy-12907",
+  "status": "COMPLETED",
+  "source_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/astropy__astropy-12907/worker_capsule.md",
+  "base_commit": "d16bfe05a744909de4b27f5875fe0d4ed41ce607",
+  "repo_url": "https://github.com/astropy/astropy.git",
+  "commands_run": [
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/astropy__astropy-12907/task_packet.json",
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/astropy__astropy-12907/worker_capsule.md",
+    "git clone https://github.com/astropy/astropy.git /tmp/turingos_worker_astropy_12907",
+    "git -C /tmp/turingos_worker_astropy_12907 checkout d16bfe05a744909de4b27f5875fe0d4ed41ce607",
+    "rg -n 'def separability_matrix|def _.*separable|separability_matrix|_separable' astropy/modeling",
+    "rg -n 'separability|Pix2Sky_TAN|CompoundModel' astropy/modeling/tests",
+    "sed -n '1,380p' astropy/modeling/separable.py",
+    "sed -n '1,230p' astropy/modeling/tests/test_separable.py",
+    "python3 -m venv /tmp/turingos_worker_astropy_12907/.venv",
+    ".venv/bin/python -m pip install -U pip",
+    ".venv/bin/python -m pip install pyerfa hypothesis pytest numpy",
+    ".venv/bin/python -m pip install extension-helpers Cython jinja2 setuptools_scm",
+    ".venv/bin/python setup.py build_ext --inplace",
+    ".venv/bin/python -m pip install 'numpy<2'",
+    ".venv/bin/python setup.py build_ext --inplace",
+    ".venv/bin/python -m pip install PyYAML",
+    ".venv/bin/python - <<'PY' ... nested separability regression assertion ... PY",
+    ".venv/bin/python - <<'PY' ... nested and unnested separability assertions ... PY",
+    ".venv/bin/python -m pytest astropy/modeling/tests/test_separable.py::test_nested_compound_model_separability_matrix -q",
+    "git diff -- astropy/modeling/separable.py",
+    "git diff -- astropy/modeling/tests/test_separable.py",
+    "git status --short",
+    "mkdir -p evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/astropy__astropy-12907"
+  ],
+  "candidate_patch_path": "shards/S00/tasks/astropy__astropy-12907/candidate.patch",
+  "candidate_source": "worker_derived",
+  "submitted_patch_scope": "source_only",
+  "integrity_statement": "I used only worker-safe task_packet.json and worker_capsule.md from the worker_safe_tasks directory for this instance, plus the public upstream astropy checkout at the stated base commit. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, hints_text, official solution hints, gold patches, hidden evaluator labels, or task evidence outside the worker-safe packet/capsule.",
+  "open_risks": [
+    "Full SWE-bench harness was not run, per instruction.",
+    "Repository pytest invocation was blocked in the minimal venv by an unsupported configured --doctest-rst option; focused direct public API assertions were run instead.",
+    "Verification used Python 3.11 with a local venv and NumPy 1.26 because the base Astropy checkout is not compatible with NumPy 2.x import behavior."
+  ]
+}

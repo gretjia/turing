@@ -1,0 +1,19 @@
+[package]
+name = "turing-attest"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+# Pinned exact (dependency_policy: no runtime-latest), mirrors sibling crates.
+# serde/serde_json: schema structs + strict JSON parsing for q_t_quote fixtures.
+# toml: hardware_manifest.toml / attestation_policy.toml parsing (first new
+# external dep of the roadmap — see evidence/loops/hw_sw_007_20260704/CONTEXT.md).
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+toml = "=1.1.2"
+turing-contracts = { path = "../turing-contracts" }
+
+[lints]
+workspace = true

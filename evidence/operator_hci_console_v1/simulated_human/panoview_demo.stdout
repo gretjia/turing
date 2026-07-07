@@ -1,0 +1,34 @@
+operator_view_snapshot.v1 panoview
+source=deterministic_replay rebuild=turing replay --verify can_write_truth=false
+heads:
+  tape_tip=mu:02f42ebded614bd70a57f42188e974a8dc0258af376b3c296688b55fbfab67be
+  authorization_head=null
+  accepted_head=mu:1c6b2e1bc34a3354a7496fcb6feefb54a70ea6a34fe3db51386545d669021e0b
+lanes:
+  tape_tip=mu:02f42ebded614bd70a57f42188e974a8dc0258af376b3c296688b55fbfab67be meaning=latest MicroTape append; every event moves this head
+  authorization_head=null meaning=latest authorization event; permission, not completion
+  accepted_head=mu:1c6b2e1bc34a3354a7496fcb6feefb54a70ea6a34fe3db51386545d669021e0b meaning=latest sovereign accept event from replay-derived head movement
+evidence:
+  - heads read through guarded MicroTape/replay path
+  - renderer may format snapshot but may not derive new truth
+failures:
+  - none in snapshot
+warnings:
+  - NO_HITL_STATUS_CEILING severity=warning message=local no-HITL gates can report IMPLEMENTER_ADDRESSED only; no human ratification
+safe commands:
+  VIEW_STATUS approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none
+  VIEW_PANOVIEW approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none
+  EXPLAIN_EVENT approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none
+  EXPLAIN_BLOCKER approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none
+  REPLAY_VERIFY approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none
+  AUDIT_INVARIANTS approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none
+  PROPOSE_INTENT approval_required=false side_effect_class=proposal_only writes_truth=false confirmation_route=none
+  PROPOSE_GOAL approval_required=false side_effect_class=proposal_only writes_truth=false confirmation_route=none
+  PROPOSE_CAPSULE approval_required=false side_effect_class=proposal_only writes_truth=false confirmation_route=none
+  APPROVE_CAPSULE approval_required=true side_effect_class=sovereign_mutation writes_truth=false confirmation_route=human_signature_required
+  DISPATCH_WORKER approval_required=true side_effect_class=worker_dispatch writes_truth=false confirmation_route=approval_required
+  OBSERVE_CAPSULE approval_required=false side_effect_class=observation writes_truth=false confirmation_route=none
+  REJECT_CANDIDATE approval_required=true side_effect_class=authorization writes_truth=false confirmation_route=approval_required
+  REQUEST_MACRO_AUTH approval_required=true side_effect_class=authorization writes_truth=false confirmation_route=human_signature_required
+  APPROVE_CANDIDATE approval_required=true side_effect_class=sovereign_mutation writes_truth=false confirmation_route=human_signature_required
+  HELP approval_required=false side_effect_class=read_only writes_truth=false confirmation_route=none

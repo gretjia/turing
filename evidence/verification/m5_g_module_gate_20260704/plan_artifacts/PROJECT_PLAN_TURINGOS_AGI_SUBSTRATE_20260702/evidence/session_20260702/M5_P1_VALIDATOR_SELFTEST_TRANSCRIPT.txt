@@ -1,0 +1,4 @@
+$ bash m5_verification/tests/test_closure_certificate_validator.sh
+PASS closure certificate validator self-test corpus
+$ python3 -m py_compile m5_verification/tools/validate_closure_certificate.py
+$ find m5_verification/corpus/closure_certificate_selftest -name "*.json" -print0 | xargs -0 -n1 python3 -m json.tool >/dev/null

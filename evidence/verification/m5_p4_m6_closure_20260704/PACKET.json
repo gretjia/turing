@@ -1,0 +1,41 @@
+{
+  "audit_surface": "github_only",
+  "auditor_must_not_use": [
+    "implementation chat",
+    "local plan directory",
+    "agent memory summaries",
+    "uncommitted local files"
+  ],
+  "closure_certificate_schema_id": "turingos.closure_certificate.v1",
+  "copied_plan_artifact_count": 117,
+  "exact_commit_supplied_out_of_band": true,
+  "gate_verdicts": {
+    "M6.G": "evidence/verification/m5_p4_m6_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_GATE_VERDICT.json"
+  },
+  "m5_p4_handoff_packet": "evidence/verification/m5_p4_m6_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6G_M5_P4_HANDOFF_PACKET.json",
+  "non_claims": [
+    "This packet does not itself confer external verification.",
+    "This packet does not authorize HCI-B or write-capable console behavior.",
+    "This packet does not claim SHIPPED, RELEASED, RATIFIED, M2 enablement, release eligibility, FCE.RUN, OG-10/genesis signature, or constitution-byte change.",
+    "Auditor verdict may be PASS or FAIL; FAIL requires repair and resubmission with a new packet."
+  ],
+  "packet_kind": "M5.P4_M6_MODULE_CLOSURE_GITHUB_PACKET",
+  "packet_local_checks": {
+    "M6.G": "evidence/verification/m5_p4_m6_closure_20260704/packet_checks/run_m6_g_rollup_check.sh"
+  },
+  "packet_root": "evidence/verification/m5_p4_m6_closure_20260704",
+  "primary_files": {
+    "manifest": "evidence/verification/m5_p4_m6_closure_20260704/PACKET_MANIFEST.sha256",
+    "prompt_template": "evidence/verification/m5_p4_m6_closure_20260704/AUDITOR_PROMPT_TEMPLATE.md",
+    "repo_artifacts": "evidence/verification/m5_p4_m6_closure_20260704/REPO_ARTIFACTS.json",
+    "source_map": "evidence/verification/m5_p4_m6_closure_20260704/SOURCE_MAP.json"
+  },
+  "repo_native_artifact_count": 19,
+  "repository_url": "https://github.com/gretjia/turing",
+  "schema_id": "turingos.m5.p4.github_module_closure_packet.v1",
+  "status_ceiling": "ADDRESSED",
+  "target_branch": "hci/operator-console-v1-rebased",
+  "targets": [
+    "M6.G"
+  ]
+}

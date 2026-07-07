@@ -1,0 +1,173 @@
+# HW-SW-007..009 Phase Gate Receipt
+# Branch: turing/phase03-attest-schemas
+# Commits under test: c986a15..848ba72 (red-first, hw-sw-007, hw-sw-008,
+# hw-sw-009), base 6c634f1.
+
+===============================================================================
+G1. cargo test -p turing-attest
+===============================================================================
+$ cd /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-007
+$ cargo test -p turing-attest
+
+     Running unittests src/lib.rs (target/debug/deps/turing_attest-...)
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+     Running tests/attestor.rs
+running 2 tests
+test simulated_attestor_quote_is_marked_fake ... ok
+test stub_backends_typed_error_never_panics ... ok
+test result: ok. 2 passed; 0 failed
+
+     Running tests/identity.rs
+running 3 tests
+test identity_real_file_parses_and_validates ... ok
+test identity_unknown_route_rejected ... ok
+test identity_non_ascii_key_rejected ... ok
+test result: ok. 3 passed; 0 failed
+
+     Running tests/manifest.rs
+running 6 tests
+test manifest_real_file_parses_and_validates ... ok
+test manifest_bad_schema_version_rejected ... ok
+test manifest_missing_signing_section_rejected ... ok
+test manifest_non_hex_digest_rejected ... ok
+test manifest_uppercase_hex_digest_rejected ... ok
+test manifest_non_ascii_device_id_rejected ... ok
+test result: ok. 6 passed; 0 failed
+
+     Running tests/policy.rs
+running 4 tests
+test policy_real_file_parses_and_validates ... ok
+test policy_bad_on_fail_rejected ... ok
+test policy_debug_without_simulator_rejected ... ok
+test policy_missing_degraded_section_rejected ... ok
+test result: ok. 4 passed; 0 failed
+
+     Running tests/qt_quote.rs
+running 4 tests
+test qt_quote_valid_parses_and_digest_self_consistent ... ok
+test qt_quote_invalid_schema_rejected ... ok
+test qt_quote_invalid_digest_rejected ... ok
+test qt_quote_invalid_nonascii_rejected ... ok
+test result: ok. 4 passed; 0 failed
+
+   Doc-tests turing_attest
+test result: ok. 0 passed; 0 failed
+
+TOTAL: 19/19 green.
+VERDICT: PASS
+
+===============================================================================
+G2. ./scripts/audit-substrate-freeze.sh
+===============================================================================
+$ ./scripts/audit-substrate-freeze.sh
+PASS: constitution sha256 pinned and verified (a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0)
+PASS: crates/turing-approval/src/lib.rs sha256 verified (c76965a662402a3387b59d995fd7ffef5862db10eeeb3fed61d9c556b591c3a7)
+PASS: crates/turing-replay/src/lib.rs sha256 verified (c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31)
+PASS: crates/turing-git-tape/src/head_set.rs sha256 verified (794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016)
+PASS: crates/turing-git-tape/src/append.rs sha256 verified (c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665)
+PASS: crates/turing-kernel/src/reducer.rs sha256 verified (43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3)
+PASS: audit-substrate-freeze complete (5 pinned files + constitution)
+exit=0
+VERDICT: PASS — no pinned file touched by this loop.
+
+===============================================================================
+G3. ./scripts/audit-forbidden-files.sh --staged  (+ per-commit path audit)
+===============================================================================
+$ ./scripts/audit-forbidden-files.sh --staged
+PASS: no forbidden paths staged
+exit=0
+
+Per-commit file lists for all four commits in this loop (c986a15, bee860a,
+1d26f4d, 848ba72) were also inspected directly; none touch **/00_authority/**,
+*constitution_root_law.md*, or PROGRESS_TRACKER.md. Full file list matches
+G5's name-only diff below.
+VERDICT: PASS
+
+===============================================================================
+G4. verify_alignment.sh (workspace authority chain)
+===============================================================================
+$ cd /home/zephryj/turingos_backup/work
+$ bash PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh
+GREEN: authority chain verified against ADR-GOV-001.
+exit=0
+VERDICT: PASS
+
+===============================================================================
+G5. git diff 6c634f1..HEAD --name-only  ⊆ allowed_files; Cargo.lock new-package list
+===============================================================================
+$ git diff 6c634f1..HEAD --name-only
+Cargo.lock
+Cargo.toml
+attestation_policy.toml
+crates/turing-attest/Cargo.toml
+crates/turing-attest/src/identity.rs
+crates/turing-attest/src/lib.rs
+crates/turing-attest/src/manifest.rs
+crates/turing-attest/src/policy.rs
+crates/turing-attest/src/qt_quote.rs
+crates/turing-attest/src/tee.rs
+crates/turing-attest/src/tpm.rs
+crates/turing-attest/tests/attestor.rs
+crates/turing-attest/tests/identity.rs
+crates/turing-attest/tests/manifest.rs
+crates/turing-attest/tests/policy.rs
+crates/turing-attest/tests/qt_quote.rs
+device_identity.json
+evidence/loops/hw_sw_007_20260704/CONTEXT.md
+evidence/loops/hw_sw_007_20260704/PREDICATE.md
+evidence/loops/hw_sw_007_20260704/capsule.yaml
+evidence/loops/hw_sw_007_20260704/red_first.txt
+evidence/loops/hw_sw_007_20260704/state.md
+fixtures/q_t_quote.invalid_digest.json
+fixtures/q_t_quote.invalid_nonascii.json
+fixtures/q_t_quote.invalid_schema.json
+fixtures/q_t_quote.valid.json
+hardware_manifest.toml
+
+Every path is inside allowed_files from capsule.yaml (crates/turing-attest/**,
+hardware_manifest.toml, attestation_policy.toml, device_identity.json,
+fixtures/q_t_quote.*.json, Cargo.toml, Cargo.lock,
+evidence/loops/hw_sw_007_20260704/**). No forbidden_files path appears.
+
+$ git diff 6c634f1..HEAD -- Cargo.lock | grep '^+name'
++name = "serde_spanned"
++name = "toml"
++name = "toml_datetime"
++name = "toml_parser"
++name = "toml_writer"
++name = "turing-attest"
++name = "winnow"
+
+Exactly the toml family (serde_spanned, toml, toml_datetime, toml_parser,
+toml_writer, winnow) plus turing-attest itself. Nothing else.
+VERDICT: PASS
+
+===============================================================================
+G6. cargo build --workspace
+===============================================================================
+$ cargo build --workspace
+   ... (all 19 workspace members incl. turing-attest) ...
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 26.99s
+exit=0
+No Cargo.lock drift after the full workspace build (git status clean
+afterward).
+VERDICT: PASS
+
+===============================================================================
+Overall verdict: G1-G6 ALL PASS.
+===============================================================================
+
+Additional checks performed beyond the six gates (Mini-Recovery trigger
+surface):
+- `grep -rn 'todo!\|unimplemented!\|panic!' crates/turing-attest/src/` →
+  clean (no output). One rework cycle was needed here — see LESSONS.md.
+- SimulatedAttestor.quote().signature always starts with "simulated:" —
+  asserted by simulated_attestor_quote_is_marked_fake.
+- No same-cause double failure occurred (single rework, single cause,
+  captured below and in LESSONS.md).
+
+Status ceiling for HW-SW-007..009: ADDRESSED, pending sovereign accept.
+Not self-claimed CLOSED/RELEASED/RATIFIED; no OG-10/genesis signature or M2
+enablement claimed.

@@ -1,0 +1,213 @@
+{
+  "agent_id": "m3-p5-deepseek-arm-a-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W04/source_snapshots",
+  "branch_id": "branch:m3-p5",
+  "claim_boundary": {
+    "arm": "A",
+    "confirmatory_s01": true,
+    "no_failure_memory": true,
+    "no_turingos_loop": true,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p5",
+  "extra_context_file": null,
+  "ipqc_window_id": "S01-W04",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [
+    "pylint-dev__pylint-8898: candidate audit FAIL",
+    "sphinx-doc__sphinx-7454: candidate audit FAIL"
+  ],
+  "provider": "deepseek",
+  "reasoning_effort": null,
+  "run_id_prefix": "m3-p5-arm-a-source-repair",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S01",
+  "source_context_name": "source_context.md",
+  "split_label": "s01-confirmatory-source-repair",
+  "status": "FAIL",
+  "task_count_completed": 10,
+  "task_count_requested": 10,
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 540,
+      "candidate_patch_sha256": "sha256:20fb03fcd76e7375f0f48d345f0feda0dabce4cf0ff2ecf13e76dcf93a7cf2dc",
+      "cost_microusd": 4625,
+      "instance_id": "sphinx-doc__sphinx-7440",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 175,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 10658,
+        "prompt_tokens": 11042,
+        "total_tokens": 11217
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 598,
+      "candidate_patch_sha256": "sha256:514c5a49189be2f1a18b623f2072e25ae94a0955c2fa80e89ae6eabcb3e19405",
+      "cost_microusd": 5056,
+      "instance_id": "sympy__sympy-13480",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 168,
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 11699,
+        "prompt_tokens": 11955,
+        "total_tokens": 12123
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 570,
+      "candidate_patch_sha256": "sha256:ce8e91251a9e3c445a119544d2940c3d66913c0bf4dfb8c70a0413b5038c8877",
+      "cost_microusd": 2043,
+      "instance_id": "astropy__astropy-14309",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 206,
+        "prompt_cache_hit_tokens": 1408,
+        "prompt_cache_miss_tokens": 4439,
+        "prompt_tokens": 5847,
+        "total_tokens": 6053
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 895,
+      "candidate_patch_sha256": "sha256:ee6b8d370d129027786aeeaee1cc9f17834d1783378b2c4a483b03f47433ea29",
+      "cost_microusd": 344,
+      "instance_id": "django__django-11099",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 263,
+        "prompt_cache_hit_tokens": 384,
+        "prompt_cache_miss_tokens": 288,
+        "prompt_tokens": 672,
+        "total_tokens": 935
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 560,
+      "candidate_patch_sha256": "sha256:b28fd86b17360d72c5aeea849337ab257d4cdf1a289cca1aac42b545eb10227b",
+      "cost_microusd": 7884,
+      "instance_id": "matplotlib__matplotlib-22871",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 158,
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 18451,
+        "prompt_tokens": 18963,
+        "total_tokens": 19121
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 501,
+      "candidate_patch_sha256": "sha256:2584df24c132723d6fc496bdbea994fe8b48dd5fe61dcfee7e80029a3f2b09f9",
+      "cost_microusd": 3718,
+      "instance_id": "pydata__xarray-4629",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 153,
+        "prompt_cache_hit_tokens": 1024,
+        "prompt_cache_miss_tokens": 8536,
+        "prompt_tokens": 9560,
+        "total_tokens": 9713
+      }
+    },
+    {
+      "candidate_audit_problems": [
+        "candidate patch does not apply to source snapshot: error: corrupt patch at line 113"
+      ],
+      "candidate_audit_status": "FAIL",
+      "candidate_patch_bytes": 3868,
+      "candidate_patch_sha256": "sha256:ac5d290d2e806b5015628cf375d13dc32cbbc42b24b616330861c38fadfcfc51",
+      "cost_microusd": 2411,
+      "instance_id": "pylint-dev__pylint-8898",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 1009,
+        "prompt_cache_hit_tokens": 1152,
+        "prompt_cache_miss_tokens": 3711,
+        "prompt_tokens": 4863,
+        "total_tokens": 5872
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 391,
+      "candidate_patch_sha256": "sha256:b6aee277d9acc6a3453c1a677b411b06e35dd8e367d272b0b75a9cbc087ae1ed",
+      "cost_microusd": 5436,
+      "instance_id": "pytest-dev__pytest-6202",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 120,
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 12695,
+        "prompt_tokens": 13463,
+        "total_tokens": 13583
+      }
+    },
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 638,
+      "candidate_patch_sha256": "sha256:43e4c1ce61791c1daaecc789042bef864c19319cefd01234a6d746db687ae167",
+      "cost_microusd": 1441,
+      "instance_id": "scikit-learn__scikit-learn-13135",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 203,
+        "prompt_cache_hit_tokens": 1664,
+        "prompt_cache_miss_tokens": 3011,
+        "prompt_tokens": 4675,
+        "total_tokens": 4878
+      }
+    },
+    {
+      "candidate_audit_problems": [
+        "candidate patch does not apply to source snapshot: error: patch fragment without header at line 21: @@ -354,4 +355,5 @@ def format_args(self, **kwargs: Any) -> str:"
+      ],
+      "candidate_audit_status": "FAIL",
+      "candidate_patch_bytes": 3625,
+      "candidate_patch_sha256": "sha256:7fadaa63273e718ad82ee01a3142e44c568eb99e7c565419a43da393fce30dbe",
+      "cost_microusd": 11099,
+      "instance_id": "sphinx-doc__sphinx-7454",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 940,
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 24538,
+        "prompt_tokens": 25434,
+        "total_tokens": 26374
+      }
+    }
+  ],
+  "thinking": {
+    "type": "disabled"
+  },
+  "wall_time_ms": 57907
+}

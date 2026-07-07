@@ -1,0 +1,13 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+index 3dd2817..d8f3b91 100644
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -606,7 +606,7 @@ class StratifiedKFold(_BaseKFold):
+             else:
+                 test_folds = np.full(n_samples, -1, dtype=int)
+             for i, class_samples in enumerate(X_sorted, start=1):
+-                test_folds[class_samples] = x_shuffled % n_splits
++                test_folds[class_samples] = x_shuffled[y_sorted == i] % n_splits
+                 x_shuffled += 1
+ 
+         return test_folds

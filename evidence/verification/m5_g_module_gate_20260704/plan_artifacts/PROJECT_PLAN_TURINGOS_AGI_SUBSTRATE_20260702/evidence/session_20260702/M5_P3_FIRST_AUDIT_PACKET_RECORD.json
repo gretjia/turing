@@ -1,0 +1,89 @@
+{
+  "schema": "turingos.m5_p3.first_audit_packet_record.v1",
+  "module": "M5",
+  "phase": "M5.P3",
+  "recorded_at_utc": "2026-07-04T02:50:19Z",
+  "phase_status_after_record": "BLOCKED",
+  "packet_status": "READY_FOR_EXTERNAL_AUDIT",
+  "repo": {
+    "url": "https://github.com/gretjia/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit_containing_packet": "5383e6919590d84fafc46b07e52af1c282dfdc75",
+    "source_evidence_repo_sha_in_packet_manifest": "84a4c5319b0e46917d2333df6033781d3939a23d"
+  },
+  "packet": {
+    "root": "evidence/verification/m5_p3_first_external_audit_20260704",
+    "gate_id": "M5.P3",
+    "packet_sha256": "sha256:6442d1e1773b3f4385e75767c22dfff6469984dbf0ceff2a90f7c56a99b0618c",
+    "packet_manifest_files": 69,
+    "packet_manifest_path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704/PACKET_MANIFEST.json",
+    "packet_manifest_sha256": "fc3fa098d8aa881d562ad075ada7760add5fedd9b7715c6596867cf3170faade",
+    "digest_manifest_path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704/MANIFEST.sha256",
+    "digest_manifest_sha256": "239ac55218ffcf88589581dcf3366e4db23cfcf6890b56c65d0b43358870270b",
+    "auditor_runbook_path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704/AUDITOR_RUNBOOK.md",
+    "auditor_runbook_sha256": "cc3a38ddb4c7e07e25a28f2b710858472b393d60df026d040c22578508ac3b24",
+    "reexecution_path": "/home/zephryj/turingos_backup/work/turing/evidence/verification/m5_p3_first_external_audit_20260704/REEXECUTION.md",
+    "reexecution_sha256": "ca3eee95c9866e5002bda473410015d2adbb392b1f51fe8c2a4818a7053ccc87"
+  },
+  "builder_changes": {
+    "builder_path": "/home/zephryj/turingos_backup/work/turing/tools/release/build_packet.py",
+    "builder_sha256": "fc9ba10947fcd36695dcdcc4b5e94cad9b91227b93eab1ed8e5ca5738f32d99b",
+    "capability_added": "optional manifest-bound --reexecution-template and --auditor-runbook-template inputs",
+    "template_paths": [
+      {
+        "path": "/home/zephryj/turingos_backup/work/turing/tools/release/templates/m5_p3_first_external_audit_20260704/REEXECUTION.md",
+        "sha256": "ca3eee95c9866e5002bda473410015d2adbb392b1f51fe8c2a4818a7053ccc87"
+      },
+      {
+        "path": "/home/zephryj/turingos_backup/work/turing/tools/release/templates/m5_p3_first_external_audit_20260704/AUDITOR_RUNBOOK.md",
+        "sha256": "cc3a38ddb4c7e07e25a28f2b710858472b393d60df026d040c22578508ac3b24"
+      }
+    ],
+    "tests": [
+      {
+        "path": "/home/zephryj/turingos_backup/work/turing/tests/test_release_mechanics.py",
+        "sha256": "8bbe63812b13ec3d26639f18fa2d6f3d2291f9fbe1fd6c4282d7bc0d34a37064"
+      },
+      {
+        "path": "/home/zephryj/turingos_backup/work/turing/tests/test_m5_p3_first_audit_packet.py",
+        "sha256": "a8ea538ff83b4a54a2f36a30674925db5b4f7a6c4b720e8cc706ed9d01605763"
+      }
+    ]
+  },
+  "fresh_github_clone_verification": {
+    "clone_commit": "5383e6919590d84fafc46b07e52af1c282dfdc75",
+    "commands": [
+      {
+        "command": "git clone https://github.com/gretjia/turing.git /tmp/turing-m5p3-github-fresh && cd /tmp/turing-m5p3-github-fresh && git checkout 5383e6919590d84fafc46b07e52af1c282dfdc75",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-github-fresh/evidence/verification/m5_p3_first_external_audit_20260704 && sha256sum -c MANIFEST.sha256",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-github-fresh && bash tools/release/build_packet.sh --validate evidence/verification/m5_p3_first_external_audit_20260704",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-github-fresh && python3 tools/bench/audit_official_harness_qualification.py --root evidence/verification/m5_p3_first_external_audit_20260704/evidence --out /tmp/m5p3_fresh_official_harness_audit.json",
+        "exit_code": 0
+      }
+    ],
+    "digest_manifest_result": "PASS",
+    "packet_validation_result": "PASS",
+    "official_harness_qualification_audit_result": "PASS"
+  },
+  "non_claims": [
+    "No M5.P3 ClosureCertificate.v1 has been received.",
+    "No M5.P3 external PASS or FAIL artifact is recorded by this packet-build step.",
+    "No EXTERNALLY_VERIFIED status is conferred for M5.P3.",
+    "No SHIPPED, RELEASED, RATIFIED, M2 enablement, release eligibility, OG-10/genesis signature, constitution-byte change, or final-certification claim is made."
+  ],
+  "next_required_external_artifact": {
+    "gate_id": "M5.P3",
+    "verifier_tier": "E1",
+    "required_result": "external PASS or FAIL artifact with all six custody booleans true",
+    "owner_action": "submit the GitHub packet to a custody-separated E1 auditor and return the certificate or FAIL artifact"
+  }
+}

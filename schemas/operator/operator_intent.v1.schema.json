@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "operator_intent.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "utterance_digest", "selected_verb", "router"],
+  "properties": {
+    "schema_id": { "const": "operator_intent.v1" },
+    "utterance_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "selected_verb": { "type": "string" },
+    "router": { "type": "string" }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W00/source_snapshots/django__django-10999",
+    "output": "Checking patch django/utils/dateparse.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/django__django-10999/candidate.patch",
+  "candidate_patch_sha256": "sha256:15f84b3269f4d5fde7e51b5c515197685cde56e42927cba5152c9ff8c71aba38",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "django/utils/dateparse.py"
+  ],
+  "instance_id": "django__django-10999",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

@@ -1,0 +1,13 @@
+diff --git a/sympy/core/basic.py b/sympy/core/basic.py
+index db4e971..ae313d0 100644
+--- a/sympy/core/basic.py
++++ b/sympy/core/basic.py
+@@ -313,7 +313,7 @@ class Basic(with_metaclass(ManagedProperties)):
+             try:
+                 other = _sympify(other)
+             except SympifyError:
+-                return False    # sympy != other
++                return NotImplemented    # sympy != other -> delegate to the other type's __eq__
+ 
+             if type(self) != type(other):
+                 return False

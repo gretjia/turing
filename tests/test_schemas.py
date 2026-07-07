@@ -16,6 +16,7 @@ from __future__ import annotations
 import sys
 import types
 import unittest
+import hashlib
 
 # --- install frozen-seam stand-ins for codec + registry BEFORE importing schemas ---
 # turingos.errors is real and present; reuse its exception classes so the stubs raise
@@ -33,6 +34,7 @@ _KNOWN_EVENTS = frozenset(
         "WorkerDispatched",
         "HumanSteerInjected",
         "WorkerReceiptImported",
+        "CostEvent",
         "MacroObservationImported",
         "PredicateEvaluated",
         "CandidateAccepted",
@@ -42,6 +44,17 @@ _KNOWN_EVENTS = frozenset(
         "ExplorationPromoted",
         "ReplayVerified",
         "HandoffGenerated",
+    }
+)
+_SOVEREIGN_ACCEPT_EVENTS = frozenset(
+    {
+        "SystemBootstrapped",
+        "ProjectAdopted",
+        "GoalStateAccepted",
+        "ModulePlanAccepted",
+        "CandidateAccepted",
+        "ExplorationArchived",
+        "ExplorationPromoted",
     }
 )
 
@@ -77,6 +90,13 @@ def _stub_assert_no_floats(payload):
 
 
 def _install_seam_stubs():
+    try:
+        __import__("turingos.codec")
+        __import__("turingos.registry")
+        return
+    except Exception:
+        pass
+
     codec = sys.modules.get("turingos.codec")
     if codec is None:
         codec = types.ModuleType("turingos.codec")
@@ -85,12 +105,19 @@ def _install_seam_stubs():
     # is hermetic even if a partial real codec is present.
     codec.assert_ascii_keys = _stub_assert_ascii_keys
     codec.assert_no_floats = _stub_assert_no_floats
+    codec.canonical_bytes = lambda payload: repr(payload).encode("utf-8")
+    codec.content_digest = lambda payload: "sha256:" + hashlib.sha256(
+        codec.canonical_bytes(payload)
+    ).hexdigest()
+    codec.event_id_from_oid = lambda oid: "mu:" + oid
 
     registry = sys.modules.get("turingos.registry")
     if registry is None:
         registry = types.ModuleType("turingos.registry")
         sys.modules["turingos.registry"] = registry
     registry.is_known = lambda et: et in _KNOWN_EVENTS
+    registry.event_class = lambda et: "SOVEREIGN_ACCEPT" if et in _SOVEREIGN_ACCEPT_EVENTS else "OBSERVATION"
+    registry.head_effect = lambda et: "ADVANCE" if et in _SOVEREIGN_ACCEPT_EVENTS else "PRESERVE"
 
 
 _install_seam_stubs()
@@ -134,6 +161,42 @@ def valid_receipt() -> dict:
         "evidence_digests": ["sha256:abc"],
         "status": "ok",
         "no_orphan": True,
+    }
+
+
+def valid_cost_event_v2() -> dict:
+    return {
+        "schema_id": "turingos.cost_event.v2",
+        "run_id": "run:unit",
+        "problem_id": "prob:unit",
+        "split": "dogfood",
+        "agent_id": "worker:unit",
+        "branch_id": "branch:unit",
+        "capsule_id": "cap:0123abcd",
+        "receipt_id": "rcpt:0123abcd",
+        "worker": {
+            "adapter_kind": "native_api",
+            "provider": "anthropic",
+            "model_id_requested": "claude-test",
+            "model_id_resolved": "claude-test-20260702",
+            "endpoint": "/v1/messages",
+            "request_id": "req_unit",
+            "response_sha256": "sha256:" + "1" * 64,
+        },
+        "usage": {
+            "input_tokens": 12,
+            "output_tokens": 3,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "provider_usage_raw_sha256": "sha256:" + "2" * 64,
+        },
+        "cost": {
+            "cost_source_kind": "provider_receipt_inline",
+            "cost_microusd": 15,
+            "price_table_digest": "sha256:" + "3" * 64,
+            "bound_kind": None,
+        },
+        "wall_time_ms": 25,
     }
 
 
@@ -468,6 +531,73 @@ class TestEventPayload(unittest.TestCase):
         self.assertIsNone(
             schemas.validate_event_payload("ReplayVerified", {"equal": True})
         )
+
+
+class TestCostEventV2(unittest.TestCase):
+    def test_valid_cost_event_v2_passes_direct_validation(self):
+        payload = valid_cost_event_v2()
+        self.assertIsNone(schemas.validate_cost_event_v2(payload))
+
+    def test_cost_event_v2_allows_tape_payload_event_type_mirror(self):
+        payload = valid_cost_event_v2()
+        payload["event_type"] = "CostEvent"
+        self.assertIsNone(schemas.validate_cost_event_v2(payload))
+
+        payload["event_type"] = "PPUTAccounted"
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
+    def test_cost_event_v2_is_not_in_frozen_event_registry(self):
+        payload = valid_cost_event_v2()
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_event_payload("CostEvent", payload)
+
+    def test_missing_cost_source_kind_rejected(self):
+        payload = valid_cost_event_v2()
+        del payload["cost"]["cost_source_kind"]
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
+    def test_missing_run_dimension_rejected(self):
+        payload = valid_cost_event_v2()
+        del payload["problem_id"]
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
+    def test_unspecified_cost_source_kind_rejected(self):
+        payload = valid_cost_event_v2()
+        payload["cost"]["cost_source_kind"] = "unspecified"
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
+    def test_bounded_estimate_requires_bound_kind(self):
+        payload = valid_cost_event_v2()
+        payload["worker"]["adapter_kind"] = "cli"
+        payload["cost"]["cost_source_kind"] = "bounded_estimate"
+        payload["cost"]["bound_kind"] = None
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
+    def test_float_cost_rejected(self):
+        payload = valid_cost_event_v2()
+        payload["cost"]["cost_microusd"] = 1.25
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+
+    def test_deepseek_usage_requires_cache_hit_miss_split(self):
+        payload = valid_cost_event_v2()
+        payload["worker"]["provider"] = "deepseek"
+        payload["usage"] = {
+            "prompt_tokens": 10,
+            "completion_tokens": 2,
+            "total_tokens": 12,
+            "provider_usage_raw_sha256": "sha256:" + "4" * 64,
+        }
+        with self.assertRaises(SchemaInvalid):
+            schemas.validate_cost_event_v2(payload)
+        payload["usage"]["prompt_cache_hit_tokens"] = 4
+        payload["usage"]["prompt_cache_miss_tokens"] = 6
+        self.assertIsNone(schemas.validate_cost_event_v2(payload))
 
 
 if __name__ == "__main__":

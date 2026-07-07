@@ -1,0 +1,88 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:3ae675dc1afb27516175f7ce4d55c20769fc5fcafac492b356440592317ecaea",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 727,
+  "content_sha256": "sha256:a7236bf508eea0a726130f58d69ea0cb502aa74564993fa80ca8e9b8eb2f8e7f",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:15c2f14882ca527811e0e475f1d1d27759a61415fffeb4d9fe1e7885d88e5cb9",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 2163,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "scikit-learn__scikit-learn-13135",
+    "receipt_id": "rcpt:57f4fa6939f1cb398c93dcb4712a8a9dab3e6ecfaa350300e950df5c420fdd37",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W04-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 216,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 4717,
+      "prompt_tokens": 4717,
+      "provider_usage_raw_sha256": "sha256:5a0bdd4b32e923b73b4ca63ad9d629c8bac46cdce846f2b41d8943488d4d13b0",
+      "total_tokens": 4933
+    },
+    "wall_time_ms": 4351,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "6483a174-5c85-40c7-ac5d-7cbe9130109a",
+      "response_sha256": "sha256:a73fa1a36737a841a0f0b7c1fdedb94e1616d6bba07eb86025e65905869bd118"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "scikit-learn__scikit-learn-13135",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W04",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 13",
+    "output": "Checking patch sklearn/preprocessing/_discretization.py...\nHunk #1 succeeded at 172 (offset 2 lines).\nApplied patch sklearn/preprocessing/_discretization.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:9681c9f88d1bf804fc75af2ca0199dd4e58752fea31ebc63fc717a11223e1c8a",
+  "response_sha256": "sha256:a73fa1a36737a841a0f0b7c1fdedb94e1616d6bba07eb86025e65905869bd118",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/scikit-learn__scikit-learn-13135/worker_capsule.md",
+  "source_context_length_chars": 11211,
+  "source_context_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/scikit-learn__scikit-learn-13135/source_context.md",
+  "source_context_sha256": "sha256:06c6899876764653666bd701f4da582c3405f67071e05e7227387020c771cbfe",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 216,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 4717,
+    "prompt_tokens": 4717,
+    "total_tokens": 4933
+  },
+  "usage_raw_sha256": "sha256:5a0bdd4b32e923b73b4ca63ad9d629c8bac46cdce846f2b41d8943488d4d13b0",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/scikit-learn__scikit-learn-13135/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:231fd11085f936e95d5fb780b49086790391f9d2765ab7c90b43e15308948565",
+  "wall_time_ms": 4351
+}

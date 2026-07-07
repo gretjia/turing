@@ -1,0 +1,37 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index abdeba8..8cd7b29 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -5,6 +5,7 @@
+ 
+ 
+ from .core import DefaultSplitter
++from .misc import FixedWidthHeaderSplitter, FixedWidthTwoLineDataSplitter
+ from .fixedwidth import (
+     FixedWidth,
+     FixedWidthData,
+@@ -57,10 +58,21 @@ class RST(FixedWidth):
+     data_class = SimpleRSTData
+     header_class = SimpleRSTHeader
+ 
+-    def __init__(self):
+-        super().__init__(delimiter_pad=None, bookend=False)
++    def __init__(self, header_rows=None):
++        super().__init__(delimiter_pad=None, bookend=False, header_rows=header_rows)
+ 
+     def write(self, lines):
+         lines = super().write(lines)
+-        lines = [lines[1]] + lines + [lines[1]]
++        sep_line = lines[1]
++        if self.header.header_rows:
++            n_header_rows = len(self.header.header_rows)
++            header_lines = lines[:n_header_rows]
++            data_lines = lines[n_header_rows:]
++            # Find the separator row at the bottom of the header
++            # In the super call, the separator already exists after all header rows
++            # We already have a separator line in lines[1] from super's output
++            lines = [sep_line] + header_lines + [sep_line] + data_lines
++            # Remove the original separator line that might be superflous
++        else:
++            lines = [sep_line] + lines + [sep_line]
+         return lines

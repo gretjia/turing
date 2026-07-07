@@ -1,0 +1,22 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index a7e5d55..abfe3cf 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -57,7 +57,7 @@ def _query_cpu() -> int | None:
+         with open("/sys/fs/cgroup/cpu/cpu.shares", encoding="utf-8") as file:
+             cpu_shares = int(file.read().rstrip())
+         # For AWS, gives correct value * 1024.
+-        avail_cpu = int(cpu_shares / 1024)
++        avail_cpu = max(1, int(cpu_shares / 1024))
+     return avail_cpu
+ 
+ 
+@@ -67,6 +67,8 @@ def _cpu_count() -> int:
+     """
+     cpu_share = _query_cpu()
+     cpu_count = None
++    if cpu_share is not None:
++        cpu_share = max(1, cpu_share)
+     sched_getaffinity = getattr(os, "sched_getaffinity", None)
+     # pylint: disable=not-callable,using-constant-test,useless-suppression
+     if sched_getaffinity:

@@ -1,0 +1,15 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+test_json_serializer (serializers.test_data.SerializerDataTests.test_json_serializer)
+partial(func, *args, **keywords) - new function with partial application ... ok
+test_python_serializer (serializers.test_data.SerializerDataTests.test_python_serializer)
+partial(func, *args, **keywords) - new function with partial application ... ok
+test_xml_serializer (serializers.test_data.SerializerDataTests.test_xml_serializer)
+partial(func, *args, **keywords) - new function with partial application ... ok
+test_yaml_serializer (serializers.test_data.SerializerDataTests.test_yaml_serializer)
+partial(func, *args, **keywords) - new function with partial application ... skipped 'The Python library for the yaml serializer is not installed.'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.743s
+
+OK (skipped=1)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...

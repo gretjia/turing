@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S01/tasks/pylint-dev__pylint-6903/candidate.patch",
+  "candidate_patch_sha256": "sha256:a3f575333b293cb0cc1d9e98a69694e4a576b1b4cf8f4dec096879ca96cdb186",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "pylint/lint/run.py"
+  ],
+  "instance_id": "pylint-dev__pylint-6903",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

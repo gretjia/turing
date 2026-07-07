@@ -95,7 +95,7 @@ fn broadcast_rule_is_abstract_and_references_failure_nodes() {
     assert!(!rule.summary.contains("hidden_predicate"));
     assert!(!rule.summary.contains("PPUT"));
 
-    let relevant = RuleShield::select_for_capsule(&[rule.clone()], "wc_ui");
+    let relevant = RuleShield::select_for_capsule(std::slice::from_ref(&rule), "wc_ui");
     assert_eq!(relevant, vec![rule]);
     assert!(RuleShield::select_for_capsule(&relevant, "wc_other").is_empty());
 }

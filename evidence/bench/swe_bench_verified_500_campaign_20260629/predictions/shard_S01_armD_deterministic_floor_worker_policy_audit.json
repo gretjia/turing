@@ -1,0 +1,320 @@
+{
+  "file_count": 1,
+  "model_name_policy": "worker__arm__experiment",
+  "placeholder_model_names_forbidden": [
+    "direct_grok_baseline",
+    "model",
+    "placeholder",
+    "tbd",
+    "test",
+    "turingos-internal-rehearsal",
+    "turingos-test",
+    "unknown"
+  ],
+  "problems": [],
+  "row_count": 50,
+  "rows": [
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "scikit-learn__scikit-learn-11578",
+      "line": 1,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "line": 2,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sympy__sympy-12489",
+      "line": 3,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "astropy__astropy-13579",
+      "line": 4,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "django__django-10999",
+      "line": 5,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "matplotlib__matplotlib-20859",
+      "line": 6,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "psf__requests-2931",
+      "line": 7,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pydata__xarray-3993",
+      "line": 8,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pylint-dev__pylint-6528",
+      "line": 9,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pytest-dev__pytest-5787",
+      "line": 10,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "scikit-learn__scikit-learn-12585",
+      "line": 11,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sphinx-doc__sphinx-10673",
+      "line": 12,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sympy__sympy-13031",
+      "line": 13,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "astropy__astropy-13977",
+      "line": 14,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "django__django-11066",
+      "line": 15,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "matplotlib__matplotlib-21568",
+      "line": 16,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "psf__requests-5414",
+      "line": 17,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pydata__xarray-4075",
+      "line": 18,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pylint-dev__pylint-6903",
+      "line": 19,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pytest-dev__pytest-5809",
+      "line": 20,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "scikit-learn__scikit-learn-12682",
+      "line": 21,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sphinx-doc__sphinx-11445",
+      "line": 22,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sympy__sympy-13091",
+      "line": 23,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "astropy__astropy-14096",
+      "line": 24,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "django__django-11087",
+      "line": 25,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "matplotlib__matplotlib-22719",
+      "line": 26,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "psf__requests-6028",
+      "line": 27,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pydata__xarray-4094",
+      "line": 28,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pylint-dev__pylint-7080",
+      "line": 29,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pytest-dev__pytest-5840",
+      "line": 30,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "scikit-learn__scikit-learn-12973",
+      "line": 31,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sphinx-doc__sphinx-11510",
+      "line": 32,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sympy__sympy-13372",
+      "line": 33,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "astropy__astropy-14182",
+      "line": 34,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "django__django-11095",
+      "line": 35,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "matplotlib__matplotlib-22865",
+      "line": 36,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pydata__xarray-4356",
+      "line": 37,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pylint-dev__pylint-7277",
+      "line": 38,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pytest-dev__pytest-6197",
+      "line": 39,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "scikit-learn__scikit-learn-13124",
+      "line": 40,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sphinx-doc__sphinx-7440",
+      "line": 41,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sympy__sympy-13480",
+      "line": 42,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "astropy__astropy-14309",
+      "line": 43,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "django__django-11099",
+      "line": 44,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "matplotlib__matplotlib-22871",
+      "line": 45,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pydata__xarray-4629",
+      "line": 46,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pylint-dev__pylint-8898",
+      "line": 47,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "pytest-dev__pytest-6202",
+      "line": 48,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "scikit-learn__scikit-learn-13135",
+      "line": 49,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    },
+    {
+      "file": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+      "instance_id": "sphinx-doc__sphinx-7454",
+      "line": 50,
+      "model_name_or_path": "deterministic-floor__armD__uplift-s01"
+    }
+  ],
+  "schema_id": "turingos.worker_policy_predictions_audit.v1",
+  "status": "PASS"
+}

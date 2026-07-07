@@ -1,0 +1,38 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index 8b2f7a0a0e..a8b6ac2fda 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -57,16 +57,16 @@ class StrCategoryConverter(units.ConversionInterface):
+     @staticmethod
+     def convert(value, unit, axis):
+         """Convert strings in *value* to floats using mapping information stored
+         in the *unit* object.
+ 
+         Parameters
+         ----------
+         value : str or iterable
+             Value or list of values to convert.
+         unit : `.UnitData`
+             An object mapping strings to integers.
+         axis : `~matplotlib.axis.Axis`
+             The axis on which the converted value is plotted.
+ 
+         Returns
+         -------
+@@ -76,13 +76,14 @@ class StrCategoryConverter(units.ConversionInterface):
+         # yield an error here.
+         if units.ConversionInterface.is_numlike(value):
+             _api.warn_deprecated(
+                 "3.5", message="Support for passing numbers through unit "
+                 "converters is deprecated since %(since)s and support will be "
+                 "removed %(removal)s; use Axis.convert_units instead.")
+             return value
++        # value is not a number-like; treat as flat iterable of strings.
+         mapped = unit._mapping
+         if isinstance(value, str):
+             return mapped(value)
+         # if the value is unmappable, convert it to the appropriate dtype
+         # it can be kept as an object array or converted to a numerical one.
+         try:
+             return np.asarray([mapped(v) for v in value])
+         except (ValueError, KeyError):

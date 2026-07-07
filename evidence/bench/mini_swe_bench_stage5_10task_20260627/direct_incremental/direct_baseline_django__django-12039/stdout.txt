@@ -1,0 +1,18 @@
+**Patch candidate exists in the worktree (2-line change).**
+
+`git diff`:
+
+```diff
+diff --git a/django/db/backends/ddl_references.py b/django/db/backends/ddl_references.py
+index 44e49806f8..89146afb45 100644
+--- a/django/db/backends/ddl_references.py
++++ b/django/db/backends/ddl_references.py
+@@ -87 +87 @@ class Columns(TableColumns):
+-                return self.quote_name(column) + self.col_suffixes[idx]
++                return self.quote_name(column) + (self.col_suffixes[idx] and ' ' + self.col_suffixes[idx])
+@@ -117 +117 @@ class IndexColumns(Columns):
+-                col = '{} {}'.format(col, self.col_suffixes[idx])
++                col = col + (self.col_suffixes[idx] and ' ' + self.col_suffixes[idx])
+```
+
+(Verified via direct execution + relevant tests: `backends.test_ddl_references`, `indexes`, `schema` all pass. Matches the exact expected `CREATE INDEX ... ("name" DESC)` / `("name" text_pattern_ops)` cases from the report.)

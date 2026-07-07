@@ -1,0 +1,42 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+index 8ca5fc2ba..a4e5aa5e4 100644
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -324,16 +324,16 @@ def _line_type(line, delimiter=None):
+ 
+     _decimal_re = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'
+     _command_re = r"READ [TS]ERR(\s+[0-9]+)+"
+-
++    
+     sep = delimiter
+     if delimiter is None:
+         sep = r'\s+'
+     _new_re = rf"NO({sep}NO)+"
+-    _data_re = rf"({_decimal_re}?|NO|[-+]?nan|[-+]?inf)" \
++    _data_re = rf"({_decimal_re}?|NO|[-+]?nan|[-+]?inf)" \
+                rf"({sep}({_decimal_re}?|NO|[-+]?nan|[-+]?inf))*)"
+     _type_re = rf"^\s*((?P<_command>{_command_re})|(?P<_new>{_new_re})" \
+                rf"|(?P<_data>{_data_re})\s*(\s!.*)?\s*$"
+-    _line_type_re = re.compile(_type_re)
++    _line_type_re = re.compile(_type_re, re.IGNORECASE)
+     line = line.strip()
+     if not line:
+         return "comment"
+@@ -355,7 +355,7 @@ def _line_type(line, delimiter=None):
+             # might still be new if it has a command, but the
+             # allow-RE flag means that special care is needed.
+             # So check whether this is a new line, or a QDP command
+-            if values[0] != 'NO':
++            if values[0].upper() != 'NO':
+                 # If it's not a NO, then it's a number, and it's a
+                 # data line. We still need to split on whitespace
+                 # to get the individual columns.
+@@ -377,7 +377,7 @@ def _line_type(line, delimiter=None):
+         # values. 
+         values = match.group('_command').split()
+         new_data = np.zeros(len(values) - 1)
+-        command = values[0]  
++        command = values[0].upper()
+ 
+         for i, val in enumerate(values[1:]):
+                 new_data[i] = int(val)

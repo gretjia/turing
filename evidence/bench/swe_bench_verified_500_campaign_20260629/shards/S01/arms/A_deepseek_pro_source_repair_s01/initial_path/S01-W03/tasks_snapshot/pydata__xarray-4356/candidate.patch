@@ -1,0 +1,20 @@
+diff --git a/xarray/core/nanops.py b/xarray/core/nanops.py
+index 1be777f..f0bb721 100644
+--- a/xarray/core/nanops.py
++++ b/xarray/core/nanops.py
+@@ -31,12 +31,11 @@ def _maybe_null_out(result, axis, mask, min_count=1):
+         if mask.any():
+             null_mask = (mask.shape[axis] - mask.sum(axis) - min_count) < 0
+             if null_mask.any():
+-                dtype, fp = result.dtype, is_float_dtype(result.dtype)
+-                if fp:
++                if is_float_dtype(result.dtype):
+                     result = result.astype(dtype=float)
+-                    result[null_mask] = np.nan
++                    result[null_mask] = float("nan")
+                 else:
+-                    result = result.astype(dtype=float)
++                    result = result.astype(float)
+                     result[null_mask] = np.nan
+     elif isinstance(mask, np.ndarray):
+         null_mask = mask.shape[axis] - mask.sum(axis) - min_count < 0

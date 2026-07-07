@@ -1,0 +1,10 @@
+{
+  "audit_ref": "TURINGOS_RETROSPECTIVE_AUDIT_FINDINGS_20260702.md F4/R8 and section 7 answer 5",
+  "label": "REAL",
+  "rationale": "Audit section 7 answer 5 identifies this root family as real evidence, with any score boundary limited by its local claim files.",
+  "real_subpaths": [
+    "direct_baseline_django__django-11790",
+    "grok_worker_django__django-11790"
+  ],
+  "root": "turing/evidence/bench/mini_swe_bench_real_worker_substrate_smoke_grok_build_patch_20260627"
+}

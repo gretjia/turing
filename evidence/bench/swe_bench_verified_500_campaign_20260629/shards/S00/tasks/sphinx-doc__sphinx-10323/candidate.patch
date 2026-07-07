@@ -1,0 +1,50 @@
+diff --git a/sphinx/directives/code.py b/sphinx/directives/code.py
+index dc44ed314..459fa4d8d 100644
+--- a/sphinx/directives/code.py
++++ b/sphinx/directives/code.py
+@@ -224,9 +224,9 @@ class LiteralIncludeReader:
+                        self.start_filter,
+                        self.end_filter,
+                        self.lines_filter,
++                       self.dedent_filter,
+                        self.prepend_filter,
+-                       self.append_filter,
+-                       self.dedent_filter]
++                       self.append_filter]
+             lines = self.read_file(self.filename, location=location)
+             for func in filters:
+                 lines = func(lines, location=location)
+@@ -396,6 +396,19 @@ class LiteralInclude(SphinxDirective):
+         'diff': directives.unchanged_required,
+     }
+ 
++    def _option_with_preserved_whitespace(self, option: str) -> str:
++        prefix = ':' + option + ':'
++        for line in self.block_text.splitlines():
++            line = line.lstrip()
++            if line.startswith(prefix) and len(line) > len(prefix):
++                value = line[len(prefix):]
++                if value.startswith(' '):
++                    return value[1:]
++                else:
++                    return value
++
++        return self.options[option]
++
+     def run(self) -> List[Node]:
+         document = self.state.document
+         if not document.settings.file_insertion_enabled:
+@@ -411,7 +424,12 @@ class LiteralInclude(SphinxDirective):
+             rel_filename, filename = self.env.relfn2path(self.arguments[0])
+             self.env.note_dependency(rel_filename)
+ 
+-            reader = LiteralIncludeReader(filename, self.options, self.config)
++            options = self.options.copy()
++            for option in ('prepend', 'append'):
++                if option in options:
++                    options[option] = self._option_with_preserved_whitespace(option)
++
++            reader = LiteralIncludeReader(filename, options, self.config)
+             text, lines = reader.read(location=location)
+ 
+             retnode: Element = nodes.literal_block(text, text, source=filename)

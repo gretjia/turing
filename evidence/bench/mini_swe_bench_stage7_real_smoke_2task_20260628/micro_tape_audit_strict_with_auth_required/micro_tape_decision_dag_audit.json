@@ -1,0 +1,1485 @@
+{
+  "aggregate": {
+    "bundle_count": 2,
+    "event_count": 38,
+    "event_counts": {
+      "BudgetAllocated": 2,
+      "CandidateAccepted": 2,
+      "CostEvent": 2,
+      "EvidenceBound": 2,
+      "FailureNode": 4,
+      "GoalStateProposed": 2,
+      "MacroObservationImported": 2,
+      "MarketCreated": 2,
+      "MarketSettled": 2,
+      "OfficialEvaluatorEvidenceImported": 2,
+      "PPUTAccounted": 4,
+      "PositionMinted": 2,
+      "PredicateEvaluated": 2,
+      "RewardDistributed": 2,
+      "SystemConstitutionAccepted": 2,
+      "WorkCapsuleBuilt": 2,
+      "WorkerReceiptImported": 2
+    },
+    "finding_counts": {
+      "official_evidence_precedes_accept": 2
+    }
+  },
+  "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
+  "event_registry": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+  "runs": [
+    {
+      "actual_refs": {
+        "accepted_head": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+        "authorization_head": null,
+        "tape_tip": "mu:7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76"
+      },
+      "bundle": "evidence/bench/mini_swe_bench_stage7_real_smoke_2task_20260628/turingos/instances/django__django-12039/micro_tape.bundle",
+      "bundle_hash": "sha256:ac2a4796c55819c2bd1b333c0a07523e6bb9176d7ff9ffbe2179020d1a7637ca",
+      "bundle_verify_output": "The bundle contains these 2 refs:\n7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5 refs/turingos/accepted_head\n7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "LEGACY_MISSING",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2",
+          "kind": "tape_parent",
+          "to": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534"
+        },
+        {
+          "from": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534",
+          "kind": "tape_parent",
+          "to": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110"
+        },
+        {
+          "from": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "kind": "tape_parent",
+          "to": "mu:440b6e53920c3a04e3ec7e12cbf63fa686cb8d35121803d4cd0c551bd28bbfde"
+        },
+        {
+          "from": "mu:440b6e53920c3a04e3ec7e12cbf63fa686cb8d35121803d4cd0c551bd28bbfde",
+          "kind": "tape_parent",
+          "to": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012"
+        },
+        {
+          "from": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012",
+          "kind": "tape_parent",
+          "to": "mu:4222bc192d75342357d14fb949cd561ba2073b05c7c9672a781239358f6a3938"
+        },
+        {
+          "from": "mu:4222bc192d75342357d14fb949cd561ba2073b05c7c9672a781239358f6a3938",
+          "kind": "tape_parent",
+          "to": "mu:bf25011065066f06f42633380a6bd93a997c91d1aa3d1915fa9d8ce4ac3edcc1"
+        },
+        {
+          "from": "mu:bf25011065066f06f42633380a6bd93a997c91d1aa3d1915fa9d8ce4ac3edcc1",
+          "kind": "tape_parent",
+          "to": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699"
+        },
+        {
+          "from": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699",
+          "kind": "tape_parent",
+          "to": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012"
+        },
+        {
+          "from": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012",
+          "kind": "tape_parent",
+          "to": "mu:47811fe04b2669cbfa7b300bfc44ce88e31c8932c6c8f908b2d072ff66d03334"
+        },
+        {
+          "from": "mu:47811fe04b2669cbfa7b300bfc44ce88e31c8932c6c8f908b2d072ff66d03334",
+          "kind": "tape_parent",
+          "to": "mu:a738b3f7b1c4a38cd139779c70f7c271f98a86b2cd0193361233ec529d29df24"
+        },
+        {
+          "from": "mu:a738b3f7b1c4a38cd139779c70f7c271f98a86b2cd0193361233ec529d29df24",
+          "kind": "tape_parent",
+          "to": "mu:67923f07cdf9cfcd8073e79d4a838818b4c60e740f59e34f3adb1cf628d53126"
+        },
+        {
+          "from": "mu:67923f07cdf9cfcd8073e79d4a838818b4c60e740f59e34f3adb1cf628d53126",
+          "kind": "tape_parent",
+          "to": "mu:f6dfac8ac1e42fefc09e0ce29fb4a9dde6ea5e4341362618db83624f28fcc2f9"
+        },
+        {
+          "from": "mu:f6dfac8ac1e42fefc09e0ce29fb4a9dde6ea5e4341362618db83624f28fcc2f9",
+          "kind": "tape_parent",
+          "to": "mu:cd957c56b832988b4eac075b865ea6ac79eb2c378ca8aa09b43f4d03d5ab64a8"
+        },
+        {
+          "from": "mu:cd957c56b832988b4eac075b865ea6ac79eb2c378ca8aa09b43f4d03d5ab64a8",
+          "kind": "tape_parent",
+          "to": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55"
+        },
+        {
+          "from": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "kind": "tape_parent",
+          "to": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5"
+        },
+        {
+          "from": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "kind": "tape_parent",
+          "to": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d"
+        },
+        {
+          "from": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d",
+          "kind": "tape_parent",
+          "to": "mu:e7c0174c5baebe32b59ff9a0385f188a0df9cc982306b4f415b7fe57d5612b3d"
+        },
+        {
+          "from": "mu:e7c0174c5baebe32b59ff9a0385f188a0df9cc982306b4f415b7fe57d5612b3d",
+          "kind": "tape_parent",
+          "to": "mu:7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76"
+        },
+        {
+          "from": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012",
+          "kind": "market_ref",
+          "to": "mu:4222bc192d75342357d14fb949cd561ba2073b05c7c9672a781239358f6a3938"
+        },
+        {
+          "from": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012",
+          "kind": "market_ref",
+          "to": "mu:bf25011065066f06f42633380a6bd93a997c91d1aa3d1915fa9d8ce4ac3edcc1"
+        },
+        {
+          "from": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "kind": "capsule_ref",
+          "to": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699"
+        },
+        {
+          "from": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "kind": "capsule_ref",
+          "to": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012"
+        },
+        {
+          "from": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "kind": "capsule_ref",
+          "to": "mu:67923f07cdf9cfcd8073e79d4a838818b4c60e740f59e34f3adb1cf628d53126"
+        },
+        {
+          "from": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "kind": "capsule_ref",
+          "to": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55"
+        },
+        {
+          "from": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699",
+          "kind": "receipt_ref",
+          "to": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55"
+        },
+        {
+          "from": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012",
+          "kind": "macro_ref",
+          "to": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55"
+        },
+        {
+          "from": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "kind": "capsule_ref",
+          "to": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5"
+        },
+        {
+          "from": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699",
+          "kind": "receipt_ref",
+          "to": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5"
+        },
+        {
+          "from": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012",
+          "kind": "macro_ref",
+          "to": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5"
+        },
+        {
+          "from": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5"
+        },
+        {
+          "from": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012",
+          "kind": "market_ref",
+          "to": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d"
+        },
+        {
+          "from": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d"
+        },
+        {
+          "from": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "kind": "terminal_event_id",
+          "to": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d"
+        },
+        {
+          "from": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012",
+          "kind": "market_ref",
+          "to": "mu:e7c0174c5baebe32b59ff9a0385f188a0df9cc982306b4f415b7fe57d5612b3d"
+        },
+        {
+          "from": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d",
+          "kind": "settlement_event_id",
+          "to": "mu:e7c0174c5baebe32b59ff9a0385f188a0df9cc982306b4f415b7fe57d5612b3d"
+        },
+        {
+          "from": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "kind": "basis_event_id",
+          "to": "mu:7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76"
+        },
+        {
+          "from": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "kind": "terminal_event_id",
+          "to": "mu:7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+        "authorization_head": null,
+        "tape_tip": "mu:7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76"
+      },
+      "event_count": 19,
+      "event_counts": {
+        "BudgetAllocated": 1,
+        "CandidateAccepted": 1,
+        "CostEvent": 1,
+        "EvidenceBound": 1,
+        "FailureNode": 2,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 2,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "WorkCapsuleBuilt": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:344937f91622",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "344937f",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:607b217245d6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "607b217",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "2:WorkCapsuleBuilt:951c810f27be",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "951c810",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:440b6e53920c3a04e3ec7e12cbf63fa686cb8d35121803d4cd0c551bd28bbfde",
+          "event_type": "EvidenceBound",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "3:EvidenceBound:440b6e53920c",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "440b6e5",
+          "terminal_event_id": null,
+          "writer_id": "writer:evidence"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:8e9be3191458a6750816f033bb4e431b4dfe4b3e5ba9bdf9762e827fb2467012",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "4:MarketCreated:8e9be3191458",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "8e9be31",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:4222bc192d75342357d14fb949cd561ba2073b05c7c9672a781239358f6a3938",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "5:PositionMinted:4222bc192d75",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "4222bc1",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:bf25011065066f06f42633380a6bd93a997c91d1aa3d1915fa9d8ce4ac3edcc1",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "6:BudgetAllocated:bf2501106506",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "bf25011",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "7:WorkerReceiptImported:a175b0e7f3ac",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "a175b0e",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:MacroObservationImported:d1e09f3dc1eb",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "d1e09f3",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:47811fe04b2669cbfa7b300bfc44ce88e31c8932c6c8f908b2d072ff66d03334",
+          "event_type": "FailureNode",
+          "failure_class": "SEMANTIC_FAILURE",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "9:FailureNode:47811fe04b26",
+          "predicate_product": "FAIL",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "47811fe",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:a738b3f7b1c4a38cd139779c70f7c271f98a86b2cd0193361233ec529d29df24",
+          "event_type": "FailureNode",
+          "failure_class": "STEER_REJECTED",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:FailureNode:a738b3f7b1c4",
+          "predicate_product": "FAIL",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "a738b3f",
+          "terminal_event_id": null,
+          "writer_id": "writer:failure"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:67923f07cdf9cfcd8073e79d4a838818b4c60e740f59e34f3adb1cf628d53126",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "11:CostEvent:67923f07cdf9",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "67923f0",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:f6dfac8ac1e42fefc09e0ce29fb4a9dde6ea5e4341362618db83624f28fcc2f9",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:PPUTAccounted:f6dfac8ac1e4",
+          "predicate_product": "PASS",
+          "progress": 0,
+          "result": null,
+          "sequence": 12,
+          "short_id": "f6dfac8",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:cd957c56b832988b4eac075b865ea6ac79eb2c378ca8aa09b43f4d03d5ab64a8",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "13:PredicateEvaluated:cd957c56b832",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 13,
+          "short_id": "cd957c5",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:OfficialEvaluatorEvidenceImported:5a074a92b1cf",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 14,
+          "short_id": "5a074a9",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "15:CandidateAccepted:7b2cee6f3227",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "7b2cee6",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "capsule_id": null,
+          "event_id": "mu:2643fc6fc1ebdbbae3a039c04b865cce33d1584653f72e8fd706cf590e33900d",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "16:MarketSettled:2643fc6fc1eb",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "YES",
+          "sequence": 16,
+          "short_id": "2643fc6",
+          "terminal_event_id": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:e7c0174c5baebe32b59ff9a0385f188a0df9cc982306b4f415b7fe57d5612b3d",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "17:RewardDistributed:e7c0174c5bae",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 17,
+          "short_id": "e7c0174",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "capsule_id": null,
+          "event_id": "mu:7b09856fcb02fd6fbb3556e3a5d9c245510e1962fccf9acd5a6a70384a728b76",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:PPUTAccounted:7b09856fcb02",
+          "predicate_product": "PASS",
+          "progress": 1,
+          "result": null,
+          "sequence": 18,
+          "short_id": "7b09856",
+          "terminal_event_id": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "writer_id": "writer:pput"
+        }
+      ],
+      "execution_findings": [
+        {
+          "detail": "CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.",
+          "finding": "official_evidence_precedes_accept",
+          "severity": "INFO"
+        }
+      ],
+      "first_candidate_accepted": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+      "git_evidence": {
+        "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
+        "git_fsck_strict_stdout": "",
+        "object_format": "sha256"
+      },
+      "golden_path": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:607b217245d6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "607b217",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:951c810f27be0d6f1598d7019caeaf535d9ac0a97025459e0818022a7c1ec110",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "2:WorkCapsuleBuilt:951c810f27be",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "951c810",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:a175b0e7f3ac7eb42fcc46fc6af6d83b7300d6b2d84721a77a44ead3e6e96699",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "7:WorkerReceiptImported:a175b0e7f3ac",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "a175b0e",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:d1e09f3dc1eb13c786e81eedd6e9913f915bf09a3662389ac033f9aaa9e5a012",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:MacroObservationImported:d1e09f3dc1eb",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "d1e09f3",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:5a074a92b1cf5c7d6892ce25cf3b4bda82a5f515ad5d88d73f1fc99f2318ad55",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:OfficialEvaluatorEvidenceImported:5a074a92b1cf",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 14,
+          "short_id": "5a074a9",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "15:CandidateAccepted:7b2cee6f3227",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "7b2cee6",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        }
+      ],
+      "golden_path_basis": "terminal_accepted_head",
+      "path_class": "accepted_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:7b2cee6f3227174ccf5e45495b49cd3b66afd67245328814efb9bab5d83e56c5"
+    },
+    {
+      "actual_refs": {
+        "accepted_head": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+        "authorization_head": null,
+        "tape_tip": "mu:af29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5"
+      },
+      "bundle": "evidence/bench/mini_swe_bench_stage7_real_smoke_2task_20260628/turingos/instances/django__django-12050/micro_tape.bundle",
+      "bundle_hash": "sha256:1c12804ecbf77b906049c595ddc2e79ec1348228b6b3ebf9e87035e348f98647",
+      "bundle_verify_output": "The bundle contains these 2 refs:\n81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e refs/turingos/accepted_head\naf29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "LEGACY_MISSING",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2",
+          "kind": "tape_parent",
+          "to": "mu:14e4b271237041df1c9175d7808322a058864cb637257bed58a300d271edd837"
+        },
+        {
+          "from": "mu:14e4b271237041df1c9175d7808322a058864cb637257bed58a300d271edd837",
+          "kind": "tape_parent",
+          "to": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a"
+        },
+        {
+          "from": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "kind": "tape_parent",
+          "to": "mu:94287138205c9f4b0bbaeb768b1fcbe44a228e6c7707bb34c730190bb72baa25"
+        },
+        {
+          "from": "mu:94287138205c9f4b0bbaeb768b1fcbe44a228e6c7707bb34c730190bb72baa25",
+          "kind": "tape_parent",
+          "to": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab"
+        },
+        {
+          "from": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab",
+          "kind": "tape_parent",
+          "to": "mu:160b9c771b8517eed1a913adeebbb609e7a51c7ab019167daf20d33b77e21fc9"
+        },
+        {
+          "from": "mu:160b9c771b8517eed1a913adeebbb609e7a51c7ab019167daf20d33b77e21fc9",
+          "kind": "tape_parent",
+          "to": "mu:15af614ceba81d0f3ca570afc8ef6a69ed6ffbc1a74e09e527ba022584552714"
+        },
+        {
+          "from": "mu:15af614ceba81d0f3ca570afc8ef6a69ed6ffbc1a74e09e527ba022584552714",
+          "kind": "tape_parent",
+          "to": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc"
+        },
+        {
+          "from": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc",
+          "kind": "tape_parent",
+          "to": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89"
+        },
+        {
+          "from": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89",
+          "kind": "tape_parent",
+          "to": "mu:733193a2e274af9aea74cf86f8557f3356f2897f5f5661c5d955f943d0242236"
+        },
+        {
+          "from": "mu:733193a2e274af9aea74cf86f8557f3356f2897f5f5661c5d955f943d0242236",
+          "kind": "tape_parent",
+          "to": "mu:34a322f7a4e0d562476a02d6580474056704afe67f4b6fb61f9a0b970d01c9b4"
+        },
+        {
+          "from": "mu:34a322f7a4e0d562476a02d6580474056704afe67f4b6fb61f9a0b970d01c9b4",
+          "kind": "tape_parent",
+          "to": "mu:f99c80cff5e840317ba87039fc02368493a645946ebe5be704ca782da7c1f0b6"
+        },
+        {
+          "from": "mu:f99c80cff5e840317ba87039fc02368493a645946ebe5be704ca782da7c1f0b6",
+          "kind": "tape_parent",
+          "to": "mu:f203867e380b98b6a3e8f4b6bf282e350d6193d1869983c01e46543b019350fa"
+        },
+        {
+          "from": "mu:f203867e380b98b6a3e8f4b6bf282e350d6193d1869983c01e46543b019350fa",
+          "kind": "tape_parent",
+          "to": "mu:dabbaecab7fbafb6fe57ab4c93a071cc7f0108f44761398cc4ffbd3e26807350"
+        },
+        {
+          "from": "mu:dabbaecab7fbafb6fe57ab4c93a071cc7f0108f44761398cc4ffbd3e26807350",
+          "kind": "tape_parent",
+          "to": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9"
+        },
+        {
+          "from": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "kind": "tape_parent",
+          "to": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e"
+        },
+        {
+          "from": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "kind": "tape_parent",
+          "to": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62"
+        },
+        {
+          "from": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62",
+          "kind": "tape_parent",
+          "to": "mu:460ef17d54976cb79bbd38d0c36fd2df9a3c9db35561c6f2ea462086e0bec224"
+        },
+        {
+          "from": "mu:460ef17d54976cb79bbd38d0c36fd2df9a3c9db35561c6f2ea462086e0bec224",
+          "kind": "tape_parent",
+          "to": "mu:af29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5"
+        },
+        {
+          "from": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab",
+          "kind": "market_ref",
+          "to": "mu:160b9c771b8517eed1a913adeebbb609e7a51c7ab019167daf20d33b77e21fc9"
+        },
+        {
+          "from": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab",
+          "kind": "market_ref",
+          "to": "mu:15af614ceba81d0f3ca570afc8ef6a69ed6ffbc1a74e09e527ba022584552714"
+        },
+        {
+          "from": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "kind": "capsule_ref",
+          "to": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc"
+        },
+        {
+          "from": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "kind": "capsule_ref",
+          "to": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89"
+        },
+        {
+          "from": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "kind": "capsule_ref",
+          "to": "mu:f99c80cff5e840317ba87039fc02368493a645946ebe5be704ca782da7c1f0b6"
+        },
+        {
+          "from": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "kind": "capsule_ref",
+          "to": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9"
+        },
+        {
+          "from": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc",
+          "kind": "receipt_ref",
+          "to": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9"
+        },
+        {
+          "from": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89",
+          "kind": "macro_ref",
+          "to": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9"
+        },
+        {
+          "from": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "kind": "capsule_ref",
+          "to": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e"
+        },
+        {
+          "from": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc",
+          "kind": "receipt_ref",
+          "to": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e"
+        },
+        {
+          "from": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89",
+          "kind": "macro_ref",
+          "to": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e"
+        },
+        {
+          "from": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e"
+        },
+        {
+          "from": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab",
+          "kind": "market_ref",
+          "to": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62"
+        },
+        {
+          "from": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62"
+        },
+        {
+          "from": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "kind": "terminal_event_id",
+          "to": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62"
+        },
+        {
+          "from": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab",
+          "kind": "market_ref",
+          "to": "mu:460ef17d54976cb79bbd38d0c36fd2df9a3c9db35561c6f2ea462086e0bec224"
+        },
+        {
+          "from": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62",
+          "kind": "settlement_event_id",
+          "to": "mu:460ef17d54976cb79bbd38d0c36fd2df9a3c9db35561c6f2ea462086e0bec224"
+        },
+        {
+          "from": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "kind": "basis_event_id",
+          "to": "mu:af29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5"
+        },
+        {
+          "from": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "kind": "terminal_event_id",
+          "to": "mu:af29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+        "authorization_head": null,
+        "tape_tip": "mu:af29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5"
+      },
+      "event_count": 19,
+      "event_counts": {
+        "BudgetAllocated": 1,
+        "CandidateAccepted": 1,
+        "CostEvent": 1,
+        "EvidenceBound": 1,
+        "FailureNode": 2,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 2,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "WorkCapsuleBuilt": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:344937f91622",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "344937f",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:14e4b271237041df1c9175d7808322a058864cb637257bed58a300d271edd837",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:14e4b2712370",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "14e4b27",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "2:WorkCapsuleBuilt:1d3657bb4124",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "1d3657b",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:94287138205c9f4b0bbaeb768b1fcbe44a228e6c7707bb34c730190bb72baa25",
+          "event_type": "EvidenceBound",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "3:EvidenceBound:94287138205c",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "9428713",
+          "terminal_event_id": null,
+          "writer_id": "writer:evidence"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:72820a31243f7bd091049895d29014c9029c869432006e53fd6769743815abab",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12050",
+          "node_id": "4:MarketCreated:72820a31243f",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "72820a3",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:160b9c771b8517eed1a913adeebbb609e7a51c7ab019167daf20d33b77e21fc9",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12050",
+          "node_id": "5:PositionMinted:160b9c771b85",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "160b9c7",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:15af614ceba81d0f3ca570afc8ef6a69ed6ffbc1a74e09e527ba022584552714",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12050",
+          "node_id": "6:BudgetAllocated:15af614ceba8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "15af614",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "7:WorkerReceiptImported:d4a2fa92c192",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "d4a2fa9",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:MacroObservationImported:8ca0cf4f53de",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "8ca0cf4",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:733193a2e274af9aea74cf86f8557f3356f2897f5f5661c5d955f943d0242236",
+          "event_type": "FailureNode",
+          "failure_class": "SEMANTIC_FAILURE",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "9:FailureNode:733193a2e274",
+          "predicate_product": "FAIL",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "733193a",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:34a322f7a4e0d562476a02d6580474056704afe67f4b6fb61f9a0b970d01c9b4",
+          "event_type": "FailureNode",
+          "failure_class": "STEER_REJECTED",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:FailureNode:34a322f7a4e0",
+          "predicate_product": "FAIL",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "34a322f",
+          "terminal_event_id": null,
+          "writer_id": "writer:failure"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:f99c80cff5e840317ba87039fc02368493a645946ebe5be704ca782da7c1f0b6",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "11:CostEvent:f99c80cff5e8",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "f99c80c",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:f203867e380b98b6a3e8f4b6bf282e350d6193d1869983c01e46543b019350fa",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:PPUTAccounted:f203867e380b",
+          "predicate_product": "PASS",
+          "progress": 0,
+          "result": null,
+          "sequence": 12,
+          "short_id": "f203867",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:dabbaecab7fbafb6fe57ab4c93a071cc7f0108f44761398cc4ffbd3e26807350",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "13:PredicateEvaluated:dabbaecab7fb",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 13,
+          "short_id": "dabbaec",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:OfficialEvaluatorEvidenceImported:494e6b7718a9",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 14,
+          "short_id": "494e6b7",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "15:CandidateAccepted:81329296f418",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "8132929",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "capsule_id": null,
+          "event_id": "mu:8ec9d137feb941c6226bde4a4d4193c29a059e5ef025d1cff8f4c86a5233cb62",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12050",
+          "node_id": "16:MarketSettled:8ec9d137feb9",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "YES",
+          "sequence": 16,
+          "short_id": "8ec9d13",
+          "terminal_event_id": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:460ef17d54976cb79bbd38d0c36fd2df9a3c9db35561c6f2ea462086e0bec224",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12050",
+          "node_id": "17:RewardDistributed:460ef17d5497",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 17,
+          "short_id": "460ef17",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "capsule_id": null,
+          "event_id": "mu:af29bd1d5ec8debbf9aa7c769328d55e794ee9330af11f9c7fb5fda5f4dcbcf5",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "18:PPUTAccounted:af29bd1d5ec8",
+          "predicate_product": "PASS",
+          "progress": 1,
+          "result": null,
+          "sequence": 18,
+          "short_id": "af29bd1",
+          "terminal_event_id": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "writer_id": "writer:pput"
+        }
+      ],
+      "execution_findings": [
+        {
+          "detail": "CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.",
+          "finding": "official_evidence_precedes_accept",
+          "severity": "INFO"
+        }
+      ],
+      "first_candidate_accepted": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+      "git_evidence": {
+        "git_fsck_strict_stderr": "notice: HEAD points to an unborn branch (master)",
+        "git_fsck_strict_stdout": "",
+        "object_format": "sha256"
+      },
+      "golden_path": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:14e4b271237041df1c9175d7808322a058864cb637257bed58a300d271edd837",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:14e4b2712370",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "14e4b27",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:1d3657bb412471949253f3acbf3cf94c792e37fc65f9a4f42d011e3db8ed059a",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "2:WorkCapsuleBuilt:1d3657bb4124",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "1d3657b",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:d4a2fa92c192fe9a03dc5cd5fe91ddc2b902ad31fadae4e5dd8aae540b28f9dc",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "7:WorkerReceiptImported:d4a2fa92c192",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "d4a2fa9",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:8ca0cf4f53de6bae6567c87ce19054a3b4795676b3f82d334431ee11c7239a89",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "8:MacroObservationImported:8ca0cf4f53de",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "8ca0cf4",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:494e6b7718a9e0e810e3fb5a45c7388d820676d310304162336484a9512f62a9",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:OfficialEvaluatorEvidenceImported:494e6b7718a9",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 14,
+          "short_id": "494e6b7",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12050",
+          "event_id": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "15:CandidateAccepted:81329296f418",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 15,
+          "short_id": "8132929",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        }
+      ],
+      "golden_path_basis": "terminal_accepted_head",
+      "path_class": "accepted_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "terminal_candidate_accepted": "mu:81329296f4188f2f937b62d90593c1a5c4ec3d35e0572981173838b87646e95e"
+    }
+  ],
+  "schema_id": "MicroTapeDecisionDagAudit.v2",
+  "status_summary": {
+    "accepted_final_progress_one": "PASS",
+    "accepted_head_authority": "PASS",
+    "authorization_head": "LEGACY_MISSING",
+    "basic_ref_reconstruction": "PASS",
+    "bundle_accessibility": "PASS",
+    "bundle_integrity": "PASS",
+    "canonical_payload_hash": "PASS",
+    "constitutional_protocol_audit": "PARTIAL",
+    "cost_conservation_all_branches": "PASS",
+    "decision_dag_completeness": "PASS",
+    "economic_timing": "PASS",
+    "failed_progress_zero": "PASS",
+    "git_topology": "PASS",
+    "market_accounting_correctness": "PASS",
+    "overall": "FAIL",
+    "ref_reconstruction": "PASS",
+    "registry_head_effect": "PASS",
+    "replay_structural_integrity": "PASS",
+    "terminal_golden_path_anchors_to_accepted_head": "PASS",
+    "vpput_accounting": "PASS"
+  },
+  "strict_findings": [
+    {
+      "id": "require_authorization_head",
+      "message": "strict authorization gate requires authorization_head PASS"
+    }
+  ],
+  "truth_source": "micro_tape_bundle_only",
+  "verdict": "FAIL"
+}

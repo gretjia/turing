@@ -1,0 +1,58 @@
+{
+  "agent_id": "m3-p6-deepseek-loop-worker",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "apply_root_dir": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W00/source_snapshots",
+  "branch_id": "branch:m3-p6:B",
+  "broadcast_rules_file": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_section": "always",
+  "claim_boundary": {
+    "arm": "B",
+    "confirmatory_s01": false,
+    "deepseek_only_source_context_loop": true,
+    "has_failure_memory_broadcast": true,
+    "no_uplift_result": true,
+    "pilot_only": false
+  },
+  "credential_material": "env_only_not_serialized",
+  "experiment_phase": "m3-p6",
+  "extra_context_file": null,
+  "extra_context_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/loop_self_repair_contexts/S01-W00",
+  "ipqc_window_id": "S01-W00",
+  "model_requested": "deepseek-v4-pro",
+  "problems": [],
+  "provider": "deepseek",
+  "reasoning_effort": null,
+  "run_id_prefix": "m3-p6-arm-b-source-context-loop",
+  "schema_id": "turingos.m3.arm_a_worker_run_summary.v1",
+  "shard_id": "S01",
+  "source_context_name": "source_context.md",
+  "split_label": "s01-loop-arm-b",
+  "status": "PASS",
+  "task_count_completed": 1,
+  "task_count_requested": 1,
+  "task_dir_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks",
+  "tasks": [
+    {
+      "candidate_audit_problems": [],
+      "candidate_audit_status": "PASS",
+      "candidate_patch_bytes": 491,
+      "candidate_patch_sha256": "sha256:15f84b3269f4d5fde7e51b5c515197685cde56e42927cba5152c9ff8c71aba38",
+      "cost_microusd": 443,
+      "instance_id": "django__django-10999",
+      "model_reported": "deepseek-v4-pro",
+      "status": "COMPLETED",
+      "usage": {
+        "completion_tokens": 217,
+        "prompt_cache_hit_tokens": 1920,
+        "prompt_cache_miss_tokens": 603,
+        "prompt_tokens": 2523,
+        "total_tokens": 2740
+      }
+    }
+  ],
+  "thinking": {
+    "type": "disabled"
+  },
+  "visible_capsule_out_dir": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules",
+  "wall_time_ms": 4009
+}

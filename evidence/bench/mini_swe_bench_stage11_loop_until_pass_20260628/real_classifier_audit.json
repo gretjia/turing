@@ -1,0 +1,74 @@
+{
+  "classes_seen": [
+    "CONTEXT_MISSING",
+    "SEMANTIC_FAIL",
+    "WRONG_FILE"
+  ],
+  "classifier_inputs_allowed_only": [
+    "command_result",
+    "diff_scope",
+    "exit_code",
+    "macro_observation_kind",
+    "official_evaluator_result",
+    "receipt_schema_status",
+    "test_log_digest",
+    "timeout_kind"
+  ],
+  "forbidden_classifier_inputs_absent": [
+    "expected_failure_class",
+    "fixture_name",
+    "instance_id_label",
+    "problem_title",
+    "scenario_label"
+  ],
+  "observer_derived_failure_class": true,
+  "problems": [],
+  "run_count": 3,
+  "runs": [
+    {
+      "classifier_inputs": {
+        "diff_scope": "wrong_file",
+        "exit_code": 1,
+        "macro_observation_kind": "patch_wrong_file",
+        "official_evaluator_result": "FAIL",
+        "test_log_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "failure_class": "WRONG_FILE",
+      "instance_id": "stage11_case_1",
+      "observer_derived_failure_class": true,
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "classifier_inputs": {
+        "exit_code": 1,
+        "official_evaluator_result": "FAIL",
+        "receipt_schema_status": "context_missing",
+        "test_log_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "timeout_kind": "context_starved"
+      },
+      "failure_class": "CONTEXT_MISSING",
+      "instance_id": "stage11_case_2",
+      "observer_derived_failure_class": true,
+      "problems": [],
+      "status": "PASS"
+    },
+    {
+      "classifier_inputs": {
+        "command_result": "semantic_mismatch",
+        "exit_code": 1,
+        "macro_observation_kind": "patch_applied_but_semantic_fail",
+        "official_evaluator_result": "FAIL",
+        "test_log_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "failure_class": "SEMANTIC_FAIL",
+      "instance_id": "stage11_case_3",
+      "observer_derived_failure_class": true,
+      "problems": [],
+      "status": "PASS"
+    }
+  ],
+  "schema_id": "Stage11RealClassifierAudit.v1",
+  "status": "PASS",
+  "truth_source": "micro_tape_bundle_only"
+}

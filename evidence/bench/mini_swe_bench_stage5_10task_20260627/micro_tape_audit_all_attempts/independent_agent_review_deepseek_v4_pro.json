@@ -1,0 +1,26 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "context_hash": "sha256:e060413265fe10fc2697e19aecef7e63d832b6d5a72c2ef5bd5e4f9604523b7f",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:428a0ed5831bf698619e64aba49f6a62a8325949b4c6dfeca7301f34cfaaebcb",
+  "request_hash": "sha256:390a9b3835b2136ac43b353635b61562e81f7c755c936c6ac8b1cb34783c3934",
+  "review": {
+    "dag_quality": "high",
+    "findings": [
+      "market_settled_before_official_evidence (WARN): MarketSettled events consistently occur before official evaluator evidence, but they are preserve-only and replayable.",
+      "pput_accounted_before_final_accept (WARN): PPUTAccounted records pre-accept progress; final progress may require replay reducer or later PPUTAccounted.",
+      "official_evidence_precedes_accept (INFO): CandidateAccepted events always follow OfficialEvaluatorEvidenceImported, as expected."
+    ],
+    "next_actions": "No immediate actions required. Consider refining event ordering in future protocol versions to reduce warnings.",
+    "replay_auditable": true,
+    "schema_id": "MicroTapeIndependentAuditVerdict.v1",
+    "verdict": "PASS"
+  },
+  "review_content_hash": "sha256:a0d0187ed976e29d1df7de6dbf783d15dd069d5a471958030e5014c851b395d5",
+  "schema_id": "DeepSeekMicroTapeIndependentAgentReviewRun.v1",
+  "status": "PASS"
+}

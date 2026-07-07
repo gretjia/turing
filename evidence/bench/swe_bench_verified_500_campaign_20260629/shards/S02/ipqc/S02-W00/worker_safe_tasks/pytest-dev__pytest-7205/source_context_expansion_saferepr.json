@@ -1,0 +1,21 @@
+{
+  "base_commit": "5e7f1ab4bf58e473e5d7f878eb2b499d7deabd29",
+  "forbidden_fields_still_excluded": [
+    "gold patch",
+    "test patch",
+    "FAIL_TO_PASS",
+    "PASS_TO_PASS",
+    "hints"
+  ],
+  "instance_id": "pytest-dev__pytest-7205",
+  "path": "src/_pytest/_io/saferepr.py",
+  "repo": "pytest-dev/pytest",
+  "schema_id": "turingos.swebench_worker_source_context_expansion.v1",
+  "selection_rule": "base_source_import_dependency_for_worker_derived_repair",
+  "source": "github_raw",
+  "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/pytest-dev__pytest-7205/source_context.md",
+  "source_context_sha256": "sha256:134bd66dc2d055b9789fecc67093d9e338a771a70ba55011265401704dccbe62",
+  "source_sha256": "sha256:694df644ccef2a62f16e263a2cc2ba47a2ab4d384b338fe99be112902b1917be",
+  "source_snapshot_path": "shards/S02/ipqc/S02-W00/source_snapshots/pytest-dev__pytest-7205/src/_pytest/_io/saferepr.py",
+  "status": "PASS"
+}

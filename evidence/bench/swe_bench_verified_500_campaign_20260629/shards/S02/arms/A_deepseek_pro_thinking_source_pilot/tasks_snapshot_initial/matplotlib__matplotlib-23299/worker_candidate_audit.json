@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S02/tasks/matplotlib__matplotlib-23299/candidate.patch",
+  "candidate_patch_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "candidate_source": "worker_derived",
+  "diff_paths": [],
+  "instance_id": "matplotlib__matplotlib-23299",
+  "problems": [
+    "candidate patch is not a unified diff"
+  ],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S02",
+  "status": "FAIL",
+  "submitted_patch_scope": "source_only"
+}

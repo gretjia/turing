@@ -1,0 +1,79 @@
+{
+  "artifacts": [
+    {
+      "label": "h2_consumption_note",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/h2_consumption_note.json",
+      "sha256": "1b7b9b41f67f8543339038fb31209f5a28bfb04fe8fe993df87be609be3f6e6f"
+    },
+    {
+      "label": "dose_response",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/dose_response.json",
+      "sha256": "bd9482f42e40e7256ffd1d4d85accf817314ed02dc046d00eeeaad804e696dd3"
+    },
+    {
+      "label": "memory_cost",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/memory_cost.json",
+      "sha256": "52264c13ad648d145ba2e879bd029a10a238dcd2a59341c51385388836defe3c"
+    },
+    {
+      "label": "lineage_table",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/lineage_table.json",
+      "sha256": "493efe60628873af702df5afaae58c13996243d7bb9f657b55365d7262ecdcb4"
+    },
+    {
+      "label": "rule_lifecycle_table",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/rule_lifecycle_table.json",
+      "sha256": "88f184f98f56ef3a6d62fe84eb66506b8a44620f980a27abf9a28cd4ddc686a6"
+    },
+    {
+      "label": "stamp_assertion",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/stamp_assertion.json",
+      "sha256": "bf477db8a65cffc99967e7a2f8bd512e725726efbb0f82be20f8a56dd3d9d31d"
+    },
+    {
+      "label": "legacy_lifecycle_auditor_note",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/audits/legacy_lifecycle_auditors_not_applicable.json",
+      "sha256": "c7089592b82e78a13c39d466d53e2d85bda64478531dbb0e28fdfadc8159d767"
+    },
+    {
+      "label": "broadcast_rule_retired_proposal",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/proposals/BroadcastRuleRetired_PROPOSAL.json",
+      "sha256": "534d8f114857dd4beb6dd9c2558260741f073a87b78e14e15171181f7df344f4"
+    }
+  ],
+  "confirmatory": {
+    "failure_memory_causal_claim_allowed": false,
+    "h2_blocked_by_h1": true,
+    "h2_delta": 0.0,
+    "h2_p": 1.0,
+    "h2_source_sha256": "9a3862fa76381187cef83ffbbdaec5c777c739750e02b2d103f377763456c0c4"
+  },
+  "deviation": {
+    "status": "RECORDED",
+    "summary": "The legacy lifecycle auditors require micro_tape_bundle coverage. M3 S01 DeepSeek continuation artifacts have worker receipts and visible capsules but no micro_tape_bundle coverage, so M4.P2 records an artifact-level substitute audit and does not claim external verification."
+  },
+  "gates": {
+    "broadcast_rule_retired_proposal": "PASS",
+    "exploratory_stamp_assertion": "PASS",
+    "h2_verbatim_copy": "PASS",
+    "legacy_coverage_auditors": "NOT_APPLICABLE_RECORDED_DEVIATION"
+  },
+  "module_atom": "M4.P2",
+  "non_claims": [
+    "M4.P2 is implementer-addressed only, not externally verified.",
+    "No new confirmatory statistics were computed by M4.",
+    "Exploratory artifacts do not support a failure-memory efficacy claim.",
+    "M4 does not land any tape schema or BroadcastRuleRetired event.",
+    "No release, ratification, M2 enablement, OG-10/genesis signature, or constitution byte change is claimed."
+  ],
+  "recorded_at_utc": "2026-07-03T16:35:00Z",
+  "schema_id": "turingos.m4.p2.causal_lifecycle_result.v1",
+  "scope": {
+    "analysis_label": "real_s01_deepseek_20260703",
+    "confirmatory_source": "M3 H2 verbatim",
+    "exploratory_source": "M3 arm B/C receipts and visible capsules",
+    "heldout_shard": "S01"
+  },
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED"
+}

@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "crates/turing-contracts",
+    "crates/turing-xcheck",
     "crates/turing-git-tape",
     "crates/turing-kernel",
     "crates/turing-execd",
@@ -18,6 +19,8 @@ members = [
     "crates/turing-qualification",
     "crates/turing-cli",
     "crates/turing-daemons",
+    "crates/turing-witness",
+    "crates/turing-attest",
 ]
 
 [workspace.package]

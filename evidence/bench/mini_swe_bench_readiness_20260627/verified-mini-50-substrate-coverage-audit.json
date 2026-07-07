@@ -1,0 +1,145 @@
+{
+  "auditor_independence": {
+    "imports_benchmark_harness": false,
+    "input_surface": "coverage_json_only"
+  },
+  "blocking_findings": [
+    {
+      "id": "missing_module_M1_canonical_codec",
+      "message": "TuringOS arm did not exercise required module M1_canonical_codec"
+    },
+    {
+      "id": "missing_module_M2_micro_git_tape",
+      "message": "TuringOS arm did not exercise required module M2_micro_git_tape"
+    },
+    {
+      "id": "missing_module_M3_event_registry",
+      "message": "TuringOS arm did not exercise required module M3_event_registry"
+    },
+    {
+      "id": "missing_module_M4_single_loop",
+      "message": "TuringOS arm did not exercise required module M4_single_loop"
+    },
+    {
+      "id": "missing_module_M7_executor_broker",
+      "message": "TuringOS arm did not exercise required module M7_executor_broker"
+    },
+    {
+      "id": "missing_module_M8_macro_observer",
+      "message": "TuringOS arm did not exercise required module M8_macro_observer"
+    },
+    {
+      "id": "missing_module_M9_predicate_kernel",
+      "message": "TuringOS arm did not exercise required module M9_predicate_kernel"
+    },
+    {
+      "id": "missing_module_M10_evidence_approval",
+      "message": "TuringOS arm did not exercise required module M10_evidence_approval"
+    },
+    {
+      "id": "missing_module_M11_failure_memory",
+      "message": "TuringOS arm did not exercise required module M11_failure_memory"
+    },
+    {
+      "id": "missing_module_M12_market_substrate",
+      "message": "TuringOS arm did not exercise required module M12_market_substrate"
+    },
+    {
+      "id": "missing_module_M13_marketrouter_shadow",
+      "message": "TuringOS arm did not exercise required module M13_marketrouter_shadow"
+    },
+    {
+      "id": "missing_module_M14_pput_accounting",
+      "message": "TuringOS arm did not exercise required module M14_pput_accounting"
+    },
+    {
+      "id": "missing_module_M15_projection",
+      "message": "TuringOS arm did not exercise required module M15_projection"
+    },
+    {
+      "id": "missing_module_M16_integration_queue",
+      "message": "TuringOS arm did not exercise required module M16_integration_queue"
+    },
+    {
+      "id": "missing_module_M17_e2e_handoff",
+      "message": "TuringOS arm did not exercise required module M17_e2e_handoff"
+    },
+    {
+      "id": "missing_process_turingd",
+      "message": "TuringOS arm did not call required process turingd"
+    },
+    {
+      "id": "missing_process_turing-execd",
+      "message": "TuringOS arm did not call required process turing-execd"
+    },
+    {
+      "id": "missing_process_turing-mcp",
+      "message": "TuringOS arm did not call required process turing-mcp"
+    },
+    {
+      "id": "missing_process_turing-marketd",
+      "message": "TuringOS arm did not call required process turing-marketd"
+    },
+    {
+      "id": "missing_process_turing-pputd",
+      "message": "TuringOS arm did not call required process turing-pputd"
+    },
+    {
+      "id": "missing_process_turing-viewd",
+      "message": "TuringOS arm did not call required process turing-viewd"
+    },
+    {
+      "id": "missing_event_GoalStateProposed",
+      "message": "TuringOS arm did not emit or import required event GoalStateProposed"
+    },
+    {
+      "id": "missing_event_MarketCreated",
+      "message": "TuringOS arm did not emit or import required event MarketCreated"
+    },
+    {
+      "id": "missing_event_BudgetAllocated",
+      "message": "TuringOS arm did not emit or import required event BudgetAllocated"
+    },
+    {
+      "id": "missing_event_WorkerReceiptImported",
+      "message": "TuringOS arm did not emit or import required event WorkerReceiptImported"
+    },
+    {
+      "id": "missing_event_MacroObservationImported",
+      "message": "TuringOS arm did not emit or import required event MacroObservationImported"
+    },
+    {
+      "id": "missing_event_MarketSettled",
+      "message": "TuringOS arm did not emit or import required event MarketSettled"
+    },
+    {
+      "id": "missing_event_PPUTAccounted",
+      "message": "TuringOS arm did not emit or import required event PPUTAccounted"
+    },
+    {
+      "id": "missing_event_ReplayVerified",
+      "message": "TuringOS arm did not emit or import required event ReplayVerified"
+    },
+    {
+      "id": "missing_event_CandidateAccepted_or_FailureNode",
+      "message": "TuringOS arm did not exercise candidate accept/reject truth gate"
+    }
+  ],
+  "event_counts": {
+    "WorkCapsuleBuilt": 50
+  },
+  "min_sample_size_checked": 50,
+  "module_counts": {
+    "M0_law_goal_harness": 50,
+    "M5_goal_module_atom_capsule": 50,
+    "M6_worker_profiles": 50
+  },
+  "process_counts": {
+    "grok_cli": 50
+  },
+  "sample_size": 50,
+  "schema_id": "MiniSweBenchSubstrateCoverageAudit.v1",
+  "scientific_status": "SUBSTRATE_COVERAGE_BLOCKED",
+  "verdict": "FAIL",
+  "warnings": []
+}

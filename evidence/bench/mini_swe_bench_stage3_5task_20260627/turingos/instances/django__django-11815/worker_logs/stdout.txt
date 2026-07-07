@@ -1,0 +1,11 @@
+**Patch left in the worktree** (see `git diff` output above for details).
+
+- Core change: [django/db/migrations/serializer.py](/tmp/turingos_substrate_worktrees_stage3/654546c5fa11a329/django/db/migrations/serializer.py) (EnumSerializer now emits `Module.EnumClass.NAME` via stable `.name` instead of `Module.EnumClass(value)`).
+- Test updates: [tests/migrations/test_writer.py](/tmp/turingos_substrate_worktrees_stage3/654546c5fa11a329/tests/migrations/test_writer.py) (only the now-obsolete `assert*` strings for the old ctor-by-value form).
+
+Verified:
+* `migrations.test_writer.WriterTests.test_serialize_enums` passes.
+* Manual roundtrip (incl. `gettext_lazy` values in an `Enum` used as a `CharField.default`) now produces `...EnumClass.NAME` (not a baked-in translated value).
+* Unrelated pre-existing test noise (regex flags) ignored; no other files or migration test data referenced plain `enum.Enum` ctor forms.
+
+This is the minimal change addressing the root cause (value-based serialization of plain `enum` members in migration writer) without touching Choices, deconstructors, or unrelated paths.

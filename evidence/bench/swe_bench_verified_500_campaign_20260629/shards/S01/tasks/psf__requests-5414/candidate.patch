@@ -1,0 +1,26 @@
+diff --git a/requests/models.py b/requests/models.py
+index e7d292d..40c2f5d 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -19,7 +19,8 @@ from urllib3.fields import RequestField
+ from urllib3.filepost import encode_multipart_formdata
+ from urllib3.util import parse_url
+ from urllib3.exceptions import (
+-    DecodeError, ReadTimeoutError, ProtocolError, LocationParseError)
++    DecodeError, ReadTimeoutError, ProtocolError, LocationParseError,
++    InvalidHeader)
+ 
+ from io import UnsupportedOperation
+ from .hooks import default_hooks
+@@ -400,7 +401,10 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         # it doesn't start with a wildcard (*), before allowing the unencoded hostname.
+         if not unicode_is_ascii(host):
+             try:
+-                host = self._get_idna_encoded_host(host)
++                try:
++                    host = self._get_idna_encoded_host(host)
++                except UnicodeError:
++                    raise InvalidURL('URL has an invalid label.')
+             except UnicodeError:
+                 raise InvalidURL('URL has an invalid label.')
+         elif host.startswith(u'*'):

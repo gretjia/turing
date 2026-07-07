@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S02/tasks/astropy__astropy-14369/candidate.patch",
+  "candidate_patch_sha256": "sha256:ac6508d0b0fe64b64215fb653d9c960cd4243f4c8187389c8bf2b128bb4fa1e4",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "astropy/io/ascii/cds.py"
+  ],
+  "instance_id": "astropy__astropy-14369",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S02",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

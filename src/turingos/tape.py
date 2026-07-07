@@ -1,9 +1,14 @@
-"""turingos.tape — the SHA-256 Micro Git ChainTape + 2 refs + single-writer guard (M2).
+"""turingos.tape — legacy Python fixture Tape for SHA-256 Micro Git ChainTape compatibility.
 
-Frozen Stage-0 interface (contracts/INTERFACES.md tape.py section, contracts/refs.md,
-contracts/append_envelope.md). This module is the SUBSTRATE: every sovereignty-boundary
-change is exactly one non-merge commit on a real Git repo whose object format is native
-SHA-256. Two refs and only two refs live under `refs/turingos/`:
+M1e demotes this direct Python append path to historical/fixture compatibility. New
+production preserve appends route through `turingd` `event.append_preserve`, backed by
+`turing-git-tape`; this module remains to read historical Python tapes and to keep
+legacy tests/replay fixtures byte-stable.
+
+Frozen Stage-0 compatibility interface (contracts/INTERFACES.md tape.py section,
+contracts/refs.md, contracts/append_envelope.md): every sovereignty-boundary change in
+historical Python tapes is exactly one non-merge commit on a real Git repo whose object
+format is native SHA-256. Two refs and only two refs live under `refs/turingos/`:
 
   refs/turingos/tape_tip       — advances on EVERY valid append (incl. FailureNodes) [Art. 0.2/0.3]
   refs/turingos/accepted_head  — advances ONLY on a SOVEREIGN_ACCEPT event with a deterministic

@@ -1,0 +1,93 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:fc29987aca846741ade0734947897b04feeea2a61c0fd54c14606c09585a4e90",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1148,
+  "content_sha256": "sha256:dea616175791d6b198749422d3616291272e3a8c8c4ca9d8da5945e657f26d25",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:1ab8af5cfdb7c44094db213f462a1bb82d4d306c06b48d2ae85497e0de80e475",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 2517,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pylint-dev__pylint-8898",
+    "receipt_id": "rcpt:4ec58ebf5aff55c199e8662954b4949133c765e46ffe24d99795b40ecffe3fd6",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W04-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 292,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 5408,
+      "prompt_tokens": 5408,
+      "provider_usage_raw_sha256": "sha256:b7da30b503f7ee38c333d333bd399cf40e266f9be171799bd5a10bd0b2fe3b67",
+      "total_tokens": 5700
+    },
+    "wall_time_ms": 5176,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "0c230e5c-5099-44d4-81a4-108fc3407646",
+      "response_sha256": "sha256:c28ea1d4f0afc57019bd322c1f54866939ec382512f0ef2a71f22a1263eb07ae"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 1240,
+  "extra_context_path": "shards/S01/loop_self_repair_contexts/S01-W04/pylint-dev__pylint-8898/extra_context.md",
+  "extra_context_sha256": "sha256:1f17662e6c3618d3d0411759eb4a5ab8c5d641eee4e4733ec7d8ded3f29a5d2a",
+  "instance_id": "pylint-dev__pylint-8898",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded extra context file, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W04",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 18",
+    "output": "Checking patch pylint/config/argument.py...\nHunk #1 succeeded at 113 (offset 10 lines).\nHunk #2 succeeded at 123 (offset 9 lines).\nApplied patch pylint/config/argument.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:08a26e7b3bb864a7b620300bbe6a9c81ff5c4ea82655615c2983f27554ca392e",
+  "response_sha256": "sha256:c28ea1d4f0afc57019bd322c1f54866939ec382512f0ef2a71f22a1263eb07ae",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pylint-dev__pylint-8898/worker_capsule.md",
+  "source_context_length_chars": 15128,
+  "source_context_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pylint-dev__pylint-8898/source_context.md",
+  "source_context_sha256": "sha256:4c7893054e8f93d4920d823e20de6747d09fd2b9e0d6d478a63a1edc1724afca",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 292,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 5408,
+    "prompt_tokens": 5408,
+    "total_tokens": 5700
+  },
+  "usage_raw_sha256": "sha256:b7da30b503f7ee38c333d333bd399cf40e266f9be171799bd5a10bd0b2fe3b67",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/pylint-dev__pylint-8898/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:b320f150e30cb1d5b24d27dfde80bc0b8d0ca8cf73308ea590aa3be1c47b35e7",
+  "wall_time_ms": 5176
+}

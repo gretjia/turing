@@ -1,0 +1,14 @@
+diff --git a/astropy/units/format/cds.py b/astropy/units/format/cds.py
+index 3f1f3b07b..ab2a8dca7 100644
+--- a/astropy/units/format/cds.py
++++ b/astropy/units/format/cds.py
+@@ -134,8 +134,8 @@ class CDS(Generic):
+         # Split on '/' to separate numerator and denominator
+         parts = s.split('/')
+-        numerator = parts[0::2]
+-        denominator = parts[1::2]
++        numerator = parts[:1]
++        denominator = parts[1:]
+ 
+         # Build numerator unit
+         num_unit = 1

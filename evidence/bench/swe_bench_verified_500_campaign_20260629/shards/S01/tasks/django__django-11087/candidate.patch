@@ -1,0 +1,60 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 3a462f1..1d0d6f5 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -175,9 +175,13 @@ class Collector:
+         related objects will be handled by their respective on_delete handler.
+ 
+         If the call is the result of a cascade, 'source' should be the model
+-        that caused it and 'nullable' should be set to True, if the relation
++        that caused it, and 'nullable' should be set to True if the relation
+         can be null.
+ 
++        If 'collect_related' is a list of field names, only those related
++        objects will be collected. Otherwise, if it's True (default), all
++        related objects will be collected.
++
+         If 'reverse_dependency' is True, 'source' will be deleted before the
+         current model, rather than after. (Needed for cascading to parent
+         models, the one case in which the cascade follows the forwards
+@@ -207,9 +211,19 @@ class Collector:
+                                  collect_related=False,
+                                  reverse_dependency=True)
+         if collect_related:
++            if isinstance(collect_related, (list, tuple)):
++                field_names = set(collect_related)
++            else:
++                field_names = None
++            related_objs = None
+             parents = model._meta.parents
+             for related in get_candidate_relations_to_delete(model._meta):
+                 # Preserve parent reverse relationships if keep_parents=True.
++                if field_names is not None and related.get_accessor_name() not in field_names:
++                    continue
++                # When field_names is specified, check if this related field
++                # is part of the requested subset.
++                keep_parents_check = keep_parents
+                 if keep_parents and related.model in parents:
+                     continue
+                 field = related.field
+@@ -217,11 +231,19 @@ class Collector:
+                     continue
+                 batches = self.get_del_batches(new_objs, field)
+                 for batch in batches:
++                    # Ensure we only fetch the primary key of related objects
+                     sub_objs = self.related_objects(related, batch)
++                    # .only() is not applied when fast delete is possible,
++                    # but that's fine because fast delete doesn't fetch anything.
+                     if self.can_fast_delete(sub_objs, from_field=field):
+                         self.fast_deletes.append(sub_objs)
+                     elif sub_objs:
+-                        field.remote_field.on_delete(self, field, sub_objs, self.using)
++                        # Collect only pk for cascade-deleted objects
++                        if field.remote_field.on_delete == CASCADE:
++                            sub_objs = sub_objs.only('pk')
++                            field.remote_field.on_delete(self, field, sub_objs, self.using)
++                        else:
++                            field.remote_field.on_delete(self, field, sub_objs, self.using)
+             for field in model._meta.private_fields:
+                 if hasattr(field, 'bulk_related_objects'):
+                     # It's something like generic foreign key.

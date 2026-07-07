@@ -1,0 +1,33 @@
+# TaskCapsule v1.5 — INTENT
+task: HW-SW-004..006 SigningBackend route+algorithm negotiation, four-surface mutation suite, YubiKey skeleton (Phase 2)
+route: turing_full (plan lite done: CONTEXT.md + PREDICATE.md)
+eta: 8h / 960 steps
+frontier_mode: auto
+test_mode: auto_full
+autonomy_tier: 1   # high_risk signing path; founder pre-authorized implementation; merge stays sovereign
+human_ux_gate: false
+ipqc_checkpoints: 3   # after each atom; TuringOS-native interval: calc-ipqc-interval.sh 420 0.10 = 25 steps
+allowed_files:
+  - crates/turing-approval/src/route_negotiation.rs
+  - crates/turing-approval/src/lib.rs        # ADDITIVE ONLY — edit-forbidden regions in PREDICATE A2
+  - crates/turing-approval/src/yubikey.rs
+  - crates/turing-approval/tests/route_negotiation.rs
+  - crates/turing-approval/tests/prop_approval_byte_surfaces.rs
+  - crates/turing-approval/Cargo.toml        # [features] yubikey = [] ONLY
+  - docs/security/key_hierarchy.md
+  - scripts/audit-approval-bytes-equivalence.sh   # extend to run new proptest-style suite
+  - substrate_freeze_manifest.toml           # REPIN ceremony only
+  - evidence/loops/hw_sw_004_20260704/**
+forbidden_files:
+  - Cargo.lock                               # zero-dep discipline: must be zero-diff
+  - "**/00_authority/**"
+  - "*constitution_root_law.md*"
+  - crates/turing-kernel/**
+  - crates/turing-replay/**
+  - crates/turing-git-tape/**
+  - crates/turing-daemons/**                 # real gate is read-only reference this phase
+  - crates/turing-contracts/**
+acceptance_commands: PREDICATE.md A1..G6
+verifier: independent validator + security auditor (≠ implementer), clean context
+ceiling: ADDRESSED, pending sovereign accept; draft commits on turing/phase02-signing-hardening only
+tier0_downgrade: any diff touching canonical-byte production or gate consumption → STOP, re-plan

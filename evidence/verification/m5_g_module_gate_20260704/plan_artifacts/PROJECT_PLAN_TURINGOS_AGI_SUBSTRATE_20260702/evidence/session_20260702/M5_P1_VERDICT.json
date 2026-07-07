@@ -1,0 +1,79 @@
+{
+  "schema": "turingos.m5_p1_verdict.v1",
+  "module": "M5",
+  "phase": "M5.P1",
+  "date": "2026-07-03",
+  "verdict": "PASS",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "requirements": {
+    "adr_m5_001_through_007_present": true,
+    "adr_status": "accepted-addressed",
+    "adr_status_ceiling": "ADDRESSED",
+    "closure_certificate_schema_present": true,
+    "validator_selftest_cases": {
+      "accept": 1,
+      "reject": 4,
+      "result": "PASS"
+    },
+    "validator_enforces": [
+      "schema_id",
+      "closed_verifier_kind_enum",
+      "closed_verdict_enum",
+      "six_custody_booleans",
+      "implementer_family_rejection",
+      "subject_digest_match",
+      "commands_run_required",
+      "implementer_ceiling_ADDRESSED",
+      "anchoring_reference_required",
+      "disjunctive_escape_hatch_rejection"
+    ],
+    "prompt_templates": {
+      "e1_present": true,
+      "e2_present": true,
+      "six_input_classes": true,
+      "no_implementer_summary_rule": true
+    },
+    "lineage_scrub_seeded_bundle": {
+      "result": "PASS",
+      "caught": [
+        "implementer_narrative",
+        "session_id",
+        "subagent_reference"
+      ]
+    },
+    "fresh_context_verifier": "PASS"
+  },
+  "evidence": [
+    {
+      "name": "M5_P1_ARTIFACT_MANIFEST",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P1_ARTIFACT_MANIFEST.sha256"
+    },
+    {
+      "name": "validator self-test transcript",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P1_VALIDATOR_SELFTEST_TRANSCRIPT.txt",
+      "sha256": "0a3e597e56f3366a03158d58e5125a636628469b3a9a42b72bf4bfc1273ad643"
+    },
+    {
+      "name": "lineage scrub transcript",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P1_LINEAGE_SCRUB_TRANSCRIPT.txt",
+      "sha256": "67f329f13e381bc2728516a5e18bcf7ffa9534a5399aa516bfc4e43350be8432"
+    },
+    {
+      "name": "fresh-context verifier",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M5_P1_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "a5ed590502e4c955d6602addf2d507eb954f69b02594338fc1365caadeed3588"
+    }
+  ],
+  "non_claims": {
+    "external_custody_certificate_issued": false,
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "m2_enabled": false,
+    "final_certification": false
+  },
+  "next_unblocked_phase": "M5.P2"
+}

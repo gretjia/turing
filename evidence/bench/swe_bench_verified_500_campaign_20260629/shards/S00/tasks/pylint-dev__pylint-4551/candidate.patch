@@ -1,0 +1,61 @@
+diff --git a/pylint/pyreverse/inspector.py b/pylint/pyreverse/inspector.py
+index 8fa122022..8305577ea 100644
+--- a/pylint/pyreverse/inspector.py
++++ b/pylint/pyreverse/inspector.py
+@@ -23,6 +23,40 @@ import astroid
+ from pylint.pyreverse import utils
+ 
+ 
++def _get_argument_annotation(arguments, name):
++    for args, annotations in (
++        (arguments.posonlyargs, arguments.posonlyargs_annotations),
++        (arguments.args, arguments.annotations),
++        (arguments.kwonlyargs, arguments.kwonlyargs_annotations),
++    ):
++        for index, arg in enumerate(args):
++            if arg.name == name:
++                if index < len(annotations):
++                    return annotations[index]
++                return None
++    return None
++
++
++def _infer_assign_attribute_type(node):
++    frame = node.frame()
++    assign_type = node.assign_type()
++    if isinstance(frame, astroid.FunctionDef) and isinstance(assign_type, astroid.Assign):
++        assigned_value = assign_type.value
++        if isinstance(assigned_value, astroid.Name):
++            annotation = _get_argument_annotation(frame.args, assigned_value.name)
++            if annotation is not None:
++                try:
++                    values = set(annotation.infer())
++                    if values and values != {astroid.Uninferable}:
++                        return values
++                except astroid.InferenceError:
++                    pass
++    try:
++        return set(node.infer())
++    except astroid.InferenceError:
++        return set()
++
++
+ def _iface_hdlr(_):
+     """Handler used by interfaces to handle suspicious interface nodes."""
+     return True
+@@ -229,12 +263,9 @@ class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
+ 
+         handle instance_attrs_type
+         """
+-        try:
+-            values = set(node.infer())
+-            current = set(parent.instance_attrs_type[node.attrname])
+-            parent.instance_attrs_type[node.attrname] = list(current | values)
+-        except astroid.InferenceError:
+-            pass
++        values = _infer_assign_attribute_type(node)
++        current = set(parent.instance_attrs_type[node.attrname])
++        parent.instance_attrs_type[node.attrname] = list(current | values)
+ 
+     def visit_import(self, node):
+         """visit an astroid.Import node

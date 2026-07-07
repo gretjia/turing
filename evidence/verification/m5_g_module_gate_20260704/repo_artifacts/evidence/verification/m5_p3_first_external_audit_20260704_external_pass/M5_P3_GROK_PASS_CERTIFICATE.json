@@ -1,0 +1,90 @@
+{
+  "findings": {
+    "claim_boundary": "CLAIM_BOUNDARY.json forbids full_swe_bench_score_claim, leaderboard_equivalence, campaign_launch, and repo_local_evaluator_official claims. release_next_phase_g is a harness-readiness predicate, not a release grant.",
+    "digest_integrity": "MANIFEST.sha256 69/69 OK. build_packet.sh --validate recomputes packet_sha256 matching PACKET_MANIFEST.json.",
+    "harness_qualification": "Upstream swebench==4.1.0 Docker harness; single-instance probe PASS; phase_f initial 19/20 preserved; phase_f_11885 repair and repaired 20/20 replay PASS.",
+    "tier_observation": "AUDITOR_RUNBOOK specifies tier E1 external_human_operator; owner commissioned cross-family audit via explicit request. Custody separation satisfied."
+  },
+  "issued_at_utc": "2026-07-04T00:00:00Z",
+  "schema_id": "turingos.closure_certificate.v1",
+  "status_semantics": {
+    "certified_closure_level": "EXTERNALLY_VERIFIED",
+    "certified_for_gate": "M5.P3",
+    "does_not_grant": [
+      "SHIPPED",
+      "RELEASED",
+      "RATIFIED",
+      "M2 enablement",
+      "release eligibility",
+      "OG-10/genesis signature",
+      "constitution-byte change",
+      "full SWE-bench score claim",
+      "leaderboard equivalence claim"
+    ],
+    "implementer_ceiling_was": "ADDRESSED"
+  },
+  "subject": {
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit_sha": "5383e6919590d84fafc46b07e52af1c282dfdc75",
+    "gate_id": "M5.P3",
+    "packet_repo_sha_pin": "84a4c5319b0e46917d2333df6033781d3939a23d",
+    "packet_root": "evidence/verification/m5_p3_first_external_audit_20260704",
+    "packet_sha256": "sha256:6442d1e1773b3f4385e75767c22dfff6469984dbf0ceff2a90f7c56a99b0618c",
+    "repo_url": "https://github.com/gretjia/turing"
+  },
+  "verification": {
+    "audit_script_output": {
+      "official_harness_kind": "upstream_swebench_docker",
+      "phase_f_completed_count": 20,
+      "phase_f_error_count": 0,
+      "phase_f_resolved_count": 20,
+      "phase_f_submitted_count": 20,
+      "release_next_phase_g": true,
+      "status": "PASS"
+    },
+    "commands_run": [
+      {
+        "command": "rm -rf /tmp/turing-m5p3-audit && git clone https://github.com/gretjia/turing.git /tmp/turing-m5p3-audit",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-audit && git checkout 5383e6919590d84fafc46b07e52af1c282dfdc75",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-audit/evidence/verification/m5_p3_first_external_audit_20260704 && sha256sum -c MANIFEST.sha256",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-audit && bash tools/release/build_packet.sh --validate evidence/verification/m5_p3_first_external_audit_20260704",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-m5p3-audit && python3 tools/bench/audit_official_harness_qualification.py --root evidence/verification/m5_p3_first_external_audit_20260704/evidence --out /tmp/m5p3_fresh_official_harness_audit.json",
+        "exit_code": 0
+      }
+    ],
+    "digest_manifest_result": "PASS",
+    "expected_verdict_comparison": {
+      "computed_before_historical_prompt": true,
+      "divergence": false,
+      "historical_prompt_path": "evidence/EXTERNAL_AUDITOR_PROMPT.md",
+      "notes": "Initial 19/20 replay preserved historically; repaired 20/20 PASS matches EXTERNAL_AUDITOR_PROMPT expected verdict."
+    },
+    "full_docker_replay": "NOT_RUN",
+    "gate_predicate_result": "PASS"
+  },
+  "verdict": "PASS",
+  "verifier": {
+    "custody": {
+      "cross_family_or_human": true,
+      "fresh_clone": true,
+      "no_implementer_transcript": true,
+      "no_shared_conversation_state": true,
+      "own_credentials": true,
+      "own_custody_output": true
+    },
+    "identity": "grok-cursor-external-auditor",
+    "kind": "external_cross_family_model"
+  }
+}

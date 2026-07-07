@@ -1,0 +1,119 @@
+{
+  "checks": [
+    {
+      "message": "duplicates=[]; blank_or_nonstring=0",
+      "name": "canonical_name.unique",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=63; observed=63",
+      "name": "counts.total",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=20; observed=20",
+      "name": "counts.advance",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=43; observed=43",
+      "name": "counts.preserve",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=12; observed=12",
+      "name": "counts.sovereign_accept",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=8; observed=8",
+      "name": "counts.authorization",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=6; observed=6",
+      "name": "counts.proposal",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=11; observed=11",
+      "name": "counts.observation",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=6; observed=6",
+      "name": "counts.receipt",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=5; observed=5",
+      "name": "counts.failure",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=15; observed=15",
+      "name": "counts.economy",
+      "status": "PASS"
+    },
+    {
+      "message": "declared='REJECT'",
+      "name": "unknown_event_policy",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=True",
+      "name": "append_only_by_name",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=True",
+      "name": "never_renumber",
+      "status": "PASS"
+    },
+    {
+      "message": "declared='sorted_canonical_names_lf_trailing_lf'; expected='sorted_canonical_names_lf_trailing_lf'",
+      "name": "registry_name_set_sha256_profile",
+      "status": "PASS"
+    },
+    {
+      "message": "declared=8cd62584552ad22b7755299daef7137e7fba4074b7a91f20b09900586e567e6a; observed=8cd62584552ad22b7755299daef7137e7fba4074b7a91f20b09900586e567e6a",
+      "name": "registry_name_set_sha256",
+      "status": "PASS"
+    }
+  ],
+  "observed": {
+    "counts": {
+      "advance": 20,
+      "authorization": 8,
+      "economy": 15,
+      "failure": 5,
+      "observation": 11,
+      "preserve": 43,
+      "proposal": 6,
+      "receipt": 6,
+      "sovereign_accept": 12,
+      "total": 63
+    },
+    "event_class_counts": {
+      "AUTHORIZATION": 8,
+      "ECONOMY": 15,
+      "FAILURE": 5,
+      "OBSERVATION": 11,
+      "PROPOSAL": 6,
+      "RECEIPT": 6,
+      "SOVEREIGN_ACCEPT": 12
+    },
+    "event_count": 63,
+    "head_effect_counts": {
+      "ADVANCE": 20,
+      "PRESERVE": 43
+    },
+    "registry_name_set_sha256": "8cd62584552ad22b7755299daef7137e7fba4074b7a91f20b09900586e567e6a",
+    "registry_name_set_sha256_profile": "sorted_canonical_names_lf_trailing_lf",
+    "unique_canonical_name_count": 63
+  },
+  "registry_path": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+  "schema": "turingos.tc0.event_registry_self_consistency_report.v1",
+  "timestamp_utc": "2026-07-03T02:37:46Z",
+  "verdict": "PASS"
+}

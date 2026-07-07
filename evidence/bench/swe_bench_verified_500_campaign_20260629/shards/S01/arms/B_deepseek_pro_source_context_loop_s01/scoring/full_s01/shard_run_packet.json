@@ -1,0 +1,25 @@
+{
+  "cache_level": "env",
+  "command": "python -m swebench.harness.run_evaluation --dataset_name princeton-nlp/SWE-bench_Verified --split test --predictions_path /home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions.jsonl --run_id turingos_m3_s01_armB_deepseek_source_context_loop_20260703 --max_workers 2 --timeout 1800 --cache_level env --namespace swebench --report_dir /home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01",
+  "docker_environment_required": true,
+  "execute_now": true,
+  "execution_requested": true,
+  "ipqc_window_id": null,
+  "namespace": "swebench",
+  "note": "Execution gate passed; run the recorded upstream SWE-bench Docker harness command.",
+  "official_harness_kind": "upstream_swebench_docker",
+  "predictions_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armB_predictions.jsonl",
+  "problems": [],
+  "report_dir": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01",
+  "run_id": "turingos_m3_s01_armB_deepseek_source_context_loop_20260703",
+  "schema_id": "turingos.swebench_shard_run_packet.v1",
+  "shard_id": "S01",
+  "status": "READY_TO_EXECUTE",
+  "timeout": 1800,
+  "validation": {
+    "expected_prediction_count": 50,
+    "prediction_count": 50,
+    "problems": [],
+    "status": "PASS"
+  }
+}

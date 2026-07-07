@@ -5,6 +5,7 @@ import tempfile
 import unittest
 
 from turingos import schemas
+from turingos.worker import adapter as worker_adapter
 from turingos.worker.cli import CliWorkerAdapter, build_prompt
 
 _STUB_OK = """import sys, pathlib
@@ -47,13 +48,36 @@ class TestCliWorkerAdapter(unittest.TestCase):
 
     def test_ok_run_builds_valid_receipt_with_candidate(self):
         wt = os.path.join(self.base, "wt_ok")
-        r = self._adapter(_STUB_OK).run(CAPSULE, wt)
+        adapter = self._adapter(_STUB_OK)
+        r = adapter.run(CAPSULE, wt)
         schemas.validate_receipt(r)               # adapter-agnostic receipt is schema-valid
         self.assertEqual(r["status"], "ok")
         self.assertIn("out.txt", r["candidate"]["files_touched"])
         self.assertTrue(r["candidate"]["tree_oid"])   # real git tree anchor
         self.assertEqual(r["worker_id"], "stub")
         self.assertTrue(r["no_orphan"])
+        schemas.validate_cost_event_v2(adapter.last_cost_event)
+
+    def test_ok_run_records_bounded_cost_event(self):
+        wt = os.path.join(self.base, "wt_cost")
+        adapter = self._adapter(_STUB_OK)
+        r = adapter.run(CAPSULE, wt)
+
+        schemas.validate_cost_event_v2(adapter.last_cost_event)
+        self.assertEqual(adapter.last_cost_event["receipt_id"], r["receipt_id"])
+        self.assertEqual(adapter.last_cost_event["worker"]["adapter_kind"], "cli")
+        self.assertEqual(adapter.last_cost_event["cost"]["cost_source_kind"], "bounded_estimate")
+        self.assertEqual(adapter.last_cost_event["cost"]["bound_kind"], "upper_bound_utf8_bytes_over_2")
+
+    def test_dispatch_preserves_cli_bounded_cost_event(self):
+        wt = os.path.join(self.base, "wt_dispatch_cost")
+        adapter = self._adapter(_STUB_OK)
+        r = worker_adapter.dispatch(adapter, CAPSULE, wt, timeout_s=5)
+
+        schemas.validate_cost_event_v2(adapter.last_cost_event)
+        self.assertEqual(adapter.last_cost_event["receipt_id"], r["receipt_id"])
+        self.assertEqual(adapter.last_cost_event["worker"]["adapter_kind"], "cli")
+        self.assertEqual(adapter.last_cost_event["cost"]["cost_source_kind"], "bounded_estimate")
 
     def test_failed_run_is_normalized(self):
         wt = os.path.join(self.base, "wt_fail")

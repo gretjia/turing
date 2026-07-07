@@ -1,0 +1,18 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 6c6a7de5a3..d118aaefda 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -67,4 +67,12 @@ def write(self, lines):
+                                             self.header.cols[j]))
+                 lines.append(header_row)
+ 
++        if hasattr(self, 'header_rows') and self.header_rows:
++            for i, row in enumerate(self.header_rows):
++                head_row = ' '.join(str(self.header.str_vals[j][i])
++                                    for j in range(len(self.header.cols)))
++                lines.append(head_row)
++            separator = ' '.join('=' * len(self.header.cols[j])
++                                 for j in range(len(self.header.cols)))
++            lines.append(separator)
+         for i, col in enumerate(self.cols):
+             col_str = col.info.iter_str_vals()

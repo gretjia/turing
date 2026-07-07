@@ -1,0 +1,115 @@
+{
+  "artifact_hashes": {
+    "README.md": "sha256:b0c01bd8ffc4dbc4d5e2dbd31eb14e517c43b122b04f6b756a10c95346a3dbd5",
+    "direct_grok_baseline.predictions.jsonl": "sha256:dfa7ffc8a095e241083f7fa329200f6b7cb297a9d88a0190a8ef879946447f12",
+    "generation_run_summary.json": "sha256:22174192ce576883aee46966db171d6e7073518baa95507eec6d8e3c35a9dc5b",
+    "official_report_direct_grok_baseline_django__django-11815.json": "sha256:ef0c8ca466a996ac66bc7de721fe4f048b68c404ee9c385a39dbe108d01e3c03",
+    "official_report_turingos_grok_worker_django__django-11815.json": "sha256:ef0c8ca466a996ac66bc7de721fe4f048b68c404ee9c385a39dbe108d01e3c03",
+    "official_summary_direct_grok_baseline.json": "sha256:7bc9e03fa7bbf199f5470e0b7a5ac80063fc5497bf2dd46ed0a26d98c2a749f8",
+    "official_summary_gold_smoke.json": "sha256:b46e430517d9baff96ea490e68c67979f1512c295b5e5c6cc770f0486ee2ea2c",
+    "official_summary_turingos_grok_worker.json": "sha256:7bc9e03fa7bbf199f5470e0b7a5ac80063fc5497bf2dd46ed0a26d98c2a749f8",
+    "patches/django__django-11790__direct_grok_baseline.patch.diff": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "patches/django__django-11790__turingos_grok_worker.patch.diff": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "patches/django__django-11815__direct_grok_baseline.patch.diff": "sha256:4e41c4f985aaaa69e1c39a24567087e2d5da39742554e41326f28fddacce8b01",
+    "patches/django__django-11815__turingos_grok_worker.patch.diff": "sha256:5231904379efdb833c81a45bc9bc4defceb7eb5ad68c1df8183eae5b8e6aee4e",
+    "turingos_grok_worker.predictions.jsonl": "sha256:271e9acc048a2e98e40c355db98410fa1d5325c3cc74eae3c5f9553e9878cabd"
+  },
+  "created_at": "2026-06-27T10:08:00Z",
+  "dataset": "MariusHobbhahn/swe-bench-verified-mini test split",
+  "dataset_parquet_sha256": "sha256:f9ba19dea78884f1081355d2d8afb671899981f24180aa0c4c1aa14d2c23e855",
+  "grok_model": "grok-composer-2.5-fast",
+  "hygiene_guarded_counts": {
+    "direct_grok_baseline_valid_resolved": 0,
+    "turingos_grok_worker_valid_resolved": 1
+  },
+  "hygiene_guarded_mcnemar": {
+    "baseline_only": 0,
+    "turingos_only": 1,
+    "two_sided_p": 1.0
+  },
+  "hygiene_guarded_outcomes": [
+    {
+      "direct_grok_baseline_valid_resolved": false,
+      "instance_id": "django__django-11790",
+      "turingos_grok_worker_valid_resolved": false
+    },
+    {
+      "direct_grok_baseline_valid_resolved": false,
+      "instance_id": "django__django-11815",
+      "turingos_grok_worker_valid_resolved": true
+    }
+  ],
+  "independent_verify_commands": [
+    "python3 -m venv /tmp/turingos-swebench-venv",
+    "/tmp/turingos-swebench-venv/bin/python -m pip install swebench pyarrow pandas",
+    "/tmp/turingos-swebench-venv/bin/python -m swebench.harness.run_evaluation --dataset_name /tmp/turingos-swebench-pilot/verified-mini-2.json --split test --predictions_path evidence/bench/mini_swe_bench_pilot_20260627/direct_grok_baseline.predictions.jsonl --max_workers 2 --timeout 900 --run_id turingos_pilot_baseline_verify --namespace swebench --cache_level env --clean false",
+    "/tmp/turingos-swebench-venv/bin/python -m swebench.harness.run_evaluation --dataset_name /tmp/turingos-swebench-pilot/verified-mini-2.json --split test --predictions_path evidence/bench/mini_swe_bench_pilot_20260627/turingos_grok_worker.predictions.jsonl --max_workers 2 --timeout 900 --run_id turingos_pilot_turingos_verify --namespace swebench --cache_level env --clean false"
+  ],
+  "instances": [
+    "django__django-11790",
+    "django__django-11815"
+  ],
+  "official_counts": {
+    "direct_grok_baseline_empty_patch": 1,
+    "direct_grok_baseline_resolved": 1,
+    "turingos_grok_worker_empty_patch": 1,
+    "turingos_grok_worker_resolved": 1
+  },
+  "official_outcomes": [
+    {
+      "direct_grok_baseline_resolved": false,
+      "instance_id": "django__django-11790",
+      "turingos_grok_worker_resolved": false
+    },
+    {
+      "direct_grok_baseline_resolved": true,
+      "instance_id": "django__django-11815",
+      "turingos_grok_worker_resolved": true
+    }
+  ],
+  "official_paired_mcnemar": {
+    "baseline_only": 0,
+    "turingos_only": 0,
+    "two_sided_p": 1.0
+  },
+  "official_swebench_version": "4.1.0",
+  "patch_hygiene": [
+    {
+      "arm": "direct_grok_baseline",
+      "instance_id": "django__django-11790",
+      "modifies_tests": false,
+      "patch_bytes": 0,
+      "touched_files": []
+    },
+    {
+      "arm": "direct_grok_baseline",
+      "instance_id": "django__django-11815",
+      "modifies_tests": true,
+      "patch_bytes": 3790,
+      "touched_files": [
+        "django/db/migrations/serializer.py",
+        "tests/migrations/test_writer.py"
+      ]
+    },
+    {
+      "arm": "turingos_grok_worker",
+      "instance_id": "django__django-11790",
+      "modifies_tests": false,
+      "patch_bytes": 0,
+      "touched_files": []
+    },
+    {
+      "arm": "turingos_grok_worker",
+      "instance_id": "django__django-11815",
+      "modifies_tests": false,
+      "patch_bytes": 761,
+      "touched_files": [
+        "django/db/migrations/serializer.py"
+      ]
+    }
+  ],
+  "requirement_verdict": "FAIL_TURINGOS_NOT_SIGNIFICANTLY_AHEAD",
+  "sample_size": 2,
+  "schema_id": "MiniSweBenchPilotResult.v1",
+  "scientific_status": "PILOT_ONLY_NOT_STATISTICALLY_POWERED"
+}

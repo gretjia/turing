@@ -1,0 +1,119 @@
+{
+  "schema_id": "turingos.gate_verdict.v0",
+  "gate": "M6.P0a",
+  "atom": "ATOM-M6.P0a-1",
+  "timestamp_utc": "2026-07-02T00:00:00Z",
+  "status_ceiling": "ADDRESSED",
+  "verdict": "PASS",
+  "evidence_class": "FIXTURE_AND_SELF_RUN",
+  "inputs_checked": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing-operator-hci-console",
+      "kind": "source_clone",
+      "base_sha": "6b9daadc607268f700c67bca5ff80f6d2d0fe560"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M6_hci_console.md",
+      "kind": "module_spec"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/research/RES_M6_hci_projection_console.md",
+      "kind": "research_spec"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/tracked_1666.patch",
+      "sha256": "ca61116816ce7c3b661f3594fdf91b9d2ee35886aa4dfe38c5b7750e262182af"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/untracked.tar.gz",
+      "sha256": "ea7d00aa74df545453c31513284bac0683439fb33fe7012102726d40699e5bf0"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/base_sha.txt",
+      "sha256": "dbee51a0bcc8a2f396a75f6137e52100194985faa5439c2366a7d85ea187925f"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/git_status_porcelain.txt",
+      "sha256": "6a2930c34f5c366db0cc4734a2dd4534e2854242d0f551bb1e72027e8b42e163"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/untracked_paths.txt",
+      "sha256": "0739ccbe5b1bece8360600ca18bceacfda3a5c003f5a06fc7ae44d07a36a334a"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/CLAIM_BOUNDARY.json",
+      "sha256": "fb72214472d235428d97770c260f30ab77a11a16b8144dc7b1267ba3134d6c56"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/MANIFEST.sha256",
+      "sha256": "03869f26946bf5555e0e07ebe7f64f198a7c1509ee0192856132d4cda2de1c60"
+    }
+  ],
+  "commands_run": [
+    {
+      "argv": "git diff > tracked_1666.patch",
+      "cwd": "/home/zephryj/turingos_backup/work/turing-operator-hci-console",
+      "exit_code": 0
+    },
+    {
+      "argv": "git rev-parse HEAD > base_sha.txt",
+      "cwd": "/home/zephryj/turingos_backup/work/turing-operator-hci-console",
+      "exit_code": 0
+    },
+    {
+      "argv": "git status --porcelain=v1 > git_status_porcelain.txt",
+      "cwd": "/home/zephryj/turingos_backup/work/turing-operator-hci-console",
+      "exit_code": 0
+    },
+    {
+      "argv": "tar --sort=name --mtime='UTC 2026-07-02' --owner=0 --group=0 --numeric-owner --use-compress-program='gzip -n' -cf untracked.tar.gz -T untracked_paths.txt",
+      "cwd": "/home/zephryj/turingos_backup/work/turing-operator-hci-console",
+      "exit_code": 0
+    },
+    {
+      "argv": "sha256sum -c MANIFEST.sha256",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1",
+      "exit_code": 0
+    }
+  ],
+  "drift_check": [
+    {
+      "item": 1,
+      "answer": "Serves G7 by preserving the at-risk console branch archive required by MODULE_M6_hci_console.md section 1.1 and tracker row M6.P0a.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M6_hci_console.md"
+    },
+    {
+      "item": 2,
+      "answer": "No red-line path was modified; only plan-directory rescue artifacts were written.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/MANIFEST.sha256"
+    },
+    {
+      "item": 3,
+      "answer": "Every preservation claim is backed by the archive manifest, base SHA, git status, and claim boundary files.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/MANIFEST.sha256"
+    },
+    {
+      "item": 4,
+      "answer": "Archive evidence is labeled FIXTURE_AND_SELF_RUN in CLAIM_BOUNDARY.json and this verdict.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/CLAIM_BOUNDARY.json"
+    },
+    {
+      "item": 5,
+      "answer": "No scope growth beyond ATOM-M6.P0a-1; only the specified archive files plus inventory/status evidence and this verdict were produced.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/M6_P0a_VERDICT.json"
+    },
+    {
+      "item": 6,
+      "answer": "A fresh agent can replay validation with sha256sum -c MANIFEST.sha256 from the archive root.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/MANIFEST.sha256"
+    },
+    {
+      "item": 7,
+      "answer": "Status is capped at ADDRESSED; no CLOSED, RELEASED, or RATIFIED status is claimed.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/CLAIM_BOUNDARY.json"
+    }
+  ],
+  "not_run_is_fail": true
+}

@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W02/source_snapshots/astropy__astropy-14096",
+    "output": "Checking patch astropy/coordinates/sky_coordinate.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/tasks/astropy__astropy-14096/candidate.patch",
+  "candidate_patch_sha256": "sha256:52ceacbfcfc0e892238c8e8f9e2dc824b0a1a359580258b0bfca220b209c571d",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "astropy/coordinates/sky_coordinate.py"
+  ],
+  "instance_id": "astropy__astropy-14096",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

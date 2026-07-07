@@ -1,0 +1,12 @@
+diff --git a/sphinx/transforms/i18n.py b/sphinx/transforms/i18n.py
+--- a/sphinx/transforms/i18n.py
++++ b/sphinx/transforms/i18n.py
+@@ -203,7 +203,7 @@ def _read_parial(self) -> None:
+             # nodes contain nested section and other nested nodes
+             if len(par) == 0:
+                 continue
+-            elif len(par) == 1 and isinstance(par[0], nodes.title):
++            elif all(isinstance(node, (nodes.title, nodes.subtitle)) for node in par):
+                 # This is a top level section or other things that
+                 # is processed on later stage (i.e. not a translation).
+                 # Rest of children are translation text.

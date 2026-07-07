@@ -1,0 +1,509 @@
+{
+  "audit_atom": "50_task_sealed_shard",
+  "ipqc_window_size": 10,
+  "schema_id": "turingos.swebench_verified_500_shard_manifest.v1",
+  "shard_id": "S00",
+  "task_count": 50,
+  "tasks": [
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 0,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "astropy__astropy-12907",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 0,
+      "repo": "astropy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 1,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-10097",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 22,
+      "repo": "django",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 2,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-13989",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 253,
+      "repo": "matplotlib",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 3,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "mwaskom__seaborn-3069",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 287,
+      "repo": "mwaskom",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 4,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pallets__flask-5014",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 289,
+      "repo": "pallets",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 5,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "psf__requests-1142",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 290,
+      "repo": "psf",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 6,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pydata__xarray-2905",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 298,
+      "repo": "pydata",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 7,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pylint-dev__pylint-4551",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 320,
+      "repo": "pylint-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 8,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pytest-dev__pytest-10051",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 330,
+      "repo": "pytest-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 9,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-10297",
+      "ipqc_window_id": "S00-W00",
+      "original_manifest_index": 349,
+      "repo": "scikit-learn",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 10,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-10323",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 381,
+      "repo": "sphinx-doc",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 11,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-11618",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 425,
+      "repo": "sympy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 12,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "astropy__astropy-13033",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 1,
+      "repo": "astropy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 13,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-10554",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 23,
+      "repo": "django",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 14,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-14623",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 254,
+      "repo": "matplotlib",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 15,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "mwaskom__seaborn-3187",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 288,
+      "repo": "mwaskom",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 16,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "psf__requests-1724",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 291,
+      "repo": "psf",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 17,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pydata__xarray-3095",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 299,
+      "repo": "pydata",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 18,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pylint-dev__pylint-4604",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 321,
+      "repo": "pylint-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 19,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pytest-dev__pytest-10081",
+      "ipqc_window_id": "S00-W01",
+      "original_manifest_index": 331,
+      "repo": "pytest-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 20,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-10844",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 350,
+      "repo": "scikit-learn",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 21,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-10435",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 382,
+      "repo": "sphinx-doc",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 22,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-12096",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 426,
+      "repo": "sympy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 23,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "astropy__astropy-13236",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 2,
+      "repo": "astropy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 24,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-10880",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 24,
+      "repo": "django",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 25,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-20488",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 255,
+      "repo": "matplotlib",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 26,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "psf__requests-1766",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 292,
+      "repo": "psf",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 27,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pydata__xarray-3151",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 300,
+      "repo": "pydata",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 28,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pylint-dev__pylint-4661",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 322,
+      "repo": "pylint-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 29,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pytest-dev__pytest-10356",
+      "ipqc_window_id": "S00-W02",
+      "original_manifest_index": 332,
+      "repo": "pytest-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 30,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-10908",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 351,
+      "repo": "scikit-learn",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 31,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-10449",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 383,
+      "repo": "sphinx-doc",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 32,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-12419",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 427,
+      "repo": "sympy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 33,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "astropy__astropy-13398",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 3,
+      "repo": "astropy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 34,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-10914",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 25,
+      "repo": "django",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 35,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-20676",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 256,
+      "repo": "matplotlib",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 36,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "psf__requests-1921",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 293,
+      "repo": "psf",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 37,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pydata__xarray-3305",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 301,
+      "repo": "pydata",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 38,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pylint-dev__pylint-4970",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 323,
+      "repo": "pylint-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 39,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pytest-dev__pytest-5262",
+      "ipqc_window_id": "S00-W03",
+      "original_manifest_index": 333,
+      "repo": "pytest-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 40,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-11310",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 352,
+      "repo": "scikit-learn",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 41,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-10466",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 384,
+      "repo": "sphinx-doc",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 42,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-12481",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 428,
+      "repo": "sympy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 43,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "astropy__astropy-13453",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 4,
+      "repo": "astropy",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 44,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-10973",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 26,
+      "repo": "django",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 45,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-20826",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 257,
+      "repo": "matplotlib",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 46,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "psf__requests-2317",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 294,
+      "repo": "psf",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 47,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pydata__xarray-3677",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 302,
+      "repo": "pydata",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 48,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pylint-dev__pylint-6386",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 324,
+      "repo": "pylint-dev",
+      "shard_id": "S00"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 49,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "pytest-dev__pytest-5631",
+      "ipqc_window_id": "S00-W04",
+      "original_manifest_index": 334,
+      "repo": "pytest-dev",
+      "shard_id": "S00"
+    }
+  ]
+}

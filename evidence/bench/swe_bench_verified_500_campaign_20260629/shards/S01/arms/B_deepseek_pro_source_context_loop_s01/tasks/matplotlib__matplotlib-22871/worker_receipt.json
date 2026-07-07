@@ -1,0 +1,92 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:24953254c7b4b5d06e308615c10cb174d4678f3007c9ed63e0659dfb7a6f7465",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 503,
+  "content_sha256": "sha256:be246eac1b1b8d14b31dc4cad200085f982efaa515aae6241dff0d398293ac84",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:e534266534c6c027c65560dc032df834393436974c79d7ee1a649f59d8a319de",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 8194,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "matplotlib__matplotlib-22871",
+    "receipt_id": "rcpt:070499d0748d7f780bb45b8410396b9f354b666e46c55d82cb7535f06ffc4b5c",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W04-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 147,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 19214,
+      "prompt_tokens": 19214,
+      "provider_usage_raw_sha256": "sha256:30bd60670508830230bb17f32a639089392737fb7b65fc7ce6539535dfa7dcf7",
+      "total_tokens": 19361
+    },
+    "wall_time_ms": 4197,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "4855c6fc-9643-4077-9472-10dad12c73d8",
+      "response_sha256": "sha256:1f9466dc2997f4e3c322caf46aa15abe405303eac1b040f03cf2e02162c44dc9"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "matplotlib__matplotlib-22871",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W04",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch lib/matplotlib/dates.py...\nHunk #1 succeeded at 797 (offset -985 lines).\nApplied patch lib/matplotlib/dates.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:1b6c43d33b6af48112eb8a56827ff5a166cdb4d8cf1131dd2bf9bd13cc5ea05c",
+  "response_sha256": "sha256:1f9466dc2997f4e3c322caf46aa15abe405303eac1b040f03cf2e02162c44dc9",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/matplotlib__matplotlib-22871/worker_capsule.md",
+  "source_context_length_chars": 68392,
+  "source_context_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/matplotlib__matplotlib-22871/source_context.md",
+  "source_context_sha256": "sha256:459b6696a7b88cf645a1f5f46f0f9508d709f32375bd8387fa06e7feb12ec110",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 147,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 19214,
+    "prompt_tokens": 19214,
+    "total_tokens": 19361
+  },
+  "usage_raw_sha256": "sha256:30bd60670508830230bb17f32a639089392737fb7b65fc7ce6539535dfa7dcf7",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/matplotlib__matplotlib-22871/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:3a2e57b6683cc1eb763bb9704a81524542267bfd766999c013bb0403fb754b55",
+  "wall_time_ms": 4197
+}

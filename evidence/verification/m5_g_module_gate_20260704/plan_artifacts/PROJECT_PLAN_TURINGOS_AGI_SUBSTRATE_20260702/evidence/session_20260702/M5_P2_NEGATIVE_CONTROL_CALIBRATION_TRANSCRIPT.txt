@@ -1,0 +1,54 @@
+$ python3 m5_verification/tools/audit_packet_fixture.py m5_verification/corpus/negative_controls/NC-1
+{
+  "details": {
+    "actual": "2a4aecf5d2a2ae4093af98a6629ee7ff10cc477720172510f25d68450a7617c8",
+    "expected": "25e545e155d9895979908db2a5694c4898f55a6f0ac207ac5d549eaf74526d03",
+    "path": "tapes/t0.bundle"
+  },
+  "reason": "manifest_digest_mismatch",
+  "schema": "turingos.m5_p2.fixture_audit.v1",
+  "verdict": "FAIL"
+}
+exit=1
+$ python3 m5_verification/tools/audit_packet_fixture.py m5_verification/corpus/negative_controls/NC-2
+{
+  "details": {
+    "gate_verdict": "PASS",
+    "transcript_exit_code": 1
+  },
+  "reason": "recomputed_verdict_contradiction",
+  "schema": "turingos.m5_p2.fixture_audit.v1",
+  "verdict": "FAIL"
+}
+exit=1
+$ python3 m5_verification/tools/audit_packet_fixture.py m5_verification/corpus/negative_controls/NC-3
+{
+  "details": {
+    "path": "evidence/fixture_label.json"
+  },
+  "reason": "fixture_mislabeled_real",
+  "schema": "turingos.m5_p2.fixture_audit.v1",
+  "verdict": "FAIL"
+}
+exit=1
+$ python3 m5_verification/tools/audit_packet_fixture.py m5_verification/corpus/negative_controls/NC-4
+{
+  "details": {
+    "path": "evidence/receipt_0.json"
+  },
+  "reason": "missing_declared_artifact",
+  "schema": "turingos.m5_p2.fixture_audit.v1",
+  "verdict": "FAIL"
+}
+exit=1
+$ python3 m5_verification/tools/audit_packet_fixture.py m5_verification/corpus/negative_controls/NC-5
+{
+  "details": {
+    "actual": "9eea210772c526ef50fde339518832aa92aa9f87",
+    "expected": "0000000000000000000000000000000000000000"
+  },
+  "reason": "repo_sha_mismatch",
+  "schema": "turingos.m5_p2.fixture_audit.v1",
+  "verdict": "FAIL"
+}
+exit=1

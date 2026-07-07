@@ -1,0 +1,13 @@
+diff --git a/sphinx/domains/std.py b/sphinx/domains/std.py
+index d820cfe..0d13ce6 100644
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -652,7 +652,7 @@ class StandardDomain(Domain):
+ 
+         .. versionadded:: 3.0
+         """
+-        if (objtype, name) in self.objects:
++        if (objtype, name.lower()) in self.objects:
+             docname = self.objects[objtype, name][0]
+             logger.warning(__('duplicate %s description of %s, other instance in %s'),
+                            objtype, name, docname, location=location)

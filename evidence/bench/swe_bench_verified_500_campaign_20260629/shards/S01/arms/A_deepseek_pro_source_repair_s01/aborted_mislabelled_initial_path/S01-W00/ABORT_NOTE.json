@@ -1,0 +1,33 @@
+{
+  "schema_id": "turingos.m3.p5.aborted_worker_pass_note.v1",
+  "status": "ABORTED_EXCLUDED",
+  "recorded_at_utc": "2026-07-03T11:22:00Z",
+  "phase": "M3.P5",
+  "shard_id": "S01",
+  "ipqc_window_id": "S01-W00",
+  "reason": "Initial path-proposal run was stopped after discovering the runner still stamped S01 receipts with M3.P4/S02-pilot metadata.",
+  "corrective_action": "Patched tools/bench/run_deepseek_arm_a_worker.py to accept explicit phase, split, run, agent, and branch labels; added regression test test_worker_result_packet_can_stamp_m3_p5_confirmatory_labels.",
+  "exclusion_rule": "These artifacts are retained as abort evidence only and must not be used for M3.P5 predictions, scoring, source-context materialization, or uplift analysis.",
+  "artifacts": [
+    {
+      "instance_id": "scikit-learn__scikit-learn-11578",
+      "candidate_patch_sha256": "c6bbeddea76f6637edbeb3140ce10bea1f629ed43167792be587ce9035bee45d",
+      "worker_receipt_sha256": "7706e5edd9984a052311262b1610de5cc0fdfe0933fd56acba08584d7713cbfe"
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "candidate_patch_sha256": "e9e3683bb7ed19d457e7022beaa5d0060512509e7fa63d98b924bce06d8b0449",
+      "worker_receipt_sha256": "83e94d2b05c852838b84223c5660338f5e6468187aab0865a808dc1414b5748e"
+    },
+    {
+      "instance_id": "sympy__sympy-12489",
+      "candidate_patch_sha256": "756afe7b5a83832ac72243aeb7880320420fa83d857f8ec08a1348ce568f2044",
+      "worker_receipt_sha256": "6e0d41a382f7658e3ccd440d343a2aaaef570af2f2860c92647142f6ba11b9a7"
+    }
+  ],
+  "non_claims": [
+    "No M3.P5 prediction is frozen by these aborted artifacts.",
+    "No harness scoring is authorized from these aborted artifacts.",
+    "No uplift result, M3.G roll-up, external audit, release, ratification, M2 enablement, OG-10 signature, or constitution-byte change is claimed."
+  ]
+}

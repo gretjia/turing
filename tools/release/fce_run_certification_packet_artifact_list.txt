@@ -1,0 +1,35 @@
+# Artifact list for the FCE.RUN exact-SHA certification packet (r11).
+# Paths are relative to --root, which must point at the r11 FCE evidence
+# root:
+#   PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/fce_run_probe_20260704_r11
+#
+# This is a certification-run SUMMARY packet: it carries the top-level
+# verdict, the run manifest, and all 19 per-scenario verdict files (each of
+# which embeds its own evidence paths + sha256s), not the full raw scenario
+# evidence trees (logs, patches, tapes), which remain in the evidence root
+# and are reachable from each verdict file's evidence_sha256 map.
+#
+# CLAIM_BOUNDARY.json at the root is copied automatically by build_packet.py
+# and does not need to be listed here.
+
+FINAL_CERTIFICATION_VERDICT.json
+FCE_RUN_MANIFEST.json
+FCE-R1/FCE-R1_verdict.json
+FCE-R2/FCE-R2_verdict.json
+FCE-R3/FCE-R3_verdict.json
+FCE-R4/FCE-R4_verdict.json
+FCE-R5/FCE-R5_verdict.json
+FCE-S1/FCE-S1_verdict.json
+FCE-S2/FCE-S2_verdict.json
+FCE-S3/FCE-S3_verdict.json
+FCE-S4/FCE-S4_verdict.json
+FCE-S5/FCE-S5_verdict.json
+FCE-S6/FCE-S6_verdict.json
+FCE-W1/FCE-W1_verdict.json
+FCE-W2/FCE-W2_verdict.json
+FCE-W3/FCE-W3_verdict.json
+FCE-B1/FCE-B1_verdict.json
+FCE-B2/FCE-B2_verdict.json
+FCE-B3/FCE-B3_verdict.json
+FCE-B4/FCE-B4_verdict.json
+FCE-B5/FCE-B5_verdict.json

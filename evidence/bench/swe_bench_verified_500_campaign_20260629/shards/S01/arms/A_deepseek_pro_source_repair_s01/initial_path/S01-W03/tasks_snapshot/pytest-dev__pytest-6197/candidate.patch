@@ -1,0 +1,13 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 9e69a24..f8bc8e0 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -497,7 +497,7 @@ class Session(FSCollector):
+                 for parent in node.iter_parents():
+                     if parent is self:
+                         continue
+-                    if isinstance(parent, Package):
++                    if isinstance(parent, Package) and parent.name != "__init__":
+                         parent_name = parent.name
+                         break
+                 if parent_name is not None:

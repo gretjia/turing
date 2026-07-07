@@ -1,3 +1,4 @@
+use serde_json::to_value;
 use turing_pput::{
     CostEvent, GroundTruthResult, PputProjection, PputRunInput, ProposalRecord, Split,
     WorkerPromptShield,
@@ -21,12 +22,29 @@ fn cost_event_counts_tokens_stdout_and_wall_time() {
     )
     .expect("cost event");
 
-    assert_eq!(cost.schema_id, "cost_event.v1");
+    assert_eq!(cost.schema_id, "turingos.cost_event.v2");
     assert_eq!(cost.total_tokens, 10);
     assert_eq!(cost.tool_stdout_tokens, 1);
     assert_eq!(cost.wall_time_ms, 100);
     assert!(cost.tool_stdout_hash.starts_with("sha256:"));
     assert!(cost.counted_in_total);
+    assert_eq!(cost.cost.cost_source_kind, "fixture");
+    assert_eq!(cost.cost.cost_microusd, 0);
+
+    let serialized = to_value(&cost).expect("serialize cost");
+    assert_eq!(serialized["schema_id"], "turingos.cost_event.v2");
+    assert_eq!(serialized["worker"]["adapter_kind"], "fake");
+    assert_eq!(serialized["usage"]["prompt_tokens"], 3);
+    assert_eq!(serialized["usage"]["completion_tokens"], 4);
+    assert_eq!(
+        serialized["usage"]["provider_usage_raw_sha256"]
+            .as_str()
+            .unwrap()
+            .len(),
+        71
+    );
+    assert_eq!(serialized["cost"]["cost_source_kind"], "fixture");
+    assert!(serialized.get("prompt_tokens").is_none());
 }
 
 #[test]
@@ -81,6 +99,7 @@ fn failed_branches_count_toward_cost_and_progress_requires_golden_path() {
 
     assert_eq!(accounted.schema_id, "pput_accounted.v1");
     assert_eq!(accounted.total_run_token_count, 15);
+    assert_eq!(accounted.total_run_cost_microusd, 0);
     assert_eq!(accounted.golden_path_token_count, 5);
     assert_eq!(accounted.total_wall_time_ms, 200);
     assert_eq!(accounted.failed_branch_count, 1);

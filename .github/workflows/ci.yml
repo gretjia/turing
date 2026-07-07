@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: ["main", "goal/**"]
+    branches: ["main", "goal/**", "hci/**"]
   pull_request:
     branches: ["main"]
 
@@ -34,6 +34,11 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace
 
+      - name: M1a canonical substrate gates
+        run: |
+          bash tools/ci/run_m1a_gates.sh --self-test
+          bash tools/ci/run_m1a_gates.sh
+
       - name: Local gate receipts
         run: python3 tools/headless/run_local_gates.py --out-dir evidence/g12 --skip-slow
 
@@ -57,3 +62,19 @@ jobs:
               raise SystemExit(f"unexpected NOT_RUN blockers: {unexpected}")
           PY
           fi
+
+  hci-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python test tooling
+        run: python3 -m pip install --upgrade pytest
+
+      - name: Install Rust toolchain
+        run: rustup toolchain install 1.96.0 --profile minimal --component rustfmt --component clippy
+
+      - name: Run HCI gates
+        run: bash tools/hci/run_hci_gates.sh --out-dir "$RUNNER_TEMP/hci-gates"

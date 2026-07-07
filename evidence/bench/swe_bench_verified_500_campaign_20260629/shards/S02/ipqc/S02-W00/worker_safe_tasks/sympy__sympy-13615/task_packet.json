@@ -1,0 +1,16 @@
+{
+  "base_commit": "50d8a102f0735da8e165a0369bbb994c7d0592a6",
+  "candidate_source_policy": "worker_derived_patch_only",
+  "difficulty": "15 min - 1 hour",
+  "environment_setup_commit": "ec9e3c0436fbff934fa84e22bf07f1b3ef5bfac3",
+  "forbidden_field_count_removed": 5,
+  "instance_id": "sympy__sympy-13615",
+  "ipqc_window_id": "S02-W00",
+  "problem_statement": "Complement doesn't work when input is a mixture of Symbols and numbers\n```\r\n>>> a=FiniteSet(x,y,2)\r\n>>> b=Interval(-10,10)\r\n>>> Complement(a,b)\r\n{x, y}\r\n```\r\n`{x, y} \\ [-10,10]` is expected as output.\n",
+  "repo": "sympy/sympy",
+  "restricted_source_fields_removed": true,
+  "schema_id": "turingos.swebench_worker_safe_task_packet.v1",
+  "shard_id": "S02",
+  "version": "1.1",
+  "visible_to_worker": true
+}

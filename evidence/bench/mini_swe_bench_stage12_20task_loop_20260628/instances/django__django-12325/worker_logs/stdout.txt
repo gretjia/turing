@@ -1,0 +1,21 @@
+**Patch applied** (only edit: [django/db/models/base.py](/tmp/turingos_substrate_worktrees/0d086da19b961666/django/db/models/base.py)).
+
+```diff
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index 8ea6c05ef9..08c463cad3 100644
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -204,7 +204,9 @@ class ModelBase(type):
+             for field in base._meta.local_fields:
+                 if isinstance(field, OneToOneField):
+                     related = resolve_relation(new_class, field.remote_field.model)
+-                    parent_links[make_model_tuple(related)] = field
++                    key = make_model_tuple(related)
++                    if key not in parent_links or field.remote_field.parent_link:
++                        parent_links[key] = field
+ 
+         # Track fields inherited from base models.
+         inherited_attributes = set()
+```
+
+(The parent_links collector now prefers any explicitly marked `parent_link=True` OneToOneField over other O2O references to the same parent; unmarked cases continue to raise as before. Verified via direct model construction in the worktree; no other files touched.)

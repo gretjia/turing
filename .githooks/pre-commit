@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# HW-SW-003 C3 — pre-commit gate: forbidden-file guard + substrate freeze.
+#
+# Enable with:
+#   git config core.hooksPath .githooks
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+"$REPO_ROOT/scripts/audit-forbidden-files.sh" --staged
+"$REPO_ROOT/scripts/audit-substrate-freeze.sh"
+
+echo "PASS: pre-commit gate (forbidden-files + substrate-freeze)"

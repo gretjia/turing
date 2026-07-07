@@ -1,0 +1,22 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 1e76a56e5..0c8bc0b43 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -17,6 +17,7 @@ import sys
+ from collections.abc import Sequence
+ from pathlib import Path
+ from typing import Pattern
++import re
+ 
+ from pylint.lint.utils import get_fatal_error_message, prepare_crash_report
+ 
+@@ -56,7 +57,8 @@ def _is_in_ignore_list_re(element: str, ignore_list: list[Pattern[str]]) -> bool
+     for exp in ignore_list:
+         if exp.match(element):
+             return True
+-    return False
++    path_element = str(Path(element).as_posix())
++    return any(exp.match(path_element) for exp in ignore_list)
+ 
+ 
+ def expand_modules(

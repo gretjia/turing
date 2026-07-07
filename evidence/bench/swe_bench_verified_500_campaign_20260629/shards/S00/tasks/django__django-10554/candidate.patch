@@ -1,0 +1,13 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 08d7faf194..24a4daa73c 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -324,6 +324,8 @@ class Query(BaseExpression):
+             obj._extra_select_cache = None
+         else:
+             obj._extra_select_cache = self._extra_select_cache.copy()
++        if self.combined_queries:
++            obj.combined_queries = tuple(query.clone() for query in self.combined_queries)
+         if 'subq_aliases' in self.__dict__:
+             obj.subq_aliases = self.subq_aliases.copy()
+         obj.used_aliases = self.used_aliases.copy()

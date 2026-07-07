@@ -1,0 +1,6 @@
+{
+  "schema_id": "m4.recompute_check.v1",
+  "status": "PASS",
+  "checked": ["hvpput_report.v1.json", "inputs/INPUT_DIGESTS.json", "inputs/RECEIPT_BINDING_NOTE.json"],
+  "method": "same-output-path regeneration and cmp byte equality"
+}

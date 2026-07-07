@@ -1,0 +1,88 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:7e412b02d8584d93de98cb44f42cdc7f5081b750acddfe61deaec3e171db484c",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1571,
+  "content_sha256": "sha256:a2c8ded5a15ff767c9630405c4aed45eebc0ee0d6fd5bc8c7566d2cbf9d4e95e",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:208c8c1fdfee96c81912a8f7d51be53a151dc0c122e25155d2255c147822e178",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3753,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pylint-dev__pylint-6528",
+    "receipt_id": "rcpt:d84fe39e467e557b9452663d811325c84541fde3955accd2f57b6696223e23e9",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 386,
+      "prompt_cache_hit_tokens": 4352,
+      "prompt_cache_miss_tokens": 8127,
+      "prompt_tokens": 12479,
+      "provider_usage_raw_sha256": "sha256:dbd2e6c8161f7a98164cf0442f7ee445155135a84a7b351c460fa3ad0792e839",
+      "total_tokens": 12865
+    },
+    "wall_time_ms": 6613,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "c2d1b3cf-6eaa-4135-a55f-98b342a9cba6",
+      "response_sha256": "sha256:b3339e130e49cf6e172947a7b95dba15a19be5e558e795dbb220340b2dd4bb1d"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "pylint-dev__pylint-6528",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 37",
+    "output": "Checking patch pylint/lint/pylinter.py...\nHunk #1 succeeded at 570 (offset -302 lines).\nHunk #2 succeeded at 595 (offset -302 lines).\nApplied patch pylint/lint/pylinter.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:02aefd872cc31ef2ee5270258c8f6417da20bc6203369f267dc230a6b31afc76",
+  "response_sha256": "sha256:b3339e130e49cf6e172947a7b95dba15a19be5e558e795dbb220340b2dd4bb1d",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/pylint-dev__pylint-6528/worker_capsule.md",
+  "source_context_length_chars": 52259,
+  "source_context_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/pylint-dev__pylint-6528/source_context.md",
+  "source_context_sha256": "sha256:8ceda2d56435438311f8f7cd639af05576045039ce7ea062c9470ab8ef7f76aa",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 386,
+    "prompt_cache_hit_tokens": 4352,
+    "prompt_cache_miss_tokens": 8127,
+    "prompt_tokens": 12479,
+    "total_tokens": 12865
+  },
+  "usage_raw_sha256": "sha256:dbd2e6c8161f7a98164cf0442f7ee445155135a84a7b351c460fa3ad0792e839",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/pylint-dev__pylint-6528/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:670f172635048a79234725853b02ab87c05cdd06918dc3de6f55d403e19bda5e",
+  "wall_time_ms": 6613
+}

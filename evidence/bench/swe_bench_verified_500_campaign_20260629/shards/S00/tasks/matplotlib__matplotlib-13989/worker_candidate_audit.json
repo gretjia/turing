@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/matplotlib__matplotlib-13989/candidate.patch",
+  "candidate_patch_sha256": "sha256:3a6e435771e4b4380e7c85e3e8456dceee6940a0158a1e180a491aaee84ddbfb",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "lib/matplotlib/axes/_axes.py"
+  ],
+  "instance_id": "matplotlib__matplotlib-13989",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

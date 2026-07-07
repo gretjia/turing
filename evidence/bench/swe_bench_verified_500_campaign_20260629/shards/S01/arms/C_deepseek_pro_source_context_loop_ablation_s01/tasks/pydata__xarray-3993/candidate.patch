@@ -1,0 +1,33 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index 2fef3ed..f5aea2c 100644
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -3433,8 +3433,8 @@ class DataArray(AbstractArray, DataWithCoords):
+ 
+         Parameters
+         ----------
+-        coord : hashable
+-            The coordinate to be used to compute the gradient.
++        dim : hashable
++            The dimension along which to compute the gradient.
+         edge_order : {1, 2}, default: 1
+             N-th order accurate differences at the boundaries.
+         datetime_unit : {"Y", "M", "W", "D", "h", "m", "s", "ms", \
+@@ -3483,7 +3483,7 @@ class DataArray(AbstractArray, DataWithCoords):
+     def integrate(
+         self, dim: Union[Hashable, Sequence[Hashable]], datetime_unit: str = None
+     ) -> "DataArray":
+-        """ integrate the array with the trapezoidal rule.
++        """Integrate the array with the trapezoidal rule.
+ 
+         .. note::
+             This feature is limited to simple cartesian geometry, i.e. dim
+@@ -3528,7 +3528,7 @@ class DataArray(AbstractArray, DataWithCoords):
+         array([5.4, 6.6, 7.8])
+         Dimensions without coordinates: y
+         """
+-        ds = self._to_temp_dataset().integrate(dim, datetime_unit)
++        ds = self._to_temp_dataset().integrate(coord=dim, datetime_unit=datetime_unit)
+         return self._from_temp_dataset(ds)
+ 
+     def unify_chunks(self) -> "DataArray":

@@ -1,0 +1,176 @@
+{
+  "schema": "turingos.m1_g_artifact_rollup.v1",
+  "date": "2026-07-03",
+  "module": "M1",
+  "gate": "M1.G",
+  "status_ceiling": "ADDRESSED",
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "6a86418ba99389e9ac60d2f04503644db80eda2a",
+    "status": "clean after M1c receipt commit"
+  },
+  "child_phase_statuses": {
+    "M1a": "ADDRESSED",
+    "M1b": "ADDRESSED",
+    "M1c": "ADDRESSED",
+    "M1d": "ADDRESSED",
+    "M1e": "ADDRESSED"
+  },
+  "ship_gate_claim_boundary": {
+    "m1_g2_rollup_allowed": true,
+    "external_verification_claim_allowed": false,
+    "closed_released_ratified_shipped_claim_allowed": false,
+    "m2_enablement_claim_allowed": false,
+    "notes": "M1.G can only be recorded at the implementer ceiling ADDRESSED unless a later M5-class custody-separated certificate is produced and cited."
+  },
+  "required_artifacts": [
+    {
+      "category": "adr",
+      "name": "ADR-M1-001",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-001-single-canonical-jcs-owner.md",
+      "sha256": "774186995ec7ea6663997bead06ba890ba461b9ccd440523f4d99362091db0b5"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M1-002",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-002-python-routing-through-owner.md",
+      "sha256": "b1e345ec9085e969615aa357e31081caa43e2c10e8ac7ff12867f86a68f65bff"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M1-003",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-003-real-run-authorization-keyring.md",
+      "sha256": "42d884f39050d79d20b824449052e87b5752c3f00162187c065880cd6dfa41e5"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M1-004",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-004-costevent-v2-worker-identity.md",
+      "sha256": "f1fe2e369ed1daa7147b1d9a489472608edcd24de0076e024f40c3e2a37a5af7"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M1-005",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-005-runsc-mutation-boundary.md",
+      "sha256": "e76483eb75f3f3e3b597ccdf070877968a41a360f0707ccfc2b1e90135cd6d60"
+    },
+    {
+      "category": "adr",
+      "name": "ADR-M1-006",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-006-canonical-gate-quartet.md",
+      "sha256": "499af55c50def75ed1fcfe1cca03fc379a928b43104def0be8ee83c11147e98d"
+    },
+    {
+      "category": "m1a",
+      "name": "canonical_gate_quartet_commit",
+      "path": "/home/zephryj/turingos_backup/work/turing",
+      "git_commit": "6851226217d2b7dec915e3b9dd2700749a385b5c"
+    },
+    {
+      "category": "m1a",
+      "name": "artifact_manifest",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1A_ARTIFACT_MANIFEST.sha256",
+      "sha256": "53fcbffcab8f45eb7fe4825e74a1bb2e2658b7623f666b2962aac0c24b9c7ecb"
+    },
+    {
+      "category": "m1b",
+      "name": "real_keyring_worker_run_coverage",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/substrate_coverage.json",
+      "sha256": "f93257df21db2e71eb947315be2e4e614804801d4a0d3cd1bddbfa1f814327ef"
+    },
+    {
+      "category": "m1b",
+      "name": "strict_all_flags_recheck",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_RECHECK_M1B_STRICT_AUDIT/micro_tape_decision_dag_audit.json",
+      "sha256": "882bdb449d906f789486837e9bd8b1590cb9eecaaac7b0e98c87a32dfd2f9795",
+      "verdict": "PASS"
+    },
+    {
+      "category": "m1c",
+      "name": "provider_receipt_commit",
+      "path": "/home/zephryj/turingos_backup/work/turing",
+      "git_commit": "6a86418ba99389e9ac60d2f04503644db80eda2a"
+    },
+    {
+      "category": "m1c",
+      "name": "real_provider_receipt",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_REAL_GROK_PROVIDER_RECEIPT/instances/django__django-12039/worker_logs/provider_receipt_sanitized.json",
+      "sha256": "5d28190ed5597a6b64faea17cde9cf8468d099fa7456e7d8c791aeb18c7e4bac"
+    },
+    {
+      "category": "m1c",
+      "name": "real_provider_micro_tape_bundle",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_REAL_GROK_PROVIDER_RECEIPT/instances/django__django-12039/micro_tape.bundle",
+      "sha256": "491ce5d7d61c99ea69ef56720988deac59736a59d800b129845c814bad2735da"
+    },
+    {
+      "category": "m1c",
+      "name": "strict_all_flags_recheck",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1G_RECHECK_M1C_STRICT_AUDIT/micro_tape_decision_dag_audit.json",
+      "sha256": "a5c818d6a83878cee287a67fd98428fba7d6ece06146a44127153cd0485b62f8",
+      "verdict": "PASS"
+    },
+    {
+      "category": "m1c",
+      "name": "fresh_context_verifier_after_receipt",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_FRESH_CONTEXT_VERIFIER_AFTER_RECEIPT.json",
+      "sha256": "50fef83921c700a3bcd46c3a5d548323c419a3765eec5f5f5cf7dc82fbc4d2fb",
+      "verdict": "PASS"
+    },
+    {
+      "category": "m1d",
+      "name": "artifact_manifest",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1D_ARTIFACT_MANIFEST.sha256",
+      "sha256": "f49ee23497c0b33147eaebb0db7d8229005f3d74871091e454df10fc99100e93"
+    },
+    {
+      "category": "m1d",
+      "name": "fresh_context_verifier",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1D_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "3f8d4e9b9e89e00e4e2eef2ac9127caeb640eaf5e12a3382ebdafe33ad45f04c",
+      "verdict": "PASS"
+    },
+    {
+      "category": "m1e",
+      "name": "blocker_fix_manifest",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1E_BLOCKER_FIX_ARTIFACT_MANIFEST.sha256",
+      "sha256": "0a2ed0a0f11f3d8308c255426c5cfbe9d780b2f2f27ad385fc462f1002a1cdb7"
+    },
+    {
+      "category": "m1e",
+      "name": "fresh_context_verifier",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1E_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "beb012225618e609dc9e78527feac5128a19d43c519e80a46ceba31a1936a454",
+      "verdict": "PASS"
+    },
+    {
+      "category": "tracker",
+      "name": "progress_tracker",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "sha256": "f7bbdd2c9196e7362c1e9f9ebdeaff3f69f58100013b2219e03fea3e0ffa3f72"
+    }
+  ],
+  "fresh_recheck_commands": [
+    {
+      "command": "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput --strict-terminal-market --require-authorization-head --require-cost-provenance --require-sandbox-provenance --coverage .../M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/substrate_coverage.json --out-dir .../M1G_RECHECK_M1B_STRICT_AUDIT",
+      "exit_code": 0,
+      "summary": "verdict PASS; all status_summary entries PASS; strict_findings empty"
+    },
+    {
+      "command": "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput --strict-terminal-market --require-authorization-head --require-cost-provenance --require-sandbox-provenance --coverage .../M1C_REAL_GROK_PROVIDER_RECEIPT/substrate_coverage.json --out-dir .../M1G_RECHECK_M1C_STRICT_AUDIT",
+      "exit_code": 0,
+      "summary": "verdict PASS; all status_summary entries PASS; strict_findings empty"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "exit_code": 0,
+      "summary": "XCHECK/M1A gate self-tests PASS; clean M1A gates PASS"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_worker_cost_event.py tests/test_schemas.py::TestCostEventV2 tests/test_micro_tape_decision_dag_audit.py",
+      "exit_code": 0,
+      "summary": "34 passed"
+    }
+  ]
+}

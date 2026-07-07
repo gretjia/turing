@@ -1,0 +1,105 @@
+{
+  "dry_run": false,
+  "max_turns": 50,
+  "model": "grok-build",
+  "runs": [
+    {
+      "elapsed_ms": 200342,
+      "exit_code": 1,
+      "instance_id": "django__django-11790",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:7be44fb1704b5631cb284706f4f914b929646a2be8d2c6d97a1ebe07bada8ab4",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/1db4aab875e88203"
+    },
+    {
+      "elapsed_ms": 108470,
+      "exit_code": 0,
+      "instance_id": "django__django-11815",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:7628c90f088686d80128e16c9d88e760b7ab6dcb2edb0dc0013c55c48f54062e",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/bcfa9709f961955b"
+    },
+    {
+      "elapsed_ms": 174997,
+      "exit_code": 0,
+      "instance_id": "django__django-11848",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:fb5d58ca4ea62dc5ff119af4c47b461f28b6644ab152c0cdac12011efc971f1e",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/3e2a076803f9f814"
+    },
+    {
+      "elapsed_ms": 53003,
+      "exit_code": 0,
+      "instance_id": "django__django-11880",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:019c53ab3ecb78ceeb386f79592d5f19633512e3863b5213566c90baf7e3038d",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/009d13eb4d768964"
+    },
+    {
+      "elapsed_ms": 146398,
+      "exit_code": 1,
+      "instance_id": "django__django-11885",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:446b8d3e6016ec05f6492069b406e361ad188dab129bb9fdf0035c30f03e9c5c",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/381b40e1c12d0bfb"
+    },
+    {
+      "elapsed_ms": 69915,
+      "exit_code": 0,
+      "instance_id": "django__django-11951",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:3cc0b623a4393acf23f2426804f91ba7a471b940d928d93b072d6163d0cffd86",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/7648f2fba0a76f2d"
+    },
+    {
+      "elapsed_ms": 106721,
+      "exit_code": 1,
+      "instance_id": "django__django-11964",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patch_nonempty": false,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/b4e282252ebc2095"
+    },
+    {
+      "elapsed_ms": 195409,
+      "exit_code": 0,
+      "instance_id": "django__django-11999",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:b0ffc6f10a2a3fe12936bcc944d8943c617644e061786ea353397189bf3fcff2",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_stage4_8task/616512f05fea8c7b"
+    }
+  ],
+  "sample_size": 8,
+  "schema_id": "DirectGrokBaselineSmokeSummary.v1"
+}

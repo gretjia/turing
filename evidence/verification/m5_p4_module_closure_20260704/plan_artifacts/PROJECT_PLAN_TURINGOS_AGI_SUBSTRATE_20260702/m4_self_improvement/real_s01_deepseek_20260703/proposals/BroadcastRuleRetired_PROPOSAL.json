@@ -1,0 +1,36 @@
+{
+  "active_set_filter": "exclude any rule_id with a later BroadcastRuleRetired event unless an explicit historical replay asks for all rules",
+  "evidence_refs": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/causal/exploratory/rule_lifecycle_table.json",
+      "sha256": "sha256:88f184f98f56ef3a6d62fe84eb66506b8a44620f980a27abf9a28cd4ddc686a6"
+    }
+  ],
+  "non_claims": [
+    "M4 does not land this event schema.",
+    "Exploratory lifecycle data is pruning evidence only, not causal efficacy evidence."
+  ],
+  "owner": "M1_SCHEMA_OWNER_PROPOSED_ONLY",
+  "pre_registered_capsule_budget": {
+    "max_broadcast_rule_chars_per_capsule": 4000,
+    "max_broadcast_rules_per_capsule": 4
+  },
+  "proposed_event": {
+    "event_type": "BroadcastRuleRetired",
+    "reason_enum": [
+      "superseded_by_rule",
+      "dose_response_null",
+      "scope_expired",
+      "injection_budget_pressure"
+    ],
+    "required_fields": [
+      "rule_id",
+      "reason",
+      "evidence_ref",
+      "retired_at_utc"
+    ],
+    "semantics": "append-only supervisor-side event; read_broadcast_rules filters retired rules from the active set without deleting history"
+  },
+  "schema_id": "m4.broadcast_rule_retired_proposal_packet.v1",
+  "status_ceiling": "ADDRESSED"
+}

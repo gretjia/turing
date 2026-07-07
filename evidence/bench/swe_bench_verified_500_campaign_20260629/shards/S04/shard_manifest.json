@@ -1,0 +1,509 @@
+{
+  "audit_atom": "50_task_sealed_shard",
+  "ipqc_window_size": 10,
+  "schema_id": "turingos.swebench_verified_500_shard_manifest.v1",
+  "shard_id": "S04",
+  "task_count": 50,
+  "tasks": [
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 200,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-25287",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 276,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 201,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-15100",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 372,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 202,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8475",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 404,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 203,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-15345",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 448,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 204,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11333",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 46,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 205,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-25311",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 277,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 206,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-25102",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 373,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 207,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8548",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 405,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 208,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-15349",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 449,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 209,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11400",
+      "ipqc_window_id": "S04-W00",
+      "original_manifest_index": 47,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 210,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-25332",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 278,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 211,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-25232",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 374,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 212,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8551",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 406,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 213,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-15599",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 450,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 214,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11433",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 48,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 215,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-25479",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 279,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 216,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-25747",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 375,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 217,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8593",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 407,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 218,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-15809",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 451,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 219,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11451",
+      "ipqc_window_id": "S04-W01",
+      "original_manifest_index": 49,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 220,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-25775",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 280,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 221,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-25931",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 376,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 222,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8595",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 408,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 223,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-15875",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 452,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 224,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11477",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 50,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 225,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-25960",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 281,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 226,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-25973",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 377,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 227,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8621",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 409,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 228,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-15976",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 453,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 229,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11490",
+      "ipqc_window_id": "S04-W02",
+      "original_manifest_index": 51,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 230,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-26113",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 282,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 231,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-26194",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 378,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 232,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8638",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 410,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 233,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-16450",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 454,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 234,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11532",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 52,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 235,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-26208",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 283,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 236,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-26323",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 379,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 237,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-8721",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 411,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 238,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-16597",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 455,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 239,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11551",
+      "ipqc_window_id": "S04-W03",
+      "original_manifest_index": 53,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 240,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-26291",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 284,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 241,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "scikit-learn__scikit-learn-9288",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 380,
+      "repo": "scikit-learn",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 242,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-9229",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 412,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 243,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-16766",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 456,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 244,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11555",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 54,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 245,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-26342",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 285,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 246,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sphinx-doc__sphinx-9230",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 413,
+      "repo": "sphinx-doc",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 247,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "sympy__sympy-16792",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 457,
+      "repo": "sympy",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 248,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "django__django-11603",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 55,
+      "repo": "django",
+      "shard_id": "S04"
+    },
+    {
+      "candidate_source_policy": "worker_derived_patch_only",
+      "execution_order_index": 249,
+      "gold_patch_shortcut_allowed": false,
+      "instance_id": "matplotlib__matplotlib-26466",
+      "ipqc_window_id": "S04-W04",
+      "original_manifest_index": 286,
+      "repo": "matplotlib",
+      "shard_id": "S04"
+    }
+  ]
+}

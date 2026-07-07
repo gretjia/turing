@@ -1,0 +1,34 @@
+diff --git a/sphinx/transforms/i18n.py b/sphinx/transforms/i18n.py
+index 8ce6011af..7a26b7327 100644
+--- a/sphinx/transforms/i18n.py
++++ b/sphinx/transforms/i18n.py
+@@ -7,7 +7,6 @@
+     please use `docutils.transforms` instead.
+ """
+ 
+-from os import path
+ from typing import TYPE_CHECKING, Any
+ 
+ from docutils import nodes
+@@ -313,6 +312,8 @@ def publish_msgstr(app: Sphinx, source: str, source_path: str, source_line: int,
+         docname=docname,
+         config=app.config,
+     )
++    # emit source-read event after reading the source
++    app.emit('source-read', docname, [source])
+     # set again, because the parsed document has not filename without suffix
+     docutil_parser = Parser()
+     with switch_source_input(docutil_parser, source):
+diff --git a/sphinx/io.py b/sphinx/io.py
+index 27a74c3e4..0294bfdd7 100644
+--- a/sphinx/io.py
++++ b/sphinx/io.py
+@@ -82,6 +82,8 @@ def read_doc(self, app: Sphinx, env: BuildEnvironment, filename: str) -> nodes.d
+             docname=docname,
+             config=app.config,
+         )
++        # emit source-read event after reading the source
++        app.emit('source-read', docname, [source])
+         docutil_parser = Parser()
+         with switch_source_input(docutil_parser, source):
+             document = docutil_parser.parse(

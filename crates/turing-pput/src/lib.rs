@@ -9,6 +9,9 @@ use std::collections::BTreeSet;
 use serde::{Deserialize, Serialize};
 use turing_contracts::jcs;
 
+const M1C_PRICE_TABLE_DIGEST: &str =
+    "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Split {
     Adaptation,
@@ -20,7 +23,9 @@ pub enum Split {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CostEvent {
     pub schema_id: String,
+    #[serde(skip_serializing)]
     pub event_type: String,
+    #[serde(skip_serializing)]
     pub head_effect: String,
     pub run_id: String,
     pub problem_id: String,
@@ -28,14 +33,52 @@ pub struct CostEvent {
     pub agent_id: String,
     pub branch_id: String,
     pub capsule_id: String,
+    pub receipt_id: String,
+    pub worker: CostWorker,
+    pub usage: CostUsage,
+    pub cost: CostAmount,
+    #[serde(skip_serializing)]
+    pub prompt_tokens: u64,
+    #[serde(skip_serializing)]
+    pub completion_tokens: u64,
+    #[serde(skip_serializing)]
+    pub tool_tokens: u64,
+    #[serde(skip_serializing)]
+    pub tool_stdout_tokens: u64,
+    #[serde(skip_serializing)]
+    pub total_tokens: u64,
+    pub wall_time_ms: u64,
+    pub tool_stdout_hash: String,
+    pub counted_in_total: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CostWorker {
+    pub adapter_kind: String,
+    pub provider: String,
+    pub model_id_requested: String,
+    pub model_id_resolved: String,
+    pub endpoint: String,
+    pub request_id: String,
+    pub response_sha256: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CostUsage {
     pub prompt_tokens: u64,
     pub completion_tokens: u64,
     pub tool_tokens: u64,
     pub tool_stdout_tokens: u64,
     pub total_tokens: u64,
-    pub wall_time_ms: u64,
-    pub tool_stdout_hash: String,
-    pub counted_in_total: bool,
+    pub provider_usage_raw_sha256: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CostAmount {
+    pub cost_source_kind: String,
+    pub cost_microusd: u64,
+    pub price_table_digest: String,
+    pub bound_kind: Option<String>,
 }
 
 impl CostEvent {
@@ -59,23 +102,60 @@ impl CostEvent {
             .and_then(|v| v.checked_add(tool_tokens))
             .and_then(|v| v.checked_add(tool_stdout_tokens))
             .ok_or(PputError::TokenOverflow)?;
+        let run_id = run_id.into();
+        let problem_id = problem_id.into();
+        let agent_id = agent_id.into();
+        let branch_id = branch_id.into();
+        let capsule_id = capsule_id.into();
+        let tool_stdout_hash = format!("sha256:{}", jcs::sha256_hex(tool_stdout));
+        let receipt_material = format!("{run_id}:{branch_id}:{tool_stdout_hash}");
+        let receipt_id = format!("rcpt:{}", jcs::sha256_hex(receipt_material.as_bytes()));
+        let usage_material = format!(
+            "{prompt_tokens}:{completion_tokens}:{tool_tokens}:{tool_stdout_tokens}:{total_tokens}"
+        );
+        let provider_usage_raw_sha256 =
+            format!("sha256:{}", jcs::sha256_hex(usage_material.as_bytes()));
         Ok(CostEvent {
-            schema_id: "cost_event.v1".to_string(),
+            schema_id: "turingos.cost_event.v2".to_string(),
             event_type: "CostEvent".to_string(),
             head_effect: "PRESERVE".to_string(),
-            run_id: run_id.into(),
-            problem_id: problem_id.into(),
+            run_id,
+            problem_id,
             split,
-            agent_id: agent_id.into(),
-            branch_id: branch_id.into(),
-            capsule_id: capsule_id.into(),
+            agent_id,
+            branch_id,
+            capsule_id,
+            receipt_id,
+            worker: CostWorker {
+                adapter_kind: "fake".to_string(),
+                provider: "fixture".to_string(),
+                model_id_requested: "fixture-model".to_string(),
+                model_id_resolved: "fixture-model-20260702".to_string(),
+                endpoint: "fixture://pput".to_string(),
+                request_id: "req_fixture_pput".to_string(),
+                response_sha256: tool_stdout_hash.clone(),
+            },
+            usage: CostUsage {
+                prompt_tokens,
+                completion_tokens,
+                tool_tokens,
+                tool_stdout_tokens,
+                total_tokens,
+                provider_usage_raw_sha256,
+            },
+            cost: CostAmount {
+                cost_source_kind: "fixture".to_string(),
+                cost_microusd: 0,
+                price_table_digest: M1C_PRICE_TABLE_DIGEST.to_string(),
+                bound_kind: None,
+            },
             prompt_tokens,
             completion_tokens,
             tool_tokens,
             tool_stdout_tokens,
             total_tokens,
             wall_time_ms,
-            tool_stdout_hash: format!("sha256:{}", jcs::sha256_hex(tool_stdout)),
+            tool_stdout_hash,
             counted_in_total: true,
         })
     }
@@ -134,6 +214,11 @@ impl PputRunInput {
             .iter()
             .try_fold(0_u64, |acc, cost| acc.checked_add(cost.wall_time_ms))
             .ok_or(PputError::WallTimeOverflow)?;
+        let total_run_cost_microusd = self
+            .costs
+            .iter()
+            .try_fold(0_u64, |acc, cost| acc.checked_add(cost.cost.cost_microusd))
+            .ok_or(PputError::TokenOverflow)?;
 
         let golden_branches: BTreeSet<&str> = self
             .proposals
@@ -177,6 +262,7 @@ impl PputRunInput {
             verified: self.verified,
             golden_path_token_count,
             total_run_token_count,
+            total_run_cost_microusd,
             total_wall_time_ms,
             progress,
             vpput_raw,
@@ -198,6 +284,7 @@ pub struct PPUTAccounted {
     pub verified: bool,
     pub golden_path_token_count: u64,
     pub total_run_token_count: u64,
+    pub total_run_cost_microusd: u64,
     pub total_wall_time_ms: u64,
     pub progress: u8,
     pub vpput_raw: String,

@@ -1,0 +1,24 @@
+diff --git a/pylint/checkers/similar.py b/pylint/checkers/similar.py
+index c65b1c893..0c5d50df9 100644
+--- a/pylint/checkers/similar.py
++++ b/pylint/checkers/similar.py
+@@ -394,6 +394,9 @@ class Similar:
+ 
+     def _compute_sims(self) -> List[Tuple[int, Set[LinesChunkLimits_T]]]:
+         """compute similarities in appended files"""
++        if self.min_lines <= 0:
++            return []
++
+         no_duplicates: Dict[int, List[Set[LinesChunkLimits_T]]] = defaultdict(list)
+ 
+         for commonality in self._iter_sims():
+@@ -825,6 +828,9 @@ class SimilarChecker(BaseChecker, Similar, MapReduceMixin):
+ 
+         stream must implement the readlines method
+         """
++        if self.min_lines <= 0:
++            return
++
+         with node.stream() as stream:
+             self.append_stream(self.linter.current_name, stream, node.file_encoding)
+ 

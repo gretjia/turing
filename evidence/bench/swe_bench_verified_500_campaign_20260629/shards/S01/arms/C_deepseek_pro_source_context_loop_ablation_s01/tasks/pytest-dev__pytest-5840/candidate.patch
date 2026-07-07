@@ -1,0 +1,22 @@
+diff --git a/src/_pytest/config/__init__.py b/src/_pytest/config/__init__.py
+index 3a0eca5..1ae89b8 100644
+--- a/src/_pytest/config/__init__.py
++++ b/src/_pytest/config/__init__.py
+@@ -368,7 +368,16 @@ class PytestPluginManager(PluginManager):
+         current = py.path.local()
+         self._confcutdir = (
+             unique_path(current.join(namespace.confcutdir, abs=True))
+-            if namespace.confcutdir
++            if namespace.confcutdir is not None
++            else None
++        )
++        self._noconftest = namespace.noconftest
++        self._using_pyargs = namespace.pyargs
++        testpaths = namespace.file_or_dir
++        foundanchor = False
++        for path in testpaths:
++            path = str(path)
++            # remove node-id syntax
+             else None
+         )
+         self._noconftest = namespace.noconftest

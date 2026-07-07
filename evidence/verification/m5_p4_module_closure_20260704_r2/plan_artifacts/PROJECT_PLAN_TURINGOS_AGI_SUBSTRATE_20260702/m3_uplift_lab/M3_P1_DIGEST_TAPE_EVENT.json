@@ -1,0 +1,38 @@
+{
+  "accepted_head_after": "2564085b8c9daa8b0e2396b606b94af49e51564b5f9dbd40fd06ffd66d091c6d",
+  "bootstrap_accepted_head": "2564085b8c9daa8b0e2396b606b94af49e51564b5f9dbd40fd06ffd66d091c6d",
+  "bootstrap_event_id": "mu:2564085b8c9daa8b0e2396b606b94af49e51564b5f9dbd40fd06ffd66d091c6d",
+  "event_id": "mu:5ebd7aec46f4fdda4f03843be6241010f654bd947f5a3782e1b1e9f8324be448",
+  "event_type": "MacroObservationImported",
+  "non_claims": [
+    "digest event records preregistration only",
+    "no worker call",
+    "no S01/S02 packet materialization",
+    "no M3.G roll-up",
+    "no external audit",
+    "no release or shipped status"
+  ],
+  "object_format": "sha256",
+  "payload": {
+    "ack_agent_id": "019f26c6-201f-7d21-98b9-2b34bd907881",
+    "created_at_utc": "2026-07-03T00:00:00Z",
+    "freeze_record_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P1_FREEZE_RECORD.json",
+    "independent_ack_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P1_INDEPENDENT_ACK.json",
+    "module_atom": "M3.P1",
+    "non_claims": [
+      "not a worker call",
+      "not an M3.G roll-up",
+      "not external audit",
+      "not release or shipped"
+    ],
+    "preregistration_sha256": "692fa796df9a4d605afc416a776b0ca018de2124344fa7990e784e9e4aab82fa",
+    "preregistration_sha256_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/PREREGISTRATION.sha256",
+    "schema_id": "turingos.m3.preregistration_digest_record.v1",
+    "worker_calls_authorized_by_this_event": false
+  },
+  "payload_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/tape/payloads/preregistration_digest.json",
+  "schema_id": "turingos.m3.p1.digest_tape_event.v1",
+  "tape_evidence_class": "REAL_DETERMINISTIC_LOCAL_SHA256_MICRO_TAPE",
+  "tape_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/tape/preregistration_digest_tape",
+  "tape_tip": "5ebd7aec46f4fdda4f03843be6241010f654bd947f5a3782e1b1e9f8324be448"
+}

@@ -1,0 +1,56 @@
+test_append_advance_event_without_predicate_pass_fails_nonzero (tests.test_cli.TestAppend.test_append_advance_event_without_predicate_pass_fails_nonzero) ... error: advance requires predicate PASS; emit a FailureNode for a failed accept
+ok
+test_append_genesis_bootstrap_roundtrips_and_advances_tip (tests.test_cli.TestAppend.test_append_genesis_bootstrap_roundtrips_and_advances_tip) ... ok
+test_append_missing_payload_file_fails_nonzero (tests.test_cli.TestAppend.test_append_missing_payload_file_fails_nonzero) ... error: file not found: /tmp/tos_cli_t/tmplnusr8ft/does_not_exist.json
+ok
+test_append_second_event_advances_tip_again (tests.test_cli.TestAppend.test_append_second_event_advances_tip_again) ... ok
+test_append_unknown_event_type_fails_nonzero (tests.test_cli.TestAppend.test_append_unknown_event_type_fails_nonzero) ... error: unknown event_type 'NotARealEvent' (closed-world)
+ok
+test_no_args_returns_nonzero (tests.test_cli.TestArgparse.test_no_args_returns_nonzero) ... usage: turingos [-h] <command> ...
+ok
+test_unknown_subcommand_returns_nonzero (tests.test_cli.TestArgparse.test_unknown_subcommand_returns_nonzero) ... usage: turingos [-h] <command> ...
+turingos: error: argument <command>: invalid choice: 'frobnicate' (choose from 'tape-init', 'append', 'predicate', 'replay', 'handoff', 'panorama', 'loop')
+ok
+test_handoff_generate_writes_bundle (tests.test_cli.TestHandoff.test_handoff_generate_writes_bundle) ... ok
+test_panorama_prints_qt_and_labels (tests.test_cli.TestPanorama.test_panorama_prints_qt_and_labels) ... ok
+test_predicate_evaluate_runs_and_prints_passed (tests.test_cli.TestPredicateEvaluate.test_predicate_evaluate_runs_and_prints_passed) ... ok
+test_replay_after_accept_reports_accepted_head (tests.test_cli.TestReplay.test_replay_after_accept_reports_accepted_head) ... ok
+test_replay_runs_and_exits_zero (tests.test_cli.TestReplay.test_replay_runs_and_exits_zero) ... ok
+test_tape_init_creates_sha256_repo (tests.test_cli.TestTapeInit.test_tape_init_creates_sha256_repo) ... ok
+test_tape_init_returns_zero (tests.test_cli.TestTapeInit.test_tape_init_returns_zero) ... ok
+test_accepted_label_not_attached_to_authorization (tests.test_panorama.TestAuthorizedVsAccepted.test_accepted_label_not_attached_to_authorization) ... ok
+test_authorized_and_accepted_are_distinct_in_output (tests.test_panorama.TestAuthorizedVsAccepted.test_authorized_and_accepted_are_distinct_in_output) ... ok
+test_dispatch_not_rendered_as_accepted_or_done (tests.test_panorama.TestAuthorizedVsAccepted.test_dispatch_not_rendered_as_accepted_or_done) ... ok
+test_dispatch_shown_under_authorized_style_label (tests.test_panorama.TestAuthorizedVsAccepted.test_dispatch_shown_under_authorized_style_label) ... ok
+test_render_does_not_change_tape_tip (tests.test_panorama.TestNoWriteBack.test_render_does_not_change_tape_tip) ... ok
+test_render_is_deterministic (tests.test_panorama.TestNoWriteBack.test_render_is_deterministic) ... ok
+test_render_includes_accepted_head (tests.test_panorama.TestRenderBasics.test_render_includes_accepted_head) ... ok
+test_render_includes_at_least_one_allowed_label (tests.test_panorama.TestRenderBasics.test_render_includes_at_least_one_allowed_label) ... ok
+test_render_returns_str (tests.test_panorama.TestRenderBasics.test_render_returns_str) ... ok
+test_render_works_on_empty_tape (tests.test_panorama.TestRenderBasics.test_render_works_on_empty_tape) ... ok
+test_has_textual_flag_is_bool (tests.test_panorama.TestTextualOptional.test_has_textual_flag_is_bool) ... ok
+test_import_works_without_textual (tests.test_panorama.TestTextualOptional.test_import_works_without_textual) ... ok
+test_two_runs_produce_same_branch_coverage (tests.test_loop.TestDeterminism.test_two_runs_produce_same_branch_coverage) ... ok
+test_fresh_process_rebuilds_from_tape_only (tests.test_loop.TestFreshProcessRebuild.test_fresh_process_rebuilds_from_tape_only) ... ok
+test_loop_e2e_gate_all_pass (tests.test_loop.TestMilestoneGate.test_loop_e2e_gate_all_pass) ... ok
+test_handoff_bundle_replays_to_same_accepted_head (tests.test_loop.TestReplay.test_handoff_bundle_replays_to_same_accepted_head) ... ok
+test_replay_equal_byte_identical (tests.test_loop.TestReplay.test_replay_equal_byte_identical) ... ok
+test_replay_rebuilds_accepted_head (tests.test_loop.TestReplay.test_replay_rebuilds_accepted_head) ... ok
+test_a_capsule_injected_only_abstract_rules_no_raw_leak (tests.test_loop.TestShield.test_a_capsule_injected_only_abstract_rules_no_raw_leak) ... ok
+test_failure_on_tape (tests.test_loop.TestShield.test_failure_on_tape) ... ok
+test_at_least_one_accept_and_one_failure (tests.test_loop.TestSummaryShape.test_at_least_one_accept_and_one_failure) ... ok
+test_branches_covered_true (tests.test_loop.TestSummaryShape.test_branches_covered_true) ... ok
+test_refs_match_disk (tests.test_loop.TestSummaryShape.test_refs_match_disk) ... ok
+test_summary_has_required_keys (tests.test_loop.TestSummaryShape.test_summary_has_required_keys) ... ok
+test_both_event_types_on_tape (tests.test_loop.TestTapeBranches.test_both_event_types_on_tape) ... ok
+test_candidate_accepted_count_matches_summary (tests.test_loop.TestTapeBranches.test_candidate_accepted_count_matches_summary) ... ok
+test_predicate_evaluated_recorded (tests.test_loop.TestTapeBranches.test_predicate_evaluated_recorded) ... ok
+test_worker_dispatched_is_authorization_not_accept (tests.test_loop.TestTapeBranches.test_worker_dispatched_is_authorization_not_accept) ... ok
+test_failed_run_is_normalized (tests.test_worker_cli.TestCliWorkerAdapter.test_failed_run_is_normalized) ... ok
+test_ok_run_builds_valid_receipt_with_candidate (tests.test_worker_cli.TestCliWorkerAdapter.test_ok_run_builds_valid_receipt_with_candidate) ... ok
+test_prompt_includes_scope_and_tests (tests.test_worker_cli.TestCliWorkerAdapter.test_prompt_includes_scope_and_tests) ... ok
+
+----------------------------------------------------------------------
+Ran 45 tests in 43.670s
+
+OK

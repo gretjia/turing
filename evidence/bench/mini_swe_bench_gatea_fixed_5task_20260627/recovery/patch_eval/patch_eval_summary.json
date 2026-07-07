@@ -1,0 +1,187 @@
+{
+  "broadcast_rules": [],
+  "by_arm": {
+    "direct": {
+      "pass": 1,
+      "total": 2
+    },
+    "turingos": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "results": [
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11790",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:77352e4c9eefa073dff9dc8d738bfa30938534aea6ed03fe4b4e0e5a656f0c4b",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:23135dbeea07c531a17cbbee797e25142f035868281e2f1317e7ab0da1ef9931",
+        "predicate_product": "PASS"
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:4b276f8daf9a32bccd26e1ec2a6c046f6ea88ab38924551cf777ca305ebeb202",
+        "capsule_id": "wc_django__django-11790",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_8cc45a22ead1cfa4",
+        "fail_to_pass_labels": [
+          "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+          "test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:6e0ea9e775ea1d17cbe8040d356664aac9e705bba03e7b368397292bd209e121",
+        "stdout_hash": "sha256:6ba21eaac168de006dd30506ea04b13d568095d44fd0aefb66e7f065980e3bb2",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:b4fdde454b6adea97827dd0a5dcee9e79125173863025c7a8db3ff7ea88a8ec9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_3b50a76e3b9d7c6d38b0e8bc0d233815"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_gatea_fixed_5task_20260627/recovery/patch_eval/turingos/django__django-11790/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_gatea_fixed_5task_20260627/recovery/patch_eval/turingos/django__django-11790/stdout.txt",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ]
+    },
+    {
+      "arm": "direct",
+      "exit_code": 0,
+      "instance_id": "django__django-11790",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:4b276f8daf9a32bccd26e1ec2a6c046f6ea88ab38924551cf777ca305ebeb202",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_e526c0d24d9be167",
+        "fail_to_pass_labels": [
+          "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+          "test_username_field_max_length_matches_user_model (auth_tests.test_forms.AuthenticationFormTest)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11790",
+        "macro_anchor_id": null,
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:6e0ea9e775ea1d17cbe8040d356664aac9e705bba03e7b368397292bd209e121",
+        "stdout_hash": "sha256:4acd60e96afb96e7816fa901beabade48293c2b06d744fe76df1e15150fcd8ec",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:b4fdde454b6adea97827dd0a5dcee9e79125173863025c7a8db3ff7ea88a8ec9",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_gatea_fixed_5task_20260627/recovery/patch_eval/direct/django__django-11790/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_gatea_fixed_5task_20260627/recovery/patch_eval/direct/django__django-11790/stdout.txt",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ]
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11815",
+      "micro_tape_import": {
+        "accepted_head_moved": true,
+        "candidate_event_id": "mu:17795330adc4f8796c38eb6e3fe5d13f777d7ab2b4b58fe63e5aea1278a6834f",
+        "candidate_write_event_type": "CandidateAccepted",
+        "official_evidence_event_id": "mu:3dbda49d04069d54bf27fab7ba03adfc85569848a6e2329ac60edcd6f66b9665",
+        "predicate_product": "PASS"
+      },
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "PASS",
+        "apply_test_patch_result": "PASS",
+        "arm": "turingos",
+        "candidate_patch_hash": "sha256:5231904379efdb833c81a45bc9bc4defceb7eb5ad68c1df8183eae5b8e6aee4e",
+        "capsule_id": "wc_django__django-11815",
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_4cf69684097cc9bc",
+        "fail_to_pass_labels": [
+          "test_serialize_class_based_validators (migrations.test_writer.WriterTests)",
+          "test_serialize_enums (migrations.test_writer.WriterTests)"
+        ],
+        "failure_class": null,
+        "forbidden_test_edit_detected": false,
+        "forbidden_test_edit_paths": [],
+        "instance_id": "django__django-11815",
+        "macro_anchor_id": "macro:diff:django__django-11815",
+        "result": "PASS",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:f5f3b26815d52a2c63cac97aa00c9e3debdecac2574a9bbe1cdcf95bcbd77a0e",
+        "stdout_hash": "sha256:f6f6fb95dbc74257232a5eb9b62b972083fcab1f335b8b70a23e670dd6d06b3c",
+        "target_test_exit_code": 0,
+        "target_test_result": "PASS",
+        "test_patch_hash": "sha256:c9a8c36ea2d687650d9de75b177205a53391276cbf2ee4854eb10551cf38e3d4",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": "rcp_80039a08e017dbca253828055556f74b"
+      },
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_gatea_fixed_5task_20260627/recovery/patch_eval/turingos/django__django-11815/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_gatea_fixed_5task_20260627/recovery/patch_eval/turingos/django__django-11815/stdout.txt",
+      "target_tests": [
+        "migrations.test_writer.WriterTests.test_serialize_class_based_validators",
+        "migrations.test_writer.WriterTests.test_serialize_enums"
+      ]
+    },
+    {
+      "arm": "direct",
+      "forbidden_test_edit_paths": [
+        "tests/migrations/test_writer.py"
+      ],
+      "instance_id": "django__django-11815",
+      "official_evaluator_evidence": {
+        "apply_candidate_result": "NOT_RUN",
+        "apply_test_patch_result": "NOT_RUN",
+        "arm": "direct",
+        "candidate_patch_hash": "sha256:7628c90f088686d80128e16c9d88e760b7ab6dcb2edb0dc0013c55c48f54062e",
+        "capsule_id": null,
+        "event_type": "OfficialEvaluatorEvidenceImported",
+        "evidence_id": "ev_official_7d5c9371863a9c25",
+        "fail_to_pass_labels": [
+          "test_serialize_class_based_validators (migrations.test_writer.WriterTests)",
+          "test_serialize_enums (migrations.test_writer.WriterTests)"
+        ],
+        "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+        "forbidden_test_edit_detected": true,
+        "forbidden_test_edit_paths": [
+          "tests/migrations/test_writer.py"
+        ],
+        "instance_id": "django__django-11815",
+        "macro_anchor_id": null,
+        "result": "FAIL",
+        "schema_id": "official_evaluator_evidence_imported.v1",
+        "stderr_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "target_test_exit_code": null,
+        "target_test_result": "NOT_RUN",
+        "test_patch_hash": "sha256:c9a8c36ea2d687650d9de75b177205a53391276cbf2ee4854eb10551cf38e3d4",
+        "truth_source": "official_evaluator_macro_evidence",
+        "worker_receipt_id": null
+      },
+      "reason": "forbidden_test_file_edit",
+      "result": "FAIL"
+    }
+  ],
+  "sample_size": 2,
+  "schema_id": "DjangoSweBenchPatchEval.v1",
+  "statistical_claim": "none_smoke_only"
+}

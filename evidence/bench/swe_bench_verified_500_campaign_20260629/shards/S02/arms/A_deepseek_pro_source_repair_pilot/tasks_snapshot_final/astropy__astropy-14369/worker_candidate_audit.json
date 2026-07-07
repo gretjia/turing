@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/ipqc/S02-W00/source_snapshots/astropy__astropy-14369",
+    "output": "Checking patch astropy/io/ascii/cds.py...\nHunk #1 succeeded at 130 (offset -47 lines).",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S02/tasks/astropy__astropy-14369/candidate.patch",
+  "candidate_patch_sha256": "sha256:eabc7103e13d8a66a861bdc2da2a7c942291c0c262d966be9ad2928620df4776",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "astropy/io/ascii/cds.py"
+  ],
+  "instance_id": "astropy__astropy-14369",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S02",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

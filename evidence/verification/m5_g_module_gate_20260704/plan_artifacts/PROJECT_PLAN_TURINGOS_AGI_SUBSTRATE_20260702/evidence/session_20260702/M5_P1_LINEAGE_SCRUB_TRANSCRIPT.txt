@@ -1,0 +1,7 @@
+$ bash m5_verification/tests/test_lineage_scrub.sh
+PASS lineage scrub seeded bundle
+$ m5_verification/tools/lineage_scrub.sh m5_verification/corpus/lineage_scrub_seeded_bundle
+LINEAGE_CONTAMINATION:implementer_narrative:m5_verification/corpus/lineage_scrub_seeded_bundle/README.md:5:we ran the implementation and fixed the packet before sending it.
+LINEAGE_CONTAMINATION:session_id:m5_verification/corpus/lineage_scrub_seeded_bundle/README.md:7:session 019f2660-004b-7900-a04d-ae7eecc72a0f carried verifier context.
+LINEAGE_CONTAMINATION:subagent_reference:m5_verification/corpus/lineage_scrub_seeded_bundle/README.md:9:The subagent report should not be supplied to an external verifier.
+lineage_scrub_exit=1

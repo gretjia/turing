@@ -1,0 +1,92 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:44a7f8d348a3c86dcd5444d9aca1ad480507ead39fa41463a9dcab7ace313fcf",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1197,
+  "content_sha256": "sha256:a3b4fb657256ce12c38980d6f77f0e55f8cd57a446826d6371cda06005af84b4",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:544c089c8a6f233232c7a402aa4dd05c1bafc3879999e3e1dd41f9decdffc6c1",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3937,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "astropy__astropy-14096",
+    "receipt_id": "rcpt:32b21fee48c280408e1d5038ac7f0097947ab93459179ad464a8cee46c286f2c",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W02-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 296,
+      "prompt_cache_hit_tokens": 13312,
+      "prompt_cache_miss_tokens": 8670,
+      "prompt_tokens": 21982,
+      "provider_usage_raw_sha256": "sha256:02333ac801a56efcb1d439c9c3db654b38310bfe6c324af679f30cd12ce164ed",
+      "total_tokens": 22278
+    },
+    "wall_time_ms": 6963,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "6f77df71-fd67-47ce-81fb-75d7dc9c8696",
+      "response_sha256": "sha256:b3116d85d99a2bee5ed0b824c1fa2ccaf587dadb9cc3c3285a25299bf4f1d644"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 1010,
+  "extra_context_path": "shards/S01/loop_self_repair_contexts/S01-W02/astropy__astropy-14096/extra_context.md",
+  "extra_context_sha256": "sha256:347333bd8a7534323d807dd72a5ed87392d0033d01e2a348aa1f76acad9b9c68",
+  "instance_id": "astropy__astropy-14096",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded extra context file, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W02",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch astropy/coordinates/sky_coordinate.py...\nHunk #1 succeeded at 894 (offset 300 lines).\nApplied patch astropy/coordinates/sky_coordinate.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:5a432f9b45a306cb3dc407b57fe64b34681c310cbc1d322069834e773d234fbc",
+  "response_sha256": "sha256:b3116d85d99a2bee5ed0b824c1fa2ccaf587dadb9cc3c3285a25299bf4f1d644",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/astropy__astropy-14096/worker_capsule.md",
+  "source_context_length_chars": 91651,
+  "source_context_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/astropy__astropy-14096/source_context.md",
+  "source_context_sha256": "sha256:eda9ccf4960f2012ef37f1b075101b9349d5fd23202f56ab86bd117b6b7c41a2",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 296,
+    "prompt_cache_hit_tokens": 13312,
+    "prompt_cache_miss_tokens": 8670,
+    "prompt_tokens": 21982,
+    "total_tokens": 22278
+  },
+  "usage_raw_sha256": "sha256:02333ac801a56efcb1d439c9c3db654b38310bfe6c324af679f30cd12ce164ed",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/astropy__astropy-14096/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:b57e01bb0f0a0a98d68139485aaedf3806b5f25e8147b4a9656a5c7d1c9fb84b",
+  "wall_time_ms": 6963
+}

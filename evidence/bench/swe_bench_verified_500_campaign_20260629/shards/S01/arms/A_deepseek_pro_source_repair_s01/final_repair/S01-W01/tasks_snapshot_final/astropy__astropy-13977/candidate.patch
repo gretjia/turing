@@ -1,0 +1,26 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index b98abfa..4d2fb32 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -666,7 +666,20 @@ class Quantity(np.ndarray):
+         # Same for inputs, but here also convert if necessary.
+         arrays = []
+         for input_, converter in zip(inputs, converters):
+-            input_ = getattr(input_, "value", input_)
++            # Extract the underlying array-like value, checking for unit
++            # attribute. If the input has a unit, or is a Quantity-like
++            # with a .value, get the raw numpy array value. Otherwise keep
++            # it as is (e.g., plain numbers, or ndarray subclass without units).
++            raw = getattr(input_, "value", input_)
++            # If this is an unrecognized object (not a plain ndarray or
++            # known scalar) and conversion is required, we cannot handle it.
++            # Return NotImplemented so that other objects (duck types) can
++            # have their __array_ufunc__ / reflected operators take over.
++            if converter is not None and not isinstance(raw, (
++                np.ndarray, int, float, complex, np.generic, np.void
++            )):
++                return NotImplemented
++            input_ = raw
+             arrays.append(converter(input_) if converter else input_)
+ 
+         # Call our superclass's __array_ufunc__

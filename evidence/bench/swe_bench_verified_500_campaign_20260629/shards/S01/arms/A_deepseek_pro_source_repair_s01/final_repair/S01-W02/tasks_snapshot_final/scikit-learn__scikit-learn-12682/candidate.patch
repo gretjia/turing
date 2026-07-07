@@ -1,0 +1,113 @@
+diff --git a/sklearn/decomposition/dict_learning.py b/sklearn/decomposition/dict_learning.py
+index a318c95..5fa2ceb 100644
+--- a/sklearn/decomposition/dict_learning.py
++++ b/sklearn/decomposition/dict_learning.py
+@@ -864,7 +864,8 @@ class SparseCodingMixin(TransformerMixin):
+     def _set_sparse_coding_params(self, n_components,
+                                   transform_algorithm='omp',
+                                   transform_n_nonzero_coefs=None,
+-                                  transform_alpha=None, split_sign=False,
++                                  transform_alpha=None,
++                                  transform_max_iter=None, split_sign=False,
+                                   n_jobs=None, positive_code=False):
+         self.n_components = n_components
+         self.transform_algorithm = transform_algorithm
+@@ -892,7 +893,7 @@ class SparseCodingMixin(TransformerMixin):
+             Transformed data
+ 
+         """
+-        check_is_fitted(self, 'components_')
++        check_is_fitted(self)
+ 
+         X = check_array(X)
+ 
+@@ -900,6 +901,7 @@ class SparseCodingMixin(TransformerMixin):
+             X, self.components_, algorithm=self.transform_algorithm,
+             n_nonzero_coefs=self.transform_n_nonzero_coefs,
+             alpha=self.transform_alpha, n_jobs=self.n_jobs,
++            max_iter=self.transform_max_iter,
+             positive=self.positive_code)
+ 
+         if self.split_sign:
+@@ -958,6 +960,10 @@ class SparseCoder(BaseEstimator, SparseCodingMixin):
+         the reconstruction error targeted. In this case, it overrides
+         `n_nonzero_coefs`.
+ 
++    transform_max_iter : int, default=1000
++        Maximum number of iterations to perform if `algorithm='lasso_cd'`.
++        .. versionadded:: 0.22
++
+     split_sign : bool, False by default
+         Whether to split the sparse feature vector into the concatenation of
+         its negative part and its positive part. This can improve the
+@@ -991,11 +997,13 @@ class SparseCoder(BaseEstimator, SparseCodingMixin):
+ 
+     def __init__(self, dictionary, transform_algorithm='omp',
+                  transform_n_nonzero_coefs=None, transform_alpha=None,
+-                 split_sign=False, n_jobs=None, positive_code=False):
++                 transform_max_iter=1000, split_sign=False,
++                 n_jobs=None, positive_code=False):
+         self._set_sparse_coding_params(dictionary.shape[0],
+                                        transform_algorithm,
+                                        transform_n_nonzero_coefs,
+-                                       transform_alpha, split_sign, n_jobs,
++                                       transform_alpha, transform_max_iter,
++                                       split_sign, n_jobs,
+                                        positive_code)
+         self.components_ = dictionary
+ 
+@@ -1086,6 +1094,10 @@ class DictionaryLearning(BaseEstimator, SparseCodingMixin):
+         the reconstruction error targeted. In this case, it overrides
+         `n_nonzero_coefs`.
+ 
++    transform_max_iter : int, default=1000
++        Maximum number of iterations to perform if `algorithm='lasso_cd'`.
++        .. versionadded:: 0.22
++
+     n_jobs : int or None, optional (default=None)
+         Number of parallel jobs to run.
+         ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+@@ -1150,6 +1162,7 @@ class DictionaryLearning(BaseEstimator, SparseCodingMixin):
+     def __init__(self, n_components=None, alpha=1, max_iter=1000, tol=1e-8,
+                  fit_algorithm='lars', transform_algorithm='omp',
+                  transform_n_nonzero_coefs=None, transform_alpha=None,
++                 transform_max_iter=1000,
+                  n_jobs=None, code_init=None, dict_init=None, verbose=False,
+                  split_sign=False, random_state=None,
+                  positive_code=False, positive_dict=False):
+@@ -1158,7 +1171,7 @@ class DictionaryLearning(BaseEstimator, SparseCodingMixin):
+                                        transform_n_nonzero_coefs,
+                                        transform_alpha, split_sign, n_jobs,
+                                        positive_code)
+-        self.alpha = alpha
++        self.transform_max_iter = transform_max_iter
+         self.max_iter = max_iter
+         self.tol = tol
+         self.fit_algorithm = fit_algorithm
+@@ -1281,6 +1294,10 @@ class MiniBatchDictionaryLearning(BaseEstimator, SparseCodingMixin):
+         the reconstruction error targeted. In this case, it overrides
+         `n_nonzero_coefs`.
+ 
++    transform_max_iter : int, default=1000
++        Maximum number of iterations to perform if `algorithm='lasso_cd'`.
++        .. versionadded:: 0.22
++
+     verbose : bool, optional (default: False)
+         To control the verbosity of the procedure.
+ 
+@@ -1339,6 +1356,7 @@ class MiniBatchDictionaryLearning(BaseEstimator, SparseCodingMixin):
+     def __init__(self, n_components=None, alpha=1, n_iter=1000,
+                  fit_algorithm='lars', n_jobs=None, batch_size=3,
+                  shuffle=True, dict_init=None, transform_algorithm='omp',
++                 transform_max_iter=1000,
+                  transform_n_nonzero_coefs=None, transform_alpha=None,
+                  verbose=False, split_sign=False, random_state=None,
+                  positive_code=False, positive_dict=False):
+@@ -1347,6 +1365,7 @@ class MiniBatchDictionaryLearning(BaseEstimator, SparseCodingMixin):
+                                        transform_n_nonzero_coefs,
+                                        transform_alpha, split_sign, n_jobs,
+                                        positive_code)
++        self.transform_max_iter = transform_max_iter
+         self.alpha = alpha
+         self.n_iter = n_iter
+         self.fit_algorithm = fit_algorithm

@@ -1,0 +1,77 @@
+{
+  "candidate_patch_sha256": "sha256:e9425f1211a892bcded0feea4db670338a958f4fa30673fd3bbc724a0c7ee9b5",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1072,
+  "content_sha256": "sha256:312d398d6d7f1e478dc188cf6815c2957c3ad7ec34a2820f99d511fdc8e6cee5",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:9faa6dd355da2087f636036822f3dec7e01d05b65301c029fba6b98ed0460306",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 416,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "astropy__astropy-13579",
+    "receipt_id": "rcpt:a24414ab10f0bbaab7166ec65919668c794b066d3c462ba6481f860a3bdeb99f",
+    "run_id": "m3-p5-arm-a-initial-path-retry3-S01-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-path-proposal-retry",
+    "usage": {
+      "completion_tokens": 335,
+      "prompt_cache_hit_tokens": 1664,
+      "prompt_cache_miss_tokens": 306,
+      "prompt_tokens": 1970,
+      "provider_usage_raw_sha256": "sha256:1decf83f1740673bf1a78095e9cd7092462264899730e93eeabfce94cbcbf3ad",
+      "total_tokens": 2305
+    },
+    "wall_time_ms": 5676,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "0143748a-d032-404b-afab-692dd49eac3d",
+      "response_sha256": "sha256:3522aa38bf61f19a922b86968ef5f5886c127b555b87d010eb250de836dc1cec"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 894,
+  "extra_context_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/astropy__astropy-13579/path_disambiguation_context.md",
+  "extra_context_sha256": "sha256:aea24bfec221744846bb717524125c80916c7a814ad3b3df662add16a35012e1",
+  "instance_id": "astropy__astropy-13579",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, recorded extra context file. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "status": "NOT_REQUESTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:c42dc45d5b07f5405ff1abb8887f27552654f9a48343ee226a63b8b3e24918d4",
+  "response_sha256": "sha256:3522aa38bf61f19a922b86968ef5f5886c127b555b87d010eb250de836dc1cec",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/astropy__astropy-13579/worker_capsule.md",
+  "source_context_length_chars": 0,
+  "source_context_path": null,
+  "source_context_sha256": null,
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 335,
+    "prompt_cache_hit_tokens": 1664,
+    "prompt_cache_miss_tokens": 306,
+    "prompt_tokens": 1970,
+    "total_tokens": 2305
+  },
+  "usage_raw_sha256": "sha256:1decf83f1740673bf1a78095e9cd7092462264899730e93eeabfce94cbcbf3ad",
+  "wall_time_ms": 5676
+}

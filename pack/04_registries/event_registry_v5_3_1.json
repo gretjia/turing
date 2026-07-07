@@ -4,18 +4,19 @@
   "status": "FROZEN_V5_3_1",
   "as_of": "2026-06-21",
   "lineage": "Human-ratified Phase-0 exact 20 ADVANCE set plus a v5.3.1 closed reconstruction of the 26 PRESERVE names; this file is the v5.3.1 authoritative registry. The missing original registry artifact is not silently impersonated.",
-  "registry_name_set_sha256": "3a7dd31316a15be381c69591821564fd6ef51faf24be4c474fe9712dc0671183",
+  "registry_name_set_sha256": "2d2994e3e64de7bac50275e2e535e42f5c3aeed1e06aa437b57689648e446389",
+  "registry_name_set_sha256_profile": "sorted_canonical_names_lf_trailing_lf",
   "counts": {
-    "total": 61,
-    "advance": 20,
-    "preserve": 41,
+    "total": 70,
+    "advance": 21,
+    "preserve": 49,
     "sovereign_accept": 12,
-    "authorization": 8,
+    "authorization": 9,
     "proposal": 6,
-    "observation": 9,
+    "observation": 15,
     "receipt": 6,
     "failure": 5,
-    "economy": 15
+    "economy": 17
   },
   "unknown_event_policy": "REJECT",
   "append_only_by_name": true,
@@ -407,6 +408,28 @@
       "status": "FROZEN_V5_3_1"
     },
     {
+      "canonical_name": "OfficialEvaluatorEvidenceImported",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "official_evaluator_evidence_imported.v1",
+      "ordinal": 10,
+      "status": "ADDITIVE_BENCHMARK_V1"
+    },
+    {
+      "canonical_name": "SandboxBoundaryAssumed",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "sandbox_boundary_assumed.v1",
+      "ordinal": 11,
+      "status": "ADDITIVE_SANDBOX_PROVENANCE_V1_0"
+    },
+    {
       "canonical_name": "WorkerDispatched",
       "event_class": "RECEIPT",
       "head_effect": "PRESERVE",
@@ -633,9 +656,9 @@
       "target_ref": "tape_tip",
       "predicate_required": true,
       "human_required": false,
-      "payload_schema_id": "cost_event.v1",
+      "payload_schema_id": "turingos.cost_event.v2",
       "ordinal": 10,
-      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+      "status": "ADDITIVE_AGENT_ECONOMY_V2_0"
     },
     {
       "canonical_name": "BranchCostEvent",
@@ -691,6 +714,83 @@
       "payload_schema_id": "heldout_guard_violation.v1",
       "ordinal": 15,
       "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "FailureNodeCapsuleBound",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "failure_node_capsule_bound.v1",
+      "ordinal": 16,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "PrincipalDeclared",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "principal_declared.v1",
+      "ordinal": 17,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "ComputationStarted",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "computation_started.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1",
+      "ordinal": 1
+    },
+    {
+      "canonical_name": "InstructionAuthorized",
+      "event_class": "AUTHORIZATION",
+      "head_effect": "ADVANCE",
+      "target_ref": "authorization_head",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "instruction_authorized.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1",
+      "ordinal": 2
+    },
+    {
+      "canonical_name": "InstructionApplied",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "instruction_applied.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1",
+      "ordinal": 3
+    },
+    {
+      "canonical_name": "MachineStateObserved",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "machine_state_observed.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1",
+      "ordinal": 4
+    },
+    {
+      "canonical_name": "ComputationHalted",
+      "event_class": "OBSERVATION",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "computation_halted.v1",
+      "status": "ADDITIVE_TC_WITNESS_V1",
+      "ordinal": 5
     }
   ]
 }

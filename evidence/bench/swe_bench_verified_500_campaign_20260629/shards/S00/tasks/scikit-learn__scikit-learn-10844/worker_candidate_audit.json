@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/scikit-learn__scikit-learn-10844/candidate.patch",
+  "candidate_patch_sha256": "sha256:dd83c160473a26629d432af14afc2b4a40f93535edb368ce73069adf2f314bd0",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sklearn/metrics/cluster/supervised.py"
+  ],
+  "instance_id": "scikit-learn__scikit-learn-10844",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

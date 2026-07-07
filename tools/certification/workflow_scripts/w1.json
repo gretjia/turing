@@ -1,0 +1,23 @@
+{
+  "schema_id": "turingos.fce_workflow_script.v1",
+  "workflow_id": "FCE-W1",
+  "title": "A certification day in the life",
+  "fixture_or_real": "TEMPLATE",
+  "steps": [
+    {
+      "actor": "operator",
+      "input": "Ask console for current heads and open lanes.",
+      "expected_observable": "console_status_has_tape_heads"
+    },
+    {
+      "actor": "orchestrator",
+      "input": "Dispatch five certification-slice tasks to the worker fleet.",
+      "expected_observable": "five_task_dispatch_events"
+    },
+    {
+      "actor": "worker",
+      "input": "Record one preserved failed attempt and later rule consumption.",
+      "expected_observable": "failure_preserved_and_consumed_rule_ids_nonempty"
+    }
+  ]
+}

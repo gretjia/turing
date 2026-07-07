@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:f5bff03d44cd127e74d367f01becf70c1e7673bb1c597740cb74170864fdd668",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 495,
+  "content_sha256": "sha256:17bbf431a840f8f38f22c1e431031d6c2158801f7ac2c70a003e97158dad2219",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:cd819ae168c1d917f401ceb43677d6d61248bde6016c6a16c97fe5934d3e0cbe",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3563,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "sympy__sympy-13372",
+    "receipt_id": "rcpt:93441892c15d190ec9052e525ac3d4a9fba27a68e36e225fa6aed105845acfd4",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 154,
+      "prompt_cache_hit_tokens": 6400,
+      "prompt_cache_miss_tokens": 8120,
+      "prompt_tokens": 14520,
+      "provider_usage_raw_sha256": "sha256:51ca4f0b9c6696d60d3b4ce081c8d9887d4ce93f598602eccb2297f10ac2fd75",
+      "total_tokens": 14674
+    },
+    "wall_time_ms": 4237,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "8e2db72a-0da0-437c-acf6-fa7588cf77b9",
+      "response_sha256": "sha256:7c75462ebcfc7bc638717086424a3ac0bdd04a4c6785df034a706836a5048790"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "sympy__sympy-13372",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch sympy/core/evalf.py...\nHunk #1 succeeded at 1307 (offset 4 lines).\nApplied patch sympy/core/evalf.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:197eb4770d2e9bad7995c5e11d36c527d806c29ba13248c3b0cd9400c404ec3f",
+  "response_sha256": "sha256:7c75462ebcfc7bc638717086424a3ac0bdd04a4c6785df034a706836a5048790",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/sympy__sympy-13372/worker_capsule.md",
+  "source_context_length_chars": 50720,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/sympy__sympy-13372/source_context.md",
+  "source_context_sha256": "sha256:c0fd90d069ce98a137a3f4bbd018a19fd4f3a872f22cc6a666e5edbd5613b1ce",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 154,
+    "prompt_cache_hit_tokens": 6400,
+    "prompt_cache_miss_tokens": 8120,
+    "prompt_tokens": 14520,
+    "total_tokens": 14674
+  },
+  "usage_raw_sha256": "sha256:51ca4f0b9c6696d60d3b4ce081c8d9887d4ce93f598602eccb2297f10ac2fd75",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/sympy__sympy-13372/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:685a2fb91f8cf0b9f8e243e7b94f9a65b2ed6f7fb7e0143831658c4db13bcdac",
+  "wall_time_ms": 4237
+}

@@ -1,0 +1,233 @@
+{
+  "gate": "M1b real-run authorization",
+  "verifier_agent_id": "codex-gpt-5",
+  "inputs_checked": [
+    "/home/zephryj/turingos_backup/work/turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/01_PROJECT_INTENT.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M1_canonical_substrate.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-003-real-run-authorization-keyring.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_ARTIFACT_MANIFEST.sha256",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_SCOPE_AUDIT_CHECKLIST.md",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_XDG_KEYRING_PROBE_TRANSCRIPT.txt",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_SMOKE_V2_TRANSCRIPT.txt",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/substrate_coverage.json",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_PATCH_EVAL_V2_TRANSCRIPT.txt",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_PATCH_EVAL_V2/patch_eval_summary.json",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_STRICT_AUDIT_V2_TRANSCRIPT.txt",
+    "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_STRICT_AUDIT_V2/micro_tape_decision_dag_audit.json",
+    "/tmp/m1b_fresh_verify_audit/micro_tape_decision_dag_audit.json",
+    "/home/zephryj/turingos_backup/work/turing"
+  ],
+  "commands_run": [
+    {
+      "cmd": "sha256sum /home/zephryj/turingos_backup/work/turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "git -C /home/zephryj/turingos_backup/work/turing rev-parse HEAD",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "sha256sum -c M1B_ARTIFACT_MANIFEST.sha256",
+      "cwd": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702",
+      "exit_code": 0
+    },
+    {
+      "cmd": "sed -n '1,80p' /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/adr/ADR-M1-003-real-run-authorization-keyring.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "jq '.' /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/substrate_coverage.json",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "jq '.' /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_PATCH_EVAL_V2/patch_eval_summary.json",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "jq '.' /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_STRICT_AUDIT_V2/micro_tape_decision_dag_audit.json",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "rg --files /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702 /home/zephryj/turingos_backup/work/turing | rg -i 'status.*claim|claim.*lint|lint.*claim|claims.*lint|status.*lint'",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "python3 tools/bench/audit_micro_tape_decision_dag.py --strict-vpput --strict-terminal-market --require-authorization-head --require-cost-provenance --require-sandbox-provenance --coverage /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/substrate_coverage.json --out-dir /tmp/m1b_fresh_verify_audit",
+      "cwd": "/home/zephryj/turingos_backup/work/turing",
+      "exit_code": 0
+    },
+    {
+      "cmd": "jq '{verdict, status_summary: .status_summary, strict_findings, sandbox_host_assumed_count: .aggregate.sandbox_host_assumed_count, bundle_count: .aggregate.bundle_count, event_count: .aggregate.event_count}' /tmp/m1b_fresh_verify_audit/micro_tape_decision_dag_audit.json",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/lint_status_claims.sh",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/lint_claim_boundaries.sh",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "sed -n '58,74p' /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "rg -n \"ADDRESSED|EXTERNALLY_VERIFIED|PLANNED|BLOCKED|status vocabulary|status_ceiling|implementer|ceiling|M1b|authorization|keyring|strict\" /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/02_EXECUTION_PLAYBOOK.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "rg -n \"M1b|authorization|keyring|strict|Grok|M1\\.G|M1c|CostEvent|ADDRESSED|EXTERNALLY_VERIFIED|PLANNED|BLOCKED\" /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/modules/MODULE_M1_canonical_substrate.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "rg -n \"M1|canonical substrate|ADDRESSED|EXTERNALLY_VERIFIED|PLANNED|BLOCKED|status\" /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/01_PROJECT_INTENT.md",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash -lc '! rg -q \"LEGACY_MISSING|HOST_ASSUMED\" /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/substrate_coverage.json /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_STRICT_AUDIT_V2/micro_tape_decision_dag_audit.json /tmp/m1b_fresh_verify_audit/micro_tape_decision_dag_audit.json'",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "cmd": "bash -lc 'tmp=$(mktemp -d); git clone --mirror -q /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1B_REAL_GROK_OS_KEYRING_SMOKE_V2/instances/django__django-12039/micro_tape.bundle \"$tmp/repo.git\"; count=$(git --git-dir=\"$tmp/repo.git\" rev-list --all --count); if [ \"$count\" -eq 0 ]; then echo \"no refs traversed\"; exit 2; fi; if git --git-dir=\"$tmp/repo.git\" grep -I -n -E \"passphrase\" $(git --git-dir=\"$tmp/repo.git\" rev-list --all) -- .; then exit 1; else echo \"refs_traversed=$count\"; exit 0; fi'",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    }
+  ],
+  "observations": {
+    "constitution": {
+      "expected_sha256": "a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0",
+      "actual_sha256": "a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0",
+      "matches": true
+    },
+    "governance_alignment": {
+      "verify_alignment_exit_code": 0,
+      "result": "GREEN"
+    },
+    "active_repo": {
+      "path": "/home/zephryj/turingos_backup/work/turing",
+      "expected_commit": "bd86ce8ee41ca298dd49634902a32d16d2a6075d",
+      "actual_commit": "bd86ce8ee41ca298dd49634902a32d16d2a6075d",
+      "matches": true
+    },
+    "artifact_manifest": {
+      "sha256sum_check_exit_code": 0,
+      "all_entries_ok": true,
+      "entries_checked": 12
+    },
+    "adr_front_matter": {
+      "status": "accepted-addressed",
+      "decision_makers_includes_codex_orchestrator": true,
+      "status_ceiling": "ADDRESSED"
+    },
+    "status_boundaries": {
+      "playbook_same_program_fresh_context_ceiling": "ADDRESSED",
+      "tracker_m1b_status": "ADDRESSED",
+      "tracker_m1c_status": "BLOCKED",
+      "tracker_m1g_status": "PLANNED",
+      "status_claims_lint": "PASS",
+      "claim_boundaries_lint": "PASS"
+    },
+    "keyring_session": {
+      "headless_dbus_run_session": true,
+      "gnome_keyring_daemon_unlock": true,
+      "secret_tool_probe_recorded": true,
+      "normal_home_with_fresh_xdg_data_home_recorded": true
+    },
+    "coverage": {
+      "sample_size": 1,
+      "instance_id": "django__django-12039",
+      "worker_mode": "grok",
+      "authorization_mode": "required",
+      "authority_provider": "os-keyring",
+      "authorization_head_expected": true,
+      "authorization_head_present": true,
+      "authorization_head": "mu:c0263e409344b0fc7478c3f6978f2a05302561f6ecdb9f466f1db55b595d6da7",
+      "authorization_head_is_legacy_missing": false,
+      "fallback_to_auto_authorization": false,
+      "worker_exit_code": 0,
+      "sandbox_kind": "runsc_rootless_do",
+      "micro_tape_bundle_refreshed_after_eval": true,
+      "micro_tape_bundle_sha256": "sha256:7d47f832acdf07608c6907e93f7ac5860b9abb3cfb1ca983cf971898fa390588"
+    },
+    "patch_eval": {
+      "sample_size": 1,
+      "turingos_arm_result": "PASS",
+      "turingos_arm_exit_code": 0,
+      "candidate_write_event_type": "CandidateAccepted",
+      "terminal_event_types": [
+        "MarketSettled",
+        "RewardDistributed",
+        "PPUTAccounted"
+      ],
+      "final_terminal_event_type": "PPUTAccounted",
+      "micro_tape_bundle_refreshed_after_eval": true,
+      "micro_tape_bundle_sha256": "sha256:7d47f832acdf07608c6907e93f7ac5860b9abb3cfb1ca983cf971898fa390588"
+    },
+    "strict_audit": {
+      "stored_report_verdict": "PASS",
+      "direct_rerun_exit_code": 0,
+      "direct_report_path": "/tmp/m1b_fresh_verify_audit/micro_tape_decision_dag_audit.json",
+      "direct_report_verdict": "PASS",
+      "overall": "PASS",
+      "authorization_head": "PASS",
+      "cost_provenance": "PASS",
+      "sandbox_provenance": "PASS",
+      "vpput_accounting": "PASS",
+      "market_accounting_correctness": "PASS",
+      "strict_findings": [],
+      "sandbox_host_assumed_count": 0,
+      "bundle_count": 1,
+      "event_count": 21
+    },
+    "negative_checks": {
+      "legacy_missing_or_host_assumed_in_green_artifacts": false,
+      "passphrase_string_found_on_micro_tape": false,
+      "micro_tape_refs_traversed_for_passphrase_scan": 21,
+      "micro_tape_refs": [
+        "refs/turingos/accepted_head",
+        "refs/turingos/authorization_head",
+        "refs/turingos/tape_tip"
+      ]
+    },
+    "evidence_class": {
+      "non_fixture_real_worker_run": true,
+      "scope_checklist_drift_check_answered": "7/7"
+    }
+  },
+  "verdict": "PASS",
+  "status_ceiling": "ADDRESSED",
+  "claims_denied": [
+    "M1.G",
+    "M1c closure",
+    "EXTERNALLY_VERIFIED",
+    "CLOSED",
+    "RELEASED",
+    "RATIFIED",
+    "SHIPPED",
+    "M2 enablement"
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "schema": "turingos.m2_tc2_verdict.v1",
+  "module": "M2",
+  "phase": "M2.TC2",
+  "timestamp_utc": "2026-07-03T03:37:57Z",
+  "verdict": "PASS",
+  "phase_status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "not_run_is_fail": true,
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "f39812cad01b0bc50172765e95053e8fe342c843",
+    "commit_message": "m2: add tc2 witness crate",
+    "status_after_commit": "clean"
+  },
+  "requirements": [
+    {
+      "id": "ATOM-TC2-1-registry",
+      "requirement": "Accept the five TC witness rows in the shared closed registry so default append/replay paths resolve the event names.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+      "sha256": "20b4ae16b7d601e3af0256c54934f7c979a320f94cb81fc215b11d9e951e7b1a",
+      "observed": {
+        "event_count": 68,
+        "registry_name_set_sha256": "ce17ed01d4c4ab813518f6ac9565e19ef2de99ed03f80bc1ac8be10cf9564118",
+        "tc_witness_rows": 5,
+        "instruction_authorized_class": "AUTHORIZATION",
+        "instruction_authorized_target_ref": "authorization_head"
+      }
+    },
+    {
+      "id": "ATOM-TC2-1-core-emitter",
+      "requirement": "Rust witness crate implements a pure generic counter-machine core and emits via the existing Rust three-ref append path.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/crates/turing-witness/src/lib.rs",
+      "sha256": "bb3450d64eb23bca77648f81285eb80fb1fbe99a8d1b46e3e03e68ad1627794d",
+      "tests": "/home/zephryj/turingos_backup/work/turing/crates/turing-witness/tests/witness.rs",
+      "tests_sha256": "397e4aad8de9eb10afdf973793fa12d2f6a04720de1a931735e640da889a188c"
+    },
+    {
+      "id": "ATOM-TC2-2-reducer-conservation",
+      "requirement": "Reducer reconstructs witness state from committed tape events and checks the state-hash chain.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/crates/turing-witness/tests/witness.rs",
+      "sha256": "397e4aad8de9eb10afdf973793fa12d2f6a04720de1a931735e640da889a188c",
+      "conservation_test": "emitter_uses_three_ref_append_path_and_reducer_conserves_state"
+    },
+    {
+      "id": "fresh-context-verifier",
+      "requirement": "Fresh-context verifier confirms TC2 may be marked ADDRESSED.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC2_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "d1e3e12484392acefa8be6ebfe1d219cc0c43ad01b936566b76cbc1b088f6118",
+      "may_mark_m2_tc2_addressed": true
+    }
+  ],
+  "commands": [
+    {
+      "command": "cargo fmt --check",
+      "exit_code": 0,
+      "summary": "workspace formatting check exited 0"
+    },
+    {
+      "command": "python3 tools/theory/lint_event_registry_consistency.py --registry pack/04_registries/event_registry_v5_3_1.json",
+      "exit_code": 0,
+      "summary": "registry self-consistency PASS at 68 rows; name-set digest ce17ed01d4c4ab813518f6ac9565e19ef2de99ed03f80bc1ac8be10cf9564118"
+    },
+    {
+      "command": "cargo test --workspace",
+      "exit_code": 0,
+      "summary": "full Rust workspace test suite exited 0, including turing-witness and tc_witness_append tests"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "exit_code": 0,
+      "summary": "full Python suite reached 100% and exited 0"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "exit_code": 0,
+      "summary": "M1A self-tests and clean gates PASS"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "summary": "no whitespace errors before commit"
+    },
+    {
+      "command": "post-commit: cargo test -p turing-witness --test witness",
+      "exit_code": 0,
+      "summary": "3 passed after commit f39812cad01b0bc50172765e95053e8fe342c843"
+    }
+  ],
+  "tdd_evidence": {
+    "red": [
+      "registry::tests::tc_witness_rows_are_in_the_closed_registry failed before shared registry acceptance: ComputationStarted must resolve",
+      "tc_witness_events_append_through_three_ref_writer failed before shared registry acceptance: UnknownEventType(\"ComputationStarted\")",
+      "cargo test -p turing-witness --test witness failed before implementation: unresolved turing_witness API imports"
+    ],
+    "green": [
+      "registry and append RED tests passed after additive rows landed",
+      "turing-witness focused tests passed after core/emitter/reducer implementation",
+      "full Rust and Python suites plus M1A gates exited 0"
+    ]
+  },
+  "explicit_non_claims": {
+    "tc10_external_artifact_exists": false,
+    "turing_completeness_claim_allowed": false,
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "m2_enabled": false,
+    "constitution_bytes_changed": false,
+    "og10_or_genesis_signature": false
+  },
+  "notes": "M2.TC2 supplies the production witness core/emitter/reducer and accepts the additive TC witness rows in the shared working registry. It does not claim TC-3/TC-4 differential corpus results, TC-10, Turing-completeness, M2.G, external verification, or M2 enablement."
+}

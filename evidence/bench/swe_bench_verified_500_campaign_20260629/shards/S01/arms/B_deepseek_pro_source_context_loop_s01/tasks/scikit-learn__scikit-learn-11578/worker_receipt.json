@@ -1,0 +1,92 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:aae7168e803c404fb1b475a583bf4b4b491ff963a02125cc0de769c1660afe3d",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 667,
+  "content_sha256": "sha256:7eae659eeaf912f97c7cb98017df44b0db8b7efddce59391d203b61769d84eaf",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:48dadbd278ca4ab9467a1e3faac92915abd9bea50b26bb29fdf6d44e9ae7a2fa",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 266,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "scikit-learn__scikit-learn-11578",
+    "receipt_id": "rcpt:688a4bc788d407ad9d72f4467969065f5084e479de57f8609952b2c3200b8571",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 186,
+      "prompt_cache_hit_tokens": 19840,
+      "prompt_cache_miss_tokens": 95,
+      "prompt_tokens": 19935,
+      "provider_usage_raw_sha256": "sha256:6fdef7e803ad3c3769e7681955f16ddad36b6ff2f5f33d497a7da64dc92163df",
+      "total_tokens": 20121
+    },
+    "wall_time_ms": 3749,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "683dd5f2-92bd-417d-b3aa-89ddca0fd63a",
+      "response_sha256": "sha256:50a92f413bdca9a10db02feb8226c24c72e4ecacd640497f695fa242ff57c555"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "scikit-learn__scikit-learn-11578",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch sklearn/linear_model/logistic.py...\nHunk #1 succeeded at 922 (offset 5 lines).\nApplied patch sklearn/linear_model/logistic.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:76e70c359e63f9e8fedc2dc94a32e625a32cb44bdf26a2384d442ddb2f18aca0",
+  "response_sha256": "sha256:50a92f413bdca9a10db02feb8226c24c72e4ecacd640497f695fa242ff57c555",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/scikit-learn__scikit-learn-11578/worker_capsule.md",
+  "source_context_length_chars": 72860,
+  "source_context_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/scikit-learn__scikit-learn-11578/source_context.md",
+  "source_context_sha256": "sha256:c34744032e78d0e7dd8de5a2d071638999df112b66568e9f236ca0b8fef3b5d8",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 186,
+    "prompt_cache_hit_tokens": 19840,
+    "prompt_cache_miss_tokens": 95,
+    "prompt_tokens": 19935,
+    "total_tokens": 20121
+  },
+  "usage_raw_sha256": "sha256:6fdef7e803ad3c3769e7681955f16ddad36b6ff2f5f33d497a7da64dc92163df",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/scikit-learn__scikit-learn-11578/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:da9a1b9155ad1c60db83819bbeb0319d94eb6ceb95be66d0b6605e843fc47344",
+  "wall_time_ms": 3749
+}

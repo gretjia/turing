@@ -1,0 +1,87 @@
+{
+  "arm_label": "A",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": null,
+  "broadcast_section_sha256": null,
+  "candidate_patch_sha256": "sha256:1ec7e3cb80031f3f10030696c8aea8f081ad48ca3fd58870b01ff4c56d53b354",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 592,
+  "content_sha256": "sha256:9281602e9c312c2c3bc8945e72b1ff6933eacf30b8ac0862ef2402f30ffd4fc8",
+  "cost_event": {
+    "agent_id": "m3-p8-deepseek-s00-new-policy-worker",
+    "branch_id": "branch:m3-p8-s00-resume",
+    "capsule_id": "cap:141e005df3ffc3371a884bbeab0fd5c5bbebf3d004e5715c52b8270cf0ea75de",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 9302,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pylint-dev__pylint-6386",
+    "receipt_id": "rcpt:696771b4353402a4c58fc582f61a7fd874feab7dd37755a020792031f3289071",
+    "run_id": "m3-p8-s00-new-policy-S00-W04-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s00-mixed-policy-inventory",
+    "usage": {
+      "completion_tokens": 10850,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 447,
+      "prompt_tokens": 447,
+      "provider_usage_raw_sha256": "sha256:ffb405de619b092aba9ce00673d41853bf36490d1f9624a099594b19476b90a6",
+      "total_tokens": 11297
+    },
+    "wall_time_ms": 156098,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "cb1a8fee-fc7a-4333-a133-6039c1702faa",
+      "response_sha256": "sha256:50a358bbf1c9445c8e25e0270351a5cfb0f7249913cc3b008a5e6e8f47d621cb"
+    }
+  },
+  "experiment_phase": "m3-p8",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "pylint-dev__pylint-6386",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S00-W04",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "status": "NOT_REQUESTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 41900,
+  "reasoning_content_sha256": "sha256:9bebb100bc8f970f302e3cb5b79ff624f8b40bae27f8b7b516ad1132643d5027",
+  "reasoning_effort": "high",
+  "request_sha256": "sha256:29cf95691258cca5ed57275152e5340dd72c3325cdb2456056398fc82aa8f4e6",
+  "response_sha256": "sha256:50a358bbf1c9445c8e25e0270351a5cfb0f7249913cc3b008a5e6e8f47d621cb",
+  "schema_id": "turingos.m3.s00_new_policy_worker_receipt.v1",
+  "shard_id": "S00",
+  "source_capsule_path": "shards/S00/ipqc/S00-W04/worker_safe_tasks/pylint-dev__pylint-6386/worker_capsule.md",
+  "source_context_length_chars": 0,
+  "source_context_path": null,
+  "source_context_sha256": null,
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "enabled"
+  },
+  "usage": {
+    "completion_tokens": 10850,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 447,
+    "prompt_tokens": 447,
+    "total_tokens": 11297
+  },
+  "usage_raw_sha256": "sha256:ffb405de619b092aba9ce00673d41853bf36490d1f9624a099594b19476b90a6",
+  "visible_capsule_path": "shards/S00/arms/P8_s00_resume_new_policy/visible_capsules/pylint-dev__pylint-6386/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:15020fc597b5d418abfb2db8eaf363ddd3ef1343a0bcf03ce699ed43e179a3be",
+  "wall_time_ms": 156098
+}

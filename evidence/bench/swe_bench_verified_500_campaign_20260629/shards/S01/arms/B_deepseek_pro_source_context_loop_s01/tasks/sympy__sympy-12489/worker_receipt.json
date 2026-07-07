@@ -1,0 +1,92 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:d45529affa03968217ec2932c38a2204c2b2d6a179fb9c8933f69c10df8856c8",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1198,
+  "content_sha256": "sha256:a91b3503e8f4a64bf9175088f6194b5748f91534bc8e268d58b041e518326487",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:473e019eebf5ab2daa7fca35c7180c971c2d9c8cb8b5459cb728c481a4f8a772",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3948,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "sympy__sympy-12489",
+    "receipt_id": "rcpt:d3fc665998c33a271a5f6c5b01bf63898c3230285fa6526f02588b8339e4a098",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 362,
+      "prompt_cache_hit_tokens": 14976,
+      "prompt_cache_miss_tokens": 8551,
+      "prompt_tokens": 23527,
+      "provider_usage_raw_sha256": "sha256:abe57b036c8be86ff579771e7baf1242c85f5875d766280abeb3cc543ca14855",
+      "total_tokens": 23889
+    },
+    "wall_time_ms": 6958,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "9f97a6de-a195-46b5-b27b-f847fadab944",
+      "response_sha256": "sha256:b2d85d1d5bc7d6abe28be58c2dee7c69647632aae5d11079849cae88538a4c69"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 578,
+  "extra_context_path": "shards/S01/loop_self_repair_contexts/S01-W00/sympy__sympy-12489/extra_context.md",
+  "extra_context_sha256": "sha256:fa07f2bd1406bb16bf71c348e0706869148b844a5dccdaa06e8bec1cd29ade59",
+  "instance_id": "sympy__sympy-12489",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded extra context file, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch sympy/combinatorics/permutations.py...\nHunk #1 succeeded at 949 (offset 86 lines).\nHunk #2 succeeded at 2710 (offset 1323 lines).\nHunk #3 succeeded at 2795 (offset 1355 lines).\nHunk #4 succeeded at 2828 (offset 1358 lines).\nApplied patch sympy/combinatorics/permutations.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:88d37d89207c6a7585fc080353572138e0329b1f279b9776b4afa865f5ed667e",
+  "response_sha256": "sha256:b2d85d1d5bc7d6abe28be58c2dee7c69647632aae5d11079849cae88538a4c69",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/sympy__sympy-12489/worker_capsule.md",
+  "source_context_length_chars": 79562,
+  "source_context_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/sympy__sympy-12489/source_context.md",
+  "source_context_sha256": "sha256:6678dafa4f8c777ea36b4286c4bfecf8b3e0108c6f0147867ab697d4fa5a1f91",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 362,
+    "prompt_cache_hit_tokens": 14976,
+    "prompt_cache_miss_tokens": 8551,
+    "prompt_tokens": 23527,
+    "total_tokens": 23889
+  },
+  "usage_raw_sha256": "sha256:abe57b036c8be86ff579771e7baf1242c85f5875d766280abeb3cc543ca14855",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/sympy__sympy-12489/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:cfc8f6467cd708600dff1be7655394a71dd08cd0e982320f1ada2bbd33d28ead",
+  "wall_time_ms": 6958
+}

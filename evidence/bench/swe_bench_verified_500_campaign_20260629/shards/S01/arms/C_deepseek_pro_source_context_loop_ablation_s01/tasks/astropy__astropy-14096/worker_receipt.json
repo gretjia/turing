@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:dbadd8f5ed27d21cc8cafee949313247f0f3b697d7f536aa343a8098758d6cf5",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1059,
+  "content_sha256": "sha256:2930d4f8342f1e1988f8b860814aef67c6b4fbc0b353432af9c74a1a06b5a6b2",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:2865ab464b45c6f0380436b39c88f13433397b94034ff236700cd18864868e64",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 479,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "astropy__astropy-14096",
+    "receipt_id": "rcpt:17a1c81e9cc741893ee87e8ca8e35b27974949fc6b15f1e6c75f0f67618e5cfa",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W02-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 282,
+      "prompt_cache_hit_tokens": 21376,
+      "prompt_cache_miss_tokens": 397,
+      "prompt_tokens": 21773,
+      "provider_usage_raw_sha256": "sha256:b0b939bece145bf696aa7fbbb7e2def697585458f8300dfdb432b4035d7097a8",
+      "total_tokens": 22055
+    },
+    "wall_time_ms": 6435,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "f5daf810-16b1-4857-bf96-3132e749ecb2",
+      "response_sha256": "sha256:e636bcba173cda9c26f44c7d6ec1d297f16b5d9efdfaf292a7bdaa29c0553fda"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 1010,
+  "extra_context_path": "shards/S01/loop_self_repair_contexts/S01-W02/astropy__astropy-14096/extra_context.md",
+  "extra_context_sha256": "sha256:347333bd8a7534323d807dd72a5ed87392d0033d01e2a348aa1f76acad9b9c68",
+  "instance_id": "astropy__astropy-14096",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded extra context file, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W02",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "/tmp/turingos-worker-patch-pu23_2o6/candidate.patch:22: trailing whitespace.\n \nChecking patch astropy/coordinates/sky_coordinate.py...\nHunk #1 succeeded at 895 (offset 298 lines).\nHunk #2 succeeded at 907 (offset 297 lines).\nApplied patch astropy/coordinates/sky_coordinate.py cleanly.\nwarning: 1 line adds whitespace errors.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:6cfed123ee92b4ac1aeec60509a536a37d0ee45d247715553c3f2ad310595bce",
+  "response_sha256": "sha256:e636bcba173cda9c26f44c7d6ec1d297f16b5d9efdfaf292a7bdaa29c0553fda",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/astropy__astropy-14096/worker_capsule.md",
+  "source_context_length_chars": 91651,
+  "source_context_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/astropy__astropy-14096/source_context.md",
+  "source_context_sha256": "sha256:eda9ccf4960f2012ef37f1b075101b9349d5fd23202f56ab86bd117b6b7c41a2",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 282,
+    "prompt_cache_hit_tokens": 21376,
+    "prompt_cache_miss_tokens": 397,
+    "prompt_tokens": 21773,
+    "total_tokens": 22055
+  },
+  "usage_raw_sha256": "sha256:b0b939bece145bf696aa7fbbb7e2def697585458f8300dfdb432b4035d7097a8",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/astropy__astropy-14096/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:75042749bf1613cdab825f877ff8ba54d9336c4589a1761d6f783aaebda0ea9c",
+  "wall_time_ms": 6435
+}

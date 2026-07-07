@@ -1,0 +1,24 @@
+diff --git a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+index 123456789..abcdef123 100644
+--- a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
++++ b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+@@ -199,10 +199,17 @@ class SlicedLowLevelWCS(BaseLowLevelWCS):
+         # Now, restrict to the dimensions we care about
+         if self._world_keep is not None:
+             world = world[self._world_keep]
++        pixel = pixel[:,self._pixel_keep]
+ 
+-        pixel = pixel[:,self._pixel_keep]
++        # Ensure pixel has the correct shape
++        if pixel.ndim == 2 and pixel.shape[1] != len(self._pixel_keep):
++            pixel = pixel.reshape(-1, len(self._pixel_keep))
+ 
+-        return pixel
++        if pixel.ndim == 2 and pixel.shape[0] == 1:
++            return pixel[0]
++        elif pixel.ndim == 2 and pixel.shape[1] == 1:
++            return pixel[:,0]
++        return pixel[0] if pixel.ndim == 2 else pixel
+ 
+     def pixel_to_world_values(self, *pixel_arrays):
+         pixel_values = np.array(pixel_arrays, dtype=np.float64)

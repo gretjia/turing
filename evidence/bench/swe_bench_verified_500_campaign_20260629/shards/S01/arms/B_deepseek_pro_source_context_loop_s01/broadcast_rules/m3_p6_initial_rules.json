@@ -1,0 +1,44 @@
+{
+  "schema_id": "turingos.m3.p6.broadcast_rules.v1",
+  "module_atom": "M3.P6",
+  "status_ceiling": "ADDRESSED",
+  "provenance": {
+    "source": "M3.P5 Arm A source-context repair execution artifacts and worker-policy audits",
+    "scope": "abstract repair-process guidance only",
+    "excluded_inputs": [
+      "gold patches",
+      "hidden evaluator labels",
+      "FAIL_TO_PASS",
+      "PASS_TO_PASS",
+      "raw SWE-bench dataset rows",
+      "official solution hints"
+    ]
+  },
+  "rules": [
+    {
+      "rule_id": "m3p6_br_001_unified_diff_shape",
+      "failure_class": "PATCH_FORMAT",
+      "guidance": "Return only a complete unified diff that starts with diff --git and includes valid file headers and hunk headers; do not use markdown fences, prose, ellipses, or truncated hunks."
+    },
+    {
+      "rule_id": "m3p6_br_002_source_only",
+      "failure_class": "WORKER_POLICY",
+      "guidance": "Edit implementation source files only; do not modify tests, testing helpers, fixtures, generated reports, benchmark evidence, or evaluation files."
+    },
+    {
+      "rule_id": "m3p6_br_003_context_discipline",
+      "failure_class": "SOURCE_CONTEXT_DISCIPLINE",
+      "guidance": "Base the patch on the worker-visible capsule and audited source context; prefer paths already present in that context unless the capsule itself makes another source-only path necessary."
+    },
+    {
+      "rule_id": "m3p6_br_004_apply_check",
+      "failure_class": "PATCH_APPLY",
+      "guidance": "Prefer small, localized hunks with enough unchanged context for git apply --check to succeed against the provided source snapshot."
+    }
+  ],
+  "non_claims": [
+    "This file does not record an M3.P6 result.",
+    "This file does not claim uplift.",
+    "This file does not claim external verification, release, ratification, M2 enablement, genesis signature, OG-10 signature, or constitution-byte change."
+  ]
+}

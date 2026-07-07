@@ -1,0 +1,32 @@
+Testing against Django installed in '/tmp/turingos_django_patch_eval/turingos_django__django-12325/django' with up to 4 processes
+Importing application invalid_models_tests
+Skipping setup of unused database(s): default, other.
+System check identified no issues (0 silenced).
+
+
+test_clash_parent_link (invalid_models_tests.test_relative_fields.ComplexClashTests.test_clash_parent_link) failed:
+
+    ImproperlyConfigured('Add parent_link=True to
+    invalid_models_tests.Child.other_parent.')
+
+Unfortunately, tracebacks cannot be pickled, making it impossible for the
+parallel test runner to handle this exception cleanly.
+
+In order to see the traceback, you should install tblib:
+
+    python -m pip install tblib
+
+
+
+test_onetoone_with_parent_model (invalid_models_tests.test_models.OtherModelTests.test_onetoone_with_parent_model) failed:
+
+    ImproperlyConfigured('Add parent_link=True to
+    invalid_models_tests.ParkingLot.other_place.')
+
+Unfortunately, tracebacks cannot be pickled, making it impossible for the
+parallel test runner to handle this exception cleanly.
+
+In order to see the traceback, you should install tblib:
+
+    python -m pip install tblib
+

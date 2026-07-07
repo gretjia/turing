@@ -1,0 +1,13 @@
+diff --git a/sympy/core/evalf.py b/sympy/core/evalf.py
+index 3c52095..1f4dc28 100644
+--- a/sympy/core/evalf.py
++++ b/sympy/core/evalf.py
+@@ -1283,6 +1283,8 @@ def evalf(x, prec, options):
+                     for arg in args[0])
+             except KeyError:
+                 rf = evalf_table[x.func]
++                if rf is None:
++                    raise NotImplementedError
+                 r = rf(x, prec, options)
+             except NotImplementedError:
+                 # catch Failure, etc

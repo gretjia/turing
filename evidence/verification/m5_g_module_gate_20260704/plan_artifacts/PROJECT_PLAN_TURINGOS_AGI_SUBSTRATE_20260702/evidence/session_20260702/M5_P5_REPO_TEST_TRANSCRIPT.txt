@@ -1,0 +1,17 @@
+$ git rev-parse HEAD
+2300a09cb7efc30b2d13adc6c4a499d672449da4
+$ git status --short
+$ python3 -m py_compile tools/release/build_packet.py tools/release/assert_release_eligible.py
+$ python3 -m pytest tests/test_release_mechanics.py -q
+..                                                                       [100%]
+$ bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh
+XCHECK_SELF_TEST_PASS
+SINGLETON_CODEC_SELF_TEST_PASS
+AST_CODEC_SELF_TEST_PASS
+REF_LINT_SELF_TEST_PASS
+M1A_SELF_TEST_PASS
+XCHECK_PASS corpus=/home/zephryj/turingos_backup/work/turing/tools/gates/corpus_jcs_extended.jsonl cases=10
+SINGLETON_CODEC_PASS
+AST_CODEC_PASS
+REF_LINT_PASS
+M1A_GATES_PASS

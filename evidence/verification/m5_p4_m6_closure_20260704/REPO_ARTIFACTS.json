@@ -1,0 +1,97 @@
+[
+  {
+    "github_path": ".github/workflows/ci.yml",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/.github/workflows/ci.yml",
+    "sha256": "10f5955eae905b726b361b5290821e1d0a72fc894093f4f8ae51996e2f9851ae"
+  },
+  {
+    "github_path": "Cargo.lock",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/Cargo.lock",
+    "sha256": "6376c1896478774f0f6261b356a266a8d5d11ba6480d357c452388bb1483d3b4"
+  },
+  {
+    "github_path": "Cargo.toml",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/Cargo.toml",
+    "sha256": "e026f0eaff3832fbb5484b3e2aab9fac47ba9151a2fe3afc5309b2d28cd2510d"
+  },
+  {
+    "github_path": "crates/turing-cli/Cargo.toml",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/Cargo.toml",
+    "sha256": "d35346587c7e79090cc62c0dd255d0a64597acc19a788d986267f49f2fbc2935"
+  },
+  {
+    "github_path": "crates/turing-cli/src/main.rs",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/src/main.rs",
+    "sha256": "4ecaf9e683b92c8b5e7ddfa947b1386c7934618e949efac75bf4bf8ca03bb040"
+  },
+  {
+    "github_path": "crates/turing-cli/tests/cli_gates.rs",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/tests/cli_gates.rs",
+    "sha256": "0ef7f36259250101d6a182e00f051ae5184f09ac53b98d2e2980a18224a64e1a"
+  },
+  {
+    "github_path": "crates/turing-projection/Cargo.toml",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-projection/Cargo.toml",
+    "sha256": "98476ad3538a23f1117804f4893471d8847d294aa20c1570594d3d6da8a9b0d5"
+  },
+  {
+    "github_path": "crates/turing-projection/clippy.toml",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-projection/clippy.toml",
+    "sha256": "fee1b8b211a4258d74bb0726af75b15fbe334ceb1e2993505e2a241401fc13c7"
+  },
+  {
+    "github_path": "crates/turing-projection/src/lib.rs",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-projection/src/lib.rs",
+    "sha256": "ddd11e2fbc57d55bce156e01d5a34fd3ed1775c1808c6ece23d25bd417e6d07a"
+  },
+  {
+    "github_path": "crates/turing-projection/tests/projection_builder.rs",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/crates/turing-projection/tests/projection_builder.rs",
+    "sha256": "4698340ba032cf7a9ccb9277a1bc14c730af04763bf867ff08acd426b1137133"
+  },
+  {
+    "github_path": "schemas/operator/operator_view_snapshot.v1.provenance.json",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/schemas/operator/operator_view_snapshot.v1.provenance.json",
+    "sha256": "e51287ba978714b2fb14594880e28a9565469b8878e236e29faedd7ec41af838"
+  },
+  {
+    "github_path": "tests/test_hci_no_write_gate.py",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tests/test_hci_no_write_gate.py",
+    "sha256": "10a2f0a8ba874b1034603d6500f3df958fd47e58559d80ee0de3460c3df0322d"
+  },
+  {
+    "github_path": "tests/test_hci_projection_integrity.py",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tests/test_hci_projection_integrity.py",
+    "sha256": "002a07201bdb8ff27432045eb520338c7211ed9a8db19ef8f1778fcb0c704b35"
+  },
+  {
+    "github_path": "tests/test_m5_p4_m6_github_audit_packet.py",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tests/test_m5_p4_m6_github_audit_packet.py",
+    "sha256": "a63615c690fce1fda8ba46b8d40d8e1cf3b48b02610d5fe66efcdedc781bdce9"
+  },
+  {
+    "github_path": "tools/hci/audit_projection_integrity.py",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tools/hci/audit_projection_integrity.py",
+    "sha256": "8a7d3153d3cffcdf5ff32462f85a6a4d940f28ef9b435aaaa7e26564c41c2e96"
+  },
+  {
+    "github_path": "tools/hci/gate_hci_no_write.sh",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tools/hci/gate_hci_no_write.sh",
+    "sha256": "f0b93edf39954c3feef17441c8e2923dbe43a00799d2cef35400a84bb65b50f9"
+  },
+  {
+    "github_path": "tools/hci/make_fixture_micro_tape.py",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tools/hci/make_fixture_micro_tape.py",
+    "sha256": "1a22ffb56ad28846dbc06f01b1a2b018e4cd63c1eb17226e03ee95acda2991bd"
+  },
+  {
+    "github_path": "tools/hci/run_hci_gates.sh",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tools/hci/run_hci_gates.sh",
+    "sha256": "7b9c28d6016c24422386d272af8d2c09c2cf0fcfeda6885df54840c3233ba520"
+  },
+  {
+    "github_path": "tools/release/build_m5_p4_m6_packet.py",
+    "original_path": "/home/zephryj/turingos_backup/work/turing/tools/release/build_m5_p4_m6_packet.py",
+    "sha256": "227f441d35eb6c3995be43872fe57fb8b4b6ee7bb28af88e6f89ea57f8fc4785"
+  }
+]

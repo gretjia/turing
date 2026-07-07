@@ -1,0 +1,31 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index a7e5d55..f4756de 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -57,7 +57,7 @@ def _query_cpu() -> int | None:
+         with open("/sys/fs/cgroup/cpu/cpu.shares", encoding="utf-8") as file:
+             cpu_shares = int(file.read().rstrip())
+         # For AWS, gives correct value * 1024.
+-        avail_cpu = int(cpu_shares / 1024)
++        avail_cpu = max(1, int(cpu_shares / 1024))
+     return avail_cpu
+ 
+ 
+@@ -77,6 +77,8 @@ def _cpu_count() -> int:
+         cpu_count = 1
+     if cpu_share is not None:
+         return min(cpu_share, cpu_count)
++    if cpu_count is not None and cpu_count < 1:
++        cpu_count = 1
+     return cpu_count
+ 
+ 
+@@ -174,7 +176,7 @@ group are mutually exclusive.",
+                 file=sys.stderr,
+             )
+             sys.exit(32)
+-        if linter.config.jobs > 1 or linter.config.jobs == 0:
++        if linter.config.jobs > 0:
+             if multiprocessing is None:
+                 print(
+                     "Multiprocessing library is missing, fallback to single process",

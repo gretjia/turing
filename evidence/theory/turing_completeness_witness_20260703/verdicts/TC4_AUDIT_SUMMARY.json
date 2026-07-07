@@ -1,0 +1,215 @@
+{
+  "mutation_matrix": {
+    "not_run_is_fail": true,
+    "rows": [
+      {
+        "caught_by": "AuditError",
+        "description": "tampered_payload_byte",
+        "message": "payload hash mismatch at sequence 1",
+        "mutant": "m1",
+        "status": "KILLED"
+      },
+      {
+        "caught_by": "AuditError",
+        "description": "dropped_event",
+        "message": "sequence mismatch at 3",
+        "mutant": "m2",
+        "status": "KILLED"
+      },
+      {
+        "caught_by": "AuditError",
+        "description": "dropped_event_rechained",
+        "message": "authorized pc mismatch",
+        "mutant": "m3",
+        "status": "KILLED"
+      },
+      {
+        "caught_by": "AuditError",
+        "description": "reordered_adjacent_events_rechained",
+        "message": "MachineStateObserved without pending applied state",
+        "mutant": "m4",
+        "status": "KILLED"
+      },
+      {
+        "caught_by": "AuditError",
+        "description": "duplicated_instruction_applied_rechained",
+        "message": "prev_state_hash mismatch",
+        "mutant": "m5",
+        "status": "KILLED"
+      },
+      {
+        "caught_by": "AuditError",
+        "description": "payload_tamper_with_payload_hash_updated",
+        "message": "next_state_hash mismatch",
+        "mutant": "m6",
+        "status": "KILLED"
+      },
+      {
+        "caught_by": "AuditError",
+        "description": "corrupt_machine_state_observed_counter",
+        "message": "payload hash mismatch at sequence 4",
+        "mutant": "m7",
+        "status": "KILLED"
+      }
+    ],
+    "schema_id": "turingos.tc4.mutation_matrix.v1",
+    "verdict": "PASS"
+  },
+  "noninterference": {
+    "ignored_event_type": "MarketCreated",
+    "interleave_invariant": true,
+    "not_run_is_fail": true,
+    "sabotage_meta_test": "FAILS_AS_EXPECTED",
+    "schema_id": "turingos.tc4.noninterference.v1",
+    "verdict": "PASS"
+  },
+  "not_run_is_fail": true,
+  "schema_id": "turingos.tc4.audit_report.v1",
+  "verdict": "PASS",
+  "verdicts": {
+    "TC-01": {
+      "gate_id": "TC-01",
+      "not_run_is_fail": true,
+      "observed": {
+        "ops": [
+          "INC",
+          "DECJZ",
+          "HALT"
+        ],
+        "payload_schema_count": 5,
+        "unknown_instruction_policy": "REJECT"
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-02": {
+      "gate_id": "TC-02",
+      "not_run_is_fail": true,
+      "observed": {
+        "programs_checked": 8,
+        "state_hash_chain_checked": true
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-03": {
+      "gate_id": "TC-03",
+      "not_run_is_fail": true,
+      "observed": {
+        "fuzz_cases_checked": 500,
+        "fuzz_failure_count": 0,
+        "programs_checked": 8
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-04": {
+      "gate_id": "TC-04",
+      "not_run_is_fail": true,
+      "observed": {
+        "branch_nonzero_seen": true,
+        "branch_zero_seen": true
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-05": {
+      "gate_id": "TC-05",
+      "not_run_is_fail": true,
+      "observed": {
+        "loop_programs": {
+          "add_a_b": {
+            "event_type": "ComputationHalted",
+            "final_state": {
+              "counter_a": 0,
+              "counter_b": 6,
+              "halted": true,
+              "program_counter": 2
+            },
+            "final_state_hash": "sha256:bebed3fe8634e52aa5a3f02dbaa60a7e6ac70dfddd7bca47e23277adf4fd5f6e",
+            "kind": "HALTED",
+            "steps_executed": 10
+          },
+          "multiply_small": {
+            "event_type": "ComputationHalted",
+            "final_state": {
+              "counter_a": 0,
+              "counter_b": 6,
+              "halted": true,
+              "program_counter": 4
+            },
+            "final_state_hash": "sha256:ad8ba77e3332bb16faade972246bbe9cb94fa969b3033415b20452b4f62f81bb",
+            "kind": "HALTED",
+            "steps_executed": 10
+          }
+        }
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-06": {
+      "gate_id": "TC-06",
+      "not_run_is_fail": true,
+      "observed": {
+        "halt_programs": [
+          "copy_a_to_b",
+          "add_a_b",
+          "multiply_small",
+          "branch_zero_nonzero",
+          "known_halting_busy_loop_with_budget"
+        ],
+        "no_witness_events_after_terminal": true
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-07": {
+      "gate_id": "TC-07",
+      "not_run_is_fail": true,
+      "observed": {
+        "killed": 7,
+        "mutants": 7
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-08": {
+      "gate_id": "TC-08",
+      "not_run_is_fail": true,
+      "observed": {
+        "dropped_event_detected": true,
+        "dropped_rechained_event_detected": true
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    },
+    "TC-09": {
+      "gate_id": "TC-09",
+      "not_run_is_fail": true,
+      "observed": {
+        "programs_checked": [
+          "copy_a_to_b",
+          "add_a_b",
+          "multiply_small",
+          "branch_zero_nonzero",
+          "known_halting_busy_loop_with_budget",
+          "spin_static_halt_unreachable",
+          "recurs_zero_decjz",
+          "guarded_growth_budget"
+        ],
+        "replay_twice_identical": true
+      },
+      "schema_id": "turingos.tc4.gate_verdict.v1",
+      "timestamp_utc": "2026-07-03T00:00:00Z",
+      "verdict": "PASS"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index 52b4c0b3..53a7a763 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -81,7 +81,7 @@ class Weighted(Generic[T_DataWithCoords]):
+         weights = self.weights
+         if weights.dtype == bool:
+             weights = weights.astype(int)
+-        return dot(dim, da.notnull(), weights)
++        return dot(dim, da.notnull().astype(weights.dtype), weights)
+ 
+     def _sum_of_weights(self, da, dim):
+         return self._sum_of_weights_or_dummy(da, dim)

@@ -1,0 +1,16 @@
+**Patch left in worktree** (only [django/db/backends/ddl_references.py](/tmp/turingos_substrate_worktrees/b3270ad8e1abf2a5/django/db/backends/ddl_references.py) touched; 2-line diff, no tests or other files):
+
+```
+diff --git a/django/db/backends/ddl_references.py b/django/db/backends/ddl_references.py
+index 44e49806f8..d35b3439da 100644
+--- a/django/db/backends/ddl_references.py
++++ b/django/db/backends/ddl_references.py
+@@ -87 +87 @@ class Columns(TableColumns):
+-                return self.quote_name(column) + self.col_suffixes[idx]
++                return self.quote_name(column) + (' ' + self.col_suffixes[idx] if self.col_suffixes[idx] else '')
+@@ -117 +117 @@ class IndexColumns(Columns):
+-                col = '{} {}'.format(col, self.col_suffixes[idx])
++                col = self.col_suffixes[idx] and '{} {}'.format(col, self.col_suffixes[idx]) or col
+```
+
+Verified via direct execution of `Columns`/`IndexColumns` (produces `"name" DESC`, `"name" text_pattern_ops`, `"name" text_pattern_ops DESC`, etc.).

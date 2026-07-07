@@ -33,6 +33,7 @@ import subprocess
 from pathlib import Path
 
 from .. import codec
+from . import cost as worker_cost
 from .adapter import WorkerAdapter
 
 # A token a "pass" candidate always embeds so a `grep PASS_MARKER`-style acceptance check is green;
@@ -172,6 +173,33 @@ class FakeWorker(WorkerAdapter):
             "status": status,
             "no_orphan": True,
         }
+        usage = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "tool_tokens": 0,
+            "tool_stdout_tokens": 0,
+            "total_tokens": 0,
+        }
+        self.last_cost_event = worker_cost.cost_event_from_receipt(
+            receipt,
+            run_id=str(capsule.get("run_id") or f"run:{receipt['capsule_id']}"),
+            problem_id=str(capsule.get("problem_id") or capsule.get("atom_id") or "problem:fake"),
+            split=str(capsule.get("split") or "dogfood"),
+            agent_id=self.worker_id,
+            branch_id=str(capsule.get("branch_id") or f"branch:{self.worker_id}:{self.scenario}"),
+            adapter_kind="fake",
+            provider="fixture",
+            model_id_requested="fixture-model",
+            model_id_resolved="fixture-model-20260702",
+            endpoint="fixture://fake-worker",
+            request_id=receipt["receipt_id"],
+            response_sha256=codec.content_digest(receipt),
+            usage=usage,
+            cost_source_kind="fixture",
+            cost_microusd=0,
+            wall_time_ms=0,
+            provider_usage_raw=usage,
+        )
         return receipt
 
     # --- receipt id ---------------------------------------------------------

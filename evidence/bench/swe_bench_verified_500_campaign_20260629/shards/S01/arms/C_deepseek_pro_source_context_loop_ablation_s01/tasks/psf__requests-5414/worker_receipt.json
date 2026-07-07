@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:56e66bf247a5b5de1c55c80799b6a9723490c06cc2c0014d23c4c4604bea2499",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1113,
+  "content_sha256": "sha256:e4b46ad80b2f2d9b973b831f16699f25fd2b99806ef6182ffbbc6f00ad35f96e",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:030ae3696672f5524aab9d009a6f900a6c638a193cd7480e7fb4aab266e7ae5b",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3664,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "psf__requests-5414",
+    "receipt_id": "rcpt:f8f2c303b7e82540344dd34497e4ec899af6c4e588718ed8b96081465d780f7b",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W01-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 280,
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 8159,
+      "prompt_tokens": 8671,
+      "provider_usage_raw_sha256": "sha256:52b6daa23dcd65b52193af81265f4bb321e35f1e82484ca7eb93e5e8c84cc223",
+      "total_tokens": 8951
+    },
+    "wall_time_ms": 5625,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "2208ed47-4d73-4094-9f64-d5f3bf2b14a0",
+      "response_sha256": "sha256:8b1b183b8dbccb08995cb7e56eb4411a4361dbb38e0cc9b43ffe629396b64407"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "psf__requests-5414",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W01",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch requests/models.py...\nHunk #1 succeeded at 383 (offset 55 lines).\nHunk #2 succeeded at 404 (offset 56 lines).\nHunk #3 succeeded at 438 (offset 65 lines).\nApplied patch requests/models.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:a2edd5025d19f92a9adc79771d05b146ccd075958b9766904f69d09ba4c81d5b",
+  "response_sha256": "sha256:8b1b183b8dbccb08995cb7e56eb4411a4361dbb38e0cc9b43ffe629396b64407",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/psf__requests-5414/worker_capsule.md",
+  "source_context_length_chars": 35352,
+  "source_context_path": "shards/S01/ipqc/S01-W01/worker_safe_tasks/psf__requests-5414/source_context.md",
+  "source_context_sha256": "sha256:e2b5509fdfac3a84cba5a58d3b98bf546370d60c4ae23323444968d7ae27a636",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 280,
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 8159,
+    "prompt_tokens": 8671,
+    "total_tokens": 8951
+  },
+  "usage_raw_sha256": "sha256:52b6daa23dcd65b52193af81265f4bb321e35f1e82484ca7eb93e5e8c84cc223",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/psf__requests-5414/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:1d43f5ba9d31a3b9ba847ea25d7c03ca7c33ef9308303277c1dbd870383bbbb7",
+  "wall_time_ms": 5625
+}

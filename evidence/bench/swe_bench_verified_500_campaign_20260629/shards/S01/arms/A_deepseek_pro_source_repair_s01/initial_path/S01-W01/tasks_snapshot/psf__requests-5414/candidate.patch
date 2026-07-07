@@ -1,0 +1,20 @@
+diff --git a/requests/models.py b/requests/models.py
+index fbb3c3e6..d03ad830 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -398,7 +398,13 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         if isinstance(url, bytes):
+             url = url.decode('utf8')
+         else:
+             url = unicode(url) if is_py2 else str(url)
+ 
++        # Catch UnicodeErrors that can occur on malformed URLs
++        try:
++            url = url.encode('idna').decode('ascii') if isinstance(url, str) else url
++        except UnicodeError as e:
++            raise InvalidURL(*e.args, request=self)
++
+         # Prevent any CVE-related hostname attacks
+         url = self._idna_encode(url)
+ 
+         return url

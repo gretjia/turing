@@ -1,0 +1,32 @@
+{
+  "blocker": "phase_f_unresolved_official_replay",
+  "completed_instances": 20,
+  "dataset_name": "princeton-nlp/SWE-bench_Verified",
+  "error_ids": [],
+  "error_instances": 0,
+  "evidence": {
+    "evaluation_results_path": "phase_f_20_run/evaluation_results.json",
+    "harness_logs_raw_path": "phase_f_20_run/harness_logs_raw.tar.gz",
+    "stderr_path": "phase_f_20_run/stderr.txt",
+    "stdout_path": "phase_f_20_run/stdout.txt"
+  },
+  "evidence_sha256": {
+    "evaluation_results": "sha256:259c12e0d06cd9094d6fdc5fa3ddeb970a280989f347f90572a8a874c2b529b4",
+    "harness_logs_raw": "sha256:af75f018975a5e658a2e4346f58660fe805dc916ac2dba2dedaf21be345a49a4",
+    "stderr": "sha256:8d5332e17f91a357e4d833f509998c623f41eca7ee2b6c8f49ace21bd73ef7f4",
+    "stdout": "sha256:67d896a8d9799536a0b745ef0c0ca266fb105cf9fa02da5f2fcf8cfa24b4a526"
+  },
+  "official_harness_kind": "upstream_swebench_docker",
+  "release_next_phase_g": false,
+  "required_next_action": "repair_unresolved_official_phase_f_target",
+  "resolved_instances": 19,
+  "run_id": "turingos_phase_f_20_official_20260629",
+  "schema_id": "turingos.phase_f_20_official_replay_audit.v1",
+  "split": "test",
+  "status": "BLOCKED",
+  "submitted_instances": 20,
+  "unresolved_ids": [
+    "django__django-11885"
+  ],
+  "unresolved_instances": 1
+}

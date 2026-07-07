@@ -1,0 +1,16 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index 76fd2c4f1..e11cce022 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -612,7 +612,10 @@ class Quantity(np.ndarray):
+                 # unless we are on the calling side of a ufunc returning
+                 # a UNSUPPORTED_PARALLEL, in which case 'output' will be
+                 # set and is not needed.
+-                arrays.append(converter(input_) if converter else input_)
++                try:
++                    arrays.append(converter(input_) if converter else input_)
++                except (ValueError, TypeError):
++                    continue
+             # Call our superclass's __array_ufunc__
+             result = super().__array_ufunc__(function, method, *arrays, **kwargs)
+             # If unit is None, a plain array is expected (e.g., comparisons), which

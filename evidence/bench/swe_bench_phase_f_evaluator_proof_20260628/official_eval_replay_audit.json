@@ -1,0 +1,193 @@
+{
+  "all_candidate_accepts_have_required_evidence": true,
+  "all_solved_tasks_have_reproducible_official_eval": false,
+  "artifact_microtape_digest_binding": true,
+  "blockers": [
+    "django__django-11790: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-11790: Stage16R test patch artifact is digest-bound but not a replayable unified diff",
+    "django__django-11815: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-11815: Stage16R test patch artifact is digest-bound but not a replayable unified diff",
+    "django__django-11964: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-11964: Stage16R test patch artifact is digest-bound but not a replayable unified diff",
+    "django__django-12209: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-12209: Stage16R test patch artifact is digest-bound but not a replayable unified diff",
+    "django__django-12273: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-12273: Stage16R test patch artifact is digest-bound but not a replayable unified diff",
+    "django__django-12308: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-12308: Stage16R test patch artifact is digest-bound but not a replayable unified diff",
+    "django__django-12325: Stage16R candidate artifact is digest-bound but not a replayable unified diff",
+    "django__django-12325: Stage16R test patch artifact is digest-bound but not a replayable unified diff"
+  ],
+  "full_dataset_claim_allowed": false,
+  "full_swe_bench_score_claim_allowed": false,
+  "leaderboard_equivalence_claim_allowed": false,
+  "official_evaluator_executable_replay": false,
+  "problems": [],
+  "release_next_phase_g": false,
+  "runs": [
+    {
+      "candidate_accepted_event_id": "mu:5ae73113ab3a0f6ddd99b54aa40c2b1ab8c1c035f50ebbc8d262500ccbc273e2",
+      "instance_id": "django__django-11790",
+      "official_evidence_event_id": "mu:a8e02e90dd557d6251f4a178cf48dc372d2faf1221c3ad722c1ad0bf54cc8093",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:71f0857710eb8222270f4a2ea80b3c356b77e343cbe54a4d3e731f23c2fe9505",
+      "instance_id": "django__django-11815",
+      "official_evidence_event_id": "mu:320ec1a79a2c440b6244c25b38f526aa2d821ea1d6faaccd1ff36148645892d6",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:abe46a9222b777eeaafc8006fee4a5bfd68c9e78d0a2902eab1809fd094e16b4",
+      "instance_id": "django__django-11848",
+      "official_evidence_event_id": "mu:7b57f886a9803342311f73e307268fb5ffa3171bbe460667cd2bdc50663ae099",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:d55d867eed2e49aa857b17e28ed317f8caa143be6cd173e97c1f09ed712c27e5",
+      "instance_id": "django__django-11880",
+      "official_evidence_event_id": "mu:e70ec278d2dd98f0d18847c6d3b0826432d863e95b54c6faa0efaac11228996c",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:8890f7021de81a2b8799027d5f4e7bc14fb8eea0ab585776f349736d2166eff1",
+      "instance_id": "django__django-11885",
+      "official_evidence_event_id": "mu:de7184f261658c0a83119dfc1c9d38d8bc41c7e5bac268f12dab0e4e027990fc",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:3a02bce693e3d95ae81e19b05b79a2836699ad8dfa4ac5fd1a8f4e45da61ad73",
+      "instance_id": "django__django-11951",
+      "official_evidence_event_id": "mu:34c27e5ba1f0eb0b84fe01e41e7720f4d8e22db8b684382518bbb16d913ae8ea",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:e1322ab2e0d017c16891715e6c64fcf8b623b15d6fa6a324e73ef424d4c846ba",
+      "instance_id": "django__django-11964",
+      "official_evidence_event_id": "mu:67b0f6f82b958e18c87e1f26c51ee56bf4011aa79e4af780844ef4261aaa5396",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:14cae4c96140cd705c1999da3ac01e236d3b05d2c0e4e41cb944a4eac190ba60",
+      "instance_id": "django__django-11999",
+      "official_evidence_event_id": "mu:855220b0b4246c81df0459cb01ce9bfc8e10f17674a1cafa1f77080ff113c8d0",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:80cba4b9f877bfeec46d368d08920a8b31ef890043f46296e856bbe64a91a74d",
+      "instance_id": "django__django-12039",
+      "official_evidence_event_id": "mu:c3d0190c55ad078f4804f2c57a6c434982afee5258adc57c4e942a8c5e499a15",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:af0e4c13b860468df5dd2eda79066e1909e0f788646b2f22a209d475386596c2",
+      "instance_id": "django__django-12050",
+      "official_evidence_event_id": "mu:e2848383adf7b1e50c888a567d36f4706c9cf67e3c1df0adc1d6cbef8d2481a4",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:63dddedca991ff900cc7bb4de83f5c0b2c593dacd7e7bfde07387472dc1ff682",
+      "instance_id": "django__django-12143",
+      "official_evidence_event_id": "mu:92d378c9fc43cfb303a340d683fc77525e1ec59a456880754fcca4fffba210b8",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:1d7fbe7d94ef24e7c9530feeb0b37a01c94e632f03dcde6e1d5504405cf91b8f",
+      "instance_id": "django__django-12155",
+      "official_evidence_event_id": "mu:73f7b2eda1ed64597cd8ed2f95c58ed5c44ad0a49edc6f587a0d56ec0a23fd0f",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:958fb0045a7d6e23dd0c18a41059d82230e378a21b66675a1520393f74b1b5d0",
+      "instance_id": "django__django-12193",
+      "official_evidence_event_id": "mu:204a44f283e1900e9d8c18ae437bc0866a7a23e9c7d2cbf85d4f249626ec2a9f",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:a71e8370f0bb9a31583e10352bbbcab1eb9772445a9f1df74bfda7f8704fe895",
+      "instance_id": "django__django-12209",
+      "official_evidence_event_id": "mu:f9031ce12d5c9642737a57533e8e8d52ade0717baebd6a544e3d5164aec36e05",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:3dc7491e8c8193173e70c1f957f2c6556df5e86e4f019f83f412aadf22f51590",
+      "instance_id": "django__django-12262",
+      "official_evidence_event_id": "mu:d3369565fffc74b82e463f0de969cf1f4d82f716fafd1639f95452e177fa1295",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:5764dd3d2b0042b032ce8b5f430ae1505fd2d4d4f37e73025ba7ec010abf0eb3",
+      "instance_id": "django__django-12273",
+      "official_evidence_event_id": "mu:1b2e3f8b1727ade913b995e3964498612251fa10883c996ab3b9229816b0f56d",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:6fc028cf6e0d2f28a5f9b636f179e362b207d0a0c70ea14fb2545f54b50e8708",
+      "instance_id": "django__django-12276",
+      "official_evidence_event_id": "mu:62faeae3998eb853327a57693be73e57d1d56794a060d4d4488478361e560c3c",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:79991c82fe1a400af2a96d7970eabf692012573906c1da378cef1886ec7ad006",
+      "instance_id": "django__django-12304",
+      "official_evidence_event_id": "mu:bf62b11f896cc27e6f2ff0ad2b0524c7265f8cfcc52ac6a294b2c654036c42ff",
+      "problems": [],
+      "source_stage": "Stage16",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:e228c4f9eb836012b7ca1e1a985a248ef7f01b1111a40ca5baa2495006eeb050",
+      "instance_id": "django__django-12308",
+      "official_evidence_event_id": "mu:e9ed36345bde1e9c6008af3f93986efa974ec712adb3b7d35cc300f4b6b2b58a",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    },
+    {
+      "candidate_accepted_event_id": "mu:38a7975df9fd6943e9c2ae4efd06cf7ae84919d52d74537289bad30b907cbff9",
+      "instance_id": "django__django-12325",
+      "official_evidence_event_id": "mu:482fd21d32a698cd4ff9a4df529e8b3e10bc10ab012be19cafbfff6166b0a5dd",
+      "problems": [],
+      "source_stage": "Stage16R",
+      "status": "PASS"
+    }
+  ],
+  "schema_id": "PhaseFEvaluatorProofAudit.v1",
+  "secret_scan_status": "PASS",
+  "status": "PARTIAL",
+  "task_count": 20
+}

@@ -1,0 +1,190 @@
+==================================================
+COMMAND: A1 full
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: matrix table has exactly 10 rows (commit 1..10), all V-code sets match constitutional contract
+PASS: real source anchors resolve (ApprovalByteSurfaces, SignatureRoute, HardwareFuture, trait SigningBackend, refs/turingos/tape_tip, replay_determinism.rs)
+head-order: N/A (no tape refs in dev checkout)
+PASS: audit-art-0-2-traceability complete
+
+==================================================
+COMMAND: A1 --commit 1
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: matrix row 1 V-codes = V-01,V-06,V-18
+PASS: real source anchors resolve (ApprovalByteSurfaces, SignatureRoute, HardwareFuture, trait SigningBackend, refs/turingos/tape_tip, replay_determinism.rs)
+PASS: audit-art-0-2-traceability complete
+
+==================================================
+COMMAND: A2 pytest
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-7.2.1, pluggy-1.0.0+repack
+rootdir: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-001, configfile: pyproject.toml
+plugins: anyio-4.13.0
+collected 16 items
+
+tests/audit/test_art_0_2_traceability.py ................                [100%]
+
+============================== 16 passed in 0.16s ==============================
+
+==================================================
+COMMAND: B1 vec1 (480 0.08 -> 33)
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+33
+
+==================================================
+COMMAND: B1 vec2 (420 0.10 -> 25)
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+25
+
+==================================================
+COMMAND: B1 vec3 (1200 0.02 -> 156)
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+156
+
+==================================================
+COMMAND: B1 vec4 (480 0.20 -> 25)
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+25
+
+==================================================
+COMMAND: B1 vec5 (abc 0.1 -> exit 2)
+==================================================
+EXIT CODE: 2
+--- tail (last 40 lines) ---
+Usage: calc-ipqc-interval.sh ETA_STEPS FAILURE_RATE
+
+Computes the canonical TuringOS IPQC checkpoint interval:
+  ipqc_interval = max(25, floor(eta_steps * (0.15 - min(0.10, failure_rate))))
+
+  ETA_STEPS      non-negative integer (planned step budget)
+  FAILURE_RATE   decimal in [0, 1], up to 4 fractional digits (e.g. 0.08)
+
+Prints the resulting integer interval to stdout. Exits 2 with this usage
+message on stderr for malformed input.
+
+==================================================
+COMMAND: B2
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: all four byte-surface fields present on ApprovalByteSurfaces (canonical_bytes, visible_card_hash_bytes, signed_bytes, gate_replay_bytes)
+running: cargo test -p turing-approval --quiet
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+......
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+PASS: cargo test -p turing-approval green
+PASS: audit-approval-bytes-equivalence complete
+
+==================================================
+COMMAND: B3 default
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+running: cargo test -p turing-kernel --test accepted_head --test authorization_head --test head_effect_tamper --quiet
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 13 tests
+.............
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+PASS: turing-kernel head-transition tests green (accepted_head, authorization_head, head_effect_tamper)
+running: cargo test -p turing-replay --test replay_determinism --quiet
+
+running 3 tests
+...
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+PASS: turing-replay replay_determinism test green
+PASS: audit-no-macro-as-micro complete
+
+==================================================
+COMMAND: B3 --scope projections
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: reducer is the sole head-mover (no accepted_head write sites outside turing-kernel/turing-git-tape)
+
+==================================================
+COMMAND: B4 doc exists
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+README present
+
+==================================================
+COMMAND: C1
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: constitution sha256 pinned and verified (a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0)
+PASS: crates/turing-approval/src/lib.rs sha256 verified (ce9d4676086aa9fb46270d80f1f958a432d9754f34d93e96c31f12dca6920751)
+PASS: crates/turing-replay/src/lib.rs sha256 verified (c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31)
+PASS: crates/turing-git-tape/src/head_set.rs sha256 verified (794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016)
+PASS: crates/turing-git-tape/src/append.rs sha256 verified (c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665)
+PASS: crates/turing-kernel/src/reducer.rs sha256 verified (43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3)
+PASS: audit-substrate-freeze complete (5 pinned files + constitution)
+
+==================================================
+COMMAND: C2 --staged
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: no forbidden paths staged
+
+==================================================
+COMMAND: C2 --check (negative vector)
+==================================================
+EXIT CODE: 1
+--- tail (last 40 lines) ---
+FAIL: forbidden path: turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md
+
+==================================================
+COMMAND: C3 pre-commit clean tree
+==================================================
+EXIT CODE: 0
+--- tail (last 40 lines) ---
+PASS: no forbidden paths staged
+PASS: constitution sha256 pinned and verified (a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0)
+PASS: crates/turing-approval/src/lib.rs sha256 verified (ce9d4676086aa9fb46270d80f1f958a432d9754f34d93e96c31f12dca6920751)
+PASS: crates/turing-replay/src/lib.rs sha256 verified (c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31)
+PASS: crates/turing-git-tape/src/head_set.rs sha256 verified (794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016)
+PASS: crates/turing-git-tape/src/append.rs sha256 verified (c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665)
+PASS: crates/turing-kernel/src/reducer.rs sha256 verified (43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3)
+PASS: audit-substrate-freeze complete (5 pinned files + constitution)
+PASS: pre-commit gate (forbidden-files + substrate-freeze)
+

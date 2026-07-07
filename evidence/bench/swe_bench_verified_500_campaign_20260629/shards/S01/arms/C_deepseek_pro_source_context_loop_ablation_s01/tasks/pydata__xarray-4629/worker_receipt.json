@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:2584df24c132723d6fc496bdbea994fe8b48dd5fe61dcfee7e80029a3f2b09f9",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 566,
+  "content_sha256": "sha256:6649d9dc08c41f9e79a474334052e1871040a42f0e24fddf54984d1f04febe36",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:713594818323e3441a89ad588e609511e35b24f5c55b9b5babb1e7c4ff45d29c",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3618,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pydata__xarray-4629",
+    "receipt_id": "rcpt:e88386b961066a6bf358871c179d302b9705c37aa7496231948d2861313df185",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W04-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 204,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 8194,
+      "prompt_tokens": 9602,
+      "provider_usage_raw_sha256": "sha256:f95329e9db18db71ca761ca0ed9b55560ad5ebfc19c42e8a284c50fc85a0ec86",
+      "total_tokens": 9806
+    },
+    "wall_time_ms": 3666,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "c73c1600-69f7-4b1e-88f1-68328a05102c",
+      "response_sha256": "sha256:aaadeaa2de0957de8760f9cdb3676a3595abc6fba82995cc9f64fb7908443811"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "pydata__xarray-4629",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W04",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch xarray/core/merge.py...\nApplied patch xarray/core/merge.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:13f82fcf3fd4634ab728b796c431fd06c85253c88d438e0e41d026350540cab8",
+  "response_sha256": "sha256:aaadeaa2de0957de8760f9cdb3676a3595abc6fba82995cc9f64fb7908443811",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pydata__xarray-4629/worker_capsule.md",
+  "source_context_length_chars": 32650,
+  "source_context_path": "shards/S01/ipqc/S01-W04/worker_safe_tasks/pydata__xarray-4629/source_context.md",
+  "source_context_sha256": "sha256:78dfb0fbafdb6c94fb82ff4a0315de1a9d7132f52a4d2ce99c387eef2045ce9b",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 204,
+    "prompt_cache_hit_tokens": 1408,
+    "prompt_cache_miss_tokens": 8194,
+    "prompt_tokens": 9602,
+    "total_tokens": 9806
+  },
+  "usage_raw_sha256": "sha256:f95329e9db18db71ca761ca0ed9b55560ad5ebfc19c42e8a284c50fc85a0ec86",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/pydata__xarray-4629/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:790fc882f5d335e833841cb2d8494f05a2f000ab8191e33398f095f443048368",
+  "wall_time_ms": 3666
+}

@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index c823b68..f313e35 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -57,6 +57,8 @@ class StrCategoryConverter(units.ConversionInterface):
+         with _api.suppress_matplotlib_deprecation_warning():
+             is_numlike = all(units.ConversionInterface.is_numlike(v)
+                              and not isinstance(v, (str, bytes))
++                             # empty arrays have no elements; treat as non-numlike
++                             if values.size > 0 else False
+                              for v in values)
+         if is_numlike:
+             _api.warn_deprecated(

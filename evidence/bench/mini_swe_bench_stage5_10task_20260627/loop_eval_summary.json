@@ -1,0 +1,232 @@
+{
+  "attempts": {
+    "direct_incremental_stage5": 2,
+    "direct_stage4": 8,
+    "direct_total_worker_attempts": 10,
+    "turingos_first_pass_stage4": 8,
+    "turingos_incremental_stage5": 2,
+    "turingos_recovery_stage4": 1,
+    "turingos_total_worker_attempts": 11
+  },
+  "base_sha": "922bcab3f25e38c58d22af1a42994b0f244290f9",
+  "created_at_utc": "2026-06-27T15:16:23Z",
+  "evidence_bundle_hash": "sha256:836b620e2540eaf069b408fc940f0ed12ee22ead16d59440e4d97ac4d0f7e223",
+  "evidence_paths": {
+    "stage4_patch_eval": "evidence/bench/mini_swe_bench_stage4_8task_20260627/patch_eval/patch_eval_summary.json",
+    "stage4_recovery_patch_eval": "evidence/bench/mini_swe_bench_stage4_8task_20260627/recovery/patch_eval/patch_eval_summary.json",
+    "stage5_combined_broadcast_rules": "evidence/bench/mini_swe_bench_stage5_10task_20260627/combined_broadcast_rules.json",
+    "stage5_incremental_patch_eval": "evidence/bench/mini_swe_bench_stage5_10task_20260627/patch_eval_incremental/patch_eval_summary.json"
+  },
+  "gate_status": {
+    "next_allowed_gate": "larger_ramp_allowed_as_smoke_scale_only_after_stage5_verification; still_no_statistical_significance_claim",
+    "stage4_8task": "PASS_DIRECTIONAL_LEAD_TURINGOS_7_OF_8_VS_DIRECT_5_OF_8",
+    "stage5_10task": "PASS_DIRECTIONAL_LEAD_TURINGOS_9_OF_10_VS_DIRECT_7_OF_10",
+    "stop_condition": "none_for_8_10_ramp; do_not_claim_statistical_significance"
+  },
+  "meta_ai_review": {
+    "accepted_head_authority": false,
+    "authority": "none",
+    "context_hash": "sha256:fab1fe492a0d7f6c16cc1190faa6f3c9e67d2949df50f9138102a6a873c6181d",
+    "credential_material": "env_only_not_serialized",
+    "model": "deepseek-v4-pro",
+    "path": "evidence/bench/mini_swe_bench_stage5_10task_20260627/meta_ai_review_deepseek_v4_pro.json",
+    "provider": "deepseek",
+    "review_content_hash": "sha256:9be2f1d4a5b25755b461aead76ccafdb49231f515d0e8c7705d065d13e172361",
+    "review_verdict": "PASS",
+    "status": "PASS"
+  },
+  "model": "grok-build",
+  "per_task": [
+    {
+      "direct_candidate_patch_hash": "sha256:7be44fb1704b5631cb284706f4f914b929646a2be8d2c6d97a1ebe07bada8ab4",
+      "direct_failure_class": "OFFICIAL_EVAL_FAIL",
+      "direct_result": "FAIL",
+      "instance_id": "django__django-11790",
+      "paired_outcome": "turingos_only",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:2f9e04296828bb579e56890e81baf3ef63bcf4fe51e2d4be73361f28e0482664",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:7628c90f088686d80128e16c9d88e760b7ab6dcb2edb0dc0013c55c48f54062e",
+      "direct_failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+      "direct_result": "FAIL",
+      "instance_id": "django__django-11815",
+      "paired_outcome": "turingos_only",
+      "target_tests": [
+        "migrations.test_writer.WriterTests.test_serialize_class_based_validators",
+        "migrations.test_writer.WriterTests.test_serialize_enums"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:3c1d7247805f825545546649bc5c4a9a452fa3653922836f78e8ebab69d45753",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:fb5d58ca4ea62dc5ff119af4c47b461f28b6644ab152c0cdac12011efc971f1e",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-11848",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_rfc850",
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_year_less_than_70"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:d301cccd9e3015d2658a00c211dcea2fc0dac5f1b48bb275bb8528b7b6c46fa3",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:019c53ab3ecb78ceeb386f79592d5f19633512e3863b5213566c90baf7e3038d",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-11880",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "forms_tests.tests.test_forms.FormsTestCase.test_field_deep_copy_error_messages"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:ca05eec3eb386b0fc23a410e444c26143e55f5ed671e0b3e9621dcf4b6440df5",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:446b8d3e6016ec05f6492069b406e361ad188dab129bb9fdf0035c30f03e9c5c",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-11885",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "delete.tests.FastDeleteTests.test_fast_delete_combined_relationships"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:8592dc468e864bc54e35c3fae6117333a5149c86234f64a905d5881a2bc0698a",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:3cc0b623a4393acf23f2426804f91ba7a471b940d928d93b072d6163d0cffd86",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-11951",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "bulk_create.tests.BulkCreateTests.test_explicit_batch_size_respects_max_batch_size"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:3cc0b623a4393acf23f2426804f91ba7a471b940d928d93b072d6163d0cffd86",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "direct_failure_class": "MISSING_OR_EMPTY_PATCH",
+      "direct_result": "FAIL",
+      "instance_id": "django__django-11964",
+      "paired_outcome": "both_fail",
+      "target_tests": [
+        "model_enums.tests.ChoicesTests.test_str",
+        "model_enums.tests.ChoicesTests.test_textchoices"
+      ],
+      "turingos_accepted_head_moved": false,
+      "turingos_candidate_patch_hash": "sha256:caa25d182d4c79bf370747617d97b97b8c5f56d11f31cdbc5e7709092884aead",
+      "turingos_failure_class": "OFFICIAL_EVAL_FAIL",
+      "turingos_predicate_product": "FAIL",
+      "turingos_result": "FAIL",
+      "turingos_write_event_type": "FailureNode"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:b0ffc6f10a2a3fe12936bcc944d8943c617644e061786ea353397189bf3fcff2",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-11999",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "model_fields.tests.GetFieldDisplayTests.test_overriding_FIELD_display"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:a2194877702509abea0d183f5eee1acdb95c70aba59144c9ea20b34c2c5471c5",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:607d1e18cf2b0ed2a62a1694d5adcaab31b905c14772d10c3ac5d897b20208f9",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-12039",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "indexes.tests.SchemaIndexesTests.test_descending_columns_list_sql"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:0e4451f60fc12b8aed7e8b0c9a73da6c2db9158651d2c659d91f233ff4a1c460",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    },
+    {
+      "direct_candidate_patch_hash": "sha256:08af6e22fa66b28c47c3cd61192637cdcf2fca544718dc4d48f8f01fb469e63f",
+      "direct_failure_class": null,
+      "direct_result": "PASS",
+      "instance_id": "django__django-12050",
+      "paired_outcome": "both_pass",
+      "target_tests": [
+        "queries.test_query.TestQuery.test_iterable_lookup_value"
+      ],
+      "turingos_accepted_head_moved": true,
+      "turingos_candidate_patch_hash": "sha256:08af6e22fa66b28c47c3cd61192637cdcf2fca544718dc4d48f8f01fb469e63f",
+      "turingos_failure_class": null,
+      "turingos_predicate_product": "PASS",
+      "turingos_result": "PASS",
+      "turingos_write_event_type": "CandidateAccepted"
+    }
+  ],
+  "results": {
+    "absolute_pass_delta": 2,
+    "direct_pass": 7,
+    "direct_total": 10,
+    "mcnemar_exact_two_sided_p": "0.5",
+    "paired_counts": {
+      "both_fail": 1,
+      "both_pass": 7,
+      "direct_only": 0,
+      "turingos_only": 2
+    },
+    "statistical_claim": "smoke_scale_directional_only_not_statistically_significant",
+    "turingos_pass": 9,
+    "turingos_total": 10
+  },
+  "sample_size": 10,
+  "schema_id": "MiniSweBenchRampLoopSummary.v1",
+  "stage": "Stage5_10task_ramp",
+  "substrate_coverage_with_meta": {
+    "blocking_findings": [],
+    "path": "evidence/bench/mini_swe_bench_stage5_10task_20260627/substrate_coverage_audit_with_meta.json",
+    "scientific_status": "SUBSTRATE_COVERAGE_READY_WITH_META_AI",
+    "verdict": "PASS"
+  },
+  "tasks_source": "/tmp/turingos-swebench-data/verified-mini-50.jsonl first 10",
+  "thinking": "off_by_worker_mode_contract_if_supported; no hidden chain-of-thought persisted",
+  "worker": "grok_cli_headless"
+}

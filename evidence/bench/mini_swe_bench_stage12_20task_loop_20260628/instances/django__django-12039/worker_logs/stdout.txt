@@ -1,0 +1,11 @@
+**Patch applied** (smallest change: whitespace fix localized to `Columns`/`IndexColumns` stringification in [django/db/backends/ddl_references.py](/tmp/turingos_substrate_worktrees/12ccec69307f050c/django/db/backends/ddl_references.py)).
+
+Verified via direct execution (covers both reported cases + edges; sqlite CREATE INDEX path also exercised):
+- `("name" DESC)`
+- `("name")`
+- `("name" text_pattern_ops)`
+- `("name" text_pattern_ops DESC)`
+- shorter suffix lists preserved
+- no trailing spaces, no glued tokens
+
+Worktree left with the edit (no other files touched).

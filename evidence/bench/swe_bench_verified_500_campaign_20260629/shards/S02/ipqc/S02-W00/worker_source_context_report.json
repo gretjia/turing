@@ -1,0 +1,197 @@
+{
+  "context_name": "source_context.md",
+  "ipqc_window_id": "S02-W00",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_source_context.v1",
+  "selection_rule": "worker_derived_candidate_diff_paths_only",
+  "shard_id": "S02",
+  "status": "PASS",
+  "task_count": 10,
+  "tasks": [
+    {
+      "base_commit": "9476425b9e34363c2d9ac38e9f04aa75ae54a775",
+      "candidate_patch_path": "shards/S02/tasks/sympy__sympy-13551/candidate.patch",
+      "instance_id": "sympy__sympy-13551",
+      "paths": [
+        {
+          "path": "sympy/concrete/products.py",
+          "sha256": "sha256:dc67feefa42423031abece64087ad2eb02d1e91ebb55f561a222537e5c22c5e7",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "sympy/sympy",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/sympy__sympy-13551/source_context.md",
+      "source_context_sha256": "sha256:906e1e6980daa87febca5bf9e9edda2e2eda55445501b2a3f17b82b315b010ae",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/sympy__sympy-13551",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "7269fa3e33e8d02485a647da91a5a2a60a06af61",
+      "candidate_patch_path": "shards/S02/tasks/astropy__astropy-14365/candidate.patch",
+      "instance_id": "astropy__astropy-14365",
+      "paths": [
+        {
+          "path": "astropy/io/ascii/qdp.py",
+          "sha256": "sha256:db64d64d72e032b6975da362dbd55f875f10942fbb9c868b14f96c5de06f2cb7",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "astropy/astropy",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/astropy__astropy-14365/source_context.md",
+      "source_context_sha256": "sha256:5b83e564f7565741dc91afa65e6abf6827b9e899180a6666b4b7b982d96ca05a",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/astropy__astropy-14365",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "d4df5e1b0b1c643fe0fc521add0236764ec8e92a",
+      "candidate_patch_path": "shards/S02/tasks/django__django-11119/candidate.patch",
+      "instance_id": "django__django-11119",
+      "paths": [
+        {
+          "path": "django/template/engine.py",
+          "sha256": "sha256:3c90579039afdc0221e96ba06f215c50abb4d5728d0f1938dc12944532e123b8",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "django/django",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/django__django-11119/source_context.md",
+      "source_context_sha256": "sha256:829ce97caacb832b5073f12066a2a9dc9291e389092e01596f7663e35ac99fb8",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/django__django-11119",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "3eadeacc06c9f2ddcdac6ae39819faa9fbee9e39",
+      "candidate_patch_path": "shards/S02/tasks/matplotlib__matplotlib-23299/candidate.patch",
+      "instance_id": "matplotlib__matplotlib-23299",
+      "paths": [
+        {
+          "path": "lib/matplotlib/_pylab_helpers.py",
+          "sha256": "sha256:c920f4f86449d73a71e52ca8e303aa74daa048eb23c08704555d08fbe0140ead",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "matplotlib/matplotlib",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/matplotlib__matplotlib-23299/source_context.md",
+      "source_context_sha256": "sha256:87ebdb52164158bed6c9ebca4b8434da79b670fad4e1d2f18b21f0b7b5242810",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/matplotlib__matplotlib-23299",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "d3b6aa6d8b997df115a53c001d00222a0f92f63a",
+      "candidate_patch_path": "shards/S02/tasks/pydata__xarray-4687/candidate.patch",
+      "instance_id": "pydata__xarray-4687",
+      "paths": [
+        {
+          "path": "xarray/core/ops.py",
+          "sha256": "sha256:3163dfa829aa2955828f7986491deb9be4c06d73f8d9e6a814c16372de8bf86c",
+          "source": "github_raw"
+        },
+        {
+          "path": "xarray/core/computation.py",
+          "sha256": "sha256:440ed45b12aa47e5c36afc1658fa94949b660f2d3f437d6ce619d299d7009053",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "pydata/xarray",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/pydata__xarray-4687/source_context.md",
+      "source_context_sha256": "sha256:d0224d79c0c739284213c35b58b5e5be5929be673d0df8ae6166d92e55a4a74e",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/pydata__xarray-4687",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "5e7f1ab4bf58e473e5d7f878eb2b499d7deabd29",
+      "candidate_patch_path": "shards/S02/tasks/pytest-dev__pytest-7205/candidate.patch",
+      "instance_id": "pytest-dev__pytest-7205",
+      "paths": [
+        {
+          "path": "src/_pytest/setuponly.py",
+          "sha256": "sha256:c51373696a6860bd6071cb83aae9b50b79afece716e9a5f58dd9020e476b9397",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "pytest-dev/pytest",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/pytest-dev__pytest-7205/source_context.md",
+      "source_context_sha256": "sha256:6a42e80a08d890b083dc0093771156e7a9153025a93946479123970d7eaaa029",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/pytest-dev__pytest-7205",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "1c8668b0a021832386470ddf740d834e02c66f69",
+      "candidate_patch_path": "shards/S02/tasks/scikit-learn__scikit-learn-13142/candidate.patch",
+      "instance_id": "scikit-learn__scikit-learn-13142",
+      "paths": [
+        {
+          "path": "sklearn/mixture/base.py",
+          "sha256": "sha256:0d24ba0f9a12e8dca935c2423009120853aa8e1db488981ebd5c631134fcfb5d",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "scikit-learn/scikit-learn",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/scikit-learn__scikit-learn-13142/source_context.md",
+      "source_context_sha256": "sha256:4e367dacfd843e3d51964de4573d15cb802aae867e285a0d9dbcb0f3d45bde71",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/scikit-learn__scikit-learn-13142",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "b3e26a6c851133b82b50f4b68b53692076574d13",
+      "candidate_patch_path": "shards/S02/tasks/sphinx-doc__sphinx-7462/candidate.patch",
+      "instance_id": "sphinx-doc__sphinx-7462",
+      "paths": [
+        {
+          "path": "sphinx/domains/python.py",
+          "sha256": "sha256:e2e915d9a05c73b88df6124c3fac218b024cd53d8ecb572db17f134355815457",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "sphinx-doc/sphinx",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/sphinx-doc__sphinx-7462/source_context.md",
+      "source_context_sha256": "sha256:215561aa929d20662030e64df556c59e397de5fa7fd9e532b32e286376891dc9",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/sphinx-doc__sphinx-7462",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "50d8a102f0735da8e165a0369bbb994c7d0592a6",
+      "candidate_patch_path": "shards/S02/tasks/sympy__sympy-13615/candidate.patch",
+      "instance_id": "sympy__sympy-13615",
+      "paths": [
+        {
+          "path": "sympy/sets/sets.py",
+          "sha256": "sha256:ba3665144926c535bc3995d6acd441d297bec5e5785e668bb18e77c6765e172c",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "sympy/sympy",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/sympy__sympy-13615/source_context.md",
+      "source_context_sha256": "sha256:5565abaaf57611a5b6e1ec085bacb0c328084ce627e0aaa324f76b45aabd7ad4",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/sympy__sympy-13615",
+      "status": "PASS"
+    },
+    {
+      "base_commit": "fa4e8d1cd279acf9b24560813c8652494ccd5922",
+      "candidate_patch_path": "shards/S02/tasks/astropy__astropy-14369/candidate.patch",
+      "instance_id": "astropy__astropy-14369",
+      "paths": [
+        {
+          "path": "astropy/io/ascii/cds.py",
+          "sha256": "sha256:82382bc451297ab3252dc17967fe427faae0e6e4cd966a6430bcf0a2d6427d69",
+          "source": "github_raw"
+        }
+      ],
+      "problems": [],
+      "repo": "astropy/astropy",
+      "source_context_path": "shards/S02/ipqc/S02-W00/worker_safe_tasks/astropy__astropy-14369/source_context.md",
+      "source_context_sha256": "sha256:75ea6163e97ae383b88b10f7f655b5b1c888130066beb14028c7f51a8cc0574f",
+      "source_snapshot_root": "shards/S02/ipqc/S02-W00/source_snapshots/astropy__astropy-14369",
+      "status": "PASS"
+    }
+  ]
+}

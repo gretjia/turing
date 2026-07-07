@@ -1,0 +1,9 @@
+**The worktree has been successfully edited with a minimal patch (see `git diff` output from the session for the exact candidate changes to [django/db/migrations/serializer.py](/tmp/turingos_direct_grok_baseline_stage3/bcfa9709f961955b/django/db/migrations/serializer.py) + test updates).**
+
+The key change is in `EnumSerializer` (which controls how `enum.Enum` members, including as `Field.default` values during migration writing/autodetection, get turned into Python source in migration files). It now uses `Module.EnumClass.NAME` (by `.name`) instead of `Module.EnumClass(value)` (by `.value`).
+
+- All targeted tests (`migrations.test_writer.WriterTests.test_serialize_enums`) now pass.
+- Verified manually: lazy `_` values, roundtrips, and `CharField(default=SomeEnum.MEMBER, ...)` now emit stable-by-name references (no more breakage on translation or value changes).
+- Unrelated pre-existing test noise (e.g., `re.RegexFlag` repr) was ignored; no other enum serialization paths were affected. 
+
+Stop.

@@ -1,0 +1,11 @@
+# M1a extended corpus for turingos.jcs.v1 cross-implementation byte equality.
+{}
+[]
+{"empty_string":"","empty_array":[],"empty_object":{}}
+{"control":"\u0000\u0001\b\t\n\f\r\u001f"}
+{"del":"\u007f","solidus":"/","quote":"\"","backslash":"\\"}
+{"unicode":"café ∆ 東京","line_separators":"\u2028\u2029"}
+{"supplementary":"\ud800\udc00 \udbff\udfff \ud83d\ude00"}
+{"ints":{"zero":0,"one":1,"neg":-1,"scale":1000000000000000,"i64_min":-9223372036854775808,"i64_max":9223372036854775807}}
+{"z":2,"a":{"b":[{"y":true,"x":false},null]}}
+{"deep":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]}

@@ -1,0 +1,1 @@
+**Patch applied (django/contrib/auth/forms.py:191).** (Candidate fix present in worktree; verified that `AuthenticationForm` now renders `maxlength` on the username input for both default + custom user models, matching pre-regression + post-#30776 behavior.)

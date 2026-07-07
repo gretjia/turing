@@ -1,0 +1,50 @@
+diff --git a/seaborn/_core/scales.py b/seaborn/_core/scales.py
+index 55874bf2..c83f2683 100644
+--- a/seaborn/_core/scales.py
++++ b/seaborn/_core/scales.py
+@@ -36,6 +36,7 @@ from pandas import Series
+ 
+ from seaborn._core.rules import categorical_order
+ from seaborn._core.typing import Default, default
++from seaborn.utils import _format_legend_ticks
+ 
+ from typing import TYPE_CHECKING
+ if TYPE_CHECKING:
+@@ -378,7 +379,7 @@ class ContinuousBase(Scale):
+             axis.set_view_interval(vmin, vmax)
+             locs = axis.major.locator()
+             locs = locs[(vmin <= locs) & (locs <= vmax)]
+-            labels = axis.major.formatter.format_ticks(locs)
++            labels = _format_legend_ticks(axis.major.formatter, locs)
+             new._legend = list(locs), list(labels)
+ 
+         return new
+diff --git a/seaborn/utils.py b/seaborn/utils.py
+index 2407853c..23f0536c 100644
+--- a/seaborn/utils.py
++++ b/seaborn/utils.py
+@@ -701,15 +701,19 @@ def locator_to_legend_entries(locator, limits, dtype):
+         formatter = mpl.ticker.ScalarFormatter()
+     formatter.axis = dummy_axis()
+ 
+-    # TODO: The following two lines should be replaced
+-    # once pinned matplotlib>=3.1.0 with:
+-    # formatted_levels = formatter.format_ticks(raw_levels)
+-    formatter.set_locs(raw_levels)
+-    formatted_levels = [formatter(x) for x in raw_levels]
++    formatted_levels = _format_legend_ticks(formatter, raw_levels)
+ 
+     return raw_levels, formatted_levels
+ 
+ 
++def _format_legend_ticks(formatter, locs):
++    """Format ticks for legend entries, including any formatter offset."""
++    formatter.set_locs(locs)
++    if formatter.get_offset():
++        return [formatter.format_data(x) for x in locs]
++    return [formatter(x) for x in locs]
++
++
+ def relative_luminance(color):
+     """Calculate the relative luminance of a color according to W3C standards
+ 

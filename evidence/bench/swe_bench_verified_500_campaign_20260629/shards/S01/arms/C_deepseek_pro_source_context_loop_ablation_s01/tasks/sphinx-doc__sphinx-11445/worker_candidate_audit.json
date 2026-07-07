@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W02/source_snapshots/sphinx-doc__sphinx-11445",
+    "output": "Checking patch sphinx/transforms/i18n.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-11445/candidate.patch",
+  "candidate_patch_sha256": "sha256:b0f53383af01f0f7d7763d71a9e10c95b7e4aebcd2d41fed636521898bb8fddf",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sphinx/transforms/i18n.py"
+  ],
+  "instance_id": "sphinx-doc__sphinx-11445",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

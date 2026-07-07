@@ -1,0 +1,30 @@
+**Patch exists (minimal one-line guard added in `contribute_to_class`).**
+
+The diff:
+
+```diff
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index ee45bb941e..411a7c4e40 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -763,8 +763,9 @@ class Field(RegisterLookupMixin):
+             if not getattr(cls, self.attname, None):
+                 setattr(cls, self.attname, self.descriptor_class(self))
+         if self.choices is not None:
+-            setattr(cls, 'get_%s_display' % self.name,
+-                    partialmethod(cls._get_FIELD_display, field=self))
++            if not getattr(cls, 'get_%s_display' % self.name, None):
++                setattr(cls, 'get_%s_display' % self.name,
++                        partialmethod(cls._get_FIELD_display, field=self))
+ 
+     def get_filter_kwargs_for_object(self, obj):
+         """
+```
+
+(The root cause was unconditional `setattr` for auto-generated `get_FOO_display` (using `partialmethod`) always winning over any user-defined method, after the switch in the metaclass + `Field.contribute_to_class` path. The guard matches the existing pattern used for `attname` descriptors.)
+
+Verification (repro + edge cases + `model_fields` + `model_inheritance` tests all pass):
+- Local override now works and returns the custom value.
+- Auto-generated behavior is unchanged when no override.
+- Abstract + concrete + proxy inheritance cases preserve user overrides (via MRO + `getattr` check).
+- No other files touched.

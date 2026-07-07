@@ -1,0 +1,6 @@
+**Patch applied to worktree (django/utils/http.py only).**  
+(See: `git diff` output above for the exact diff.)
+
+The fix replaces the hardcoded `<70` / 1900-2000 cutoff with RFC 7231-compliant logic: compute the 2-digit year relative to the current year (century base), then subtract 100 for any result that would be >50 years in the future. (This applies only to the RFC850 2-digit case; 4-digit dates are unchanged.)
+
+Verified via direct execution against current year (2026) for boundary cases (xx=94,26,76,77,99,00 + 4-digit control) — all map as specified by the RFC. No other files inspected or modified.

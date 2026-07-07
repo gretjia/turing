@@ -1,0 +1,16 @@
+diff --git a/requests/models.py b/requests/models.py
+index 9c624d3..695c354 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -448,7 +448,10 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+                     if isinstance(data, basestring) or hasattr(data, 'read'):
+                         content_type = None
+                     else:
+-                        content_type = 'application/x-www-form-urlencoded'
++                        if isinstance(data, (str, bytes)):
++                            content_type = None
++                        else:
++                            content_type = 'application/x-www-form-urlencoded'
+ 
+             self.prepare_content_length(body)
+ 

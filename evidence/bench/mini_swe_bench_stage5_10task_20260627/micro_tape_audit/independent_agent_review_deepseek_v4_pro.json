@@ -1,0 +1,39 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "context_hash": "sha256:d8c65ba0694470e310df17241339c36176872b81919fbd891a26f2ba0822b5be",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:da71f8e27f364c09c02153e6eaa77dab0358f5526899b2316d2640d39000f2f2",
+  "request_hash": "sha256:b10e272a0b36eefdd6335f3889041e460cfc304605f9b8824e136d6bd08e4690",
+  "review": {
+    "dag_quality": "WARN",
+    "findings": [
+      {
+        "finding": "market_settled_before_official_evidence",
+        "severity": "WARN"
+      },
+      {
+        "finding": "pput_accounted_before_final_accept",
+        "severity": "WARN"
+      },
+      {
+        "finding": "official_evidence_precedes_accept",
+        "severity": "INFO"
+      }
+    ],
+    "next_actions": [
+      "Monitor market settlement timing for potential race conditions.",
+      "Clarify PPUT accounting to handle final acceptance state.",
+      "No replay integrity issues detected."
+    ],
+    "replay_auditable": true,
+    "schema_id": "MicroTapeIndependentReview.v1",
+    "verdict": "PASS"
+  },
+  "review_content_hash": "sha256:47aeed9980284d49730ac1e1b67ab69fd0c681c97208728d0795e96d22d7b370",
+  "schema_id": "DeepSeekMicroTapeIndependentAgentReviewRun.v1",
+  "status": "PASS"
+}

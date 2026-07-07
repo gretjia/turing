@@ -1,0 +1,78 @@
+{
+  "candidate_patch_sha256": "sha256:9da482c5053f2986c1e1b66ffeba6ed176826129f218038fb75e54810904b4ea",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1488,
+  "content_sha256": "sha256:931766b0521e4ada63267c57cbbe79bb7361dd2b1ceb0501f03534b0c9e9499d",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:dbbb692f799d0531de0d727d2ee6a376f05114f4cddf1a3e5ab067107def246e",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 629,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "astropy__astropy-14182",
+    "receipt_id": "rcpt:93bd8689438cad877b611c9cb2dc516f34ef4b840ff89fef996c20a1e4769362",
+    "run_id": "m3-p5-arm-a-source-repair-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-confirmatory-source-repair",
+    "usage": {
+      "completion_tokens": 418,
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 656,
+      "prompt_tokens": 1296,
+      "provider_usage_raw_sha256": "sha256:bfd004ea5508db97cb98050b29f8190f47feb5a228cbdec6b44c4278a466e248",
+      "total_tokens": 1714
+    },
+    "wall_time_ms": 6488,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "c5cea7fe-2ab8-4924-ac8f-c9ee32b8e76c",
+      "response_sha256": "sha256:3c6c2dae1ee91e1a2bd0d9067def56dc983046cd63dc34864dae00d9e0b396ee"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "astropy__astropy-14182",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch astropy/io/ascii/rst.py...\nHunk #1 succeeded at 5 (offset -1 lines).\nHunk #2 succeeded at 58 (offset 12 lines).\nApplied patch astropy/io/ascii/rst.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:5651efcb65f880baef9b55a43b4f45d89f934e714a7e9f5e9787d7c604ef9dde",
+  "response_sha256": "sha256:3c6c2dae1ee91e1a2bd0d9067def56dc983046cd63dc34864dae00d9e0b396ee",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/astropy__astropy-14182/worker_capsule.md",
+  "source_context_length_chars": 1970,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/astropy__astropy-14182/source_context.md",
+  "source_context_sha256": "sha256:e8edd8a2c149e4cf6ce707bd1660ef701293cc584327f13f1b17f44110aa7855",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 418,
+    "prompt_cache_hit_tokens": 640,
+    "prompt_cache_miss_tokens": 656,
+    "prompt_tokens": 1296,
+    "total_tokens": 1714
+  },
+  "usage_raw_sha256": "sha256:bfd004ea5508db97cb98050b29f8190f47feb5a228cbdec6b44c4278a466e248",
+  "wall_time_ms": 6488
+}

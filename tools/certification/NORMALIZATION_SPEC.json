@@ -1,0 +1,17 @@
+{
+  "schema_id": "turingos.fce_normalization_spec.v1",
+  "volatile_json_pointer_suffixes": [
+    "/timestamp_utc",
+    "/created_at_utc",
+    "/wall_clock_ms"
+  ],
+  "volatile_key_names": [
+    "absolute_scratch_path",
+    "scratch_dir",
+    "tmp_dir"
+  ],
+  "notes": [
+    "FCE-R2 comparisons remove only these fields before canonical byte comparison.",
+    "Any other difference is nondeterminism and fails replay determinism."
+  ]
+}

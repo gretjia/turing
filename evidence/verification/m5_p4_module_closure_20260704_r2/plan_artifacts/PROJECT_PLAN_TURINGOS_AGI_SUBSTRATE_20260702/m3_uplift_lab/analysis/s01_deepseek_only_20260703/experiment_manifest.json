@@ -1,0 +1,73 @@
+{
+  "arms": [
+    "A",
+    "B",
+    "C"
+  ],
+  "description": "M3.P7 real analysis manifest for the reregistered DeepSeek-only same-provider source-context loop measurement. S01-scoped result files derive only from official upstream SWE-bench Docker harness reports.",
+  "deviation_label": "DeepSeek-only same-provider source-context loop continuation; not the original heterogeneous-worker preregistration.",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_DERIVED_S01_SCOPE",
+  "schema_id": "turingos.m3.deepseek_only_s01_analysis_manifest.v1",
+  "scoring": {
+    "deepseek-v4-pro__same-provider-source-context-worker": {
+      "A": "scoring/deepseek-v4-pro__same-provider-source-context-worker_armA/evaluation_results.json",
+      "B": "scoring/deepseek-v4-pro__same-provider-source-context-worker_armB/evaluation_results.json",
+      "C": "scoring/deepseek-v4-pro__same-provider-source-context-worker_armC/evaluation_results.json"
+    }
+  },
+  "tasks": [
+    "astropy__astropy-13579",
+    "astropy__astropy-13977",
+    "astropy__astropy-14096",
+    "astropy__astropy-14182",
+    "astropy__astropy-14309",
+    "django__django-10999",
+    "django__django-11066",
+    "django__django-11087",
+    "django__django-11095",
+    "django__django-11099",
+    "matplotlib__matplotlib-20859",
+    "matplotlib__matplotlib-21568",
+    "matplotlib__matplotlib-22719",
+    "matplotlib__matplotlib-22865",
+    "matplotlib__matplotlib-22871",
+    "psf__requests-2931",
+    "psf__requests-5414",
+    "psf__requests-6028",
+    "pydata__xarray-3993",
+    "pydata__xarray-4075",
+    "pydata__xarray-4094",
+    "pydata__xarray-4356",
+    "pydata__xarray-4629",
+    "pylint-dev__pylint-6528",
+    "pylint-dev__pylint-6903",
+    "pylint-dev__pylint-7080",
+    "pylint-dev__pylint-7277",
+    "pylint-dev__pylint-8898",
+    "pytest-dev__pytest-5787",
+    "pytest-dev__pytest-5809",
+    "pytest-dev__pytest-5840",
+    "pytest-dev__pytest-6197",
+    "pytest-dev__pytest-6202",
+    "scikit-learn__scikit-learn-11578",
+    "scikit-learn__scikit-learn-12585",
+    "scikit-learn__scikit-learn-12682",
+    "scikit-learn__scikit-learn-12973",
+    "scikit-learn__scikit-learn-13124",
+    "scikit-learn__scikit-learn-13135",
+    "sphinx-doc__sphinx-10614",
+    "sphinx-doc__sphinx-10673",
+    "sphinx-doc__sphinx-11445",
+    "sphinx-doc__sphinx-11510",
+    "sphinx-doc__sphinx-7440",
+    "sphinx-doc__sphinx-7454",
+    "sympy__sympy-12489",
+    "sympy__sympy-13031",
+    "sympy__sympy-13091",
+    "sympy__sympy-13372",
+    "sympy__sympy-13480"
+  ],
+  "workers": [
+    "deepseek-v4-pro__same-provider-source-context-worker"
+  ]
+}

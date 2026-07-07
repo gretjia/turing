@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S00/tasks/pydata__xarray-3095/candidate.patch",
+  "candidate_patch_sha256": "sha256:3050a1f05a92ad553b9584a60970ed8424684448c25f75ec3eb8890cb56be6dc",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "xarray/core/variable.py"
+  ],
+  "instance_id": "pydata__xarray-3095",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S00",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

@@ -1,0 +1,53 @@
+diff --git a/requests/models.py b/requests/models.py
+index 613a0521..a3b1fc4c 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -435,7 +435,7 @@ def prepare_url(self, url, params):
+ 
+     def prepare_headers(self, headers):
+         """Prepares the given HTTP headers."""
+-        
++
+         self.headers = CaseInsensitiveDict()
+         if headers:
+             for header in headers.items():
+@@ -499,7 +499,7 @@ def prepare_auth(self, auth, url=''):
+             # If we're going to be POST using file-like objects, we allow a
+             # Content-Type of application/x-www-form-urlencoded and skip
+             # setting the default.
+-            if isinstance(self.body, (bytes, bytearray, str, type(None))):
++            if hasattr(self, 'body') and isinstance(self.body, (bytes, bytearray, str, type(None))):
+                 self.headers.setdefault('Content-Type', 'application/x-www-form-urlencoded')
+ 
+         if self.body is not None:
+@@ -649,14 +649,16 @@ def _create_connection(self, conn_type, request, proxies=None, verify=None, cert
+         # proxy via the extra http_proxy & https_proxy env vars.
+         # For both HTTP and HTTPS, we create the proxy via the
+         # proxy_headers if set by the user.
++        proxy_headers = proxies[proxy].get('proxy_headers', {}) if proxies and proxy in proxies else {}
+         if conn_type == "http":
+             # Apply proxy auth if set
+-            proxy_auth = proxies[proxy].get('proxy_auth', None) if proxies else None
++            proxy_auth = proxies[proxy].get('proxy_auth', getattr(proxies[proxy], 'get', None)
++                                            ()) if proxies and proxy in proxies else None
+             if proxy_auth:
+                 if isinstance(proxy_auth, tuple):
+                     proxy_auth = HTTPProxyAuth(*proxy_auth)
+                 proxy_auth = proxy_auth(self)
+-            proxy_headers = proxies[proxy].get('proxy_headers', {}) if proxies else {}
++                proxy_headers.update(proxy_auth)
+             conn = http.client.HTTPConnection(proxy, **conn_params)
+         else:
+             # Apply proxy auth if set
+@@ -664,8 +666,9 @@ def _create_connection(self, conn_type, request, proxies=None, verify=None, cert
+             if proxy_auth:
+                 if isinstance(proxy_auth, tuple):
+                     proxy_auth = HTTPProxyAuth(*proxy_auth)
+-                proxy_auth = proxy_auth(self)
+-            proxy_headers = proxies[proxy].get('proxy_headers', {}) if proxies else {}
++                proxy_auth_headers = proxy_auth(self)
++                proxy_headers.update(proxy_auth_headers)
++            proxy_headers = proxies[proxy].get('proxy_headers', {}) if proxies and proxy in proxies else {}
+             conn = http.client.HTTPSConnection(proxy, **conn_params)
+         conn.proxy_headers = proxy_headers
+         return conn

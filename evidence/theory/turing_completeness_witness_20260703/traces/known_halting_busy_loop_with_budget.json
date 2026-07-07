@@ -1,0 +1,208 @@
+{
+  "schema_id": "turingos.tc3.witness_trace.v1",
+  "program_id": "known_halting_busy_loop_with_budget",
+  "terminal_event_id": "mu:7c978c17b6c2292e61c3d01627f818a97deb9f018e1030e7de1571daf69297b1",
+  "terminal_event_type": "ComputationHalted",
+  "terminal_kind": "HALTED",
+  "steps_executed": 12,
+  "final_state": {
+    "program_counter": 2,
+    "counter_a": 5,
+    "counter_b": 0,
+    "halted": true
+  },
+  "final_state_hash": "sha256:47b677627f73b62f3671eb007af9a153758f079109987d2eb1e3017f15d7a9b4",
+  "events": [
+    {
+      "event_id": "mu:948dd84a747405387a3fef8933226fc7cf589e93376b316c4c26d3aba8111026",
+      "event_type": "ComputationStarted",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:4d4fa104fee810431f1af35a753a1f7cc57036ecc43aa777847237376a340bc8",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:a6d959aebc4fdcbc0a2815e7a9c5bdca6583095b8c0e1aeb3ef2d319e64a3296",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:6becfdd502672f5d98773c8c5c9743c1b52f30499399cbc359188ec68e498f7a",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:6a617e0846578ee12acb26f21686404ca84202d15c7c4d1a0eceab3fe00ae142",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:ab76dfb4251630231d2425e0b001b6992bdefef2235a8336c0442baee2429a20",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:4606daaecf5ec26c52074a75289e5d0c89100e43b49555cff399ca935eeb84e9",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:17d5ad202197da8748410fb465c61817600abddcc9c0075692780dae032da79b",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:83f5e2b724ed8b603eba72ac036f4047dddafb3a63e5cbd6846e5a7f7abd15f8",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:a986f0c4c3a63e54ae297e981a0a1dfac375c3f7babb5387853a661a90c03bc8",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:24b95bcb44493f6326967150ed5b386c09d902e1e4563317199f979fb67a9e68",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:a62f8a84bf6af562b6133f541af7d98e73fe790a41860bde634d8de9dc91b0ff",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:0aa6b40d826e196aa448a4a916c3bad11d0551ee555d0398cbd0f5c077446801",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:a18cb9c1670c621f856a3264a896ff2d80a680154cdbf0584242ea7011eb88db",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:291f8b7d7966abf5d134dcd1f9d9eb803b59ac993958dd6d9d45faf4b2bda5ab",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:b37382969ece361e44c5faf98434a456a4b25f31a0d06b56900189a2de4601b3",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:cbf48685f77d7fded3295ff0b3f7f3b394610c152a0cb5fd27d1ce79435cf38e",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:630ae091dbce3769dda8b0af2e506fef4b6503edff30f1c7b797367cef24f667",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:01cbfe056edfca315c850d3b1169ea82301ecd016bff8bc26d5c8bebb41bb4e7",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:f0687ebab26c245a0c2bb1860bbaeecbf8c24a9526979fdf82a8778ffeb3fa0d",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:bbc0e2b61ab639a5152546523a7368efe0a468d449bb65b8321a413577658096",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:b10a511c5ea29cf22068d1ff4895497da283bf6fdcc8ab55d9c80ecad9ace339",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:2b86f3ac0b46d1e76f2ad5a937fb2cb2af481c275bc670c71f97b426ba75a8f9",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:b77c118fec4badf84f3b2f9e9d52f06453bf8fc98b7767adb7ce69328488f51f",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:77036eb91de8f9dd730997bd9fba2213b70aa69fa5138a6ad51961c2d7eb8155",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:f5fd55fbbf9175d455e1a0926b8747eecfe1487f72954b8b1cc1efb4c400047c",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:976482b2855dfb6e402b1aa1ee7d27613e80c6cdc57a3024782787935353f3ae",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:3c1ca6448596d7c180644cf8d6f491a623898a832ba3b483b23dadd3182e3981",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:e107b71fd2fe116d933e84f99ad679943567dc0bb0e0fb421c583a08bd2f8fc7",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:4a2508208c83c35abfcc561bfd04e8596fc5db0c07a1dce2a737438e2ec40a86",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:280a7b3a9ea185d83430cb67abeefd4b99c9fb5ad2ba679ef44d9fc8fb9e0246",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:d2302296d5047491517d29315ea3121c670cc2148582ce57ed98b769475e3897",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:efe1271d1af5e70fe476f8b0c4fe52745012777bd9f08fe586fc4abae75167cb",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:0c7e8a031b1fd1899d731577aaeb2028f637bdf91928c090401a40380652b0a8",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:0fcd34ed46cbcd8a768a89d95dbf73eac4d4436680e2e7a71325ed3e4ee7b4e1",
+      "event_type": "InstructionAuthorized",
+      "head_moved": "AuthorizationHead"
+    },
+    {
+      "event_id": "mu:792962e7de773c5d53252ece9087c0695c11d5c7cfadf2abd4404b6e86192225",
+      "event_type": "InstructionApplied",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:e26258ed15ae3b91face5568f3772fea3d8b9a47b8932fbb16a1e5891fd17e55",
+      "event_type": "MachineStateObserved",
+      "head_moved": "None"
+    },
+    {
+      "event_id": "mu:7c978c17b6c2292e61c3d01627f818a97deb9f018e1030e7de1571daf69297b1",
+      "event_type": "ComputationHalted",
+      "head_moved": "None"
+    }
+  ],
+  "reducer_checked": true
+}

@@ -1,0 +1,14 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index c823b68..fef5372 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -58,6 +58,9 @@ class StrCategoryConverter(units.ConversionInterface):
+             is_numlike = all(units.ConversionInterface.is_numlike(v)
+                              and not isinstance(v, (str, bytes))
+                              for v in values)
++        # Keep the old pass-through behaviour for empty arrays
++        if values.size == 0:
++            is_numlike = False
+         if is_numlike:
+             _api.warn_deprecated(
+                 "3.5", message="Support for passing numbers through unit "

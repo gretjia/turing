@@ -1,0 +1,19 @@
+{
+  "apply_check": {
+    "apply_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/ipqc/S01-W02/source_snapshots/matplotlib__matplotlib-22719",
+    "output": "Checking patch lib/matplotlib/category.py...",
+    "status": "PASS"
+  },
+  "candidate_patch_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/matplotlib__matplotlib-22719/candidate.patch",
+  "candidate_patch_sha256": "sha256:3b78059ac6f101e002c9dd60e2a78901f3a152985b9f190ef3d3c80a532867ed",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "lib/matplotlib/category.py"
+  ],
+  "instance_id": "matplotlib__matplotlib-22719",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

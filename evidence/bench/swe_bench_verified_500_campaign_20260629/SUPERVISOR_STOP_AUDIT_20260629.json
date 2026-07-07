@@ -1,0 +1,71 @@
+{
+  "schema_id": "turingos.supervisor_stop_audit.v1",
+  "created_at_utc": "2026-06-29T09:19:22Z",
+  "base_commit_before_stop_packet": "f7f9efb09fd08b9a6d241d99a8c2ed58e745529f",
+  "decision": "STOP_SWE_BENCH_WORKER_GENERATION",
+  "reason": "The current workers inherit the strongest available Codex model configuration. Continuing S00 patch generation would mostly test frontier-model patching ability, not the TuringOS substrate, loop discipline, replay, evidence integrity, or weaker-worker governance.",
+  "worker_model_scope": {
+    "deepseek_api_used": false,
+    "deepseek_key_written_to_artifacts": false,
+    "codex_subagents_used": true,
+    "frontier_model_result_claim_allowed": false
+  },
+  "s00_state_at_stop": {
+    "shard_id": "S00",
+    "expected_prediction_count": 50,
+    "audited_worker_candidate_count": 48,
+    "prediction_count": 48,
+    "prediction_report_status": "FAIL",
+    "shard_run_packet_status": "BLOCKED",
+    "execute_now": false,
+    "missing_prediction_instance_ids": [
+      "pydata__xarray-3677",
+      "pylint-dev__pylint-6386"
+    ],
+    "official_harness_started_for_s00": false,
+    "official_harness_result_claim_allowed": false
+  },
+  "s00_w04_state": {
+    "worker_safe_packets": "PASS_10_OF_10",
+    "audited_pass_candidates": [
+      "scikit-learn__scikit-learn-11310",
+      "sphinx-doc__sphinx-10466",
+      "sympy__sympy-12481",
+      "astropy__astropy-13453",
+      "django__django-10973",
+      "matplotlib__matplotlib-20826",
+      "psf__requests-2317",
+      "pytest-dev__pytest-5631"
+    ],
+    "abandoned_or_incomplete_candidates": [
+      {
+        "instance_id": "pydata__xarray-3677",
+        "reason": "worker was stopped before a complete receipt/audit existed",
+        "local_uncommitted_partial_patch_sha256": "sha256:4537ccd5a6133493fd2c45344bec60d6403982bcd85a89dbead8c599788d04e7",
+        "eligible_for_predictions": false
+      },
+      {
+        "instance_id": "pylint-dev__pylint-6386",
+        "reason": "worker was stopped before candidate.patch existed",
+        "eligible_for_predictions": false
+      }
+    ]
+  },
+  "claims": {
+    "s00_ready_to_execute": false,
+    "full_verified_500_campaign_started": false,
+    "full_verified_500_result_claim_allowed": false,
+    "leaderboard_equivalence_claim_allowed": false,
+    "full_score_claim_allowed": false,
+    "turing_completeness_formally_proven": false,
+    "turing_completeness_proof_path_defined": true
+  },
+  "turingos_substrate_audit_summary": {
+    "microtape_replay_substrate": "EVIDENCE_PRESENT_IN_PRIOR_STAGE_PACKETS",
+    "official_harness_identity_gate": "READY_FROM_PRIOR_QUALIFICATION",
+    "gold_patch_guard": "PASS_FOR_WORKER_SAFE_PACKETS_AND_CANDIDATE_AUDIT_PATH",
+    "loop_engineering": "PARTIAL_S00_PRE_EXECUTION_GATE",
+    "universal_computation_proof": "NOT_YET_FORMALLY_PROVEN"
+  },
+  "required_next_action": "Switch from SWE-bench patch-generation score chasing to a formal TuringOS small-step computation proof: implement a MicroTape-backed two-counter machine or universal Turing machine witness, prove replay equivalence, then run independent recursive audit."
+}

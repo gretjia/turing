@@ -1,0 +1,839 @@
+{
+  "aggregate": {
+    "bundle_count": 1,
+    "event_count": 21,
+    "event_counts": {
+      "AtomAuthorized": 1,
+      "BudgetAllocated": 1,
+      "CandidateAccepted": 1,
+      "CostEvent": 1,
+      "EvidenceBound": 1,
+      "FailureNode": 2,
+      "GoalStateProposed": 1,
+      "MacroObservationImported": 1,
+      "MarketCreated": 1,
+      "MarketSettled": 1,
+      "OfficialEvaluatorEvidenceImported": 1,
+      "PPUTAccounted": 2,
+      "PositionMinted": 1,
+      "PredicateEvaluated": 1,
+      "RewardDistributed": 1,
+      "SystemConstitutionAccepted": 1,
+      "WorkCapsuleBuilt": 1,
+      "WorkerDispatchAuthorized": 1,
+      "WorkerReceiptImported": 1
+    },
+    "finding_counts": {
+      "official_evidence_precedes_accept": 1
+    },
+    "sandbox_host_assumed_count": 0
+  },
+  "canonicalization_profile": "turingos.jcs.v1-compatible-no-floats-ascii-keys",
+  "event_registry": "/home/zephryj/turingos_backup/work/turing/pack/04_registries/event_registry_v5_3_1.json",
+  "runs": [
+    {
+      "actual_refs": {
+        "accepted_head": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+        "authorization_head": "mu:88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9",
+        "tape_tip": "mu:8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987"
+      },
+      "bundle": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M1C_REAL_GROK_PROVIDER_RECEIPT/instances/django__django-12039/micro_tape.bundle",
+      "bundle_hash": "sha256:491ce5d7d61c99ea69ef56720988deac59736a59d800b129845c814bad2735da",
+      "bundle_verify_output": "The bundle contains these 3 refs:\na555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019 refs/turingos/accepted_head\n88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9 refs/turingos/authorization_head\n8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987 refs/turingos/tape_tip\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha256",
+      "checks": {
+        "accepted_final_progress_one": "PASS",
+        "accepted_head_authority": "PASS",
+        "authorization_head": "PASS",
+        "bundle_integrity": "PASS",
+        "canonical_payload_hash": "PASS",
+        "cost_conservation_all_branches": "PASS",
+        "cost_provenance": "PASS",
+        "decision_dag_completeness": "PASS",
+        "economic_timing": "PASS",
+        "failed_progress_zero": "PASS",
+        "git_topology": "PASS",
+        "market_accounting_correctness": "PASS",
+        "ref_reconstruction": "PASS",
+        "registry_head_effect": "PASS",
+        "sandbox_provenance": "PASS",
+        "terminal_golden_path_anchors_to_accepted_head": "PASS",
+        "vpput_accounting": "PASS"
+      },
+      "dag_edges": [
+        {
+          "from": "mu:344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2",
+          "kind": "tape_parent",
+          "to": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534"
+        },
+        {
+          "from": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534",
+          "kind": "tape_parent",
+          "to": "mu:5b020faa5ff3429ab3657d7882ed812a4f1f628173b76b80cb0ceae87ee57b0d"
+        },
+        {
+          "from": "mu:5b020faa5ff3429ab3657d7882ed812a4f1f628173b76b80cb0ceae87ee57b0d",
+          "kind": "tape_parent",
+          "to": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "tape_parent",
+          "to": "mu:88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9"
+        },
+        {
+          "from": "mu:88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9",
+          "kind": "tape_parent",
+          "to": "mu:28020395931810a515f7358a8237470335e36cdab91415261446d30d99a92274"
+        },
+        {
+          "from": "mu:28020395931810a515f7358a8237470335e36cdab91415261446d30d99a92274",
+          "kind": "tape_parent",
+          "to": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c"
+        },
+        {
+          "from": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c",
+          "kind": "tape_parent",
+          "to": "mu:e85e78837517506c949cf2ac19a7a70723a9bca60e810b93a114d97c3c32d85a"
+        },
+        {
+          "from": "mu:e85e78837517506c949cf2ac19a7a70723a9bca60e810b93a114d97c3c32d85a",
+          "kind": "tape_parent",
+          "to": "mu:10647362cb6858db512a284b990b33f01cff74f3d7c03ae0b608076d0a636687"
+        },
+        {
+          "from": "mu:10647362cb6858db512a284b990b33f01cff74f3d7c03ae0b608076d0a636687",
+          "kind": "tape_parent",
+          "to": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80"
+        },
+        {
+          "from": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80",
+          "kind": "tape_parent",
+          "to": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5"
+        },
+        {
+          "from": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5",
+          "kind": "tape_parent",
+          "to": "mu:eca6f7dd1048924a16d08d2c3d99944740a8b053bc685c054404c72b9a502a78"
+        },
+        {
+          "from": "mu:eca6f7dd1048924a16d08d2c3d99944740a8b053bc685c054404c72b9a502a78",
+          "kind": "tape_parent",
+          "to": "mu:18478e757eca049d1e7d5ee5499d57f8813ff065cd2e21658b1508d45b167f2b"
+        },
+        {
+          "from": "mu:18478e757eca049d1e7d5ee5499d57f8813ff065cd2e21658b1508d45b167f2b",
+          "kind": "tape_parent",
+          "to": "mu:07099415414760544f7542e03fa741d225f21e60de767063b4b0ea3cb4beb49b"
+        },
+        {
+          "from": "mu:07099415414760544f7542e03fa741d225f21e60de767063b4b0ea3cb4beb49b",
+          "kind": "tape_parent",
+          "to": "mu:bb539fc2fe3c9e4de8d2685bbe58b25f9056e6d0fdd0981c36a1889e41f55ee7"
+        },
+        {
+          "from": "mu:bb539fc2fe3c9e4de8d2685bbe58b25f9056e6d0fdd0981c36a1889e41f55ee7",
+          "kind": "tape_parent",
+          "to": "mu:6334dc3bc9af28b53e5217fac7679b095ba373a923aae36e8090a07896c1d334"
+        },
+        {
+          "from": "mu:6334dc3bc9af28b53e5217fac7679b095ba373a923aae36e8090a07896c1d334",
+          "kind": "tape_parent",
+          "to": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f"
+        },
+        {
+          "from": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "kind": "tape_parent",
+          "to": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019"
+        },
+        {
+          "from": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "kind": "tape_parent",
+          "to": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c"
+        },
+        {
+          "from": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c",
+          "kind": "tape_parent",
+          "to": "mu:8e8ffd5d0fbdca5c6efe9e93c28648087a3becdbb4ba729d6b96e35b7759965c"
+        },
+        {
+          "from": "mu:8e8ffd5d0fbdca5c6efe9e93c28648087a3becdbb4ba729d6b96e35b7759965c",
+          "kind": "tape_parent",
+          "to": "mu:8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "capsule_ref",
+          "to": "mu:88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9"
+        },
+        {
+          "from": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c",
+          "kind": "market_ref",
+          "to": "mu:e85e78837517506c949cf2ac19a7a70723a9bca60e810b93a114d97c3c32d85a"
+        },
+        {
+          "from": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c",
+          "kind": "market_ref",
+          "to": "mu:10647362cb6858db512a284b990b33f01cff74f3d7c03ae0b608076d0a636687"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "capsule_ref",
+          "to": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "capsule_ref",
+          "to": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "capsule_ref",
+          "to": "mu:07099415414760544f7542e03fa741d225f21e60de767063b4b0ea3cb4beb49b"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "capsule_ref",
+          "to": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f"
+        },
+        {
+          "from": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80",
+          "kind": "receipt_ref",
+          "to": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f"
+        },
+        {
+          "from": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5",
+          "kind": "macro_ref",
+          "to": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f"
+        },
+        {
+          "from": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "kind": "capsule_ref",
+          "to": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019"
+        },
+        {
+          "from": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80",
+          "kind": "receipt_ref",
+          "to": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019"
+        },
+        {
+          "from": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5",
+          "kind": "macro_ref",
+          "to": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019"
+        },
+        {
+          "from": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "kind": "official_evidence_to_accept",
+          "to": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019"
+        },
+        {
+          "from": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c",
+          "kind": "market_ref",
+          "to": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c"
+        },
+        {
+          "from": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "kind": "settlement_basis_event_id",
+          "to": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c"
+        },
+        {
+          "from": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "kind": "terminal_event_id",
+          "to": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c"
+        },
+        {
+          "from": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c",
+          "kind": "market_ref",
+          "to": "mu:8e8ffd5d0fbdca5c6efe9e93c28648087a3becdbb4ba729d6b96e35b7759965c"
+        },
+        {
+          "from": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c",
+          "kind": "settlement_event_id",
+          "to": "mu:8e8ffd5d0fbdca5c6efe9e93c28648087a3becdbb4ba729d6b96e35b7759965c"
+        },
+        {
+          "from": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "kind": "basis_event_id",
+          "to": "mu:8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987"
+        },
+        {
+          "from": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "kind": "terminal_event_id",
+          "to": "mu:8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987"
+        }
+      ],
+      "derived_refs": {
+        "accepted_head": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+        "authorization_head": "mu:88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9",
+        "tape_tip": "mu:8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987"
+      },
+      "event_count": 21,
+      "event_counts": {
+        "AtomAuthorized": 1,
+        "BudgetAllocated": 1,
+        "CandidateAccepted": 1,
+        "CostEvent": 1,
+        "EvidenceBound": 1,
+        "FailureNode": 2,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "OfficialEvaluatorEvidenceImported": 1,
+        "PPUTAccounted": 2,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "WorkCapsuleBuilt": 1,
+        "WorkerDispatchAuthorized": 1,
+        "WorkerReceiptImported": 1
+      },
+      "events": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:344937f916226ed32a38cbe9866a28f06e5a89d560ec3efa668a1b0ae005ebe2",
+          "event_type": "SystemConstitutionAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "0:SystemConstitutionAccepted:344937f91622",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 0,
+          "short_id": "344937f",
+          "terminal_event_id": null,
+          "writer_id": "writer:bootstrap"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:607b217245d6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "607b217",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:5b020faa5ff3429ab3657d7882ed812a4f1f628173b76b80cb0ceae87ee57b0d",
+          "event_type": "AtomAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "2:AtomAuthorized:5b020faa5ff3",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 2,
+          "short_id": "5b020fa",
+          "terminal_event_id": null,
+          "writer_id": "writer:approval"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "3:WorkCapsuleBuilt:e6d987ee7640",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "e6d987e",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:88f79155708e8ad097309b10e9de4f8bcdedca58376990164d4ed7b99edf46e9",
+          "event_type": "WorkerDispatchAuthorized",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "4:WorkerDispatchAuthorized:88f79155708e",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 4,
+          "short_id": "88f7915",
+          "terminal_event_id": null,
+          "writer_id": "writer:approval"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:28020395931810a515f7358a8237470335e36cdab91415261446d30d99a92274",
+          "event_type": "EvidenceBound",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "5:EvidenceBound:280203959318",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 5,
+          "short_id": "2802039",
+          "terminal_event_id": null,
+          "writer_id": "writer:evidence"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:a8c26f148705df22fca7f6b20491afec9e6337dbf56305c6f1a48ba81e70b93c",
+          "event_type": "MarketCreated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "6:MarketCreated:a8c26f148705",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 6,
+          "short_id": "a8c26f1",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:e85e78837517506c949cf2ac19a7a70723a9bca60e810b93a114d97c3c32d85a",
+          "event_type": "PositionMinted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "7:PositionMinted:e85e78837517",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 7,
+          "short_id": "e85e788",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:10647362cb6858db512a284b990b33f01cff74f3d7c03ae0b608076d0a636687",
+          "event_type": "BudgetAllocated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "8:BudgetAllocated:10647362cb68",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 8,
+          "short_id": "1064736",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "9:WorkerReceiptImported:eb23b05839a1",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "eb23b05",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:MacroObservationImported:28f688d76826",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "28f688d",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:eca6f7dd1048924a16d08d2c3d99944740a8b053bc685c054404c72b9a502a78",
+          "event_type": "FailureNode",
+          "failure_class": "SEMANTIC_FAILURE",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "11:FailureNode:eca6f7dd1048",
+          "predicate_product": "FAIL",
+          "progress": null,
+          "result": null,
+          "sequence": 11,
+          "short_id": "eca6f7d",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:18478e757eca049d1e7d5ee5499d57f8813ff065cd2e21658b1508d45b167f2b",
+          "event_type": "FailureNode",
+          "failure_class": "STEER_REJECTED",
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "12:FailureNode:18478e757eca",
+          "predicate_product": "FAIL",
+          "progress": null,
+          "result": null,
+          "sequence": 12,
+          "short_id": "18478e7",
+          "terminal_event_id": null,
+          "writer_id": "writer:failure"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:07099415414760544f7542e03fa741d225f21e60de767063b4b0ea3cb4beb49b",
+          "event_type": "CostEvent",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "13:CostEvent:070994154147",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 13,
+          "short_id": "0709941",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:bb539fc2fe3c9e4de8d2685bbe58b25f9056e6d0fdd0981c36a1889e41f55ee7",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "14:PPUTAccounted:bb539fc2fe3c",
+          "predicate_product": "PASS",
+          "progress": 0,
+          "result": null,
+          "sequence": 14,
+          "short_id": "bb539fc",
+          "terminal_event_id": null,
+          "writer_id": "writer:pput"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:6334dc3bc9af28b53e5217fac7679b095ba373a923aae36e8090a07896c1d334",
+          "event_type": "PredicateEvaluated",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "15:PredicateEvaluated:6334dc3bc9af",
+          "predicate_product": "NOT_RUN",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 15,
+          "short_id": "6334dc3",
+          "terminal_event_id": null,
+          "writer_id": "writer:replay"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "16:OfficialEvaluatorEvidenceImported:103d82fed4c9",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 16,
+          "short_id": "103d82f",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "17:CandidateAccepted:a555746fea63",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 17,
+          "short_id": "a555746",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "capsule_id": null,
+          "event_id": "mu:b6491ff0f8f343b94ea0c8d76dc90c28790c9b2d68a905c8ade6593b74b8832c",
+          "event_type": "MarketSettled",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "18:MarketSettled:b6491ff0f8f3",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "YES",
+          "sequence": 18,
+          "short_id": "b6491ff",
+          "terminal_event_id": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:8e8ffd5d0fbdca5c6efe9e93c28648087a3becdbb4ba729d6b96e35b7759965c",
+          "event_type": "RewardDistributed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": "mkt_django__django-12039",
+          "node_id": "19:RewardDistributed:8e8ffd5d0fbd",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 19,
+          "short_id": "8e8ffd5",
+          "terminal_event_id": null,
+          "writer_id": "writer:market"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "capsule_id": null,
+          "event_id": "mu:8fb6c3ebdfabcca3a0d3e33ff8fd6afca378b167f51a6b6a439cc9a40240a987",
+          "event_type": "PPUTAccounted",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "20:PPUTAccounted:8fb6c3ebdfab",
+          "predicate_product": "PASS",
+          "progress": 1,
+          "result": null,
+          "sequence": 20,
+          "short_id": "8fb6c3e",
+          "terminal_event_id": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "writer_id": "writer:pput"
+        }
+      ],
+      "execution_findings": [
+        {
+          "detail": "CandidateAccepted occurs only after OfficialEvaluatorEvidenceImported PASS.",
+          "finding": "official_evidence_precedes_accept",
+          "severity": "INFO"
+        }
+      ],
+      "first_candidate_accepted": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+      "git_evidence": {
+        "git_fsck_strict_returncode": 0,
+        "git_fsck_strict_stderr_digest": {
+          "byte_length": 48,
+          "redacted": true,
+          "sha256": "sha256:a30a7e556a90f794d518e79ae5cf1c80499ba3ab0e1c1b9d0217f4aa4da39b49"
+        },
+        "git_fsck_strict_stdout_digest": {
+          "byte_length": 0,
+          "redacted": true,
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "object_format": "sha256"
+      },
+      "golden_path": [
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": null,
+          "event_id": "mu:607b217245d67e61c7a528f90c13e8ec9b47f5624a1011f7188cb1fa01b3a534",
+          "event_type": "GoalStateProposed",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "1:GoalStateProposed:607b217245d6",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 1,
+          "short_id": "607b217",
+          "terminal_event_id": null,
+          "writer_id": "writer:goal"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:e6d987ee7640273604e3f460f1588d8f14bdb407b624a61deebe15c066b41fd8",
+          "event_type": "WorkCapsuleBuilt",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "3:WorkCapsuleBuilt:e6d987ee7640",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 3,
+          "short_id": "e6d987e",
+          "terminal_event_id": null,
+          "writer_id": "writer:capsule"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:eb23b05839a1fd2f49f2f203a583d45fa8063122350bed7377ce837779764f80",
+          "event_type": "WorkerReceiptImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "9:WorkerReceiptImported:eb23b05839a1",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 9,
+          "short_id": "eb23b05",
+          "terminal_event_id": null,
+          "writer_id": "writer:receipt"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:28f688d768267e7e971f0f951bba5f04ff1443daafbebc327fe20f859072f5d5",
+          "event_type": "MacroObservationImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "10:MacroObservationImported:28f688d76826",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 10,
+          "short_id": "28f688d",
+          "terminal_event_id": null,
+          "writer_id": "writer:macro"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:103d82fed4c9af4bd42a98f0972e114d0f78118a810f9df024c8c2f9a836440f",
+          "event_type": "OfficialEvaluatorEvidenceImported",
+          "failure_class": null,
+          "head_effect": "PRESERVE",
+          "market_id": null,
+          "node_id": "16:OfficialEvaluatorEvidenceImported:103d82fed4c9",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": "PASS",
+          "sequence": 16,
+          "short_id": "103d82f",
+          "terminal_event_id": null,
+          "writer_id": "writer:official-evaluator"
+        },
+        {
+          "authority_epoch": 0,
+          "basis_event_id": null,
+          "capsule_id": "wc_django__django-12039",
+          "event_id": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019",
+          "event_type": "CandidateAccepted",
+          "failure_class": null,
+          "head_effect": "ADVANCE",
+          "market_id": null,
+          "node_id": "17:CandidateAccepted:a555746fea63",
+          "predicate_product": "PASS",
+          "progress": null,
+          "result": null,
+          "sequence": 17,
+          "short_id": "a555746",
+          "terminal_event_id": null,
+          "writer_id": "writer:predicate"
+        }
+      ],
+      "golden_path_basis": "terminal_accepted_head",
+      "path_class": "accepted_path",
+      "replay_problems": [],
+      "replay_valid": true,
+      "sandbox_host_assumed_count": 0,
+      "terminal_candidate_accepted": "mu:a555746fea63ffb0bdb5d0d63f01118864fd3d8c7af3a051a08cce8d8abd2019"
+    }
+  ],
+  "schema_id": "MicroTapeDecisionDagAudit.v2",
+  "status_summary": {
+    "accepted_final_progress_one": "PASS",
+    "accepted_head_authority": "PASS",
+    "authorization_head": "PASS",
+    "basic_ref_reconstruction": "PASS",
+    "bundle_accessibility": "PASS",
+    "bundle_integrity": "PASS",
+    "canonical_payload_hash": "PASS",
+    "constitutional_protocol_audit": "PASS",
+    "cost_conservation_all_branches": "PASS",
+    "cost_provenance": "PASS",
+    "decision_dag_completeness": "PASS",
+    "economic_timing": "PASS",
+    "failed_progress_zero": "PASS",
+    "git_topology": "PASS",
+    "market_accounting_correctness": "PASS",
+    "overall": "PASS",
+    "ref_reconstruction": "PASS",
+    "registry_head_effect": "PASS",
+    "replay_structural_integrity": "PASS",
+    "sandbox_provenance": "PASS",
+    "terminal_golden_path_anchors_to_accepted_head": "PASS",
+    "vpput_accounting": "PASS"
+  },
+  "strict_findings": [],
+  "truth_source": "micro_tape_bundle_only",
+  "verdict": "PASS"
+}

@@ -1,0 +1,8 @@
+**Patch applied** (1-line change in production code only):
+
+- File: `django/db/models/sql/query.py`
+- Diff: `value = tuple(resolved_values)` → `value = type(value)(resolved_values)`
+- Worktree status: 1 modified file, no other changes, no test/benchmark files touched.
+- Verified: list inputs now return `list`, tuple inputs return `tuple` (including after expression resolution).
+
+Patch left in the checked-out worktree as required.

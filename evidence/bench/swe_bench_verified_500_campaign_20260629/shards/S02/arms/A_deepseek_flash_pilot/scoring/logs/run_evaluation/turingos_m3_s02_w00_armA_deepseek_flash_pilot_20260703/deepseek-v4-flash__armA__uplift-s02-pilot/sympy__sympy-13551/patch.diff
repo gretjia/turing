@@ -1,0 +1,13 @@
+diff --git a/sympy/concrete/products.py b/sympy/concrete/products.py
+index 9bde1a8..d4edb28 100644
+--- a/sympy/concrete/products.py
++++ b/sympy/concrete/products.py
+@@ -270,6 +270,8 @@ def product_simplify(s):
+         return product_simplify(p1 * p2)
+     elif isinstance(p, Pow):
+         return product_simplify(p.base) ** p.exp
++    elif isinstance(p, Add):
++        return p
+     elif isinstance(p, Function):
+         return p
+     else:

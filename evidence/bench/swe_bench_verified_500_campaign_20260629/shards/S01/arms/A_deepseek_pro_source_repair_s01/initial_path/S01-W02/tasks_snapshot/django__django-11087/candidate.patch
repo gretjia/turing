@@ -1,0 +1,60 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 0e7b4e6f48..a7c265299c 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -179,13 +179,15 @@ class Collector:
+                 return self.data[model]
+         return self.data[model], self.batches.get(model, set()), self.field_updates.get(model, {})
+ 
+-    def collect(self, objs, source=None, nullable=False, collect_related=True,
+-            source_attr=None, reverse_dependency=False, keep_parents=False):
++    def collect(self, objs, source=None, nullable=False, collect_related=True,
++                source_attr=None, reverse_dependency=False, keep_parents=False,
++                from_parent=None):
+         """
+         Add 'objs' to the collection of objects to be deleted as well as all
+         parent instances.  'objs' must be a homogeneous iterable collection of
+         model instances (e.g. a QuerySet).  If 'collect_related' is True,
+         related objects will be handled by their respective on_delete handler.
++        'from_parent' is the parent model when collecting related objects.
+ 
+         If the call is the result of a cascade, 'source' should be the model
+         that caused it and 'nullable' should be set to True, if the
+@@ -196,6 +198,12 @@ class Collector:
+             if self.can_fast_delete(objs):
+                 self.fast_deletes.append(objs)
+                 return
++            # Determine required fields based on the source (parent) model.
++            if from_parent and hasattr(from_parent, '_meta'):
++                # We only need the primary key column(s) of the target model.
++                objs = objs.only(*[field.attname for field in objs.model._meta.fields if field.primary_key])
++            elif not from_parent:
++                objs = objs.only(*[field.attname for field in objs.model._meta.fields if field.primary_key])
+             new_objs = self.add(objs, source, nullable, reverse_dependency=reverse_dependency)
+         else:
+             new_objs = objs
+@@ -213,7 +221,7 @@ class Collector:
+                     reverse_dependency=True,
+                     source_attr=field.remote_field.get_accessor_name(),
+                     keep_parents=keep_parents,
+-                )
++                    from_parent=model)
+ 
+         if collect_related:
+             if keep_parents:
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 08e83a2a29..2a387c14b2 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -587,8 +587,9 @@ class SQLCompiler:
+             result = []
+             for obj in self.query.extra_select:
+                 if isinstance(obj, Col):
+-                    result.append(obj)
++                    if obj.target.column in columns:
++                        result.append(obj)
+             return result
+-
+         if not self.query.select:
+             return []
+         select = []

@@ -1,0 +1,95 @@
+{
+  "fresh_real_evaluator_bundle_count": 7,
+  "full_dataset_claim_allowed": false,
+  "full_swe_bench_score_claim_allowed": false,
+  "leaderboard_equivalence_claim_allowed": false,
+  "next_loop": "rerun_phase_f_evaluator_proof",
+  "official_pass_count": 7,
+  "phase_f_evaluator_proof_ready": false,
+  "release_phase_f": false,
+  "release_phase_g": false,
+  "remaining_repair_count": 0,
+  "repair_target_count": 7,
+  "runs": [
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-11790",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-11790/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:59424e95caaeb76442c8c07de1d730e2d5744cd050e6c506abdd40a53774bc29",
+      "official_result": "PASS",
+      "target_selection_source": "FAIL_TO_PASS",
+      "worker_patch_bytes": 707,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-11815",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-11815/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:27fbcdc40022032a683754798565921dd2f9af39794f498dcb585e045d1cd1d8",
+      "official_result": "PASS",
+      "target_selection_source": "FAIL_TO_PASS",
+      "worker_patch_bytes": 734,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-11964",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-11964/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:a325a28c09edc6797d082ac03aa6f65abc97063536df2927872a6daf6632502b",
+      "official_result": "PASS",
+      "target_selection_source": "FAIL_TO_PASS",
+      "worker_patch_bytes": 391,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-12209",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-12209/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:e69134c054256eab5be8692ecc0e3ea664a2ce27e0373abc26100e0966325930",
+      "official_result": "PASS",
+      "target_selection_source": "test_patch_module_fallback_after_label_import_failure",
+      "worker_patch_bytes": 1386,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-12273",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-12273/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:39ecee010981d699a2f80bfd6a657bf9d4ddfcd6c4eb3c4684005de5666aeefb",
+      "official_result": "PASS",
+      "target_selection_source": "FAIL_TO_PASS",
+      "worker_patch_bytes": 1331,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-12308",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-12308/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:dceee84f68913c8ad1f16269fac032da4074efb2d4faa571d968d54809929523",
+      "official_result": "PASS",
+      "target_selection_source": "FAIL_TO_PASS",
+      "worker_patch_bytes": 735,
+      "worker_patch_is_unified_diff": true
+    },
+    {
+      "accepted_head_moved": true,
+      "candidate_write_event_type": "CandidateAccepted",
+      "instance_id": "django__django-12325",
+      "micro_tape_bundle": "evidence/bench/swe_bench_stage16r_real_evaluator_completed_20260628/turingos/instances/django__django-12325/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:dc7746e2244c59662bc764f0b4921ab88ae833953b284a81ecda135563350f48",
+      "official_result": "PASS",
+      "target_selection_source": "FAIL_TO_PASS",
+      "worker_patch_bytes": 629,
+      "worker_patch_is_unified_diff": true
+    }
+  ],
+  "schema_id": "Stage16RRealEvaluatorCompletedSummary.v1",
+  "status": "PASS",
+  "strict_microtape_status": "PASS"
+}

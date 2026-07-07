@@ -1,0 +1,19 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index ae82d26340..6cdc58046e 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -310,7 +310,14 @@ class Collector:
+                     )
+ 
+             # fast deletes
++            # Combine fast deletes for the same model to reduce the number of queries.
++            seen = {}
+             for qs in self.fast_deletes:
++                if qs.model in seen:
++                    seen[qs.model].query.where.add(qs.query.where, 'OR')
++                else:
++                    seen[qs.model] = qs
++            for qs in seen.values():
+                 count = qs._raw_delete(using=self.using)
+                 deleted_counter[qs.model._meta.label] += count
+ 

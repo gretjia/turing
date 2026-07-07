@@ -1,0 +1,17 @@
+{
+  "gate_id": "TC-06",
+  "not_run_is_fail": true,
+  "observed": {
+    "halt_programs": [
+      "copy_a_to_b",
+      "add_a_b",
+      "multiply_small",
+      "branch_zero_nonzero",
+      "known_halting_busy_loop_with_budget"
+    ],
+    "no_witness_events_after_terminal": true
+  },
+  "schema_id": "turingos.tc4.gate_verdict.v1",
+  "timestamp_utc": "2026-07-03T00:00:00Z",
+  "verdict": "PASS"
+}

@@ -1,0 +1,132 @@
+{
+  "arms": {
+    "A": {
+      "billing_complete_portfolio": {
+        "hvpput_m_str": "0.000236136",
+        "hvpput_pair": {
+          "denominator_microusd_ms": 59287840380,
+          "numerator_solves": 14
+        },
+        "solves_per_dollar_e6_str": "62411954",
+        "total_cost_microusd": 224316,
+        "total_solves": 14,
+        "total_wall_ms": 264305
+      },
+      "bounded_portfolio": {
+        "hvpput_bound_kind": "lower_bound_via_cost_upper_bound",
+        "hvpput_pair": {
+          "denominator_microusd_ms": 0,
+          "numerator_solves": 0
+        },
+        "total_cost_microusd_upper_bound": 0,
+        "total_solves": 0,
+        "total_wall_ms": 0
+      },
+      "class_breakdown": {
+        "n_billing_complete": 50,
+        "n_bounded": 0,
+        "n_excluded": 0
+      },
+      "exclusions": [],
+      "source_report": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/per_arm/arm_A_hvpput_report.v1.json",
+        "sha256": "sha256:3a939fb59b6a89308d997b01eb8e96f35ad7918fb73b75ce5a61a211cc38f0c9"
+      }
+    },
+    "B": {
+      "billing_complete_portfolio": {
+        "hvpput_m_str": "0.000401378",
+        "hvpput_pair": {
+          "denominator_microusd_ms": 39862586528,
+          "numerator_solves": 16
+        },
+        "solves_per_dollar_e6_str": "98646082",
+        "total_cost_microusd": 162196,
+        "total_solves": 16,
+        "total_wall_ms": 245768
+      },
+      "bounded_portfolio": {
+        "hvpput_bound_kind": "lower_bound_via_cost_upper_bound",
+        "hvpput_pair": {
+          "denominator_microusd_ms": 0,
+          "numerator_solves": 0
+        },
+        "total_cost_microusd_upper_bound": 0,
+        "total_solves": 0,
+        "total_wall_ms": 0
+      },
+      "class_breakdown": {
+        "n_billing_complete": 50,
+        "n_bounded": 0,
+        "n_excluded": 0
+      },
+      "exclusions": [],
+      "source_report": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/per_arm/arm_B_hvpput_report.v1.json",
+        "sha256": "sha256:8a10ed721dd7becb80cd7aa92a178b18e3a057ff0933eb00821820ebe7a089cb"
+      }
+    },
+    "C": {
+      "billing_complete_portfolio": {
+        "hvpput_m_str": "0.000669797",
+        "hvpput_pair": {
+          "denominator_microusd_ms": 23887808640,
+          "numerator_solves": 16
+        },
+        "solves_per_dollar_e6_str": "167000668",
+        "total_cost_microusd": 95808,
+        "total_solves": 16,
+        "total_wall_ms": 249330
+      },
+      "bounded_portfolio": {
+        "hvpput_bound_kind": "lower_bound_via_cost_upper_bound",
+        "hvpput_pair": {
+          "denominator_microusd_ms": 0,
+          "numerator_solves": 0
+        },
+        "total_cost_microusd_upper_bound": 0,
+        "total_solves": 0,
+        "total_wall_ms": 0
+      },
+      "class_breakdown": {
+        "n_billing_complete": 50,
+        "n_bounded": 0,
+        "n_excluded": 0
+      },
+      "exclusions": [],
+      "source_report": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/per_arm/arm_C_hvpput_report.v1.json",
+        "sha256": "sha256:3e3a99f9221ba3ead771f804824615f0020d6f035948cc673854da941caadaaf"
+      }
+    }
+  },
+  "class_breakdown": {
+    "n_billing_complete": 150,
+    "n_bounded": 0,
+    "n_excluded": 0
+  },
+  "created_at_utc": "2026-07-03T16:00:00Z",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "input_digests": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/INPUT_DIGESTS.json",
+    "schema_id": "m4.input_digests.v1",
+    "sha256": "sha256:79ecbc12d78398c37797c2dc69a5d20cc5272ccef01233d87a836f9da40c80d8"
+  },
+  "receipt_binding_verification": {
+    "all_provider_receipt_inline_events_normalized": true,
+    "created_at_utc": "2026-07-03T16:00:00Z",
+    "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d",
+    "provider_receipt_inline_events": 150,
+    "schema_id": "m4.receipt_binding_note.v1",
+    "usage_schema_counts": {
+      "deepseek_chat_v1": 150
+    }
+  },
+  "registry": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/heldout_task_registry.v1.json",
+    "sha256": "sha256:7ab612f5f310a5efc869ad8f1193ced23608de52abb9459af86eab568a79d8cb",
+    "task_count": 50
+  },
+  "schema_id": "m4.hvpput_report.v1",
+  "status_ceiling": "ADDRESSED"
+}

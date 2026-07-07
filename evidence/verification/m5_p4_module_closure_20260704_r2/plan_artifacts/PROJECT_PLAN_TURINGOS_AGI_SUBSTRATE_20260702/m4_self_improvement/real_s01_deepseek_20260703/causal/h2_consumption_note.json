@@ -1,0 +1,35 @@
+{
+  "ablation_honesty_audit_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/m3_p6_ablation_capsule_audit.json",
+  "ablation_honesty_audit_sha256": "sha256:0d9d55728f7fc8df8a16f1ea963f1751066ad8a83dfcaf9021a75c128ee08870",
+  "failure_memory_causal_claim_allowed": false,
+  "h2": {
+    "arm1": "C",
+    "arm1_resolved": 16,
+    "arm2": "B",
+    "arm2_resolved": 16,
+    "blocked_by_h1": true,
+    "bootstrap_ci95": {
+      "ci95_high": 0.1,
+      "ci95_low": -0.1,
+      "method": "cluster_by_task_percentile_bootstrap",
+      "replicates": 10000,
+      "seed": 20260703
+    },
+    "both_resolved": 13,
+    "delta": 0.0,
+    "exact_mcnemar_two_sided_p": 1.0,
+    "harm_only": 3,
+    "holm_alpha": null,
+    "holm_reject": false,
+    "neither_resolved": 31,
+    "pairs": 50,
+    "positive_direction": false,
+    "uplift_only": 3
+  },
+  "label": "CONFIRMATORY_VERBATIM_M3_H2",
+  "mde_statement": "Pre-registered design is powered for large effects: one worker on 50 paired tasks has roughly 15-23 percentage point MDE depending on harm rate; pooling 2-3 workers targets roughly 6-14 percentage points before task-clustering inflation.",
+  "schema_id": "m4.h2_consumption_note.v1",
+  "source_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/out/UPLIFT_REPORT.json",
+  "source_sha256": "sha256:9a3862fa76381187cef83ffbbdaec5c777c739750e02b2d103f377763456c0c4",
+  "verbatim_copy_rule": "No M4 confirmatory statistics were recomputed; fields are copied from M3 UPLIFT_REPORT.json."
+}

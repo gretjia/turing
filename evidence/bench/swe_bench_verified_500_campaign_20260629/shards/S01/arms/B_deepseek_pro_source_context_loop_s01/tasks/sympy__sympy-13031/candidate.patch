@@ -1,0 +1,22 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+index da1d307..7cbde70 100644
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -2011,10 +2011,14 @@ class MatrixBase(MatrixDeprecated,
+                 if len(ncol) > 1:
+                     raise ValueError("Got rows of variable lengths: %s" %
+                                      sorted(list(ncol)))
+-                cols = ncol.pop() if ncol else 0
+-                rows = len(in_mat) if cols else 0
++                cols = max(ncol) if ncol else 0
++                # rows must be computed from the number of items only when
++                # there are columns – otherwise a 0 x 0 matrix has no items.
+                 if rows:
+-                    if not is_sequence(in_mat[0]):
++                    rows = len(in_mat)
++                else:
++                    rows = 0
++                if rows and not is_sequence(in_mat[0]):
+                         cols = 1
+                         flat_list = [cls._sympify(i) for i in in_mat]
+                         return rows, cols, flat_list

@@ -1,0 +1,15 @@
+diff --git a/sphinx/ext/inheritance_diagram.py b/sphinx/ext/inheritance_diagram.py
+index 1234567..abcdefg 100644
+--- a/sphinx/ext/inheritance_diagram.py
++++ b/sphinx/ext/inheritance_diagram.py
+@@ -150,7 +150,7 @@ class InheritanceDiagram(Figure):
+         for class_name, class_info in graph.items():
+             full_name = class_name
+             try:
+-                refuri = self.builder.get_relative_uri(
+-                    self.env.docname, class_info['docname'])
++                refuri = self.builder.get_relative_uri(
++                    '_images/inheritance-diagram', class_info['docname'])
+                 url = refuri + class_info.get('anchor', '')
+             except NoUri:
+                 url = ''

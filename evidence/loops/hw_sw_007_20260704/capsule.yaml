@@ -1,0 +1,34 @@
+# TaskCapsule v1.5 — INTENT
+task: HW-SW-007..009 hardware manifest + attestation policy + device identity schemas, turing-attest skeleton, q_t_quote fixtures (Phase 3)
+route: turing_full (plan lite done: CONTEXT.md + PREDICATE.md)
+eta: 6h / 720 steps
+frontier_mode: auto
+test_mode: auto_full
+autonomy_tier: 3
+human_ux_gate: false
+ipqc_checkpoints: 3   # after each atom; TuringOS-native: calc-ipqc-interval.sh 2400 0.06 = 216 steps
+allowed_files:
+  - crates/turing-attest/**
+  - hardware_manifest.toml
+  - attestation_policy.toml
+  - device_identity.json
+  - fixtures/q_t_quote.valid.json
+  - fixtures/q_t_quote.invalid_schema.json
+  - fixtures/q_t_quote.invalid_digest.json
+  - fixtures/q_t_quote.invalid_nonascii.json
+  - Cargo.toml            # workspace members += crates/turing-attest ONLY
+  - Cargo.lock            # ONLY turing-attest + toml-family packages may appear
+  - evidence/loops/hw_sw_007_20260704/**
+forbidden_files:
+  - "**/00_authority/**"
+  - "*constitution_root_law.md*"
+  - crates/turing-approval/**
+  - crates/turing-kernel/**
+  - crates/turing-replay/**
+  - crates/turing-git-tape/**
+  - crates/turing-contracts/**   # read-only (jcs API consumed, never edited)
+  - substrate_freeze_manifest.toml
+  - scripts/**
+acceptance_commands: PREDICATE.md A1..G6
+verifier: independent validator (≠ implementer), clean context
+ceiling: ADDRESSED, pending sovereign accept; draft commits on turing/phase03-attest-schemas only

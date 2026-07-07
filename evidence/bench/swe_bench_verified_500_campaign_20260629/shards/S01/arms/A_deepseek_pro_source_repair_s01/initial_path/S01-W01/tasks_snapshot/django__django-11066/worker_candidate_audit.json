@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S01/tasks/django__django-11066/candidate.patch",
+  "candidate_patch_sha256": "sha256:8138d8dfedcd669d612c61e171e1d7e871c7c68b5b5cf0954656a47428383ebe",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "django/contrib/contenttypes/management/__init__.py"
+  ],
+  "instance_id": "django__django-11066",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

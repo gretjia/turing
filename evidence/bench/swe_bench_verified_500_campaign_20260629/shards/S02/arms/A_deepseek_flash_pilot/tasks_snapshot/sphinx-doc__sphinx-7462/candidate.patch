@@ -1,0 +1,16 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 12184e473..e31a43f79 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -109,7 +109,10 @@ def unparse(self, node):
+             result.append('(')
+             for i, child in enumerate(node.slice):
+                 if i > 0:
+-                    result.pop()
++                    if result:
++                        result.pop()
++                    else:
++                        result.append('(')
+                     result.append(', ')
+                 result.append(self.unparse(child))
+             result.append(')')

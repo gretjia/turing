@@ -1,0 +1,98 @@
+{
+  "schema_id": "turingos.gate_verdict.v0",
+  "gate": "M6.P0b",
+  "atom": "ATOM-M6.P0b-1",
+  "timestamp_utc": "2026-07-02T00:00:00Z",
+  "status_ceiling": "ADDRESSED",
+  "verdict": "PASS",
+  "evidence_class": "REAL_DETERMINISTIC_EXECUTION",
+  "copied_evidence_kind": "FIXTURE_AND_SELF_RUN",
+  "inputs_checked": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1",
+      "kind": "plan_directory_rescue_archive"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702",
+      "kind": "active_repo_evidence_copy"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/OWNER_ACTIVATION_NOTE.md",
+      "kind": "execution_activation_note",
+      "sha256": "5977455307e77efac7ece6a3bb0e09fd0bb88ae58f17ac4bfbdef37bcad4c22b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/MANIFEST.sha256",
+      "sha256": "03869f26946bf5555e0e07ebe7f64f198a7c1509ee0192856132d4cda2de1c60"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/tracked_1666.patch",
+      "sha256": "ca61116816ce7c3b661f3594fdf91b9d2ee35886aa4dfe38c5b7750e262182af"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/untracked.tar.gz",
+      "sha256": "ea7d00aa74df545453c31513284bac0683439fb33fe7012102726d40699e5bf0"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/M6_P0a_VERDICT.json",
+      "sha256": "c1a623d270622a217d7655d388a7b3984a9a4ba47fd90a9d7e045da236549004"
+    }
+  ],
+  "commands_run": [
+    {
+      "argv": "rsync -a --delete /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1/ /home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "argv": "diff -qr /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/rescue/operator_console_v1 /home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702",
+      "cwd": "/home/zephryj/turingos_backup/work",
+      "exit_code": 0
+    },
+    {
+      "argv": "sha256sum -c MANIFEST.sha256",
+      "cwd": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702",
+      "exit_code": 0
+    }
+  ],
+  "drift_check": [
+    {
+      "item": 1,
+      "answer": "Serves G7 by placing the already-preserved console archive into the active repo evidence tree, satisfying tracker row M6.P0b.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/PROGRESS_TRACKER.md"
+    },
+    {
+      "item": 2,
+      "answer": "No red-line path was modified; only the active repo evidence tree received a copy after the owner activation note was recorded.",
+      "artifact": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/OWNER_ACTIVATION_NOTE.md"
+    },
+    {
+      "item": 3,
+      "answer": "Copy identity is backed by diff -qr exit 0 and matching archive digests.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/MANIFEST.sha256"
+    },
+    {
+      "item": 4,
+      "answer": "The copied archive keeps its FIXTURE_AND_SELF_RUN claim boundary; this copy-verification verdict is REAL_DETERMINISTIC_EXECUTION.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/CLAIM_BOUNDARY.json"
+    },
+    {
+      "item": 5,
+      "answer": "No scope growth beyond ATOM-M6.P0b-1; the atom only copied the P0a archive and verified identity.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/M6_P0b_VERDICT.json"
+    },
+    {
+      "item": 6,
+      "answer": "A fresh agent can re-run diff -qr between the plan archive and repo copy, then sha256sum -c MANIFEST.sha256 in either directory.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/MANIFEST.sha256"
+    },
+    {
+      "item": 7,
+      "answer": "Status is capped at ADDRESSED; no CLOSED, RELEASED, or RATIFIED status is claimed.",
+      "artifact": "/home/zephryj/turingos_backup/work/turing/evidence/hci/operator_console_v1_rescue_20260702/CLAIM_BOUNDARY.json"
+    }
+  ],
+  "not_run_is_fail": true
+}

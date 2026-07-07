@@ -1,0 +1,13 @@
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+index 53345a6..9078ae7 100644
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -582,7 +582,7 @@ class PyLinter(
+                     if "__init__.py" in files:
+                         skip_subtrees.append(root)
+                         yield root
+-                    else:
++                    elif not any(root.startswith(s) for s in skip_subtrees):
+                         yield from (
+                             os.path.join(root, file)
+                             for file in files

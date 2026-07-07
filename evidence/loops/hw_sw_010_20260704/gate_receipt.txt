@@ -1,0 +1,241 @@
+# HW-SW-010..013 Phase Gate Receipt
+# Branch: turing/phase04-tpm-path
+# Commits under test: 316f67c (red-first) .. bf68d21 (hw-sw-013), base 5383e69
+#   316f67c test: hw-sw-010 red-first tpm tests
+#   944d20b feat: hw-sw-010 swtpm simulator harness
+#   b758f1c feat: hw-sw-011 tpm attestor shell backend
+#   66b461a feat: hw-sw-012 seal to pcr policy
+#   bf68d21 feat: hw-sw-013 real vtpm path and divergence
+
+===============================================================================
+G1. cargo test -p turing-attest (all green; hardware_quote_roundtrip actually
+    ran swtpm)
+===============================================================================
+$ cd /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-010
+$ cargo test -p turing-attest --no-fail-fast -- --test-threads=1
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running unittests src/lib.rs (target/debug/deps/turing_attest-...)
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+     Running tests/attestor.rs
+running 3 tests
+test simulated_attestor_quote_is_marked_fake ... ok
+test tee_stub_typed_error_never_panics ... ok
+test tpm_attestor_constructors_report_correct_kind ... ok
+test result: ok. 3 passed; 0 failed
+
+     Running tests/divergence.rs
+running 1 test
+test sim_real_divergence ... ok
+test result: ok. 1 passed; 0 failed
+(confirmed by a separate --nocapture run: no "SKIP" line printed, i.e. the
+full sim-vs-real structural comparison actually executed, not the
+skip-with-note path -- both receipt_sim.json and receipt_real.json exist.)
+
+     Running tests/identity.rs
+running 3 tests
+test identity_non_ascii_key_rejected ... ok
+test identity_real_file_parses_and_validates ... ok
+test identity_unknown_route_rejected ... ok
+test result: ok. 3 passed; 0 failed
+
+     Running tests/manifest.rs
+running 6 tests
+test manifest_bad_schema_version_rejected ... ok
+test manifest_missing_signing_section_rejected ... ok
+test manifest_non_ascii_device_id_rejected ... ok
+test manifest_non_hex_digest_rejected ... ok
+test manifest_real_file_parses_and_validates ... ok
+test manifest_uppercase_hex_digest_rejected ... ok
+test result: ok. 6 passed; 0 failed
+
+     Running tests/policy.rs
+running 4 tests
+test policy_bad_on_fail_rejected ... ok
+test policy_debug_without_simulator_rejected ... ok
+test policy_missing_degraded_section_rejected ... ok
+test policy_real_file_parses_and_validates ... ok
+test result: ok. 4 passed; 0 failed
+
+     Running tests/qt_quote.rs
+running 4 tests
+test qt_quote_invalid_digest_rejected ... ok
+test qt_quote_invalid_nonascii_rejected ... ok
+test qt_quote_invalid_schema_rejected ... ok
+test qt_quote_valid_parses_and_digest_self_consistent ... ok
+test result: ok. 4 passed; 0 failed
+
+     Running tests/tpm.rs
+running 2 tests
+test hardware_quote_roundtrip ... ok
+test read_pcrs_returns_sha256_bank ... ok
+test result: ok. 2 passed; 0 failed; finished in 1.60s
+  (hardware_quote_roundtrip: builds TpmAttestor::simulator against a swtpm
+   this run itself spawned via tests/common/mod.rs::SwtpmGuard; asserts
+   verify() Ok on its own quote AND Err(VerifyFailed) on a tampered
+   qualifying value; also exercises the Attestor trait-object adapter's
+   quote() on the happy path.)
+
+   Doc-tests turing_attest
+running 0 tests
+test result: ok. 0 passed; 0 failed
+
+TOTAL: 23/23 green.
+VERDICT: PASS
+
+===============================================================================
+G2. ./scripts/attest-tpm.sh --simulator  (exit 0, receipt_sim.json verified)
+===============================================================================
+$ ./scripts/attest-tpm.sh --simulator
+PASS: receipt_sim.json written (.../evidence/loops/hw_sw_010_20260704/receipt_sim.json)
+exit=0
+$ python3 -c "import json; print(json.load(open('evidence/loops/hw_sw_010_20260704/receipt_sim.json'))['verified'])"
+True
+VERDICT: PASS (ran clean 4+ times across this loop's development; zero
+leaked swtpm processes or temp dirs after any run, confirmed via `ps aux`).
+
+===============================================================================
+G3. ./scripts/attest-tpm.sh --seal-test  (exit 0)
+===============================================================================
+$ ./scripts/attest-tpm.sh --seal-test
+PASS: seal_test.json written (.../evidence/loops/hw_sw_010_20260704/seal_test.json)
+exit=0
+$ cat evidence/loops/hw_sw_010_20260704/seal_test.json
+{
+  "sealed": true,
+  "unseal_ok_when_matching": true,
+  "unseal_fails_after_pcr_change": true
+}
+VERDICT: PASS (ran clean 3x; the sealed key is an explicit SECONDARY demo
+secret -- "turingos-hw-sw-012-secondary-demo-secret-not-sovereign" -- never
+the sovereign approval key; that custody stays entirely with SigningBackend,
+untouched by this script).
+
+===============================================================================
+G4. ./run_test.sh --human-journey (absent, non-blocking) + combined
+    ./scripts/attest-tpm.sh --simulator (SW+HW combined acceptance)
+===============================================================================
+$ [ -x ./run_test.sh ] || echo "run_test.sh absent — note, non-blocking"
+run_test.sh absent — note, non-blocking
+$ ./scripts/attest-tpm.sh --simulator
+PASS: receipt_sim.json written (...)
+exit=0
+VERDICT: PASS (run_test.sh's absence is a documented non-blocking note per
+SPEC's own G4 wording, not a failure; the combined-acceptance half of G4
+passed).
+
+===============================================================================
+G5. ./scripts/audit-substrate-freeze.sh  (no pinned file touched)
+===============================================================================
+$ ./scripts/audit-substrate-freeze.sh
+PASS: constitution sha256 pinned and verified (a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0)
+PASS: crates/turing-approval/src/lib.rs sha256 verified (c76965a662402a3387b59d995fd7ffef5862db10eeeb3fed61d9c556b591c3a7)
+PASS: crates/turing-replay/src/lib.rs sha256 verified (c0f9ef62abe26bf9e91e2b0b3dd1125f074440177d169e733da620fb46f46c31)
+PASS: crates/turing-git-tape/src/head_set.rs sha256 verified (794b090188a55c216e87a2a987ba493538daa741a356cddf67a41950987d7016)
+PASS: crates/turing-git-tape/src/append.rs sha256 verified (c3780364889cbdafeff9113bce6dca1a9a66d435f01c2784e4305a705dce5665)
+PASS: crates/turing-kernel/src/reducer.rs sha256 verified (43cbe5709b28c899ff38e9c03a94ad086a7f7bca56c4f65fcad428e49831d2b3)
+PASS: audit-substrate-freeze complete (5 pinned files + constitution)
+exit=0
+VERDICT: PASS. Confirmed: crates/turing-attest/src/tpm.rs and lib.rs are
+NOT in substrate_freeze_manifest.toml's [[files]] set (checked the manifest
+directly); no pinned file's digest changed.
+
+===============================================================================
+G6. ./scripts/audit-forbidden-files.sh --staged
+===============================================================================
+$ ./scripts/audit-forbidden-files.sh --staged
+PASS: no forbidden paths staged
+exit=0
+
+Full base..HEAD file list (G8 section below) was also inspected directly:
+no path matches **/00_authority/**, *constitution_root_law.md*, or
+PROGRESS_TRACKER.md.
+VERDICT: PASS
+
+===============================================================================
+G7. verify_alignment.sh (workspace authority chain)
+===============================================================================
+$ cd /home/zephryj/turingos_backup/work
+$ bash PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh
+GREEN: authority chain verified against ADR-GOV-001.
+exit=0
+VERDICT: PASS
+
+===============================================================================
+G8. git diff <base>..HEAD -- Cargo.lock EMPTY (zero new Rust deps)
+===============================================================================
+$ git diff 5383e69..HEAD -- Cargo.lock | wc -l
+0
+VERDICT: PASS — zero-diff confirmed at every commit boundary during this
+loop (checked immediately after the red-first cargo run too, before any
+Rust implementation existed, since turing-contracts's pre-existing
+sha2/hex/toml-family deps appear in build logs and could be mistaken for
+new pulls).
+
+$ git diff 5383e69..HEAD --name-only
+crates/turing-attest/src/lib.rs
+crates/turing-attest/src/tpm.rs
+crates/turing-attest/tests/attestor.rs
+crates/turing-attest/tests/common/mod.rs
+crates/turing-attest/tests/divergence.rs
+crates/turing-attest/tests/tpm.rs
+evidence/loops/hw_sw_010_20260704/LESSONS.md
+evidence/loops/hw_sw_010_20260704/SPEC.md
+evidence/loops/hw_sw_010_20260704/receipt_real.json
+evidence/loops/hw_sw_010_20260704/receipt_sim.json
+evidence/loops/hw_sw_010_20260704/red_first.txt
+evidence/loops/hw_sw_010_20260704/seal_test.json
+hardware_manifest.toml
+scripts/attest-tpm.sh
+
+Every path is inside SPEC.md's allowed_files (crates/turing-attest/src/
+tpm.rs, crates/turing-attest/src/lib.rs [additive AttestorKind variants
+only], crates/turing-attest/tests/**, scripts/attest-tpm.sh,
+hardware_manifest.toml [additive tpm.present flip], evidence/loops/
+hw_sw_010_20260704/**). No forbidden_files path appears.
+VERDICT: PASS
+
+===============================================================================
+Overall verdict: G1-G8 ALL PASS.
+===============================================================================
+
+Additional checks performed beyond the eight gates (Mini-Recovery trigger
+surface):
+- cargo clippy -p turing-attest --all-targets: clean (one manual_is_multiple_of
+  nit found and fixed during HW-SW-011, re-checked clean after).
+- cargo test --workspace (--test-threads=1): all green, no replay/tape impact
+  (this phase's changes are confined to turing-attest + scripts/ +
+  hardware_manifest.toml + evidence/, none of which any replay/kernel test
+  reads).
+- verify() correctly rejects a tampered qualifying value
+  (hardware_quote_roundtrip's Err(VerifyFailed) assertion) — the PCP
+  discipline requirement from docs/roadmap/.../phase_04_tpm_path.md's
+  Constitutional Anchor.
+- sim_real_divergence: verified both receipts verified=true, same
+  pcr_selection, same qualifying_hex, kinds differ (TpmSimulator vs Vtpm),
+  AK public keys differ — the exact "identical input, different signer"
+  contract.
+- No sovereign key material touched: `crates/turing-approval/**` does not
+  appear in the base..HEAD file list above (G8), and every textual mention
+  of "turing-approval" in the diff is a documentation comment naming it as
+  the untouched custody surface, not a code change to it; --seal-test's
+  sealed secret is explicitly named and commented as a non-sovereign demo
+  secret.
+- AttestorKind's three pre-existing variants (Simulated, Tpm, Tee) are
+  byte-for-byte unchanged; only Vtpm/TpmSimulator were added.
+- Three reworks occurred (LESSONS.md): EXIT-trap scope bug (leaked swtpm
+  process), `od` line-collapsing hex-corruption bug, and swtpm/libtpms
+  transient-object-slot exhaustion. Each is a distinct cause; no same-cause
+  double failure.
+- real-vTPM receipt (receipt_real.json) was produced directly by the
+  implementer in this environment: `sudo -n true` succeeds here, so
+  ./scripts/attest-tpm.sh --real ran for real against /dev/tpmrm0 rather
+  than being deferred to the orchestrator. If sudo -n had failed, the
+  script prints a NOTE and returns non-zero rather than fabricating a
+  receipt (verified this branch is reachable by reading run_real()).
+
+Status ceiling for HW-SW-010..013: ADDRESSED, pending sovereign accept.
+Not self-claimed CLOSED/RELEASED/RATIFIED; no OG-10/genesis signature or
+M2 enablement claimed.

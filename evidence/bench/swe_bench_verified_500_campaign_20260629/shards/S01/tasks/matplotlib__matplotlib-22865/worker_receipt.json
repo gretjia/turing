@@ -1,0 +1,78 @@
+{
+  "candidate_patch_sha256": "sha256:32d26338c142484584f768504f3c22a2d6ced5c34e544621d8cf6456a7e66ca0",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1173,
+  "content_sha256": "sha256:1c6ab9aa4609ac28961154ecef6949e42a35772034b9fd6431a82777b292f5a2",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:16e2759875d14b6b0eec0551578e7f7c7c4269e3efe7ce50ffd4036857d51461",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 7065,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "matplotlib__matplotlib-22865",
+    "receipt_id": "rcpt:dc97670f4bead2f61779180bd29a00af7d5be6fc0b7c95fd20b94a57846d39ab",
+    "run_id": "m3-p5-arm-a-source-repair-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-confirmatory-source-repair",
+    "usage": {
+      "completion_tokens": 331,
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 16154,
+      "prompt_tokens": 16666,
+      "provider_usage_raw_sha256": "sha256:09973fd754de08c7812c52c9c3df940c3ac5cb622703a2a2414c44f7537a0973",
+      "total_tokens": 16997
+    },
+    "wall_time_ms": 6372,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "faee668e-daa2-4a8c-af48-836bc530f7dc",
+      "response_sha256": "sha256:2bc19165b7da5b2e2d9a296c92da9aaaa2d1e1c1cadac263012869a57b60cefa"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "matplotlib__matplotlib-22865",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch lib/matplotlib/colorbar.py...\nHunk #1 succeeded at 650 (offset -233 lines).\nApplied patch lib/matplotlib/colorbar.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:02e9b64f51306952798f4dbf11bb9187fb59ca674350f9c0ac0008c47cb8be4b",
+  "response_sha256": "sha256:2bc19165b7da5b2e2d9a296c92da9aaaa2d1e1c1cadac263012869a57b60cefa",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/matplotlib__matplotlib-22865/worker_capsule.md",
+  "source_context_length_chars": 62709,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/matplotlib__matplotlib-22865/source_context.md",
+  "source_context_sha256": "sha256:615bf27bacadedb61504e31e489a636ae401548f2dcb1ca0826dc741d5407e56",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 331,
+    "prompt_cache_hit_tokens": 512,
+    "prompt_cache_miss_tokens": 16154,
+    "prompt_tokens": 16666,
+    "total_tokens": 16997
+  },
+  "usage_raw_sha256": "sha256:09973fd754de08c7812c52c9c3df940c3ac5cb622703a2a2414c44f7537a0973",
+  "wall_time_ms": 6372
+}

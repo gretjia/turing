@@ -1,0 +1,40 @@
+{
+  "instance_id": "pylint-dev__pylint-4551",
+  "status": "COMPLETED",
+  "source_capsule_path": "shards/S00/ipqc/S00-W00/worker_safe_tasks/pylint-dev__pylint-4551/worker_capsule.md",
+  "base_commit": "99589b08de8c5a2c6cc61e13a37420a868c80599",
+  "repo_url": "https://github.com/pylint-dev/pylint.git",
+  "commands_run": [
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/pylint-dev__pylint-4551/task_packet.json",
+    "sed -n '1,260p' evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/ipqc/S00-W00/worker_safe_tasks/pylint-dev__pylint-4551/worker_capsule.md",
+    "git clone https://github.com/pylint-dev/pylint.git /tmp/turingos_worker_pylint_4551",
+    "git fetch origin 99589b08de8c5a2c6cc61e13a37420a868c80599",
+    "git checkout --detach 99589b08de8c5a2c6cc61e13a37420a868c80599",
+    "rg \"pyreverse|instance_attrs|attrs|type_annotation|annotation\" -n pylint",
+    "rg \"pyreverse\" -n tests",
+    "find pylint/pyreverse -maxdepth 2 -type f | sort",
+    "find tests -maxdepth 3 -type d -name '*pyreverse*' -o -type f -path '*pyreverse*' | sort",
+    "sed -n '1,320p' pylint/pyreverse/inspector.py",
+    "sed -n '1,260p' pylint/pyreverse/diagrams.py",
+    "sed -n '1,260p' tests/unittest_pyreverse_inspector.py",
+    "sed -n '1,280p' tests/unittest_pyreverse_diadefs.py",
+    "rg \"astroid|pytest|python_requires\" -n setup.cfg setup.py pyproject.toml requirements* tox.ini",
+    "python3 -m venv .venv && . .venv/bin/activate && python -m pip install -U pip setuptools wheel && python -m pip install -r requirements_test_min.txt -e .",
+    ". .venv/bin/activate && python -m pip install 'wrapt>=1.17'",
+    ". .venv/bin/activate && pytest tests/unittest_pyreverse_inspector.py::test_instance_attrs_resolution_uses_parameter_annotations",
+    ". .venv/bin/activate && pytest tests/unittest_pyreverse_inspector.py::test_instance_attrs_resolution_uses_parameter_annotations tests/unittest_pyreverse_inspector.py::test_instance_attrs_resolution",
+    ". .venv/bin/activate && pytest tests/unittest_pyreverse_inspector.py::test_instance_attrs_resolution_uses_parameter_annotations tests/unittest_pyreverse_inspector.py::test_instance_attrs_resolution tests/unittest_pyreverse_inspector.py tests/unittest_pyreverse_diadefs.py tests/unittest_pyreverse_writer.py",
+    ". .venv/bin/activate && pytest tests/unittest_pyreverse_inspector.py tests/unittest_pyreverse_diadefs.py tests/unittest_pyreverse_writer.py",
+    ". .venv/bin/activate && python - <<'PY'\nimport astroid\nfrom pylint.pyreverse.diagrams import ClassDiagram\nfrom pylint.pyreverse.inspector import Linker, Project\n\nklass = astroid.extract_node('''\nclass C:\n    def __init__(self, a: str = None):\n        self.a = a\n''')\nlinker = Linker(Project())\nlinker.visit_classdef(klass)\ndiagram = ClassDiagram('classes test', 'PUB_ONLY')\nprint(diagram.get_attrs(klass))\nPY",
+    "git diff -- pylint/pyreverse/inspector.py > evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S00/tasks/pylint-dev__pylint-4551/candidate.patch"
+  ],
+  "candidate_patch_path": "shards/S00/tasks/pylint-dev__pylint-4551/candidate.patch",
+  "candidate_source": "worker_derived",
+  "submitted_patch_scope": "source_only",
+  "integrity_statement": "I used only worker-safe task files for task details. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, hints_text, official solution hints, gold patches, hidden evaluator labels, or task evidence outside the worker-safe packet/capsule.",
+  "open_risks": [
+    "Full SWE-bench harness was not run, per instruction.",
+    "Local verification used Python 3.11 with a temporary venv override to wrapt>=1.17 because the pinned wrapt 1.12.1 dependency imports inspect.formatargspec, which is unavailable on Python 3.11.",
+    "No tests are included in candidate.patch because the requested submitted patch scope is source_only."
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "turingos.m2_tc3_verdict.v1",
+  "module": "M2",
+  "phase": "M2.TC3",
+  "timestamp_utc": "2026-07-03T04:07:04Z",
+  "verdict": "PASS",
+  "phase_status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "not_run_is_fail": true,
+  "active_repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit": "b6fe4d13c1b387129ca229fdfa9415fe14c4ca41",
+    "commit_message": "m2: add tc3 witness exports",
+    "status_after_commit": "clean"
+  },
+  "requirements": [
+    {
+      "id": "ATOM-TC3-1-run-export",
+      "requirement": "Execute five halting and three non-halting witness programs, record C1/C2/C3 certificates, and export git bundles plus digest manifest.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/bundle_manifest.json",
+      "sha256": "95010d45181ad29554079e33f4d8b0f911b860e6c3d5acf6c3925b80f0c57054",
+      "observed": {
+        "program_count": 8,
+        "halting_program_count": 5,
+        "nonhalting_program_count": 3,
+        "nonhalting_certificate_classes": [
+          "C1_STATIC_HALT_UNREACHABILITY",
+          "C2_STATE_RECURRENCE",
+          "C3_BUDGET_BOUNDED"
+        ],
+        "bundle_count": 8,
+        "bundle_sha256s": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/bundle_sha256s.txt",
+        "bundle_sha256s_sha256": "96ac663af9d402548496719ec500ad4d1db893dfd9a7b6fd4f156c1cda8af353"
+      }
+    },
+    {
+      "id": "ATOM-TC3-2-seed-pinned-fuzz",
+      "requirement": "Seed-pinned T1 fuzz campaign into the evidence root with manifest and differential results recorded.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/fuzz/fuzz_manifest.json",
+      "sha256": "0d2368154f142a067cdfea84a7e02de94c3113cb2ec6e483bd84fe6252a75c4e",
+      "differential_results": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/fuzz/differential_results.json",
+      "differential_results_sha256": "dbb17579e4cdb6d507dd6c57799d32b68270e5148c3cda761fee7789657575c2",
+      "observed": {
+        "seed": 20260702,
+        "program_count": 500,
+        "max_program_len": 32,
+        "max_steps": 4096,
+        "cases_checked": 500,
+        "differential_failure_count": 0
+      }
+    },
+    {
+      "id": "claim-boundary",
+      "requirement": "Evidence root claim boundary forbids TC-10, external-verification, and unqualified Turing-completeness claims.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/CLAIM_BOUNDARY.json",
+      "sha256": "620d4b4ac5096f483446221663272212920ad243584d804d788ac3ef834beea4",
+      "observed": {
+        "turing_completeness_claim_allowed": false,
+        "tc10_external_artifact_exists": false,
+        "status_ceiling": "IMPLEMENTER_ADDRESSED"
+      }
+    },
+    {
+      "id": "fresh-context-verifier",
+      "requirement": "Fresh-context verifier confirms TC3 may be marked ADDRESSED.",
+      "status": "PASS",
+      "evidence": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC3_FRESH_CONTEXT_VERIFIER.json",
+      "sha256": "5dae18ad68308344b54096a8db76b15f5b7b0e225e07131edc9c1010d5f79ca2",
+      "may_mark_m2_tc3_addressed": true
+    }
+  ],
+  "commands": [
+    {
+      "command": "cargo test -p turing-witness --test tc3_export",
+      "exit_code": 0,
+      "summary": "TC3 focused Rust tests passed: budget terminal/reducer and export shape"
+    },
+    {
+      "command": "cargo run -p turing-witness --bin tc3-export -- evidence/theory/turing_completeness_witness_20260703",
+      "exit_code": 0,
+      "summary": "TC3 evidence regenerated with 8 programs, 5 halting, 3 non-halting"
+    },
+    {
+      "command": "python3 tools/theory/audit_tc3_evidence.py --root evidence/theory/turing_completeness_witness_20260703 --write",
+      "exit_code": 0,
+      "summary": "Python reference differential audit PASS; 500 cases checked, 0 failures"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc3_evidence.py",
+      "exit_code": 0,
+      "summary": "TC3 evidence-root pytest passed"
+    },
+    {
+      "command": "cargo fmt --check",
+      "exit_code": 0,
+      "summary": "workspace formatting check exited 0"
+    },
+    {
+      "command": "cargo test --workspace",
+      "exit_code": 0,
+      "summary": "full Rust workspace test suite exited 0"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "exit_code": 0,
+      "summary": "full Python suite reached 100% and exited 0"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh",
+      "exit_code": 0,
+      "summary": "M1A self-tests and clean gates PASS"
+    },
+    {
+      "command": "python3 tools/theory/lint_event_registry_consistency.py --registry pack/04_registries/event_registry_v5_3_1.json",
+      "exit_code": 0,
+      "summary": "registry self-consistency PASS at 68 rows"
+    },
+    {
+      "command": "git diff --check && git diff --cached --check",
+      "exit_code": 0,
+      "summary": "no whitespace errors before commit"
+    },
+    {
+      "command": "post-commit: cargo test -p turing-witness --test tc3_export && PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc3_evidence.py",
+      "exit_code": 0,
+      "summary": "focused TC3 smoke passed after commit b6fe4d13c1b387129ca229fdfa9415fe14c4ca41"
+    }
+  ],
+  "tdd_evidence": {
+    "red": [
+      "cargo test -p turing-witness --test tc3_export failed before implementation with unresolved TC3 API imports and missing reducer terminal fields",
+      "PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc3_evidence.py failed before export with missing bundle_manifest.json"
+    ],
+    "green": [
+      "TC3 focused Rust tests passed after budget terminal/reducer/export implementation",
+      "TC3 evidence pytest and Python differential audit passed after evidence generation",
+      "full Rust/Python suites plus M1A gates exited 0"
+    ]
+  },
+  "explicit_non_claims": {
+    "tc10_external_artifact_exists": false,
+    "turing_completeness_claim_allowed": false,
+    "externally_verified": false,
+    "closed": false,
+    "released": false,
+    "ratified": false,
+    "shipped": false,
+    "m2_enabled": false,
+    "constitution_bytes_changed": false,
+    "og10_or_genesis_signature": false
+  },
+  "artifact_manifest": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC3_ARTIFACT_MANIFEST.sha256",
+    "sha256": "c3f7dcec24820e06f04522f15f5512c9a8b43b3cc80c35afc1271db78ca5e200"
+  },
+  "notes": "M2.TC3 supplies deterministic run/export evidence only. It does not claim TC4 mutation/non-interference/replay-twice results, TC-10, Turing-completeness, M2.G, external verification, or M2 enablement."
+}

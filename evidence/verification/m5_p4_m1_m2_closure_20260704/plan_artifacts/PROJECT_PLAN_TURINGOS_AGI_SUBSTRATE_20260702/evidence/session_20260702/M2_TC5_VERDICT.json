@@ -1,0 +1,137 @@
+{
+  "active_repo": {
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "clean_clone_target_commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+    "commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+    "commit_message": "m2: publish tc5 external packet",
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "status_after_commit": "clean"
+  },
+  "artifact_manifest": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC5_ARTIFACT_MANIFEST.sha256",
+    "sha256": "278492e99e95bad5a445610e0de3d1b8cc999055a9baf6e90620e8f163ae027d"
+  },
+  "commands": [
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc5_packet.py",
+      "exit_code": 0,
+      "summary": "TC5 packet pytest passed"
+    },
+    {
+      "command": "python3 tools/theory/build_tc5_packet.py --root evidence/theory/turing_completeness_witness_20260703 --check",
+      "exit_code": 0,
+      "summary": "TC5 packet check PASS; TC-10 NOT_RUN and claim boundary false"
+    },
+    {
+      "command": "sha256sum -c evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+      "exit_code": 0,
+      "summary": "repo-local packet manifest verified from repo root"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest -q tests",
+      "exit_code": 0,
+      "summary": "full Python suite reached 100% and exited 0"
+    },
+    {
+      "command": "cargo fmt --check && cargo test --workspace",
+      "exit_code": 0,
+      "summary": "format check and full Rust workspace test suite exited 0"
+    },
+    {
+      "command": "python3 tools/theory/audit_tc3_evidence.py --root evidence/theory/turing_completeness_witness_20260703 && python3 tools/theory/audit_tc4_witness.py --root evidence/theory/turing_completeness_witness_20260703 --write && python3 tools/theory/build_tc5_packet.py --root evidence/theory/turing_completeness_witness_20260703 --subject-commit ed6234f2dc398d7763596643902f26d4b8d3ef6c --write",
+      "exit_code": 0,
+      "summary": "TC3, TC4, and TC5 regeneration path exited 0"
+    },
+    {
+      "command": "bash tools/ci/run_m1a_gates.sh --self-test && bash tools/ci/run_m1a_gates.sh && git diff --check",
+      "exit_code": 0,
+      "summary": "M1A self-tests and clean gates PASS; no whitespace errors"
+    },
+    {
+      "command": "post-commit: PYTHONPATH=src python3 -m pytest -q tests/test_theory_tc5_packet.py && python3 tools/theory/build_tc5_packet.py --root evidence/theory/turing_completeness_witness_20260703 --check && sha256sum -c evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+      "exit_code": 0,
+      "summary": "focused TC5 smoke passed after commit 9eea210772c526ef50fde339518832aa92aa9f87"
+    }
+  ],
+  "explicit_non_claims": {
+    "closed": false,
+    "constitution_bytes_changed": false,
+    "externally_verified": false,
+    "m2_enabled": false,
+    "m2_gate_passed": false,
+    "og10_or_genesis_signature": false,
+    "ratified": false,
+    "released": false,
+    "shipped": false,
+    "tc10_external_artifact_exists": false,
+    "tc10_passed": false,
+    "turing_completeness_claim_allowed": false
+  },
+  "module": "M2",
+  "notes": "M2.TC5 publishes the implementer-side exact-SHA packet and TC-10 NOT_RUN slot only. It does not satisfy TC-10, M2.G, external verification, or any Turing-completeness claim.",
+  "not_run_is_fail": true,
+  "phase": "M2.TC5",
+  "phase_status": "ADDRESSED",
+  "requirements": [
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC5_PACKET_DESCRIPTOR.json",
+      "id": "ATOM-TC5-1-exact-sha-packet",
+      "observed": {
+        "clean_clone_target_commit": "9eea210772c526ef50fde339518832aa92aa9f87",
+        "repo_packet_subject_commit": "ed6234f2dc398d7763596643902f26d4b8d3ef6c"
+      },
+      "requirement": "Publish an exact-SHA packet and record the clean-clone target commit.",
+      "sha256": "3d4dfff2960704af734831c80b3ec5d617e5e52fe6fecc2c05f0f375c99fd18a",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/verdicts/TC-10.json",
+      "id": "tc10-slot-not-run",
+      "observed": {
+        "external_verifier_artifact": null,
+        "external_verifier_required": true,
+        "implementer_may_run": false,
+        "not_run_is_fail": true,
+        "verdict": "NOT_RUN"
+      },
+      "requirement": "TC-10 slot exists but is NOT_RUN until an M5-class external verifier writes it outside implementer custody.",
+      "sha256": "2175df5d72bb6407bb7fb17dea040faa19dd6292c36e97440f0efdf38f0e551c",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/packet/PACKET_MANIFEST.sha256",
+      "id": "packet-manifest",
+      "observed": {
+        "manifest_check": "PASS",
+        "manifest_sha256": "c55311796e4e60df6e2d705b0b28702281fc78ccffc24b38adf1fa8ca60439df"
+      },
+      "requirement": "Packet digests are recorded and verify from repo root.",
+      "sha256": "c55311796e4e60df6e2d705b0b28702281fc78ccffc24b38adf1fa8ca60439df",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/turing/evidence/theory/turing_completeness_witness_20260703/packet/CLAIM_BOUNDARY.json",
+      "id": "packet-claim-boundary",
+      "observed": {
+        "m2_gate_claim_allowed": false,
+        "tc10_external_artifact_exists": false,
+        "turing_completeness_claim_allowed": false
+      },
+      "requirement": "Packet claim boundary forbids TC-10, M2.G, external-verification, and unqualified Turing-completeness claims.",
+      "sha256": "74a99cf3dcc46670c78751c8c0683c4274e10eeb73450c2b03fab88b977ee358",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M2_TC5_FRESH_CONTEXT_VERIFIER.json",
+      "id": "fresh-context-verifier",
+      "may_mark_m2_tc5_addressed": true,
+      "requirement": "Fresh-context verifier confirms TC5 may be marked ADDRESSED.",
+      "sha256": "e432700c559f34323ac7fcc8dbb40954aab2e489501a678c1fa248024c916c42",
+      "status": "PASS"
+    }
+  ],
+  "schema": "turingos.m2_tc5_verdict.v1",
+  "status_ceiling": "ADDRESSED",
+  "timestamp_utc": "2026-07-03T04:52:00Z",
+  "verdict": "PASS"
+}

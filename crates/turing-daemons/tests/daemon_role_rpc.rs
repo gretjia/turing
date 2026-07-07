@@ -95,7 +95,11 @@ fn daemons_reject_world_writable_socket_parents() {
         }
         std::thread::sleep(Duration::from_millis(20));
     }
-    let status = status.expect("daemon should exit on unsafe socket parent");
+    if status.is_none() {
+        let _ = child.kill();
+    }
+    let waited = child.wait().expect("wait daemon child");
+    let status = status.unwrap_or(waited);
     assert!(!status.success(), "daemon must reject unsafe socket parent");
 }
 
@@ -347,11 +351,409 @@ fn marketd_writes_project_scoped_wallet_snapshot_without_truth_authority() {
         std::fs::read_to_string(state_dir.join("wallet_projection.json")).expect("wallet snapshot");
     assert!(snapshot.contains(r#""schema_id":"wallet_projection_snapshot.v1""#));
     assert!(snapshot.contains(r#""agent_tape""#));
-    assert!(snapshot.contains(r#""yes_positions":{"mkt_tape_wallet":"5"}"#));
+    // E0.1 regression guard: the tape carries TWO PositionMinted events (the
+    // second, deliberately, without an inner `payload.event_type` key — that
+    // is exactly the shape real tape payloads have) plus a RewardDistributed.
+    // A filter keyed on the inner payload's event_type drops the second mint
+    // and the reward silently; both must survive into the projection.
+    assert!(
+        snapshot.contains(r#""yes_positions":{"mkt_tape_wallet":"5","mkt_wallet_tape":"5"}"#),
+        "expected both mints in yes_positions, got: {snapshot}"
+    );
+    assert!(
+        snapshot.contains(r#""no_positions":{"mkt_tape_wallet":"5","mkt_wallet_tape":"5"}"#),
+        "expected both mints in no_positions, got: {snapshot}"
+    );
+    // coin_balance = -5 (mint 1) - 5 (mint 2) + 2 (reward) - 1 (slash) = -9;
+    // this only lands at -9 if the reward event also survived the filter.
+    assert!(
+        snapshot.contains(r#""coin_balance":"-9""#),
+        "expected reward-adjusted coin_balance -9, got: {snapshot}"
+    );
     assert!(!snapshot.contains(r#""agent_forged""#));
     assert!(snapshot.contains(r#""credential_material_included":false"#));
     assert!(!snapshot.contains(r#""accepted_head""#));
     assert!(!snapshot.contains("credential_hash"));
+
+    shutdown(socket, child);
+}
+
+/// Builds a `SystemConstitutionAccepted` genesis + `MarketCreated` (with a G-MKT-06 capsule
+/// binding) fixture tape, and returns the repo dir handle plus the market's frozen
+/// `predicate_set_hash` (so callers can also build a matching/mismatching `CandidateAccepted`).
+fn build_market_fixture_tape(
+    repo: &Path,
+    market_id: &str,
+    capsule_id: &str,
+    proposer_id: &str,
+) -> String {
+    git::init_sha256(repo).expect("init micro git");
+    let tape = Append::open(repo).expect("open tape");
+    tape.append(
+        AppendRequest::new(
+            "SystemConstitutionAccepted",
+            "writer:genesis",
+            json!({"constitution_digest": "sha256:".to_string() + &"9".repeat(64)}),
+        )
+        .predicate_pass(),
+    )
+    .expect("append genesis");
+    let predicate_set_hash = turing_predicate::candidate_predicate_set_hash();
+    tape.append(
+        AppendRequest::new(
+            "MarketCreated",
+            "writer:market",
+            json!({
+                "schema_id": "market_created.v1",
+                "event_type": "MarketCreated",
+                "head_effect": "PRESERVE",
+                "market_id": market_id,
+                "initial_pool_y": "1000",
+                "initial_pool_n": "1000",
+                "k": "1000000",
+                "truth_status": "statistical_signal_only",
+                "capsule_id": capsule_id,
+                "proposer_id": proposer_id,
+                "predicate_set_hash": predicate_set_hash,
+            }),
+        )
+        .predicate_pass(),
+    )
+    .expect("append market");
+    predicate_set_hash
+}
+
+#[test]
+fn marketd_mints_swaps_and_settles_a_real_tape_market_via_g_mkt_06() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    build_market_fixture_tape(&repo, "mkt_e1b", "cap_e1b", "proposer_e1b");
+    let tape = Append::open(&repo).expect("open tape");
+    let candidate_receipt = tape
+        .append(
+            AppendRequest::new(
+                "CandidateAccepted",
+                "writer:kernel",
+                json!({"candidate_id": "cand_e1b", "capsule_id": "cap_e1b"}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append candidate accepted");
+    let accepted_head_before = git::rev_parse_opt(&repo, "refs/turingos/accepted_head")
+        .expect("read accepted head before marketd calls");
+
+    let socket = dir.path().join("marketd-mint.sock");
+    let mut child = spawn_daemon_with_micro_git("turing-marketd", &socket, &repo);
+    wait_for_socket(&socket, &mut child);
+
+    let mint_response = rpc(
+        &socket,
+        "market.mint",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_e1b",
+            "agent_id": "trader_1",
+            "coin_in": "50",
+            "principal_position_cap": "1000",
+        }),
+    );
+    assert_eq!(mint_response["result"]["event_type"], "PositionMinted");
+    assert_eq!(mint_response["result"]["yes_out"], "50");
+    assert_eq!(mint_response["result"]["no_out"], "50");
+    assert_eq!(mint_response["result"]["can_move_accepted_head"], false);
+    assert_eq!(mint_response["result"]["accepted_head_moved"], false);
+
+    let swap_response = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_e1b",
+            "trader_id": "trader_1",
+            "side": "BUY_YES",
+            "pay_coin": "10",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "1000",
+        }),
+    );
+    assert_eq!(swap_response["result"]["event_type"], "AMMSwapExecuted");
+    assert_eq!(swap_response["result"]["side"], "BUY_YES");
+    assert_eq!(swap_response["result"]["can_move_accepted_head"], false);
+
+    let settle_response = rpc(
+        &socket,
+        "market.settle",
+        json!({
+            "writer_id": "writer:kernel",
+            "market_id": "mkt_e1b",
+            "result": "YES",
+            "settlement_event_id": candidate_receipt.event_id,
+        }),
+    );
+    assert_eq!(
+        settle_response["result"]["event_type"], "MarketSettled",
+        "expected a valid G-MKT-06 settlement to be accepted, got: {settle_response}"
+    );
+    assert_eq!(settle_response["result"]["result"], "YES");
+    assert_eq!(settle_response["result"]["can_move_accepted_head"], false);
+
+    let accepted_head_after = git::rev_parse_opt(&repo, "refs/turingos/accepted_head")
+        .expect("read accepted head after marketd calls");
+    assert_eq!(
+        accepted_head_before, accepted_head_after,
+        "marketd's mint/swap/settle must never move accepted_head"
+    );
+
+    shutdown(socket, child);
+}
+
+#[test]
+fn marketd_refuses_settlement_that_fails_g_mkt_06() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    build_market_fixture_tape(&repo, "mkt_gate", "cap_real", "proposer_gate");
+    let tape = Append::open(&repo).expect("open tape");
+    // A CandidateAccepted for a DIFFERENT capsule than the market is bound to.
+    let wrong_capsule_receipt = tape
+        .append(
+            AppendRequest::new(
+                "CandidateAccepted",
+                "writer:kernel",
+                json!({"candidate_id": "cand_other", "capsule_id": "cap_other"}),
+            )
+            .predicate_pass(),
+        )
+        .expect("append candidate accepted for a different capsule");
+    let failure_receipt = tape
+        .append(
+            AppendRequest::new(
+                "FailureNode",
+                "writer:kernel",
+                json!({
+                    "verified": false,
+                    "failure_class": "SEMANTIC_FAILURE",
+                    "candidate_digest": "sha256:".to_string() + &"a".repeat(64),
+                    "observation_digest": "sha256:".to_string() + &"b".repeat(64),
+                }),
+            )
+            .predicate_fail(),
+        )
+        .expect("append failure node");
+
+    let socket = dir.path().join("marketd-gate.sock");
+    let mut child = spawn_daemon_with_micro_git("turing-marketd", &socket, &repo);
+    wait_for_socket(&socket, &mut child);
+
+    let capsule_mismatch = rpc(
+        &socket,
+        "market.settle",
+        json!({
+            "writer_id": "writer:kernel",
+            "market_id": "mkt_gate",
+            "result": "YES",
+            "settlement_event_id": wrong_capsule_receipt.event_id,
+        }),
+    );
+    assert!(
+        capsule_mismatch.get("error").is_some(),
+        "settlement referencing a CandidateAccepted for a different capsule must be refused, got: {capsule_mismatch}"
+    );
+
+    let wrong_reference_type = rpc(
+        &socket,
+        "market.settle",
+        json!({
+            "writer_id": "writer:kernel",
+            "market_id": "mkt_gate",
+            "result": "NO",
+            "settlement_event_id": wrong_capsule_receipt.event_id,
+        }),
+    );
+    assert!(
+        wrong_reference_type.get("error").is_some(),
+        "a NO settlement must reference a FailureNode, not a CandidateAccepted; got: {wrong_reference_type}"
+    );
+
+    let missing_reference = rpc(
+        &socket,
+        "market.settle",
+        json!({
+            "writer_id": "writer:kernel",
+            "market_id": "mkt_gate",
+            "result": "YES",
+            "settlement_event_id": "mu:".to_string() + &"0".repeat(64),
+        }),
+    );
+    assert!(
+        missing_reference.get("error").is_some(),
+        "a settlement_event_id absent from the tape must be refused, got: {missing_reference}"
+    );
+
+    // Sanity: the legitimate FailureNode path (NO) DOES pass G-MKT-06 (existence + type +
+    // ordering all hold), proving the above refusals are real gate failures, not a blanket
+    // "market.settle never works" bug.
+    let valid_no = rpc(
+        &socket,
+        "market.settle",
+        json!({
+            "writer_id": "writer:kernel",
+            "market_id": "mkt_gate",
+            "result": "NO",
+            "settlement_event_id": failure_receipt.event_id,
+        }),
+    );
+    assert_eq!(
+        valid_no["result"]["event_type"], "MarketSettled",
+        "a NO settlement referencing a real on-tape FailureNode must be accepted, got: {valid_no}"
+    );
+
+    shutdown(socket, child);
+}
+
+#[test]
+fn marketd_swap_refuses_self_trade_position_cap_and_proposer_conflict() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let repo = dir.path().join("micro.git");
+    std::fs::create_dir(&repo).expect("create micro git dir");
+    build_market_fixture_tape(&repo, "mkt_defense", "cap_defense", "proposer_defense");
+
+    let socket = dir.path().join("marketd-defense.sock");
+    let mut child = spawn_daemon_with_micro_git("turing-marketd", &socket, &repo);
+    wait_for_socket(&socket, &mut child);
+
+    // Seed trader_1 with a BUY_YES swap.
+    let first_swap = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "trader_1",
+            "side": "BUY_YES",
+            "pay_coin": "10",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "1000",
+        }),
+    );
+    assert_eq!(first_swap["result"]["event_type"], "AMMSwapExecuted");
+
+    // Self-trade: trader_1 immediately takes the opposite side against the same pool with no
+    // other principal trading in between.
+    let self_trade = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "trader_1",
+            "side": "BUY_NO",
+            "pay_coin": "5",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "1000",
+        }),
+    );
+    assert!(
+        self_trade.get("error").is_some(),
+        "trader_1 taking the opposite side immediately after its own swap must be refused, got: {self_trade}"
+    );
+
+    // A DIFFERENT trader may legitimately take the opposite side (no self-trade issue).
+    let other_trader_swap = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "trader_2",
+            "side": "BUY_NO",
+            "pay_coin": "5",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "1000",
+        }),
+    );
+    assert_eq!(
+        other_trader_swap["result"]["event_type"], "AMMSwapExecuted",
+        "a different principal must be able to take the opposite side, got: {other_trader_swap}"
+    );
+
+    // Now trader_1 taking BUY_NO is allowed again (trader_2 traded in between).
+    let round_reopened = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "trader_1",
+            "side": "BUY_NO",
+            "pay_coin": "1",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "1000",
+        }),
+    );
+    assert_eq!(
+        round_reopened["result"]["event_type"], "AMMSwapExecuted",
+        "after an intervening trade by another principal, trader_1 may take the opposite side, got: {round_reopened}"
+    );
+
+    // Principal position cap: trader_2 already holds get_y/get_n from its swap above; a tiny
+    // cap must refuse further exposure.
+    let cap_exceeded = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "trader_2",
+            "side": "BUY_NO",
+            "pay_coin": "1",
+            "principal_position_cap": "0.000000001",
+            "proposer_no_deminimis_cap": "1000",
+        }),
+    );
+    assert!(
+        cap_exceeded.get("error").is_some(),
+        "a principal_position_cap far below existing exposure must refuse the swap, got: {cap_exceeded}"
+    );
+
+    // Proposer-conflict: the market's own proposer betting NO above a de-minimis cap.
+    let proposer_conflict = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "proposer_defense",
+            "side": "BUY_NO",
+            "pay_coin": "10",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "0.000000001",
+        }),
+    );
+    assert!(
+        proposer_conflict.get("error").is_some(),
+        "the market's own proposer betting NO above de-minimis must be refused, got: {proposer_conflict}"
+    );
+
+    // The same proposer betting YES on its own capsule is fine (the honest-signal direction).
+    let proposer_yes = rpc(
+        &socket,
+        "market.swap",
+        json!({
+            "writer_id": "writer:trader",
+            "market_id": "mkt_defense",
+            "trader_id": "proposer_defense",
+            "side": "BUY_YES",
+            "pay_coin": "10",
+            "principal_position_cap": "1000",
+            "proposer_no_deminimis_cap": "0.000000001",
+        }),
+    );
+    assert_eq!(
+        proposer_yes["result"]["event_type"], "AMMSwapExecuted",
+        "the proposer betting YES on its own capsule must be allowed, got: {proposer_yes}"
+    );
 
     shutdown(socket, child);
 }
@@ -408,25 +810,7 @@ fn pputd_writes_hidden_project_scoped_pput_snapshot_without_prompt_leakage() {
         AppendRequest::new(
             "CostEvent",
             "writer:pput",
-            json!({
-                "schema_id": "cost_event.v1",
-                "event_type": "CostEvent",
-                "head_effect": "PRESERVE",
-                "run_id": "run_tape",
-                "problem_id": "problem_tape",
-                "split": "heldout",
-                "agent_id": "agent_worker",
-                "branch_id": "branch_failed",
-                "capsule_id": "wc_snapshot",
-                "prompt_tokens": 2,
-                "completion_tokens": 3,
-                "tool_tokens": 5,
-                "tool_stdout_tokens": 7,
-                "total_tokens": 17,
-                "wall_time_ms": 100,
-                "tool_stdout_hash": digest('f'),
-                "counted_in_total": true
-            }),
+            cost_event_v2("run_tape", "problem_tape", "branch_failed", 17, 100),
         )
         .predicate_pass(),
     )
@@ -921,6 +1305,19 @@ fn spawn_daemon_with_project_and_micro_git(
         .expect("spawn daemon")
 }
 
+fn spawn_daemon_with_micro_git(name: &str, socket: &Path, micro_git: &Path) -> Child {
+    Command::new(bin(name))
+        .args([
+            "--serve",
+            "--socket",
+            socket.to_str().expect("UTF-8 socket path"),
+            "--micro-git",
+            micro_git.to_str().expect("UTF-8 micro git path"),
+        ])
+        .spawn()
+        .expect("spawn daemon")
+}
+
 fn bin(name: &str) -> &'static str {
     match name {
         "turing-execd" => env!("CARGO_BIN_EXE_turing-execd"),
@@ -972,6 +1369,49 @@ fn wait_for_socket(socket: &Path, child: &mut Child) {
 
 fn digest(ch: char) -> String {
     format!("sha256:{}", ch.to_string().repeat(64))
+}
+
+fn cost_event_v2(
+    run_id: &str,
+    problem_id: &str,
+    branch_id: &str,
+    total_tokens: u64,
+    wall_time_ms: u64,
+) -> Value {
+    json!({
+        "schema_id": "turingos.cost_event.v2",
+        "run_id": run_id,
+        "problem_id": problem_id,
+        "split": "heldout",
+        "agent_id": "agent_worker",
+        "branch_id": branch_id,
+        "capsule_id": "wc_snapshot",
+        "receipt_id": "rcpt:".to_string() + &"1".repeat(64),
+        "worker": {
+            "adapter_kind": "fake",
+            "provider": "fixture",
+            "model_id_requested": "fixture-model",
+            "model_id_resolved": "fixture-model-20260702",
+            "endpoint": "fixture://pput",
+            "request_id": "req_fixture_pput",
+            "response_sha256": digest('b')
+        },
+        "usage": {
+            "input_tokens": total_tokens / 2,
+            "output_tokens": total_tokens - (total_tokens / 2),
+            "total_tokens": total_tokens,
+            "provider_usage_raw_sha256": digest('c')
+        },
+        "cost": {
+            "cost_source_kind": "fixture",
+            "cost_microusd": 0,
+            "price_table_digest": "sha256:21db84a3efaf6e7ff8b185e7cb958243adc5a23def982ea0fcce0bc5fc7c6f2c",
+            "bound_kind": null
+        },
+        "wall_time_ms": wall_time_ms,
+        "tool_stdout_hash": digest('f'),
+        "counted_in_total": true
+    })
 }
 
 fn grant_json() -> Value {

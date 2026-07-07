@@ -1,0 +1,211 @@
+{
+  "run_id": "substrate_smoke",
+  "sample_size": 2,
+  "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+  "turingos_arm_runs": [
+    {
+      "basis": "real_daemon_rpc_plus_explicit_qualification_checks",
+      "broadcast_rules_emitted": [],
+      "broadcast_rules_injected": [
+        {
+          "failure_class": "TARGET_TEST_TYPE_MISMATCH",
+          "guidance": "When setting widget attrs from a field max_length, preserve the runtime integer value; do not convert it to a string unless the surrounding API explicitly requires strings.",
+          "rule_id": "br_recovery_11790_maxlength_runtime_type",
+          "source_evidence_id": "ev_recovery_11790_official_eval_fail",
+          "source_instance_id": "django__django-11790"
+        },
+        {
+          "failure_class": "TARGET_TEST_SERIALIZATION_FORM",
+          "guidance": "For Django migration serialization of enum members and RegexFlag members, emit bracket lookup syntax using the member name, for example EnumClass['NAME'], rather than value construction or dot attribute syntax.",
+          "rule_id": "br_recovery_11815_enum_bracket_lookup",
+          "source_evidence_id": "ev_recovery_11815_official_eval_fail",
+          "source_instance_id": "django__django-11815"
+        },
+        {
+          "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+          "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+          "rule_id": "br_recovery_no_benchmark_test_edits",
+          "source_evidence_id": "ev_recovery_scope_policy",
+          "source_instance_id": "stage3"
+        },
+        {
+          "failure_class": "MISSING_OR_EMPTY_PATCH",
+          "guidance": "Do not stop with an unchanged worktree. Inspect the failing behavior and leave a concrete production-code patch; if no safe patch exists, explain the blocker without claiming completion.",
+          "rule_id": "br_stage4_11964_missing_patch",
+          "source_evidence_id": "ev_stage4_11964_missing_patch",
+          "source_instance_id": "django__django-11964"
+        },
+        {
+          "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+          "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+          "rule_id": "br_stage4_no_benchmark_test_edits",
+          "source_evidence_id": "ev_stage4_scope_policy",
+          "source_instance_id": "stage4"
+        }
+      ],
+      "candidate_id": "cand_django__django-12039",
+      "capsule_id": "wc_django__django-12039",
+      "event_calls": {
+        "BudgetAllocated": 1,
+        "CostEvent": 1,
+        "EvidenceBound": 1,
+        "FailureNode": 2,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "PPUTAccounted": 1,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "WorkCapsuleBuilt": 1,
+        "WorkerReceiptImported": 1
+      },
+      "instance_id": "django__django-12039",
+      "macro_anchor_id": "macro:diff:django__django-12039",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage5_10task_20260627/turingos_incremental/instances/django__django-12039/micro_tape.bundle",
+      "module_calls": {
+        "M0_law_goal_harness": 1,
+        "M10_evidence_approval": 1,
+        "M11_failure_memory": 1,
+        "M12_market_substrate": 1,
+        "M13_marketrouter_shadow": 1,
+        "M14_pput_accounting": 1,
+        "M15_projection": 1,
+        "M16_integration_queue": 1,
+        "M17_e2e_handoff": 1,
+        "M1_canonical_codec": 1,
+        "M2_micro_git_tape": 1,
+        "M3_event_registry": 1,
+        "M4_single_loop": 1,
+        "M5_goal_module_atom_capsule": 1,
+        "M6_worker_profiles": 1,
+        "M7_executor_broker": 1,
+        "M8_macro_observer": 1,
+        "M9_predicate_kernel": 1
+      },
+      "patch_hash": "sha256:0e4451f60fc12b8aed7e8b0c9a73da6c2db9158651d2c659d91f233ff4a1c460",
+      "predicate_write_event_type": "FailureNode",
+      "process_calls": {
+        "grok_cli": 1,
+        "turing-execd": 1,
+        "turing-marketd": 2,
+        "turing-mcp": 1,
+        "turing-pputd": 1,
+        "turing-viewd": 1,
+        "turingd": 1
+      },
+      "project": "evidence/bench/mini_swe_bench_stage5_10task_20260627/turingos_incremental/instances/django__django-12039/project",
+      "receipt_count": 16,
+      "worker_exit_code": 0,
+      "worker_id": "worker:sha256:2f5c5c807942e287608e0df621f02cab5f815cc2fe9770ca65bb48b45cce1137",
+      "worker_log_dir": "evidence/bench/mini_swe_bench_stage5_10task_20260627/turingos_incremental/instances/django__django-12039/worker_logs",
+      "worker_mode": "grok",
+      "worker_receipt_id": "rcp_f165c4f28cc1c3f2761847fc13afda97",
+      "worker_worktree": "/tmp/turingos_substrate_worktrees/246f7b7e3e7f1766"
+    },
+    {
+      "basis": "real_daemon_rpc_plus_explicit_qualification_checks",
+      "broadcast_rules_emitted": [],
+      "broadcast_rules_injected": [
+        {
+          "failure_class": "TARGET_TEST_TYPE_MISMATCH",
+          "guidance": "When setting widget attrs from a field max_length, preserve the runtime integer value; do not convert it to a string unless the surrounding API explicitly requires strings.",
+          "rule_id": "br_recovery_11790_maxlength_runtime_type",
+          "source_evidence_id": "ev_recovery_11790_official_eval_fail",
+          "source_instance_id": "django__django-11790"
+        },
+        {
+          "failure_class": "TARGET_TEST_SERIALIZATION_FORM",
+          "guidance": "For Django migration serialization of enum members and RegexFlag members, emit bracket lookup syntax using the member name, for example EnumClass['NAME'], rather than value construction or dot attribute syntax.",
+          "rule_id": "br_recovery_11815_enum_bracket_lookup",
+          "source_evidence_id": "ev_recovery_11815_official_eval_fail",
+          "source_instance_id": "django__django-11815"
+        },
+        {
+          "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+          "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+          "rule_id": "br_recovery_no_benchmark_test_edits",
+          "source_evidence_id": "ev_recovery_scope_policy",
+          "source_instance_id": "stage3"
+        },
+        {
+          "failure_class": "MISSING_OR_EMPTY_PATCH",
+          "guidance": "Do not stop with an unchanged worktree. Inspect the failing behavior and leave a concrete production-code patch; if no safe patch exists, explain the blocker without claiming completion.",
+          "rule_id": "br_stage4_11964_missing_patch",
+          "source_evidence_id": "ev_stage4_11964_missing_patch",
+          "source_instance_id": "django__django-11964"
+        },
+        {
+          "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+          "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+          "rule_id": "br_stage4_no_benchmark_test_edits",
+          "source_evidence_id": "ev_stage4_scope_policy",
+          "source_instance_id": "stage4"
+        }
+      ],
+      "candidate_id": "cand_django__django-12050",
+      "capsule_id": "wc_django__django-12050",
+      "event_calls": {
+        "BudgetAllocated": 1,
+        "CostEvent": 1,
+        "EvidenceBound": 1,
+        "FailureNode": 2,
+        "GoalStateProposed": 1,
+        "MacroObservationImported": 1,
+        "MarketCreated": 1,
+        "MarketSettled": 1,
+        "PPUTAccounted": 1,
+        "PositionMinted": 1,
+        "PredicateEvaluated": 1,
+        "RewardDistributed": 1,
+        "SystemConstitutionAccepted": 1,
+        "WorkCapsuleBuilt": 1,
+        "WorkerReceiptImported": 1
+      },
+      "instance_id": "django__django-12050",
+      "macro_anchor_id": "macro:diff:django__django-12050",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage5_10task_20260627/turingos_incremental/instances/django__django-12050/micro_tape.bundle",
+      "module_calls": {
+        "M0_law_goal_harness": 1,
+        "M10_evidence_approval": 1,
+        "M11_failure_memory": 1,
+        "M12_market_substrate": 1,
+        "M13_marketrouter_shadow": 1,
+        "M14_pput_accounting": 1,
+        "M15_projection": 1,
+        "M16_integration_queue": 1,
+        "M17_e2e_handoff": 1,
+        "M1_canonical_codec": 1,
+        "M2_micro_git_tape": 1,
+        "M3_event_registry": 1,
+        "M4_single_loop": 1,
+        "M5_goal_module_atom_capsule": 1,
+        "M6_worker_profiles": 1,
+        "M7_executor_broker": 1,
+        "M8_macro_observer": 1,
+        "M9_predicate_kernel": 1
+      },
+      "patch_hash": "sha256:08af6e22fa66b28c47c3cd61192637cdcf2fca544718dc4d48f8f01fb469e63f",
+      "predicate_write_event_type": "FailureNode",
+      "process_calls": {
+        "grok_cli": 1,
+        "turing-execd": 1,
+        "turing-marketd": 2,
+        "turing-mcp": 1,
+        "turing-pputd": 1,
+        "turing-viewd": 1,
+        "turingd": 1
+      },
+      "project": "evidence/bench/mini_swe_bench_stage5_10task_20260627/turingos_incremental/instances/django__django-12050/project",
+      "receipt_count": 16,
+      "worker_exit_code": 0,
+      "worker_id": "worker:sha256:2f5c5c807942e287608e0df621f02cab5f815cc2fe9770ca65bb48b45cce1137",
+      "worker_log_dir": "evidence/bench/mini_swe_bench_stage5_10task_20260627/turingos_incremental/instances/django__django-12050/worker_logs",
+      "worker_mode": "grok",
+      "worker_receipt_id": "rcp_f3a79e184bb181788347cc236991c738",
+      "worker_worktree": "/tmp/turingos_substrate_worktrees/e9fd9a077a0753fb"
+    }
+  ]
+}

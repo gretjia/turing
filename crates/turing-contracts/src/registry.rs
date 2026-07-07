@@ -1,4 +1,4 @@
-//! Embedded event registry — the closed Phase-0 table plus additive Agent Economy events.
+//! Embedded event registry — the closed Phase-0 table plus additive event families.
 //!
 //! The ratified registry JSON (`pack/04_registries/event_registry_v5_3_1.json`) is
 //! compiled into the binary with [`include_str!`] and parsed a single time behind a
@@ -17,18 +17,18 @@ use serde::Deserialize;
 
 use crate::envelope::HeadEffect;
 
-/// The six frozen event classes. `head_effect`/head movement are a function of the
+/// The closed event classes. `head_effect`/head movement are a function of the
 /// class plus the predicate product; the class is what selects *which* sovereign head a
 /// PASS may advance.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventClass {
     /// Advances `accepted_head` on PASS (the 12 SOVEREIGN_ACCEPT events).
     SovereignAccept,
-    /// Advances `authorization_head` on PASS (the 8 AUTHORIZATION events).
+    /// Advances `authorization_head` on PASS (the 9 AUTHORIZATION events).
     Authorization,
     /// PRESERVE; only `tape_tip` moves (the 6 PROPOSAL events).
     Proposal,
-    /// PRESERVE; only `tape_tip` moves (the 9 OBSERVATION events).
+    /// PRESERVE; only `tape_tip` moves (the 11 OBSERVATION events).
     Observation,
     /// PRESERVE; only `tape_tip` moves (the 6 RECEIPT events).
     Receipt,
@@ -56,11 +56,27 @@ impl EventClass {
 /// Original Phase-0 Greenfield registry cardinality.
 pub const BASELINE_EVENT_COUNT: usize = 46;
 
-/// Additive Agent Economy events introduced by the Greenfield v1.0 upgrade.
-pub const ECONOMY_EVENT_COUNT: usize = 15;
+/// Additive Agent Economy events introduced by the Greenfield v1.0 upgrade, plus the
+/// ADR-ECON-002 `FailureNodeCapsuleBound` binding event and the ADR-ECON-001
+/// `PrincipalDeclared` association event.
+pub const ECONOMY_EVENT_COUNT: usize = 17;
 
-/// Total closed registry cardinality after additive economy events.
-pub const TOTAL_EVENT_COUNT: usize = BASELINE_EVENT_COUNT + ECONOMY_EVENT_COUNT;
+/// Additive benchmark evidence events introduced by the mini-SWE-bench Gate A loop.
+pub const BENCHMARK_EVENT_COUNT: usize = 1;
+
+/// Additive sandbox provenance events introduced by the M1d mutation-boundary gate.
+pub const SANDBOX_EVENT_COUNT: usize = 1;
+
+/// Additive Turing-completeness witness rows introduced by M2.TC0/TC2.
+pub const TC_WITNESS_EVENT_COUNT: usize = 5;
+
+/// Total closed registry cardinality after additive economy, benchmark, sandbox, and
+/// TC witness events.
+pub const TOTAL_EVENT_COUNT: usize = BASELINE_EVENT_COUNT
+    + ECONOMY_EVENT_COUNT
+    + BENCHMARK_EVENT_COUNT
+    + SANDBOX_EVENT_COUNT
+    + TC_WITNESS_EVENT_COUNT;
 
 /// Which sovereign ref a class targets (the registry `target_ref` column).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -160,7 +176,7 @@ fn table() -> &'static BTreeMap<String, RegistryRow> {
 
 /// Look up the registry-derived row for `event_type`.
 ///
-/// Returns `None` for any name outside the closed 46-event set (the `unknown_event_policy
+/// Returns `None` for any name outside the closed event set (the `unknown_event_policy
 /// = REJECT` discipline); callers turn that into an `UNKNOWN_EVENT_TYPE` admission
 /// rejection rather than trusting the writer.
 #[must_use]
@@ -198,7 +214,7 @@ mod tests {
         assert_eq!(
             registered_event_count(),
             TOTAL_EVENT_COUNT,
-            "the closed registry has baseline plus additive economy events"
+            "the closed registry has baseline plus additive economy, benchmark, sandbox, and TC witness events"
         );
     }
 
@@ -226,12 +242,79 @@ mod tests {
         let predicate_free = registry("PredicateEvaluated").unwrap();
         assert!(!predicate_free.predicate_required);
         assert_eq!(predicate_free.head_effect, HeadEffect::Preserve);
+
+        let official_evaluator = registry("OfficialEvaluatorEvidenceImported").unwrap();
+        assert_eq!(official_evaluator.class, EventClass::Observation);
+        assert_eq!(official_evaluator.head_effect, HeadEffect::Preserve);
+        assert_eq!(official_evaluator.target_ref, TargetRef::TapeTip);
+        assert_eq!(
+            official_evaluator.payload_schema_id,
+            "official_evaluator_evidence_imported.v1"
+        );
+
+        let sandbox_boundary = registry("SandboxBoundaryAssumed").unwrap();
+        assert_eq!(sandbox_boundary.class, EventClass::Observation);
+        assert_eq!(sandbox_boundary.head_effect, HeadEffect::Preserve);
+        assert_eq!(sandbox_boundary.target_ref, TargetRef::TapeTip);
+        assert_eq!(
+            sandbox_boundary.payload_schema_id,
+            "sandbox_boundary_assumed.v1"
+        );
     }
 
     #[test]
     fn unknown_event_type_is_rejected_closed_world() {
         assert!(registry("NotARealEvent").is_none());
         assert!(registry("").is_none());
+    }
+
+    #[test]
+    fn tc_witness_rows_are_in_the_closed_registry() {
+        for expected in [
+            (
+                "ComputationStarted",
+                EventClass::Observation,
+                HeadEffect::Preserve,
+                TargetRef::TapeTip,
+                "computation_started.v1",
+            ),
+            (
+                "InstructionAuthorized",
+                EventClass::Authorization,
+                HeadEffect::Advance,
+                TargetRef::AuthorizationHead,
+                "instruction_authorized.v1",
+            ),
+            (
+                "InstructionApplied",
+                EventClass::Observation,
+                HeadEffect::Preserve,
+                TargetRef::TapeTip,
+                "instruction_applied.v1",
+            ),
+            (
+                "MachineStateObserved",
+                EventClass::Observation,
+                HeadEffect::Preserve,
+                TargetRef::TapeTip,
+                "machine_state_observed.v1",
+            ),
+            (
+                "ComputationHalted",
+                EventClass::Observation,
+                HeadEffect::Preserve,
+                TargetRef::TapeTip,
+                "computation_halted.v1",
+            ),
+        ] {
+            let (name, class, head_effect, target_ref, payload_schema_id) = expected;
+            let row = registry(name).unwrap_or_else(|| panic!("{name} must resolve"));
+            assert_eq!(row.class, class, "{name} class");
+            assert_eq!(row.head_effect, head_effect, "{name} head_effect");
+            assert_eq!(row.target_ref, target_ref, "{name} target_ref");
+            assert!(row.predicate_required, "{name} predicate_required");
+            assert_eq!(row.payload_schema_id, payload_schema_id, "{name} schema");
+        }
     }
 
     #[test]
@@ -245,12 +328,12 @@ mod tests {
         for n in &names {
             assert!(registry(n).is_some(), "enumerated name {n:?} must resolve");
         }
-        // The 8 AUTHORIZATION events are present in the enumeration (sanity for SG-15).
+        // The 9 AUTHORIZATION events are present in the enumeration (sanity for SG-15).
         let auth = names
             .iter()
             .filter(|n| registry(n).unwrap().class == EventClass::Authorization)
             .count();
-        assert_eq!(auth, 8);
+        assert_eq!(auth, 9);
         let economy = names
             .iter()
             .filter(|n| registry(n).unwrap().class == EventClass::Economy)

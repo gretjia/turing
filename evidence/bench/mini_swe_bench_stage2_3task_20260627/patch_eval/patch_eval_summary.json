@@ -1,0 +1,79 @@
+{
+  "by_arm": {
+    "direct": {
+      "pass": 1,
+      "total": 3
+    },
+    "turingos": {
+      "pass": 2,
+      "total": 3
+    }
+  },
+  "results": [
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11790",
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/turingos/django__django-11790/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/turingos/django__django-11790/stdout.txt",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ]
+    },
+    {
+      "arm": "direct",
+      "exit_code": 1,
+      "instance_id": "django__django-11790",
+      "result": "FAIL",
+      "stderr": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/direct/django__django-11790/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/direct/django__django-11790/stdout.txt",
+      "target_tests": [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_matches_user_model"
+      ]
+    },
+    {
+      "arm": "turingos",
+      "instance_id": "django__django-11815",
+      "reason": "test_patch_apply_failed_after_candidate_patch",
+      "result": "FAIL",
+      "stderr": "error: patch failed: tests/migrations/test_writer.py:267\nerror: tests/migrations/test_writer.py: patch does not apply\n"
+    },
+    {
+      "arm": "direct",
+      "instance_id": "django__django-11815",
+      "reason": "test_patch_apply_failed_after_candidate_patch",
+      "result": "FAIL",
+      "stderr": "error: patch failed: tests/migrations/test_writer.py:267\nerror: tests/migrations/test_writer.py: patch does not apply\n"
+    },
+    {
+      "arm": "turingos",
+      "exit_code": 0,
+      "instance_id": "django__django-11848",
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/turingos/django__django-11848/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/turingos/django__django-11848/stdout.txt",
+      "target_tests": [
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_rfc850",
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_year_less_than_70"
+      ]
+    },
+    {
+      "arm": "direct",
+      "exit_code": 0,
+      "instance_id": "django__django-11848",
+      "result": "PASS",
+      "stderr": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/direct/django__django-11848/stderr.txt",
+      "stdout": "evidence/bench/mini_swe_bench_stage2_3task_20260627/patch_eval/direct/django__django-11848/stdout.txt",
+      "target_tests": [
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_rfc850",
+        "utils_tests.test_http.HttpDateProcessingTests.test_parsing_year_less_than_70"
+      ]
+    }
+  ],
+  "sample_size": 3,
+  "schema_id": "DjangoSweBenchPatchEval.v1",
+  "statistical_claim": "none_smoke_only"
+}

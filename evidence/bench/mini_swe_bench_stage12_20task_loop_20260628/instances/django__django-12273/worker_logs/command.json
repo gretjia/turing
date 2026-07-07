@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "grok",
+    "-p",
+    "<visible_capsule_prompt>",
+    "--cwd",
+    "/tmp/turingos_substrate_worktrees/4409ceb992ba5189",
+    "--output-format",
+    "plain",
+    "--model",
+    "grok-build",
+    "--always-approve",
+    "--permission-mode",
+    "bypassPermissions",
+    "--disable-web-search",
+    "--no-plan",
+    "--no-memory",
+    "--no-subagents",
+    "--max-turns",
+    "50",
+    "--verbatim"
+  ]
+}

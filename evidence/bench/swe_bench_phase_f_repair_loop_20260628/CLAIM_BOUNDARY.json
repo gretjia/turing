@@ -1,0 +1,12 @@
+{
+  "artifact_kind": "PHASE_F_REPAIR_LOOP_BLOCKER_PACKET",
+  "full_dataset_claim_allowed": false,
+  "full_swe_bench_score_claim_allowed": false,
+  "leaderboard_equivalence_claim_allowed": false,
+  "not_full_swe_bench_dataset": true,
+  "phase_g_release_allowed": false,
+  "purpose": "Decide whether Phase F can be repaired from existing evidence or must loop back to fresh Stage16R-real evaluator bundles.",
+  "schema_id": "PhaseFRepairClaimBoundary.v1",
+  "source_phase_f_root": "evidence/bench/swe_bench_phase_f_evaluator_proof_20260628",
+  "source_phase_f_status": "PARTIAL"
+}

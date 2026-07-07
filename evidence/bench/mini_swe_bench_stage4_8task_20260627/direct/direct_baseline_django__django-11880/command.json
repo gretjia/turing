@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "grok",
+    "-p",
+    "<direct_baseline_prompt>",
+    "--cwd",
+    "/tmp/turingos_direct_grok_stage4_8task/009d13eb4d768964",
+    "--output-format",
+    "plain",
+    "--model",
+    "grok-build",
+    "--always-approve",
+    "--permission-mode",
+    "bypassPermissions",
+    "--disable-web-search",
+    "--no-plan",
+    "--no-memory",
+    "--no-subagents",
+    "--max-turns",
+    "50",
+    "--verbatim"
+  ]
+}

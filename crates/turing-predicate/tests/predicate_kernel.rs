@@ -6,7 +6,7 @@ use turing_predicate::{
 
 #[test]
 fn predicate_product_deterministic() {
-    let kernel = PredicateKernel::default();
+    let kernel = PredicateKernel;
     let checks = vec![
         PredicateCheck::pass("scope.allowed"),
         PredicateCheck::fail("budget.within_limit", "BUDGET_SCOPE"),

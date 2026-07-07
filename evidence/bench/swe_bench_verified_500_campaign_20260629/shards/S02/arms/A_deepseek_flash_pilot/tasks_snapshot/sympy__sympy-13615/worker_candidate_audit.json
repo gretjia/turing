@@ -1,0 +1,14 @@
+{
+  "candidate_patch_path": "shards/S02/tasks/sympy__sympy-13615/candidate.patch",
+  "candidate_patch_sha256": "sha256:6da36f5e869b0275a4cf35cc37633a4be2a8863ff90388fe4a25e68396244454",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sympy/sets/sets.py"
+  ],
+  "instance_id": "sympy__sympy-13615",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S02",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

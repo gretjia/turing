@@ -1,0 +1,1379 @@
+import importlib.util
+import hashlib
+import json
+import subprocess
+from pathlib import Path
+
+from turingos import schemas
+
+
+REPO = Path(__file__).resolve().parents[1]
+HARNESS = REPO / "tools" / "bench" / "mini_swe_bench_grok_headless.py"
+AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_plan.py"
+SUBSTRATE_AUDITOR = REPO / "tools" / "bench" / "audit_mini_swe_bench_substrate_coverage.py"
+SUBSTRATE_SMOKE = REPO / "tools" / "bench" / "run_mini_swe_bench_substrate_smoke.py"
+META_REVIEW = REPO / "tools" / "bench" / "run_deepseek_meta_review.py"
+DIRECT_BASELINE = REPO / "tools" / "bench" / "run_direct_grok_baseline_smoke.py"
+PATCH_EVAL = REPO / "tools" / "bench" / "evaluate_django_swe_bench_patches.py"
+SMOKE = REPO / "tools" / "bench" / "smoke_mini_swe_bench_grok_headless.sh"
+
+
+def load_harness():
+    spec = importlib.util.spec_from_file_location("mini_swe_bench_grok_headless", HARNESS)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_module(path: Path, module_name: str):
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_substrate_smoke_token_bound_estimator_uses_utf8_bytes_not_word_count():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    text = "one two three"
+
+    assert runner.upper_bound_tokens_from_utf8_bytes(text) > len(text.split())
+    assert runner.TOKEN_BOUND_KIND == "upper_bound_utf8_bytes_over_2"
+
+
+def test_grok_debug_receipt_sanitizes_provider_usage_and_costs():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    debug_log = "\n".join(
+        [
+            'config=SamplerConfig { credential_debug: Some("redacted-material-must-not-appear") }',
+            'received "session/prompt" response: {"stopReason":"end_turn","_meta":{"sessionId":"sess_1","requestId":"req_1","promptId":"req_1","totalTokens":20725,"modelId":"grok-build","inputTokens":20499,"outputTokens":225,"cachedReadTokens":2880,"reasoningTokens":214}}',
+        ]
+    )
+    stdout_text = '{"text":"M1C_JSON_PROBE_OK","requestId":"req_1","sessionId":"sess_1"}'
+
+    receipt = runner.sanitized_grok_provider_receipt(
+        debug_log,
+        stdout_text=stdout_text,
+        stderr_text="",
+        model_requested="grok-build",
+    )
+
+    assert receipt["schema_id"] == "grok_cli_provider_receipt.v1"
+    assert receipt["raw_debug_retained"] is False
+    assert receipt["request_id"] == "req_1"
+    assert receipt["usage"]["input_tokens"] == 20499
+    assert receipt["usage"]["cached_input_tokens"] == 2880
+    assert receipt["usage"]["output_tokens"] == 225
+    assert receipt["usage"]["reasoning_tokens"] == 214
+    assert receipt["cost"]["computed_cost_microusd"] == 18645
+    assert "redacted-material-must-not-appear" not in json.dumps(receipt)
+
+
+def test_grok_provider_receipt_yields_provider_inline_cost_event():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    receipt = {
+        "schema_id": "grok_cli_provider_receipt.v1",
+        "provider": "xai",
+        "endpoint": "grok-cli:responses",
+        "session_id": "sess_1",
+        "request_id": "req_1",
+        "model_id_requested": "grok-build",
+        "model_id_resolved": "grok-build",
+        "usage": {
+            "input_tokens": 20499,
+            "cached_input_tokens": 2880,
+            "output_tokens": 225,
+            "reasoning_tokens": 214,
+        },
+        "usage_raw_sha256": "sha256:" + "1" * 64,
+        "response_sha256": "sha256:" + "2" * 64,
+        "cost": {
+            "computed_cost_microusd": 18645,
+            "price_table_digest": runner.M1C_PRICE_TABLE_DIGEST,
+        },
+    }
+    worker_result = {
+        "provider_receipt": receipt,
+        "elapsed_ms": 1234,
+        "stdout_hash": "sha256:" + "3" * 64,
+        "stderr_hash": "sha256:" + "4" * 64,
+    }
+
+    payload = runner.cost_event_payload_for_worker_result(
+        task={"instance_id": "django__django-12039"},
+        worker_id="worker:sha256:" + "5" * 64,
+        worker_mode="grok",
+        capsule_id="wc_django__django-12039",
+        worker_result=worker_result,
+    )
+
+    assert payload["schema_id"] == "turingos.cost_event.v2"
+    assert payload["cost"]["cost_source_kind"] == "provider_receipt_inline"
+    assert payload["cost"]["cost_microusd"] == 18645
+    assert payload["cost"]["bound_kind"] is None
+    assert payload["worker"]["provider"] == "xai"
+    assert payload["worker"]["request_id"] == "req_1"
+    assert payload["usage"]["provider_usage_raw_sha256"] == "sha256:" + "1" * 64
+
+    tape_payload = {"event_type": "CostEvent", **payload}
+    assert schemas.validate_cost_event_v2(tape_payload) is None
+
+
+def test_grok_headless_argv_turns_planning_memory_and_subagents_off():
+    harness = load_harness()
+    argv = harness.grok_worker_argv(
+        cwd="/tmp/turingos-mini-swe/task",
+        prompt="visible capsule",
+        model="grok-code-fast-1",
+        max_turns=8,
+    )
+
+    assert argv[:2] == ["grok", "-p"]
+    assert ["--cwd", "/tmp/turingos-mini-swe/task"] in [
+        argv[i : i + 2] for i in range(len(argv) - 1)
+    ]
+    assert ["--output-format", "plain"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
+    assert "--reasoning-effort" not in argv
+    assert "--effort" not in argv
+    assert "--always-approve" in argv
+    assert "--no-plan" in argv
+    assert "--no-memory" in argv
+    assert "--no-subagents" in argv
+    assert "--disable-web-search" in argv
+
+
+def test_dry_run_writes_baseline_and_turingos_plan(tmp_path):
+    harness = load_harness()
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "django__django-00001",
+                "repo": "https://github.com/django/django",
+                "base_commit": "abc123",
+                "problem_statement": "Fix the failing regression test.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "run.json"
+
+    rc = harness.main(
+        [
+            "--tasks-jsonl",
+            str(tasks),
+            "--out",
+            str(out),
+            "--dry-run",
+            "--limit",
+            "1",
+        ]
+    )
+
+    assert rc == 0
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["schema_id"] == "MiniSweBenchGrokHeadlessRun.v1"
+    assert packet["benchmark"] == "swe_bench_verified_mini"
+    assert packet["worker_id"].startswith("worker:sha256:")
+    assert packet["experiment_design"] == {
+        "schema_id": "MiniSweBenchExperimentDesign.v1",
+        "assignment": "paired_within_task",
+        "arms": ["direct_grok_baseline", "turingos_grok_worker"],
+        "statistical_unit": "swe_bench_instance",
+        "minimum_real_tasks": 50,
+        "randomization_seed": 20260627,
+        "pre_registered_before_execution": True,
+        "primary_metric": {
+            "name": "resolved_by_predicate",
+            "type": "paired_binary",
+            "truth_source": "micro_tape_predicate_replay",
+        },
+        "secondary_metrics": [
+            "cost_per_resolved_task",
+            "wall_time_ms",
+            "retry_count",
+            "failure_class_distribution",
+            "replay_pass_rate",
+            "invalid_accepted_head_attempts",
+        ],
+        "statistical_tests": [
+            {
+                "name": "mcnemar_exact",
+                "applies_to": "paired_binary_resolution",
+            },
+            {
+                "name": "paired_bootstrap_ci",
+                "confidence": "0.95",
+                "applies_to": "paired_differences",
+            },
+        ],
+        "multiple_runs_policy": "report_all_runs_no_best_of_n_unless_preregistered",
+        "exclusion_policy": "no_post_hoc_exclusions",
+    }
+    assert packet["meta_ai"] == {
+        "schema_id": "MetaAIProvider.v1",
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "base_url": "https://api.deepseek.com/v1",
+        "api_key_env": "DEEPSEEK_API_KEY",
+        "credential_material": "env_only_not_serialized",
+        "authority": "none",
+        "accepted_head_authority": False,
+    }
+    assert packet["thinking_contract"] == "grok_no_plan_no_memory_no_subagents_plain_output"
+    assert packet["truth_guard"]["accepted_head_policy"] == "predicate_only"
+    assert packet["truth_guard"]["forbidden_acceptance_signals"] == [
+        "exit_code_0",
+        "ci_green",
+        "grok_self_report",
+        "official_benchmark_result",
+    ]
+    assert {run["mode"] for run in packet["runs"]} == {
+        "direct_grok_baseline",
+        "turingos_grok_worker",
+    }
+    for run in packet["runs"]:
+        argv = run["grok_command"]["argv"]
+        assert ["--output-format", "plain"] in [argv[i : i + 2] for i in range(len(argv) - 1)]
+        assert "--no-plan" in argv
+        assert "--reasoning-effort" not in argv
+        assert "--effort" not in argv
+        assert run["task"]["instance_id"] == "django__django-00001"
+
+
+def test_meta_ai_env_key_is_not_serialized(tmp_path, monkeypatch):
+    harness = load_harness()
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "sentinel-secret-must-not-appear")
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "sympy__sympy-00001",
+                "repo": "https://github.com/sympy/sympy",
+                "base_commit": "def456",
+                "problem_statement": "Fix the failing symbolic regression.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "run.json"
+
+    rc = harness.main(
+        [
+            "--tasks-jsonl",
+            str(tasks),
+            "--out",
+            str(out),
+            "--dry-run",
+            "--meta-provider",
+            "deepseek",
+            "--meta-model",
+            "deepseek-v4-pro",
+            "--meta-api-key-env",
+            "DEEPSEEK_API_KEY",
+        ]
+    )
+
+    assert rc == 0
+    raw = out.read_text(encoding="utf-8")
+    assert "sentinel-secret-must-not-appear" not in raw
+    assert "DEEPSEEK_API_KEY" in raw
+
+
+def test_clean_auditor_passes_scientific_smoke_plan(tmp_path):
+    harness = load_harness()
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        "\n".join(
+            json.dumps(
+                {
+                    "instance_id": f"project__repo-{index:05d}",
+                    "repo": "https://github.com/example/repo",
+                    "base_commit": f"base{index}",
+                    "problem_statement": "Fix the failing regression test.",
+                },
+                sort_keys=True,
+            )
+            for index in range(2)
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    plan = tmp_path / "plan.json"
+    audit = tmp_path / "audit.json"
+    assert harness.main(["--tasks-jsonl", str(tasks), "--out", str(plan), "--dry-run"]) == 0
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(AUDITOR),
+            "--plan",
+            str(plan),
+            "--out",
+            str(audit),
+            "--allow-smoke",
+            "--min-tasks",
+            "2",
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    packet = json.loads(audit.read_text(encoding="utf-8"))
+    assert packet["schema_id"] == "MiniSweBenchPlanAudit.v1"
+    assert packet["verdict"] == "PASS"
+    assert packet["auditor_independence"]["imports_benchmark_harness"] is False
+    assert packet["scientific_status"] == "SMOKE_ONLY_NOT_REAL_BENCHMARK"
+
+
+def test_clean_auditor_rejects_underpowered_real_plan(tmp_path):
+    harness = load_harness()
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "django__django-00001",
+                "repo": "https://github.com/django/django",
+                "base_commit": "abc123",
+                "problem_statement": "Fix the failing regression test.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    plan = tmp_path / "plan.json"
+    audit = tmp_path / "audit.json"
+    assert harness.main(["--tasks-jsonl", str(tasks), "--out", str(plan), "--dry-run"]) == 0
+
+    proc = subprocess.run(
+        ["python3", str(AUDITOR), "--plan", str(plan), "--out", str(audit)],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 1
+    packet = json.loads(audit.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "FAIL"
+    assert any(
+        finding["id"] == "sample_size_below_minimum"
+        for finding in packet["blocking_findings"]
+    )
+
+
+def test_benchmark_smoke_script_runs_harness_and_auditor(tmp_path):
+    proc = subprocess.run(
+        ["bash", str(SMOKE), str(tmp_path)],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    audit = json.loads((tmp_path / "audit.json").read_text(encoding="utf-8"))
+    assert audit["verdict"] == "PASS"
+    assert (tmp_path / "plan.json").exists()
+
+
+def test_substrate_coverage_auditor_rejects_missing_modules(tmp_path):
+    coverage = tmp_path / "coverage.json"
+    out = tmp_path / "audit.json"
+    coverage.write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "run_id": "coverage_missing",
+                "sample_size": 50,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-00001",
+                        "module_calls": {
+                            "M0_law_goal_harness": 1,
+                            "M6_worker_profiles": 1,
+                        },
+                        "process_calls": {
+                            "grok_cli": 1,
+                        },
+                        "event_calls": {
+                            "WorkCapsuleBuilt": 1,
+                        },
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_AUDITOR),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 1
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "FAIL"
+    missing = {finding["id"] for finding in packet["blocking_findings"]}
+    assert "missing_module_M2_micro_git_tape" in missing
+    assert "missing_process_turingd" in missing
+    assert "missing_event_CandidateAccepted_or_FailureNode" in missing
+
+
+def test_substrate_coverage_auditor_accepts_all_required_modules(tmp_path):
+    coverage = tmp_path / "coverage.json"
+    out = tmp_path / "audit.json"
+    module_calls = {
+        module_id: 1
+        for module_id in [
+            "M0_law_goal_harness",
+            "M1_canonical_codec",
+            "M2_micro_git_tape",
+            "M3_event_registry",
+            "M4_single_loop",
+            "M5_goal_module_atom_capsule",
+            "M6_worker_profiles",
+            "M7_executor_broker",
+            "M8_macro_observer",
+            "M9_predicate_kernel",
+            "M10_evidence_approval",
+            "M11_failure_memory",
+            "M12_market_substrate",
+            "M13_marketrouter_shadow",
+            "M14_pput_accounting",
+            "M15_projection",
+            "M16_integration_queue",
+            "M17_e2e_handoff",
+        ]
+    }
+    process_calls = {
+        process: 1
+        for process in [
+            "turingd",
+            "turing-execd",
+            "turing-mcp",
+            "turing-marketd",
+            "turing-pputd",
+            "turing-viewd",
+            "grok_cli",
+        ]
+    }
+    event_calls = {
+        event: 1
+        for event in [
+            "GoalStateProposed",
+            "WorkCapsuleBuilt",
+            "MarketCreated",
+            "BudgetAllocated",
+            "WorkerReceiptImported",
+            "MacroObservationImported",
+            "CandidateAccepted",
+            "FailureNode",
+            "MarketSettled",
+            "PPUTAccounted",
+            "PredicateEvaluated",
+        ]
+    }
+    coverage.write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "run_id": "coverage_full",
+                "sample_size": 50,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-00001",
+                        "module_calls": module_calls,
+                        "process_calls": process_calls,
+                        "event_calls": event_calls,
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_AUDITOR),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "PASS"
+    assert packet["scientific_status"] == "SUBSTRATE_COVERAGE_READY"
+
+
+def test_substrate_coverage_auditor_accepts_real_meta_ai_review(tmp_path):
+    coverage = tmp_path / "coverage.json"
+    meta = tmp_path / "meta.json"
+    out = tmp_path / "audit.json"
+    modules = [
+        "M0_law_goal_harness",
+        "M1_canonical_codec",
+        "M2_micro_git_tape",
+        "M3_event_registry",
+        "M4_single_loop",
+        "M5_goal_module_atom_capsule",
+        "M6_worker_profiles",
+        "M7_executor_broker",
+        "M8_macro_observer",
+        "M9_predicate_kernel",
+        "M10_evidence_approval",
+        "M11_failure_memory",
+        "M12_market_substrate",
+        "M13_marketrouter_shadow",
+        "M14_pput_accounting",
+        "M15_projection",
+        "M16_integration_queue",
+        "M17_e2e_handoff",
+    ]
+    coverage.write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "run_id": "coverage_full_meta",
+                "sample_size": 1,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-11790",
+                        "module_calls": {module: 1 for module in modules},
+                        "process_calls": {
+                            "turingd": 1,
+                            "turing-execd": 1,
+                            "turing-mcp": 1,
+                            "turing-marketd": 1,
+                            "turing-pputd": 1,
+                            "turing-viewd": 1,
+                            "grok_cli": 1,
+                        },
+                        "event_calls": {
+                            "GoalStateProposed": 1,
+                            "WorkCapsuleBuilt": 1,
+                            "MarketCreated": 1,
+                            "BudgetAllocated": 1,
+                            "WorkerReceiptImported": 1,
+                            "MacroObservationImported": 1,
+                            "FailureNode": 1,
+                            "MarketSettled": 1,
+                            "PPUTAccounted": 1,
+                            "PredicateEvaluated": 1,
+                        },
+                    }
+                ],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    meta.write_text(
+        json.dumps(
+            {
+                "schema_id": "DeepSeekMetaAIReviewRun.v1",
+                "provider": "deepseek",
+                "model": "deepseek-v4-pro",
+                "status": "PASS",
+                "authority": "none",
+                "accepted_head_authority": False,
+                "credential_material": "env_only_not_serialized",
+                "review": {"verdict": "WARN"},
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_AUDITOR),
+            "--coverage",
+            str(coverage),
+            "--out",
+            str(out),
+            "--min-sample-size",
+            "1",
+            "--worker-process",
+            "grok_cli",
+            "--meta-ai-review",
+            str(meta),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["verdict"] == "PASS"
+    assert packet["scientific_status"] == "SUBSTRATE_COVERAGE_READY_WITH_META_AI"
+    assert packet["meta_ai"]["review_verdict"] == "WARN"
+
+
+def test_substrate_smoke_runner_fake_worker_outputs_full_coverage(tmp_path):
+    tasks = tmp_path / "verified-mini.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "django__django-11790",
+                "repo": "django/django",
+                "base_commit": "main",
+                "problem_statement": "Real SWE-bench shaped task fixture.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "run"
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(SUBSTRATE_SMOKE),
+            "--tasks-jsonl",
+            str(tasks),
+            "--out-dir",
+            str(out_dir),
+            "--worker-mode",
+            "fake",
+            "--limit",
+            "1",
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    coverage = json.loads((out_dir / "substrate_coverage.json").read_text(encoding="utf-8"))
+    assert coverage["schema_id"] == "MiniSweBenchSubstrateCoverage.v1"
+    assert coverage["sample_size"] == 1
+    assert coverage["turingos_arm_runs"][0]["instance_id"] == "django__django-11790"
+
+    audit = json.loads((out_dir / "substrate_coverage_audit.json").read_text(encoding="utf-8"))
+    assert audit["verdict"] == "PASS"
+    assert audit["scientific_status"] == "SUBSTRATE_INSTRUMENTATION_ONLY_NOT_REAL_WORKER"
+    summary = json.loads((out_dir / "substrate_smoke_result.json").read_text(encoding="utf-8"))
+    assert summary["scientific_status"] == "SUBSTRATE_INSTRUMENTATION_ONLY_NOT_REAL_WORKER"
+
+
+def test_meta_ai_review_missing_key_is_not_run_and_does_not_serialize_secret(tmp_path, monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    evidence = tmp_path / "evidence"
+    evidence.mkdir()
+    (evidence / "substrate_coverage_audit.json").write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverageAudit.v1",
+                "verdict": "PASS",
+                "scientific_status": "SUBSTRATE_COVERAGE_READY",
+                "blocking_findings": [],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "meta.json"
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(META_REVIEW),
+            "--evidence-dir",
+            str(evidence),
+            "--out",
+            str(out),
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 2
+    packet = json.loads(out.read_text(encoding="utf-8"))
+    assert packet["status"] == "NOT_RUN"
+    assert packet["credential_material"] == "env_only_not_serialized"
+    assert "DEEPSEEK_API_KEY" in packet["missing_env"]
+    assert "sk-" not in out.read_text(encoding="utf-8")
+
+
+def test_meta_ai_review_context_reads_incremental_ramp_layout(tmp_path):
+    reviewer = load_module(META_REVIEW, "run_deepseek_meta_review")
+    evidence = tmp_path / "stage5"
+    substrate = evidence / "turingos_incremental"
+    direct = evidence / "direct_incremental" / "direct_baseline_django__django-12039"
+    patch_eval = evidence / "patch_eval_incremental"
+    worker_logs = substrate / "instances" / "django__django-12039" / "worker_logs"
+    worker_logs.mkdir(parents=True)
+    direct.mkdir(parents=True)
+    patch_eval.mkdir(parents=True)
+    (worker_logs / "diff.patch").write_text("diff --git a/app.py b/app.py\n", encoding="utf-8")
+    (worker_logs / "stderr.txt").write_text("", encoding="utf-8")
+    (worker_logs / "stdout.txt").write_text("worker output\n", encoding="utf-8")
+    (substrate / "substrate_coverage_audit.json").write_text(
+        json.dumps({"schema_id": "MiniSweBenchSubstrateCoverageAudit.v1", "verdict": "PASS"}),
+        encoding="utf-8",
+    )
+    (substrate / "substrate_smoke_result.json").write_text(
+        json.dumps({"schema_id": "MiniSweBenchSubstrateSmokeResult.v1", "worker_process": "grok_cli"}),
+        encoding="utf-8",
+    )
+    (substrate / "substrate_coverage.json").write_text(
+        json.dumps(
+            {
+                "schema_id": "MiniSweBenchSubstrateCoverage.v1",
+                "sample_size": 1,
+                "turingos_arm_runs": [
+                    {
+                        "instance_id": "django__django-12039",
+                        "worker_mode": "grok",
+                        "worker_id": "worker:sha256:" + "a" * 64,
+                        "worker_exit_code": 0,
+                        "predicate_write_event_type": "FailureNode",
+                        "process_calls": {"turingd": 1, "grok_cli": 1},
+                        "event_calls": {"WorkCapsuleBuilt": 1},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (direct / "result.json").write_text(
+        json.dumps({"schema_id": "DirectGrokBaselineSmoke.v1", "instance_id": "django__django-12039"}),
+        encoding="utf-8",
+    )
+    (patch_eval / "patch_eval_summary.json").write_text(
+        json.dumps({"schema_id": "DjangoSweBenchPatchEvalSummary.v1", "by_arm": {"turingos": {"pass": 1}}}),
+        encoding="utf-8",
+    )
+    (evidence / "loop_eval_summary.json").write_text(
+        json.dumps({"schema_id": "MiniSweBenchRampLoopSummary.v1", "results": {"turingos_pass": 9}}),
+        encoding="utf-8",
+    )
+
+    _prompt, context = reviewer.build_review_payload(evidence)
+
+    assert context["substrate_smoke_result"]["worker_process"] == "grok_cli"
+    assert context["direct_baseline_results"][0]["instance_id"] == "django__django-12039"
+    assert context["patch_eval_summary"]["by_arm"]["turingos"]["pass"] == 1
+    assert context["loop_eval_summary"]["results"]["turingos_pass"] == 9
+
+
+def test_direct_baseline_dry_run_writes_redacted_commands(tmp_path):
+    tasks = tmp_path / "tasks.jsonl"
+    tasks.write_text(
+        json.dumps(
+            {
+                "instance_id": "django__django-11790",
+                "repo": "django/django",
+                "base_commit": "b1d6b35e146aea83b171c1b921178bbaae2795ed",
+                "problem_statement": "Fix the failing regression.",
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "baseline"
+
+    proc = subprocess.run(
+        [
+            "python3",
+            str(DIRECT_BASELINE),
+            "--tasks-jsonl",
+            str(tasks),
+            "--out-dir",
+            str(out_dir),
+            "--limit",
+            "1",
+            "--dry-run",
+        ],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    summary = json.loads((out_dir / "direct_baseline_summary.json").read_text(encoding="utf-8"))
+    assert summary["sample_size"] == 1
+    command = json.loads(
+        (out_dir / "direct_baseline_django__django-11790" / "command.json").read_text(encoding="utf-8")
+    )
+    assert "<direct_baseline_prompt>" in command["argv"]
+    assert "Fix the failing regression" not in json.dumps(command)
+
+
+def test_django_fail_to_pass_labels_convert_to_runtests_labels():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    labels = evaluator.django_test_labels(
+        [
+            "test_username_field_max_length_defaults_to_254 (auth_tests.test_forms.AuthenticationFormTest)",
+            "already.runnable.Label",
+        ]
+    )
+
+    assert labels == [
+        "auth_tests.test_forms.AuthenticationFormTest.test_username_field_max_length_defaults_to_254",
+        "already.runnable.Label",
+    ]
+
+
+def test_django_test_modules_from_test_patch_ignores_model_helpers():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    modules = evaluator.django_test_modules_from_test_patch(
+        """diff --git a/tests/serializers/models/data.py b/tests/serializers/models/data.py
+--- a/tests/serializers/models/data.py
++++ b/tests/serializers/models/data.py
+diff --git a/tests/serializers/test_data.py b/tests/serializers/test_data.py
+--- a/tests/serializers/test_data.py
++++ b/tests/serializers/test_data.py
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+"""
+    )
+
+    assert modules == ["serializers.test_data"]
+
+
+def test_official_evidence_records_target_selection_source():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    payload = evaluator.official_evaluator_evidence_payload(
+        task={
+            "instance_id": "django__django-12209",
+            "FAIL_TO_PASS": ["partial(func, *args, **keywords) - new function with partial application"],
+            "test_patch": "diff --git a/tests/serializers/test_data.py b/tests/serializers/test_data.py\n",
+        },
+        arm="turingos",
+        candidate_patch_text="diff --git a/django/db/models/base.py b/django/db/models/base.py\n",
+        apply_candidate_result={"status": "PASS", "exit_code": 0, "stdout": "", "stderr": ""},
+        apply_test_patch_result={"status": "PASS", "exit_code": 0, "stdout": "", "stderr": ""},
+        target_test_result={
+            "status": "PASS",
+            "exit_code": 0,
+            "stdout": "",
+            "stderr": "",
+            "target_tests": ["serializers.test_data"],
+            "target_selection_source": "test_patch_module_fallback_after_label_import_failure",
+        },
+    )
+
+    assert payload["target_selection_source"] == "test_patch_module_fallback_after_label_import_failure"
+    assert payload["target_tests"] == ["serializers.test_data"]
+    assert payload["result"] == "PASS"
+
+
+def test_evaluator_refreshes_micro_tape_bundle_after_terminal_import(tmp_path):
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    repo = tmp_path / "micro"
+    repo.mkdir()
+    subprocess.run(["git", "-C", str(repo), "init", "--object-format=sha256", "-q", "--", "."], check=True)
+    (repo / "event").write_text('{"event_type":"SystemConstitutionAccepted"}\n', encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "event"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "-c",
+            "user.name=TuringOS Test",
+            "-c",
+            "user.email=test@example.invalid",
+            "commit",
+            "-m",
+            "genesis",
+            "-q",
+        ],
+        check=True,
+    )
+    run = {
+        "instance_id": "django__django-stage12-refresh",
+        "micro_git": str(repo),
+        "micro_tape_bundle": str(tmp_path / "micro_tape.bundle"),
+    }
+    first = evaluator.refresh_micro_tape_bundle(run)
+
+    (repo / "event").write_text('{"event_type":"OfficialEvaluatorEvidenceImported"}\n', encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "event"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "-c",
+            "user.name=TuringOS Test",
+            "-c",
+            "user.email=test@example.invalid",
+            "commit",
+            "-m",
+            "official evidence",
+            "-q",
+        ],
+        check=True,
+    )
+
+    refreshed = evaluator.refresh_micro_tape_bundle(run)
+
+    assert Path(refreshed["micro_tape_bundle"]).exists()
+    assert refreshed["micro_tape_bundle"] == first["micro_tape_bundle"]
+    assert refreshed["micro_tape_bundle_sha256"].startswith("sha256:")
+    assert refreshed["micro_tape_bundle_sha256"] != first["micro_tape_bundle_sha256"]
+    assert run["micro_tape_bundle_refreshed_after_eval"] is True
+
+    coverage = tmp_path / "substrate_coverage.json"
+    coverage.write_text(
+        json.dumps({"schema_id": "coverage.v1", "turingos_arm_runs": [{"instance_id": run["instance_id"]}]})
+        + "\n",
+        encoding="utf-8",
+    )
+    evaluator.write_refreshed_substrate_coverage(
+        coverage,
+        {run["instance_id"]: run},
+        stage12_loop_until_pass=True,
+    )
+    coverage_packet = json.loads(coverage.read_text(encoding="utf-8"))
+    coverage_run = coverage_packet["turingos_arm_runs"][0]
+    assert coverage_run["micro_tape_bundle_sha256"] == refreshed["micro_tape_bundle_sha256"]
+    assert coverage_run["micro_tape_bundle_refreshed_after_eval"] is True
+    assert coverage_packet["run_id"] == "stage12_20task_loop_until_pass"
+    assert coverage_packet["scientific_status"] == "STAGE12_20TASK_SCALE_PROTOCOL_EVIDENCE_NOT_STATISTICAL_CLAIM"
+
+
+def test_stage12_loop_metadata_records_failed_attempt_before_terminal_accept():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-12039",
+        "capsule_id": "wc_django__django-12039",
+        "macro_anchor_id": "macro:diff:django__django-12039",
+        "worker_receipt_id": "rcp_12039",
+        "authorization_head": "mu:" + "1" * 64,
+        "stage12_first_attempt": {
+            "official_evidence_event_id": "mu:" + "3" * 64,
+            "failure_event_id": "mu:" + "2" * 64,
+            "failure_certificate_event_id": "mu:" + "5" * 64,
+            "retry_authorization_event_id": "mu:" + "6" * 64,
+        },
+    }
+
+    loop = evaluator.stage12_loop_until_pass_metadata(
+        substrate_run=substrate_run,
+        terminal_import={
+            "candidate_event_id": "mu:" + "4" * 64,
+            "candidate_write_event_type": "CandidateAccepted",
+            "accepted_head_moved": True,
+        },
+    )
+
+    assert loop["attempts_total"] == 2
+    assert loop["failed_attempts_before_accept"] == 1
+    assert loop["accepted_attempt_index"] == 2
+    assert loop["budget_exhausted"] is False
+    assert loop["first_failure_event_id"] == "mu:" + "2" * 64
+    assert loop["failure_certificate_event_id"] == "mu:" + "5" * 64
+    assert loop["terminal_candidate_accepted_event_id"] == "mu:" + "4" * 64
+    assert loop["accepted_head"] == "mu:" + "4" * 64
+    assert loop["retry_policy_event_id"] == "mu:" + "6" * 64
+    assert loop["verified_from_micro_tape_bundle_only"] is True
+
+
+def test_stage12_loop_metadata_records_budget_exhausted_without_accept():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-12050",
+        "authorization_head": "mu:" + "a" * 64,
+        "stage12_first_attempt": {
+            "official_evidence_event_id": "mu:" + "c" * 64,
+            "failure_event_id": "mu:" + "b" * 64,
+            "retry_authorization_event_id": "mu:" + "e" * 64,
+        },
+    }
+
+    loop = evaluator.stage12_loop_until_pass_metadata(
+        substrate_run=substrate_run,
+        terminal_import={
+            "candidate_event_id": "mu:" + "d" * 64,
+            "candidate_write_event_type": "FailureNode",
+            "accepted_head_moved": False,
+        },
+    )
+
+    assert loop["attempts_total"] == 2
+    assert loop["failed_attempts_before_accept"] == 1
+    assert loop["accepted_attempt_index"] is None
+    assert loop["budget_exhausted"] is True
+    assert loop["terminal_candidate_accepted_event_id"] is None
+    assert loop["accepted_head"] is None
+
+
+def test_gate_a_capsule_prompt_injects_scope_and_broadcast_rules():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    task = {
+        "instance_id": "django__django-11815",
+        "repo": "django/django",
+        "base_commit": "abc123",
+        "problem_statement": "Fix the migration writer regression.",
+    }
+
+    prompt = runner.visible_grok_prompt(
+        task,
+        "wc_django__django-11815",
+        broadcast_rules=[
+            {
+                "rule_id": "br_scope_test_edit",
+                "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+                "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+            }
+        ],
+    )
+
+    assert "Do not edit benchmark/official test files" in prompt
+    assert "SCOPE_VIOLATION_TEST_EDIT" in prompt
+    assert "hidden predicate" not in prompt.lower()
+    assert "pput" not in prompt.lower()
+
+
+def test_gate_a_grant_forbids_swe_bench_test_file_mutations():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+
+    grant = runner.grant_json(
+        "wc_django__django-11815",
+        "mkt_django__django-11815",
+        "worker:sha256:" + "1" * 64,
+    )
+
+    forbidden = set(grant["scope"]["forbidden_paths"])
+    assert "tests/**" in forbidden
+    assert "*/tests/**" in forbidden
+    assert "test_*.py" in forbidden
+    assert "*_test.py" in forbidden
+
+
+def test_gate_a_evaluator_payload_detects_test_edits_and_is_micro_tape_importable():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    task = {
+        "instance_id": "django__django-11815",
+        "test_patch": "diff --git a/tests/example.py b/tests/example.py\n",
+        "FAIL_TO_PASS": ["tests.example.TestCase.test_regression"],
+    }
+    patch_text = (
+        "diff --git a/tests/migrations/test_writer.py b/tests/migrations/test_writer.py\n"
+        "--- a/tests/migrations/test_writer.py\n"
+        "+++ b/tests/migrations/test_writer.py\n"
+        "@@\n"
+        "-old\n"
+        "+new\n"
+    )
+
+    payload = evaluator.official_evaluator_evidence_payload(
+        task=task,
+        arm="turingos",
+        candidate_patch_text=patch_text,
+        apply_candidate_result={"status": "PASS", "exit_code": 0, "stdout": "", "stderr": ""},
+        apply_test_patch_result={"status": "FAIL", "exit_code": 1, "stdout": "", "stderr": "conflict"},
+        target_test_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        capsule_id="wc_django__django-11815",
+        macro_anchor_id="macro:diff:django__django-11815",
+        worker_receipt_id="rcp_pack",
+    )
+
+    assert payload["schema_id"] == "official_evaluator_evidence_imported.v1"
+    assert payload["event_type"] == "OfficialEvaluatorEvidenceImported"
+    assert payload["evidence_id"].startswith("ev_official_")
+    assert payload["instance_id"] == "django__django-11815"
+    assert payload["capsule_id"] == "wc_django__django-11815"
+    assert payload["macro_anchor_id"] == "macro:diff:django__django-11815"
+    assert payload["worker_receipt_id"] == "rcp_pack"
+    assert payload["candidate_patch_hash"] == "sha256:" + hashlib.sha256(patch_text.encode()).hexdigest()
+    assert payload["test_patch_hash"].startswith("sha256:")
+    assert payload["result"] == "FAIL"
+    assert payload["failure_class"] == "SCOPE_VIOLATION_TEST_EDIT"
+    assert payload["forbidden_test_edit_detected"] is True
+    assert payload["forbidden_test_edit_paths"] == ["tests/migrations/test_writer.py"]
+    assert payload["truth_source"] == "official_evaluator_macro_evidence"
+
+
+def test_gate_a_evaluator_payload_covers_missing_patch_as_importable_failure():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    task = {
+        "instance_id": "django__django-11964",
+        "test_patch": "diff --git a/tests/example.py b/tests/example.py\n",
+        "FAIL_TO_PASS": ["tests.example.TestCase.test_regression"],
+    }
+
+    payload = evaluator.official_evaluator_evidence_payload(
+        task=task,
+        arm="turingos",
+        candidate_patch_text="",
+        apply_candidate_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        apply_test_patch_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        target_test_result={"status": "NOT_RUN", "exit_code": None, "stdout": "", "stderr": ""},
+        capsule_id="wc_django__django-11964",
+        macro_anchor_id="macro:diff:django__django-11964",
+        worker_receipt_id="rcp_empty",
+        failure_class_override="MISSING_OR_EMPTY_PATCH",
+    )
+
+    assert payload["result"] == "FAIL"
+    assert payload["failure_class"] == "MISSING_OR_EMPTY_PATCH"
+    assert payload["candidate_patch_hash"] == "sha256:" + hashlib.sha256(b"").hexdigest()
+    assert payload["capsule_id"] == "wc_django__django-11964"
+
+
+def test_gate_a_evaluator_builds_candidate_payload_from_evidence_and_substrate_refs():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-11790",
+        "capsule_id": "wc_django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "worker_receipt_id": "rcp_abc",
+    }
+    evidence_payload = {
+        "evidence_id": "ev_official_deadbeef",
+        "result": "PASS",
+    }
+
+    candidate_payload = evaluator.candidate_payload_from_official_evidence(
+        substrate_run,
+        evidence_payload,
+    )
+
+    assert candidate_payload == {
+        "candidate_id": "cand_django__django-11790",
+        "capsule_id": "wc_django__django-11790",
+        "macro_anchor_id": "macro:diff:django__django-11790",
+        "worker_receipt_id": "rcp_abc",
+        "official_evaluator_evidence_id": "ev_official_deadbeef",
+    }
+
+
+def test_gate_a_terminal_post_verification_events_encode_market_and_final_pput():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-11790",
+        "worker_id": "worker:sha256:" + "1" * 64,
+        "market_id": "mkt_django__django-11790",
+        "capsule_id": "wc_django__django-11790",
+        "worker_prompt_tokens_estimate": 10,
+        "worker_completion_tokens_estimate": 5,
+        "worker_tool_stdout_tokens_estimate": 3,
+        "worker_elapsed_ms": 20,
+        "worker_cost_microusd": 7,
+    }
+    evidence_payload = {
+        "evidence_id": "ev_official_pass",
+        "result": "PASS",
+    }
+    verified = {
+        "official_evidence_event_id": "mu:" + "a" * 64,
+        "candidate_event_id": "mu:" + "b" * 64,
+        "candidate_write_event_type": "CandidateAccepted",
+    }
+
+    events = evaluator.terminal_post_verification_events(
+        substrate_run=substrate_run,
+        evidence_payload=evidence_payload,
+        verified=verified,
+    )
+
+    assert [event["event_type"] for event in events] == [
+        "MarketSettled",
+        "RewardDistributed",
+        "PPUTAccounted",
+    ]
+    market = events[0]["payload"]
+    assert market["result"] == "YES"
+    assert market["settlement_basis_event_id"] == verified["official_evidence_event_id"]
+    assert market["terminal_event_id"] == verified["candidate_event_id"]
+    assert market["is_terminal"] is True
+    reward = events[1]["payload"]
+    assert reward["reward_coin"] == "1"
+    assert reward["slash_coin"] == "0"
+    pput = events[2]["payload"]
+    assert pput["accounting_stage"] == "final"
+    assert pput["progress"] == 1
+    assert pput["basis_event_id"] == verified["official_evidence_event_id"]
+    assert pput["terminal_event_id"] == verified["candidate_event_id"]
+    assert pput["total_run_token_count"] == 18
+    assert pput["total_wall_time_ms"] == 20
+    assert pput["total_run_cost_microusd"] == 7
+    assert pput["vpput_raw"] != "0"
+
+
+def test_gate_a_terminal_post_verification_events_failed_run_progress_zero():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    substrate_run = {
+        "instance_id": "django__django-11964",
+        "worker_id": "worker:sha256:" + "2" * 64,
+        "market_id": "mkt_django__django-11964",
+        "capsule_id": "wc_django__django-11964",
+        "worker_prompt_tokens_estimate": 10,
+        "worker_completion_tokens_estimate": 5,
+        "worker_tool_stdout_tokens_estimate": 3,
+        "worker_elapsed_ms": 20,
+    }
+    evidence_payload = {
+        "evidence_id": "ev_official_fail",
+        "result": "FAIL",
+    }
+    verified = {
+        "official_evidence_event_id": "mu:" + "a" * 64,
+        "candidate_event_id": "mu:" + "c" * 64,
+        "candidate_write_event_type": "FailureNode",
+    }
+
+    events = evaluator.terminal_post_verification_events(
+        substrate_run=substrate_run,
+        evidence_payload=evidence_payload,
+        verified=verified,
+    )
+
+    assert events[0]["payload"]["result"] == "NO"
+    assert events[1]["payload"]["reward_coin"] == "0"
+    assert events[1]["payload"]["slash_coin"] == "1"
+    assert events[2]["payload"]["progress"] == 0
+    assert events[2]["payload"]["vpput_raw"] == "0"
+
+
+def test_real_mutation_event_payloads_include_sandbox_provenance():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    sandbox = {
+        "kind": "runsc_rootless_do",
+        "network": "none",
+        "runsc_version": "runsc version release-20260608.0",
+        "runsc_binary_sha256": "sha256:" + "4" * 64,
+        "selftest_exit": 0,
+    }
+
+    worker_payload = runner.with_sandbox_provenance(
+        "WorkerReceiptImported",
+        {"receipt_id": "rcp_real", "capsule_id": "wc_real"},
+        sandbox,
+    )
+    macro_payload = runner.with_sandbox_provenance(
+        "MacroObservationImported",
+        {"macro_id": "macro:diff:real", "capsule_id": "wc_real"},
+        sandbox,
+    )
+    non_mutation_payload = runner.with_sandbox_provenance(
+        "CostEvent",
+        {"schema_id": "turingos.cost_event.v2"},
+        sandbox,
+    )
+
+    assert worker_payload["sandbox"] == sandbox
+    assert macro_payload["sandbox"] == sandbox
+    assert "sandbox" not in non_mutation_payload
+
+
+def test_gate_a_failure_evidence_reduces_to_abstract_broadcast_rule():
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    evidence_payload = {
+        "evidence_id": "ev_official_scope",
+        "instance_id": "django__django-11815",
+        "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+        "stderr_hash": "sha256:" + "a" * 64,
+        "stdout_hash": "sha256:" + "b" * 64,
+    }
+
+    rule = evaluator.broadcast_rule_from_evidence(evidence_payload)
+
+    assert rule == {
+        "rule_id": "br_ev_official_scope",
+        "source_evidence_id": "ev_official_scope",
+        "source_instance_id": "django__django-11815",
+        "failure_class": "SCOPE_VIOLATION_TEST_EDIT",
+        "guidance": "Do not edit benchmark/official test files unless the task contract explicitly allows test changes.",
+    }
+    assert "stderr" not in json.dumps(rule).lower()
+    assert "stdout" not in json.dumps(rule).lower()
+
+
+def test_gate_a_worker_stop_contract_distinguishes_nonzero_patch_pass():
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+
+    assert (
+        runner.classify_worker_stop(
+            exit_code=1,
+            stderr="Max turns reached",
+            diff_text="diff --git a/django/forms.py b/django/forms.py\n",
+            official_eval_result="PASS",
+        )
+        == "PATCH_PASS_WITH_WORKER_NONZERO"
+    )
+    assert (
+        runner.classify_worker_stop(
+            exit_code=1,
+            stderr="Max turns reached",
+            diff_text="diff --git a/django/forms.py b/django/forms.py\n",
+            official_eval_result="FAIL",
+        )
+        == "MAX_TURNS_WITH_PATCH"
+    )
+    assert (
+        runner.classify_worker_stop(
+            exit_code=0,
+            stderr="",
+            diff_text="",
+            official_eval_result="FAIL",
+        )
+        == "MAX_TURNS_NO_PATCH"
+    )
+
+
+def test_gate_a_pput_prompt_validation_uses_actual_visible_prompt_bytes(tmp_path):
+    runner = load_module(SUBSTRATE_SMOKE, "run_mini_swe_bench_substrate_smoke")
+    log_dir = tmp_path / "worker_logs"
+    log_dir.mkdir()
+    prompt = "visible capsule without hidden scoring formula\n"
+    (log_dir / "visible_prompt.txt").write_text(prompt, encoding="utf-8")
+
+    request = runner.pput_prompt_validation_request(log_dir)
+
+    assert request["prompt"] == prompt
+    assert request["prompt_hash"] == "sha256:" + hashlib.sha256(prompt.encode()).hexdigest()
+    assert request["source"] == "actual_visible_prompt_txt"
+
+
+def test_gate_a_micro_import_socket_path_stays_below_unix_limit(tmp_path):
+    evaluator = load_module(PATCH_EVAL, "evaluate_django_swe_bench_patches")
+    long_runtime_root = tmp_path / ("deep_" + "x" * 140)
+
+    socket_path = evaluator.micro_import_socket_path(
+        long_runtime_root,
+        "django__django-11885",
+    )
+
+    assert str(socket_path).startswith("/tmp/")
+    assert len(str(socket_path)) < 100

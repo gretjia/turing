@@ -1,0 +1,34 @@
+**Patch applied to `django/utils/http.py`** (only source change; worktree left with it; no test/benchmark files edited or inspected beyond the one needed source file).
+
+```diff
+diff --git a/django/utils/http.py b/django/utils/http.py
+index 572cfb4347..8bd80517f7 100644
+--- a/django/utils/http.py
++++ b/django/utils/http.py
+@@ -176,10 +176,10 @@ def parse_http_date(date):
+     try:
+         year = int(m.group('year'))
+         if year < 100:
+-            if year < 70:
+-                year += 2000
+-            else:
+-                year += 1900
++            now = datetime.datetime.utcnow().year
++            year += (now // 100) * 100
++            if year > now + 50:
++                year -= 100
+         month = MONTHS.index(m.group('mon').lower()) + 1
+         day = int(m.group('day'))
+         hour = int(m.group('hour'))
+```
+
+Verification (via direct execution of the function on RFC850 2-digit-year cases + other formats; current year=2026 in env):
+- `...-80...` → 1980
+- `...-10...` → 2010
+- `...-99...` → 1999
+- `...-50...` → 2050
+- `...-77...` → 1977 (2077 > 2026+50)
+- `...-76...` → 2076 (not >50)
+- RFC1123/ASCTIME/4-digit + recent 2-digit cases still parse unchanged.
+
+The change implements the RFC 7231 rule (century based on now; future >50y → most recent past matching yy) with a minimal diff.

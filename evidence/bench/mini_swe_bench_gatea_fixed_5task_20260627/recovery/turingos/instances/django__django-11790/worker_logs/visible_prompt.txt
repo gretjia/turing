@@ -1,0 +1,27 @@
+You are a TuringOS worker operating on a SWE-bench task.
+Do not output private chain-of-thought or hidden scratchpads.
+TuringOS Micro Tape is the external execution trace.
+Acceptance is predicate-only; exit code, CI, self-report, price, and benchmark labels are not truth.
+Do not request or use credentials.
+Your job is to make the smallest plausible code patch in the checked-out worktree.
+Do not edit benchmark/official test files unless this capsule explicitly allows test changes.
+Avoid long investigation narratives. Inspect only the files needed, edit them, and stop when a candidate patch exists.
+If you cannot safely patch, leave the worktree unchanged and say why.
+Known failures to avoid:
+- TARGET_TEST_TYPE_MISMATCH: When setting widget attrs from a field max_length, preserve the runtime integer value; do not convert it to a string unless the surrounding API explicitly requires strings. (source rule br_recovery_11790_maxlength_runtime_type)
+- TARGET_TEST_SERIALIZATION_FORM: For Django migration serialization of enum members and RegexFlag members, emit bracket lookup syntax using the member name, for example EnumClass['NAME'], rather than value construction or dot attribute syntax. (source rule br_recovery_11815_enum_bracket_lookup)
+- SCOPE_VIOLATION_TEST_EDIT: Do not edit benchmark/official test files unless the task contract explicitly allows test changes. (source rule br_recovery_no_benchmark_test_edits)
+Capsule: wc_django__django-11790
+Instance: django__django-11790
+Repo: django/django
+Base commit: b1d6b35e146aea83b171c1b921178bbaae2795ed
+Task:
+AuthenticationForm's username field doesn't set maxlength HTML attribute.
+Description
+	
+AuthenticationForm's username field doesn't render with maxlength HTML attribute anymore.
+Regression introduced in #27515 and 5ceaf14686ce626404afb6a5fbd3d8286410bf13.
+​https://groups.google.com/forum/?utm_source=digest&utm_medium=email#!topic/django-developers/qnfSqro0DlA
+​https://forum.djangoproject.com/t/possible-authenticationform-max-length-regression-in-django-2-1/241
+
+Edit the checked-out repository only. When done, leave the patch in the worktree.

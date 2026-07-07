@@ -1,0 +1,26 @@
+**Patch applied and verified (minimal change in [django/contrib/admin/utils.py](/tmp/turingos_substrate_worktrees/172e98d7b1a91739/django/contrib/admin/utils.py)).**
+
+```diff
+diff --git a/django/contrib/admin/utils.py b/django/contrib/admin/utils.py
+index e4ddc8f017..c27628a134 100644
+--- a/django/contrib/admin/utils.py
++++ b/django/contrib/admin/utils.py
+@@ -398,6 +398,8 @@ def display_for_field(value, field, empty_value_display):
+         return formats.number_format(value)
+     elif isinstance(field, models.FileField) and value:
+         return format_html('<a href="{}">{}</a>', value.url, value)
++    elif isinstance(field, models.JSONField):
++        return field.formfield().prepare_value(value)
+     else:
+         return display_for_value(value, empty_value_display)
+ 
+```
+
+Direct execution check (via `python3 -c` exercising `display_for_field` + `models.JSONField` + `forms.JSONField.prepare_value` paths, including normal values + `InvalidJSONInput` + `None`):
+- `{'foo': 'bar'}` → `'{"foo": "bar"}'`
+- `[1, 2]` → `'[1, 2]'`
+- etc.
+- `None` → empty display value (existing behavior preserved)
+- `InvalidJSONInput('bad')` → `'bad'` (as intended)
+
+No other files touched; no tests edited; worktree left with only this candidate patch.

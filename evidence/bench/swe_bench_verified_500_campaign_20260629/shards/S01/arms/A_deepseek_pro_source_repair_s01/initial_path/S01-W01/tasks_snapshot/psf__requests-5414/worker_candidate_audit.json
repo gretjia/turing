@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S01/tasks/psf__requests-5414/candidate.patch",
+  "candidate_patch_sha256": "sha256:f608618ca8a8db68a27a32e2dfaf9033dbb993e219db4b212b9052256189a3c1",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "requests/models.py"
+  ],
+  "instance_id": "psf__requests-5414",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

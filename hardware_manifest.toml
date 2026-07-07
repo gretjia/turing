@@ -1,0 +1,38 @@
+# turingos hardware_manifest.toml — HW-SW-007 (Phase 3, P0 pure software)
+# Declares what this dev machine IS and which substrate hashes BootGate
+# (docs/roadmap/secure_os_18_month/06_boot_gate.md §5.b) expects on it.
+# Edited only via draft commit + sovereign accept.
+
+schema_version = "hardware_manifest.v1"
+
+[device]
+id       = "dev-zephryj-01"
+platform = "x86_64-linux"
+tpm      = { present = true, version = "2.0" }
+tee      = { kind = "none" }
+
+[measurements]
+# constitution_sha256: sha256sum of
+# turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md (workspace-root
+# relative; read-only; the pinned constitutional value).
+constitution_sha256   = "a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0"
+# schema_pack_sha256: sha256sum of crates/turing-contracts/src/jcs.rs
+# (turingos.jcs.v1 canonical envelope/schema pack owned by turing-contracts).
+schema_pack_sha256    = "762956473a9d6385dc1fb7a3eda71ca4374bc68df6171d7ba5a00e461ab40ad9"
+# predicate_pack_sha256: sha256sum of crates/turing-predicate/src/lib.rs
+# (closed-world predicate registry surface, Art. I quantized law).
+predicate_pack_sha256 = "aa547af874a6f918be868cb8f9ccd9b2dfe57cb010b7a8407364f52c7d1a9435"
+# runtime_binary_sha256: P0 proxy = sha256sum of Cargo.lock (no release
+# binary exists yet in Phase 3; P1 self-measures /proc/self/exe against a
+# bootloader-extended PCR per 06_boot_gate.md's runtime_binary_hash_measured
+# conjunct). Regenerate this value whenever Cargo.lock changes.
+runtime_binary_sha256 = "c945fbad043701f1fea905355a2b120d444f595a2d40e59da75c13f4d6a98bbe"
+
+[signing]
+route     = "os_keyring"
+key_id    = "turingos-approval-2026"
+algorithm = "ed25519"
+
+[pcr_baseline]
+bank = "sha256"
+pcrs = {}  # populated Phase 5

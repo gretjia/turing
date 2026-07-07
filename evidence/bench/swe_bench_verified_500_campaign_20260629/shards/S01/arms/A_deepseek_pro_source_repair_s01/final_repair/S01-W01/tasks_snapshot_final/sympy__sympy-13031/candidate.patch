@@ -1,0 +1,13 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+index da1d307..7ae950c 100644
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -2005,7 +2005,7 @@ class MatrixBase(MatrixDeprecated,
+                     else:
+                         in_mat.append(row)
+                         try:
+-                            ncol.add(len(row))
++                            ncol.add(len(row) if not isinstance(row, MatrixBase) else row.cols)
+                         except TypeError:
+                             ncol.add(1)
+                 if len(ncol) > 1:

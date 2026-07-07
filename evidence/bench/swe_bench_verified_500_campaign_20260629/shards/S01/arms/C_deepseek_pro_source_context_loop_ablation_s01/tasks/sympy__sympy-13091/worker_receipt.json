@@ -1,0 +1,87 @@
+{
+  "arm_label": "C",
+  "broadcast_rule_count": 0,
+  "broadcast_rule_ids": [],
+  "broadcast_rules_path": null,
+  "broadcast_rules_sha256": null,
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:fd28dddbea5d2975ec542e20a9e4ec20de705a22e6a399626a166bdd199d4dd8",
+  "candidate_patch_sha256": "sha256:385a5b813b7d2c6bd4f7f9039520265caa679ed04cbb670a688c6e1112177249",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 503,
+  "content_sha256": "sha256:fe866a093e573dba54eddef488350da66be267092cfca9be12b6c0a2ae4516bb",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:C",
+    "capsule_id": "cap:19ba5545dbb8d2238139c6ae616a53863102566eec41e7bfa5fed7e831e25793",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 3568,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "sympy__sympy-13091",
+    "receipt_id": "rcpt:442ab69d8f898a087aa2ff1bb8fe4d3bec8f144d3ec58554869805bdc2531982",
+    "run_id": "m3-p6-arm-c-source-context-loop-ablation-S01-W02-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-c-ablation",
+    "usage": {
+      "completion_tokens": 145,
+      "prompt_cache_hit_tokens": 7552,
+      "prompt_cache_miss_tokens": 8142,
+      "prompt_tokens": 15694,
+      "provider_usage_raw_sha256": "sha256:09de8d98969528a931f218be2683448ce3388f8436bbd00ba8dbeb4ab94373ca",
+      "total_tokens": 15839
+    },
+    "wall_time_ms": 3832,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "42e87aba-b4a3-4df6-8587-8d3641ec2216",
+      "response_sha256": "sha256:6c918263a0733ab436f297c0515262cd31e5b8977102122caa34966fe2e643a5"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "sympy__sympy-13091",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W02",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch sympy/core/basic.py...\nApplied patch sympy/core/basic.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:006f3a94238289465a12cc0ac176107f0156ff098114036cfeee65bbe856b0e5",
+  "response_sha256": "sha256:6c918263a0733ab436f297c0515262cd31e5b8977102122caa34966fe2e643a5",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/sympy__sympy-13091/worker_capsule.md",
+  "source_context_length_chars": 61834,
+  "source_context_path": "shards/S01/ipqc/S01-W02/worker_safe_tasks/sympy__sympy-13091/source_context.md",
+  "source_context_sha256": "sha256:56a771ae180417f237284324f6d20bb66936b63d2e17c8ffe56c82036d6ed2ec",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 145,
+    "prompt_cache_hit_tokens": 7552,
+    "prompt_cache_miss_tokens": 8142,
+    "prompt_tokens": 15694,
+    "total_tokens": 15839
+  },
+  "usage_raw_sha256": "sha256:09de8d98969528a931f218be2683448ce3388f8436bbd00ba8dbeb4ab94373ca",
+  "visible_capsule_path": "shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/capsules/sympy__sympy-13091/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:6ccc6a955f9f70819d3272c414ba7b10e72cea1d1c6ad2a05ac922fef53c7464",
+  "wall_time_ms": 3832
+}

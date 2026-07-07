@@ -1,0 +1,23 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "base_url": "https://api.deepseek.com/v1",
+  "context_hash": "sha256:da6f918e87b8357d768e220f698ce7b1c5cb04657ea8c2d56de042834c4d7c6b",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:7fba1410d7233dc3016c03aa8d39c64d41accb73873e36e745eeabd11aafa1b8",
+  "request_hash": "sha256:e335414237876c5be420c5a159e44a61ce499435897f4760a903dda09b32881d",
+  "review": {
+    "benchmark_claim_allowed": true,
+    "findings": "Substrate coverage complete with all required modules and events. Scientific meaning as a real-worker SWE-bench smoke test is valid. No truth-boundary violations: system uses predicate-only policy; patch eval results are provided for context but not used as truth signals. Minor note: one worker instance hit max turns but still produced a passing patch, and one patch evaluation failed due to patch application failure, consistent with smoke test expectations.",
+    "next_required_gate": "None",
+    "schema_id": "MetaAIAuditResult.v1",
+    "substrate_complete": true,
+    "verdict": "PASS"
+  },
+  "review_content_hash": "sha256:152e3c66ffb8ab66a229173a03d8eeb770e1bb06852d205503eba1c2bc690594",
+  "schema_id": "DeepSeekMetaAIReviewRun.v1",
+  "status": "PASS"
+}

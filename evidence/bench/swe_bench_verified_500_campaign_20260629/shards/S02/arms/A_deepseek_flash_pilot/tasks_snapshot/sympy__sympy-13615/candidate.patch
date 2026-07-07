@@ -1,0 +1,16 @@
+diff --git a/sympy/sets/sets.py b/sympy/sets/sets.py
+index 2b70494a9d..a1f3ff05ca 100644
+--- a/sympy/sets/sets.py
++++ b/sympy/sets/sets.py
+@@ -1360,6 +1360,11 @@ def eval(cls, A, B):
+             # reduce sets
+             return A - B
+ 
++        if isinstance(A, FiniteSet):
++            # Remove elements of A that are contained in B
++            new_elements = [e for e in A.args if e not in B]
++            return FiniteSet(*new_elements)
++
+         if isinstance(B, FiniteSet):
+             A_unk = [a for a in A.args if a.is_Symbol or a.is_Number]
+             if any(a in B for a in A_unk):

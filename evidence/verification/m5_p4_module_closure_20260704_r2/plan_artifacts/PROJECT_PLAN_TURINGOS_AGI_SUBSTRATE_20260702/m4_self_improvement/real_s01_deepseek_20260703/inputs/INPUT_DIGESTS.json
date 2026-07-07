@@ -1,0 +1,683 @@
+{
+  "arms": {
+    "A": {
+      "label": "A",
+      "normalized_receipts": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/arm_A_receipts.json",
+        "sha256": "sha256:24c373aaecae034682a4a71203372060b0536c51d57d4b5f1bab81e1753f1b14"
+      },
+      "normalized_results": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/arm_A_results.json",
+        "sha256": "sha256:956710640de79a1311369242c319c4fa901d88380aebcf46d9f9b45d5de3a50b"
+      },
+      "provider_receipt_inline_events": 50,
+      "receipt_files": [
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/astropy__astropy-13579/worker_receipt.json",
+          "sha256": "sha256:73eb08125178e1844a5df4612c944d759a5cb688c8cd03e5cf92f02ea28412e9"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/django__django-10999/worker_receipt.json",
+          "sha256": "sha256:50faa36f85a6aab3c49da3f472e6ab8ceb144914e0a3fc4614a75b25351cf2d8"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/matplotlib__matplotlib-20859/worker_receipt.json",
+          "sha256": "sha256:dd1f5a4dc840abedea79dfc7d55788f2a5e8cfd2c954e4e9e515be0433d74e2d"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/psf__requests-2931/worker_receipt.json",
+          "sha256": "sha256:31010c751f7f0b022bf84a0d2aab6421ef9ffbf38811bbf98b39dc0e8e9a2ca7"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/pydata__xarray-3993/worker_receipt.json",
+          "sha256": "sha256:3798dd52f4f736785a25f40fa8b6b70a90e009041cce976f60eb039e542c5664"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/pylint-dev__pylint-6528/worker_receipt.json",
+          "sha256": "sha256:40bf579af72098442b2cab6aefd0d53ceed7323096d420d88bd87bdd57f65d54"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/pytest-dev__pytest-5787/worker_receipt.json",
+          "sha256": "sha256:7e12aabd11b4a23c3a064e298348334748d57cb4545518cfdb07445713076f0a"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/scikit-learn__scikit-learn-11578/worker_receipt.json",
+          "sha256": "sha256:8052f85a08a764d7ea2a870416fe6180e6a5d790160b9a14f7cd37f16861b4a9"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/sphinx-doc__sphinx-10614/worker_receipt.json",
+          "sha256": "sha256:a5ff7758acef65787d7fda467b0224da33788f47c60e9d79980fb41dc37c89f5"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/tasks_snapshot_final/sympy__sympy-12489/worker_receipt.json",
+          "sha256": "sha256:7e1897ebefce83b199524eb6b067e674ce898a82407b19c20c7f3786e898d478"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/astropy__astropy-13977/worker_receipt.json",
+          "sha256": "sha256:3a7451761d18e645ed054cf1ea5112c681b7c09c7452442b076219614f23da36"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/django__django-11066/worker_receipt.json",
+          "sha256": "sha256:531893291fefded3afe8bddfac2da5c9a8fadae8a623c7c2a09fe160fb6a3a2e"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/matplotlib__matplotlib-21568/worker_receipt.json",
+          "sha256": "sha256:6dc8c1d2ce79a189a04a2cd4727124969998ae2dd91352c2c4c6efac24eed433"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/psf__requests-5414/worker_receipt.json",
+          "sha256": "sha256:2938c6447c138c504a1f8e87afe3a7dc1d129b94fd0b0a9d0dc7b3ff4f547b7c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/pydata__xarray-4075/worker_receipt.json",
+          "sha256": "sha256:303ab962a3faf0e07f8896c0f92c1ef3c29d4d241dc592c897df4165936e46d3"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/pylint-dev__pylint-6903/worker_receipt.json",
+          "sha256": "sha256:76a5e0203e06c051cd35841e43365dbfdd493b67802968d5721b5fc8bb82677c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/pytest-dev__pytest-5809/worker_receipt.json",
+          "sha256": "sha256:a6acf06170b2ff295457d4e774df69eeb8f159a337af406891dc1deaf87896b9"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/scikit-learn__scikit-learn-12585/worker_receipt.json",
+          "sha256": "sha256:1818133e7a5de8a4d0ff5e8bac81fca8b96fa382c46667ab2322048402d09f84"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/sphinx-doc__sphinx-10673/worker_receipt.json",
+          "sha256": "sha256:39539077f37fbcb0e6e507f8518e8ad608ec1e6600cedb26b1edad2baa88aac7"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/tasks_snapshot_final/sympy__sympy-13031/worker_receipt.json",
+          "sha256": "sha256:55468394c11a649df130a260a7338ceb94687618ec9e18527929556afb2ed6cb"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/astropy__astropy-14096/worker_receipt.json",
+          "sha256": "sha256:62ac0056d6424eb5511d47fde16dbb5259f4f116eac80b160bc768d434abd05e"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/django__django-11087/worker_receipt.json",
+          "sha256": "sha256:8a5c90521dac88f6808a5d5dfc80e90607ec2126185e5fb3d2e524d10a6e3709"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/matplotlib__matplotlib-22719/worker_receipt.json",
+          "sha256": "sha256:fea70cb40062084318c8d54ab5508a1eba43536aebbeecc42f848a7afb785e06"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/psf__requests-6028/worker_receipt.json",
+          "sha256": "sha256:9e23c122bad86bfd6b8b0b932811e2fc54338f9942d7ab6842d4654715bc6e69"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/pydata__xarray-4094/worker_receipt.json",
+          "sha256": "sha256:ab3f9d81508704a24e821d7d68ba32bb29f18be1f49e6134704d12e4d8692cd2"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/pylint-dev__pylint-7080/worker_receipt.json",
+          "sha256": "sha256:83766143821a85b5cb9600cc5fef11169deb6278975ad6f50c3b8e3a64657002"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/pytest-dev__pytest-5840/worker_receipt.json",
+          "sha256": "sha256:c823d9d882991b5093068f687263ef34dd928ae68e3bc25e549e642b07512776"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/scikit-learn__scikit-learn-12682/worker_receipt.json",
+          "sha256": "sha256:b374043aeefbc67581c5f7f238750e932091f2a199dd69750d6418f810762b6f"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/sphinx-doc__sphinx-11445/worker_receipt.json",
+          "sha256": "sha256:bd7e374d54fda3629cdcac1bb5f65c0834eb35d662571bb8110e9b9da976e594"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W02/tasks_snapshot_final/sympy__sympy-13091/worker_receipt.json",
+          "sha256": "sha256:8f29bb9bcf754160566ed97ded928f4bce5bfe773ff389f425852af78f526750"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/astropy__astropy-14182/worker_receipt.json",
+          "sha256": "sha256:125e2c9f74125136edf2295c8ed6d49a1d9cd01a54968488e45f8c76e35f73f4"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/django__django-11095/worker_receipt.json",
+          "sha256": "sha256:587b5500a39f27aecca69cdec080c718ee38df8578dace509e4383d6065e1eee"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/matplotlib__matplotlib-22865/worker_receipt.json",
+          "sha256": "sha256:03b5084e6c820123f4ab6f9c8e5bd11a02fe71c1b7cc0663a393cd3e41771a5d"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/pydata__xarray-4356/worker_receipt.json",
+          "sha256": "sha256:711105b3b8c422e57475ebf8cec8534ff7629edc99ac17280c31febb500b3226"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/pylint-dev__pylint-7277/worker_receipt.json",
+          "sha256": "sha256:0985de7f67790e15d1c72c5a345c46a1c1562f22baccbf3df44fe0bc68d5c1e1"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/pytest-dev__pytest-6197/worker_receipt.json",
+          "sha256": "sha256:593695f90882476c577063a61e0ce8b9882397196e2704400d234a6ed3514ada"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/scikit-learn__scikit-learn-12973/worker_receipt.json",
+          "sha256": "sha256:679ed4da1b2c9aaa1601b83f520d4cdba2ae80e0b4595f4536dd23cec06d27f5"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/scikit-learn__scikit-learn-13124/worker_receipt.json",
+          "sha256": "sha256:f47e38c17f17b05c268ca7a817448a6592f08ec642a14d1a49267a8f41466813"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/sphinx-doc__sphinx-11510/worker_receipt.json",
+          "sha256": "sha256:25d64e7d72d7de0c3e49a610fa1d17c74e2e304f0f05615cb543841467efac76"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/tasks_snapshot_final/sympy__sympy-13372/worker_receipt.json",
+          "sha256": "sha256:4b559965325c4baa21dadfc5a2ba192f1a894efa3383832b6bb8463b23a49d2a"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/astropy__astropy-14309/worker_receipt.json",
+          "sha256": "sha256:5c7bc032e1c9f5f77f285d02b52dc420c80e587056a10695c0fa0025be441d05"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/django__django-11099/worker_receipt.json",
+          "sha256": "sha256:ed0f23f10e3205e3f749c61e4bb1ed74d3e27515343eeb8c7a4ba2a5b0936d97"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/matplotlib__matplotlib-22871/worker_receipt.json",
+          "sha256": "sha256:7cb9cc5f4f9e1f2537071d68339a892ea1d948c949ac39b364a1150b81650ce7"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/pydata__xarray-4629/worker_receipt.json",
+          "sha256": "sha256:fc4aec676da3e7a76b556deda8c25922e052e3e588b6ed40a99860b84cf3242e"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/pylint-dev__pylint-8898/worker_receipt.json",
+          "sha256": "sha256:d5fdd8d30d1a8daf7f37d7390dec9ba390e5855c1aacd2d26b8d55cf89d6d544"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/pytest-dev__pytest-6202/worker_receipt.json",
+          "sha256": "sha256:71a2b55745bc3f28594e9f6279cc2137e424c2f6a72303ae4db348635997ca7f"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/scikit-learn__scikit-learn-13135/worker_receipt.json",
+          "sha256": "sha256:327f930ec9d4b3cafc5b9c895c91e778fe3a6e4ae5c865b9badf6f60da7d8c0e"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/sphinx-doc__sphinx-7440/worker_receipt.json",
+          "sha256": "sha256:e97ff046976b42946f6bfe308deb3e3b77ee96dbd76b4ce96acf81bb5d1f5934"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/sphinx-doc__sphinx-7454/worker_receipt.json",
+          "sha256": "sha256:dc63247458751e904b1ce022c0554e8f69db67fbdf592b76640ea2e5672c3669"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/tasks_snapshot_final/sympy__sympy-13480/worker_receipt.json",
+          "sha256": "sha256:5187c50f53a0ffc73111b6fa78ff47e6f2bc1f626a479d5e4651515e40878deb"
+        }
+      ],
+      "receipt_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair",
+      "result_report": {
+        "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+        "sha256": "sha256:a9cdb57d7bdb77435b90b24f338a1813049a1e630548c6d17890638137a1f452"
+      },
+      "usage_schema_counts": {
+        "deepseek_chat_v1": 50
+      }
+    },
+    "B": {
+      "label": "B",
+      "normalized_receipts": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/arm_B_receipts.json",
+        "sha256": "sha256:ee3d4f6caeaa526b6170262f6dd21038126ebbf1c8ded847d1f26c9ab2409c42"
+      },
+      "normalized_results": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/arm_B_results.json",
+        "sha256": "sha256:ce9f37c41519b3949e0a2ffd1ba430687c353fe7a4d67c44fb7070273d7e1adf"
+      },
+      "provider_receipt_inline_events": 50,
+      "receipt_files": [
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/astropy__astropy-13579/worker_receipt.json",
+          "sha256": "sha256:78236f4bf24df6e1494c08b7a8d760202e8147906962283eda105d14ac75806c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/astropy__astropy-13977/worker_receipt.json",
+          "sha256": "sha256:ddd33370ecd09f83f58d393ba3c79a3b4274137bd087f92c40987d5531d3523c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/astropy__astropy-14096/worker_receipt.json",
+          "sha256": "sha256:e02001573209351eeb413b82201c90c72f8afee4244860932597f8f4fff932eb"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/astropy__astropy-14182/worker_receipt.json",
+          "sha256": "sha256:c00721fbef3cbcc1d2c44155d8d0fa34a3335797c09bcebf28bd15d8f8bbdf2e"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/astropy__astropy-14309/worker_receipt.json",
+          "sha256": "sha256:d63bf4f17a4008ca72158a310017d8954f997887268f1ac9468303720f654007"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/django__django-10999/worker_receipt.json",
+          "sha256": "sha256:2c650c9f1b48253d4235cf7eef0c6992c9a312703d802bef75bd6cea8492fe7b"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/django__django-11066/worker_receipt.json",
+          "sha256": "sha256:9c5caa48bc02d88e48f79cf884bbab81cdbcdf5b224328f2ec708545eda1b066"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/django__django-11087/worker_receipt.json",
+          "sha256": "sha256:093840f855c186357b5d31e35cecec6787edfbb4dc9ca9878739d04bf6de3848"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/django__django-11095/worker_receipt.json",
+          "sha256": "sha256:dc04aa383410c7a37a2ef81cf12620342d1edcec801e4ee5b6e7c3ce08c63842"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/django__django-11099/worker_receipt.json",
+          "sha256": "sha256:e62938f46b5cf83aef0dc8a395d2f8051b2a83d3b0ababe8807844815748a149"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/matplotlib__matplotlib-20859/worker_receipt.json",
+          "sha256": "sha256:82e505a1c0e0094ebf70074b3b95c0a272f78055131323b40a473baafada6ae9"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/matplotlib__matplotlib-21568/worker_receipt.json",
+          "sha256": "sha256:27dbe5d98e70e488d3126f6d9eb50308b905a4e8ab812df4b3b25d62e1020302"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/matplotlib__matplotlib-22719/worker_receipt.json",
+          "sha256": "sha256:c733fb6a4e934736e755b6a8aa79c374edd31cb8db052a65382e2e40ec15bc43"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/matplotlib__matplotlib-22865/worker_receipt.json",
+          "sha256": "sha256:65b2749ffb455215e2d34a7df5c9a3e4d5628bcb22a094f1a420200804900723"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/matplotlib__matplotlib-22871/worker_receipt.json",
+          "sha256": "sha256:6690d3b2a329a92994c7210b68099a1b7ff53fcd243f9131b5e201b0a6f1443e"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/psf__requests-2931/worker_receipt.json",
+          "sha256": "sha256:7bb22769148ef73a77ca2e6f14c79c4e2fe464c1d6f8e055245802ea19afe143"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/psf__requests-5414/worker_receipt.json",
+          "sha256": "sha256:000048a10d86039d179eabf7a8218c4ff4f1a6d9f8ed85592d147e5a960a746b"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/psf__requests-6028/worker_receipt.json",
+          "sha256": "sha256:953b26fd0e97cf6ae09e2fa8d9fd47c40f42bf98e0830ec843c04bd7ca878183"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pydata__xarray-3993/worker_receipt.json",
+          "sha256": "sha256:ad8c7aa50c921d966dc8795a8a4f56954821202c9c56a8dad2293198823fadd6"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pydata__xarray-4075/worker_receipt.json",
+          "sha256": "sha256:1a2086ec2189bd1845f7b30dc5f0a5b5bf54e7fc37bd1a10376e3aa8de56e422"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pydata__xarray-4094/worker_receipt.json",
+          "sha256": "sha256:0fd69c00bb96d8e19457254a510b7636f239f83f7221e5ee8ef8891a161db6ee"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pydata__xarray-4356/worker_receipt.json",
+          "sha256": "sha256:82476c58573e20db9774a098a29d543218fa20fb1568e8aa4bddbb3f2a0630c7"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pydata__xarray-4629/worker_receipt.json",
+          "sha256": "sha256:8c9e49bc9c6aa6acc3fbbfdcef728ef9b15649d77e96a9b965815f752a487822"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pylint-dev__pylint-6528/worker_receipt.json",
+          "sha256": "sha256:24b06c92706126e244e26a4ce1dcd7a7b2b2c107d243894dc36f2fca67c1a913"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pylint-dev__pylint-6903/worker_receipt.json",
+          "sha256": "sha256:8f467de2f9af2fb53b329489b9c4e45fce43ab57666aee3b3b53c4cec648f7ff"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pylint-dev__pylint-7080/worker_receipt.json",
+          "sha256": "sha256:1e2018dd1a79aecd76c02ed3e13eeb36da7e99a092c49442405ef6e962fbf8df"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pylint-dev__pylint-7277/worker_receipt.json",
+          "sha256": "sha256:602d56f61326f50a241ab62527b1b311559b32fe50210de8b2b4fe1ea6967708"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pylint-dev__pylint-8898/worker_receipt.json",
+          "sha256": "sha256:e82c8294963af5d4f625647a77847da25b7f9db70fc9c242071cd0ed7da8c6c6"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pytest-dev__pytest-5787/worker_receipt.json",
+          "sha256": "sha256:0f869e983dc6752c76a90bcac0c7a6159983ee0671873dcab17ba4b805c20759"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pytest-dev__pytest-5809/worker_receipt.json",
+          "sha256": "sha256:acc5b4278dd5b339c9a8dd10c9e7cd8477e3ee98f015429adcb12000f0685284"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pytest-dev__pytest-5840/worker_receipt.json",
+          "sha256": "sha256:beee519c53d8fd96d1390cb45bc3746a77bccc85b9f2183d386af8b071d467ad"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pytest-dev__pytest-6197/worker_receipt.json",
+          "sha256": "sha256:ef09523240b9f23d82a54609b36201afc1cea75c2ec024374d19610b05e0d16b"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/pytest-dev__pytest-6202/worker_receipt.json",
+          "sha256": "sha256:6bdf1491aa50c56fae5ad69ce2539c53670d645a188a287648b100403c354ae0"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/scikit-learn__scikit-learn-11578/worker_receipt.json",
+          "sha256": "sha256:66a980667cca069feb82bfa87c989024996ea4f4dcb5aba37582fecea8993eeb"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/scikit-learn__scikit-learn-12585/worker_receipt.json",
+          "sha256": "sha256:41d3055df4dbd445f646780043305c801f252d26c14c2a5fe8a4c2c25b46de50"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/scikit-learn__scikit-learn-12682/worker_receipt.json",
+          "sha256": "sha256:670337ef31e794e89fc9842e7f0c3707eb1f1bd5de34eb0c2f4ddc859f071cca"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/scikit-learn__scikit-learn-12973/worker_receipt.json",
+          "sha256": "sha256:b4656ac8fbf4de0808a4f0024e99fb4f51f887e03fdd64e52e620182770398eb"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/scikit-learn__scikit-learn-13124/worker_receipt.json",
+          "sha256": "sha256:cc00e50f229e03c0922c45ef33432525e64cd21f7d4b71df6a01f50f91e02274"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/scikit-learn__scikit-learn-13135/worker_receipt.json",
+          "sha256": "sha256:14a99a8cb65d12bc610127999cdc125d898856084ad2707d908893cc85c07fe2"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sphinx-doc__sphinx-10614/worker_receipt.json",
+          "sha256": "sha256:1808ae87f9649d63b1551cbab967e51dc67d2c414d49af29dd834e2881a27fc4"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sphinx-doc__sphinx-10673/worker_receipt.json",
+          "sha256": "sha256:386eb4303f46750f5855359fb8fe417faf54007be24082c283b6489bac20c055"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sphinx-doc__sphinx-11445/worker_receipt.json",
+          "sha256": "sha256:b1e427746d9b2c50fcbc4ef9912be9f47841eedabac5267672e746d6581e9a84"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sphinx-doc__sphinx-11510/worker_receipt.json",
+          "sha256": "sha256:67abac976eaab18e7d93fa39296ade2b8f4461ce763735cc5be320281b49d605"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sphinx-doc__sphinx-7440/worker_receipt.json",
+          "sha256": "sha256:2548de41edb4c99819354e2403d4e903e9f609f168868a74103f5c2390a23fb9"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sphinx-doc__sphinx-7454/worker_receipt.json",
+          "sha256": "sha256:80a1ceb7795ccb50254a8e74188b5268c921997fb88ff75a707a63e830bfed30"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sympy__sympy-12489/worker_receipt.json",
+          "sha256": "sha256:09a786f410741c72ce4d520ba21946c1c69479a8919efe539f9ab6aa4f093aa0"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sympy__sympy-13031/worker_receipt.json",
+          "sha256": "sha256:794189905399dd6ddf2e101ecf0afde6cb73a0237cb78dc07f16edda6f9fac47"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sympy__sympy-13091/worker_receipt.json",
+          "sha256": "sha256:445c1cbb82e7cbb5548a09368b4f2f8af2fc3a8b6cbfce130bcde49259ef6770"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sympy__sympy-13372/worker_receipt.json",
+          "sha256": "sha256:a88f391f8ea415b19f2aff2937cc6f918097000167df49ea378281112d687ab7"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks/sympy__sympy-13480/worker_receipt.json",
+          "sha256": "sha256:3f4a86c5257f89df8df08787727ec4ed75e933406185ee8f95c7e57496302d86"
+        }
+      ],
+      "receipt_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/tasks",
+      "result_report": {
+        "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/scoring/full_s01/deepseek-v4-pro__armB__source-context-loop-s01.turingos_m3_s01_armB_deepseek_source_context_loop_20260703.json",
+        "sha256": "sha256:85c3cfd9b23345538869fa68706dd13be92a2143b7b2126fab54088dd7d888cc"
+      },
+      "usage_schema_counts": {
+        "deepseek_chat_v1": 50
+      }
+    },
+    "C": {
+      "label": "C",
+      "normalized_receipts": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/arm_C_receipts.json",
+        "sha256": "sha256:125fa87da2905ab52c54b838c8841bc9865564921b7c8fe83afef52de407ca95"
+      },
+      "normalized_results": {
+        "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/arm_C_results.json",
+        "sha256": "sha256:aed73519597f1e0b21414d43e322bcfc44da01250bf2d14a0b366eac45f3e10a"
+      },
+      "provider_receipt_inline_events": 50,
+      "receipt_files": [
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/astropy__astropy-13579/worker_receipt.json",
+          "sha256": "sha256:5cd068803de928598746d1042874367afa3402a00b8dcd169cfb69c1dbf04c5f"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/astropy__astropy-13977/worker_receipt.json",
+          "sha256": "sha256:beeb6b434e8dfb6ca52478132522594c6aeed0ad097b090caf6abafab158b924"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/astropy__astropy-14096/worker_receipt.json",
+          "sha256": "sha256:474a0875e50f1c903931aea6a1bd5b067f8315c065c7c63771dddb5eba49127d"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/astropy__astropy-14182/worker_receipt.json",
+          "sha256": "sha256:2ad83a349599896b2ab0242a2c5152843f748d14824689f78fb25b706ac00824"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/astropy__astropy-14309/worker_receipt.json",
+          "sha256": "sha256:51e0960562cac93d3f7080dc9740afc6a2651db1c5e7678536ce849d1d829dfc"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/django__django-10999/worker_receipt.json",
+          "sha256": "sha256:6d84030129da8d43fe8e5715bc4dc6f7bd67ecdfc0cc1545b6efccb8531373b8"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/django__django-11066/worker_receipt.json",
+          "sha256": "sha256:fa557000ba1a9114f1c2615b683e37874f52623cbd890cfdd4402ed06771e57d"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/django__django-11087/worker_receipt.json",
+          "sha256": "sha256:6154e8650cb65d5a1b9d21d1a0196b68aecd239053c41a4a6efb7c79ef58e61f"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/django__django-11095/worker_receipt.json",
+          "sha256": "sha256:40edd2b4284d793766f4d3a2662f15be07793a4b9ac3c0f6273407b42b54156b"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/django__django-11099/worker_receipt.json",
+          "sha256": "sha256:537af165f9461ecdaf9233581b475a3c71d6aba99560c93b9d8ce88e3491ed1b"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/matplotlib__matplotlib-20859/worker_receipt.json",
+          "sha256": "sha256:79964e266696dbee12c0a7a554e9d1dc0354c5dfaaf6b831b571b4543dd61304"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/matplotlib__matplotlib-21568/worker_receipt.json",
+          "sha256": "sha256:deca7abeff0057e6ad7ff683502e3433c01a236a26265050f06390e35f7ba2b2"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/matplotlib__matplotlib-22719/worker_receipt.json",
+          "sha256": "sha256:4c3d60bbc37643fb42eacc11693f1ea9088e2b34da175918a2b84dd5398e76ac"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/matplotlib__matplotlib-22865/worker_receipt.json",
+          "sha256": "sha256:e94abb63b2c992967df5f564d1ccacdd95ae5d5e654127a8a8a37a49d83c543c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/matplotlib__matplotlib-22871/worker_receipt.json",
+          "sha256": "sha256:d80a7bb24efc6ca07ab4fc88fe26efa0aa5338fc97ba87163b058a72ebb13627"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/psf__requests-2931/worker_receipt.json",
+          "sha256": "sha256:1b2c150bed09e05ac1babf6d7efab097048ab6d5353226260f7621bf64f92d72"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/psf__requests-5414/worker_receipt.json",
+          "sha256": "sha256:2431bafb5456c4a45671b9a46c0debcd6cebd418d529ae1568c0a0904caa6020"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/psf__requests-6028/worker_receipt.json",
+          "sha256": "sha256:e99bc1cb0610486e097099249e2cb5524ef26c93bda4fc366533cb06e9abf0d6"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pydata__xarray-3993/worker_receipt.json",
+          "sha256": "sha256:f4600085112e62338f8d85eed69107c03a6c04e915e4c3211dfeed6a7c3151bf"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pydata__xarray-4075/worker_receipt.json",
+          "sha256": "sha256:f533a36e397383cac38ff099c07295a48f2f0f67f72aec0fd156cdd27972e3f8"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pydata__xarray-4094/worker_receipt.json",
+          "sha256": "sha256:83fd06ab98ea990adafe7e824feddf8f50476123d7a165fedce8c3a5fad5dd05"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pydata__xarray-4356/worker_receipt.json",
+          "sha256": "sha256:af3425ee230bdf82ae0f6a1d401998017c2f125cd81ce018bf98f06ae2f0b001"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pydata__xarray-4629/worker_receipt.json",
+          "sha256": "sha256:659ec76a00b6919dc43219e5a7c1f896ce82396e697ac0b6c8ce32f1ad92d2bf"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pylint-dev__pylint-6528/worker_receipt.json",
+          "sha256": "sha256:9fea4b74d11258128b3bdff34e08393b06383dcc7e22e4494c908ebcc729c298"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pylint-dev__pylint-6903/worker_receipt.json",
+          "sha256": "sha256:98bb2d7c0980713eb7d25adc0b66f8435ef873e6ff594b69ee4ae5aa9bd394fb"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pylint-dev__pylint-7080/worker_receipt.json",
+          "sha256": "sha256:b03626b6bf7ebd2ad96fa0752cedfa9191884ff9a5faca2052105832ed00730f"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pylint-dev__pylint-7277/worker_receipt.json",
+          "sha256": "sha256:5026d224cebfe562ae62cc64d57a9c5912f571bbf36cb73003803352147e34f6"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pylint-dev__pylint-8898/worker_receipt.json",
+          "sha256": "sha256:2b2e51fa27a5a2c55a6126e690703c7bddf8ba37e22642cb20ee9a7d281837ca"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pytest-dev__pytest-5787/worker_receipt.json",
+          "sha256": "sha256:263c42d6902ab5ddbc22cbdea8114625c1e0fa715163300e3037ba9d0c555fe8"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pytest-dev__pytest-5809/worker_receipt.json",
+          "sha256": "sha256:c18f1b32ab61dd5340b54b80fc2cc41c2069a9adff45135dfd93cb7eaf20e117"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pytest-dev__pytest-5840/worker_receipt.json",
+          "sha256": "sha256:da803f69b95452762c107c51c60b948bc97ddea12321024cc0ba18265d6982a0"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pytest-dev__pytest-6197/worker_receipt.json",
+          "sha256": "sha256:65693fdfb8656a8f704f5a90da39423dc7701e24493d526dafb708f49a13c09d"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/pytest-dev__pytest-6202/worker_receipt.json",
+          "sha256": "sha256:40188f8972d839eafb68f77d3c8012e5ac50c2a6e22356e4acd0973590bf5532"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/scikit-learn__scikit-learn-11578/worker_receipt.json",
+          "sha256": "sha256:42a4e9207c2feb298aeaea48a62ed100d8a241dff901ceb77e5edc4991f20647"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/scikit-learn__scikit-learn-12585/worker_receipt.json",
+          "sha256": "sha256:f0be09ea5acb66182fff8dd02781bc4bfecc54308b09d391612a3ea14e9b6b40"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/scikit-learn__scikit-learn-12682/worker_receipt.json",
+          "sha256": "sha256:d8fdb47e4485e9b6f2b19b40e19bee528d3c61c9c99d607d9742b9f463102d62"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/scikit-learn__scikit-learn-12973/worker_receipt.json",
+          "sha256": "sha256:9f97cab7c0d02e25b96e5c41993c89a5f001fdeeb575ae365e7716098643d005"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/scikit-learn__scikit-learn-13124/worker_receipt.json",
+          "sha256": "sha256:8f64bdba0a0f7a2a38d497ecbbfb656a157ccb451a85df9b95f79869e5c015fd"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/scikit-learn__scikit-learn-13135/worker_receipt.json",
+          "sha256": "sha256:6529bd69b3e8ec0053b7d8007d9a57e9d23c7e60e01f0578271e5302403045fe"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-10614/worker_receipt.json",
+          "sha256": "sha256:ac57e09737b9846516a0859420564b265f3af90d61e49d35c113e2699c6c2ef9"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-10673/worker_receipt.json",
+          "sha256": "sha256:989731aab8dba11544f92ab31e3dc80b62b634901d73f77b8952607d5b8d37ea"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-11445/worker_receipt.json",
+          "sha256": "sha256:0d7a0d4090e462036bdc5016f64f14c3d3cccdc35e67a5160aa83b355675ef8c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-11510/worker_receipt.json",
+          "sha256": "sha256:003855d593ecedd2be9810efd37bf40401996456b8fb0d7fe6defa7108c26f2d"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-7440/worker_receipt.json",
+          "sha256": "sha256:c391e4e36a46d4c35b31f76c87a71429a7f61ba6f9e5518edb41e776312ec1e3"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sphinx-doc__sphinx-7454/worker_receipt.json",
+          "sha256": "sha256:f58f34cc00f6a013e671cfcc9cf1454beb46462e987742447b63c241fa91fe12"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sympy__sympy-12489/worker_receipt.json",
+          "sha256": "sha256:f368501eab050b40c2a7e5fd766b9ccdf4ead1b05e826c76e0ec59be9238e162"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sympy__sympy-13031/worker_receipt.json",
+          "sha256": "sha256:a0e4b3346a523a4cde64779d42029efe3b188021730d9732965fa4124ff2a25c"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sympy__sympy-13091/worker_receipt.json",
+          "sha256": "sha256:d5cf6d1f17d0e67cdba9a74bc052d4863d82d8bc99b7a63af4f752a54ff41422"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sympy__sympy-13372/worker_receipt.json",
+          "sha256": "sha256:f5c38b3d050c4fdce1e64321ff6cbafe989536d753737736c1d01652ca177fb4"
+        },
+        {
+          "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks/sympy__sympy-13480/worker_receipt.json",
+          "sha256": "sha256:fad3f734f9dbabc7999a2cb4a158261aa61ede4c8d161422acb012e791a378ea"
+        }
+      ],
+      "receipt_root": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/tasks",
+      "result_report": {
+        "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/C_deepseek_pro_source_context_loop_ablation_s01/scoring/full_s01/deepseek-v4-pro__armC__source-context-loop-ablation-s01.turingos_m3_s01_armC_deepseek_source_context_loop_ablation_20260703.json",
+        "sha256": "sha256:dbd8b5324ef91893dfb4f6440106aa2bca6e17229bb76d5ddb188c04ae9c06d7"
+      },
+      "usage_schema_counts": {
+        "deepseek_chat_v1": 50
+      }
+    }
+  },
+  "created_at_utc": "2026-07-03T16:00:00Z",
+  "price_table": {
+    "canonical_content_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d",
+    "normalized_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/inputs/price_table.m4.json",
+    "normalized_sha256": "sha256:39dde2181884f932847789e08c6f31264bf733bf2546c18846454f9786eb6891",
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/PRICE_TABLE_M3_P4_DEEPSEEK_ONLY.json",
+    "sha256": "sha256:343e82b37cd76da1df1f1cd948fb9471b19b8ce0045133b96ee662be3797be4c"
+  },
+  "registry": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/real_s01_deepseek_20260703/heldout_task_registry.v1.json",
+    "sha256": "sha256:7ab612f5f310a5efc869ad8f1193ced23608de52abb9459af86eab568a79d8cb"
+  },
+  "schema_id": "m4.input_digests.v1"
+}

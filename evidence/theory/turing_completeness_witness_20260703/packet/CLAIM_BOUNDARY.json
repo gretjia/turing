@@ -1,0 +1,27 @@
+{
+  "claims_allowed": [
+    "TC-01 through TC-09 local verdicts are present and PASS",
+    "TC-10 slot is present and NOT_RUN pending M5-class external verification",
+    "exact-SHA packet inputs and digests are recorded for external verification"
+  ],
+  "claims_forbidden": [
+    "TuringOS is Turing-complete",
+    "TC-10 passed",
+    "M2.G passed",
+    "EXTERNALLY_VERIFIED",
+    "CLOSED",
+    "RELEASED",
+    "RATIFIED",
+    "SHIPPED",
+    "M2_ENABLED"
+  ],
+  "evidence_class": "REAL_DETERMINISTIC_EXECUTION_PLUS_PACKET",
+  "m2_gate_claim_allowed": false,
+  "not_run_is_fail": true,
+  "schema_id": "turingos.tc5.packet_claim_boundary.v1",
+  "scope": "M2.TC5 exact-SHA packet for external TC-10 verification",
+  "status_ceiling": "IMPLEMENTER_ADDRESSED",
+  "subject_commit": "ed6234f2dc398d7763596643902f26d4b8d3ef6c",
+  "tc10_external_artifact_exists": false,
+  "turing_completeness_claim_allowed": false
+}

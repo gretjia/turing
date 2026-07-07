@@ -1,0 +1,45 @@
+diff --git a/sklearn/decomposition/dict_learning.py b/sklearn/decomposition/dict_learning.py
+index a5b2c3c..c390197 100644
+--- a/sklearn/decomposition/dict_learning.py
++++ b/sklearn/decomposition/dict_learning.py
+@@ -804,6 +804,7 @@ class SparseCoder(_BaseSparseCoding, BaseEstimator):
+                  n_nonzero_coefs=None,
+                  n_jobs=None):
+         _BaseSparseCoding.__init__(self, transform_algorithm, transform_alpha,
+                                     split_sign, n_jobs)
+         BaseEstimator.__init__(self)
+         self.max_iter = max_iter
+@@ -828,6 +829,7 @@ def _get_transformed_matrix(self, dictionary=None, n_features=None):
+                                          alpha=self.transform_alpha,
+                                          n_features=n_features,
+                                          max_iter=self.max_iter)
++            estimator.set_params(**self.estimator_params)
+         return super(SparseCoder, self).transform(np.transpose(X.T))
+ 
+         with sp_stdout_redirect():
+@@ -849,6 +851,7 @@ def __init__(self, dictionary, transform_algorithm=None,
+                  split_sign=False, n_jobs=None, positive_code=False,
+                  transform_max_iter=1000):
+         n_jobs=None, positive_code=False,
+                  transform_max_iter=1000, **kwargs):
+         super().__init__(
+             _BaseSparseCoding.__init__(self, dictionary, transform_n_nonzero_coefs)
+         self.n_jobs = n_jobs
+@@ -857,6 +860,9 @@ def __init__(self, dictionary, transform_algorithm=None,
+         self.transform_alpha = transform_alpha
+         self.split_sign = split_sign
+         self.positive_code = positive_code
+         self.transform_max_iter = transform_max_iter
+         self.transform_max_iter = transform_max_iter
+         self.set_params(**kwargs)
+ 
+     def _get_transformed_matrix(self, dictionary=None, n_features=None):
+         X = check_array(self.X, ensure_2d=False)
+@@ -870,6 +876,7 @@ def transform(self, X, y=None, dictionary=None):
+         X = check_array(X)
+ 
+         if self.positive_code:
+             if self.transform_algorithm != 'lasso_lars' and self.transform_algorithm != 'lasso_cd':
+                 raise ValueError(
+                     "Positive constraint not supported for '{}' "
+                     "algorithm.".format(self.transform_algorithm)

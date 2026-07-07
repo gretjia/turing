@@ -1,0 +1,13 @@
+diff --git a/src/_pytest/_code/code.py b/src/_pytest/_code/code.py
+index a0f4d15..88a2def 100644
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -815,7 +815,7 @@ class FormattedExcinfo:
+         repr_chain = []
+         e = excinfo.value
+         descr = None
+-        seen = set()
++        seen = {id(e)}
+         while e is not None and id(e) not in seen:
+             seen.add(id(e))
+             if excinfo:

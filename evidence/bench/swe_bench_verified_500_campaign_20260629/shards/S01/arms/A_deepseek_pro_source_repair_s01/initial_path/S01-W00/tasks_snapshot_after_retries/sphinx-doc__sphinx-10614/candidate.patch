@@ -1,0 +1,27 @@
+diff --git a/sphinx/ext/inheritance_diagram.py b/sphinx/ext/inheritance_diagram.py
+index 02d5b27d3..a2a857d49 100644
+--- a/sphinx/ext/inheritance_diagram.py
++++ b/sphinx/ext/inheritance_diagram.py
+@@ -356,7 +356,7 @@ class InheritanceGraph:
+         for name, full_name, cls, url in self.class_info:
+             if url is not None:
+                 hyperlink = url
+-            elif name in urls:
++            elif full_name in urls:
+                 hyperlink = urls[full_name]
+             else:
+                 hyperlink = ''
+@@ -368,7 +368,12 @@ class InheritanceGraph:
+                 self.class_info = [x for x in self.class_info
+                                    if x[1] in all_classes and x[0] not in excludes_]
+ 
+-            urls = {full_name: self.get_relpath(url) for full_name, url in urls.items()}
++            urls = {}
++            for full_name, url in urls.items():
++                # Generate the relative path based on the current document's source
++                # directory to ensure the link is correct when the SVG is embedded
++                # in a non-root document.
++                urls[full_name] = self.get_relpath(url)
+             for i, (name, full_name, cls, url) in enumerate(self.class_info):
+                 if url is not None:
+                     continue

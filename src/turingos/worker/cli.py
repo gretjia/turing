@@ -14,6 +14,7 @@ import subprocess
 
 from .. import codec
 from .. import dispatch_router
+from . import cost as worker_cost
 from .adapter import WorkerAdapter, _pgid_alive, _reap_group
 
 
@@ -76,6 +77,11 @@ def _git(wt, *args, check=True):
     if check and r.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} -> {r.returncode}: {r.stderr}")
     return r
+
+
+def _run_dimension(capsule: dict, key: str, fallback: str) -> str:
+    value = capsule.get(key)
+    return value if isinstance(value, str) and value else fallback
 
 
 class CliWorkerAdapter(WorkerAdapter):
@@ -161,7 +167,7 @@ class CliWorkerAdapter(WorkerAdapter):
             argv = self._argv(prompt, worktree)
         status, no_orphan, _tail = self._spawn_reap(argv, worktree, timeout_s)
         tree_oid, files_touched, macro_commit = self._candidate(worktree)
-        return {
+        receipt = {
             "schema_id": "turingos.receipt.v1",
             "receipt_id": "rcpt:" + codec.content_digest(
                 {"capsule_id": capsule.get("capsule_id", ""), "worker_id": self.worker_id,
@@ -174,3 +180,34 @@ class CliWorkerAdapter(WorkerAdapter):
             "status": status,
             "no_orphan": no_orphan,
         }
+        prompt_tokens = worker_cost.upper_bound_tokens_from_utf8_bytes(prompt)
+        completion_tokens = worker_cost.upper_bound_tokens_from_utf8_bytes(_tail)
+        usage = {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "tool_tokens": 0,
+            "tool_stdout_tokens": completion_tokens,
+            "total_tokens": prompt_tokens + completion_tokens + completion_tokens,
+        }
+        self.last_cost_event = worker_cost.cost_event_from_receipt(
+            receipt,
+            run_id=_run_dimension(capsule, "run_id", f"run:{receipt['capsule_id']}"),
+            problem_id=_run_dimension(capsule, "problem_id", _run_dimension(capsule, "atom_id", "problem:cli")),
+            split=_run_dimension(capsule, "split", "dogfood"),
+            agent_id=self.worker_id,
+            branch_id=_run_dimension(capsule, "branch_id", f"branch:{self.worker_id}"),
+            adapter_kind="cli",
+            provider=self.worker_id,
+            model_id_requested=str(getattr(self, "last_tier", "cli")),
+            model_id_resolved=str(getattr(self, "last_tier", "cli")),
+            endpoint="cli://worker",
+            request_id=receipt["receipt_id"],
+            response_sha256=codec.content_digest({"status": status, "tail": _tail}),
+            usage=usage,
+            cost_source_kind="bounded_estimate",
+            cost_microusd=0,
+            wall_time_ms=0,
+            provider_usage_raw=usage,
+            bound_kind="upper_bound_utf8_bytes_over_2",
+        )
+        return receipt

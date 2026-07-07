@@ -1,0 +1,80 @@
+diff --git a/src/_pytest/_code/code.py b/src/_pytest/_code/code.py
+index a0f4d15..df6babb 100644
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -572,7 +572,10 @@ class ExceptionInfo(Generic[_E]):
+         """
+         if style == "native":
+             return ReprExceptionInfo(
+-                ReprTracebackNative(
++                ReprTraceback(
++                    reprentries=[],
++                    extraline=None,
++                    style="native",
+                     traceback.format_exception(
+                         self.type, self.value, self.traceback[0]._rawentry
+                     )
+@@ -812,7 +815,7 @@ class FormattedExcinfo:
+ 
+     def repr_excinfo(self, excinfo):
+ 
+-        repr_chain = []
++        reprtraceback = self.repr_traceback(excinfo)
+         e = excinfo.value
+         descr = None
+         seen = set()
+@@ -833,6 +836,7 @@ class FormattedExcinfo:
+             if e.__cause__ is not None and self.chain:
+                 e = e.__cause__
+                 excinfo = (
++                    ExceptionInfo.from_exc_info((type(e), e, e.__traceback__))
+                     ExceptionInfo((type(e), e, e.__traceback__))
+                     if e.__traceback__
+                     else None
+@@ -843,15 +847,20 @@ class FormattedExcinfo:
+             ):
+                 e = e.__context__
+                 excinfo = (
++                    ExceptionInfo.from_exc_info((type(e), e, e.__traceback__))
+                     ExceptionInfo((type(e), e, e.__traceback__))
+                     if e.__traceback__
+                     else None
+                 )
+                 descr = "During handling of the above exception, another exception occurred:"
++                break
+             else:
+                 e = None
+         repr_chain.reverse()
+-        return ExceptionChainRepr(repr_chain)
++        return ExceptionChainRepr(
++            ([ (self.repr_traceback(excinfo), reprcrash, descr) ])
++            if chain is empty else repr_chain
++        )
+ 
+ 
+ class TerminalRepr:
+@@ -939,15 +948,22 @@ class ReprTraceback(TerminalRepr):
+ class ReprTracebackNative(ReprTraceback):
+     def __init__(self, tblines):
+         self.style = "native"
+-        self.reprentries = [ReprEntryNative(tblines)]
++        self.reprentries = []
+         self.extraline = None
+ 
++    def toterminal(self, tw):
++        for line in tblines:
++            tw.write(line)
++        super().toterminal(tw)
++
+ 
+ class ReprEntryNative(TerminalRepr):
+     style = "native"
+ 
+     def __init__(self, tblines):
+-        self.lines = tblines
++        self.reprfileloc = None
++        self.reprfuncargs = None
++        self.reprlocals = None
+ 
+     def toterminal(self, tw):
+         tw.write("".join(self.lines))

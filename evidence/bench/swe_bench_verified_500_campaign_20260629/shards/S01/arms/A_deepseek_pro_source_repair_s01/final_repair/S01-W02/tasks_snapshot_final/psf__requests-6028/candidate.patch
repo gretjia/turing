@@ -1,0 +1,22 @@
+diff --git a/requests/models.py b/requests/models.py
+index dfbea85..0b5be5c 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -440,7 +440,16 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+             else:
+                 query = enc_params
+ 
+-        url = requote_uri(urlunparse([scheme, netloc, path, None, query, fragment]))
++        # Ensure the auth part of the proxy URL is not double-encoded:
++        # This happens because `parse_url` leaves the raw `auth` string as-is,
++        # but `urlunparse` (and `requote_uri`) will encode special characters
++        # (like '@', ':', etc.), which breaks proxy authentication with newer
++        # versions of Python that enforce stricter URL parsing.
++        if auth:
++            netloc = '%s@%s:%s' % (auth, host, port) if port else '%s@%s' % (auth, host)
++            url = requote_uri(urlunparse([scheme, netloc, path, None, query, fragment]))
++        else:
++            url = requote_uri(urlunparse([scheme, netloc, path, None, query, fragment]))
+         self.url = url
+ 
+     def prepare_headers(self, headers):

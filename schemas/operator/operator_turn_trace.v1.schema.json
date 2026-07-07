@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "operator_turn_trace.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "operator_intent",
+    "selected_verb",
+    "typed_command",
+    "tool_manifest",
+    "agent_capabilities",
+    "advisory_confidence",
+    "rejections"
+  ],
+  "properties": {
+    "schema_id": { "const": "operator_turn_trace.v1" },
+    "operator_intent": { "$ref": "operator_intent.v1.schema.json" },
+    "selected_verb": { "type": "string" },
+    "typed_command": { "$ref": "typed_command.v1.schema.json" },
+    "tool_manifest": { "$ref": "operator_tool_manifest.v1.schema.json" },
+    "agent_capabilities": { "type": "object" },
+    "advisory_confidence": { "type": "string" },
+    "rejections": { "type": "array", "items": { "type": "string" } }
+  }
+}

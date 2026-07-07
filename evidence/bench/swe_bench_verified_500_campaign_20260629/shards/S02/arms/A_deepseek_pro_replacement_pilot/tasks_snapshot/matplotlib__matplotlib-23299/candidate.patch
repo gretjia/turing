@@ -1,0 +1,24 @@
+diff --git a/lib/matplotlib/_pylab_helpers.py b/lib/matplotlib/_pylab_helpers.py
+index 45ce4ff071..3b2a130b82 100644
+--- a/lib/matplotlib/_pylab_helpers.py
++++ b/lib/matplotlib/_pylab_helpers.py
+@@ -116,6 +116,8 @@ def get_fig_manager(num):
+     @classmethod
+     def destroy(cls, num):
+         """Destroy manager *num* -- either a manager instance or a manager number."""
++        if not cls.has_fignum(num):
++            return
+         manager = cls.figs.pop(num)
+         manager.canvas.mpl_disconnect(manager._cidgcf)
+         manager.destroy()
+@@ -141,7 +143,9 @@ def destroy_all(cls):
+         # need to copy the list so we don't change it during iteration
+         for manager in list(cls.figs.values()):
+             manager.canvas.mpl_disconnect(manager._cidgcf)
+-            manager.destroy()
++        # Destroying a manager may trigger a call to destroy(num) so do
++        # not call destroy here.
++            manager.destroy()   # also pops it from cls.figs
+         cls._set_new_active_manager()
+ 
+     @classmethod

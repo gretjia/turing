@@ -1,0 +1,69 @@
+{
+  "dry_run": false,
+  "max_turns": 50,
+  "model": "grok-build",
+  "runs": [
+    {
+      "elapsed_ms": 275641,
+      "exit_code": 0,
+      "instance_id": "django__django-11790",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:4b276f8daf9a32bccd26e1ec2a6c046f6ea88ab38924551cf777ca305ebeb202",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_baseline_stage3/1db4aab875e88203"
+    },
+    {
+      "elapsed_ms": 80139,
+      "exit_code": 0,
+      "instance_id": "django__django-11815",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:7628c90f088686d80128e16c9d88e760b7ab6dcb2edb0dc0013c55c48f54062e",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_baseline_stage3/bcfa9709f961955b"
+    },
+    {
+      "elapsed_ms": 63593,
+      "exit_code": 0,
+      "instance_id": "django__django-11848",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:d301cccd9e3015d2658a00c211dcea2fc0dac5f1b48bb275bb8528b7b6c46fa3",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_baseline_stage3/3e2a076803f9f814"
+    },
+    {
+      "elapsed_ms": 62989,
+      "exit_code": 0,
+      "instance_id": "django__django-11880",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:019c53ab3ecb78ceeb386f79592d5f19633512e3863b5213566c90baf7e3038d",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_baseline_stage3/009d13eb4d768964"
+    },
+    {
+      "elapsed_ms": 167137,
+      "exit_code": 1,
+      "instance_id": "django__django-11885",
+      "max_turns": 50,
+      "model": "grok-build",
+      "patch_hash": "sha256:ae8eb009448c14327d0f9b14e96c1185f88d18c98bee77439ac7fd5893b9b682",
+      "patch_nonempty": true,
+      "schema_id": "DirectGrokBaselineSmoke.v1",
+      "status": "RUN",
+      "worktree": "/tmp/turingos_direct_grok_baseline_stage3/381b40e1c12d0bfb"
+    }
+  ],
+  "sample_size": 5,
+  "schema_id": "DirectGrokBaselineSmokeSummary.v1"
+}

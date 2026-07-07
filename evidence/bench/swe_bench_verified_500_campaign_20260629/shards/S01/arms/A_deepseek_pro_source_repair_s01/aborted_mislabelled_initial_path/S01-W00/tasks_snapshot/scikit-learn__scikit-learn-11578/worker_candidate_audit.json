@@ -1,0 +1,15 @@
+{
+  "apply_check": null,
+  "candidate_patch_path": "shards/S01/tasks/scikit-learn__scikit-learn-11578/candidate.patch",
+  "candidate_patch_sha256": "sha256:c6bbeddea76f6637edbeb3140ce10bea1f629ed43167792be587ce9035bee45d",
+  "candidate_source": "worker_derived",
+  "diff_paths": [
+    "sklearn/linear_model/logistic.py"
+  ],
+  "instance_id": "scikit-learn__scikit-learn-11578",
+  "problems": [],
+  "schema_id": "turingos.swebench_worker_candidate_audit.v1",
+  "shard_id": "S01",
+  "status": "PASS",
+  "submitted_patch_scope": "source_only"
+}

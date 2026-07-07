@@ -1,0 +1,178 @@
+{
+  "schema_id": "turingos.m6_p5_projection_integrity_result.v1",
+  "module": "M6",
+  "phase": "M6.P5",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "recorded_at_utc": "2026-07-04T05:00:00Z",
+  "repo": {
+    "path": "/home/zephryj/turingos_backup/work/turing",
+    "remote": "https://github.com/gretjia/turing.git",
+    "branch": "hci/operator-console-v1-rebased",
+    "commit_sha": "0fd16d1abede372fa8514824ef98a4405e780a86",
+    "pushed": true,
+    "excluded_untracked_paths": [
+      "evidence/verification/"
+    ]
+  },
+  "scope": {
+    "atom_m6_p5_1": "Independent projection-integrity auditor for operator_view_snapshot.v1; it does not import turing-projection.",
+    "atom_m6_p5_2": "Provenance manifest closure for every snapshot leaf.",
+    "atom_m6_p5_3": "Render-fidelity check between JSON snapshot and text status render.",
+    "atom_m6_p5_4": "Worker-leakage grep over worker-facing paths.",
+    "atom_m6_p5_5": "Aggregate hci-gates runner and GitHub Actions hci-gates job."
+  },
+  "red_before_repair": {
+    "observed": true,
+    "command": "PYTHONPATH=src python3 -m pytest tests/test_hci_projection_integrity.py -q",
+    "exit_code": 1,
+    "finding": "Focused M6.P5 tests failed before the fixture builder, independent auditor, provenance manifest, and hci-gates runner existed."
+  },
+  "repair": {
+    "production_changes": [
+      "Added status/panoview --json rendering for operator_view_snapshot.v1 and included micro_repo in text status/panoview output for render-fidelity checks.",
+      "Added tools/hci/audit_projection_integrity.py with shadow-rebuild, direct Git head derivation, provenance-closure, render-fidelity, and worker-leakage checks.",
+      "Added schemas/operator/operator_view_snapshot.v1.provenance.json.",
+      "Added tools/hci/make_fixture_micro_tape.py for a deterministic SHA-256 MicroTape fixture.",
+      "Added tools/hci/run_hci_gates.sh and wired .github/workflows/ci.yml hci-gates on hci/** branches."
+    ],
+    "auditor_import_boundary": "audit_projection_integrity.py uses Python stdlib and direct Git commands; it does not import turing-projection."
+  },
+  "projection_integrity": {
+    "verdict_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/m6_p5_hci_gates_20260704/hci_projection_integrity_verdict.json",
+    "verdict_sha256": "502e80990f50ef8e8dedfc3ee15d7e49ce75efcfebba0657d8552aeddf4c6cce",
+    "verdict": "PASS",
+    "checks": {
+      "shadow_rebuild": "PASS",
+      "independent_heads": "PASS",
+      "provenance_closure": "PASS",
+      "render_fidelity": "PASS",
+      "worker_leakage": "PASS"
+    },
+    "snapshot_hash": "sha256:f9171818b89ce71ac5dfd764f4f3ccf111afbe103bb9da4c0ec304f6c14639c8"
+  },
+  "commands_run": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_CARGO_FMT_TRANSCRIPT.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "PYTHONPATH=src python3 -m pytest tests/test_hci_projection_integrity.py -q",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_PROJECTION_INTEGRITY_PYTEST_TRANSCRIPT.txt",
+      "sha256": "cf426ab35f3b06fccef8290fde5325d90af130a79da1d1752031518df77c4236"
+    },
+    {
+      "command": "bash tools/hci/run_hci_gates.sh --out-dir <plan>/evidence/session_20260702/m6_p5_hci_gates_20260704",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_HCI_GATES_TRANSCRIPT.txt",
+      "sha256": "7d16a706df99ec21c573e73609c1e7eeab031f2bbf5a79761f1ce856b499fc1c"
+    },
+    {
+      "command": "cargo test -p turing-cli --test cli_gates --quiet",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_CLI_GATES_TRANSCRIPT.txt",
+      "sha256": "931cc9a3f20bc69c7a33a1045fd9b900c5fb1caf89ecc8fede74b3863c048250"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_GIT_DIFF_CHECK_TRANSCRIPT.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "strict changed-file secret scan for sk-[A-Za-z0-9]{16,}",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_SECRET_SCAN_TRANSCRIPT.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "bash governance/verify_alignment.sh",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_VERIFY_ALIGNMENT_TRANSCRIPT.txt",
+      "sha256": "79fdd14b9adeb8fc153226211b79a1976e076567914e4917ab3e7c7ee735b1d4"
+    },
+    {
+      "command": "bash governance/lint_status_claims.sh",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_STATUS_LINT_TRANSCRIPT.txt",
+      "sha256": "c5cc9c7010cc579f343d8c2697c33628bf8ac04df7c978294a0c93482ef9806f"
+    },
+    {
+      "command": "bash governance/lint_claim_boundaries.sh",
+      "exit_code": 0,
+      "transcript": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M6_P5_CLAIM_LINT_TRANSCRIPT.txt",
+      "sha256": "8bb5dc3b6077c2e212a3ce5661715944297ab9b2255a9b90106b5badf05a4486"
+    }
+  ],
+  "gate_outputs": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/m6_p5_hci_gates_20260704/hci_gates_result.json",
+      "sha256": "c9a7abf562ba7b017a08ccd2126fae4ea012048a10bf6a97d32eefb99aded14d"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/m6_p5_hci_gates_20260704/operator_snapshot.json",
+      "sha256": "a42e74728fed78725c79c754425ec5d2ceec475a83b02d1947866399514faa27"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/m6_p5_hci_gates_20260704/operator_status.txt",
+      "sha256": "eb32e5738e9b1762441f3ea83ee33be9f662dd9635e2c995e0c80316f077407c"
+    }
+  ],
+  "code_artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/.github/workflows/ci.yml",
+      "sha256": "10f5955eae905b726b361b5290821e1d0a72fc894093f4f8ae51996e2f9851ae"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/crates/turing-cli/src/main.rs",
+      "sha256": "4ecaf9e683b92c8b5e7ddfa947b1386c7934618e949efac75bf4bf8ca03bb040"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/schemas/operator/operator_view_snapshot.v1.provenance.json",
+      "sha256": "e51287ba978714b2fb14594880e28a9565469b8878e236e29faedd7ec41af838"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tests/test_hci_projection_integrity.py",
+      "sha256": "002a07201bdb8ff27432045eb520338c7211ed9a8db19ef8f1778fcb0c704b35"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/hci/audit_projection_integrity.py",
+      "sha256": "8a7d3153d3cffcdf5ff32462f85a6a4d940f28ef9b435aaaa7e26564c41c2e96"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/hci/make_fixture_micro_tape.py",
+      "sha256": "1a22ffb56ad28846dbc06f01b1a2b018e4cd63c1eb17226e03ee95acda2991bd"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/tools/hci/run_hci_gates.sh",
+      "sha256": "7b9c28d6016c24422386d272af8d2c09c2cf0fcfeda6885df54840c3233ba520"
+    }
+  ],
+  "drift_check": {
+    "serves_goal": "G7: 100% displayed values replayable and zero head-moving paths by static, dynamic, and projection-integrity gates.",
+    "red_lines": "No HCI-B, no write-capable console behavior, no constitution-byte change, no M2 enablement, no OG-10/genesis signature.",
+    "artifact_backing": "All claims above cite transcript paths or gate-output paths with sha256 digests.",
+    "fixture_labeling": "The MicroTape used by the gate is a deterministic fixture for implementation verification, not external verification.",
+    "scope": "M6.P5 projection-integrity/CI gates only; M6.G roll-up remains separate.",
+    "fresh_replay": "A fresh checkout can rerun the hci-gates runner at the pinned commit.",
+    "status_ceiling": "ADDRESSED only."
+  },
+  "verdict": "PASS",
+  "does_not_grant": [
+    "EXTERNALLY_VERIFIED",
+    "M6.G",
+    "FCE.ENTRY",
+    "FCE.RUN",
+    "SHIPPED",
+    "RELEASED",
+    "RATIFIED",
+    "M2 enablement",
+    "HCI-B",
+    "write-capable console behavior",
+    "OG-10/genesis signature",
+    "constitution-byte change"
+  ]
+}

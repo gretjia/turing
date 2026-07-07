@@ -419,6 +419,9 @@ fn economy_payload(event: &EconomyEvent) -> DemoResult<Value> {
         EconomyEvent::AmmSwapExecuted(inner) => to_value(inner),
         EconomyEvent::MarketSettled(inner) => to_value(inner),
         EconomyEvent::RewardDistributed(inner) => to_value(inner),
+        // ADR-ECON-001: not emitted by this qualification demo harness today; kept exhaustive
+        // so a future `PrincipalDeclared` append here would still serialize correctly.
+        EconomyEvent::PrincipalDeclared(inner) => to_value(inner),
     }
 }
 

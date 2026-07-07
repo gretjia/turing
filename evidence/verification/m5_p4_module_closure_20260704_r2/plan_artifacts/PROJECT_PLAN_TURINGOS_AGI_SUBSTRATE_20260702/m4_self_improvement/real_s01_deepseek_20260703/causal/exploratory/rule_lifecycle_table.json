@@ -1,0 +1,54 @@
+{
+  "causal_claim_allowed": false,
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "label": "EXPLORATORY",
+  "rows": [
+    {
+      "activation_stage": "m3_p6_initial_rules_file",
+      "consumption_count": 50,
+      "cost_identification_note": "not_identifiable_individually_all_rules_injected_together",
+      "failure_class": "PATCH_FORMAT",
+      "joint_rule_set_observed_b_minus_c_cost_microusd_total": 66388,
+      "per_rule_injection_cost_microusd_total": null,
+      "post_consumption_arm_b_resolved_count": 16,
+      "retirement_candidate_reason_if_any": "dose_response_null",
+      "rule_id": "m3p6_br_001_unified_diff_shape"
+    },
+    {
+      "activation_stage": "m3_p6_initial_rules_file",
+      "consumption_count": 50,
+      "cost_identification_note": "not_identifiable_individually_all_rules_injected_together",
+      "failure_class": "WORKER_POLICY",
+      "joint_rule_set_observed_b_minus_c_cost_microusd_total": 66388,
+      "per_rule_injection_cost_microusd_total": null,
+      "post_consumption_arm_b_resolved_count": 16,
+      "retirement_candidate_reason_if_any": "dose_response_null",
+      "rule_id": "m3p6_br_002_source_only"
+    },
+    {
+      "activation_stage": "m3_p6_initial_rules_file",
+      "consumption_count": 50,
+      "cost_identification_note": "not_identifiable_individually_all_rules_injected_together",
+      "failure_class": "SOURCE_CONTEXT_DISCIPLINE",
+      "joint_rule_set_observed_b_minus_c_cost_microusd_total": 66388,
+      "per_rule_injection_cost_microusd_total": null,
+      "post_consumption_arm_b_resolved_count": 16,
+      "retirement_candidate_reason_if_any": "dose_response_null",
+      "rule_id": "m3p6_br_003_context_discipline"
+    },
+    {
+      "activation_stage": "m3_p6_initial_rules_file",
+      "consumption_count": 50,
+      "cost_identification_note": "not_identifiable_individually_all_rules_injected_together",
+      "failure_class": "PATCH_APPLY",
+      "joint_rule_set_observed_b_minus_c_cost_microusd_total": 66388,
+      "per_rule_injection_cost_microusd_total": null,
+      "post_consumption_arm_b_resolved_count": 16,
+      "retirement_candidate_reason_if_any": "dose_response_null",
+      "rule_id": "m3p6_br_004_apply_check"
+    }
+  ],
+  "schema_id": "m4.exploratory_rule_lifecycle_table.v1",
+  "source_rules_path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "source_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599"
+}

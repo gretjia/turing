@@ -1,0 +1,87 @@
+{
+  "corpus_failure_memory": {
+    "activated_rule_event_id": "mu:3aa9b0258eef0d8be79105cf884047ebf6a36a7b4d80a1acf86fe218fac62928",
+    "consumer_capsule_id": "wc_stage14_014dd41fc09729f6_consumer",
+    "efficacy": {
+      "causal_claim_allowed": false,
+      "claim": "Observed association only; no causal claim from fixture sample.",
+      "consumed_rule_attempts": 1,
+      "non_consumed_comparable_attempts": 0,
+      "post_activation_failures": 0,
+      "pre_activation_failures": 3,
+      "sample_size": 4
+    },
+    "failure_class": "CONTEXT_MISSING",
+    "min_source_failures": 3,
+    "rule_id": "br_stage14_context_missing_corpus",
+    "schema_id": "Stage14CorpusFailureMemory.v1",
+    "source_failure_nodes": [
+      "mu:90081f5bedc48e5d2b516a2764b69e1fe2eeab6e7abde67bb4175a22931ac3b6",
+      "mu:aefffa0502b04bccf39f6879e7dac74a35e7c19741eb10744ea1ba8c90ef9f66",
+      "mu:7b46810f0139097e0b1b7e3aedd59c6bb22a1ea7c1823b5d91f28350caddc38b"
+    ]
+  },
+  "run_id": "stage14_corpus_failure_memory",
+  "sample_size": 4,
+  "schema_id": "Stage14CorpusFailureMemoryFixtureManifest.v1",
+  "scientific_status": "CORPUS_FAILURE_MEMORY_FIXTURE_NOT_SOLVE_RATE",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:b3086f5aead4a9c5782631babd081aa5ede760bec5650f0ced3a23928d6ef797",
+      "authorization_head": "mu:21a4927086ab506de645f31e9ac3bb78f9719e9b8854891b96485a8e1f9c2e9c",
+      "authorization_mode": "required",
+      "basis": "stage14_corpus_failure_source",
+      "expected_result": "FAIL",
+      "failure_certificate_event_id": "mu:b1960ed24eb94c8bac51053dac2769f6d979c2afbd96e892d764b886de199d1b",
+      "failure_class": "CONTEXT_MISSING",
+      "failure_node_id": "mu:90081f5bedc48e5d2b516a2764b69e1fe2eeab6e7abde67bb4175a22931ac3b6",
+      "instance_id": "django__django-11790",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage14_corpus_failure_memory_20260628/turingos/instances/django__django-11790/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:55a93b5595dae00c1c01aef7fbc4f2713174bd22cdfbf855f1e587098f4766e3",
+      "tape_tip": "mu:7f0baeba0dd80b70eeb34982a4bfee588f55515fa2f7076e2215ba06acf6fb18"
+    },
+    {
+      "accepted_head": "mu:b3086f5aead4a9c5782631babd081aa5ede760bec5650f0ced3a23928d6ef797",
+      "authorization_head": "mu:dfdb8590757c098f16dd74b5f3f70b11e76ee907b8ac90ab231faffc11627003",
+      "authorization_mode": "required",
+      "basis": "stage14_corpus_failure_source",
+      "expected_result": "FAIL",
+      "failure_certificate_event_id": "mu:bd5776aad21c5e7cb74ef3177199ae19a1eda8ee9a32f075d093d29cb5e2b612",
+      "failure_class": "CONTEXT_MISSING",
+      "failure_node_id": "mu:aefffa0502b04bccf39f6879e7dac74a35e7c19741eb10744ea1ba8c90ef9f66",
+      "instance_id": "django__django-11815",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage14_corpus_failure_memory_20260628/turingos/instances/django__django-11815/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:cfd69abe09f7979dc54d0d3ba69f2feeb6e85820ada08f3e7a4cf3fbfb9349d1",
+      "tape_tip": "mu:ef07561b192be7546f6ab16e7067b1c25bb3cfc736248a940a8d07763debf92b"
+    },
+    {
+      "accepted_head": "mu:44c009818cefd82268545271add6d4ccf088f95b7ae8868b96eb5d1ae6c016c7",
+      "authorization_head": "mu:c2413b9287a65828dda7e375322e138f27b83efe4bf3a62fcabf2514f6281f53",
+      "authorization_mode": "required",
+      "basis": "stage14_corpus_failure_source",
+      "expected_result": "FAIL",
+      "failure_certificate_event_id": "mu:8425fe9b0172fba19a7537a214ef3b22a57f8b138cd47df4425268fcb523d587",
+      "failure_class": "CONTEXT_MISSING",
+      "failure_node_id": "mu:7b46810f0139097e0b1b7e3aedd59c6bb22a1ea7c1823b5d91f28350caddc38b",
+      "instance_id": "django__django-11848",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage14_corpus_failure_memory_20260628/turingos/instances/django__django-11848/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:00433a2295664df378f0a78a5d898d3dc92771f6f2b3a9cc060ad4120a74e85c",
+      "tape_tip": "mu:d24cb33cd426aadd988a42fefe941c2c69c27dce88be588f418d90c52db7e54a"
+    },
+    {
+      "accepted_head": "mu:c3f69962fdcba0c35efb46dcd4c4466f2c9614c3cc4f21618117d36e4d2740ab",
+      "activated_rule_event_id": "mu:3aa9b0258eef0d8be79105cf884047ebf6a36a7b4d80a1acf86fe218fac62928",
+      "authorization_head": "mu:125c52436e423017ae08df91a6784421c5d9c80f19a669edbfc5ef85b73189de",
+      "authorization_mode": "required",
+      "basis": "stage14_corpus_failure_memory_consumer",
+      "consumer_capsule_id": "wc_stage14_014dd41fc09729f6_consumer",
+      "expected_result": "PASS",
+      "instance_id": "django__django-11880",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage14_corpus_failure_memory_20260628/turingos/instances/django__django-11880/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:fa5ab7741561495bcf131fe9d1cb1006187afb1b9a160eae8475bdfeb6472f78",
+      "rule_id": "br_stage14_context_missing_corpus",
+      "tape_tip": "mu:d5a9b4558a2ceab687820ba5ee94c57ff7dd5ee151d8835740e72aedb92c7430"
+    }
+  ]
+}

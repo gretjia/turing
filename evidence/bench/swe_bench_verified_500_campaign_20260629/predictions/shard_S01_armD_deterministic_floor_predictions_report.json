@@ -1,0 +1,17 @@
+{
+  "arm": "D",
+  "candidate_source": "deterministic_floor",
+  "model_name_or_path": "deterministic-floor__armD__uplift-s01",
+  "note": "Arm D deterministic floor; any resolved task in upstream harness output is a preregistered STOP condition.",
+  "patch_template_sha256": "sha256:5206b8de80913bcd55989686b3a2d683553736f8e14bfadb0f298e65920edd64",
+  "prediction_count": 50,
+  "predictions_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_armD_deterministic_floor_predictions.jsonl",
+  "predictions_sha256": "sha256:92190500879a60842f4a8752a5ae7d702e779ec06b337177674f7d70625bc513",
+  "problems": [],
+  "schema_id": "turingos.swebench_deterministic_floor_predictions_report.v1",
+  "shard_id": "S01",
+  "source_manifest_path": "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/shard_manifest.json",
+  "source_manifest_sha256": "sha256:68261be554042a3ca38454211d98014fc305b77ebff200414d9bb3d0e7c3a3ec",
+  "status": "PASS",
+  "task_count": 50
+}

@@ -1,0 +1,28 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 3c20502..9f99204 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -510,10 +510,20 @@ class Session(nodes.FSCollector):
+                 if parent.isdir():
+                     pkginit = parent.join("__init__.py")
+                     if pkginit.isfile():
+-                        if pkginit not in self._node_cache:
+-                            col = self._collectfile(pkginit, handle_dupes=False)
++                        if parent in self._pkg_roots:
++                            # We already have the package, skip
++                            continue
++                        if pkginit in self._node_cache:
++                            col = self._node_cache[pkginit]
++                        else:
++                            ihook = self.gethookproxy(pkginit)
++                            col = ihook.pytest_collect_file(
++                                path=pkginit, parent=self
++                            )
+                             if col:
+-                                if isinstance(col[0], Package):
++                                if isinstance(col, list):
++                                    col = col[0]
++                                if isinstance(col, Package):
+                                     self._pkg_roots[parent] = col[0]
+                                 # always store a list in the cache, matchnodes expects it
+                                 self._node_cache[col[0].fspath] = [col[0]]

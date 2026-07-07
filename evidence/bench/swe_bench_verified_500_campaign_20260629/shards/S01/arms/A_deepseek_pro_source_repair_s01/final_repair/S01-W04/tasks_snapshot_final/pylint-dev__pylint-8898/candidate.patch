@@ -1,0 +1,71 @@
+diff --git a/pylint/config/argument.py b/pylint/config/argument.py
+index 30a5fd1..d9cb882 100644
+--- a/pylint/config/argument.py
++++ b/pylint/config/argument.py
+@@ -84,7 +84,8 @@ def _path_transformer(value: str) -> str:
+ def _glob_paths_csv_transformer(value: str) -> Sequence[str]:
+     """Transforms a comma separated list of paths while expanding user and
+     variables and glob patterns.
+-    """
++    """Paths may be separated by a comma or, on Windows, by a semicolon.
++    To avoid breaking paths that contain semicolons, the separator is comma."""
+     paths: list[str] = []
+     for path in _csv_transformer(value):
+         paths.extend(glob(_path_transformer(path), recursive=True))
+@@ -104,6 +105,7 @@ def _py_version_transformer(value: str) -> tuple[int, ...]:
+ 
+ def _regex_transformer(value: str) -> Pattern[str]:
+     """Return `re.compile(value)`."""
++    value = pylint_utils._unquote(value)
+     try:
+         return re.compile(value)
+     except re.error as e:
+@@ -114,15 +116,46 @@ def _regex_transformer(value: str) -> Pattern[str]:
+ def _regexp_csv_transfomer(value: str) -> Sequence[Pattern[str]]:
+     """Transforms a comma separated list of regular expressions."""
+     patterns: list[Pattern[str]] = []
+-    for pattern in _csv_transformer(value):
++    # Split the string manually, respecting quoted commas
++    for pattern in _split_csv_pattern(value):
+         patterns.append(_regex_transformer(pattern))
+     return patterns
+ 
++def _split_csv_pattern(value: str) -> list[str]:
++    """Split a CSSV-like string, respecting double-quoted values containing commas."""
++    result: list[str] = []
++    current: list[str] = []
++    in_quotes = False
++    for char in value:
++        if char == '"':
++            in_quotes = not in_quotes
++            current.append(char)
++        elif char == ',' and not in_quotes:
++            result.append(''.join(current).strip())
++            current = []
++        else:
++            current.append(char)
++    if current:
++        result.append(''.join(current).strip())
++    # Remove surrounding quotes from each pattern
++    unquoted: list[str] = []
++    for pat in result:
++        if pat.startswith('"') and pat.endswith('"'):
++            unquoted.append(pat[1:-1])
++        elif pat.startswith("'") and pat.endswith("'"):
++            unquoted.append(pat[1:-1])
++        else:
++            unquoted.append(pat)
++    return [p for p in unquoted if p]
+ 
+ def _regexp_paths_csv_transfomer(value: str) -> Sequence[Pattern[str]]:
+     """Transforms a comma separated list of regular expressions paths."""
+     patterns: list[Pattern[str]] = []
+-    for pattern in _csv_transformer(value):
++    for pattern in _split_csv_pattern(value):
++        # Remove quotes if present (they are not part of the path pattern)
++        if (pattern.startswith('"') and pattern.endswith('"')) or \
++           (pattern.startswith("'") and pattern.endswith("'")):
++            pattern = pattern[1:-1]
+         patterns.append(
+             re.compile(
+                 str(pathlib.PureWindowsPath(pattern)).replace("\\", "\\\\")

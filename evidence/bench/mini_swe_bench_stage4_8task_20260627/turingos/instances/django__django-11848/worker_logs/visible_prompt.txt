@@ -1,0 +1,31 @@
+You are a TuringOS worker operating on a SWE-bench task.
+Do not output private chain-of-thought or hidden scratchpads.
+TuringOS Micro Tape is the external execution trace.
+Acceptance is predicate-only; exit code, CI, self-report, price, and benchmark labels are not truth.
+Do not request or use credentials.
+Your job is to make the smallest plausible code patch in the checked-out worktree.
+Do not edit benchmark/official test files unless this capsule explicitly allows test changes.
+Avoid long investigation narratives. Inspect only the files needed, edit them, and stop when a candidate patch exists.
+If you cannot safely patch, leave the worktree unchanged and say why.
+Known failures to avoid:
+- TARGET_TEST_TYPE_MISMATCH: When setting widget attrs from a field max_length, preserve the runtime integer value; do not convert it to a string unless the surrounding API explicitly requires strings. (source rule br_recovery_11790_maxlength_runtime_type)
+- TARGET_TEST_SERIALIZATION_FORM: For Django migration serialization of enum members and RegexFlag members, emit bracket lookup syntax using the member name, for example EnumClass['NAME'], rather than value construction or dot attribute syntax. (source rule br_recovery_11815_enum_bracket_lookup)
+- SCOPE_VIOLATION_TEST_EDIT: Do not edit benchmark/official test files unless the task contract explicitly allows test changes. (source rule br_recovery_no_benchmark_test_edits)
+Capsule: wc_django__django-11848
+Instance: django__django-11848
+Repo: django/django
+Base commit: f0adf3b9b7a19cdee05368ff0c0c2d087f011180
+Task:
+django.utils.http.parse_http_date two digit year check is incorrect
+Description
+	 
+		(last modified by Ad Timmering)
+	 
+RFC 850 does not mention this, but in RFC 7231 (and there's something similar in RFC 2822), there's the following quote:
+Recipients of a timestamp value in rfc850-date format, which uses a
+two-digit year, MUST interpret a timestamp that appears to be more
+than 50 years in the future as representing the most recent year in
+the past that had the same last two digits.
+Current logic is hard coded to consider 0-69 to be in 2000-2069, and 70-99 to be 1970-1999, instead of comparing versus the current year.
+
+Edit the checked-out repository only. When done, leave the patch in the worktree.

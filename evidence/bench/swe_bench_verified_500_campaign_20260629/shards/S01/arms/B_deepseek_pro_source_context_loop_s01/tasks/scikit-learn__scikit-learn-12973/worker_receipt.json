@@ -1,0 +1,93 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:d2d8663f7d846bdde51d3926f690361f42efbb32e53a54aa2ba47166eebe7182",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1111,
+  "content_sha256": "sha256:e594dca2f4f1cddedcf6cdaac7d505e824e57536b02ee6ebc37c32ff37925937",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:a9ffdab4e2ccb157bc5cff7ec6753f6617fc3877640fec965ea72f54ba207e97",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 6773,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "scikit-learn__scikit-learn-12973",
+    "receipt_id": "rcpt:2a9867f7cdd0cecc6c79ad2991acd5eaa0d18392631d4e27b1a1f0972477ae43",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 333,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 15460,
+      "prompt_tokens": 15460,
+      "provider_usage_raw_sha256": "sha256:660b9c3c99d7cd45dcca6c59b9f885ece23e357de6a9a482b42cff60f78f0481",
+      "total_tokens": 15793
+    },
+    "wall_time_ms": 6659,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "350b7c7b-b5ba-4937-88df-a83f4e14224d",
+      "response_sha256": "sha256:5b4585d8f52381c73c3abe24cd5054dc42131e254fa780d9a1ea49244f9b79d1"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "scikit-learn__scikit-learn-12973",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 19",
+    "output": "Checking patch sklearn/linear_model/least_angle.py...\nHunk #1 succeeded at 1479 (offset -8 lines).\nHunk #2 succeeded at 1496 (offset -8 lines).\nApplied patch sklearn/linear_model/least_angle.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:cda78e33b08939336705ca758757976a0e629ccfc2dd43184a31ca0bec7f41f8",
+  "response_sha256": "sha256:5b4585d8f52381c73c3abe24cd5054dc42131e254fa780d9a1ea49244f9b79d1",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/scikit-learn__scikit-learn-12973/worker_capsule.md",
+  "source_context_length_chars": 59441,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/scikit-learn__scikit-learn-12973/source_context.md",
+  "source_context_sha256": "sha256:9e4ed457d65fc76a8398958ac46c7ca9697312119bf7054731e906b72ec7d2b6",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 333,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 15460,
+    "prompt_tokens": 15460,
+    "total_tokens": 15793
+  },
+  "usage_raw_sha256": "sha256:660b9c3c99d7cd45dcca6c59b9f885ece23e357de6a9a482b42cff60f78f0481",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/scikit-learn__scikit-learn-12973/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:f7fc117bf38f5cc748d5fee7ba204ddfdba78554ca2f8107fcadcf0f50ad00f4",
+  "wall_time_ms": 6659
+}

@@ -1,0 +1,32 @@
+diff --git a/xarray/core/computation.py b/xarray/core/computation.py
+index 9fe93c8..0066f19 100644
+--- a/xarray/core/computation.py
++++ b/xarray/core/computation.py
+@@ -1817,6 +1817,7 @@ def where(cond, x, y):
+         join="exact",
+         dataset_join="exact",
+         dask="allowed",
++        keep_attrs=True,
+     )
+ 
+ 
+diff --git a/xarray/core/ops.py b/xarray/core/ops.py
+index 8265035..63a763c 100644
+--- a/xarray/core/ops.py
++++ b/xarray/core/ops.py
+@@ -181,7 +181,7 @@ def where_method(self, cond, other=dtypes.NA):
+         join=join,
+         dataset_join=join,
+         dask="allowed",
+-        keep_attrs=True,
++        keep_attrs=False,
+     )
+ 
+ 
+@@ -329,4 +329,4 @@ class IncludeNumpySameMethods:
+     def __init_subclass__(cls, **kwargs):
+         super().__init_subclass__(**kwargs)
+ 
+-        inject_numpy_same(cls)  # some methods not applicable to Dataset objects
++        inject_numpy_same(cls)  # some methods not applicable to Dataset objects
+\ No newline at end of file

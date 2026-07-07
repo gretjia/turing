@@ -1,0 +1,14 @@
+{
+  "campaign_kind": "internal_official_harness_run",
+  "dataset": "SWE-bench Verified",
+  "full_score_claim_allowed_before_fg_pass": false,
+  "full_swe_bench_dataset_claim_allowed": false,
+  "full_swe_bench_verified_500_claim_allowed_after_fg_pass": true,
+  "gold_patch_shortcut_allowed": false,
+  "leaderboard_equivalence_claim_allowed": false,
+  "official_leaderboard_submission_claim_allowed": false,
+  "phase_g_release_allowed_before_official_harness_gates": false,
+  "repo_local_evaluator_official_claim_allowed": false,
+  "selection_policy": "ALL",
+  "task_count": 500
+}

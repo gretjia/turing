@@ -1,0 +1,78 @@
+{
+  "candidate_patch_sha256": "sha256:3fcc4a8bc2859851ec77a1e079bb4f39dfb66133ea55dbfeac4d981bcb9007ac",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 685,
+  "content_sha256": "sha256:e7991a269257b8bcdae0ef5df7e86bbe3efeee3bc9992d993abdf4c6b7e8e439",
+  "cost_event": {
+    "agent_id": "m3-p5-deepseek-arm-a-worker",
+    "branch_id": "branch:m3-p5",
+    "capsule_id": "cap:c66d1e14a34201eb5fb65b5a0babf8c3a0bf609ef1da9d5b5109b9b07f634f83",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 4965,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "matplotlib__matplotlib-20859",
+    "receipt_id": "rcpt:b27f8f4eaf1490257aa8f9979bc9ef8fc3b83af9d7b31a864bcf6aef144e651a",
+    "run_id": "m3-p5-arm-a-source-repair-S01-W00-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-confirmatory-source-repair",
+    "usage": {
+      "completion_tokens": 178,
+      "prompt_cache_hit_tokens": 768,
+      "prompt_cache_miss_tokens": 11458,
+      "prompt_tokens": 12226,
+      "provider_usage_raw_sha256": "sha256:717156ce3a26ee5edb2d186cb817927a3c2aa9265573c8bd31b1a9207a8a6133",
+      "total_tokens": 12404
+    },
+    "wall_time_ms": 4173,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "428b4b49-ae03-4369-af6d-61debea71d86",
+      "response_sha256": "sha256:cfa3683d465002eb217c2fb887fe018bd0aa38c3bef39ca7d3ffe08b66253734"
+    }
+  },
+  "experiment_phase": "m3-p5",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "matplotlib__matplotlib-20859",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W00",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "output": "Checking patch lib/matplotlib/legend.py...\nHunk #1 succeeded at 430 (offset -2 lines).\nApplied patch lib/matplotlib/legend.py cleanly.",
+    "status": "DIRECT"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:a44f03f7e81893dd1800ee88d041189f57412bff75fb6635b15d350d034313e1",
+  "response_sha256": "sha256:cfa3683d465002eb217c2fb887fe018bd0aa38c3bef39ca7d3ffe08b66253734",
+  "schema_id": "turingos.m3.arm_a_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/matplotlib__matplotlib-20859/worker_capsule.md",
+  "source_context_length_chars": 49138,
+  "source_context_path": "shards/S01/ipqc/S01-W00/worker_safe_tasks/matplotlib__matplotlib-20859/source_context.md",
+  "source_context_sha256": "sha256:17399cc143dcdcca57a559b4f48804f3dfd7ff8461e4fef39b2ef413e7f2511d",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 178,
+    "prompt_cache_hit_tokens": 768,
+    "prompt_cache_miss_tokens": 11458,
+    "prompt_tokens": 12226,
+    "total_tokens": 12404
+  },
+  "usage_raw_sha256": "sha256:717156ce3a26ee5edb2d186cb817927a3c2aa9265573c8bd31b1a9207a8a6133",
+  "wall_time_ms": 4173
+}

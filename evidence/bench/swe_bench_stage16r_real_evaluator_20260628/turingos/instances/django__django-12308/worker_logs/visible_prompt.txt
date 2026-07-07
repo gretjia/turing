@@ -1,0 +1,24 @@
+You are a TuringOS worker operating on a SWE-bench task.
+Do not output private chain-of-thought or hidden scratchpads.
+TuringOS Micro Tape is the external execution trace.
+Acceptance is predicate-only; exit code, CI, self-report, price, and benchmark labels are not truth.
+Do not request or use credentials.
+Your job is to make the smallest plausible code patch in the checked-out worktree.
+Do not edit benchmark/official test files unless this capsule explicitly allows test changes.
+Avoid long investigation narratives. Inspect only the files needed, edit them, and stop when a candidate patch exists.
+If you cannot safely patch, leave the worktree unchanged and say why.
+Known failures to avoid:
+- OFFICIAL_EVAL_FAIL: Prefer the smallest production-code change that targets the failing behavior; preserve public API types unless the task explicitly asks otherwise. (source rule br_stage16r_real_probe_11790_type_contract)
+Capsule: wc_django__django-12308
+Instance: django__django-12308
+Repo: django/django
+Base commit: 2e0f04507b17362239ba49830d26fec504d46978
+Task:
+JSONField are not properly displayed in admin when they are readonly.
+Description
+	
+JSONField values are displayed as dict when readonly in the admin.
+For example, {"foo": "bar"} would be displayed as {'foo': 'bar'}, which is not valid JSON.
+I believe the fix would be to add a special case in django.contrib.admin.utils.display_for_field to call the prepare_value of the JSONField (not calling json.dumps directly to take care of the InvalidJSONInput case).
+
+Edit the checked-out repository only. When done, leave the patch in the worktree.

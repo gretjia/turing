@@ -1,0 +1,127 @@
+{
+  "findings": {
+    "digest_integrity": "All PACKET_MANIFEST.sha256 entries OK. All 84 SOURCE_MAP and 7 REPO_ARTIFACTS sha256 values match on-disk files at pinned commit. Rollup, handoff, and gate-verdict cited digests verify.",
+    "gate_predicate_gaps": "Independent frozen-script recomputation for M3 and full MODULE_M4 \u00a74.1 M4.P3 eval rerun are blocked by files absent from SOURCE_MAP/REPO_ARTIFACTS.",
+    "measurement_consistency": "Repo-native harness reports corroborate null M3 measurement (arm A/B/C resolved_instances 14/16/16). M3G_ANALYSIS_RECHECK.json published and recomputed report sha256 both match in-packet UPLIFT_REPORT.json (9a3862fa\u2026). M4 CLAIM_BOUNDARY forbids failure-memory efficacy and external-verification claims.",
+    "status_ceiling": "M3G/M4G gate verdicts, rollups, handoff packets, UPLIFT_REPORT.json, and CLAIM_BOUNDARY.json consistently honor ADDRESSED implementer ceiling. No target artifact claims EXTERNALLY_VERIFIED, SHIPPED, RELEASED, M2 enablement, OG-10/genesis signature, or constitution-byte change."
+  },
+  "issued_at_utc": "2026-07-04T00:00:00Z",
+  "reasons": [
+    {
+      "code": "M3_MISSING_ANALYSIS_REEXECUTION_INPUTS",
+      "message": "Frozen analyze_uplift.py cannot be re-executed from the GitHub packet: experiment_manifest.json references derived scoring inputs not copied into the packet.",
+      "missing_paths": [
+        "evidence/verification/m5_p4_module_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/ANALYSIS_INPUT_DERIVATION_RECORD.json",
+        "evidence/verification/m5_p4_module_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armA/evaluation_results.json",
+        "evidence/verification/m5_p4_module_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armB/evaluation_results.json",
+        "evidence/verification/m5_p4_module_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/analysis/s01_deepseek_only_20260703/scoring/deepseek-v4-pro__same-provider-source-context-worker_armC/evaluation_results.json"
+      ],
+      "referenced_by": "M3_P7_FROZEN_ANALYSIS_RESULT.json",
+      "required_for": "MODULE_M3 \u00a74.2 / MODULE_M5 \u00a71.4 independent \u0394/CI recomputation from frozen script",
+      "target": "M3.G"
+    },
+    {
+      "code": "M4_MISSING_P3_ARTIFACT_MANIFEST",
+      "message": "test_m4_p3_northstar.sh cannot be executed from the GitHub packet because M4_P3_NORTHSTAR_ARTIFACTS.sha256 is absent from SOURCE_MAP and the packet tree.",
+      "missing_path": "evidence/verification/m5_p4_module_closure_20260704/plan_artifacts/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m4_self_improvement/M4_P3_NORTHSTAR_ARTIFACTS.sha256",
+      "required_for": "MODULE_M4 \u00a74.1 M4.P3 northstar conformance eval claimed green in M4G handoff predicate",
+      "target": "M4.G",
+      "test_exit_code": 1
+    }
+  ],
+  "repair_route": "Add the missing analysis derivation/scoring inputs and M4_P3_NORTHSTAR_ARTIFACTS.sha256 to SOURCE_MAP with updated PACKET_MANIFEST.sha256; commit at a new SHA; resubmit for M5.P4 re-audit. Do not patch packet in place.",
+  "schema_id": "turingos.closure_certificate.v1",
+  "status_semantics": {
+    "does_not_grant": [
+      "EXTERNALLY_VERIFIED",
+      "SHIPPED",
+      "RELEASED",
+      "RATIFIED",
+      "M2 enablement",
+      "release eligibility"
+    ],
+    "implementer_ceiling": "ADDRESSED"
+  },
+  "subject": {
+    "branch": "goal/mini-swe-bench-grok-worker",
+    "commit_sha": "713ca849f80874e4540fe88d4874bca625a579c0",
+    "gate_id": "M5.P4",
+    "module_targets": [
+      "M3.G",
+      "M4.G"
+    ],
+    "packet_root": "evidence/verification/m5_p4_module_closure_20260704",
+    "repo_url": "https://github.com/gretjia/turing"
+  },
+  "verdict": "FAIL",
+  "verification": {
+    "commands_run": [
+      {
+        "command": "rm -rf /tmp/turing-audit-m5p4 && git clone https://github.com/gretjia/turing /tmp/turing-audit-m5p4",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-audit-m5p4 && git checkout 713ca849f80874e4540fe88d4874bca625a579c0",
+        "exit_code": 0
+      },
+      {
+        "command": "cd /tmp/turing-audit-m5p4/evidence/verification/m5_p4_module_closure_20260704 && sha256sum -c PACKET_MANIFEST.sha256",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 verify SOURCE_MAP.json (84 entries) and REPO_ARTIFACTS.json (7 entries) digests against fresh clone",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 verify M3G/M4G rollups, handoff packets, and gate-verdict evidence digests",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 analyze_uplift.py --root <packet>/m3_uplift_lab/analysis/s01_deepseek_only_20260703 --out /tmp/recheck",
+        "exit_code": 1
+      },
+      {
+        "command": "bash <packet>/m4_self_improvement/tests/test_m4_p2_causal_lifecycle.sh",
+        "exit_code": 0
+      },
+      {
+        "command": "bash <packet>/m4_self_improvement/tests/test_m4_p3_northstar.sh",
+        "exit_code": 1
+      }
+    ],
+    "digest_manifest_result": "PASS",
+    "gate_predicate_result": "FAIL",
+    "module_assessments": {
+      "M3.G": {
+        "drift_check_pass_count": 7,
+        "gate_predicate": "MODULE_M3 \u00a73 G4 valid-measurement roll-up; Drift-Check 7/7",
+        "implementer_ceiling_supported": true,
+        "independent_recompute_blocked": true,
+        "overclaims_detected": false,
+        "rollup_all_required_items_present": true,
+        "status_in_artifacts": "ADDRESSED"
+      },
+      "M4.G": {
+        "drift_check_pass_count": 7,
+        "gate_predicate": "MODULE_M4 \u00a73 G5 roll-up; \u00a74 evals green; Drift-Check 7/7",
+        "implementer_ceiling_supported": true,
+        "overclaims_detected": false,
+        "rollup_all_required_items_present": true,
+        "section_4_eval_rerun_blocked": true,
+        "status_in_artifacts": "ADDRESSED"
+      }
+    }
+  },
+  "verifier": {
+    "custody": {
+      "cross_family_or_human": true,
+      "fresh_clone": true,
+      "no_implementer_transcript": true,
+      "no_shared_conversation_state": true,
+      "own_credentials": true,
+      "own_custody_output": true
+    },
+    "identity": "grok-cursor-external-auditor",
+    "kind": "external_cross_family_model"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "run_id": "stage9_native_api_worker",
+  "sample_size": 2,
+  "schema_id": "Stage9NativeApiWorkerFixtureManifest.v1",
+  "scientific_status": "NATIVE_API_WORKER_TOOL_RECEIPT_FIXTURE_NOT_SOLVE_RATE",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:7d74eae536ba93a8c5fe14659893198a0ee7b7fbab0be9e31702631476a14732",
+      "authorization_head": "mu:aef2bf049cda3449e7d458000200762e2e95a265782cc7e3d2263c2d41ec8324",
+      "authorization_mode": "required",
+      "basis": "stage9_native_api_worker_tool_receipt_fixture",
+      "candidate_id": "cand_stage9_3ca4462c9852c1a6",
+      "capsule_id": "wc_stage9_3ca4462c9852c1a6",
+      "expected_result": "PASS",
+      "instance_id": "django__django-12039",
+      "market_id": "mkt_stage9_3ca4462c9852c1a6",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage9_native_api_worker_20260628/turingos/instances/django__django-12039/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:3afc40ea18d9ef050641cbffb8bed24f055d4eb2702140d03d5e5aff687f4ef1",
+      "native_api_worker": {
+        "expected_tools": [
+          "read_file",
+          "list_dir",
+          "grep",
+          "apply_patch",
+          "write_file",
+          "run_command"
+        ],
+        "failed_tool_receipt_event_ids": [],
+        "prompt_leak_scan": "PASS",
+        "tool_receipt_event_ids": [
+          "mu:f0d41dc46d9d8b2e4731240335f4f04241d3bd59f5cdd9a7da1764712d1a2b5f",
+          "mu:35d0f9e6c87795dbee3fd983693ea6125c61b3250fa55c7fb40e369a0396a9e8",
+          "mu:e8a8487daf059196a3cf5569f5b2516f5d9bdc7b2694f94ae53214777a4c4231",
+          "mu:382caaa7e5b0e24d12f5eb61046bd37c647aef323183cd943c6ec47854e04434",
+          "mu:15ddae465c3c78853ff0759e144365fd1e3df03defdec415a075e5f44b0a52f6",
+          "mu:bb874d7404cbf4991fb394da72049a95b52effa255a386fe7fd3d6492bf9bb62"
+        ],
+        "worker_kind": "NativeApiWorker",
+        "worker_receipt_id": "rcp_stage9_3ca4462c9852c1a6",
+        "worker_receipts_assembled_from_tool_receipts": true
+      },
+      "tape_tip": "mu:0e1e2777c8d42fba757391e2e612bdb8f83d3343728388fa055aef1d28cc9b9a",
+      "worker_id": "worker:sha256:fc285f67d70a95b58c2f43fdd578f84bcf210529d83e1f3fd6c2b2848f545ee3"
+    },
+    {
+      "accepted_head": "mu:f56417de037f597948e68398d84a241c32f2561fafff2ea4e28a9af2938134e1",
+      "authorization_head": "mu:6efe62b84bcb44a1b34c09052c642abe2b68485d723f0e80cef883a30877effb",
+      "authorization_mode": "required",
+      "basis": "stage9_native_api_worker_tool_receipt_fixture",
+      "candidate_id": "cand_stage9_8c367ffa892da4c2",
+      "capsule_id": "wc_stage9_8c367ffa892da4c2",
+      "expected_result": "FAIL",
+      "instance_id": "django__django-12050",
+      "market_id": "mkt_stage9_8c367ffa892da4c2",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage9_native_api_worker_20260628/turingos/instances/django__django-12050/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:8c66d2b84e6008590616505dffa4f7698e7b60f484da40c716d8cb2cc0a314a0",
+      "native_api_worker": {
+        "expected_tools": [
+          "read_file",
+          "list_dir",
+          "grep",
+          "apply_patch",
+          "write_file",
+          "run_command"
+        ],
+        "failed_tool_receipt_event_ids": [
+          "mu:32aca58a6b60738f76894c27a3ebee83dfd7a9148e3c394d4295c170a887ffc9"
+        ],
+        "prompt_leak_scan": "PASS",
+        "tool_receipt_event_ids": [
+          "mu:7877cf88c76aeaa016bc0e28478d0c6da3eaeb4d4a43a0c9faf9c4045a815455",
+          "mu:1fb6650158f2ba77022cd96ef9039c8ed79ec3bdb39a29367774cfece2ccf0b8",
+          "mu:8fe481b424850ca25c56216f4706062d4ef70d3c8d8f2bb7014fdd22da81ad70",
+          "mu:32aca58a6b60738f76894c27a3ebee83dfd7a9148e3c394d4295c170a887ffc9"
+        ],
+        "worker_kind": "NativeApiWorker",
+        "worker_receipt_id": "rcp_stage9_8c367ffa892da4c2",
+        "worker_receipts_assembled_from_tool_receipts": true
+      },
+      "tape_tip": "mu:c455b24efa986c0bc0f61aaf75d3b97b52aab6f27e6738cc390afd66b2809cc7",
+      "worker_id": "worker:sha256:e5a016a92f713af07686e922128a5fabcec0e70771157a880979908039b4442c"
+    }
+  ]
+}

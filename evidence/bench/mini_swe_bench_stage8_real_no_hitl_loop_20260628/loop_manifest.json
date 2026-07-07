@@ -1,0 +1,54 @@
+{
+  "run_id": "stage8_real_no_hitl_loop",
+  "sample_size": 1,
+  "schema_id": "Stage8NoHitlLoopFixtureManifest.v1",
+  "scientific_status": "NO_HITL_LOOP_PROTOCOL_FIXTURE_NOT_SOLVE_RATE",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+      "authorization_head": "mu:0a6725e9fadbad11a449190e02a295d66b8fbacf26a00c32b213793427c7ca40",
+      "authorization_head_expected": true,
+      "authorization_mode": "required",
+      "basis": "stage8_no_hitl_loop_fixture_with_failure_memory_retry",
+      "candidate_id": "cand_stage8_3ca4462c9852c1a6",
+      "capsule_id": "wc_stage8_3ca4462c9852c1a6_attempt2",
+      "expected_result": "PASS_AFTER_RETRY",
+      "failure_memory": {
+        "abstract_pattern": "Retry with a production-code-only patch that satisfies the official target tests.",
+        "broadcast_rule_event_id": "mu:05687ad0830093285eef0697caffb94bba8484a2e0edc161f9acc378df9aa12e",
+        "broadcast_rule_reduced_from_tape": true,
+        "failure_class": "OFFICIAL_EVAL_FAIL",
+        "hidden_predicates_absent_from_visible_capsule": true,
+        "injected_into_capsule_id": "wc_stage8_3ca4462c9852c1a6_attempt2",
+        "raw_log_refs_present_only_as_private_evidence": true,
+        "raw_log_text_absent_from_visible_capsule": true,
+        "source_failure_nodes": [
+          "mu:1a72efcf70b4346431ffca6b2abf08871600e0066004359bf2e38c056bc3ed03"
+        ]
+      },
+      "instance_id": "django__django-12039",
+      "market_id": "mkt_stage8_3ca4462c9852c1a6",
+      "micro_git": "not_persisted_bundle_is_audit_artifact",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage8_real_no_hitl_loop_20260628/turingos/instances/django__django-12039/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:df0ccc6df48c3ac87dac7d66f51ce029432828245df0077b8d84b798bd723155",
+      "no_hitl_loop": {
+        "accepted_head": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+        "broadcast_rule_event_id": "mu:05687ad0830093285eef0697caffb94bba8484a2e0edc161f9acc378df9aa12e",
+        "fallback_to_auto_authorization": false,
+        "first_failure_event_id": "mu:1a72efcf70b4346431ffca6b2abf08871600e0066004359bf2e38c056bc3ed03",
+        "human_intervention_count": 0,
+        "manual_approval_count": 0,
+        "manual_patch_count": 0,
+        "manual_rerun_selection_count": 0,
+        "retry_decision_source": "tape_reducer_or_policy",
+        "retry_policy_event_id": "mu:3cc056d939a1fea9dc1f978233bc45b519660faa26fba5edd71020ce1f6f2f38",
+        "second_attempt_capsule_event_id": "mu:95b51c51a080cb38f624bdf5b776d88d9305b67ee1dd025024d6f4ae59e01998",
+        "terminal_candidate_accepted_event_id": "mu:f17c61a1217408519a377288290c32702e56571264ee2da1c7f442d12695e9ae",
+        "verified_from_micro_tape_bundle_only": true
+      },
+      "tape_tip": "mu:ce5127cfa0db05fc596add77735ea411554c349d4c3d786921c22218086e2eab",
+      "worker_id": "worker:sha256:06fb458767d72b0a66e57611f3b52210fbfc1a205f72bd59038b54d7e9050c2a"
+    }
+  ]
+}

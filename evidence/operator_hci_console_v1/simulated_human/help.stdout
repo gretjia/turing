@@ -1,0 +1,5 @@
+Operator Console v1
+contracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1
+commands: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help
+fixed verbs: VIEW_STATUS, VIEW_PANOVIEW, EXPLAIN_EVENT, EXPLAIN_BLOCKER, REPLAY_VERIFY, AUDIT_INVARIANTS, PROPOSE_INTENT, PROPOSE_GOAL, PROPOSE_CAPSULE, APPROVE_CAPSULE, DISPATCH_WORKER, OBSERVE_CAPSULE, REJECT_CANDIDATE, REQUEST_MACRO_AUTH, APPROVE_CANDIDATE, HELP
+status ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists

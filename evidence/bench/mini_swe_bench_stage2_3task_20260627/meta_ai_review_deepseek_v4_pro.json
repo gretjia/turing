@@ -1,0 +1,23 @@
+{
+  "accepted_head_authority": false,
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "authority": "none",
+  "base_url": "https://api.deepseek.com/v1",
+  "context_hash": "sha256:831516cccca341a39f90dc526d27912bb22cae601494298e32c06008c0951447",
+  "credential_material": "env_only_not_serialized",
+  "model": "deepseek-v4-pro",
+  "provider": "deepseek",
+  "raw_response_hash": "sha256:1b4d8a0123d3a47677a387ac8616a976be2fda76f925c67497a6164e3175d15e",
+  "request_hash": "sha256:7539ad057fcbd1d4014a95054801393d8549e1405d278bdc50ddbf576e74e840",
+  "review": {
+    "benchmark_claim_allowed": true,
+    "findings": "TuringOS real-worker Mini SWE-bench smoke test completed with 3 instances. Substrate coverage audit passed. TuringOS arm achieved 2 PASS, 1 FAIL (patch apply failure for django__django-11815, same as direct). No truth-boundary violations detected. Evidence is scientifically meaningful.",
+    "next_required_gate": "none",
+    "schema_id": "MetaAIReviewContext.v1",
+    "substrate_complete": true,
+    "verdict": "PASS"
+  },
+  "review_content_hash": "sha256:4643fadf0d4a44ff900ef6265d8dc9f80ca4aa55a197b46f9a7a8beb384625cb",
+  "schema_id": "DeepSeekMetaAIReviewRun.v1",
+  "status": "PASS"
+}

@@ -1,0 +1,9 @@
+Operator Console v1 interactive wrapper
+operator_view_snapshot.v1 heartbeat source_kind=deterministic_replay operator_state=Healthy tape_tip=mu:02f42ebded614bd70a57f42188e974a8dc0258af376b3c296688b55fbfab67be authorization_head=null accepted_head=mu:1c6b2e1bc34a3354a7496fcb6feefb54a70ea6a34fe3db51386545d669021e0b can_write_truth=false status_ceiling=IMPLEMENTER_ADDRESSED snapshot_hash=sha256:31f1d88a1dd1e42c834e73458f58dae5764dcb48823ba013dee3eb70cf720efc
+operator_turn_trace.v1 selected_verb=EXPLAIN_EVENT typed_command.v1 approval_required=false writes_truth=false side_effect_class=read_only confirmation_route=none advisory_confidence=0.70 autonomous_dispatch=false
+Operator Console v1
+contracts: operator_view_snapshot.v1 typed_command.v1 operator_intent.v1 operator_tool_manifest.v1 operator_turn_trace.v1
+commands: status [--micro-git <path>|--micro-bundle <path>] | panoview [--micro-git <path>|--micro-bundle <path>] | explain blocker|event [--micro-git <path>|--micro-bundle <path>] | ask <utterance> | operator | help
+fixed verbs: VIEW_STATUS, VIEW_PANOVIEW, EXPLAIN_EVENT, EXPLAIN_BLOCKER, REPLAY_VERIFY, AUDIT_INVARIANTS, PROPOSE_INTENT, PROPOSE_GOAL, PROPOSE_CAPSULE, APPROVE_CAPSULE, DISPATCH_WORKER, OBSERVE_CAPSULE, REJECT_CANDIDATE, REQUEST_MACRO_AUTH, APPROVE_CANDIDATE, HELP
+status ceiling: IMPLEMENTER_ADDRESSED until a real external human signature exists
+operator console exit

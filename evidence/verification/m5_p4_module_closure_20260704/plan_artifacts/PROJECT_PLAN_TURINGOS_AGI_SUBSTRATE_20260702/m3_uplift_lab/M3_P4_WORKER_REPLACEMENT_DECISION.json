@@ -1,0 +1,74 @@
+{
+  "claim_boundary": {
+    "no_constitution_byte_change": true,
+    "no_external_verifier_closure": true,
+    "no_m2_enablement": true,
+    "no_m3_g_claim": true,
+    "no_m3_uplift_claim": true,
+    "no_og10_or_genesis_signature": true
+  },
+  "decision_scope": "M3.P4 calibration only",
+  "evidence": {
+    "deepseek_only_reregistration_record": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_DEEPSEEK_ONLY_REREGISTRATION_RECORD.json",
+      "sha256": "0a94df0cd218097f42083fe77fad71b21c8c61fd1fc00d756afc4e725dec506b"
+    },
+    "flash_canary": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P4_CANARIES/deepseek_v4_flash_worker_canary.json",
+      "sha256": "a038f04c871107b3be236cfc3be3a5ec3a75a9f257d5cf3647d2f123a32aa493"
+    },
+    "flash_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_flash_pilot/scoring/deepseek-v4-flash__armA__uplift-s02-pilot.turingos_m3_s02_w00_armA_deepseek_flash_pilot_20260703.json",
+      "sha256": "d87064dedb50b9faf4106fb37d902871d731d6f801e5ce42359fb1601edbecf4"
+    },
+    "pro_disabled_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_pro_replacement_pilot/scoring/deepseek-v4-pro__armA__uplift-s02-pilot-replacement.turingos_m3_s02_w00_armA_deepseek_pro_replacement_pilot_20260703.json",
+      "sha256": "12ee692dbb589f5cbf92dc583160895c24736d3eb0993e59c0825ab31128da73"
+    },
+    "pro_meta_canary": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P4_CANARIES/deepseek_v4_pro_meta_canary.json",
+      "sha256": "7b6880b74eb3157831b7205d911cb0984ef44368a311974dcd9e6b07fd45bd66"
+    },
+    "pro_worker_replacement_canary": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P4_CANARIES/deepseek_v4_pro_worker_replacement_canary.json",
+      "sha256": "199540507853de030f9936af49b218e82eee2d2a7f17bd3619261b768f4313ed"
+    },
+    "source_repair_consolidation": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_pro_source_repair_pilot/source_repair_pilot_consolidation.json",
+      "sha256": "18d0674d949e99d0bbaf767a7be5f346360f7e938c0c28e2f37e2c9f2132b5d8"
+    },
+    "source_repair_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_pro_source_repair_pilot/scoring/deepseek-v4-pro__armA__source-context-repair-pilot.turingos_m3_s02_w00_armA_deepseek_pro_source_repair_pilot_20260703.json",
+      "sha256": "912dbdd15ec42ef51724db6ac9029151c12c6e480ed788e69b11cce1b2061516"
+    }
+  },
+  "original_blocker": "required multi-provider roster could not run because OpenAI API was unavailable",
+  "owner_constraint": "OpenAI unavailable; DeepSeek-only credentials supplied out of band; secret values not recorded",
+  "provider_roster_disposition": {
+    "deepseek-v4-flash": {
+      "errors": 6,
+      "pilot_status": "OUT_OF_BAND_REJECTED",
+      "resolved": 0,
+      "role": "initial_worker",
+      "submitted": 10
+    },
+    "deepseek-v4-pro source-context repair": {
+      "errors": 0,
+      "pilot_status": "IN_BAND_ACCEPTED",
+      "resolved": 3,
+      "role": "accepted_replacement_worker",
+      "submitted": 10
+    },
+    "deepseek-v4-pro thinking disabled": {
+      "errors": 9,
+      "pilot_status": "OUT_OF_BAND_REJECTED",
+      "resolved": 0,
+      "role": "replacement_worker_attempt",
+      "submitted": 10
+    }
+  },
+  "recorded_at_utc": "2026-07-03T10:45:00Z",
+  "replacement_rule_applied": "replace out-of-band workers under logged M3.P4 calibration rule",
+  "schema_id": "turingos.m3.p4.worker_replacement_decision.v1",
+  "status": "ACCEPTED_FOR_M3_P4"
+}

@@ -1,0 +1,30 @@
+{
+  "arms": {
+    "A": {
+      "event_count": 50,
+      "receipt_total_cost_microusd": 224316,
+      "receipt_total_wall_ms": 264305,
+      "report_total_cost_microusd": 224316,
+      "report_total_wall_ms": 264305,
+      "status": "PASS"
+    },
+    "B": {
+      "event_count": 50,
+      "receipt_total_cost_microusd": 162196,
+      "receipt_total_wall_ms": 245768,
+      "report_total_cost_microusd": 162196,
+      "report_total_wall_ms": 245768,
+      "status": "PASS"
+    },
+    "C": {
+      "event_count": 50,
+      "receipt_total_cost_microusd": 95808,
+      "receipt_total_wall_ms": 249330,
+      "report_total_cost_microusd": 95808,
+      "report_total_wall_ms": 249330,
+      "status": "PASS"
+    }
+  },
+  "schema_id": "m4.conservation_reconciliation.v1",
+  "status": "PASS"
+}

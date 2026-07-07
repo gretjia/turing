@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-7.2.1, pluggy-1.0.0+repack
+rootdir: /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-001, configfile: pyproject.toml
+plugins: anyio-4.13.0
+collected 16 items
+
+tests/audit/test_art_0_2_traceability.py ...............F                [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_audit_script_exits_zero _________________________
+
+    def test_audit_script_exits_zero():
+>       assert AUDIT_SCRIPT.exists(), f"audit script not found at {AUDIT_SCRIPT}"
+E       AssertionError: audit script not found at /home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-001/scripts/audit-art-0-2-traceability.sh
+E       assert False
+E        +  where False = <bound method Path.exists of PosixPath('/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-001/scripts/audit-art-0-2-traceability.sh')>()
+E        +    where <bound method Path.exists of PosixPath('/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-001/scripts/audit-art-0-2-traceability.sh')> = PosixPath('/home/zephryj/turingos_backup/work/turing/.turingos/worktrees/hw-sw-001/scripts/audit-art-0-2-traceability.sh').exists
+
+tests/audit/test_art_0_2_traceability.py:161: AssertionError
+=========================== short test summary info ============================
+FAILED tests/audit/test_art_0_2_traceability.py::test_audit_script_exits_zero
+========================= 1 failed, 15 passed in 0.24s =========================

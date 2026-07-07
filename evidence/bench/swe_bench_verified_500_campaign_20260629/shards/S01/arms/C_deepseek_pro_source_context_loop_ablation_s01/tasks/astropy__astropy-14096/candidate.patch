@@ -1,0 +1,25 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index ab475f7..c85e62b 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -895,7 +895,10 @@ class SkyCoord(ShapedLikeNDArray):
+                 return self.transform_to(attr)
+ 
+         # Fail
+-        raise AttributeError(
++        # Let the original error propagate if this was a property/attribute
++        # defined on the subclass that raised an AttributeError during its
++        # own computation.
++        raise AttributeError(  # noqa: TRY003
+             f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+         )
+ 
+@@ -904,7 +907,7 @@ class SkyCoord(ShapedLikeNDArray):
+         if "_sky_coord_frame" in self.__dict__:
+             if self._is_name(attr):
+                 raise AttributeError(f"'{attr}' is immutable")
+-
++ 
+             if not attr.startswith("_") and hasattr(self._sky_coord_frame, attr):
+                 setattr(self._sky_coord_frame, attr, val)
+                 return

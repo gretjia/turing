@@ -1,0 +1,35 @@
+diff --git a/astropy/io/ascii/cds.py b/astropy/io/ascii/cds.py
+index a045ab5a21..4da265c40c 100644
+--- a/astropy/io/ascii/cds.py
++++ b/astropy/io/ascii/cds.py
+@@ -270,11 +270,25 @@ def _split_multi_float_table_units(cls, cols, groups, regex=re.compile(r'(?P<fun
+                                 if unit!='---':
+                                         unit = unify_log_unit(unit)
+                                         if '/' in unit:
+-                                                parts = unit.split('/')
+-                                                unit = parts[0].strip()
+-                                                div_unit = parts[-1].split()
+-                                                div_parts = [div_unit[0].strip()]
+-                                                div_parts.extend(div_unit[1:])
++                                                # Split unit into numerator and denominator
++                                                numerator, denominator = unit.split('/', 1)
++                                                # Parse denominator to preserve multiplicative factors like kpc2
++                                                # The issue: splitting denominator by spaces breaks composite units
++                                                # (e.g., "m/s/kpc2" should become 1 / (m * s * kpc2)).
++                                                # The original code did parts[-1].split() which loses information
++                                                # when there is only one denominator term.
++                                                # We need to correctly handle units like 10+3J/m/s/kpc2
++                                                # Numerator: 10+3J
++                                                # Denominator: m/s/kpc2
++                                                denom_parts = denominator.split('/')
++                                                div_parts = [denom_parts[0].strip()]
++                                                for part in denom_parts[1:]:
++                                                    div_parts.append(part.strip())
++                                                unit = numerator.strip()
++                                                # Keep numerator power-of-ten prefix if present
++                                                # numerator already includes it
++                                                # The unit will be constructed as Unit(numerator) / Unit(denom_combined)
++                                                # where denom_combined is the product of div_parts
+                                                 i = 0
+                                                 while i < len(cols):
+                                                         if cols[i].name in groups[j].columns:

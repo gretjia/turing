@@ -1,0 +1,63 @@
+diff --git a/sympy/combinatorics/permutations.py b/sympy/combinatorics/permutations.py
+index 4ac1c2e..ff8d982 100644
+--- a/sympy/combinatorics/permutations.py
++++ b/sympy/combinatorics/permutations.py
+@@ -858,7 +858,7 @@ class Permutation(Basic):
+         ok = True
+         if not args:  # a
+             return _af_new(list(range(size or 0)))
+-        elif len(args) > 1:  # c
++        elif len(args) > 1:  # c  (direct cycle notation: Perm(1,2,3))
+             return _af_new(Cycle(*args).list(size))
+         if len(args) == 1:
+             a = args[0]
+@@ -882,10 +882,9 @@ class Permutation(Basic):
+         # safe to assume args are valid; this also makes a copy
+         # of the args
+         args = list(args[0])
+-
+         is_cycle = args and is_sequence(args[0])
+         if is_cycle:  # e
+-            args = [[int(i) for i in c] for c in args]
++            args = [cls(*[int(i) for i in c], size=size) for c in args]
+         else:  # d
+             args = [int(i) for i in args]
+ 
+@@ -903,11 +902,24 @@ class Permutation(Basic):
+                 any(i not in temp for i in range(len(temp))):
+             raise ValueError("Integers 0 through %s must be present." %
+                              max(temp))
+-
+         if is_cycle:
+-            # it's not necessarily canonical so we won't store
+-            # it -- use the array form instead
+-            c = Cycle()
++            # This is entered in cyclic form.
++            # Get the array form by multiplying the cycles
++            # from left to right.
++            aform = None
++            for ci in args:
++                if aform is None:
++                    aform = ci.array_form
++                else:
++                    aform = [ci._array_form[aform[i]] for i in range(len(ci._array_form))]
++            if aform is None:
++                aform = list(range(len(args)))
++            if size:
++                # pad with identity up to size
++                if size > len(aform):
++                    aform.extend(list(range(len(aform), size)))
++            else:
++                size = len(aform)
+             for ci in args:
+                 c = c(*ci)
+             aform = c.list()
+@@ -921,7 +933,7 @@ class Permutation(Basic):
+         size = len(aform)
+         obj = Basic.__new__(cls, aform)
+         obj._array_form = aform
+-        obj._size = size
++        obj._size = size or len(aform)
+         return obj
+ 
+     @staticmethod

@@ -1,0 +1,19 @@
+diff --git a/src/_pytest/_code/code.py b/src/_pytest/_code/code.py
+index a0f4d15..5e827fd 100644
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -825,7 +825,13 @@ class FormattedExcinfo:
+                 # fallback to native repr if the exception doesn't have a traceback:
+                 # ExceptionInfo objects require a full traceback to work
+                 reprtraceback = ReprTracebackNative(
+-                    traceback.format_exception(type(e), e, None)
++                    traceback.format_exception(
++                        type(e),
++                        e,
++                        e.__traceback__,
++                        limit=None,
++                        chain=False,
++                    )
+                 )
+                 reprcrash = None
+ 

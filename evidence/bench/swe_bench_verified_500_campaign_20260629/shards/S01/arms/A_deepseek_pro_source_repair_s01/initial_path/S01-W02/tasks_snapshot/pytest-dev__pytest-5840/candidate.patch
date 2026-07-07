@@ -1,0 +1,52 @@
+diff --git a/src/_pytest/config/__init__.py b/src/_pytest/config/__init__.py
+index e2b3990d4..b2a74cf48 100644
+--- a/src/_pytest/config/__init__.py
++++ b/src/_pytest/config/__init__.py
+@@ -573,7 +573,7 @@ def get_config(
+     try:
+         config = _prepareconfig(args, plugins)
+     except ConftestImportFailure as e:
+-        tw = py.io.TerminalWriter(sys.stderr)
++        tw = TerminalWriter(sys.stderr)
+         for line in traceback.format_exception_only(type(e), e):
+             tw.line(line, red=True)
+         tw.line("ERROR: could not load %s\n" % (e.path), red=True)
+@@ -581,8 +581,8 @@ def get_config(
+         return 4
+     except UsageError as e:
+         tw = TerminalWriter(sys.stderr)
+-        for msg in e.args:
+-            tw.line("ERROR: {}\n".format(msg), red=True)
++        tw.line("ERROR: {}\n".format(e.args[0]), red=True)
++        tw.line("{} --help for more information".format(e.args[0]))
+         return e.exit_code
+ 
+     return config
+@@ -607,7 +607,7 @@ def main(args=None, plugins=None):
+     try:
+         config = _prepareconfig(args, plugins)
+     except UsageError as e:
+-        tw = py.io.TerminalWriter(sys.stderr)
++        tw = TerminalWriter(sys.stderr)
+         for msg in e.args:
+             tw.line("ERROR: {}\n".format(msg), red=True)
+         return 4
+@@ -722,11 +722,16 @@ def get_plugin_manager():
+ 
+ def _prepareconfig(args=None, plugins=None):
+     if args is None:
+-        args = sys.argv[1:]
++        args = list(sys.argv[1:])
+     elif isinstance(args, Path):
+         args = [str(args)]
+     elif not isinstance(args, list):
+         msg = "`args` parameter expected to be a list or tuple of strings, got: {!r} (type: {})"
+         raise TypeError(msg.format(args, type(args)))
+ 
+     config = get_plugin_manager()
+     pluginmanager = config.pluginmanager
++
++    # On Windows, pytest converts rootdir to lower case. This causes
++    # issues when importing conftest from packages with mixed case names.
++    # The fix is to add the original cwd to sys.path before importing.
+     try:

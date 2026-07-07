@@ -1,0 +1,258 @@
+{
+  "run_id": "stage11_loop_until_pass",
+  "sample_size": 3,
+  "schema_id": "Stage11LoopUntilPassFixtureManifest.v1",
+  "scientific_status": "LOOP_UNTIL_PASS_FIXTURE_NOT_SOLVE_RATE",
+  "truth_source": "fresh_micro_tape_bundles",
+  "turingos_arm_runs": [
+    {
+      "accepted_head": "mu:fcf84f25893809b9d4b44a173a694a2352c4acf0c37ddd95dfa6a7eefeeb2937",
+      "authorization_head": "mu:91dea85cb8bf8f3e47f57ee6d26246dfda2294885cf78e726e0c8c36baf0b772",
+      "authorization_mode": "required",
+      "basis": "stage11_loop_until_pass_fixture",
+      "candidate_id": "cand_stage11_b21454d1cb9a45d7",
+      "capsule_id": "wc_stage11_b21454d1cb9a45d7_attempt2",
+      "expected_result": "PASS",
+      "failure_memory_activation": {
+        "abstract_pattern": "The first attempt changed the wrong file surface.",
+        "activated_rule_event_id": "mu:efa37cda18f04a473b34fee87bbd316ffe0bdf59ffc2fd0c2ad6b57ec0d1e55a",
+        "broadcast_rule_reduced_from_tape": true,
+        "failure_class": "WRONG_FILE",
+        "hidden_predicates_absent_from_visible_capsule": true,
+        "injected_into_capsule_id": "wc_stage11_b21454d1cb9a45d7_attempt2",
+        "later_capsule_consumed_rule": true,
+        "pput_or_heldout_details_absent_from_visible_capsule": true,
+        "raw_log_refs_private_only": true,
+        "raw_log_text_absent_from_visible_capsule": true,
+        "source_failure_nodes": [
+          "mu:280f34f56b35889e1517a44b0274719554fc05997b46073547d70618d0663a7c"
+        ],
+        "status": "PASS"
+      },
+      "instance_id": "stage11_case_1",
+      "loop_until_pass": {
+        "accepted_attempt_index": 2,
+        "accepted_head": "mu:fcf84f25893809b9d4b44a173a694a2352c4acf0c37ddd95dfa6a7eefeeb2937",
+        "attempts_total": 2,
+        "broadcast_rule_activated_event_id": "mu:efa37cda18f04a473b34fee87bbd316ffe0bdf59ffc2fd0c2ad6b57ec0d1e55a",
+        "budget_exhausted": false,
+        "failed_attempts_before_accept": 1,
+        "failure_certificate_event_id": "mu:0115b0cfcffe35856bce623519a3f0d8cbd566c2b42b748014f0ce2c97910f03",
+        "fallback_to_auto_authorization": false,
+        "first_failed_attempt_index": 1,
+        "first_failure_event_id": "mu:280f34f56b35889e1517a44b0274719554fc05997b46073547d70618d0663a7c",
+        "human_intervention_count": 0,
+        "manual_approval_count": 0,
+        "manual_patch_count": 0,
+        "manual_rerun_selection_count": 0,
+        "retry_decision_source": "tape_reducer_or_policy",
+        "retry_policy_event_id": "mu:78fc6c99dc3f492c46ad9f2c20af90ed88bf07498a21278603922d04b267a96e",
+        "second_attempt_capsule_event_id": "mu:71c238a3b63b2d24f89cb182563ea58dfc4459279bdcd7d565df0ac908ff9b41",
+        "status": "PASS",
+        "terminal_candidate_accepted_event_id": "mu:fcf84f25893809b9d4b44a173a694a2352c4acf0c37ddd95dfa6a7eefeeb2937",
+        "verified_from_micro_tape_bundle_only": true
+      },
+      "market_id": "mkt_stage11_b21454d1cb9a45d7",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage11_loop_until_pass_20260628/turingos/instances/stage11_case_1/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:47cc03074a8407edb8e4ad412e173e43077170b108d60853edf2397d3037f266",
+      "real_classifier": {
+        "classifier_inputs": {
+          "diff_scope": "wrong_file",
+          "exit_code": 1,
+          "macro_observation_kind": "patch_wrong_file",
+          "official_evaluator_result": "FAIL",
+          "test_log_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "classifier_inputs_allowed_only": [
+          "exit_code",
+          "timeout_kind",
+          "official_evaluator_result",
+          "diff_scope",
+          "receipt_schema_status",
+          "command_result",
+          "macro_observation_kind",
+          "test_log_digest"
+        ],
+        "failure_class": "WRONG_FILE",
+        "forbidden_classifier_inputs_absent": [
+          "scenario_label",
+          "fixture_name",
+          "instance_id_label",
+          "problem_title",
+          "expected_failure_class"
+        ],
+        "observer_derived_failure_class": true,
+        "status": "PASS"
+      },
+      "stage11_case_id": "case_a",
+      "tape_tip": "mu:29f3f96bbb789a6ed8728b59aec080a7ab29297c6b6ba307b69405a39409dc4d",
+      "worker_id": "worker:sha256:f8a0af35ba7a1bcf533c8bb1721424060deb770337ea154f68a5f16c0511c259"
+    },
+    {
+      "accepted_head": "mu:a64951c70215cc6549a39eb3ada69f285d6d8ab704f4659a40a9b5435b761917",
+      "authorization_head": "mu:1776f11bb52521daeb0586cd23485fd7a0edf313aec1c2b60c788f3e3e79adcb",
+      "authorization_mode": "required",
+      "basis": "stage11_loop_until_pass_fixture",
+      "candidate_id": "cand_stage11_00a4c3985ec19a90",
+      "capsule_id": "wc_stage11_00a4c3985ec19a90_attempt2",
+      "expected_result": "PASS",
+      "failure_memory_activation": {
+        "abstract_pattern": "The first attempt lacked the required implementation context.",
+        "activated_rule_event_id": "mu:e97ec1a277d98db51b773f0fb99e219526ffefac0c39779368bdd0daac8bf72a",
+        "broadcast_rule_reduced_from_tape": true,
+        "failure_class": "CONTEXT_MISSING",
+        "hidden_predicates_absent_from_visible_capsule": true,
+        "injected_into_capsule_id": "wc_stage11_00a4c3985ec19a90_attempt2",
+        "later_capsule_consumed_rule": true,
+        "pput_or_heldout_details_absent_from_visible_capsule": true,
+        "raw_log_refs_private_only": true,
+        "raw_log_text_absent_from_visible_capsule": true,
+        "source_failure_nodes": [
+          "mu:35acc35fcb65171fd20ef1dac6d7865bf1943419999a7e9e0f0b7f70e861cf9a"
+        ],
+        "status": "PASS"
+      },
+      "instance_id": "stage11_case_2",
+      "loop_until_pass": {
+        "accepted_attempt_index": 2,
+        "accepted_head": "mu:a64951c70215cc6549a39eb3ada69f285d6d8ab704f4659a40a9b5435b761917",
+        "attempts_total": 2,
+        "broadcast_rule_activated_event_id": "mu:e97ec1a277d98db51b773f0fb99e219526ffefac0c39779368bdd0daac8bf72a",
+        "budget_exhausted": false,
+        "failed_attempts_before_accept": 1,
+        "failure_certificate_event_id": "mu:c694d85baeec13380f7550afd7b6988d31aab4820e39b8ee776d880aab570b6d",
+        "fallback_to_auto_authorization": false,
+        "first_failed_attempt_index": 1,
+        "first_failure_event_id": "mu:35acc35fcb65171fd20ef1dac6d7865bf1943419999a7e9e0f0b7f70e861cf9a",
+        "human_intervention_count": 0,
+        "manual_approval_count": 0,
+        "manual_patch_count": 0,
+        "manual_rerun_selection_count": 0,
+        "retry_decision_source": "tape_reducer_or_policy",
+        "retry_policy_event_id": "mu:ad70e0f934bd272f509b30083af511d212c3872037e907575bd0b02c060d5a0e",
+        "second_attempt_capsule_event_id": "mu:74747446358464a3abc5560e12cf38a6191f070603b5cbb35168243eb380044c",
+        "status": "PASS",
+        "terminal_candidate_accepted_event_id": "mu:a64951c70215cc6549a39eb3ada69f285d6d8ab704f4659a40a9b5435b761917",
+        "verified_from_micro_tape_bundle_only": true
+      },
+      "market_id": "mkt_stage11_00a4c3985ec19a90",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage11_loop_until_pass_20260628/turingos/instances/stage11_case_2/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:88497d0f1da090c7bfa2c3caaaa2f20ebd2a31ad69c239c82140dd838a2a7ae6",
+      "real_classifier": {
+        "classifier_inputs": {
+          "exit_code": 1,
+          "official_evaluator_result": "FAIL",
+          "receipt_schema_status": "context_missing",
+          "test_log_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "timeout_kind": "context_starved"
+        },
+        "classifier_inputs_allowed_only": [
+          "exit_code",
+          "timeout_kind",
+          "official_evaluator_result",
+          "diff_scope",
+          "receipt_schema_status",
+          "command_result",
+          "macro_observation_kind",
+          "test_log_digest"
+        ],
+        "failure_class": "CONTEXT_MISSING",
+        "forbidden_classifier_inputs_absent": [
+          "scenario_label",
+          "fixture_name",
+          "instance_id_label",
+          "problem_title",
+          "expected_failure_class"
+        ],
+        "observer_derived_failure_class": true,
+        "status": "PASS"
+      },
+      "stage11_case_id": "case_b",
+      "tape_tip": "mu:9fc89811f1d2edcbc15721c37d509fd6987f1d975732c8c4f8ce3c18f9174845",
+      "worker_id": "worker:sha256:6f6dc21ca259466d13343327da88a38f1250531d848cf5eb531cf1e3291f41db"
+    },
+    {
+      "accepted_head": "mu:108b9e61ba38d78621acf30fdbb6c5c1dbf47f3b207e94a3b298fb322f8eb8c1",
+      "authorization_head": "mu:4d060bc4fc598baa5c71f61a2b9128c3e6e3f0c7bdf6c319a886c7afc91962fa",
+      "authorization_mode": "required",
+      "basis": "stage11_loop_until_pass_fixture",
+      "candidate_id": "cand_stage11_b645784df0faa4a0",
+      "capsule_id": "wc_stage11_b645784df0faa4a0_attempt2",
+      "expected_result": "PASS",
+      "failure_memory_activation": {
+        "abstract_pattern": "The first attempt applied but did not satisfy target semantics.",
+        "activated_rule_event_id": "mu:3517bbe2e28bca507f9664baca4407a387d923a48451a95e21562b759965f6a0",
+        "broadcast_rule_reduced_from_tape": true,
+        "failure_class": "SEMANTIC_FAIL",
+        "hidden_predicates_absent_from_visible_capsule": true,
+        "injected_into_capsule_id": "wc_stage11_b645784df0faa4a0_attempt2",
+        "later_capsule_consumed_rule": true,
+        "pput_or_heldout_details_absent_from_visible_capsule": true,
+        "raw_log_refs_private_only": true,
+        "raw_log_text_absent_from_visible_capsule": true,
+        "source_failure_nodes": [
+          "mu:7c5590af376bce866d0211da17b91b2a39c030b2a6d22c8a54dbb2c7c93bdc66"
+        ],
+        "status": "PASS"
+      },
+      "instance_id": "stage11_case_3",
+      "loop_until_pass": {
+        "accepted_attempt_index": 2,
+        "accepted_head": "mu:108b9e61ba38d78621acf30fdbb6c5c1dbf47f3b207e94a3b298fb322f8eb8c1",
+        "attempts_total": 2,
+        "broadcast_rule_activated_event_id": "mu:3517bbe2e28bca507f9664baca4407a387d923a48451a95e21562b759965f6a0",
+        "budget_exhausted": false,
+        "failed_attempts_before_accept": 1,
+        "failure_certificate_event_id": "mu:c83b5ad821d6a7f9855a01ffff97b280a9ac41b30cedcbd6291ebdd678d7f3b2",
+        "fallback_to_auto_authorization": false,
+        "first_failed_attempt_index": 1,
+        "first_failure_event_id": "mu:7c5590af376bce866d0211da17b91b2a39c030b2a6d22c8a54dbb2c7c93bdc66",
+        "human_intervention_count": 0,
+        "manual_approval_count": 0,
+        "manual_patch_count": 0,
+        "manual_rerun_selection_count": 0,
+        "retry_decision_source": "tape_reducer_or_policy",
+        "retry_policy_event_id": "mu:646d7cb239f0588a681bac79c8f661a3c454cc594e2e2a9029f3c1413f220a93",
+        "second_attempt_capsule_event_id": "mu:36b1070b706e99a9efcbdb098b62ec4b9a44f712ef3b686efbb9ca0f47334883",
+        "status": "PASS",
+        "terminal_candidate_accepted_event_id": "mu:108b9e61ba38d78621acf30fdbb6c5c1dbf47f3b207e94a3b298fb322f8eb8c1",
+        "verified_from_micro_tape_bundle_only": true
+      },
+      "market_id": "mkt_stage11_b645784df0faa4a0",
+      "micro_tape_bundle": "evidence/bench/mini_swe_bench_stage11_loop_until_pass_20260628/turingos/instances/stage11_case_3/micro_tape.bundle",
+      "micro_tape_bundle_sha256": "sha256:b2c728fff389438027de218e778e52a46aa85a07dadfa5478bdb31a41fe52eb8",
+      "real_classifier": {
+        "classifier_inputs": {
+          "command_result": "semantic_mismatch",
+          "exit_code": 1,
+          "macro_observation_kind": "patch_applied_but_semantic_fail",
+          "official_evaluator_result": "FAIL",
+          "test_log_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "classifier_inputs_allowed_only": [
+          "exit_code",
+          "timeout_kind",
+          "official_evaluator_result",
+          "diff_scope",
+          "receipt_schema_status",
+          "command_result",
+          "macro_observation_kind",
+          "test_log_digest"
+        ],
+        "failure_class": "SEMANTIC_FAIL",
+        "forbidden_classifier_inputs_absent": [
+          "scenario_label",
+          "fixture_name",
+          "instance_id_label",
+          "problem_title",
+          "expected_failure_class"
+        ],
+        "observer_derived_failure_class": true,
+        "status": "PASS"
+      },
+      "stage11_case_id": "case_c",
+      "tape_tip": "mu:89f9aea031b858387ef1a36d5e435416c36bdab0b083c518c5f415fffd0f52f5",
+      "worker_id": "worker:sha256:ae4de9f6cba00a0f0a737e1b81db6c8950c52b6e8ba862d5e64da471881d2d73"
+    }
+  ]
+}

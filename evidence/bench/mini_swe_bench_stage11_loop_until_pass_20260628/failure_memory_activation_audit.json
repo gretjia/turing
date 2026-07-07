@@ -1,0 +1,76 @@
+{
+  "abstract_pattern": "The first attempt changed the wrong file surface.",
+  "activated_rule_event_id": "mu:efa37cda18f04a473b34fee87bbd316ffe0bdf59ffc2fd0c2ad6b57ec0d1e55a",
+  "broadcast_rule_reduced_from_tape": true,
+  "failure_class": "WRONG_FILE",
+  "hidden_predicates_absent_from_visible_capsule": true,
+  "injected_into_capsule_id": "wc_stage11_b21454d1cb9a45d7_attempt2",
+  "later_capsule_consumed_rule": true,
+  "pput_or_heldout_details_absent_from_visible_capsule": true,
+  "problems": [],
+  "raw_log_refs_private_only": true,
+  "raw_log_text_absent_from_visible_capsule": true,
+  "run_count": 3,
+  "runs": [
+    {
+      "abstract_pattern": "The first attempt changed the wrong file surface.",
+      "activated_rule_event_id": "mu:efa37cda18f04a473b34fee87bbd316ffe0bdf59ffc2fd0c2ad6b57ec0d1e55a",
+      "broadcast_rule_reduced_from_tape": true,
+      "failure_class": "WRONG_FILE",
+      "hidden_predicates_absent_from_visible_capsule": true,
+      "injected_into_capsule_id": "wc_stage11_b21454d1cb9a45d7_attempt2",
+      "instance_id": "stage11_case_1",
+      "later_capsule_consumed_rule": true,
+      "pput_or_heldout_details_absent_from_visible_capsule": true,
+      "problems": [],
+      "raw_log_refs_private_only": true,
+      "raw_log_text_absent_from_visible_capsule": true,
+      "source_failure_nodes": [
+        "mu:280f34f56b35889e1517a44b0274719554fc05997b46073547d70618d0663a7c"
+      ],
+      "status": "PASS"
+    },
+    {
+      "abstract_pattern": "The first attempt lacked the required implementation context.",
+      "activated_rule_event_id": "mu:e97ec1a277d98db51b773f0fb99e219526ffefac0c39779368bdd0daac8bf72a",
+      "broadcast_rule_reduced_from_tape": true,
+      "failure_class": "CONTEXT_MISSING",
+      "hidden_predicates_absent_from_visible_capsule": true,
+      "injected_into_capsule_id": "wc_stage11_00a4c3985ec19a90_attempt2",
+      "instance_id": "stage11_case_2",
+      "later_capsule_consumed_rule": true,
+      "pput_or_heldout_details_absent_from_visible_capsule": true,
+      "problems": [],
+      "raw_log_refs_private_only": true,
+      "raw_log_text_absent_from_visible_capsule": true,
+      "source_failure_nodes": [
+        "mu:35acc35fcb65171fd20ef1dac6d7865bf1943419999a7e9e0f0b7f70e861cf9a"
+      ],
+      "status": "PASS"
+    },
+    {
+      "abstract_pattern": "The first attempt applied but did not satisfy target semantics.",
+      "activated_rule_event_id": "mu:3517bbe2e28bca507f9664baca4407a387d923a48451a95e21562b759965f6a0",
+      "broadcast_rule_reduced_from_tape": true,
+      "failure_class": "SEMANTIC_FAIL",
+      "hidden_predicates_absent_from_visible_capsule": true,
+      "injected_into_capsule_id": "wc_stage11_b645784df0faa4a0_attempt2",
+      "instance_id": "stage11_case_3",
+      "later_capsule_consumed_rule": true,
+      "pput_or_heldout_details_absent_from_visible_capsule": true,
+      "problems": [],
+      "raw_log_refs_private_only": true,
+      "raw_log_text_absent_from_visible_capsule": true,
+      "source_failure_nodes": [
+        "mu:7c5590af376bce866d0211da17b91b2a39c030b2a6d22c8a54dbb2c7c93bdc66"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "schema_id": "Stage11FailureMemoryActivationAudit.v1",
+  "source_failure_nodes": [
+    "mu:280f34f56b35889e1517a44b0274719554fc05997b46073547d70618d0663a7c"
+  ],
+  "status": "PASS",
+  "truth_source": "micro_tape_bundle_plus_coverage_refs"
+}

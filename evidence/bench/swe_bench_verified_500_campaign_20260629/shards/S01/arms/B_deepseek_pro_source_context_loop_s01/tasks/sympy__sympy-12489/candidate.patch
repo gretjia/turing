@@ -1,0 +1,19 @@
+diff --git a/sympy/combinatorics/permutations.py b/sympy/combinatorics/permutations.py
+index 4ac1c2e..051e849 100644
+--- a/sympy/combinatorics/permutations.py
++++ b/sympy/combinatorics/permutations.py
+@@ -2710,7 +2710,7 @@ class Permutation(Basic):
+         return Perm(perm)
+ 
+     @classmethod
+-    def from_inversion_vector(self, inversion):
++    def from_inversion_vector(cls, inversion):
+         """
+         Calculates the permutation from the inversion vector.
+ 
+@@ -2828,4 +2828,4 @@ def _merge(arr, temp, left, mid, right):
+     return inv_count
+ 
+ Perm = Permutation
+-_af_new = Perm._af_new
++_af_new = lambda perm: Perm._af_new(perm)

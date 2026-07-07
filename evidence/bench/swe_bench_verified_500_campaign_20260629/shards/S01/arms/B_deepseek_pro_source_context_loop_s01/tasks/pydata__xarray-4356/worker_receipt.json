@@ -1,0 +1,93 @@
+{
+  "arm_label": "B",
+  "broadcast_rule_count": 4,
+  "broadcast_rule_ids": [
+    "m3p6_br_001_unified_diff_shape",
+    "m3p6_br_002_source_only",
+    "m3p6_br_003_context_discipline",
+    "m3p6_br_004_apply_check"
+  ],
+  "broadcast_rules_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/broadcast_rules/m3_p6_initial_rules.json",
+  "broadcast_rules_sha256": "sha256:ad90fa83d9f4b65ac5a11ce72ef7237779020c8bec49a9917281d733ca242599",
+  "broadcast_section_mode": "always",
+  "broadcast_section_sha256": "sha256:7b5a6c654052f389287de1a19a4ae7206bc341d6a8283f97fcf8a4b5cbd6141c",
+  "candidate_patch_sha256": "sha256:736162dbc4e9f71f51d625077cc7bc2efc19b0b733272ce0e1adced34b0b8e1b",
+  "candidate_source": "worker_derived",
+  "content_length_chars": 1698,
+  "content_sha256": "sha256:049736d00f3e79e184257ba65f452d0403f3dd32546b2a26834abaa0629e53a2",
+  "cost_event": {
+    "agent_id": "m3-p6-deepseek-loop-worker",
+    "branch_id": "branch:m3-p6:B",
+    "capsule_id": "cap:3d731db582b22127cff346e6f5ce3c681706b9b578464c19d7d649b74e98edff",
+    "cost": {
+      "bound_kind": null,
+      "cost_microusd": 1558,
+      "cost_source_kind": "provider_receipt_inline",
+      "price_table_digest": "sha256:0fa76772fd96ffecefe83eb521338be8bc4eabbfac736ef8567f77b1107df39d"
+    },
+    "problem_id": "pydata__xarray-4356",
+    "receipt_id": "rcpt:c2ff6a4cb7314fb81d98f18b9a5e16f92e9f44b030742110f69c6acbfd6cd057",
+    "run_id": "m3-p6-arm-b-source-context-loop-S01-W03-deepseek-v4-pro",
+    "schema_id": "turingos.cost_event.v2",
+    "split": "s01-loop-arm-b",
+    "usage": {
+      "completion_tokens": 493,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2723,
+      "prompt_tokens": 2723,
+      "provider_usage_raw_sha256": "sha256:33460e402098fa31669fa64696e59cbd8dbf3376476eff25d8eae72fc5384bba",
+      "total_tokens": 3216
+    },
+    "wall_time_ms": 6729,
+    "worker": {
+      "adapter_kind": "native_api",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model_id_requested": "deepseek-v4-pro",
+      "model_id_resolved": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "request_id": "36a52220-6887-44f9-b0b7-801df431fc35",
+      "response_sha256": "sha256:6c2037b106d0ceb4c6e793d665b4a87f03e6a55877e4001c13f463a2c29bf9ed"
+    }
+  },
+  "experiment_phase": "m3-p6",
+  "extra_context_length_chars": 0,
+  "extra_context_path": null,
+  "extra_context_sha256": null,
+  "instance_id": "pydata__xarray-4356",
+  "integrity_statement": "I read only the worker-safe task_packet.json, worker_capsule.md, audited source_context.md selected from worker-derived candidate diff paths, recorded failure-memory broadcast section. I did not read raw SWE-bench dataset rows, dataset patches, test patches, FAIL_TO_PASS, PASS_TO_PASS, official solution hints, gold patches, or hidden evaluator labels.",
+  "ipqc_window_id": "S01-W03",
+  "model_reported": "deepseek-v4-pro",
+  "model_requested": "deepseek-v4-pro",
+  "patch_normalization": {
+    "direct_output": "error: corrupt patch at line 25",
+    "output": "Checking patch xarray/core/nanops.py...\nHunk #1 succeeded at 25 (offset -7 lines).\nHunk #2 succeeded at 33 (offset -6 lines).\nApplied patch xarray/core/nanops.py cleanly.",
+    "status": "RECOUNTED"
+  },
+  "provider": "deepseek",
+  "reasoning_content_length_chars": 0,
+  "reasoning_content_sha256": null,
+  "request_sha256": "sha256:ab94519c8ebbb758560f52b14f9d211fe645551e8430c5188ecfbcc3cc588b0b",
+  "response_sha256": "sha256:6c2037b106d0ceb4c6e793d665b4a87f03e6a55877e4001c13f463a2c29bf9ed",
+  "schema_id": "turingos.m3.deepseek_loop_worker_receipt.v1",
+  "shard_id": "S01",
+  "source_capsule_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/pydata__xarray-4356/worker_capsule.md",
+  "source_context_length_chars": 7051,
+  "source_context_path": "shards/S01/ipqc/S01-W03/worker_safe_tasks/pydata__xarray-4356/source_context.md",
+  "source_context_sha256": "sha256:cdb452f58c586bdca8b671fb0d03762fef3d3675e979270f8ef423994cdd8d8f",
+  "status": "COMPLETED",
+  "submitted_patch_scope": "source_only",
+  "thinking": {
+    "type": "disabled"
+  },
+  "usage": {
+    "completion_tokens": 493,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 2723,
+    "prompt_tokens": 2723,
+    "total_tokens": 3216
+  },
+  "usage_raw_sha256": "sha256:33460e402098fa31669fa64696e59cbd8dbf3376476eff25d8eae72fc5384bba",
+  "visible_capsule_path": "shards/S01/arms/B_deepseek_pro_source_context_loop_s01/capsules/pydata__xarray-4356/worker_visible_capsule.md",
+  "visible_capsule_sha256": "sha256:63fae5515ffe6a67f244f010fdba54cb93ee1f2518889f3a030ed1238f8c893e",
+  "wall_time_ms": 6729
+}

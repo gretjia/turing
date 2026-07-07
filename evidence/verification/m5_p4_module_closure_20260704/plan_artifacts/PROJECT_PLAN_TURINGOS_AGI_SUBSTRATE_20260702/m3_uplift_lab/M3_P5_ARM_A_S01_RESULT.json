@@ -1,0 +1,166 @@
+{
+  "schema_id": "turingos.m3.p5.arm_a_s01_result.v1",
+  "module_atom": "M3.P5",
+  "status": "ADDRESSED",
+  "status_ceiling": "ADDRESSED",
+  "recorded_at_utc": "2026-07-03T12:44:07Z",
+  "scope": {
+    "shard": "S01",
+    "arm": "A",
+    "worker_identity": "deepseek-v4-pro__armA__source-context-repair-s01",
+    "provider": "deepseek",
+    "model_requested": "deepseek-v4-pro",
+    "measurement_label": "DeepSeek-only same-provider reduced-heterogeneity source-context-repair measurement",
+    "continuation_authority_path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P5_DEEPSEEK_SOURCE_REPAIR_CONTINUATION_RECORD.json"
+  },
+  "upstream_swebench_score": {
+    "dataset_name": "princeton-nlp/SWE-bench_Verified",
+    "split": "test",
+    "swebench_harness": "upstream Docker harness",
+    "run_id": "turingos_m3_s01_armA_deepseek_pro_source_repair_20260703",
+    "submitted_instances": 50,
+    "completed_instances": 50,
+    "resolved_instances": 14,
+    "unresolved_instances": 36,
+    "empty_patch_instances": 0,
+    "error_instances": 0,
+    "submitted_solve_rate": 0.28,
+    "report_total_instances_field": 500,
+    "report_incomplete_ids_count": 450,
+    "incomplete_ids_interpretation": "Non-submitted complement of the 500-task Verified split, not incomplete submitted S01 tasks.",
+    "resolved_ids": [
+      "astropy__astropy-14309",
+      "django__django-11066",
+      "django__django-11095",
+      "django__django-11099",
+      "matplotlib__matplotlib-22719",
+      "pydata__xarray-4629",
+      "pylint-dev__pylint-6903",
+      "pytest-dev__pytest-5809",
+      "pytest-dev__pytest-6202",
+      "scikit-learn__scikit-learn-11578",
+      "scikit-learn__scikit-learn-12585",
+      "sphinx-doc__sphinx-7440",
+      "sympy__sympy-13372",
+      "sympy__sympy-13480"
+    ]
+  },
+  "gate_evidence": {
+    "prediction_count": 50,
+    "worker_policy_audit_status": "PASS",
+    "candidate_patch_audit_final_status": "PASS for all 50 submitted S01 tasks after targeted format retries",
+    "official_harness_process_exit_code": 0,
+    "official_harness_errors": 0,
+    "secret_values_recorded": false
+  },
+  "artifacts": [
+    {
+      "label": "continuation_addendum",
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P5_DEEPSEEK_SOURCE_REPAIR_CONTINUATION.md",
+      "sha256": "a51eaa6f70b9e3c80a4a296d3aeb07180a0ecd63bbfd94b98546a28c7a036426"
+    },
+    {
+      "label": "combined_predictions",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_predictions.jsonl",
+      "sha256": "5318bffafe08ea2955f6b4608ddcbd589f05b607cde32f4349f5d59dcb2a0725"
+    },
+    {
+      "label": "combined_predictions_build_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_predictions_report.json",
+      "sha256": "692129911e616c7c75e1fd99149c4a6b1653661597a2d720013d4eb347511a5d"
+    },
+    {
+      "label": "combined_worker_policy_audit",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S01_worker_policy_audit.json",
+      "sha256": "a0327de14efe3d22f2873fe06460c5437baaaafa677d9c372fb2e71de26926d6"
+    },
+    {
+      "label": "shard_run_packet",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/shard_run_packet.json",
+      "sha256": "f202bf2ce8b9b1a6df20c8832402b73343d466e2e2830c773595471cb01afed2"
+    },
+    {
+      "label": "shard_run_command",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/shard_run_command.txt",
+      "sha256": "0ccd1c3c43a00b733b2d443599ecc81d220cc327d24fd0d11f8311e1695fb5b7"
+    },
+    {
+      "label": "official_upstream_swebench_report",
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/scoring/full_s01/deepseek-v4-pro__armA__source-context-repair-s01.turingos_m3_s01_armA_deepseek_pro_source_repair_20260703.json",
+      "sha256": "a9cdb57d7bdb77435b90b24f338a1813049a1e630548c6d17890638137a1f452"
+    }
+  ],
+  "window_artifacts": [
+    {
+      "window": "S01-W00",
+      "initial_path_summary_sha256": "2b9ef665dcdfad3e3270efc1d262cb277dfc1250a451e0750cc543f4e1abe550",
+      "source_context_report_sha256": "96f104c9c3d070912d836e5c0246f06f9699b8a3e5e59ddb6a5eba517e116c0a",
+      "final_repair_summary_sha256": "e3c770d5259b4ea35a34a5c77d99899968af7632a19fe77116c77fb5c3a0d594",
+      "predictions_sha256": "bf7c61eb1c73f118a82199c5d37ac0d23a249f0da6ba98f33a5cf0ece7eefeb8",
+      "worker_policy_audit_sha256": "f21801b7e3c5205e5595e1cadb54febe18c9f217add823b7a035b27af0617f49"
+    },
+    {
+      "window": "S01-W01",
+      "initial_path_summary_sha256": "d04bcff9afd992bf3c59563b106afebde42477e2aad3f758349655dda2467523",
+      "source_context_report_sha256": "d3992864dc031cb0fa3756b124dec273f40275dfeb3a156cd5ebd3c6d8c1f2e3",
+      "final_repair_summary_sha256": "a2fd6f766b3c56c14b7be27b095ee4787b8f9036f89ad23abf765188d6edaeb7",
+      "predictions_sha256": "e5c98c056df491ef0fb22d65c84eca525b9d2926648592111ed58b39acc0968d",
+      "worker_policy_audit_sha256": "b45ef4efc10a3a94e1ad84aacdd447f1dade335cf814799b4dfba78e65fa6276"
+    },
+    {
+      "window": "S01-W02",
+      "initial_path_summary_sha256": "995966550f844f868887890dc34f049e4af29fdd9880efa096e61f712d363acd",
+      "source_context_report_sha256": "e4b6b26e38dffd64604ba37502b5fd088454a9cb07e4ad4f9785105267ff62a9",
+      "final_repair_summary_sha256": "824e5285b2c0c093f6ea3aa2d81d4194bd66218c5330ba8b3e15b183497cbd7e",
+      "predictions_sha256": "022534a9cdeb9f1a22bd5723c04e0e2d00671d12ce0fcbeb5a91931c95bd7bb0",
+      "worker_policy_audit_sha256": "42473e8a678ba4ce58c4784a15ddfa966b4d9b569ada58725e96c1db5da11a51"
+    },
+    {
+      "window": "S01-W03",
+      "initial_path_summary_sha256": "e5cf178554e96aa038c0b2c622cb1bf8cdaa51a4d9891f2208f464ca8f65f259",
+      "source_context_report_sha256": "f74d98ddf4475a196a4ddb852180a27f2e38878ca7afd86453ba3deae9c519ce",
+      "final_repair_summary_sha256": "9c6fd6e05d63cec1ecc59f5fca9599672a03e8694d84525cd53b06d94443e6ed",
+      "predictions_sha256": "d5a5e7368c72b1c7507f9c603c73be2e52e3550f0cb1f89a7f563b403a352b70",
+      "worker_policy_audit_sha256": "d60d17ad39a07d016158dc14409ceb45b5a780c9aa83cdf83d3bcc3fe9c229e8"
+    },
+    {
+      "window": "S01-W04",
+      "initial_path_summary_sha256": "561eaf284c37d1325e5a2cb7de9fe042d62431d4550b21936df3e1fa9ef99e96",
+      "source_context_report_sha256": "1ef60949e05ecc68afb4560e87dcf23c6aec4e57ff269a2119f9bab3c833bfda",
+      "final_repair_summary_sha256": "3f18c7b3504b3f07bd8224d039429798aa80b170cd11f791de80b1fe81fa4d46",
+      "predictions_sha256": "bea68e5d7f6b3a2ab6f3b984494f556c5e5fb3a080eb5b34d23ea5df670f236e",
+      "worker_policy_audit_sha256": "577120015821366f6a940537687a451d5e992d2431050fa0f0c9fd99bcabab41"
+    }
+  ],
+  "retry_artifacts": [
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/retries/pylint-dev__pylint-6528_enabled_retry_summary.json",
+      "sha256": "1eb16a8814024671bea419e57178b4c95cdfdd8fd05e9974f4d7976674ed0f67"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W00/retries/pylint-dev__pylint-6528_format_retry2_summary.json",
+      "sha256": "e3767bba4010443abdc98f68e0a5e8670aa39e68570549feaf0e7066bb0c3f54"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W01/retries/sphinx-doc__sphinx-10673_format_retry_summary.json",
+      "sha256": "12c33f15141eb9a42c4a74d9b876ac33a905bfa2944cc70bce9cdd98360f4386"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W03/retries/pytest-dev__pytest-6197_format_retry_summary.json",
+      "sha256": "1cf4bd0eea024c1454cecd6c3526863d68c9a84cff4d3c1f719edd7dd02f1bf3"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/retries/pylint-dev__pylint-8898_format_retry_summary.json",
+      "sha256": "73c35caddbb9f95c00f706fd4eff3da781ffe1d6b751efa99f833cf4418a2a39"
+    },
+    {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01/arms/A_deepseek_pro_source_repair_s01/final_repair/S01-W04/retries/sphinx-doc__sphinx-7454_format_retry_summary.json",
+      "sha256": "6aa632c1d577737eb325356f01364d06153fd2311f3c4f7972ad39dcc7d56c6f"
+    }
+  ],
+  "non_claims": [
+    "This record addresses M3.P5 Arm A S01 only at implementer ceiling.",
+    "This is not the original heterogeneous-worker preregistration; it is the DeepSeek-only continuation authorized by the M3.P5 continuation addendum.",
+    "No Arm B, Arm C, M3.P6, M3.P7, uplift result, positive improvement claim, M3.G roll-up, external audit, release, ratification, M2 enablement, OG-10 signature, genesis signature, or constitution-byte change is claimed."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "accepted_worker": "deepseek-v4-pro__armA__source-context-repair-pilot",
+  "calibration_band": {
+    "max_inclusive": 0.45,
+    "min_inclusive": 0.15,
+    "observed": 0.3,
+    "status": "PASS"
+  },
+  "claim_boundary": {
+    "m3_g_not_claimed": true,
+    "m3_p4_only": true,
+    "m3_p5_p7_not_run": true,
+    "no_external_verifier_closure": true,
+    "no_m2_enablement": true,
+    "no_release_or_ship_claim": true,
+    "no_uplift_result": true
+  },
+  "evidence": {
+    "deepseek_only_reregistration_record": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_DEEPSEEK_ONLY_REREGISTRATION_RECORD.json",
+      "sha256": "0a94df0cd218097f42083fe77fad71b21c8c61fd1fc00d756afc4e725dec506b"
+    },
+    "flash_canary": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P4_CANARIES/deepseek_v4_flash_worker_canary.json",
+      "sha256": "a038f04c871107b3be236cfc3be3a5ec3a75a9f257d5cf3647d2f123a32aa493"
+    },
+    "flash_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_flash_pilot/scoring/deepseek-v4-flash__armA__uplift-s02-pilot.turingos_m3_s02_w00_armA_deepseek_flash_pilot_20260703.json",
+      "sha256": "d87064dedb50b9faf4106fb37d902871d731d6f801e5ce42359fb1601edbecf4"
+    },
+    "predictions": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S02_S02-W00_predictions.jsonl",
+      "sha256": "b6dd8b7e95bd05f64c558bf6c5a17da40732da751544f96ae6e666ebbaeb8e2f"
+    },
+    "predictions_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S02_S02-W00_predictions_report.json",
+      "sha256": "f48ed5c3bef6df7c6e75ce4f52b46e1cdd3fba1228c6f73205f207d420fa1755"
+    },
+    "pro_disabled_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_pro_replacement_pilot/scoring/deepseek-v4-pro__armA__uplift-s02-pilot-replacement.turingos_m3_s02_w00_armA_deepseek_pro_replacement_pilot_20260703.json",
+      "sha256": "12ee692dbb589f5cbf92dc583160895c24736d3eb0993e59c0825ab31128da73"
+    },
+    "pro_meta_canary": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P4_CANARIES/deepseek_v4_pro_meta_canary.json",
+      "sha256": "7b6880b74eb3157831b7205d911cb0984ef44368a311974dcd9e6b07fd45bd66"
+    },
+    "pro_worker_replacement_canary": {
+      "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/evidence/session_20260702/M3_P4_CANARIES/deepseek_v4_pro_worker_replacement_canary.json",
+      "sha256": "199540507853de030f9936af49b218e82eee2d2a7f17bd3619261b768f4313ed"
+    },
+    "source_context_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/ipqc/S02-W00/worker_source_context_report.json",
+      "sha256": "fc7a8b1ce75d91a36ff1ce877004b817bc74a29eee65d6415d1a919d64d8c6db"
+    },
+    "source_repair_consolidation": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_pro_source_repair_pilot/source_repair_pilot_consolidation.json",
+      "sha256": "18d0674d949e99d0bbaf767a7be5f346360f7e938c0c28e2f37e2c9f2132b5d8"
+    },
+    "source_repair_report": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S02/arms/A_deepseek_pro_source_repair_pilot/scoring/deepseek-v4-pro__armA__source-context-repair-pilot.turingos_m3_s02_w00_armA_deepseek_pro_source_repair_pilot_20260703.json",
+      "sha256": "912dbdd15ec42ef51724db6ac9029151c12c6e480ed788e69b11cce1b2061516"
+    },
+    "worker_policy_audit": {
+      "path": "/home/zephryj/turingos_backup/work/turing/evidence/bench/swe_bench_verified_500_campaign_20260629/predictions/shard_S02_S02-W00_worker_policy_audit.json",
+      "sha256": "b08631c8e6f9ffa6f19656fb312c7fbea22df99dcb85b26681b90a1fc826911b"
+    }
+  },
+  "gate": "10 S02 tasks per worker, Arm A; 15-45 percent weakness-band calibration; replace out-of-band workers under logged rule",
+  "local_pre_scoring_gates": {
+    "candidate_apply_audit_pass_count": 10,
+    "candidate_apply_audit_task_count": 10,
+    "gold_patch_guard": "PASS",
+    "source_context_report": "PASS",
+    "worker_policy_audit": "PASS",
+    "worker_safe_packets": "PASS"
+  },
+  "official_result": {
+    "completed": 10,
+    "empty_patches": 0,
+    "error_ids": [],
+    "errors": 0,
+    "resolved": 3,
+    "resolved_ids": [
+      "django__django-11119",
+      "pytest-dev__pytest-7205",
+      "scikit-learn__scikit-learn-13142"
+    ],
+    "resolved_rate": 0.3,
+    "submitted": 10,
+    "unresolved": 7,
+    "unresolved_ids": [
+      "astropy__astropy-14365",
+      "astropy__astropy-14369",
+      "matplotlib__matplotlib-23299",
+      "pydata__xarray-4687",
+      "sphinx-doc__sphinx-7462",
+      "sympy__sympy-13551",
+      "sympy__sympy-13615"
+    ]
+  },
+  "phase": "M3.P4",
+  "recorded_at_utc": "2026-07-03T10:46:00Z",
+  "replacement_decision": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/m3_uplift_lab/M3_P4_WORKER_REPLACEMENT_DECISION.json",
+    "sha256": "dc231ef31136717f6eb5ed9b5332afac827c727b4a88726ca7d2c5c467e2227e"
+  },
+  "schema_id": "turingos.m3.p4.calibration_report.v1",
+  "status": "ADDRESSED"
+}

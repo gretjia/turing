@@ -1,0 +1,29 @@
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index 844c01e95e..f0143432df 100644
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -804,9 +804,21 @@ class Model(metaclass=ModelBase):
+         inserted = False
+         for parent, field in meta.parents.items():
+             # Make sure the link fields are synced between parent and self.
+-            if (field and getattr(self, parent._meta.pk.attname) is None and
+-                    getattr(self, field.attname) is not None):
+-                setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
++            if field:
++                pk_val = getattr(self, parent._meta.pk.attname)
++                link_val = getattr(self, field.attname)
++                if pk_val is None:
++                    if not self._state.adding:
++                        # Resetting the pk of a child (loaded from the DB)
++                        # should also reset the parent link so a new parent
++                        # is inserted.
++                        setattr(self, field.attname, None)
++                    elif link_val is not None:
++                        # A new instance can have the parent link set to an
++                        # existing parent without the pk being set.
++                        setattr(self, parent._meta.pk.attname, link_val)
++                elif link_val is None:
++                    setattr(self, field.attname, pk_val)
+             parent_inserted = self._save_parents(cls=parent, using=using, update_fields=update_fields)
+             updated = self._save_table(
+                 cls=parent, using=using, update_fields=update_fields,
