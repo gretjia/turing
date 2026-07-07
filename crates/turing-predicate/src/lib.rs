@@ -56,7 +56,17 @@ impl PredicateKernel {
         event_registry_closed_world(event_type)?;
 
         let mut checks = checks;
-        checks.sort_by(|a, b| a.check_id.cmp(&b.check_id));
+        // CONFIRMED-bug-#4 fix (INV-4 class): sorting by `check_id` alone is a STABLE sort, so
+        // two checks sharing the same `check_id` kept their *input* construction order on ties
+        // -- meaning `reject_class` (and therefore `report_hash`) could differ for the exact
+        // same multiset of checks depending only on caller-side ordering. Breaking the tie by
+        // `reject_class` too makes the sort (and therefore `reject_class`/`report_hash`) a pure
+        // function of the check contents, never of input order, even when `check_id` repeats.
+        checks.sort_by(|a, b| {
+            a.check_id
+                .cmp(&b.check_id)
+                .then_with(|| a.reject_class.cmp(&b.reject_class))
+        });
 
         let mut passed_predicates = Vec::new();
         let mut failed_predicates = Vec::new();

@@ -380,8 +380,17 @@ impl MarketReplay {
                     let market = markets
                         .get_mut(&settled.market_id)
                         .ok_or_else(|| EconomyError::UnknownMarket(settled.market_id.clone()))?;
-                    market.status = "settled".to_string();
-                    market.settlement_result = Some(settled.result.clone());
+                    // CONFIRMED-bug-#4 fix (INV-4/INV-17 class, "view != replay(view)"): this
+                    // used to unconditionally overwrite status/settlement_result on EVERY
+                    // MarketSettled, so a second, conflicting MarketSettled for an
+                    // already-settled market flipped the reported settlement_result even
+                    // though WalletProjection (the real financial ledger) already treats a
+                    // second settle as a true no-op (it clears positions on the first settle).
+                    // First-settle-wins now, matching WalletProjection's own idempotency.
+                    if market.status != "settled" {
+                        market.status = "settled".to_string();
+                        market.settlement_result = Some(settled.result.clone());
+                    }
                 }
                 EconomyEvent::PositionMinted(_) | EconomyEvent::RewardDistributed(_) => {}
             }
@@ -537,6 +546,15 @@ struct MarketConservationInternal {
     /// market. A slash destroys real spendable Coin (`WalletProjection` debits it), so it is
     /// counted as backing symmetrically with `minted_coin`/`declared_subsidy`/`swap_pay_coin`.
     slash_coin: DecimalAmount,
+    /// CONFIRMED-bug-#4 fix (INV-4/INV-17 class, "view != replay(view)"): whether a
+    /// `MarketSettled` has already been folded for this market. Before this fix,
+    /// `yes_positions`/`no_positions` were never cleared after a settle, so a second,
+    /// conflicting `MarketSettled` for the same market re-summed the still-present positions
+    /// and added them AGAIN into `redeemed_coin` -- inflating the reported redemption from an
+    /// event that paid nobody anything extra, and could flip a healthy market's `holds` to
+    /// `false`. Guarding on this flag makes a duplicate settle a true no-op here too, matching
+    /// `WalletProjection`'s own first-settle-wins idempotency.
+    settled: bool,
 }
 
 /// CONFIRMED-bug-#2 fix (candidate 3): ensures every `market_id` this function ever observes —
@@ -624,21 +642,31 @@ pub fn check_conservation(
                     pay_coin;
             }
             EconomyEvent::MarketSettled(settled) => {
-                let mut redeemed = DecimalAmount::default();
-                let side_positions = match settled.result.as_str() {
-                    "YES" => Some(&yes_positions),
-                    "NO" => Some(&no_positions),
-                    _ => None,
-                };
-                if let Some(side_positions) = side_positions {
-                    for ((market_id, _agent_id), amount) in side_positions {
-                        if market_id == &settled.market_id {
-                            redeemed += *amount;
+                // CONFIRMED-bug-#4 fix: a second, conflicting MarketSettled for an
+                // already-settled market must be a no-op here too (see the `settled` field
+                // doc comment above) -- do not re-sum positions or add to redeemed_coin again.
+                let already_settled = markets
+                    .get(&settled.market_id)
+                    .map(|market| market.settled)
+                    .unwrap_or(false);
+                if !already_settled {
+                    let mut redeemed = DecimalAmount::default();
+                    let side_positions = match settled.result.as_str() {
+                        "YES" => Some(&yes_positions),
+                        "NO" => Some(&no_positions),
+                        _ => None,
+                    };
+                    if let Some(side_positions) = side_positions {
+                        for ((market_id, _agent_id), amount) in side_positions {
+                            if market_id == &settled.market_id {
+                                redeemed += *amount;
+                            }
                         }
                     }
+                    let market = ensure_tracked(&mut order, &mut markets, &settled.market_id);
+                    market.redeemed_coin += redeemed;
+                    market.settled = true;
                 }
-                ensure_tracked(&mut order, &mut markets, &settled.market_id).redeemed_coin +=
-                    redeemed;
             }
             EconomyEvent::RewardDistributed(reward) => {
                 let reward_coin = DecimalAmount::parse_non_negative(&reward.reward_coin)?;
