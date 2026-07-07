@@ -117,11 +117,30 @@ B6. **Residual resume gap**: a fresh run that ends with scoring rc≠0 *after* t
     scoring-success marker artifact (small on-disk format addition — deferred to owner
     since Stage A artifacts are mid-flight).
 
-## C. Test evidence
+## C. Test evidence (final, 2026-07-07, verified twice: implementer agent + conductor)
 
-Recorded in this document's companion run (2026-07-07): full Python suite for econ_lab
-(`tests/test_econ_lab_wp7_harness.py`, `test_live_driver_{head_parity,replay,resume}.py`,
-`test_live_split_verifier.py` + new regression files) and `cargo test -p turing-economy`
-(isolated `CARGO_TARGET_DIR`; live binary mtimes verified untouched), plus the F4 gate
-self-test and a live probe of `stage_a_health.sh` against the running Stage A arms.
-Exact counts in the session summary; suites green at time of writing.
+- Python: 63 passed, 0 failed — `tests/test_econ_lab_wp7_harness.py` (10),
+  `test_live_driver_head_parity.py` (2, byte-identity vs the fork-point driver the live
+  arms loaded), `test_live_driver_replay.py` (4), `test_live_driver_resume.py` (7),
+  `test_live_split_verifier.py` (12), new `test_live_driver_crash_hardening.py` (11),
+  new `test_econ_lab_audit_fixes.py` (13, incl. readout self-test via CLI).
+- Rust: `cargo test -p turing-economy` — 97 passed, 0 failed, 1 ignored (pre-existing)
+  across 16 targets; `cargo test -p turing-daemons --test f4_econ_leakage_gate` — 2
+  passed. All cargo runs used an isolated `CARGO_TARGET_DIR`;
+  `target/debug/econ_fold_cli` mtime 2026-07-07 17:23:12 UTC unchanged throughout
+  (target/release absent) — the live Stage A binary was never rebuilt.
+- Gate: `gate_f4_econ_leakage.sh --self-test` PASS (extended cases incl. seeded
+  single-line-struct leak → FAIL, missing surface → NOT_RUN, non-UTF-8 → NOT_RUN);
+  real run `F4_LEAK_PASS (12 surface files scanned, 12 patterns)`.
+- Ops: fixed `stage_a_health.sh` probed live against the running Stage A
+  (2 RUNNING arms, driver_procs=2, exit 0, no false alarms);
+  `run_stage_a.sh`/`stage_a_health.sh` were replaced via atomic `mv` only.
+- Governance: `verify_alignment.sh` GREEN at session start.
+
+Coordination note: the concurrent TuringLoop patrol session swept part of this work into
+commit `f29ef21` (its byte-identity gate re-proof, PREREG amendment #3 re-pin of the
+readout sha). Its gate runs the Python parity/offline suites + F4 only — the Rust changes
+in that commit and in the working tree were additionally verified by this audit's own
+`cargo test` runs above. Remaining working-tree changes (routing_fold.rs,
+econ_fold_cli.rs, Rust test additions, this §C update) are left for the patrol's next
+governed sweep.

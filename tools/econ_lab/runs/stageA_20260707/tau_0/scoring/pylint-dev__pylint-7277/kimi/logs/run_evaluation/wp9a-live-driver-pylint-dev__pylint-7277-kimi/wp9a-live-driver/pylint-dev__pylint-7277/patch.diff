@@ -1,0 +1,14 @@
+diff --git a/pylint/__init__.py b/pylint/__init__.py
+index 1234567..abcdefg 100644
+--- a/pylint/__init__.py
++++ b/pylint/__init__.py
+@@ -96,7 +96,7 @@ def run_pylint(argv: Sequence[str] | None = None) -> None:
+     # are inserted at the beginning of sys.path
+     try:
+         sys.path[:] = sys.argv[1:2] + sys.path[:]
+-        sys.path.pop(0)
++        if sys.path and sys.path[0] in ("", ".", os.getcwd()):
++            sys.path.pop(0)
+         Run(argv, reporter=reporter, do_exit=True)
+     finally:
+         sys.path[:] = original_sys_path

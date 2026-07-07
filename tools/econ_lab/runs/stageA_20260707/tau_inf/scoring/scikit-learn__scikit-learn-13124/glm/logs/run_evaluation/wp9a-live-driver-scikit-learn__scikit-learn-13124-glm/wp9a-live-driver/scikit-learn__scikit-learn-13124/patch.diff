@@ -1,0 +1,80 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+index xxxxxxx..xxxxxxx 100644
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -??? +??? @@ class _StratifiedKFold(BaseCrossValidator,):
+     def split(self, X, y, groups=None):
+         """Generate indices to split data into training and test set.
+ 
+         Parameters
+         ----------
+         X : array-like, shape (n_samples, n_features)
+             Training data, where n_samples is the number of samples
+             and n_features is the number of features.
+         y : array-like, shape (n_samples,)
+             The target variable for supervised learning problems.
+             Stratification is done based on the y labels.
+         groups : object
+             Always ignored, exists for compatibility.
+ 
+         Returns
+         -------
+         train : ndarray
+             The training set indices for that split.
+         test : ndarray
+             The testing set indices for that split.
+ 
+         """
+         if y is None:
+             raise ValueError("y cannot be None")
+ 
+-        if shuffle:
+-            rng = check_random_state(self.random_state)
+-            # Shuffles the data before splitting to ensure all folds are
+-            # different when shuffle is True.
+-            y_shuffle = y.copy()
+-            rng.shuffle(y_shuffle)
+-            # Get the permutation to reorder the samples according to the
+-            # shuffled labels.
+-            self.perm = np.argsort(y_shuffle.argsort())
+-        else:
+-            self.perm = np.arange(X.shape[0])
++        rng = check_random_state(self.random_state)
++        
++        # Get unique classes and their indices
++        classes, y_indices = np.unique(y, return_inverse=True)
++
++        # Initialize permutation array
++        self.perm = np.arange(X.shape[0])
++
++        # If shuffle is True, shuffle within each class
++        if self.shuffle:
++            # For each class, shuffle the indices within the class
++            for i in range(len(classes)):
++                # Get indices of the current class
++                cls_idx = np.where(y_indices == i)[0]
++                
++                # Shuffle the indices within the class
++                shuffled_idx = rng.permutation(cls_idx)
++                
++                # Update the permutation array based on the shuffled indices
++                self.perm[cls_idx] = shuffled_idx
+ 
+         # Make sure we have at least n_splits folds for each class
+-        _, y_indices = np.unique(y, return_inverse=True)
++        _, y_indices = np.unique(y[self.perm], return_inverse=True)
+         n_unique_classes = y_indices.shape[0]
+         if n_unique_classes < self.n_splits:
+             raise ValueError("The least populated class in y has only 1"
+                              " member, which is less than n_splits={}."
+                              "".format(self.n_splits))
+ 
+         # Split into n_splits folds
+         test_folds = np.zeros(y.shape[0], dtype=np.int)
+-        for i, class_indices in enumerate(class_indices):
++        for i in range(len(classes)):
+             if fold_sizes[i] != 0:
+-                indices = np.array_split(class_indices, fold_sizes[i])
++                indices = np.where(y_indices == i)[0]
++                indices = np.array_split(self.perm[indices], fold_sizes[i])
+                 test_folds[indices] = np.arange(fold_sizes[i], dtype=np.int)

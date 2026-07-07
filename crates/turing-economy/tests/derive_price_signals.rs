@@ -28,7 +28,7 @@
 //!    hidden state (Art 0.2), so replay can never diverge from the original derivation.
 //! 7. `truth_status` is always `"statistical_signal_only"` (Art I.1: price is never truth).
 
-use turing_economy::{AmmPool, EconomyEvent, PriceSignal, derive_price_signals};
+use turing_economy::{AmmPool, EconomyError, EconomyEvent, PriceSignal, derive_price_signals};
 
 const SCALE: i128 = 1_000_000_000;
 
@@ -225,6 +225,51 @@ fn derive_price_signals_clamps_out_of_range_effective_price() {
         "BUY_NO effective_price > 1 complements to a negative value, which must clamp to 0"
     );
     assert_eq!(negative_complement.no_price, "1");
+}
+
+/// Fix-regression: an unrecognized `side` on the (untrusted) tape must be a hard error --
+/// previously any string that was not exactly `"BUY_NO"` (e.g. a forged `"SELL_YES"`, or
+/// even a case-variant `"buy_no"`) silently fell into the BUY_YES reading. The only side
+/// values this codebase ever writes are `BUY_YES`/`BUY_NO` (`AmmPool::buy_yes`/`buy_no`;
+/// the daemons RPC boundary rejects anything else), and both keep their exact behavior.
+#[test]
+fn derive_price_signals_rejects_unrecognized_side() {
+    let forged = |side: &str| {
+        EconomyEvent::AmmSwapExecuted(turing_economy::AmmSwapExecuted {
+            schema_id: "amm_swap_executed.v1".to_string(),
+            market_id: "mkt_forged_side".to_string(),
+            trader_id: "trader_forged".to_string(),
+            side: side.to_string(),
+            pay_coin: "0".to_string(),
+            d_y: "0".to_string(),
+            d_n: "0".to_string(),
+            get_y: "0".to_string(),
+            get_n: "0".to_string(),
+            pool_y_before: "1".to_string(),
+            pool_n_before: "1".to_string(),
+            pool_y_after: "1".to_string(),
+            pool_n_after: "1".to_string(),
+            invariant_k_before: "1".to_string(),
+            invariant_k_after: "1".to_string(),
+            effective_price: "0.5".to_string(),
+        })
+    };
+
+    for bad_side in ["SELL_YES", "buy_no", "BUY_YES ", ""] {
+        assert_eq!(
+            derive_price_signals(&[forged(bad_side)]),
+            Err(EconomyError::InvalidSwapSide(bad_side.to_string())),
+            "side {bad_side:?} must be rejected, never silently read as BUY_YES"
+        );
+    }
+
+    // The two legitimate spellings keep working exactly as before.
+    for good_side in ["BUY_YES", "BUY_NO"] {
+        assert!(
+            derive_price_signals(&[forged(good_side)]).is_ok(),
+            "side {good_side:?} must remain accepted"
+        );
+    }
 }
 
 #[test]

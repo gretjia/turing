@@ -1962,3 +1962,32 @@ fn validate_digest(value: &str) -> Result<(), EconomyError> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod exp2_saturation_tests {
+    //! Inline (not `tests/`) because `exp2_q32` is private to this module; same regression
+    //! is covered for `routing_fold`'s own copy in `routing_fold::tests`.
+
+    use super::{exp2_q32, Q32_ONE};
+
+    /// Regression: `floor_part == 95` used to compute `base << 95` with `base` in
+    /// `[2^32, 2^33)`, wrapping the i128 sign bit into a huge NEGATIVE "exponential"
+    /// (violating the documented "saturates" contract). It must saturate to `i128::MAX`.
+    #[test]
+    fn exp2_q32_saturates_positive_at_floor_part_95_never_negative() {
+        assert_eq!(exp2_q32(95 * Q32_ONE), i128::MAX);
+        assert_eq!(exp2_q32(95 * Q32_ONE + Q32_ONE / 2), i128::MAX);
+        assert_eq!(exp2_q32(96 * Q32_ONE), i128::MAX);
+        // Just below the saturation threshold: still a plain (large, positive) shift.
+        let at_94 = exp2_q32(94 * Q32_ONE);
+        assert_eq!(at_94, Q32_ONE << 94);
+        assert!(at_94 > 0);
+        // Blanket property near the threshold: exp2 of a positive input is never negative.
+        for floor in 90..100 {
+            assert!(
+                exp2_q32(floor * Q32_ONE + Q32_ONE / 3) > 0,
+                "exp2_q32 must never go negative (floor_part={floor})"
+            );
+        }
+    }
+}

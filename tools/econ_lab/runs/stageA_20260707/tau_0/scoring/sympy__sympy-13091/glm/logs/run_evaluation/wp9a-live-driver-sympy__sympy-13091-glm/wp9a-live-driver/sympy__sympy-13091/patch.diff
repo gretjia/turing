@@ -1,0 +1,13 @@
+diff --git a/sympy/core/basic.py b/sympy/core/basic.py
+index d1320814..e3c90a2f 100644
+--- a/sympy/core/basic.py
++++ b/sympy/core/basic.py
+@@ -313,7 +313,7 @@ class Basic(metaclass=MetaClass):
+             return sympify(a)
+         except SympifyError:
+             if op == 'Eq':
+-                return False
++                return NotImplemented
+             return None
+ 
+     def __lt__(self, other):

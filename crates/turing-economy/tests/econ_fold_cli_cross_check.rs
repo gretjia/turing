@@ -56,6 +56,32 @@ fn run_cli(subcommand: &str, request_json: &Value) -> Value {
     serde_json::from_slice(&output.stdout).expect("econ_fold_cli stdout must be valid JSON")
 }
 
+/// Like [`run_cli`], but for requests the CLI must *reject*: asserts a non-zero exit and
+/// returns stderr so the caller can pin the diagnostic.
+fn run_cli_expect_error(subcommand: &str, request_json: &Value) -> String {
+    let bin = env!("CARGO_BIN_EXE_econ_fold_cli");
+    let mut child = Command::new(bin)
+        .arg(subcommand)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn econ_fold_cli");
+    child
+        .stdin
+        .take()
+        .expect("child stdin")
+        .write_all(request_json.to_string().as_bytes())
+        .expect("write request to child stdin");
+    let output = child.wait_with_output().expect("wait for econ_fold_cli");
+    assert!(
+        !output.status.success(),
+        "econ_fold_cli {subcommand} unexpectedly succeeded on an invalid request: stdout={}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    String::from_utf8_lossy(&output.stderr).into_owned()
+}
+
 /// Builds a tape with two keys: one that accumulates two `RoutingPriorUpdated` verdicts
 /// (one true, one false) and one whose single update is then clawed back (net-zero state) --
 /// exercising both the "N>0" and "clawed-back-to-N=0" branches of the fold in one tape.
@@ -189,6 +215,45 @@ fn cli_fold_output_matches_direct_library_fold_call_byte_for_byte() {
     assert_eq!(
         response, response_2,
         "fold-and-suggest must be deterministic across repeated CLI invocations on identical input"
+    );
+}
+
+/// Fix-regression: `fold-and-suggest` joins each candidate route back to its synthesized
+/// Q_eff price signal by `market_id` (first match wins inside `MarketRouter::suggest`), so
+/// a duplicate `market_id` across `candidate_routes` would silently misattribute one
+/// route's Q_eff to another. The CLI must reject such a request with a clear error.
+#[test]
+fn cli_fold_and_suggest_rejects_duplicate_market_id_across_candidate_routes() {
+    let request = json!({
+        "schema": "econ_fold_cli.fold_and_suggest.request.v1",
+        "committed_routing_events": [],
+        "initial_prices": [],
+        "candidate_routes": [
+            {
+                "route_id": "route_a",
+                "market_id": "mkt_shared",
+                "expected_failure_domain": "provider_x",
+                "requested_tokens": 1,
+                "domain_bucket": "swe_bench_verified_500_campaign",
+                "scaffold_id": "scaffold:sha256:cross-check-armA",
+            },
+            {
+                "route_id": "route_b",
+                "market_id": "mkt_shared",
+                "expected_failure_domain": "provider_y",
+                "requested_tokens": 1,
+                "domain_bucket": "swe_bench_verified_500_campaign",
+                "scaffold_id": "scaffold:sha256:cross-check-armB",
+            }
+        ],
+        "price_signal_hash": digest("price-signal"),
+        "pput_prior_hash": digest("pput-prior"),
+        "router_mode": {"kind": "SoftmaxArgmaxBypass"},
+    });
+    let stderr = run_cli_expect_error("fold-and-suggest", &request);
+    assert!(
+        stderr.contains("duplicate market_id") && stderr.contains("mkt_shared"),
+        "diagnostic must name the duplicate market_id; got stderr: {stderr}"
     );
 }
 

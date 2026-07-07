@@ -1,0 +1,36 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index e856638ba..d8a3c5f9c 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -381,6 +381,7 @@ class Session(nodes.FSCollector):
+                 # No point in finding packages when collecting doctests
+                 if not self.config.getoption("doctestmodules", False):
+                     pm = self.config.pluginmanager
++                    pkg_roots = {}
+                     for parent in reversed(argpath.parts()):
+                         if pm._confcutdir and pm._confcutdir.relto(parent):
+                             break
+@@ -390,7 +391,14 @@ class Session(nodes.FSCollector):
+                             if col:
+                                 if isinstance(col[0], Package):
+                                     self._pkg_roots[parent] = col[0]
+-                                # always store a list in the cache, matchnodes expects it
++                                    if parent not in pkg_roots:
++                                        pkg_roots[parent] = col[0]
++                                # always store a list in the cache, matchnodes expects it
++                                self._node_cache[col[0].fspath] = [col[0]]
++
++                    # Re-register any package roots discovered
++                    for parent, package in pkg_roots.items():
++                        if parent not in self._pkg_roots:
+                                 self._node_cache[col[0].fspath] = [col[0]]
+ 
+         # If it's a directory argument, recurse and look for any Subpackages.
+@@ -405,6 +413,7 @@ class Session(nodes.FSCollector):
+             for path in argpath.visit(
+                 fil=self._visit_filter, rec=self._recurse, bf=True, sort=True
+             ):
++                dirpath = path.dirpath()
+                 if dirpath not in seen_dirs:
+                     # Collect packages first.
+                     seen_dirs.add(dirpath)

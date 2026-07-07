@@ -1,0 +1,19 @@
+diff --git a/lib/matplotlib/colorbar.py b/lib/matplotlib/colorbar.py
+index a49a83e6b6..1f0ff7b3f1 100644
+--- a/lib/matplotlib/colorbar.py
++++ b/lib/matplotlib/colorbar.py
+@@ -1136,8 +1136,14 @@ class Colorbar:
+                 if len(self._y) >= self.n_rasterize:
+                     self.solids.set_rasterized(True)
+         self.dividers.set_segments(
+-            np.dstack([X, Y])[1:-1] if self.drawedges else [])
++            np.dstack([X, Y]) if self.drawedges else [])
++        if self.drawedges and not self._extend_lower():
++            self.dividers.set_segments(
++                np.dstack([X, Y])[1:] if self.drawedges else [])
++        if self.drawedges and not self._extend_upper():
++            self.dividers.set_segments(
++                np.dstack([X, Y])[:-1] if self.drawedges else [])
+ 
+     def _add_solids_patches(self, X, Y, C, mappable):
+         hatches = mappable.hatches * len(C)  # Have enough hatches.

@@ -1,0 +1,117 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 8f5e2e7d1..71a4a9b2e 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -35,6 +35,11 @@ class RST(BaseReader):
+         The number of rows of the header to write as a "header" before the
+         actual data (e.g. name of column, then units of column).
+     """
++
++    def __init__(self, header_rows=None, **kwargs):
++        super().__init__(**kwargs)
++        self.header_rows = header_rows
++
+     def write(self, table):
+         lines = []
+         header = table.masked_array.dtype.names
+@@ -42,6 +47,10 @@ class RST(BaseReader):
+ 
+         col_widths = [len(col) for col in header]
+ 
++        # Handle multiple header rows
++        if self.header_rows is not None:
++            return self._write_multiline_header(table, header, col_widths)
++
+         lines.append(" ".join(header))
+         lines.append(" ".join(["=" * len(col) for col in header]))
+ 
+@@ -68,6 +77,27 @@ class RST(BaseReader):
+         lines.append(" ".join([format(col, width) for col, width in zip(main_cols, col_widths)]))
+         return lines
+ 
++    def _write_multiline_header(self, table, header, col_widths):
++        """Write a table with multiple header rows."""
++        lines = []
++        
++        # Determine how many header rows we have
++        n_header_rows = len(self.header_rows) if self.header_rows else 1
++
++        # Create the header content
++        header_content = {name: [] for name in header}
++        for row_type in self.header_rows:
++            for name in header:
++                if row_type == 'name':
++                    header_content[name].append(name)
++                elif row_type == 'unit':
++                    unit = table[name].unit
++                    header_content[name].append(str(unit) if unit else '')
++
++        # Write the header content
++        for i in range(n_header_rows):
++            lines.append(" ".join([val.ljust(col_widths[j]) for j, val in enumerate([row[i] for row in header_content.values()])]))
++        lines.append(" ".join(["=" * len(col) for col in header]))
++
++        # Write the data rows
++        for row in table:
++            lines.append(" ".join([str(val).ljust(col_widths[i]) for i, val in enumerate(row)]))
++        
++        return lines
+diff --git a/astropy/io/ascii/tests/test_rst.py b/astropy/io/ascii/tests/test_rst.py
+index 5b32b3e6a..b6f1c8e3c 100644
+--- a/astropy/io/ascii/tests/test_rst.py
++++ b/astropy/io/ascii/tests/test_rst.py
+@@ -471,6 +471,17 @@ def test_write_rst_no_header(test_data):
+     assert rst_lines[2] == "  data1   data2   data3"
+ 
+ 
++def test_write_rst_with_header_rows(test_data):
++    out = StringIO()
++    test_data.write(out, format="rst", header_rows=["name", "unit"])
++    rst = out.getvalue()
++
++    assert "-----  -----  -----" in rst
++    assert "data1  data2  data3" in rst
++    assert "  0      1      2" in rst
++
++
+ def test_write_rst_no_header_units(test_data):
+     out = StringIO()
+     test_data['data1'].unit = 'm / s'
+@@ -498,6 +509,18 @@ def test_write_rst_units(test_data):
+     assert "  m / s  s      kg  " in rst
+ 
+ 
++def test_write_rst_multiline_header_with_units(test_data):
++    """Test that the RST writer handles multiline headers with units properly."""
++    test_data['data1'].unit = 'm'
++    test_data['data2'].unit = 's'
++    test_data['data3'].unit = 'kg'
++
++    out = StringIO()
++    test_data.write(out, format="rst", header_rows=["name", "unit"])
++    rst = out.getvalue()
++
++    assert "m  s   kg" in rst.split('\n')[3]
++
++
+ def test_write_rst_exclude_names(test_data):
+     out = StringIO()
+     test_data.write(out, format="rst", exclude_names=['data2'])
+diff --git a/astropy/io/ascii/ui.py b/astropy/io/ascii/ui.py
+index 5a7b2f5d8..8a9b8f43c 100644
+--- a/astropy/io/ascii/ui.py
++++ b/astropy/io/ascii/ui.py
+@@ -797,9 +797,11 @@ def get_writer(Writer=None, fast_writer=None, **kwargs):
+         writer_class = core._fast_writer_registry[fast_writer]
+     else:
+         # Find the writer class based on the input parameters
+-        writer_class = core._get_writer(Writer=Writer, fast_writer=fast_writer, **kwargs)
++        writer = core._get_writer(Writer=Writer, fast_writer=fast_writer, **kwargs)
++        if 'header_rows' in kwargs:
++            writer.header_rows = kwargs['header_rows']
+ 
+-    return writer_class(**kwargs)
++    return writer
+ 
+ 
+ def get_reader(Reader=None, fast_reader=None, **kwargs):

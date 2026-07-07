@@ -89,7 +89,10 @@ fn exp2_q32(y: i128) -> i128 {
     let frac = y.rem_euclid(Q32_ONE);
     let base = exp2f_q32(frac);
     if floor_part >= 0 {
-        if floor_part >= 96 {
+        // `base` is in `[2^32, 2^33)`, so a shift of 95 can already reach/wrap the i128
+        // sign bit (`base << 95` up to ~2^128): saturate at 95, not 96, or the "saturates"
+        // contract is violated with a huge NEGATIVE value.
+        if floor_part >= 95 {
             i128::MAX
         } else {
             base << (floor_part as u32)
@@ -351,6 +354,16 @@ fn parse_event_hash(value: &str) -> Result<[u8; 32], EconomyError> {
     if hex.len() != 64 {
         return Err(EconomyError::RoutingFoldMalformedEventHash);
     }
+    // Strict lowercase-hex alphabet, mirroring the digest format this crate itself emits
+    // (`sha256_hex`'s `{:x}`): `u8::from_str_radix` alone is too lenient -- it accepts a
+    // `+` sign (`"+f"` parses as 15) and uppercase hex, so `"AB"`/`"ab"`/`"+b"` would
+    // otherwise alias to one dedup identity.
+    if !hex
+        .bytes()
+        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    {
+        return Err(EconomyError::RoutingFoldMalformedEventHash);
+    }
     let mut bytes = [0u8; 32];
     for (i, byte) in bytes.iter_mut().enumerate() {
         let chunk = hex
@@ -379,6 +392,21 @@ pub fn economy_event_to_routing_fold_event(
                 scaffold_id: updated.route_scaffold.clone(),
             };
             let event_hash = parse_event_hash(&updated.event_hash)?;
+            // Tape-integrity guard: never trust the deserialized `event_hash` field --
+            // re-derive the identity digest from the event's own fields (the same
+            // `routing_prior_event_hash` the `EconomyEvent::routing_prior_updated`
+            // constructor used to mint it) and hard-error on mismatch, so a
+            // forged/tampered row can never smuggle a chosen dedup identity into the fold.
+            let expected_event_hash = crate::routing_prior_event_hash(
+                &updated.route_domain,
+                &updated.route_scaffold,
+                updated.verdict,
+                &updated.verdict_source_id,
+                &updated.verifier_attestation_hash,
+            )?;
+            if updated.event_hash != expected_event_hash {
+                return Err(EconomyError::RoutingFoldEventHashMismatch);
+            }
             Ok(Some(RoutingFoldEvent::PriorUpdated {
                 key,
                 verdict: updated.verdict,
@@ -436,7 +464,15 @@ pub struct AnnealConfig {
 /// `N=0` returns exactly `τ_hi` (no approximation error: the zero exponent short-circuits
 /// before `exp2`/`log2` are invoked at all).
 pub fn tau_anneal_q32(n: u64, cfg: &AnnealConfig) -> Result<i128, EconomyError> {
-    if cfg.n_anneal == 0 || cfg.tau_hi_q32 <= 0 || cfg.tau_lo_q32 <= 0 {
+    // `tau_lo_q32 > tau_hi_q32` is a degenerate (inverted-bounds) configuration: the
+    // annealing schedule is defined as a decay from τ_hi down to τ_lo, and an inverted
+    // pair makes the exponent positive/unbounded (the exact shape that reaches
+    // `exp2_q32`'s saturation region). Rejected like the other degenerate configs.
+    if cfg.n_anneal == 0
+        || cfg.tau_hi_q32 <= 0
+        || cfg.tau_lo_q32 <= 0
+        || cfg.tau_lo_q32 > cfg.tau_hi_q32
+    {
         return Err(EconomyError::RoutingFoldInvalidAnnealConfig);
     }
     if n == 0 {
@@ -747,6 +783,43 @@ mod tests {
             tau_anneal_q32(5, &cfg),
             Err(EconomyError::RoutingFoldInvalidAnnealConfig)
         );
+    }
+
+    #[test]
+    fn tau_anneal_rejects_inverted_tau_bounds() {
+        let mut cfg = test_anneal_cfg();
+        std::mem::swap(&mut cfg.tau_hi_q32, &mut cfg.tau_lo_q32); // now tau_lo > tau_hi
+        assert_eq!(
+            tau_anneal_q32(5, &cfg),
+            Err(EconomyError::RoutingFoldInvalidAnnealConfig)
+        );
+        // Equal bounds remain a valid (constant-τ) configuration, not newly rejected.
+        let mut flat = test_anneal_cfg();
+        flat.tau_lo_q32 = flat.tau_hi_q32;
+        assert!(tau_anneal_q32(5, &flat).is_ok());
+    }
+
+    // -- Decision 4: exp2_q32 positive-saturation regression -----------------------
+
+    /// Regression: `floor_part == 95` used to compute `base << 95` with `base` in
+    /// `[2^32, 2^33)`, wrapping the i128 sign bit into a huge NEGATIVE "exponential"
+    /// (violating the documented "saturates" contract). It must saturate to `i128::MAX`.
+    #[test]
+    fn exp2_q32_saturates_positive_at_floor_part_95_never_negative() {
+        assert_eq!(exp2_q32(95 * Q32_ONE), i128::MAX);
+        assert_eq!(exp2_q32(95 * Q32_ONE + Q32_ONE / 2), i128::MAX);
+        assert_eq!(exp2_q32(96 * Q32_ONE), i128::MAX);
+        // Just below the saturation threshold: still a plain (large, positive) shift.
+        let at_94 = exp2_q32(94 * Q32_ONE);
+        assert_eq!(at_94, Q32_ONE << 94);
+        assert!(at_94 > 0);
+        // Blanket property near the threshold: exp2 of a positive input is never negative.
+        for floor in 90..100 {
+            assert!(
+                exp2_q32(floor * Q32_ONE + Q32_ONE / 3) > 0,
+                "exp2_q32 must never go negative (floor_part={floor})"
+            );
+        }
     }
 
     // -- Decision 3: N_eff floor arbitration hook, "floor wins" -------------------

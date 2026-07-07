@@ -197,6 +197,81 @@ fn malformed_hash_is_a_hard_translation_error_not_swallowed() {
     assert_eq!(result, Err(EconomyError::RoutingFoldMalformedEventHash));
 }
 
+/// Fix-regression: `parse_event_hash` must reject `+`-signed and uppercase hex aliases.
+/// `u8::from_str_radix` alone is lenient (`"+f"` parses as 15; `"AB"`/`"ab"` parse to the
+/// same byte), so without a strict `[0-9a-f]` alphabet check two differently-spelled hash
+/// strings would alias to one clawback-dedup identity. Exercised through the clawback
+/// variant (whose hash is a pure reference, with no recompute-from-fields cross-check).
+#[test]
+fn parse_event_hash_rejects_signed_and_uppercase_hex_aliases() {
+    let signed = format!("sha256:+f{}", "ab".repeat(31)); // 64 chars, "+f" leads
+    let uppercase = format!("sha256:{}", "AB".repeat(32)); // 64 chars, uppercase hex
+    let mixed_case = format!("sha256:{}{}", "Ab".repeat(16), "ab".repeat(16));
+    for bad_hash in [signed, uppercase, mixed_case] {
+        let forged_clawback =
+            EconomyEvent::RoutingPriorClawback(turing_economy::RoutingPriorClawback {
+                schema_id: "routing_prior_clawback.v1".to_string(),
+                event_type: "RoutingPriorClawback".to_string(),
+                head_effect: "PRESERVE".to_string(),
+                updated_event_hash: bad_hash.clone(),
+            });
+        assert_eq!(
+            routing_fold::economy_event_to_routing_fold_event(&forged_clawback),
+            Err(EconomyError::RoutingFoldMalformedEventHash),
+            "hash spelling {bad_hash:?} must be rejected, not leniently parsed"
+        );
+    }
+
+    // The exact lowercase spelling of the same bytes remains parseable (referencing an
+    // unknown target is then the fold's problem, not the parser's) -- only the alias
+    // spellings are newly rejected.
+    let lowercase = format!("sha256:{}", "ab".repeat(32));
+    let legit_clawback = EconomyEvent::routing_prior_clawback(lowercase).expect("constructs");
+    assert!(routing_fold::economy_event_to_routing_fold_event(&legit_clawback).is_ok());
+}
+
+/// Fix-regression (tape-integrity guard): the translation layer must never trust a
+/// deserialized `RoutingPriorUpdated.event_hash` field -- it re-derives the identity digest
+/// from the event's own fields and hard-errors on mismatch. A constructor-built event (the
+/// only kind this codebase ever writes, incl. via `econ_fold_cli build-routing-prior-updated`)
+/// still translates fine.
+#[test]
+fn tampered_event_hash_is_rejected_and_constructor_built_event_still_translates() {
+    let legit = updated_event(
+        "code_review",
+        "scaffold:sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        true,
+        "verifier:heldout-diff-checker-v1",
+        "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+    );
+    // Legit path: constructor-minted event_hash matches the re-derivation -> Ok(Some(..)).
+    let translated = routing_fold::economy_event_to_routing_fold_event(&legit)
+        .expect("constructor-built event must translate");
+    assert!(translated.is_some(), "RoutingPriorUpdated must map to a fold event");
+
+    // Tampered path: same event, but the event_hash field is swapped for a *well-formed*
+    // (correct format, wrong value) digest -- e.g. an attacker re-pointing dedup identity.
+    let mut tampered_payload = updated_payload(&legit).clone();
+    tampered_payload.event_hash = format!("sha256:{}", "ab".repeat(32));
+    let tampered = EconomyEvent::RoutingPriorUpdated(tampered_payload);
+    assert_eq!(
+        routing_fold::economy_event_to_routing_fold_event(&tampered),
+        Err(EconomyError::RoutingFoldEventHashMismatch),
+        "a tampered event_hash must be a hard error, never folded"
+    );
+
+    // A tampered *field* (verdict flip) with the original hash is the same forgery seen
+    // from the other side: the recomputed digest no longer matches the carried hash.
+    let mut flipped_payload = updated_payload(&legit).clone();
+    flipped_payload.verdict = false;
+    let flipped = EconomyEvent::RoutingPriorUpdated(flipped_payload);
+    assert_eq!(
+        routing_fold::economy_event_to_routing_fold_event(&flipped),
+        Err(EconomyError::RoutingFoldEventHashMismatch),
+        "a verdict flip under the original hash must be a hard error, never folded"
+    );
+}
+
 fn parse_sha256(value: &str) -> [u8; 32] {
     let hex = value.strip_prefix("sha256:").expect("sha256: prefix");
     let mut bytes = [0u8; 32];

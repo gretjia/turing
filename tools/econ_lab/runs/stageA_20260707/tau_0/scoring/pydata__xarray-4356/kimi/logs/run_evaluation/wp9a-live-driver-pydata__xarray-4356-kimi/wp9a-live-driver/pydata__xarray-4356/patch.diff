@@ -1,0 +1,12 @@
+diff --git a/xarray/core/nanops.py b/xarray/core/nanops.py
+--- a/xarray/core/nanops.py
++++ b/xarray/core/nanops.py
+@@ -26,7 +26,7 @@ def _maybe_null_out(result, axis, mask, min_count=1):
+     if axis is None:
+         null_count = min_count - mask.size + mask.sum()
+     else:
+-        null_count = min_count - mask.shape[axis] + mask.sum(axis=axis)
++        null_count = min_count - np.take(mask.shape, axis).prod() + mask.sum(axis=axis)
+     if np.ndim(null_count) == 0 and null_count > 0:
+         result = np.nan
+     else:

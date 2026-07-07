@@ -46,7 +46,7 @@
 //!   echo '<diversity-metrics request JSON>'            | econ_fold_cli diversity-metrics
 //!   echo '<build-routing-prior-updated request JSON>'  | econ_fold_cli build-routing-prior-updated
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::Read;
 
 use serde::{Deserialize, Serialize};
@@ -325,6 +325,20 @@ fn run_fold_and_suggest(input: &str) -> Result<String, String> {
     // file, a radix conversion (see module doc), not a reimplementation of Q_eff itself.
     let mut routes: Vec<CandidateRoute> = Vec::with_capacity(request.candidate_routes.len());
     let mut signals: Vec<PriceSignal> = Vec::with_capacity(request.candidate_routes.len());
+    // `MarketRouter::suggest` joins each route back to its synthesized PriceSignal by
+    // `market_id` (first match wins), so a duplicate `market_id` across candidate routes
+    // would silently misattribute one route's Q_eff to another: reject it up front.
+    let mut seen_market_ids: BTreeSet<&str> = BTreeSet::new();
+    for route_input in &request.candidate_routes {
+        if !seen_market_ids.insert(route_input.market_id.as_str()) {
+            return Err(format!(
+                "duplicate market_id {:?} across candidate_routes: every candidate route \
+                 must reference a distinct market_id (the per-route Q_eff price signal is \
+                 joined back by market_id, so a duplicate would silently misattribute Q_eff)",
+                route_input.market_id
+            ));
+        }
+    }
     for route_input in &request.candidate_routes {
         let key = RoutingKey {
             domain_bucket: route_input.domain_bucket.clone(),
