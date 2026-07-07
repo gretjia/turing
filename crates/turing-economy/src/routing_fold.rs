@@ -53,7 +53,13 @@ const EXP2F_C3_Q32: i128 = 239_780_565;
 
 /// Q32.32 multiply, truncating toward zero (ADR-ECON-003 Decision 4), saturating instead
 /// of panicking on the (practically unreachable at realistic magnitudes) overflow case.
-fn q32_mul(a: i128, b: i128) -> i128 {
+///
+/// `pub(crate)` (not private): WP5's `diversity_metrics` module reuses this primitive
+/// rather than re-declaring it a second time now that both live in the same crate/branch
+/// (the "re-declared rather than imported" rationale on `exp2_q32`/`log2_q32` below was
+/// specifically about cross-worktree/branch separation during parallel WP1/WP3 development;
+/// that constraint no longer applies to a module added after the merge).
+pub(crate) fn q32_mul(a: i128, b: i128) -> i128 {
     match a.checked_mul(b) {
         Some(product) => product / Q32_ONE,
         None if (a >= 0) == (b >= 0) => i128::MAX,
@@ -95,7 +101,10 @@ fn exp2_q32(y: i128) -> i128 {
 /// `log2(x)` for `x > 0` in Q32.32 -- see the module-level "Known spec gap" note.
 /// Deterministic fixed-iteration-count bisection against the pinned [`exp2_q32`]; never
 /// reads any external state, never varies its iteration count by input.
-fn log2_q32(x: i128) -> i128 {
+///
+/// `pub(crate)`: reused by WP5's `diversity_metrics` module for `H_lineage`'s Shannon-entropy
+/// `log2` term (same crate, no re-declaration needed post-merge; see [`q32_mul`]'s note).
+pub(crate) fn log2_q32(x: i128) -> i128 {
     debug_assert!(x > 0, "log2_q32 domain is x > 0");
     let mut lo: i128 = -(64 * Q32_ONE);
     let mut hi: i128 = 64 * Q32_ONE;
