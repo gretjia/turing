@@ -252,3 +252,55 @@ fn d5_defense_check_error_text_never_leaks_forbidden_coefficient_markers() {
         }
     }
 }
+
+/// WP4 (design doc R1.1 §7 WP4; ADR-ECON-003 Decision 2/6) — PRESERVE assertion for the
+/// new `RoutingPriorUpdated`/`RoutingPriorClawback` events, same pattern as ADR-ECON-001's
+/// `PrincipalDeclared`: constructed via the public constructor (never a hand-rolled struct
+/// literal, so this exercises the same code path production callers use), asserting
+/// `head_effect == "PRESERVE"` directly on the event AND that the closed event registry
+/// agrees (ECONOMY class, so `hunt_authority.rs` in `turing-predicate`'s registry sweep
+/// covers it too -- this test pins the two sources of truth to agree).
+#[test]
+fn routing_prior_events_are_preserve_class_in_both_the_constructor_and_the_registry() {
+    let updated = EconomyEvent::routing_prior_updated(
+        "code_review",
+        "scaffold:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        true,
+        "verifier:heldout-diff-checker-v1",
+        "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    )
+    .expect("routing_prior_updated constructs on well-formed input");
+    let EconomyEvent::RoutingPriorUpdated(updated_payload) = &updated else {
+        panic!("routing_prior_updated must return EconomyEvent::RoutingPriorUpdated");
+    };
+    assert_eq!(
+        updated_payload.head_effect, "PRESERVE",
+        "OBSERVED head_effect={:?}, EXPECTED \"PRESERVE\" for RoutingPriorUpdated",
+        updated_payload.head_effect
+    );
+
+    let clawback = EconomyEvent::routing_prior_clawback(updated_payload.event_hash.clone())
+        .expect("routing_prior_clawback constructs on a well-formed digest");
+    let EconomyEvent::RoutingPriorClawback(clawback_payload) = &clawback else {
+        panic!("routing_prior_clawback must return EconomyEvent::RoutingPriorClawback");
+    };
+    assert_eq!(
+        clawback_payload.head_effect, "PRESERVE",
+        "OBSERVED head_effect={:?}, EXPECTED \"PRESERVE\" for RoutingPriorClawback",
+        clawback_payload.head_effect
+    );
+
+    // Cross-check against the closed registry (the same source of truth
+    // `turing-predicate`'s registry-sweep `hunt_authority.rs` reads): both new event
+    // names must resolve as ECONOMY-class / PRESERVE, never a forged/absent row.
+    for name in ["RoutingPriorUpdated", "RoutingPriorClawback"] {
+        let row = turing_contracts::registry::registry(name)
+            .unwrap_or_else(|| panic!("{name} must be present in the closed event registry"));
+        assert_eq!(
+            row.class,
+            turing_contracts::registry::EventClass::Economy,
+            "{name}: OBSERVED class={:?}, EXPECTED Economy",
+            row.class
+        );
+    }
+}

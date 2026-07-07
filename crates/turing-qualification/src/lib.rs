@@ -422,6 +422,10 @@ fn economy_payload(event: &EconomyEvent) -> DemoResult<Value> {
         // ADR-ECON-001: not emitted by this qualification demo harness today; kept exhaustive
         // so a future `PrincipalDeclared` append here would still serialize correctly.
         EconomyEvent::PrincipalDeclared(inner) => to_value(inner),
+        // WP4: likewise not emitted by this demo harness today; kept exhaustive so a
+        // future `RoutingPriorUpdated`/`RoutingPriorClawback` append would still serialize.
+        EconomyEvent::RoutingPriorUpdated(inner) => to_value(inner),
+        EconomyEvent::RoutingPriorClawback(inner) => to_value(inner),
     }
 }
 

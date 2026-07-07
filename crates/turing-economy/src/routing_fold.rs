@@ -9,11 +9,17 @@
 //! parameter *value* to leak (Art III.4, F4). The concrete numbers only ever appear in
 //! test fixtures, never in production-facing code, comments, or error paths.
 //!
-//! Scope note: this module implements the fold and the arbitration hook only. The actual
-//! `RoutingPriorUpdated` / `RoutingPriorClawback` `EconomyEvent` variants (and their
-//! independent-verifier wiring per ADR-ECON-003 Decision 2) are WP4's deliverable (design
-//! doc §7); [`RoutingFoldEvent`] is this fold's own input contract so WP3 is independently
-//! testable ahead of WP4 -- WP4 need only translate committed tape events into it.
+//! Scope note: this module implements the fold, the arbitration hook, and (WP4, design doc
+//! §7/§4 G3) the deterministic translation from committed `crate::EconomyEvent::
+//! RoutingPriorUpdated`/`RoutingPriorClawback` tape events into this fold's own
+//! [`RoutingFoldEvent`] input contract -- see [`economy_event_to_routing_fold_event`] /
+//! [`economy_events_to_routing_fold_events`] / [`fold_routing_state_from_tape`] below. The
+//! `EconomyEvent` variants themselves (and their independent-verifier constructor wiring
+//! per ADR-ECON-003 Decision 2) live in `crate::lib` (`EconomyEvent::routing_prior_updated`/
+//! `routing_prior_clawback`), following the `PrincipalDeclared` ADDITIVE_AGENT_ECONOMY_V1_0
+//! precedent (ADR-ECON-001); this module never reads or writes them directly except through
+//! the translation functions below, so [`fold_routing_state`] itself stays untouched (WP4's
+//! job is to feed this pre-existing seam, not reimplement it).
 //!
 //! Known spec gap (reported, not guessed): ADR-ECON-003 Decision 4 pins the `exp2f` cubic
 //! polynomial but does not pin a `log2` polynomial, even though Decision 4 says "τ(N) 的幂
@@ -316,6 +322,88 @@ pub fn fold_routing_state(
         }
     }
     Ok(nodes)
+}
+
+// ---------------------------------------------------------------------------
+// WP4 (design doc R1.1 §7 WP4/§4 G3; ADR-ECON-003 Decision 2/6) -- deterministic
+// translation from committed `crate::EconomyEvent` tape rows into this fold's own
+// `RoutingFoldEvent` input contract. Plugs the pre-existing WP3 seam above; does not
+// reimplement it.
+// ---------------------------------------------------------------------------
+
+/// Parse a `sha256:`-prefixed 64-hex-digit digest (the format
+/// `crate::EconomyEvent::routing_prior_updated`/`routing_prior_clawback` already validate
+/// on construction) into 32 raw bytes. Total: malformed input is a hard error, never a
+/// silently-truncated/zero-padded hash.
+fn parse_event_hash(value: &str) -> Result<[u8; 32], EconomyError> {
+    let hex = value
+        .strip_prefix("sha256:")
+        .ok_or(EconomyError::RoutingFoldMalformedEventHash)?;
+    if hex.len() != 64 {
+        return Err(EconomyError::RoutingFoldMalformedEventHash);
+    }
+    let mut bytes = [0u8; 32];
+    for (i, byte) in bytes.iter_mut().enumerate() {
+        let chunk = hex
+            .get(i * 2..i * 2 + 2)
+            .ok_or(EconomyError::RoutingFoldMalformedEventHash)?;
+        *byte = u8::from_str_radix(chunk, 16)
+            .map_err(|_| EconomyError::RoutingFoldMalformedEventHash)?;
+    }
+    Ok(bytes)
+}
+
+/// Deterministically translate one committed `crate::EconomyEvent` into this fold's own
+/// [`RoutingFoldEvent`] input contract (ADR-ECON-003 Decision 6). Every non-routing-prior
+/// `EconomyEvent` variant maps to `Ok(None)` (not a routing-fold input at all) -- this
+/// function invents no new fold semantics; it only relays the fields
+/// `EconomyEvent::routing_prior_updated`/`routing_prior_clawback` already crafted
+/// (`RoutingKey { domain_bucket, scaffold_id }` from the event's routing-key value fields,
+/// the verdict bit, and the parsed hash) into this module's pre-existing seam.
+pub fn economy_event_to_routing_fold_event(
+    event: &crate::EconomyEvent,
+) -> Result<Option<RoutingFoldEvent>, EconomyError> {
+    match event {
+        crate::EconomyEvent::RoutingPriorUpdated(updated) => {
+            let key = RoutingKey {
+                domain_bucket: updated.route_domain.clone(),
+                scaffold_id: updated.route_scaffold.clone(),
+            };
+            let event_hash = parse_event_hash(&updated.event_hash)?;
+            Ok(Some(RoutingFoldEvent::PriorUpdated {
+                key,
+                verdict: updated.verdict,
+                event_hash,
+            }))
+        }
+        crate::EconomyEvent::RoutingPriorClawback(clawback) => {
+            let updated_event_hash = parse_event_hash(&clawback.updated_event_hash)?;
+            Ok(Some(RoutingFoldEvent::Clawback { updated_event_hash }))
+        }
+        _ => Ok(None),
+    }
+}
+
+/// Order-preserving batch form of [`economy_event_to_routing_fold_event`] (Art 0.2: a pure,
+/// tape-order-preserving map -- never reorders, never silently drops a malformed hash).
+pub fn economy_events_to_routing_fold_events(
+    events: &[crate::EconomyEvent],
+) -> Result<Vec<RoutingFoldEvent>, EconomyError> {
+    events
+        .iter()
+        .filter_map(|event| economy_event_to_routing_fold_event(event).transpose())
+        .collect()
+}
+
+/// Convenience seam (WP4): translate `events` then fold in one call, so a caller need not
+/// import [`RoutingFoldEvent`] at all. This is the "already-existing seam" the design
+/// doc/ADR direct WP4 to plug into -- [`fold_routing_state`] itself is untouched.
+pub fn fold_routing_state_from_tape(
+    initial_prices: &BTreeMap<RoutingKey, i128>,
+    events: &[crate::EconomyEvent],
+) -> Result<BTreeMap<RoutingKey, NodeState>, EconomyError> {
+    let fold_events = economy_events_to_routing_fold_events(events)?;
+    fold_routing_state(initial_prices, &fold_events)
 }
 
 // ---------------------------------------------------------------------------
