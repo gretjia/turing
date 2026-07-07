@@ -30,6 +30,18 @@ pub enum EconomyEvent {
     /// when aggregating, falling back to the literal `agent_id` when no declaration exists
     /// (back-compat with every pre-ADR-ECON-001 fixture/call site).
     PrincipalDeclared(PrincipalDeclared),
+    /// WP4 (design doc R1.1 §7 WP4/§4 G3; ADR-ECON-003 Decision 2/6): the independent
+    /// verifier's (structurally separate from the ∏p accept predicate, per Decision 2)
+    /// PASS/FAIL verdict on one routed scaffold attempt, additive and PRESERVE-class,
+    /// following the same `ADDITIVE_AGENT_ECONOMY_V1_0` registry pattern as
+    /// `PrincipalDeclared` above. Consumed only by `routing_fold::fold_routing_state`
+    /// (via [`routing_fold::economy_events_to_routing_fold_events`]) to update a node's
+    /// `(Q, N, P)` state; never moves `accepted_head`.
+    RoutingPriorUpdated(RoutingPriorUpdated),
+    /// WP4: an exact after-the-fact reversal of one earlier `RoutingPriorUpdated`
+    /// (ADR-ECON-003 Decision 6.3 "clawback"), referenced by that event's own `event_hash`.
+    /// Additive, PRESERVE-class, same registry pattern.
+    RoutingPriorClawback(RoutingPriorClawback),
 }
 
 impl EconomyEvent {
@@ -140,6 +152,100 @@ impl EconomyEvent {
             agent_id: agent_id.into(),
         })
     }
+
+    /// WP4 (design doc R1.1 §7 WP4; ADR-ECON-003 Decision 2/6): construct an independent
+    /// verifier's verdict event on one `(route_domain, route_scaffold)` routing key. Additive,
+    /// PRESERVE-class, follows the `principal_declared` constructor's ADDITIVE_AGENT_ECONOMY_V1_0
+    /// pattern above.
+    ///
+    /// `verdict_source_id` identifies which independent verifier instance produced the
+    /// verdict (ADR-ECON-003 Decision 2.2: a structurally separate crate/binary from the
+    /// ∏p accept predicate) -- opaque to this constructor, carries no formula/threshold value.
+    /// `verifier_attestation_hash` must already be a `sha256:`-prefixed 64-hex digest (same
+    /// format as `price_signal_hash`/`pput_prior_hash` above).
+    ///
+    /// `event_hash` is *derived*, not caller-supplied: a JCS-SHA256 digest over the event's
+    /// own identity fields (Art 0.2 determinism -- the same five inputs always fold to the
+    /// same `event_hash`, so a `RoutingPriorClawback` can reference it exactly and
+    /// `routing_fold::fold_routing_state`'s duplicate-hash dedup is meaningful).
+    pub fn routing_prior_updated(
+        route_domain: impl Into<String>,
+        route_scaffold: impl Into<String>,
+        verdict: bool,
+        verdict_source_id: impl Into<String>,
+        verifier_attestation_hash: impl Into<String>,
+    ) -> Result<Self, EconomyError> {
+        let route_domain = route_domain.into();
+        let route_scaffold = route_scaffold.into();
+        let verdict_source_id = verdict_source_id.into();
+        let verifier_attestation_hash = verifier_attestation_hash.into();
+        validate_digest(&verifier_attestation_hash)?;
+
+        let event_hash = routing_prior_event_hash(
+            &route_domain,
+            &route_scaffold,
+            verdict,
+            &verdict_source_id,
+            &verifier_attestation_hash,
+        )?;
+
+        Ok(EconomyEvent::RoutingPriorUpdated(RoutingPriorUpdated {
+            schema_id: "routing_prior_updated.v1".to_string(),
+            event_type: "RoutingPriorUpdated".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_domain,
+            route_scaffold,
+            verdict,
+            verdict_source_id,
+            verifier_attestation_hash,
+            event_hash,
+        }))
+    }
+
+    /// WP4 (ADR-ECON-003 Decision 6.3): an exact inverse of one earlier
+    /// `RoutingPriorUpdated`, referenced by that event's own `event_hash` (as produced by
+    /// [`Self::routing_prior_updated`]). Additive, PRESERVE-class. Validity of the
+    /// reference (must exist, must not already be clawed back) is enforced downstream by
+    /// `routing_fold::fold_routing_state`, not here -- this constructor only shapes the
+    /// event.
+    pub fn routing_prior_clawback(updated_event_hash: impl Into<String>) -> Result<Self, EconomyError> {
+        let updated_event_hash = updated_event_hash.into();
+        validate_digest(&updated_event_hash)?;
+        Ok(EconomyEvent::RoutingPriorClawback(RoutingPriorClawback {
+            schema_id: "routing_prior_clawback.v1".to_string(),
+            event_type: "RoutingPriorClawback".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            updated_event_hash,
+        }))
+    }
+}
+
+/// `event_hash` for a `RoutingPriorUpdated` event (ADR-ECON-003 Decision 6.3 dedup key):
+/// JCS-canonicalize the event's own identity fields and SHA-256 them, same codec used by
+/// `routing_fold::scaffold_id` (`turing_contracts::jcs`). Pure function of its five
+/// arguments only (Art 0.2) -- never reads clock/random/global state, so the same tape
+/// replayed twice always derives byte-identical `event_hash`es.
+fn routing_prior_event_hash(
+    route_domain: &str,
+    route_scaffold: &str,
+    verdict: bool,
+    verdict_source_id: &str,
+    verifier_attestation_hash: &str,
+) -> Result<String, EconomyError> {
+    let value = serde_json::json!({
+        "schema": "routing_prior_updated_identity.v1",
+        "route_domain": route_domain,
+        "route_scaffold": route_scaffold,
+        "verdict": verdict,
+        "verdict_source_id": verdict_source_id,
+        "verifier_attestation_hash": verifier_attestation_hash,
+    });
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingEventIdentity(e.to_string()))?;
+    Ok(format!(
+        "sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -232,6 +338,50 @@ pub struct PrincipalDeclared {
     pub head_effect: String,
     pub principal_id: String,
     pub agent_id: String,
+}
+
+/// WP4 (design doc R1.1 §7 WP4/§4 G3; ADR-ECON-003 Decision 2/6): one independent
+/// verifier's PASS/FAIL verdict on a routed `(route_domain, route_scaffold)` attempt.
+/// Additive, PRESERVE-class -- see [`EconomyEvent::routing_prior_updated`]. Consumed by
+/// `routing_fold::economy_events_to_routing_fold_events` to feed
+/// `routing_fold::fold_routing_state` (WP3's pre-existing seam); this struct itself never
+/// carries a τ/λ/floor value (Art III.4/F4) -- only the routing key (as
+/// caller-computed opaque strings; see `routing_fold::domain_bucket`/`scaffold_id` key
+/// functions), the verdict bit, and the independent-verifier provenance.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RoutingPriorUpdated {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    /// The routed key's domain component (ADR-ECON-003 Decision 1 `domain_bucket` key
+    /// function's *output value*, carried under a non-reserved field name -- see the F4
+    /// gate's identifier-only scan surface, `tools/gates/gate_f4_econ_leakage.sh`).
+    pub route_domain: String,
+    /// The routed key's scaffold component (ADR-ECON-003 Decision 1 `scaffold_id` key
+    /// function's *output value*; same field-naming rationale as `route_domain` above).
+    pub route_scaffold: String,
+    /// Independent verifier's verdict (ADR-ECON-003 Decision 2; `true` = PASS).
+    pub verdict: bool,
+    /// Identifies which independent verifier instance produced this verdict (ADR-ECON-003
+    /// Decision 2.2: structurally separate from the ∏p accept predicate). Opaque string.
+    pub verdict_source_id: String,
+    /// `sha256:`-prefixed 64-hex attestation digest from the independent verifier.
+    pub verifier_attestation_hash: String,
+    /// JCS-SHA256 identity digest over this event's own fields (see
+    /// [`EconomyEvent::routing_prior_updated`]); the dedup/reference key a later
+    /// `RoutingPriorClawback` names.
+    pub event_hash: String,
+}
+
+/// WP4 (ADR-ECON-003 Decision 6.3): exact after-the-fact reversal of one earlier
+/// `RoutingPriorUpdated`. Additive, PRESERVE-class.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RoutingPriorClawback {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    /// References the `event_hash` of the `RoutingPriorUpdated` being reversed.
+    pub updated_event_hash: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -435,7 +585,12 @@ impl MarketReplay {
                 }
                 EconomyEvent::PositionMinted(_)
                 | EconomyEvent::RewardDistributed(_)
-                | EconomyEvent::PrincipalDeclared(_) => {}
+                | EconomyEvent::PrincipalDeclared(_)
+                // WP4: independent-verifier routing-prior events are not market state
+                // (no market_id, no coin flow) -- they only feed `routing_fold`'s (Q, N, P)
+                // fold, a separate projection entirely.
+                | EconomyEvent::RoutingPriorUpdated(_)
+                | EconomyEvent::RoutingPriorClawback(_) => {}
             }
         }
         Ok(MarketReplay {
@@ -523,7 +678,10 @@ impl WalletProjection {
                     wallet.coin += DecimalAmount::parse_non_negative(&reward.reward_coin)?;
                     wallet.coin -= DecimalAmount::parse_non_negative(&reward.slash_coin)?;
                 }
-                EconomyEvent::MarketCreated(_) | EconomyEvent::PrincipalDeclared(_) => {}
+                EconomyEvent::MarketCreated(_)
+                | EconomyEvent::PrincipalDeclared(_)
+                | EconomyEvent::RoutingPriorUpdated(_)
+                | EconomyEvent::RoutingPriorClawback(_) => {}
             }
         }
 
@@ -720,7 +878,12 @@ pub fn check_conservation(
             }
             // ADR-ECON-001: a principal declaration is an identity fact, not a coin-flow event;
             // it carries no market_id and never affects mint/redemption conservation math.
-            EconomyEvent::PrincipalDeclared(_) => {}
+            // WP4: routing-prior events are likewise not coin-flow (no market_id, no
+            // minted/redeemed/reward coin) -- excluded from conservation math for the same
+            // reason, symmetric with PrincipalDeclared above.
+            EconomyEvent::PrincipalDeclared(_)
+            | EconomyEvent::RoutingPriorUpdated(_)
+            | EconomyEvent::RoutingPriorClawback(_) => {}
         }
     }
 
@@ -1642,6 +1805,14 @@ pub enum EconomyError {
     /// WP3 (ADR-ECON-003 Decision 5/6): `AnnealConfig` was degenerate (zero `N_anneal`, or
     /// a non-positive τ bound). Carries no numeric value (F4).
     RoutingFoldInvalidAnnealConfig,
+    /// WP4 (ADR-ECON-003 Decision 6): `EconomyEvent::routing_prior_updated`'s JCS
+    /// canonicalization of its own identity fields rejected the input. Carries only the
+    /// generic codec diagnostic, never a routing-key or verdict value.
+    InvalidRoutingEventIdentity(String),
+    /// WP4 (ADR-ECON-003 Decision 2/6): `routing_fold::economy_events_to_routing_fold_events`
+    /// found a `RoutingPriorUpdated`/`RoutingPriorClawback` hash field that does not parse
+    /// as 32 raw bytes (i.e. is not a `sha256:` + 64-hex digest of the expected width).
+    RoutingFoldMalformedEventHash,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -1705,6 +1876,12 @@ impl std::fmt::Display for EconomyError {
             }
             EconomyError::RoutingFoldInvalidAnnealConfig => {
                 write!(f, "routing fold: invalid annealing configuration")
+            }
+            EconomyError::InvalidRoutingEventIdentity(detail) => {
+                write!(f, "invalid routing-event identity: {detail}")
+            }
+            EconomyError::RoutingFoldMalformedEventHash => {
+                write!(f, "routing fold: malformed event hash")
             }
         }
     }
