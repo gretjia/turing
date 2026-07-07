@@ -26,7 +26,7 @@ impl EconomyEvent {
         pool_n: &str,
     ) -> Result<Self, EconomyError> {
         let pool = AmmPool::new(market_id.into(), pool_y, pool_n)?;
-        let k = pool.k_string();
+        let k = pool.k_string()?;
         Ok(EconomyEvent::MarketCreated(MarketCreated {
             schema_id: "market_created.v1".to_string(),
             event_type: "MarketCreated".to_string(),
@@ -246,8 +246,8 @@ impl AmmPool {
             pool_n_before: self.pool_n.to_decimal_string(),
             pool_y_after: pool_y_after.to_decimal_string(),
             pool_n_after: pool_n_after.to_decimal_string(),
-            invariant_k_before: self.k_string(),
-            invariant_k_after: DecimalAmount::mul(pool_y_after, pool_n_after).to_decimal_string(),
+            invariant_k_before: self.k_string()?,
+            invariant_k_after: DecimalAmount::mul(pool_y_after, pool_n_after)?.to_decimal_string(),
             effective_price: DecimalAmount::ratio(pay, get_y)?.to_decimal_string(),
         })
     }
@@ -280,14 +280,14 @@ impl AmmPool {
             pool_n_before: self.pool_n.to_decimal_string(),
             pool_y_after: pool_y_after.to_decimal_string(),
             pool_n_after: pool_n_after.to_decimal_string(),
-            invariant_k_before: self.k_string(),
-            invariant_k_after: DecimalAmount::mul(pool_y_after, pool_n_after).to_decimal_string(),
+            invariant_k_before: self.k_string()?,
+            invariant_k_after: DecimalAmount::mul(pool_y_after, pool_n_after)?.to_decimal_string(),
             effective_price: DecimalAmount::ratio(pay, get_n)?.to_decimal_string(),
         })
     }
 
-    fn k_string(&self) -> String {
-        DecimalAmount::mul(self.pool_y, self.pool_n).to_decimal_string()
+    fn k_string(&self) -> Result<String, EconomyError> {
+        Ok(DecimalAmount::mul(self.pool_y, self.pool_n)?.to_decimal_string())
     }
 }
 
@@ -304,8 +304,8 @@ fn assert_k_non_decreasing(
     pool_y_after: DecimalAmount,
     pool_n_after: DecimalAmount,
 ) -> Result<(), EconomyError> {
-    let k_before = DecimalAmount::mul(pool_y_before, pool_n_before);
-    let k_after = DecimalAmount::mul(pool_y_after, pool_n_after);
+    let k_before = DecimalAmount::mul(pool_y_before, pool_n_before)?;
+    let k_after = DecimalAmount::mul(pool_y_after, pool_n_after)?;
     if k_after < k_before {
         return Err(EconomyError::PostTradeInvariantViolated {
             k_before: k_before.to_decimal_string(),
@@ -962,10 +962,25 @@ impl DecimalAmount {
         self.units == 0
     }
 
-    fn mul(left: DecimalAmount, right: DecimalAmount) -> DecimalAmount {
-        DecimalAmount {
-            units: left.units * right.units / SCALE,
-        }
+    /// INV-7 fix: the intermediate product `left.units * right.units` can exceed `i128::MAX`
+    /// for organically reachable pool/pay magnitudes (e.g. pool = pay = 2e10 decimal already
+    /// overflows, since raw units are scaled by SCALE=1e9). A bare `*` either panics (dev
+    /// profile, `overflow-checks = true`) or silently wraps to a corrupted value (release
+    /// profile, `overflow-checks = false` by default with no workspace override) — in the
+    /// release case the corrupted, wrapped value is exactly what gets written to the tape and
+    /// then re-validated by `assert_k_non_decreasing`/`verify_swap_post_trade_invariant`, which
+    /// re-derive `k` with the same vulnerable multiply and are therefore blind to the
+    /// corruption. `checked_mul` never panics and never wraps; on overflow we surface a
+    /// explicit `ArithmeticOverflow` error so the caller (`buy_yes`/`buy_no`) cleanly refuses
+    /// the trade instead of emitting a corrupted swap event, in both dev and release profiles.
+    fn mul(left: DecimalAmount, right: DecimalAmount) -> Result<DecimalAmount, EconomyError> {
+        let product = left
+            .units
+            .checked_mul(right.units)
+            .ok_or(EconomyError::ArithmeticOverflow)?;
+        Ok(DecimalAmount {
+            units: product / SCALE,
+        })
     }
 
     fn mul_div(
@@ -976,8 +991,12 @@ impl DecimalAmount {
         if denominator.is_zero() {
             return Err(EconomyError::DivisionByZero);
         }
+        let product = self
+            .units
+            .checked_mul(numerator.units)
+            .ok_or(EconomyError::ArithmeticOverflow)?;
         Ok(DecimalAmount {
-            units: self.units * numerator.units / denominator.units,
+            units: product / denominator.units,
         })
     }
 
@@ -988,8 +1007,12 @@ impl DecimalAmount {
         if denominator.is_zero() {
             return Err(EconomyError::DivisionByZero);
         }
+        let product = numerator
+            .units
+            .checked_mul(SCALE)
+            .ok_or(EconomyError::ArithmeticOverflow)?;
         Ok(DecimalAmount {
-            units: numerator.units * SCALE / denominator.units,
+            units: product / denominator.units,
         })
     }
 
@@ -1057,6 +1080,7 @@ pub enum EconomyError {
     ZeroPool,
     ZeroPay,
     DivisionByZero,
+    ArithmeticOverflow,
     UnknownMarket(String),
     NoCandidateRoutes,
     InvalidMicroEventId(String),
@@ -1078,6 +1102,10 @@ impl std::fmt::Display for EconomyError {
             EconomyError::ZeroPool => write!(f, "AMM pools must be non-zero"),
             EconomyError::ZeroPay => write!(f, "AMM pay_coin must be non-zero"),
             EconomyError::DivisionByZero => write!(f, "division by zero"),
+            EconomyError::ArithmeticOverflow => write!(
+                f,
+                "arithmetic overflow: intermediate product exceeds i128 range (INV-7)"
+            ),
             EconomyError::UnknownMarket(market_id) => write!(f, "unknown market {market_id:?}"),
             EconomyError::NoCandidateRoutes => write!(f, "no candidate routes available"),
             EconomyError::InvalidMicroEventId(id) => write!(f, "invalid Micro event id {id:?}"),

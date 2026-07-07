@@ -436,23 +436,31 @@ fn inv7_bounded_extreme_values_do_not_panic_property() {
     }
 }
 
-/// **Confirmed GAP, pinned (`SPEC_ECONOMY.md` INV-7):** `DecimalAmount::mul`/`mul_div`/
-/// `ratio` use bare `*`/`/` with no `checked_mul`. At pool/pay magnitudes still comfortably
+/// **INV-7 ENFORCED (was GAP, fixed in PART D.1):** `DecimalAmount::mul`/`mul_div`/`ratio`
+/// used to use bare `*`/`/` with no `checked_mul`. At pool/pay magnitudes still comfortably
 /// inside what `parse_non_negative`'s own `checked_mul` allows to be *parsed*
 /// (~1e26 decimal, i.e. ~1e35 raw units -- nowhere near `i128::MAX`/`SCALE` on their own),
-/// the very next multiplication inside `mul_div` (`self.units * numerator.units`) overflows
-/// `i128` and panics in a debug build (`overflow-checks = true` is Cargo's dev-profile
-/// default, unset by this workspace). This test intentionally pins that panic as an expected
-/// outcome rather than silently tolerating it: if a future fix adds checked arithmetic and
-/// returns a graceful `Err` instead, this test starts **failing** (no panic occurs), which is
-/// the correct signal to rewrite it as an `Ok`/`Err` assertion and flip INV-7 from GAP to
-/// ENFORCED in `SPEC_ECONOMY.md`.
+/// the very next multiplication inside `mul_div` (`self.units * numerator.units`) overflowed
+/// `i128`: a debug-build panic (`overflow-checks = true`, Cargo's dev-profile default), or a
+/// **silent wraparound** in a release build (`overflow-checks = false`, no workspace
+/// override) that corrupted pool state past every existing k-monotonicity guard (both
+/// `assert_k_non_decreasing` and `verify_swap_post_trade_invariant` re-derive `k` with the
+/// same vulnerable multiply).
+///
+/// Fix: `mul`/`mul_div`/`ratio` now use `i128::checked_mul` and return
+/// `EconomyError::ArithmeticOverflow` instead of panicking or wrapping, in both profiles.
+/// This regression pins the fixed behaviour: the overflow-inducing swap above is now cleanly
+/// refused, never panics, and never corrupts pool state.
 #[test]
-#[should_panic(expected = "attempt to multiply with overflow")]
-fn inv7_extreme_pool_sizes_overflow_is_a_confirmed_gap() {
+fn inv7_extreme_pool_sizes_overflow_is_now_refused_not_gap() {
     let huge = "100000000000000000000000000"; // 1e26 decimal -> ~1e35 raw units
     let pool = AmmPool::new("mkt_overflow", huge, huge).expect("huge pool constructs fine");
-    let _ = pool.buy_yes("attacker", huge); // panics inside DecimalAmount::mul_div
+    let result = pool.buy_yes("attacker", huge);
+    assert_eq!(
+        result,
+        Err(turing_economy::EconomyError::ArithmeticOverflow),
+        "INV-7 regression: overflow-inducing swap must be cleanly refused, not panic/wrap: got {result:?}"
+    );
 }
 
 // --- INV-8: minimum-liquidity floor (confirmed GAP, documented as a passing fact) ----------
