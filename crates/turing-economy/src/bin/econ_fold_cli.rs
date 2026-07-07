@@ -30,10 +30,21 @@
 //! merged) so the Python driver never re-derives N_eff/H_lineage itself, exactly the same
 //! "single source of truth" discipline as the two subcommands above.
 //!
+//! WP9b (ADR-ECON-003 Decision 2.4, 2026-07-07 增补; `tools/econ_lab/verifier/
+//! live_split_verifier.py`'s own live independent-verifier wiring): added the
+//! `build-routing-prior-updated` subcommand, a thin wrapper around
+//! `turing_economy::EconomyEvent::routing_prior_updated` (WP4, already merged). This exists
+//! solely so the Python live-run driver never recomputes the `event_hash` JCS-SHA256
+//! identity digest itself ("python 不重算任何公式") -- the driver reads a per-test-id
+//! independent verdict from the real SWE-bench harness's own report, then calls this
+//! subcommand to get back the fully-formed, correctly-hashed `EconomyEvent` to append to its
+//! `committed_routing_events` tape.
+//!
 //! Usage:
-//!   echo '<derive-keys request JSON>'        | econ_fold_cli derive-keys
-//!   echo '<fold-and-suggest request JSON>'   | econ_fold_cli fold-and-suggest
-//!   echo '<diversity-metrics request JSON>'  | econ_fold_cli diversity-metrics
+//!   echo '<derive-keys request JSON>'                  | econ_fold_cli derive-keys
+//!   echo '<fold-and-suggest request JSON>'             | econ_fold_cli fold-and-suggest
+//!   echo '<diversity-metrics request JSON>'            | econ_fold_cli diversity-metrics
+//!   echo '<build-routing-prior-updated request JSON>'  | econ_fold_cli build-routing-prior-updated
 
 use std::collections::BTreeMap;
 use std::io::Read;
@@ -435,6 +446,61 @@ fn run_diversity_metrics(input: &str) -> Result<String, String> {
 }
 
 // ---------------------------------------------------------------------------
+// build-routing-prior-updated (WP9b bridge; ADR-ECON-003 Decision 2.4)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct BuildRoutingPriorUpdatedRequest {
+    schema: String,
+    route_domain: String,
+    route_scaffold: String,
+    verdict: bool,
+    verdict_source_id: String,
+    /// `sha256:`-prefixed 64-hex attestation digest (validated by
+    /// `EconomyEvent::routing_prior_updated` itself, not re-validated here).
+    verifier_attestation_hash: String,
+}
+
+#[derive(Serialize)]
+struct BuildRoutingPriorUpdatedResponse {
+    schema: &'static str,
+    /// The fully-formed `EconomyEvent::RoutingPriorUpdated(..)`, serialized in the crate's
+    /// own externally-tagged enum representation (`{"RoutingPriorUpdated": {...}}`) -- the
+    /// same shape `committed_routing_events` already accepts in `fold-and-suggest`, so the
+    /// Python caller appends this value verbatim onto its growing tape.
+    event: EconomyEvent,
+}
+
+fn run_build_routing_prior_updated(input: &str) -> Result<String, String> {
+    let request: BuildRoutingPriorUpdatedRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid build-routing-prior-updated request JSON: {e}"))?;
+    if request.schema != "econ_fold_cli.build_routing_prior_updated.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.build_routing_prior_updated.request.v1, got {})",
+            request.schema
+        ));
+    }
+
+    // Single source of truth: turing_economy::EconomyEvent::routing_prior_updated (WP4) --
+    // the event_hash JCS-SHA256 identity digest is never recomputed in this file or in the
+    // Python driver.
+    let event = EconomyEvent::routing_prior_updated(
+        request.route_domain,
+        request.route_scaffold,
+        request.verdict,
+        request.verdict_source_id,
+        request.verifier_attestation_hash,
+    )
+    .map_err(|e| format!("routing_prior_updated construction failed: {e:?}"))?;
+
+    let response = BuildRoutingPriorUpdatedResponse {
+        schema: "econ_fold_cli.build_routing_prior_updated.response.v1",
+        event,
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
 // entry point
 // ---------------------------------------------------------------------------
 
@@ -450,8 +516,10 @@ fn main() {
         "derive-keys" => run_derive_keys(&input),
         "fold-and-suggest" => run_fold_and_suggest(&input),
         "diversity-metrics" => run_diversity_metrics(&input),
+        "build-routing-prior-updated" => run_build_routing_prior_updated(&input),
         other => Err(format!(
-            "unknown subcommand {other:?} (expected derive-keys, fold-and-suggest, or diversity-metrics)"
+            "unknown subcommand {other:?} (expected derive-keys, fold-and-suggest, \
+             diversity-metrics, or build-routing-prior-updated)"
         )),
     };
 
