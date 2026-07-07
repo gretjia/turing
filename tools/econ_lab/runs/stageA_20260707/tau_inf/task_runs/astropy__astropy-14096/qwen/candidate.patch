@@ -1,0 +1,16 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index ef40319bbb2..9894d3840a6 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -595,7 +595,10 @@ def __getattr__(self, attr):
+             # Try to interpret as a new frame for transforming.
+             frame_cls = frame_transform_graph.lookup_name(attr)
+             if frame_cls is not None and self.frame.is_transformable_to(frame_cls):
+-                return self.transform_to(attr)
++                try:
++                    return self.transform_to(attr)
++                except AttributeError as e:
++                    raise AttributeError(e.args[0].replace(f"'{self.__class__.__name__}' object has no attribute '{attr}'", f"'{self.__class__.__name__}' object has no attribute '{attr}'")) from e
+ 
+         # Fail
+         raise AttributeError(

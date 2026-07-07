@@ -1,0 +1,18 @@
+diff --git a/requests/adapters.py b/requests/adapters.py
+index 9cd6e65..a8b1c23 100644
+--- a/requests/adapters.py
++++ b/requests/adapters.py
+@@ -554,6 +554,11 @@ class HTTPAdapter(BaseAdapter):
+ 
+                 conn = self.get_connection(proxy_url, proxies, stream, request)
+                 conn.timeout = timeout
++                
++                # In Python 3.8.12+, we need to ensure the proxy is properly indicated
++                # to ensure the Proxy-Authorization header is included.
++                # This is to address the behavior change in Python 3.8.12 where
++                # the Proxy-Authorization header is only included when a proxy
++                # is actually configured.
++                conn._tunnel_host = hostname
+ 
+                 if not conn:
+                     raise MaxRetryError(proxy, url, f"Cannot connect to {proxy_url}.")

@@ -1,0 +1,15 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index a64cf2d..xxxxxxxx 100644
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -XXXX,6 +XXXX,9 @@ class DataArray:
+     def to_unstacked_dataset(self, dim, **kwargs):
+         # ... existing implementation ...
+         result = {}
+         for var_name, var_data in unstacked_vars.items():
+-            result[var_name] = var_data
++            # Skip adding the stacking dimension as a variable
++            if var_name != dim:
++                result[var_name] = var_data
+         
+         return result

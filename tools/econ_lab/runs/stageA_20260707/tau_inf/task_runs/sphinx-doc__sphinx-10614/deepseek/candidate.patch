@@ -1,0 +1,11 @@
+diff --git a/sphinx/ext/inheritance_diagram.py b/sphinx/ext/inheritance_diagram.py
+--- a/sphinx/ext/inheritance_diagram.py
++++ b/sphinx/ext/inheritance_diagram.py
+@@ -208,7 +208,7 @@ class InheritanceDiagram:
+             return None
+         docname = self.get_doc(fullname)
+         if docname:
+-            link = '../' + self.env.get_relative_uri(self.env.docname, docname) + '#' + fullname
++            link = '../' + docname + '.html' + '#' + fullname
+             return link
+         return None

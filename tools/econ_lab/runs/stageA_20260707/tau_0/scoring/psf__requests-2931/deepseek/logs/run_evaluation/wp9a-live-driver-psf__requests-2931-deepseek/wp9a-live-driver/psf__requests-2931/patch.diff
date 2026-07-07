@@ -1,0 +1,13 @@
+diff --git a/requests/utils.py b/requests/utils.py
+index 4e5a6b7..8f9a0bc 100644
+--- a/requests/utils.py
++++ b/requests/utils.py
+@@ -100,6 +100,8 @@ def to_native_string(string, encoding='utf-8'):
+     is already a native string.
+     """
+ 
++    if isinstance(string, bytes):
++        return string
+     if isinstance(string, str):
+         return string
+     return string.encode(encoding)

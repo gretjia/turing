@@ -1,0 +1,15 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index [OLD_INDEX]..[NEW_INDEX]
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -598,6 +598,13 @@
+         # If we get here, the attribute is not found in the normal way.
++        # Check if the attribute exists as a property in the class hierarchy
++        for cls in self.__class__.__mro__:
++            if attr in cls.__dict__ and isinstance(cls.__dict__[attr], property):
++                # The attribute exists as a property; try to access it directly
++                # This will call the property's getter, which may raise an AttributeError
++                return getattr(self, attr)
++
+         raise AttributeError("'{0}' object has no attribute '{1}'"
+                              .format(self.__class__.__name__, attr))

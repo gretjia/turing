@@ -31,6 +31,17 @@
 # This gate is read-only: it never edits crates/turing-economy/src/lib.rs (or anything else
 # under scan) -- scanning is not writing.
 #
+# Fail-closed guarantee: an unscannable surface must never yield PASS. A listed
+# SURFACE_FILES entry that is missing, a file the extractor cannot read/decode, or a
+# grep error all produce F4_LEAK_NOT_RUN (exit 3) with a message naming the file.
+#
+# Known extraction limit: when one physical line declares multiple fields and an
+# EARLIER field's type is a fn-pointer (e.g. `pub a: fn(u64) -> u64, pub b: u64`),
+# the `fn` keyword in the scanned prefix is indistinguishable from a fn-signature
+# parameter list, so later fields on that same line are suppressed. Fields on their
+# own lines (the normal rustfmt shape) and fn-pointer-typed fields themselves are
+# handled correctly.
+#
 # Usage:
 #   gate_f4_econ_leakage.sh              scan the real surfaces under repo root, exit 0/1/3
 #   gate_f4_econ_leakage.sh --self-test  bidirectional self-test (clean PASS / seeded FAIL)
@@ -98,7 +109,14 @@ collect_targets() {
 extract_rs_surface() {
   python3 - "$1" <<'PY'
 import re, sys
-src = open(sys.argv[1], encoding='utf-8').read()
+try:
+    src = open(sys.argv[1], encoding='utf-8').read()
+except OSError as e:
+    print(f"extract_rs_surface: cannot read {sys.argv[1]}: {e}", file=sys.stderr)
+    sys.exit(4)
+except UnicodeDecodeError as e:
+    print(f"extract_rs_surface: {sys.argv[1]} is not valid UTF-8: {e}", file=sys.stderr)
+    sys.exit(4)
 out = {}
 def emit(line, text):
     if text.strip():
@@ -111,12 +129,26 @@ raw_hashes = 0
 while i < n:
     c = src[i]
     if c == '\n':
+        if state in ('str', 'rawstr'):
+            # A newline inside a string literal is literal-content: keep it so a
+            # multi-line "ta\nu_hi" is never glued into the single token tau_hi.
+            cur.append('\n')
+            line += 1
+            i += 1
+            continue
         if state == 'line_comment':
             state = 'code'
         stripped = ''.join(code_line)
-        if re.match(r'^\s*(pub(\([^)]*\))?\s+)?[A-Za-z_][A-Za-z0-9_]*\s*:\s', stripped) \
-           and not re.search(r'\b(fn|let|const|static|impl|use|mod)\b', stripped):
-            emit(line, stripped)
+        # Field declarations: at line start or after '{'/',' so single-line structs
+        # (`pub struct X { pub tau_hi: u64 }`) emit their field names too. Exclusion
+        # keywords are checked only in the text BEFORE the candidate field, so a
+        # fn-pointer-typed field (`pub tau: fn(u64) -> u64`) is still emitted while
+        # fn-signature parameter lists / let bindings / patterns are not.
+        for m in re.finditer(r'(?:^|[{,])(\s*(?:pub(?:\([^)]*\))?\s+)?'
+                             r'[A-Za-z_][A-Za-z0-9_]*\s*:\s[^,{}]*)', stripped):
+            if re.search(r'\b(fn|let|const|static|impl|use|mod)\b', stripped[:m.start(1)]):
+                continue
+            emit(line, m.group(1))
         code_line = []
         line += 1
         i += 1
@@ -172,21 +204,56 @@ gate_scan() {
   local pattern
   pattern="$(build_pattern)"
 
+  # Fail closed on scope drift: every explicitly listed surface file must exist. A
+  # renamed/moved surface file must surface as NOT_RUN, never as a silently smaller
+  # scan scope (only the glob dirs may legitimately be empty).
+  local rel
+  for rel in "${SURFACE_FILES[@]}"; do
+    if [[ ! -f "$root/$rel" ]]; then
+      echo "F4_LEAK_NOT_RUN missing surface file: $root/$rel (listed in SURFACE_FILES; refusing to scan a silently reduced scope)" >&2
+      return 3
+    fi
+  done
+
   mapfile -t targets < <(collect_targets "$root")
   if [[ "${#targets[@]}" -eq 0 ]]; then
     echo "F4_LEAK_NOT_RUN no surface files found under $root" >&2
     return 3
   fi
 
-  local hits t
+  local hits extracted t rc
   hits="$(mktemp)"
+  extracted="$(mktemp)"
   for t in "${targets[@]}"; do
     case "$t" in
       *.rs)
-        extract_rs_surface "$t" | grep -iE "$pattern" | sed "s|^|$t:|" >>"$hits" || true
+        # Fail closed: an extractor failure means the file was NOT scanned; it must
+        # never contribute "zero hits" to a PASS.
+        rc=0
+        extract_rs_surface "$t" >"$extracted" || rc=$?
+        if [[ "$rc" -ne 0 ]]; then
+          rm -f "$hits" "$extracted"
+          echo "F4_LEAK_NOT_RUN surface extractor failed (exit $rc) on $t; file was not scanned" >&2
+          return 3
+        fi
+        rc=0
+        grep -iE "$pattern" "$extracted" >"$extracted.hits" || rc=$?
+        if [[ "$rc" -ge 2 ]]; then
+          rm -f "$hits" "$extracted" "$extracted.hits"
+          echo "F4_LEAK_NOT_RUN grep failed (exit $rc) on extracted surface of $t; file was not scanned" >&2
+          return 3
+        fi
+        sed "s|^|$t:|" "$extracted.hits" >>"$hits"
+        rm -f "$extracted.hits"
         ;;
       *)
-        grep -HinE "$pattern" "$t" >>"$hits" 2>/dev/null || true
+        rc=0
+        grep -HinE "$pattern" "$t" >>"$hits" || rc=$?
+        if [[ "$rc" -ge 2 ]]; then
+          rm -f "$hits" "$extracted"
+          echo "F4_LEAK_NOT_RUN unreadable surface file (grep exit $rc): $t; file was not scanned" >&2
+          return 3
+        fi
         ;;
     esac
   done
@@ -195,10 +262,10 @@ gate_scan() {
     while IFS= read -r hit; do
       echo "F4_LEAK_FAIL $hit"
     done <"$hits"
-    rm -f "$hits"
+    rm -f "$hits" "$extracted"
     return 1
   fi
-  rm -f "$hits"
+  rm -f "$hits" "$extracted"
   echo "F4_LEAK_PASS (${#targets[@]} surface files scanned, $(( ${#PATTERNS[@]} )) patterns)"
 }
 
@@ -250,6 +317,52 @@ EOF
     echo "F4_LEAK_SELF_TEST_FAIL comment/identifier mention was wrongly flagged" >&2
     return 1
   fi
+
+  # Fix-3 direction: a string literal spanning physical lines must not be glued into
+  # a single forbidden token ("ta\nu_hi" is NOT tau_hi) -- must still PASS.
+  printf '%s\n' 'pub const SPLIT: &str = "ta' 'u_hi";' \
+    >>"$work/crates/turing-economy/src/lib.rs"
+  if ! gate_scan "$work" >/dev/null; then
+    echo "F4_LEAK_SELF_TEST_FAIL multi-line string literal was glued into a forbidden token" >&2
+    return 1
+  fi
+
+  local rc
+  # Fix-4 direction: a single-line struct declaration leaking a forbidden field name
+  # must FAIL (exit 1).
+  cp "$work/crates/turing-execd/src/lib.rs" "$work/execd_lib_backup.rs"
+  printf '%s\n' 'pub struct SingleLineCarrier { pub tau_hi: u64 }' \
+    >>"$work/crates/turing-execd/src/lib.rs"
+  rc=0
+  gate_scan "$work" >/dev/null || rc=$?
+  if [[ "$rc" -ne 1 ]]; then
+    echo "F4_LEAK_SELF_TEST_FAIL single-line struct field leak yielded exit $rc, want FAIL(1)" >&2
+    return 1
+  fi
+  mv "$work/execd_lib_backup.rs" "$work/crates/turing-execd/src/lib.rs"
+
+  # Fix-2 direction: a listed surface file that is missing (renamed away) must be
+  # NOT_RUN (exit 3), never PASS.
+  mv "$work/crates/turing-projection/src/lib.rs" "$work/crates/turing-projection/src/lib.rs.moved"
+  rc=0
+  gate_scan "$work" >/dev/null 2>&1 || rc=$?
+  if [[ "$rc" -ne 3 ]]; then
+    echo "F4_LEAK_SELF_TEST_FAIL missing surface file yielded exit $rc, want NOT_RUN(3)" >&2
+    return 1
+  fi
+  mv "$work/crates/turing-projection/src/lib.rs.moved" "$work/crates/turing-projection/src/lib.rs"
+
+  # Fix-1 direction: an unscannable .rs surface (extractor failure on non-UTF-8
+  # bytes) must be NOT_RUN (exit 3), never PASS.
+  cp "$work/crates/turing-projection/src/lib.rs" "$work/projection_lib_backup.rs"
+  printf '\xff\xfe not utf-8\n' >>"$work/crates/turing-projection/src/lib.rs"
+  rc=0
+  gate_scan "$work" >/dev/null 2>&1 || rc=$?
+  if [[ "$rc" -ne 3 ]]; then
+    echo "F4_LEAK_SELF_TEST_FAIL non-UTF-8 surface yielded exit $rc, want NOT_RUN(3)" >&2
+    return 1
+  fi
+  mv "$work/projection_lib_backup.rs" "$work/crates/turing-projection/src/lib.rs"
 
   # Seed exactly one leak: an error-message construction site starts naming the anneal
   # floor identifier and the temperature identifier together, as a real regression would.

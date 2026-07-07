@@ -154,6 +154,11 @@ def stub_score_with_official_harness(
     report_dir = report_dir.resolve()
     report_dir.mkdir(parents=True, exist_ok=True)
     model_name = "wp9a-live-driver"
+    # Mirror the real `score_with_official_harness`'s own predictions.jsonl record (exact
+    # filename/row shape), so resume's tamper guard (`_reused_report_matches_current_patch`)
+    # can cross-check a reused report against the current candidate.patch in these tests too.
+    predictions_row = {"instance_id": instance_id, "model_name_or_path": model_name, "model_patch": model_patch}
+    (report_dir / "predictions.jsonl").write_text(json.dumps(predictions_row) + "\n", encoding="utf-8")
     aggregated_report = {
         "schema_version": 2,
         "resolved_ids": [instance_id] if resolved else [],

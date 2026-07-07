@@ -1,0 +1,20 @@
+diff --git a/requests/models.py b/requests/models.py
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -395,10 +395,13 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         if not parsed.netloc:
+             raise MissingSchema(error)
+ 
+         # In general, we want to try IDNA encoding the hostname if the string contains
+         # non-ascii characters. This allows users to manually pass in hostnames
+         # with non-ascii characters, and hosts that are already IDNA encoded.
+-        host = parsed.hostname.encode('idna').decode('utf-8')
++        try:
++            host = parsed.hostname.encode('idna').decode('utf-8')
++        except UnicodeError:
++            raise InvalidURL('URL has an invalid label.')
+ 
+         # Carefully reconstruct the network location
+         netloc = auth or ''
+         if auth:
+             netloc += '@'

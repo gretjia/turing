@@ -1,0 +1,53 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -2579,6 +2579,40 @@ class MatrixBase(MatrixDeprecated,
+                  MatrixCommon):
+     """Base class for matrix objects."""
++
++    @classmethod
++    def hstack(cls, *args):
++        """Return a matrix formed by joining args using column-wise stacking."""
++        if len(args) == 0:
++            return cls(0, 0, [])
++
++        rows = args[0].rows
++        for arg in args:
++            if arg.rows != rows:
++                raise ShapeError("All matrices must have the same number of rows.")
++
++        cols = sum(arg.cols for arg in args)
++        if rows == 0 or cols == 0:
++            return cls.zeros(rows, cols)
++
++        result = []
++        for i in range(rows):
++            row = []
++            for arg in args:
++                row.extend(arg[i, :].tolist()[0])
++            result.append(row)
++        return cls(result)
++
++    @classmethod
++    def vstack(cls, *args):
++        """Return a matrix formed by joining args using row-wise stacking."""
++        if len(args) == 0:
++            return cls(0, 0, [])
++
++        cols = args[0].cols
++        for arg in args:
++            if arg.cols != cols:
++                raise ShapeError("All matrices must have the same number of columns.")
++
++        rows = sum(arg.rows for arg in args)
++        if rows == 0 or cols == 0:
++            return cls.zeros(rows, cols)
++
++        result = []
++        for arg in args:
++            result.extend(arg.tolist())
++        return cls(result)
++
+     # Added just for numpy compatibility
+     __array_priority__ = 11
+ 

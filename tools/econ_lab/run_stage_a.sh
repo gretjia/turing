@@ -16,11 +16,18 @@ mkdir -p "$RUN_ROOT"
 source "$HOME/.turingos/secrets.env"
 export SILICONFLOW_API_KEY DEEPSEEK_API_KEY
 
+# Atomic status write: the health probe reads status.json concurrently; a
+# truncate-then-write leaves a window where it reads an empty file.
+write_status() {
+  local dir="$1" json="$2"
+  echo "$json" > "$dir/status.json.tmp" && mv "$dir/status.json.tmp" "$dir/status.json"
+}
+
 run_arm() {
   local tau="$1" label="$2"
   local dir="$RUN_ROOT/tau_$label"
   mkdir -p "$dir"
-  echo "{\"arm\":\"tau_$label\",\"status\":\"RUNNING\",\"started_unix\":$(date +%s)}" > "$dir/status.json"
+  write_status "$dir" "{\"arm\":\"tau_$label\",\"status\":\"RUNNING\",\"started_unix\":$(date +%s)}"
   python3 "$DRIVER" \
     --tau "$tau" \
     --out "$dir/verdict.json" \
@@ -30,7 +37,7 @@ run_arm() {
     --scoring-timeout-s 2700 \
     > "$dir/driver.log" 2>&1
   local rc=$?
-  echo "{\"arm\":\"tau_$label\",\"status\":\"$([ $rc -eq 0 ] && echo DONE || echo FAILED)\",\"exit\":$rc,\"finished_unix\":$(date +%s)}" > "$dir/status.json"
+  write_status "$dir" "{\"arm\":\"tau_$label\",\"status\":\"$([ $rc -eq 0 ] && echo DONE || echo FAILED)\",\"exit\":$rc,\"finished_unix\":$(date +%s)}"
   echo "[stageA] arm tau_$label finished rc=$rc"
   return $rc
 }
@@ -49,8 +56,21 @@ for spec in "${ARMS[@]}"; do
 done
 for p in "${pids[@]}"; do wait "$p" || true; done
 
+# Aggregate the launcher exit code from the arms' terminal statuses (not from
+# `wait` codes: the `wait -n` throttle may already have reaped a pid, making a
+# later `wait $pid` unreliable). Any FAILED/missing status -> exit 1 so a
+# supervisor wrapper sees the failure instead of an unconditional 0.
 echo "[stageA] all arms complete"
+LAUNCH_RC=0
 for spec in "${ARMS[@]}"; do
   label="${spec##*:}"
-  cat "$RUN_ROOT/tau_$label/status.json"; echo
+  s="$RUN_ROOT/tau_$label/status.json"
+  if [ ! -f "$s" ]; then
+    echo "[stageA] tau_$label: status.json missing"
+    LAUNCH_RC=1
+    continue
+  fi
+  cat "$s"; echo
+  grep -q '"status":"DONE"' "$s" || LAUNCH_RC=1
 done
+exit $LAUNCH_RC

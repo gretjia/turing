@@ -1,0 +1,25 @@
+diff --git a/lib/matplotlib/dates.py b/lib/matplotlib/dates.py
+--- a/lib/matplotlib/dates.py
++++ b/lib/matplotlib/dates.py
+@@ -991,7 +991,7 @@ class AutoDateFormatter(Formatter):
+         self._locator = locator
+         self._defaultfmt = defaultfmt
+         self._formatter = {
+-            AutoDateLocator.MONTHLY: DateFormatter('%Y-%m', tz=tz),
++            AutoDateLocator.MONTHLY: DateFormatter('%Y-%m', tz=tz),
+             AutoDateLocator.DAILY: DateFormatter('%Y-%m-%d', tz=tz),
+             AutoDateLocator.HOURLY: ScalarFormatter(useOffset=False,
+                                                     useMathText=False),
+@@ -1000,10 +1000,10 @@ class AutoDateFormatter(Formatter):
+                                                 useMathText=False),
+             AutoDateLocator.SECONDLY: ScalarFormatter(useOffset=False,
+                                                      useMathText=False),
+-            AutoDateLocator.WEEKLY: DateFormatter('%Y-%m-%d', tz=tz),
++            AutoDateLocator.WEEKLY: DateFormatter('%Y-%m-%d', tz=tz),
+         }
+         self._formatter[AutoDateLocator.MINUTELY] = ScalarFormatter(
+-            useOffset=False, useMathText=False)
++            useOffset=False, useMathText=False)
+         self._formatter[AutoDateLocator.HOURLY] = ScalarFormatter(
+             useOffset=False, useMathText=False)
+         self._formatter[AutoDateLocator.SECONDLY] = ScalarFormatter(

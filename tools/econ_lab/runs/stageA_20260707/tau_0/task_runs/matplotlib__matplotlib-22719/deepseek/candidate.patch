@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index 9ebccf4b6c..0b5ecc30c3 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -56,7 +56,7 @@ class StrCategoryConverter(ConversionInterface):
+         # Unitless values are not currently supported, but the warning
+         # is only emitted for numeric values (which are likely unitless).
+         is_numlike = (isinstance(value, numbers.Number) or
+-                      isinstance(value, np.ndarray) and value.dtype.kind in 'iuf')
++                      isinstance(value, np.ndarray) and value.dtype.kind in 'iuf' and value.size > 0)
+         if is_numlike:
+             _api.warn_deprecated(
+                 "3.5", message="Support for passing numbers through unit "

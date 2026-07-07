@@ -1,0 +1,22 @@
+diff --git a/sphinx/ext/inheritance_diagram.py b/sphinx/ext/inheritance_diagram.py
+--- a/sphinx/ext/inheritance_diagram.py
++++ b/sphinx/ext/inheritance_diagram.py
+@@ -XXX,XX +XXX,XX @@
+     def generate_diagram(self):
+         # ... up to setting URLs
+         for fullname, node in sorted(self.class_info.items()):
+             target_docname = ...  # determined earlier
+             if target_docname:
+-                new_uri = self.get_relative_uri(docname, target_docname)
+-                node.set_url(new_uri + '#' + fullname)
++                if self.format == 'svg':
++                    # For SVG output, the image is stored in the builder's imagedir,
++                    # and the SVG file is embedded from there.  The links in the SVG
++                    # must be relative to the SVG file's location, not the current page.
++                    imagedir = path.join(self.builder.outdir, self.builder.imagedir)
++                    target_file = self.builder.get_outfile(target_docname)
++                    rel_path = path.relpath(target_file, imagedir).replace('\\', '/')
++                    new_uri = rel_path + '#' + fullname
++                else:
++                    new_uri = self.get_relative_uri(docname, target_docname) + '#' + fullname
++                node.set_url(new_uri)

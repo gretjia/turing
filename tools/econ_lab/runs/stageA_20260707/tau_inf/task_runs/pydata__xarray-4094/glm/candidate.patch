@@ -1,0 +1,14 @@
+diff --git a/xarray/core/variables.py b/xarray/core/variables.py
+index xxxx..xxxx 100644
+--- a/xarray/core/variables.py
++++ b/xarray/core/variables.py
+@@ -673,7 +673,10 @@ class DataArray(AbstractArray, CoordinatesMixin):
+     def to_unstacked_dataset(self, dim, **kwargs):
+-        return self.to_dataset().unstack(dim=dim, **kwargs)
++        if 'compat' not in kwargs:
++            kwargs['compat'] = 'override'
++        return self.to_dataset().unstack(dim=dim, **kwargs)
++
+ 
+ def _to_ndarray(values):
+     """If data is not a numpy ndarray, convert it to one."""

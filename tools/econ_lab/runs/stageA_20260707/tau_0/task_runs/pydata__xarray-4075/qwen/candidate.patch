@@ -1,0 +1,21 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index 9602b4e0d..4a0b1b1d3 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -124,7 +124,7 @@ class Weighted:
+         # For the weighted mean, we need to compute:
+         # (data * weights).sum() / weights.sum()
+         sum_of_weights = xr.dot(dta.notnull(), wgt)
+-        if sum_of_weights == 0:
++        if sum_of_weights == 0 or sum_of_weights.dtype == np.bool_:
+             raise ValueError("No valid weights found")
+ 
+         # compute weighted mean
+@@ -132,7 +132,7 @@ class Weighted:
+         # We can't simply do (data * weights).sum() / weights.sum()
+         # as this would ignore NaNs in data (but not in weights)
+         # The correct approach is:
+-        result = (dta * wgt).sum() / sum_of_weights
++        result = (dta * wgt).sum() / sum_of_weights.astype(float)
+ 
+         return result

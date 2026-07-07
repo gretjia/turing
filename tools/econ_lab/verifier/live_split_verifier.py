@@ -109,7 +109,11 @@ def collect_test_outcomes(tests_status: Optional[dict[str, Any]]) -> dict[str, b
     for category in GRADING_CATEGORIES:
         block = tests_status.get(category) or {}
         for test_id in block.get("success", None) or []:
-            outcomes[test_id] = True
+            # Fail-closed across categories too: a test_id should never repeat across
+            # categories in a well-formed harness report, but if it was already recorded
+            # as failing by an earlier category, a later category's success list must not
+            # upgrade it back to passing.
+            outcomes[test_id] = outcomes.get(test_id, True)
         for test_id in block.get("failure", None) or []:
             # A test_id should never appear in both success and failure for the same
             # category in a well-formed harness report; if it does, "failure" is treated as

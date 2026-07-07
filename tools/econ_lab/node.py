@@ -70,11 +70,14 @@ NodeKey = Tuple[str, str]  # (domain_bucket, scaffold_id)
 @dataclass
 class Ledger:
     """Keyed ``(domain_bucket, scaffold_id)`` node states plus the backup-event dedup
-    sets required by ADR-ECON-003 Decision 6.3 ("同一原事件至多 clawback 一次") and the
+    records required by ADR-ECON-003 Decision 6.3 ("同一原事件至多 clawback 一次") and the
     implicit "an update event_hash is applied at most once" invariant it depends on."""
 
     states: Dict[NodeKey, NodeState] = field(default_factory=dict)
-    _applied_hashes: set = field(default_factory=set)
+    # event_hash -> (key, v) of the original application, so a clawback can be checked to
+    # be the *exact inverse* of that application (Decision 6.3's "exact inverse of one
+    # earlier update"), not merely a hash-known event replayed against an arbitrary node.
+    _applied_hashes: Dict[str, Tuple[NodeKey, int]] = field(default_factory=dict)
     _clawed_back_hashes: set = field(default_factory=set)
 
     def get(self, key: NodeKey, default_p: float) -> NodeState:
@@ -85,7 +88,7 @@ class Ledger:
             raise FoldError("duplicate RoutingPriorUpdated event_hash applied twice")
         state = self.get(key, default_p).apply_update(v)
         self.states[key] = state
-        self._applied_hashes.add(event_hash)
+        self._applied_hashes[event_hash] = (key, v)
         return state
 
     def clawback(self, key: NodeKey, ref_event_hash: str, v: int, default_p: float) -> NodeState:
@@ -93,6 +96,13 @@ class Ledger:
             raise FoldError("clawback references an unknown RoutingPriorUpdated event_hash")
         if ref_event_hash in self._clawed_back_hashes:
             raise FoldError("duplicate clawback of the same RoutingPriorUpdated event_hash")
+        if self._applied_hashes[ref_event_hash] != (key, v):
+            # Decision 6.3: a clawback is the exact inverse of one earlier update. A
+            # clawback carrying the right event_hash but a different node key or verdict
+            # would silently corrupt the (N, S) counters it actually lands on.
+            raise FoldError(
+                "clawback key/verdict does not match the original RoutingPriorUpdated application"
+            )
         state = self.get(key, default_p).apply_clawback(v)
         self.states[key] = state
         self._clawed_back_hashes.add(ref_event_hash)

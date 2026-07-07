@@ -59,6 +59,18 @@ def load_stream(path: Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     if data.get("schema") != STREAM_SCHEMA:
         raise ValueError(f"unrecognized task-stream schema (expected {STREAM_SCHEMA})")
+    # Validate case_id uniqueness at load time: a duplicate case_id would only surface
+    # later as a confusing FoldError deep inside the arm fold (arms.py's per-(case_id,
+    # scaffold_id) event-hash dedup), so reject the malformed stream here by name instead.
+    seen_case_ids: set = set()
+    for bucket_name, bucket_fixture in (data.get("buckets") or {}).items():
+        for trial in bucket_fixture.get("trials") or []:
+            case_id = trial.get("case_id")
+            if case_id in seen_case_ids:
+                raise ValueError(
+                    f"duplicate case_id {case_id!r} in task stream (bucket {bucket_name!r})"
+                )
+            seen_case_ids.add(case_id)
     return data
 
 

@@ -230,7 +230,7 @@ impl EconomyEvent {
 /// `routing_fold::scaffold_id` (`turing_contracts::jcs`). Pure function of its five
 /// arguments only (Art 0.2) -- never reads clock/random/global state, so the same tape
 /// replayed twice always derives byte-identical `event_hash`es.
-fn routing_prior_event_hash(
+pub(crate) fn routing_prior_event_hash(
     route_domain: &str,
     route_scaffold: &str,
     verdict: bool,
@@ -1200,9 +1200,14 @@ pub fn derive_price_signals(events: &[EconomyEvent]) -> Result<Vec<PriceSignal>,
     for event in events {
         if let EconomyEvent::AmmSwapExecuted(swap) = event {
             let price = DecimalAmount::parse_non_negative(&swap.effective_price)?;
+            // The only side values this codebase ever writes are `BUY_YES`/`BUY_NO`
+            // (`AmmPool::buy_yes`/`buy_no`; the daemons RPC boundary rejects anything
+            // else). An unrecognized side on the (untrusted) tape is a hard error, never
+            // silently read as a yes-side price.
             let yes_price = match swap.side.as_str() {
+                "BUY_YES" => clamp_unit_interval(price),
                 "BUY_NO" => clamp_unit_interval(unit_amount() - price),
-                _ => clamp_unit_interval(price),
+                other => return Err(EconomyError::InvalidSwapSide(other.to_string())),
             };
             latest_yes_price.insert(swap.market_id.clone(), yes_price);
         }
@@ -1390,9 +1395,11 @@ fn argmax_select<'a>(priced_routes: &[(&'a CandidateRoute, DecimalAmount)]) -> &
 /// B-zone (Art III.4): must never be echoed into an error/log/schema/doc surface.
 const ROUTING_SELECT_SEED_DOMAIN: &str = "routing-select.v1";
 
-/// `u64 = LE(SHA256(domain ‖ price_signal_hash ‖ pput_prior_hash ‖ join(sorted(route_ids),
-/// "\x00"))[0..8])` (ADR-ECON-003 Decision 4). All inputs are already-committed
-/// caller-supplied literals, so identical inputs reproduce identical bytes (Art 0.2).
+/// ADR-ECON-003 Decision 4 pins `u64 = LE(SHA256(domain ‖ price_signal_hash ‖
+/// pput_prior_hash ‖ join(sorted(route_ids), "\x00") ‖ trigger_event_hash)[0..8])`. All
+/// inputs are already-committed caller-supplied literals, so identical inputs reproduce
+/// identical bytes (Art 0.2).
+// DEVIATION(ADR-ECON-003 D4): trigger_event_hash omitted; owner decision pending 2026-07-07
 fn derive_selection_seed_u64(
     price_signal_hash: &str,
     pput_prior_hash: &str,
@@ -1471,7 +1478,10 @@ fn exp2_q32(y: i128) -> i128 {
     let frac = y.rem_euclid(Q32_ONE);
     let base = exp2f_q32(frac);
     if floor_part >= 0 {
-        if floor_part >= 96 {
+        // `base` is in `[2^32, 2^33)`, so a shift of 95 can already reach/wrap the i128
+        // sign bit (`base << 95` up to ~2^128): saturate at 95, not 96, or the "saturates"
+        // contract is violated with a huge NEGATIVE value.
+        if floor_part >= 95 {
             i128::MAX
         } else {
             base << (floor_part as u32)
@@ -1844,6 +1854,14 @@ pub enum EconomyError {
     /// verdicts -- a malformed/contradictory input, never silently resolved by
     /// last-write-wins.
     DiversityMetricConflictingSettlement,
+    /// `derive_price_signals` found an `AmmSwapExecuted.side` value that is neither
+    /// `BUY_YES` nor `BUY_NO` (the only values this codebase ever writes) -- untrusted
+    /// tape input, never silently read as a yes-side price.
+    InvalidSwapSide(String),
+    /// WP4 tape-integrity guard: a `RoutingPriorUpdated.event_hash` field does not match
+    /// the identity digest re-derived from the event's own fields
+    /// (`routing_prior_event_hash`) -- a forged/tampered tape row, never folded.
+    RoutingFoldEventHashMismatch,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -1918,6 +1936,15 @@ impl std::fmt::Display for EconomyError {
                 write!(
                     f,
                     "diversity metrics: conflicting settlement verdicts for the same lineage/index"
+                )
+            }
+            EconomyError::InvalidSwapSide(side) => {
+                write!(f, "invalid swap side {side:?} (expected BUY_YES or BUY_NO)")
+            }
+            EconomyError::RoutingFoldEventHashMismatch => {
+                write!(
+                    f,
+                    "routing fold: event_hash does not match the digest re-derived from the event's own fields"
                 )
             }
         }

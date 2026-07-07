@@ -1,0 +1,18 @@
+diff --git a/lib/matplotlib/legend.py b/lib/matplotlib/legend.py
+index 539992a521..0d1939b4ad 100644
+--- a/lib/matplotlib/legend.py
++++ b/lib/matplotlib/legend.py
+@@ -433,7 +433,7 @@ def __init__(
+ 
+         if isinstance(parent, Axes):
+             self.isaxes = True
+-            self.axes = parent
++            self.axes = parent
+             self.set_figure(parent.figure)
+         elif isinstance(parent, Figure):
+             self.isaxes = False
+-            self.set_figure(parent)
++            self.set_figure(parent)
+         else:
+             raise TypeError("Legend needs either Axes or Figure as parent")
+         self.parent = parent

@@ -1,0 +1,20 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 5c3d9aeb39..4b1e7674c1 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -258,9 +258,10 @@ class Collector:
+     def related_objects(self, related, objs):
+         """
+         Get a QuerySet of objects related to `objs` via the relation `related`.
+         """
+-        return related.related_model._base_manager.using(self.using).filter(
+-            **{"%s__in" % related.field.name: objs}
+-        )
++        # Create a queryset that only selects the primary key field and the
++        # foreign key field necessary for the relationship. This avoids fetching
++        # other fields that might cause UnicodeDecodeError during delete().
++        return related.related_model._base_manager.using(self.using).only(related.field.name).filter(
++            **{"%s__in" % related.field.name: objs}
++        )
+ 
+     def instances_with_model(self):

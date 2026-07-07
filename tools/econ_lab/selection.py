@@ -62,10 +62,20 @@ def tau_mode(tau: Optional[float]) -> str:
     return FINITE
 
 
+def _require_route_ids(route_ids: Sequence[str]) -> None:
+    """Degenerate-input guard (not a Decision-4 semantic: selection over zero routes is
+    undefined in every regime). Raising here replaces the previous silent-``None`` return
+    from :func:`select_argmax` and the bare ``IndexError`` out of :func:`_inverse_cdf`;
+    behavior on any non-empty pool is unchanged."""
+    if not route_ids:
+        raise ValueError("empty route_ids")
+
+
 def select_argmax(route_ids: Sequence[str], q_by_route: Mapping[str, float]) -> str:
     """tau=0 mode bypass (Decision 4): "不走 softmax,直接调用现行 argmax 代码路径
     ...严格 `>` 平局保先" over *input order* (mirrors economy:989-1007's convention:
     the first route in ``route_ids`` input order with a strictly greater Q wins ties)."""
+    _require_route_ids(route_ids)
     best = None
     best_q = None
     for rid in route_ids:
@@ -93,6 +103,7 @@ def _inverse_cdf(sorted_ids: Sequence[str], weights: Sequence[float], u: float) 
 
 def select_uniform(route_ids: Sequence[str], u: float) -> str:
     """tau=inf mode (Decision 4): uniform inverse-CDF over ``sorted(route_ids)``."""
+    _require_route_ids(route_ids)
     sorted_ids = sorted(route_ids)
     return _inverse_cdf(sorted_ids, [1.0] * len(sorted_ids), u)
 
@@ -102,6 +113,7 @@ def select_softmax(
 ) -> str:
     """finite tau>0 (Decision 4): softmax(Q/tau) inverse-CDF, cumulative order =
     ``sorted(route_ids)`` (same order the seed derivation hashes over)."""
+    _require_route_ids(route_ids)
     sorted_ids = sorted(route_ids)
     scaled = [q_by_route[rid] / tau for rid in sorted_ids]
     shift = max(scaled)  # numerically-stabilizing shift only; does not change the result

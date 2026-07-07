@@ -1,0 +1,40 @@
+diff --git a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+index 0df94ff709..4b3a93a7c0 100644
+--- a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
++++ b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+@@ -126,6 +126,18 @@ class SlicedLowLevelWCS(BaseWCSWrapper):
+         if len(self._pixel_keep) == 0 or len(self._world_keep) == 0:
+             raise ValueError("Cannot slice WCS: the resulting WCS should have "
+                              "at least one pixel and one world dimension.")
++        
++        # Compute the world coordinate values for dropped (sliced-out) world
++        # dimensions.  These are the values that correspond to the pixel slice
++        # that was taken, and must be used when inverting world_to_pixel.
++        pixel_arrays_dummy = tuple(0 for _ in self._pixel_keep)
++        all_world = self._pixel_to_world_values_all(*pixel_arrays_dummy)
++        if self._wcs.world_n_dim == 1:
++            all_world = (all_world,)
++        self._dropped_world_values = [
++            all_world[iw] for iw in range(self._wcs.world_n_dim)
++            if iw not in self._world_keep
++        ]
+ 
+     @lazyproperty
+     def dropped_world_dimensions(self):
+@@ -240,9 +252,11 @@ class SlicedLowLevelWCS(BaseWCSWrapper):
+     def world_to_pixel_values(self, *world_arrays):
+         world_arrays = tuple(map(np.asanyarray, world_arrays))
+         world_arrays_new = []
++        dropped_idx = 0
+         iworld_curr = -1
+         for iworld in range(self._wcs.world_n_dim):
+             if iworld in self._world_keep:
+                 iworld_curr += 1
+                 world_arrays_new.append(world_arrays[iworld_curr])
+             else:
+-                world_arrays_new.append(1.)
++                world_arrays_new.append(self._dropped_world_values[dropped_idx])
++                dropped_idx += 1
+ 
+         world_arrays_new = np.broadcast_arrays(*world_arrays_new)
+         pixel_arrays = list(self._wcs.world_to_pixel_values(*world_arrays_new))

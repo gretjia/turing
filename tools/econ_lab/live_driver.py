@@ -106,6 +106,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -215,13 +216,20 @@ def find_default_cli_bin() -> Path:
 
 
 def call_cli(cli_bin: Path, subcommand: str, request: dict[str, Any]) -> dict[str, Any]:
-    proc = subprocess.run(
-        [str(cli_bin), subcommand],
-        input=json.dumps(request).encode("utf-8"),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=30,
-    )
+    try:
+        proc = subprocess.run(
+            [str(cli_bin), subcommand],
+            input=json.dumps(request).encode("utf-8"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as error:
+        # Same failure contract as the nonzero-exit branch below (a RuntimeError naming the
+        # subcommand), so callers never see a raw TimeoutExpired leak out of this bridge.
+        raise RuntimeError(
+            f"econ_fold_cli {subcommand} failed (timed out after {error.timeout}s)"
+        ) from error
     if proc.returncode != 0:
         raise RuntimeError(
             f"econ_fold_cli {subcommand} failed (exit {proc.returncode}): "
@@ -388,10 +396,21 @@ def nfc_lower_trim_preview(raw: Optional[str]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def load_provider_config() -> dict[str, Any]:
-    """DeepSeek-direct's own non-secret config (the fallback path's native adapter)."""
+def load_provider_config() -> Optional[dict[str, Any]]:
+    """DeepSeek-direct's own non-secret config (the fallback path's native adapter).
+
+    Returns `None` when `~/.turingos/provider-profiles.json` does not exist at all (an
+    environment with no DeepSeek-direct fallback configured): the deepseek lineage's
+    SiliconFlow-primary path is unaffected, and `dispatch_worker_for_lineage` below reports
+    the fallback dispatch as NOT_RUN with a "provider config missing" detail instead of the
+    whole driver crashing at startup. When the file exists, behavior is unchanged byte for
+    byte (including the stores_api_key_values refusal)."""
     profile_path = Path.home() / ".turingos" / "provider-profiles.json"
-    data = json.loads(profile_path.read_text(encoding="utf-8"))
+    try:
+        profile_text = profile_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return None
+    data = json.loads(profile_text)
     if data.get("stores_api_key_values"):
         raise RuntimeError(
             "refusing to read provider-profiles.json: stores_api_key_values is true, "
@@ -643,11 +662,14 @@ def dispatch_worker_for_lineage(
     packet: dict[str, Any],
     task_dir_root: Path,
     run_id_prefix: str,
-    deepseek_native_provider_config: dict[str, Any],
+    deepseek_native_provider_config: Optional[dict[str, Any]],
 ) -> dict[str, Any]:
     """Dispatch one (arm, lineage) pair, applying the deepseek-only SiliconFlow-primary /
     DeepSeek-direct-fallback rule (PREREG Appendix A, frozen; see module doc's fallback-
-    trigger note for the exact condition this driver uses)."""
+    trigger note for the exact condition this driver uses). A `None`
+    `deepseek_native_provider_config` (no `~/.turingos/provider-profiles.json` on this
+    machine -- see `load_provider_config`) makes the fallback leg NOT_RUN with a
+    "provider config missing" detail; the SiliconFlow-primary leg is unaffected."""
     primary_result = dispatch_via_siliconflow(
         arm=arm, lineage=lineage, packet=packet, task_dir_root=task_dir_root
     )
@@ -656,6 +678,16 @@ def dispatch_worker_for_lineage(
         and LINEAGE_CONFIGS[lineage]["has_native_fallback"]
         and primary_result["status"] in ("NOT_RUN", "ERROR", "API_ERROR")
     ):
+        if deepseek_native_provider_config is None:
+            return {
+                "status": "NOT_RUN",
+                "detail": "provider config missing (~/.turingos/provider-profiles.json not found)",
+                "instance_id": packet["instance_id"],
+                "arm": arm,
+                "lineage": lineage,
+                "provider_path": "deepseek_direct_fallback",
+                "primary_attempt_status": primary_result["status"],
+            }
         fallback_result = dispatch_worker(
             arm=arm,
             packet=packet,
@@ -756,7 +788,13 @@ def _read_scoring_report(
         return None
     # Aggregated report, schema_version 2 (see this module's WP9b orchestrator addendum doc
     # comment above): per-outcome instance_id lists, not a `{instance_id: {...}}` mapping.
-    aggregated_report = json.loads(report_path.read_text(encoding="utf-8"))
+    try:
+        aggregated_report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        # A truncated/unreadable aggregated report (e.g. a killed run's partial write) is
+        # treated exactly like a missing one: the caller's cue that the harness must be run
+        # (again) -- never a crash, and never a fabricated verdict from partial bytes.
+        return None
     instance_dir = _per_instance_report_dir(
         report_dir, run_id=run_id, model_name=model_name, instance_id=instance_id
     )
@@ -871,7 +909,16 @@ def score_with_official_harness(
     scoring_result = _read_scoring_report(
         report_dir=report_dir, run_id=run_id, instance_id=instance_id, model_name=model_name
     )
-    assert scoring_result is not None  # report_path.exists() was just checked above
+    if scoring_result is None:
+        # report_path.exists() was just checked above, so `None` here means the report file
+        # exists but is unreadable/truncated -- same SCORING_FAILED contract as a harness
+        # that produced no report at all (never a fabricated verdict).
+        return {
+            "status": "SCORING_FAILED",
+            "command": command,
+            "returncode": proc.returncode,
+            "log_path": str(log_path),
+        }
     return scoring_result
 
 
@@ -968,7 +1015,7 @@ def _settle_one(
     lineage: str,
     task_dir_root: Path,
     report_root: Path,
-    deepseek_native_provider_config: dict[str, Any],
+    deepseek_native_provider_config: Optional[dict[str, Any]],
     cli_bin: Path,
     route_domain: str,
     route_scaffold: str,
@@ -1073,7 +1120,14 @@ def _load_settlement_checkpoint(task_dir_root: Path, instance_id: str) -> Option
     path = _settlement_checkpoint_path(task_dir_root, instance_id)
     if not path.exists():
         return None
-    return json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        # A truncated/unreadable checkpoint (e.g. left by a run killed mid-write, before
+        # `_write_settlement_checkpoint` became atomic) degrades to "no checkpoint": the
+        # caller falls back to the coarser artifact-level reconstruction below, which remains
+        # correct without the checkpoint -- resume never crashes on partial checkpoint bytes.
+        return None
 
 
 def _write_settlement_checkpoint(task_dir_root: Path, instance_id: str, checkpoint: dict[str, Any]) -> None:
@@ -1082,10 +1136,17 @@ def _write_settlement_checkpoint(task_dir_root: Path, instance_id: str, checkpoi
     `run_driver` and touches no key of the `verdict` dict it builds, so it cannot change
     `verdict.json`'s bytes by construction (guarded by
     `tests/test_live_driver_head_parity.py`, which never passes `--resume` and still exercises
-    this write path once WP9c's fresh-run call site below runs)."""
+    this write path once WP9c's fresh-run call site below runs).
+
+    The write is atomic (temp file in the same directory, then `os.replace`): a kill during
+    the write leaves either the previous checkpoint or none at all on disk, never a truncated
+    `settlement.json` -- and `_load_settlement_checkpoint` above degrades a truncated file to
+    "no checkpoint" anyway, so both halves of the contract hold independently."""
     path = _settlement_checkpoint_path(task_dir_root, instance_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(checkpoint, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp_path = path.with_name(path.name + ".tmp")
+    tmp_path.write_text(json.dumps(checkpoint, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(tmp_path, path)
 
 
 def _reconstruct_worker_result_from_artifacts(
@@ -1103,10 +1164,10 @@ def _reconstruct_worker_result_from_artifacts(
 
     Returns `None` when either artifact is missing at every candidate path this file's own
     dispatch paths ever write to -- a partial write from a killed process (e.g. candidate.patch
-    written, then killed before worker_receipt.json) is deliberately treated the same as "no
-    artifact" (matching the fresh-dispatch contract, which always writes both files as one
-    unit), so the caller falls back to a full re-dispatch rather than settling on a
-    possibly-truncated patch.
+    written, then killed before worker_receipt.json; or a worker_receipt.json that exists but
+    is truncated/unparseable) is deliberately treated the same as "no artifact" (matching the
+    fresh-dispatch contract, which always writes both files as one unit), so the caller falls
+    back to a full re-dispatch rather than settling on a possibly-truncated patch.
 
     Checks the siliconflow path first (`task_dir_root/<instance>/<lineage>/`), then -- only
     for the deepseek lineage -- the native-fallback path
@@ -1115,7 +1176,12 @@ def _reconstruct_worker_result_from_artifacts(
     """
     siliconflow_dir = task_dir_root / instance_id / lineage
     if (siliconflow_dir / "candidate.patch").exists() and (siliconflow_dir / "worker_receipt.json").exists():
-        receipt = json.loads((siliconflow_dir / "worker_receipt.json").read_text(encoding="utf-8"))
+        try:
+            receipt = json.loads((siliconflow_dir / "worker_receipt.json").read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            # Truncated/unreadable receipt = "no artifact" (docstring contract above):
+            # re-dispatch rather than settle on a possibly-partial write.
+            return None
         patch_bytes = len((siliconflow_dir / "candidate.patch").read_text(encoding="utf-8").encode("utf-8"))
         return {
             "status": "COMPLETED",
@@ -1130,7 +1196,11 @@ def _reconstruct_worker_result_from_artifacts(
     if lineage == "deepseek":
         fallback_dir = task_dir_root / "deepseek_direct_fallback" / instance_id
         if (fallback_dir / "candidate.patch").exists() and (fallback_dir / "worker_receipt.json").exists():
-            receipt = json.loads((fallback_dir / "worker_receipt.json").read_text(encoding="utf-8"))
+            try:
+                receipt = json.loads((fallback_dir / "worker_receipt.json").read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                # Same truncated-receipt rule as the siliconflow path above: "no artifact".
+                return None
             patch_bytes = len((fallback_dir / "candidate.patch").read_text(encoding="utf-8").encode("utf-8"))
             # Known, reported gap (this module's own "known spec gaps" discipline, see the
             # module docstring): `candidate_audit_status`/`candidate_audit_problems` live in a
@@ -1157,6 +1227,38 @@ def _reconstruct_worker_result_from_artifacts(
     return None
 
 
+def _reused_report_matches_current_patch(*, report_dir: Path, instance_id: str, model_patch: str) -> bool:
+    """Resume tamper guard for `_settle_one_resume`'s report-reuse branch: an on-disk
+    aggregated scoring report is only reusable if it was actually computed over the *current*
+    `candidate.patch`. The fresh scoring path (`score_with_official_harness`) records exactly
+    what it handed the harness in `<report_dir>/predictions.jsonl` (one JSON row per line:
+    `instance_id` / `model_name_or_path` / `model_patch`); this cross-checks the current
+    patch's sha256 against the `model_patch` recorded there for this `instance_id`. Any
+    mismatch, missing/unreadable predictions file, or absent row returns `False`, and the
+    caller falls back to re-scoring (local docker, zero API spend) instead of settling one
+    patch on another patch's report. Resume-only: the fresh path never reads this."""
+    predictions_path = report_dir / "predictions.jsonl"
+    try:
+        prediction_lines = predictions_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return False
+    current_patch_sha256 = sha256_hex(model_patch.encode("utf-8"))
+    for line in prediction_lines:
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            return False
+        if isinstance(row, dict) and row.get("instance_id") == instance_id:
+            recorded_patch = row.get("model_patch")
+            return (
+                isinstance(recorded_patch, str)
+                and sha256_hex(recorded_patch.encode("utf-8")) == current_patch_sha256
+            )
+    return False
+
+
 def _settle_one_resume(
     *,
     args: argparse.Namespace,
@@ -1165,7 +1267,7 @@ def _settle_one_resume(
     lineage: str,
     task_dir_root: Path,
     report_root: Path,
-    deepseek_native_provider_config: dict[str, Any],
+    deepseek_native_provider_config: Optional[dict[str, Any]],
     cli_bin: Path,
     route_domain: str,
     route_scaffold: str,
@@ -1216,6 +1318,13 @@ def _settle_one_resume(
         run_id = f"wp9a-live-driver-{instance_id}-{lineage}"
         report_dir = (report_root / instance_id / lineage).resolve()
         reused_scoring_result = _read_scoring_report(report_dir=report_dir, run_id=run_id, instance_id=instance_id)
+        if reused_scoring_result is not None and not _reused_report_matches_current_patch(
+            report_dir=report_dir, instance_id=instance_id, model_patch=model_patch
+        ):
+            # Tamper guard (`_reused_report_matches_current_patch`): the on-disk report was
+            # computed over a different patch than the candidate.patch now on disk -- never
+            # settle on it; fall through to re-scoring the current patch instead.
+            reused_scoring_result = None
         if reused_scoring_result is not None:
             # "评分产物在 -> 复用报告重算裁决" -- `live_split_verifier.judge` is a pure function,
             # so re-judging an already-produced report is exactly what a fresh run's own single

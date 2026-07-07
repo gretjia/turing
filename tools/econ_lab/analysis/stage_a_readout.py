@@ -13,6 +13,15 @@ the harness whole-suite `resolved`. Tests: one-sided two-proportion pooled-SE
 z-tests, interior arm > each extreme, Bonferroni alpha' = 0.05/3 over the three
 interior arms. Ceiling: ADDRESSED; this script never claims beyond the frozen
 criteria and a null/falsified outcome is a valid, reportable result.
+
+Addendum (2026-07-07, defect record per the freeze discipline above): `arm_stats`
+aggregated per-dispatch `settlement_verdict_resolved` last-wins (unconditional
+overwrite), so a later None dispatch clobbered a real verdict -- inconsistent
+with the OR-aggregation of the neighboring diagnostic `resolved`. Fixed to keep
+the first non-None verdict per task. No judgment logic, test family, or alpha
+changed; output is byte-identical for single-dispatch tasks, which is all Stage
+A data (non-smoke arms have exactly one dispatch per task). Self-test case 6
+pins the fix.
 """
 from __future__ import annotations
 
@@ -42,7 +51,10 @@ def arm_stats(verdict: dict) -> dict:
         sv = None
         resolved = False
         for d in dispatches:
-            if "settlement_verdict_resolved" in d:
+            # First non-None verdict wins (addendum 2026-07-07): consistent with the
+            # OR-aggregation of `resolved` below; a later None dispatch never clobbers a
+            # real verdict. Identical to the old overwrite for the single-dispatch case.
+            if sv is None and d.get("settlement_verdict_resolved") is not None:
                 sv = d["settlement_verdict_resolved"]
             sr = d.get("scoring_result") or {}
             resolved = resolved or bool(sr.get("resolved"))
@@ -183,6 +195,21 @@ def self_test() -> int:
     # 5. z sanity: 40/50 vs 20/50 one-sided p << 0.0167
     t = one_sided_two_prop_z(40, 50, 20, 50)
     assert t["p"] < 0.0001, t
+    # 6. addendum 2026-07-07: a later None dispatch must not clobber a real verdict
+    #    (first non-None wins, consistent with the OR-aggregation of `resolved`).
+    multi = {
+        "tasks": [
+            {
+                "dispatches": [
+                    {"settlement_verdict_resolved": True, "scoring_result": {"resolved": True}},
+                    {"settlement_verdict_resolved": None, "scoring_result": {}},
+                ]
+            }
+        ],
+        "verifier_summary": {},
+    }
+    st = arm_stats(multi)
+    assert st["n_settled"] == 1 and st["k_pass"] == 1 and st["infra_null"] == 0, st
     print("STAGE_A_READOUT_SELF_TEST_PASS")
     return 0
 

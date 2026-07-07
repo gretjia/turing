@@ -1,0 +1,25 @@
+diff --git a/lib/matplotlib/legend.py b/lib/matplotlib/legend.py
+index 1e2a5f9b8e..ccd4d1be00 100644
+--- a/lib/matplotlib/legend.py
++++ b/lib/matplotlib/legend.py
+@@ -434,7 +434,7 @@ class Legend(Artist):
+         # docstring inherited
+         super().__init__(parent)
+         if not isinstance(parent, (Axes, Figure)):
+-            raise TypeError("Legend needs either Axes or Figure as parent")
++            raise TypeError("Legend needs either Axes or FigureBase as parent")
+ 
+         self._legend_box = None
+         self._legend_title_box = None
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index 5d3d1fa2ba..7e48b0c0a6 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -1064,6 +1064,7 @@ class SubFigure(FigureBase):
+         handles = extra_args[0] if len(extra_args) == 1 else extra_args[0:2]
+         labels = extra_args[1] if len(extra_args) == 2 else extra_args[0:2]
+         kwargs = extra_args[2] if len(extra_args) == 3 else {}
++        from matplotlib.legend import Legend
+         l = mlegend.Legend(self, handles, labels, *extra_args,
+                            **kwargs)
+         self.legends.append(l)

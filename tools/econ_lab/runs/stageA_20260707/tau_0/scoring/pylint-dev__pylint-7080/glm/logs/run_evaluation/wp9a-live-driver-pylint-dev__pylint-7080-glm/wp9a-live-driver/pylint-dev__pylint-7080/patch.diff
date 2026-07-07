@@ -1,0 +1,35 @@
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+index 4e5e8f8d7..2c6e5d6e3 100644
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -1937,6 +1937,13 @@ class PyLinter:
+                             elif arg in self._externals_msg:
+                                 self.reporter.rewrite_message(self._externals_msg[arg])
+                 batch_test += 1
++
++        # When running recursively, we need to check ignore-paths before expanding files
++        if self.config.recursive and hasattr(self.config, "ignore_paths"):
++            self.config.ignore_paths = [
++                f
++                for f in self.config.ignore_paths
++                if not os.path.basename(os.path.dirname(f)).startswith(os.path.basename(os.path.join(directory, f)))
++            ]
++
+         if not os.path.isdir(directory):
+             for filepath in self expand_files(
+                 [directory] + list(self.config.reports), ignore_list=self.config.ignore_paths_list
+@@ -1968,6 +1975,13 @@ class PyLinter:
+                 self._report_extra_messages_stats()
+             return
+ 
++        # When running recursively, we need to check ignore-paths before expanding files
++        if self.config.recursive and hasattr(self.config, "ignore_paths"):
++            self.config.ignore_paths = [
++                f
++                for f in self.config.ignore_paths
++                if not os.path.basename(os.path.dirname(f)).startswith(os.path.basename(os.path.join(directory, f)))
++            ]
++
+         if self.config.reports:
+             for report in self.config.reports:
+                 self.reporter.on_report_display(report)

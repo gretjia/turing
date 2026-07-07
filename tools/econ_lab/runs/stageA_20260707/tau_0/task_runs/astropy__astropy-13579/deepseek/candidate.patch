@@ -1,0 +1,151 @@
+diff --git a/astropy/wcs/wcsapi/sliced_low_level_wcs.py b/astropy/wcs/wcsapi/sliced_low_level_wcs.py
+index 2c86dcb9a1..a2bb3f5f2f 100644
+--- a/astropy/wcs/wcsapi/sliced_low_level_wcs.py
++++ b/astropy/wcs/wcsapi/sliced_low_level_wcs.py
+@@ -1,6 +1,7 @@
+ import numpy as np
+ from abc import abstractmethod
+ from astropy.wcs.wcsapi.low_level_api import BaseLowLevelWCS
++from astropy.utils import NumpyRNGContext
+ 
+ class SlicedLowLevelWCS(BaseLowLevelWCS):
+@@ -185,25 +186,63 @@ class SlicedLowLevelWCS(BaseLowLevelWCS):
+         return super()._as_mpl_axes(*args, **kwargs)
+ 
+     def world_to_pixel_values(self, *world_values):
+-        # world_values correspond to the world axes that are not sliced
+-        # we need to compute the world value for the sliced axis from the slice pixel index
+-        # using the underlying WCS with the pixel axes that are kept set to 0 (or some value)
+-        # then concatenate and call underlying world_to_pixel_values, then take relevant pixel axes.
+-        if self._world_keep:
+-            world_keep = self._world_keep
+-            pixel_keep = self._pixel_keep
++        """
++        Convert world coordinates to pixel coordinates for this sliced WCS.
++
++        This method solves for the pixel coordinates that correspond to the
++        given world coordinates, under the constraint that the pixel coordinate
++        of the sliced axis is fixed to the slice index.  Because the world
++        coordinates may be coupled through the projection matrix, a simple
++        one-step inversion using a pre-computed world value for the sliced axis
++        can be incorrect.  Instead we use an iterative Newton method to find
++        the self-consistent world value for the sliced axis.
++        """
++        # Validate input
++        if len(world_values) != len(self._world_keep):
++            raise ValueError("Number of world values must match the number of "
++                             "world axes that are not sliced")
++
++        # Determine the indices of the pixel and world axes that are kept
++        pixel_keep = list(self._pixel_keep)
++        pixel_slice = list(self._pixel_slice)
++        world_keep = list(self._world_keep)
++        world_slice = list(self._world_slice)
++
++        # Convert world values to arrays if they are not already
++        world_values = [np.asarray(w, dtype=float) for w in world_values]
++        shape = world_values[0].shape if world_values else ()
++        for w in world_values:
++            if w.shape != shape:
++                raise ValueError("All world value arrays must have the same shape")
++
++        # Prepare output arrays
++        pixel_values = [np.empty(shape) for _ in pixel_keep]
++
++        # Iterate over each element in the array (inefficient but correct)
++        # For large arrays this may be slow; a vectorized approach could be optimized later.
++        flat_worlds = [w.ravel() for w in world_values]
++        flat_pixels = [p.ravel() for p in pixel_values]
++
++        for i in range(np.prod(shape) if shape else 1):
++            # Build the world values for this element
++            input_world = [fw[i] for fw in flat_worlds]
++
++            # Initial guess for the sliced world value: use the pixel_to_world
++            # of the underlying WCS at the slice pixel index with the kept
++            # pixel axes set to 0.
++            pixel_guess = np.zeros(self._underlying_wcs.pixel_n_dim)
++            for idx, p in zip(pixel_slice, [self._slice_index] * len(pixel_slice)):
++                pixel_guess[idx] = p
++            sliced_world_guess = self._underlying_wcs.pixel_to_world_values(*pixel_guess)
++            sliced_world_guess = np.array(sliced_world_guess)[world_slice]
+ 
+-        # Convert the sliced pixel index to world value using the underlying WCS
+-        # at some nominal pixel values for the other axes.
+-        # This is the bug: the other pixel values are not known.
++            # Newton iteration to find the correct sliced world value
++            for iteration in range(10):  # max 10 iterations
++                # Construct the full world array with current guess
++                full_world = [None] * self._underlying_wcs.world_n_dim
++                for j, idx in enumerate(world_keep):
++                    full_world[idx] = input_world[j]
++                for j, idx in enumerate(world_slice):
++                    full_world[idx] = sliced_world_guess[j] if len(world_slice) == 1 else sliced_world_guess[j]
+ 
+-        # Get the shape of the input world arrays
+-        # etc.
++                # Compute pixel values from the full world
++                pixel_all = self._underlying_wcs.world_to_pixel_values(*full_world)
+ 
+-        # For the slice axis, we compute the world value by calling
+-        # underlying_wcs.pixel_to_world_values(0,0,slice_index) or something.
+-        # That is incorrect.
++                # Extract the sliced pixel value
++                sliced_pixel = np.array([pixel_all[idx] for idx in pixel_slice])
+ 
+-        # Then combine and call underlying_wcs.world_to_pixel_values
+-        # and return the first two pixel values.
++                # Compute the difference from the target slice index
++                pixel_slice_target = np.array([self._slice_index] * len(pixel_slice))
++                delta = sliced_pixel - pixel_slice_target
+ 
+-        # This is the bug.
++                # If convergence reached, exit
++                if np.all(np.abs(delta) < 1e-10):
++                    break
++
++                # Compute numerical Jacobian of pixel_slice with respect to sliced_world
++                # Since the number of sliced axes is small (typically 1), we use finite differences
++                eps = 1e-8 * (np.abs(sliced_world_guess) + 1e-8)
++                jac = np.empty((len(pixel_slice), len(world_slice)))
++                for j in range(len(world_slice)):
++                    sliced_world_eps = sliced_world_guess.copy()
++                    sliced_world_eps[j] += eps[j]
++                    full_world_eps = [None] * self._underlying_wcs.world_n_dim
++                    for k, idx in enumerate(world_keep):
++                        full_world_eps[idx] = input_world[k]
++                    for k, idx in enumerate(world_slice):
++                        full_world_eps[idx] = sliced_world_eps[k] if len(world_slice) == 1 else sliced_world_eps[k]
++                    pixel_all_eps = self._underlying_wcs.world_to_pixel_values(*full_world_eps)
++                    sliced_pixel_eps = np.array([pixel_all_eps[idx] for idx in pixel_slice])
++                    jac[:, j] = (sliced_pixel_eps - sliced_pixel) / eps[j]
++
++                # Newton update: delta_world = - inv(J) * delta_pixel
++                try:
++                    inv_jac = np.linalg.solve(jac, delta)
++                except np.linalg.LinAlgError:
++                    # If singular, use pseudo-inverse
++                    inv_jac = np.linalg.lstsq(jac, delta, rcond=None)[0]
++                sliced_world_guess -= inv_jac
++
++            # After convergence, extract the kept pixel values
++            for j, idx in enumerate(pixel_keep):
++                flat_pixels[j][i] = pixel_all[idx]
++
++        # Reshape outputs to original shape
++        result = tuple(p.reshape(shape) for p in pixel_values)
++        return result if len(pixel_values) > 1 else result[0]
+ 
+-        # The sliced WCS's world_to_pixel should invert the 2D mapping
+-        # with p3 fixed; this requires solving a system.
+     def pixel_to_world_values(self, *pixel_values):
+         # pixel_values correspond to the pixel axes that are not sliced
+         # we need to compute the full pixel values by inserting the slice index
+         # for the sliced pixel axis, then call underlying_wcs.pixel_to_world_values,
+         # then extract the world values for the world axes that are not sliced.
++        if len(pixel_values) != len(self._pixel_keep):
++            raise ValueError("Number of pixel values must match the number of "
++                             "pixel axes that are not sliced")
+         pixel_keep = list(self._pixel_keep)
+         pixel_slice = list(self._pixel_slice)
+         world_keep = list(self._world_keep)

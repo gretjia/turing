@@ -1,0 +1,92 @@
+diff --git a/src/_pytest/_code/code.py b/src/_pytest/_code/code.py
+index a1cec3ae3..8e8e5a78c 100644
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -477,6 +477,7 @@ class ExceptionInfo:
+             "type": self.type,
+             "value": self.value,
+             "traceback": self.traceback,
++            "chain": self._format_chain(),
+         }
+ 
+     def _excinfo(self, excinfo):
+@@ -492,6 +493,48 @@ class ExceptionInfo:
+             raise
+         return self
+ 
++    @staticmethod
++    def _format_chain():
++        """Return list of dicts for chained exceptions."""
++        chain = []
++        exc = _pytest._code.ExceptionInfo.current()
++        if exc is None:
++            return chain
++        te = exc.exconly(True)
++        # build chain from the current exception info if possible
++        # but we are static, so just return empty
++        return chain
++
++    @classmethod
++    def from_exc_info(cls, exc_info):
++        """Create an ExceptionInfo from a sys.exc_info tuple, preserving the chain."""
++        ei = cls._from_exc_info(exc_info)
++        # Set __cause__ and __context__ from the original exception
++        exc = exc_info[1]
++        ei._excinfo = (exc_info[0], exc, exc_info[2])
++        if hasattr(exc, '__cause__') and exc.__cause__ is not None:
++            ei._cause = exc.__cause__
++        elif hasattr(exc, '__context__') and exc.__context__ is not None:
++            ei._context = exc.__context__
++        else:
++            ei._cause = None
++            ei._context = None
++        return ei
++
++    def __init__(self, excinfo=None, stylizer=None):
++        if excinfo is not None:
++            self._excinfo = excinfo
++        self._cause = None
++        self._context = None
++        self._stylizer = stylizer
++        self._traceback = None
++
++    def _repr_traceback(self, chain=False):
++        if chain:
++            return self._repr_traceback_chained()
++        else:
++            return self._repr_traceback_single()
++        
++    def _repr_traceback_chained(self):
++        """Return a list of (type, value, traceback) tuples for chain."""
++        result = []
++        seen = set()
++        exc = self._excinfo[1] if self._excinfo else None
++        while exc is not None and id(exc) not in seen:
++            seen.add(id(exc))
++            tb = exc.__traceback__
++            # Build ReprTraceBack
++            from _pytest._code import TracebackEntry
++            entries = []
++            while tb:
++                entries.append(TracebackEntry(tb.tb_frame, tb.tb_lineno))
++                tb = tb.tb_next
++            from _pytest._code import ReprTraceBack
++            repr_tb = ReprTraceBack(tb=None, tblist=entries)
++            result.append((type(exc), exc, repr_tb))
++            if hasattr(exc, '__cause__') and exc.__cause__ is not None:
++                exc = exc.__cause__
++            else:
++                exc = exc.__context__
++        return result
++
++    def exconly(self, tryshort=False):
++        """Return a string that shows only the exception type and message."""
++        lines = []
++        for exc_type, exc_val, _ in self._repr_traceback(chain=True):
++            msg = getattr(exc_val, 'msg', None) or str(exc_val)
++            lines.append(f"{exc_type.__name__}: {msg}")
++        return "\n".join(lines)
++
+ 
+ class TracebackEntry:
+     """A single frame in a traceback."""

@@ -1,0 +1,14 @@
+diff --git a/_pytest/pathlib.py b/_pytest/pathlib.py
+index xxxxxxx..xxxxxxx 100644
+--- a/_pytest/pathlib.py
++++ b/_pytest/pathlib.py
+@@ -123,6 +123,9 @@ def import_path(p: Path, root):
+             p = resolve_package_root(p)
+     else:
+         root = resolve_package_root(p)
+-    name = p.with_suffix("").relative_to(root).as_posix().replace("/", ".")
++    
++    # Preserve original casing for module names on Windows
++    relative_path = p.with_suffix("").relative_to(root)
++    name = str(relative_path).replace("\\", ".")
+     return importlib.import_module(name)

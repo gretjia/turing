@@ -1,0 +1,16 @@
+diff --git a/requests/models.py b/requests/models.py
+index 19d9662..b19d76c 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -398,7 +398,11 @@ class Request:
+         try:
+             # Check if the host is a valid IDNA label
+             host.encode('idna')
+-        except UnicodeError:
++        except UnicodeError as e:
++            # Re-raise as InvalidUrl to maintain consistent error handling
++            raise InvalidUrl("URL has an invalid label.") from e
++
+         except (AttributeError, TypeError):
+             # If host is not a string, it's invalid
+             raise InvalidUrl("URL has an invalid label.")
