@@ -24,8 +24,9 @@ use turing_contracts::jcs;
 use turing_contracts::registry;
 use turing_economy::{
     AmmPool, AmmSwapExecuted, CandidateRoute, EconomyEvent, MarketCreated, MarketReplay,
-    MarketRouter, MarketRouterMode, MarketSettled, PositionMinted, PriceSignal, RewardDistributed,
-    WalletProjection, check_principal_position_cap, check_proposer_conflict, check_self_trade,
+    MarketRouter, MarketRouterMode, MarketSettled, PositionMinted, PrincipalDeclared, PriceSignal,
+    RewardDistributed, WalletProjection, check_principal_position_cap, check_proposer_conflict,
+    check_self_trade,
 };
 use turing_execd::capability::{
     ActionClass, Budget, CapabilityGrant, CapabilityScope, NetworkScope, Risk, RiskClass,
@@ -2487,6 +2488,9 @@ fn parse_economy_event(value: &Value) -> Result<EconomyEvent, String> {
         "RewardDistributed" => serde_json::from_value::<RewardDistributed>(value.clone())
             .map(EconomyEvent::RewardDistributed)
             .map_err(|error| format!("invalid RewardDistributed: {error}")),
+        "PrincipalDeclared" => serde_json::from_value::<PrincipalDeclared>(value.clone())
+            .map(EconomyEvent::PrincipalDeclared)
+            .map_err(|error| format!("invalid PrincipalDeclared: {error}")),
         other => Err(format!("unknown economy event_type {other:?}")),
     }
 }
@@ -2784,6 +2788,7 @@ fn load_economy_events_from_tape(repo: &Path) -> Result<Vec<EconomyEvent>, Strin
                     | "AMMSwapExecuted"
                     | "MarketSettled"
                     | "RewardDistributed"
+                    | "PrincipalDeclared"
             ) {
                 return None;
             }

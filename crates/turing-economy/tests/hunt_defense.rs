@@ -27,6 +27,12 @@ use turing_economy::{
     check_self_trade,
 };
 
+/// ADR-ECON-001 (owner-ratified 2026-07-07): shorthand for the additive governance
+/// declaration that `agent_id` is the same principal as `principal_id`.
+fn declare(principal_id: &str, agent_id: &str) -> EconomyEvent {
+    EconomyEvent::principal_declared(principal_id, agent_id)
+}
+
 // --- deterministic PRNG (fixed seed, same algorithm as the other lens files) ----------------
 
 struct Rng(u64);
@@ -55,25 +61,18 @@ const FIXED_SEED_1: u64 = 0x5EED_1234_C0FF_EE01;
 const FIXED_SEED_2: u64 = 0x5EED_1234_C0FF_EE02;
 const FIXED_SEED_3: u64 = 0x5EED_1234_C0FF_EE03;
 
-/// CANDIDATE BUG 1 (INV-12 stated as: "同 principal 对侧同轮 → refused"). A single dust
-/// interposing swap from ANY other agent_id resets `check_self_trade`'s tracker, so the
-/// *original* trader can flip sides immediately after, with zero capital committed by the
-/// "interposing" identity beyond dust. `check_self_trade` tracks only the single
-/// most-recently-seen swap on the market (any trader), not "the last swap by a genuinely
-/// distinct, unrelated principal" -- so a colluding pair (or two accounts controlled by the
-/// same attacker) can wash-trade at will for the cost of one dust trade.
-/// NEEDS OWNER (out of scope for PART D.1's 4 assigned CONFIRMED bugs; this is a separate
-/// 镜头4/defense-lens finding, not one of the 4 bugs dispatched for this capsule run).
-/// `check_self_trade` tracks only the single most-recently-seen swap on the market by literal
-/// `trader_id`/`agent_id` string; there is no Sybil-resistant "real principal" identity in this
-/// codebase to aggregate across (the same architectural gap as INV-13's documented
-/// `principal_id == agent_id` limitation). Closing this requires a principal registry
-/// (`principal_id != agent_id`, capsule PART D.2's own explicit GAP), an owner-level
-/// architecture decision -- not a local fix to `check_self_trade`.
+/// FORMERLY CANDIDATE BUG 1 (INV-12 stated as: "同 principal 对侧同轮 → refused"), now FIXED by
+/// ADR-ECON-001 (owner-ratified 2026-07-07, additive `PrincipalDeclared`). A single dust
+/// interposing swap from ANY other agent_id used to reset `check_self_trade`'s tracker, letting
+/// the *original* trader flip sides immediately after, with zero capital committed by the
+/// "interposing" identity beyond dust. `check_self_trade` now resolves both the query trader and
+/// the last-seen swap's trader through any `PrincipalDeclared` events present on the same
+/// `events` tape (see `resolve_principal` in `turing-economy/src/lib.rs`); when the authority has
+/// declared `attacker-puppet` to be the same principal as `attacker`, the dust interposition no
+/// longer clears the round. Undeclared puppets (no `PrincipalDeclared` on the tape) still defeat
+/// this check exactly as before -- this is governance declaration + enforcement, not automatic
+/// Sybil detection (ADR-ECON-001 explicitly scopes automatic inference out).
 #[test]
-#[ignore = "NEEDS OWNER: requires a Sybil-resistant principal registry (principal_id != \
-            agent_id), the same architecture-level GAP as INV-13 (capsule PART D.2). Not one \
-            of PART D.1's 4 assigned CONFIRMED bugs."]
 fn inv12_self_trade_should_still_refuse_after_dust_puppet_interposition_property() {
     let mut rng = Rng::new(FIXED_SEED_1);
     let mut violations = 0usize;
@@ -103,7 +102,8 @@ fn inv12_self_trade_should_still_refuse_after_dust_puppet_interposition_property
         .expect("post-swap pool state is always a valid pool");
 
         // Sybil/colluding puppet trades dust (does not even need to trade opposite -- any swap
-        // by a different agent_id resets the tracker).
+        // by a different agent_id resets the tracker), but the authority has declared it to be
+        // the same principal as "attacker" (ADR-ECON-001).
         let Ok(puppet_dust) = pool_after_first.buy_yes("attacker-puppet", &dust_pay.to_string())
         else {
             continue;
@@ -112,6 +112,7 @@ fn inv12_self_trade_should_still_refuse_after_dust_puppet_interposition_property
         let events = vec![
             EconomyEvent::AmmSwapExecuted(attacker_first),
             EconomyEvent::AmmSwapExecuted(puppet_dust),
+            declare("attacker", "attacker-puppet"),
         ];
 
         trials += 1;
@@ -130,18 +131,15 @@ fn inv12_self_trade_should_still_refuse_after_dust_puppet_interposition_property
         violations, 0,
         "INV-12 VIOLATED in {violations}/{trials} fixed-seed trials (seed {FIXED_SEED_1:#x}): \
          check_self_trade returned Ok(()) (attacker's opposite-side flip was ALLOWED) after a \
-         single 1-micro-Coin dust interposing swap from a puppet agent_id, even though the same \
-         real principal ('attacker') still controls both swaps. Expected: Err(SelfTradeRejected). \
-         First minimal repro at fixture index {first_repro:?} (i, pool_y, pool_n)."
+         single 1-micro-Coin dust interposing swap from a declared-same-principal puppet \
+         agent_id. Expected: Err(SelfTradeRejected). First minimal repro at fixture index \
+         {first_repro:?} (i, pool_y, pool_n)."
     );
 }
 
-/// Minimal, hand-verified repro of CANDIDATE BUG 1 with concrete fixed numbers (no RNG).
-/// NEEDS OWNER: see the rationale on the property test above.
+/// Minimal, hand-verified repro of the formerly-CANDIDATE-BUG-1 case, now green under
+/// ADR-ECON-001's declared-principal resolution. See the rationale on the property test above.
 #[test]
-#[ignore = "NEEDS OWNER: requires a Sybil-resistant principal registry (principal_id != \
-            agent_id), the same architecture-level GAP as INV-13 (capsule PART D.2). Not one \
-            of PART D.1's 4 assigned CONFIRMED bugs."]
 fn inv12_self_trade_dust_interposition_minimal_repro() {
     let pool = AmmPool::new("m-repro", "1000000000", "1000000000").expect("pool");
     let attacker_first = pool.buy_yes("attacker", "100000000").expect("first swap");
@@ -158,6 +156,7 @@ fn inv12_self_trade_dust_interposition_minimal_repro() {
     let events = vec![
         EconomyEvent::AmmSwapExecuted(attacker_first),
         EconomyEvent::AmmSwapExecuted(puppet_dust),
+        declare("attacker", "attacker-puppet"),
     ];
 
     let result = check_self_trade(&events, "m-repro", "attacker", "BUY_NO");
@@ -165,7 +164,8 @@ fn inv12_self_trade_dust_interposition_minimal_repro() {
         matches!(result, Err(EconomyError::SelfTradeRejected(_))),
         "INV-12 VIOLATED: expected Err(SelfTradeRejected(_)) but got {result:?}. Observed: \
          Ok(()) -- attacker holds YES (first swap, pay=100000000) AND is allowed to immediately \
-         take NO, with the only 'clearing' event being their own 1-micro-Coin puppet trade."
+         take NO, with the only 'clearing' event being their own declared-same-principal \
+         1-micro-Coin puppet trade."
     );
 }
 
@@ -184,21 +184,17 @@ fn inv12_self_trade_direct_flip_is_still_refused_control() {
     );
 }
 
-/// CANDIDATE BUG 2 (INV-14 stated as: "proposer 不得在自己市场持 NO 超 de-minimis").
-/// `check_proposer_conflict` is a strict no-op (`Ok(())`) whenever `trader_id != proposer_id`,
-/// with NO aggregation across any other identity. A proposer who routes their NO bet through
-/// literally any other string as `trader_id` (a puppet/second agent_id under the same
-/// real-world control) faces zero de-minimis enforcement -- the check does not even attempt to
-/// look at the puppet's position.
-/// NEEDS OWNER (out of scope for PART D.1's 4 assigned CONFIRMED bugs; a separate 镜头4
-/// defense-lens finding). `check_proposer_conflict` compares `trader_id` to the literal
-/// `proposer_id` string with zero cross-identity aggregation -- the same missing
-/// Sybil-resistant principal registry as INV-13/INV-12 above. Architecture-level, not a local
-/// fix.
+/// FORMERLY CANDIDATE BUG 2 (INV-14 stated as: "proposer 不得在自己市场持 NO 超 de-minimis"), now
+/// FIXED by ADR-ECON-001 (owner-ratified 2026-07-07, additive `PrincipalDeclared`).
+/// `check_proposer_conflict` used to be a strict no-op (`Ok(())`) whenever `trader_id !=
+/// proposer_id`, with NO aggregation across any other identity, so a proposer routing their NO
+/// bet through any other string as `trader_id` faced zero de-minimis enforcement. The no-op
+/// guard and the aggregation now both resolve through any `PrincipalDeclared` events present on
+/// the same `events` tape (see `resolve_principal`); when the authority has declared
+/// `proposer-puppet` to be the same principal as `proposer`, the puppet's NO position is caught.
+/// Undeclared puppets still bypass this check exactly as before (governance declaration, not
+/// automatic Sybil detection -- explicitly out of scope per ADR-ECON-001).
 #[test]
-#[ignore = "NEEDS OWNER: requires a Sybil-resistant principal registry (principal_id != \
-            agent_id), the same architecture-level GAP as INV-13 (capsule PART D.2). Not one \
-            of PART D.1's 4 assigned CONFIRMED bugs."]
 fn inv14_proposer_conflict_should_still_cap_puppet_account_net_no_property() {
     let mut rng = Rng::new(FIXED_SEED_2);
     let mut violations = 0usize;
@@ -218,11 +214,15 @@ fn inv14_proposer_conflict_should_still_cap_puppet_account_net_no_property() {
         )
         .expect("pool construction with positive reserves must succeed");
 
-        // The proposer's puppet identity buys a huge NO position directly.
+        // The proposer's puppet identity buys a huge NO position directly, and the authority has
+        // declared the puppet to be the same principal as "proposer" (ADR-ECON-001).
         let Ok(puppet_swap) = pool.buy_no("proposer-puppet", &huge_no_pay.to_string()) else {
             continue;
         };
-        let events = vec![EconomyEvent::AmmSwapExecuted(puppet_swap)];
+        let events = vec![
+            EconomyEvent::AmmSwapExecuted(puppet_swap),
+            declare("proposer", "proposer-puppet"),
+        ];
 
         trials += 1;
         // STATED INVARIANT: the real proposer ("proposer"), acting through puppet identity
@@ -253,16 +253,16 @@ fn inv14_proposer_conflict_should_still_cap_puppet_account_net_no_property() {
     );
 }
 
-/// Minimal, hand-verified repro of CANDIDATE BUG 2 with concrete fixed numbers.
-/// NEEDS OWNER: see the rationale on the property test above.
+/// Minimal, hand-verified repro of the formerly-CANDIDATE-BUG-2 case, now green under
+/// ADR-ECON-001's declared-principal resolution. See the rationale on the property test above.
 #[test]
-#[ignore = "NEEDS OWNER: requires a Sybil-resistant principal registry (principal_id != \
-            agent_id), the same architecture-level GAP as INV-13 (capsule PART D.2). Not one \
-            of PART D.1's 4 assigned CONFIRMED bugs."]
 fn inv14_proposer_conflict_puppet_account_minimal_repro() {
     let pool = AmmPool::new("m-repro2", "1000000000", "1000000000").expect("pool");
     let puppet_swap = pool.buy_no("proposer-puppet", "400000000").expect("swap");
-    let events = vec![EconomyEvent::AmmSwapExecuted(puppet_swap)];
+    let events = vec![
+        EconomyEvent::AmmSwapExecuted(puppet_swap),
+        declare("proposer", "proposer-puppet"),
+    ];
 
     let result = check_proposer_conflict(
         &events,
@@ -277,10 +277,8 @@ fn inv14_proposer_conflict_puppet_account_minimal_repro() {
         matches!(result, Err(EconomyError::ProposerConflictRejected(_))),
         "INV-14 VIOLATED: expected Err(ProposerConflictRejected(_)) but got {result:?}. Observed: \
          Ok(()) even though the 'proposer' economic actor (via puppet identity \
-         'proposer-puppet') holds net_no from a 400000000-pay swap on their own market, far \
-         above de_minimis_cap=1. Unlike check_principal_position_cap, this function's doc \
-         comment does not flag this Sybil/puppet limitation at all -- it is a *total* bypass \
-         (zero aggregation attempted), not merely a partial one."
+         'proposer-puppet', declared the same principal via PrincipalDeclared) holds net_no from \
+         a 400000000-pay swap on their own market, far above de_minimis_cap=1."
     );
 }
 
@@ -306,21 +304,33 @@ fn inv14_proposer_conflict_direct_case_is_still_refused_control() {
     );
 }
 
-/// CANDIDATE BUG 3 (INV-13 magnitude confirmation). The documented principal-cap Sybil gap
-/// ("Sybil-splitting formally defeats per-account caps") is not merely imperfect -- it is
-/// UNBOUNDED: N puppet identities, each individually satisfying `cap`, let the same real
-/// economic actor accumulate `N * cap` aggregate exposure with no upper bound as N grows.
-/// STATED INVARIANT under test here (a strengthened reading of INV-13, "principal 级仓位上限":
-///跨账户按 principal 聚合封顶): the real aggregate exposure of one economic actor spread over
-/// puppets should stay bounded by `cap`, not scale linearly with puppet count.
-/// NEEDS OWNER (out of scope for PART D.1's 4 assigned CONFIRMED bugs). This is exactly the
-/// INV-13 Sybil-registry GAP the capsule itself names as the canonical "needs owner, not a
-/// local fix" example (PART D.2: "principal registry (principal_id != agent_id)"). Left
-/// failing and `#[ignore]`d rather than hidden.
+/// CANDIDATE BUG 3 (INV-13 magnitude confirmation). STILL `#[ignore]`d after ADR-ECON-001
+/// (owner-ratified 2026-07-07) -- NOT the same gap as INV-12/INV-14 above, and not closeable by
+/// this capsule's additive `PrincipalDeclared` mechanism as this test is currently written.
+///
+/// ADR-ECON-001's decision is explicit: "这不是自动 Sybil 检测(一般不可能),而是治理声明 + 谓词
+/// 强制执行" -- resolution happens by scanning `PrincipalDeclared` events *on the `events` tape
+/// passed into the call under test*. This test, by design, gives each puppet call an entirely
+/// empty, non-shared `events: Vec::new()` (no declaration could ever be present) and a distinct
+/// literal `principal_id` string per call (there is no `agent_id` argument at all for
+/// `check_principal_position_cap` to resolve -- the test passes the puppet identity directly as
+/// the function's own `principal_id`). The N-puppet aggregation asserted in the test
+/// (`aggregate_yes`) happens entirely in the test's own Rust loop, outside any single call to
+/// production code, so no additive change to `check_principal_position_cap`/`principal_position`
+/// can observe it. Turning this specific test green would require rewriting its call pattern
+/// (one shared `events` tape carrying `PrincipalDeclared` rows for every puppet, plus calling
+/// with one canonical `principal_id` instead of N distinct ones) -- i.e. changing what the test
+/// exercises, not merely removing `#[ignore]`. Per this capsule's explicit STOP-and-report
+/// discipline, left `#[ignore]`d rather than reshaped to pass; flagging for owner/implementer
+/// confirmation on whether that test-authoring change is in scope for a future capsule.
 #[test]
-#[ignore = "NEEDS OWNER: this IS the capsule's own canonical INV-13 Sybil-registry example \
-            (PART D.2: principal registry, principal_id != agent_id). Not one of PART D.1's 4 \
-            assigned CONFIRMED bugs."]
+#[ignore = "ADR-ECON-001 (owner-ratified 2026-07-07) fixes PrincipalDeclared resolution WITHIN a \
+            shared events tape; this test's puppet calls each pass events=Vec::new() (no shared \
+            tape, so no declaration can ever be present) and a distinct literal principal_id per \
+            call with no agent_id argument to resolve -- the N-puppet aggregation happens in the \
+            test's own loop, outside any single call to production code. Not closeable by an \
+            additive production-code change without also restructuring this test's call \
+            pattern; needs owner/implementer confirmation before that scope is taken on."]
 fn inv13_principal_cap_should_bound_ring_collusion_aggregate_property() {
     let mut rng = Rng::new(FIXED_SEED_3);
     let cap: u64 = 1_000;

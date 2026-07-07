@@ -4,19 +4,19 @@
   "status": "FROZEN_V5_3_1",
   "as_of": "2026-06-21",
   "lineage": "Human-ratified Phase-0 exact 20 ADVANCE set plus a v5.3.1 closed reconstruction of the 26 PRESERVE names; this file is the v5.3.1 authoritative registry. The missing original registry artifact is not silently impersonated.",
-  "registry_name_set_sha256": "cd34b7a23edbcf6070bae1585838b5f68c285b0ca1e74b7642d8dfa1a597f10a",
+  "registry_name_set_sha256": "2d2994e3e64de7bac50275e2e535e42f5c3aeed1e06aa437b57689648e446389",
   "registry_name_set_sha256_profile": "sorted_canonical_names_lf_trailing_lf",
   "counts": {
-    "total": 69,
+    "total": 70,
     "advance": 21,
-    "preserve": 48,
+    "preserve": 49,
     "sovereign_accept": 12,
     "authorization": 9,
     "proposal": 6,
     "observation": 15,
     "receipt": 6,
     "failure": 5,
-    "economy": 16
+    "economy": 17
   },
   "unknown_event_policy": "REJECT",
   "append_only_by_name": true,
@@ -724,6 +724,17 @@
       "human_required": false,
       "payload_schema_id": "failure_node_capsule_bound.v1",
       "ordinal": 16,
+      "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
+    },
+    {
+      "canonical_name": "PrincipalDeclared",
+      "event_class": "ECONOMY",
+      "head_effect": "PRESERVE",
+      "target_ref": "tape_tip",
+      "predicate_required": true,
+      "human_required": false,
+      "payload_schema_id": "principal_declared.v1",
+      "ordinal": 17,
       "status": "ADDITIVE_AGENT_ECONOMY_V1_0"
     },
     {

@@ -17,6 +17,14 @@ pub enum EconomyEvent {
     AmmSwapExecuted(AmmSwapExecuted),
     MarketSettled(MarketSettled),
     RewardDistributed(RewardDistributed),
+    /// ADR-ECON-001 (owner-ratified 2026-07-07): additive, PRESERVE-class governance
+    /// declaration that `agent_id` is a member of `principal_id`, following the same
+    /// `ADDITIVE_AGENT_ECONOMY_V1_0` registry pattern as every other economy event above.
+    /// Not automatic Sybil detection (out of scope per the ADR) -- an authority
+    /// (ArchitectAI/owner) asserts the mapping; the D5 defenses below then resolve through it
+    /// when aggregating, falling back to the literal `agent_id` when no declaration exists
+    /// (back-compat with every pre-ADR-ECON-001 fixture/call site).
+    PrincipalDeclared(PrincipalDeclared),
 }
 
 impl EconomyEvent {
@@ -112,6 +120,21 @@ impl EconomyEvent {
             _ => None,
         }
     }
+
+    /// ADR-ECON-001: authority-declared association of `agent_id` with `principal_id`. PRESERVE
+    /// (never moves `accepted_head`), additive over every existing economy event.
+    pub fn principal_declared(
+        principal_id: impl Into<String>,
+        agent_id: impl Into<String>,
+    ) -> Self {
+        EconomyEvent::PrincipalDeclared(PrincipalDeclared {
+            schema_id: "principal_declared.v1".to_string(),
+            event_type: "PrincipalDeclared".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            principal_id: principal_id.into(),
+            agent_id: agent_id.into(),
+        })
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -191,6 +214,19 @@ pub struct RewardDistributed {
     pub reward_coin: String,
     pub slash_coin: String,
     pub reason: String,
+}
+
+/// ADR-ECON-001 (owner-ratified 2026-07-07, additive): authority-declared "these agent_ids are
+/// the same economic principal" association. `market_id`-independent by design (a principal
+/// declaration is a governance fact about identity, not scoped to one market). Consumed by
+/// `resolve_principal`/`principal_position`/`check_self_trade`/`check_proposer_conflict`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PrincipalDeclared {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    pub principal_id: String,
+    pub agent_id: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -392,7 +428,9 @@ impl MarketReplay {
                         market.settlement_result = Some(settled.result.clone());
                     }
                 }
-                EconomyEvent::PositionMinted(_) | EconomyEvent::RewardDistributed(_) => {}
+                EconomyEvent::PositionMinted(_)
+                | EconomyEvent::RewardDistributed(_)
+                | EconomyEvent::PrincipalDeclared(_) => {}
             }
         }
         Ok(MarketReplay {
@@ -480,7 +518,7 @@ impl WalletProjection {
                     wallet.coin += DecimalAmount::parse_non_negative(&reward.reward_coin)?;
                     wallet.coin -= DecimalAmount::parse_non_negative(&reward.slash_coin)?;
                 }
-                EconomyEvent::MarketCreated(_) => {}
+                EconomyEvent::MarketCreated(_) | EconomyEvent::PrincipalDeclared(_) => {}
             }
         }
 
@@ -675,6 +713,9 @@ pub fn check_conservation(
                 market.reward_coin += reward_coin;
                 market.slash_coin += slash_coin;
             }
+            // ADR-ECON-001: a principal declaration is an identity fact, not a coin-flow event;
+            // it carries no market_id and never affects mint/redemption conservation math.
+            EconomyEvent::PrincipalDeclared(_) => {}
         }
     }
 
@@ -709,26 +750,36 @@ pub fn check_conservation(
 /// This is exactly the wash-trade pattern D5 targets: paying the pool's slippage to yourself
 /// on both sides extracts subsidized k-growth with zero genuine directional signal. Trading
 /// the SAME side again, or trading opposite AFTER another principal has traded, is allowed.
+///
+/// ADR-ECON-001 (owner-ratified 2026-07-07, additive): the "last trader" tracker below now
+/// compares resolved principals (via [`resolve_principal`]), not literal `trader_id` strings, so
+/// an authority-declared puppet identity trading the interposing swap no longer resets the
+/// tracker for its real principal. No declaration present -> resolves to the literal id,
+/// identical to pre-ADR-ECON-001 behavior (back-compat).
 pub fn check_self_trade(
     events: &[EconomyEvent],
     market_id: &str,
     trader_id: &str,
     side: &str,
 ) -> Result<(), EconomyError> {
+    let query_principal = resolve_principal(events, trader_id);
     let mut last: Option<(String, String)> = None;
     for event in events {
         if let EconomyEvent::AmmSwapExecuted(swap) = event
             && swap.market_id == market_id
         {
-            last = Some((swap.trader_id.clone(), swap.side.clone()));
+            last = Some((
+                resolve_principal(events, &swap.trader_id),
+                swap.side.clone(),
+            ));
         }
     }
-    if let Some((last_trader, last_side)) = last
-        && last_trader == trader_id
+    if let Some((last_principal, last_side)) = last
+        && last_principal == query_principal
         && last_side != side
     {
         return Err(EconomyError::SelfTradeRejected(format!(
-            "{trader_id} already holds {last_side} in the open clearing round for {market_id}; cannot also take {side} against the same pool with no other principal trading in between"
+            "{trader_id} (principal {query_principal}) already holds {last_side} in the open clearing round for {market_id}; cannot also take {side} against the same pool with no other principal trading in between"
         )));
     }
     Ok(())
@@ -738,13 +789,13 @@ pub fn check_self_trade(
 /// on `market_id` (existing on-tape positions plus the pending `pending_yes`/`pending_no` a
 /// caller is about to add) and rejects if either side would exceed `cap`.
 ///
-/// **Sybil-splitting limitation (recorded, not solved):** this codebase has no
-/// principal/account-grouping concept distinct from `agent_id` (confirmed: no `principal`
-/// identifier exists anywhere else in the workspace), so `principal_id` here is `agent_id`.
-/// A Sybil that spreads the same economic actor across multiple `agent_id`s formally defeats
-/// this cap, exactly as D5 warns ("Sybil-splitting formally defeats per-account caps") -- a
-/// real principal registry is a prerequisite for closing this gap, not something this
-/// function can paper over.
+/// **Sybil-splitting (ADR-ECON-001, owner-ratified 2026-07-07, additive):** `principal_id` is
+/// resolved through any [`EconomyEvent::PrincipalDeclared`] events present on `events` (see
+/// [`resolve_principal`]) before aggregating, so an authority (ArchitectAI/owner) that has
+/// declared several `agent_id`s to be the same principal gets them aggregated together here.
+/// This is governance declaration + predicate enforcement, not automatic Sybil detection (out
+/// of scope per the ADR): a puppet `agent_id` with no declaration on the given `events` tape
+/// still resolves to itself, identical to pre-ADR-ECON-001 behavior (back-compat).
 pub fn check_principal_position_cap(
     events: &[EconomyEvent],
     market_id: &str,
@@ -774,8 +825,14 @@ pub fn check_principal_position_cap(
 /// floored at zero) rather than raw `no_position`, so the proposer's own CTF mint -- which by
 /// construction always yields `yes_out == no_out` (see [`EconomyEvent::position_minted`]) --
 /// never trips this on its own; only a directional swap into NO creates net NO exposure. A
-/// no-op (`Ok`) when `trader_id != proposer_id` or `proposer_id` is empty (market not bound
-/// to a proposer, e.g. a pre-D4 fixture).
+/// no-op (`Ok`) when `trader_id` does not resolve to the same principal as `proposer_id`, or
+/// `proposer_id` is empty (market not bound to a proposer, e.g. a pre-D4 fixture).
+///
+/// ADR-ECON-001 (owner-ratified 2026-07-07, additive): the no-op guard and the aggregation below
+/// both compare/resolve through [`resolve_principal`], so a puppet `agent_id` declared (via
+/// [`EconomyEvent::PrincipalDeclared`] on the given `events`) to be the same principal as
+/// `proposer_id` is caught even though its literal `trader_id` differs. No declaration -> falls
+/// back to literal string comparison, identical to pre-ADR-ECON-001 behavior (back-compat).
 pub fn check_proposer_conflict(
     events: &[EconomyEvent],
     market_id: &str,
@@ -785,7 +842,9 @@ pub fn check_proposer_conflict(
     pending_no: &str,
     de_minimis_cap: &str,
 ) -> Result<(), EconomyError> {
-    if proposer_id.is_empty() || trader_id != proposer_id {
+    if proposer_id.is_empty()
+        || resolve_principal(events, trader_id) != resolve_principal(events, proposer_id)
+    {
         return Ok(());
     }
     let cap = DecimalAmount::parse_non_negative(de_minimis_cap)?;
@@ -807,24 +866,53 @@ pub fn check_proposer_conflict(
     Ok(())
 }
 
+/// ADR-ECON-001 (owner-ratified 2026-07-07, additive): resolves `agent_id` to its
+/// authority-declared principal by scanning `events` for a matching
+/// [`EconomyEvent::PrincipalDeclared`] (last declaration on the tape wins, so a governance
+/// correction later on the same tape supersedes an earlier one). Falls back to `agent_id`
+/// itself when no declaration names it -- exactly the pre-ADR-ECON-001 `principal_id ==
+/// agent_id` behavior, so every existing caller/fixture that never emits `PrincipalDeclared`
+/// is unaffected (back-compat).
+fn resolve_principal(events: &[EconomyEvent], agent_id: &str) -> String {
+    events
+        .iter()
+        .rev()
+        .find_map(|event| match event {
+            EconomyEvent::PrincipalDeclared(declared) if declared.agent_id == agent_id => {
+                Some(declared.principal_id.clone())
+            }
+            _ => None,
+        })
+        .unwrap_or_else(|| agent_id.to_string())
+}
+
 /// Shared aggregation for the two principal-scoped D5 checks above: existing minted +
 /// swapped (yes, no) exposure for `principal_id` on `market_id`, from the tape alone.
+///
+/// ADR-ECON-001 (owner-ratified 2026-07-07, additive): both the query identity and each
+/// candidate event's actor identity are resolved through [`resolve_principal`] before
+/// comparing, so declared puppet `agent_id`s aggregate under their real principal. With no
+/// `PrincipalDeclared` events on `events`, every resolution is a no-op and this is byte-for-byte
+/// the pre-ADR-ECON-001 literal-string match (back-compat).
 fn principal_position(
     events: &[EconomyEvent],
     market_id: &str,
     principal_id: &str,
 ) -> Result<(DecimalAmount, DecimalAmount), EconomyError> {
+    let query_principal = resolve_principal(events, principal_id);
     let (mut yes, mut no) = (DecimalAmount::default(), DecimalAmount::default());
     for event in events {
         match event {
             EconomyEvent::PositionMinted(mint)
-                if mint.market_id == market_id && mint.agent_id == principal_id =>
+                if mint.market_id == market_id
+                    && resolve_principal(events, &mint.agent_id) == query_principal =>
             {
                 yes += DecimalAmount::parse_non_negative(&mint.yes_out)?;
                 no += DecimalAmount::parse_non_negative(&mint.no_out)?;
             }
             EconomyEvent::AmmSwapExecuted(swap)
-                if swap.market_id == market_id && swap.trader_id == principal_id =>
+                if swap.market_id == market_id
+                    && resolve_principal(events, &swap.trader_id) == query_principal =>
             {
                 yes += DecimalAmount::parse_non_negative(&swap.get_y)?;
                 no += DecimalAmount::parse_non_negative(&swap.get_n)?;
