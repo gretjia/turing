@@ -1,0 +1,69 @@
+{
+  "priors": {
+    "armA::deepseek": 0.057692,
+    "armA::glm": 0.083333,
+    "armA::kimi": 0.1875,
+    "armA::qwen": 0.019231,
+    "armB::deepseek": 0.395833,
+    "armB::glm": 0.194444,
+    "armB::kimi": 0.475,
+    "armB::qwen": 0.375,
+    "armC::deepseek": 0.138889,
+    "armC::glm": 0.5,
+    "armC::kimi": 0.233333,
+    "armC::qwen": 0.192308
+  },
+  "provenance": "pooled S01 Stage A settled outcomes, P=(0.5+S)/(1+N), Decision 6",
+  "schema": "econ_lab.stage_b_prime_priors.v1",
+  "source_run": "stageA_20260707",
+  "support": {
+    "armA::deepseek": {
+      "k": 1,
+      "n": 25
+    },
+    "armA::glm": {
+      "k": 2,
+      "n": 29
+    },
+    "armA::kimi": {
+      "k": 4,
+      "n": 23
+    },
+    "armA::qwen": {
+      "k": 0,
+      "n": 25
+    },
+    "armB::deepseek": {
+      "k": 9,
+      "n": 23
+    },
+    "armB::glm": {
+      "k": 3,
+      "n": 17
+    },
+    "armB::kimi": {
+      "k": 9,
+      "n": 19
+    },
+    "armB::qwen": {
+      "k": 7,
+      "n": 19
+    },
+    "armC::deepseek": {
+      "k": 2,
+      "n": 17
+    },
+    "armC::glm": {
+      "k": 3,
+      "n": 6
+    },
+    "armC::kimi": {
+      "k": 3,
+      "n": 14
+    },
+    "armC::qwen": {
+      "k": 2,
+      "n": 12
+    }
+  }
+}
