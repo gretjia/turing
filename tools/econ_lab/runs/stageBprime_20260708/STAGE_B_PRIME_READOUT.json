@@ -1,0 +1,65 @@
+{
+  "alpha_prime": 0.016666666666666666,
+  "arm_stats": {
+    "C": {
+      "infra_null": 8,
+      "k_pass": 6,
+      "n_settled": 42,
+      "rate": 0.14285714285714285
+    },
+    "F": {
+      "infra_null": 1,
+      "k_pass": 4,
+      "n_settled": 49,
+      "rate": 0.08163265306122448
+    },
+    "U": {
+      "infra_null": 4,
+      "k_pass": 6,
+      "n_settled": 46,
+      "rate": 0.13043478260869565
+    },
+    "W": {
+      "infra_null": 9,
+      "k_pass": 6,
+      "n_settled": 41,
+      "rate": 0.14634146341463414
+    }
+  },
+  "canaries": {
+    "C": 2,
+    "F": 2,
+    "U": 2,
+    "W": 2
+  },
+  "frozen_by": "PREREG Appendix A amendment #4",
+  "rank_inversions_descriptive_W": [],
+  "schema": "econ_lab.stage_b_prime_readout.v1",
+  "stage_b_outcome": "NO_TRANSFER_DEMONSTRATED_HONEST_RECORD",
+  "status_ceiling": "ADDRESSED",
+  "supported": {
+    "H_B1_W_gt_U": false,
+    "H_B2_W_gt_F": false,
+    "H_B3_W_gt_C": false
+  },
+  "tests": {
+    "H_B1_W_gt_U": {
+      "b_w_pass_other_fail": 5,
+      "c_w_fail_other_pass": 3,
+      "n_discordant": 8,
+      "p_one_sided": 0.36328125
+    },
+    "H_B2_W_gt_F": {
+      "b_w_pass_other_fail": 4,
+      "c_w_fail_other_pass": 2,
+      "n_discordant": 6,
+      "p_one_sided": 0.34375
+    },
+    "H_B3_W_gt_C": {
+      "b_w_pass_other_fail": 4,
+      "c_w_fail_other_pass": 4,
+      "n_discordant": 8,
+      "p_one_sided": 0.63671875
+    }
+  }
+}
