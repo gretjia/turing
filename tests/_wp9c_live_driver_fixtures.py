@@ -144,7 +144,13 @@ def stub_score_with_official_harness(
     also *writes* the aggregated-report + per-instance-report.json artifact pair to
     `report_dir` (mirroring `score_with_official_harness`'s real on-disk contract exactly), so
     this module's resume tests can exercise `_read_scoring_report`'s real read-back path, not
-    a weakened one."""
+    a weakened one. Also writes `SCORING_OK.marker` (B6, ADR-ECON-003 Decision 7.5,
+    2026-07-08): the real `score_with_official_harness` writes this marker on every successful
+    scoring run as of WP10, and `_settle_one_resume` now refuses to reuse an on-disk report
+    without a validating marker -- this stub mirrors that contract exactly so the pre-existing
+    resume-reuse tests keep exercising "reuse, don't rescore" rather than silently falling back
+    to "always rescore" (which would still pass those tests today but for the wrong reason)."""
+    import hashlib
     import json
 
     resolved = instance_id.endswith("0001")
@@ -167,9 +173,10 @@ def stub_score_with_official_harness(
         "incomplete_ids": [],
         "error_ids": [],
     }
-    (report_dir / f"{model_name}.{run_id}.json").write_text(
-        json.dumps(aggregated_report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    report_path = report_dir / f"{model_name}.{run_id}.json"
+    report_path.write_text(json.dumps(aggregated_report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    marker_digest = hashlib.sha256(report_path.read_bytes()).hexdigest()
+    (report_dir / "SCORING_OK.marker").write_text(marker_digest + "\n", encoding="utf-8")
     instance_dir = report_dir / "logs" / "run_evaluation" / run_id / model_name / instance_id
     instance_dir.mkdir(parents=True, exist_ok=True)
     (instance_dir / "report.json").write_text(

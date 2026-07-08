@@ -189,6 +189,13 @@ def _run_once(driver, tmp_path: Path, tag: str, *, smoke: bool = False, max_task
         scoring_timeout_s=60,
         task_dir_root=tmp_path / f"task_runs_{tag}",
         report_dir=tmp_path / f"scoring_{tag}",
+        # B5 (ADR-ECON-003 Decision 7.4): fixed, tag-independent -- this test asserts the
+        # select->settle loop is byte-for-byte reproducible across two *separate* driver
+        # invocations of the same conceptual run (only the tag/out-path differs, as a test
+        # artifact); a tag-derived default run_label would make the two invocations'
+        # verifier attestations (and therefore RoutingPriorUpdated event_hash) legitimately
+        # differ, which is not what this test is checking.
+        run_label="test-select-settle-determinism",
     )
     return driver.run_driver(args)
 

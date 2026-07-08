@@ -74,6 +74,16 @@ def _args(run_root: Path, *, resume: bool, max_tasks: int = TASK_COUNT) -> argpa
         task_dir_root=run_root / "task_runs",
         report_dir=run_root / "scoring",
         resume=resume,
+        # B5 (ADR-ECON-003 Decision 7.4): fixed, run_root-independent -- these tests compare
+        # a "baseline" (uninterrupted) run against a "killed"/"resumed" run of the *same*
+        # conceptual run, deliberately materialized under two different tmp directories (a
+        # test-construction artifact, not two independent real runs); a --out-path-derived
+        # default run_label would make the two runs' verifier attestations (and therefore
+        # RoutingPriorUpdated event_hash) legitimately differ, defeating the byte-identity
+        # comparisons below. Real resume usage always reuses the same --out across the
+        # interrupted run and its --resume rerun, so the production default (--out's own
+        # path) stays correct there.
+        run_label="test-wp9c-resume",
     )
 
 

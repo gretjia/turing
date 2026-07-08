@@ -125,7 +125,14 @@ from verifier import live_split_verifier  # noqa: E402
 import run_deepseek_arm_a_worker as arm_a_worker  # noqa: E402
 
 SHARD_ROOT = REPO_ROOT / "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01"
-TASKS_GLOB = "ipqc/S01-W*/worker_safe_tasks/*/task_packet.json"
+# Shard-name-agnostic (Stage B', `--task-shard`, ADR-ECON-003 Decision 7.6): `shard_root`
+# itself already scopes the glob to one shard (S01 by default, S02 under `--task-shard`) --
+# the "S01"/"S02" prefix inside each ipqc window directory name (e.g. `S01-W00`, `S02-W00`)
+# is redundant given that scoping, so this pattern matches either shard's own window-directory
+# naming instead of being hardcoded to S01's. Behavior-identical for the default S01 case (the
+# exact same files match) -- previously `ipqc/S01-W*/...`, which silently matched zero files
+# under any other shard root (the bug `--task-shard` would otherwise hit).
+TASKS_GLOB = "ipqc/*-W*/worker_safe_tasks/*/task_packet.json"
 
 DRIVER_SCHEMA = "econ_lab.live_driver.verdict.v1"
 EVIDENCE_CLASS_SMOKE = "SMOKE_FIXTURE"
@@ -291,6 +298,83 @@ def derive_scaffold_ids(cli_bin: Path) -> dict[str, dict[str, str]]:
     return result
 
 
+# ---------------------------------------------------------------------------
+# Stage B' warm-start priors (ADR-ECON-003 Decision 6.1/7.6, PREREG Appendix A amendment #4,
+# `--priors`) -- offline JSON load only, no formula invented: the P-injection semantics
+# (first-appearance freeze, P=0.5 default for a missing route) live entirely in the
+# pre-existing Rust `initial_prices` fold plumbing (`fold_and_select` above /
+# `crates/turing-economy/src/bin/econ_fold_cli.rs::q_eff_for_key`); this section only turns a
+# priors file into that request field's shape.
+# ---------------------------------------------------------------------------
+
+#: Q32.32 fixed-point unit, mirrored from `crates/turing-economy/src/routing_fold.rs::Q32_ONE`
+#: (ADR-ECON-003 Decision 4: "全程 Q32.32 定点"). Encoding-only constant (matches this file's
+#: pre-existing `--tau` mantissa conversion below) -- not a re-derivation of any economic
+#: formula.
+_Q32_ONE = 1 << 32
+
+
+def load_stage_b_prime_priors(priors_path: Path) -> tuple[dict[str, float], str]:
+    """Load a Stage B' warm-start priors file. Accepts both the pinned
+    `econ_lab.stage_b_prime_priors.v1` shape (`tools/econ_lab/analysis/
+    gen_stage_b_priors.py`'s own output, `{"priors": {"<arm>::<lineage>": p, ...}, ...}`) and a
+    bare `{"<arm>::<lineage>": p, ...}` mapping (this flag's own documented contract) -- never
+    guessed beyond these two shapes. Returns `(priors_map, file_sha256_hex)`; the sha256 is
+    computed over the raw file bytes (before JSON parsing) so it is exactly reproducible by an
+    independent `sha256sum` of the same path (migration/provenance evidence, ADR-ECON-003
+    Decision 7.6: "注入文件的 sha256 与生成脚本必须 pin 入预注册")."""
+    raw_bytes = priors_path.read_bytes()
+    file_sha256 = sha256_hex(raw_bytes)
+    parsed = json.loads(raw_bytes.decode("utf-8"))
+    if isinstance(parsed, dict) and "priors" in parsed and isinstance(parsed["priors"], dict):
+        priors_map = parsed["priors"]
+    elif isinstance(parsed, dict):
+        priors_map = parsed
+    else:
+        raise ValueError(f"--priors file {priors_path} must be a JSON object")
+    return {str(k): float(v) for k, v in priors_map.items()}, file_sha256
+
+
+def _p_float_to_q32_mantissa_decimal(p: float) -> str:
+    """`p` (a `[0, 1]` probability) -> its Q32.32 fixed-point mantissa as a decimal-literal
+    string (the exact wire shape `econ_fold_cli`'s `InitialPriceInput.p_q32` parses -- JSON
+    numbers cannot losslessly carry the i128 range, same rationale as the Rust struct's own
+    doc comment). Clamped to `[0, 1]` first (Decision 6.1: "clamp 到 [0,1]"); truncated toward
+    zero on the fixed-point scale (Decision 4's rounding convention throughout this file,
+    e.g. the pre-existing `--tau` mantissa conversion below)."""
+    clamped = max(0.0, min(1.0, p))
+    return str(int(clamped * _Q32_ONE))
+
+
+def stage_b_prime_initial_prices(
+    priors_map: dict[str, float],
+    *,
+    domain_bucket: str,
+    scaffold_ids: dict[str, dict[str, str]],
+) -> list[dict[str, Any]]:
+    """One `initial_prices` entry per (arm, lineage) route named in `priors_map`, for the
+    *current task's* `domain_bucket` (a route's warm-start P applies at every domain_bucket it
+    is encountered under -- `scaffold_id` alone, not `(domain_bucket, scaffold_id)`, is the
+    priors file's own key granularity, per this flag's documented contract). A route absent
+    from `priors_map` is simply omitted here -- the CLI's own `q_eff_for_key` fallback already
+    applies `P = 0.5` to any `(domain_bucket, scaffold_id)` key with no `initial_prices` entry
+    and no fold history, so "文件缺路由 ⇒ 该路由 P=0.5" needs no explicit entry from this side."""
+    entries: list[dict[str, Any]] = []
+    for arm in ARM_DESCRIPTORS:
+        for lineage in LINEAGES:
+            label = _scaffold_label(arm, lineage)
+            if label not in priors_map:
+                continue
+            entries.append(
+                {
+                    "domain_bucket": domain_bucket,
+                    "scaffold_id": scaffold_ids[arm][lineage],
+                    "p_q32": _p_float_to_q32_mantissa_decimal(priors_map[label]),
+                }
+            )
+    return entries
+
+
 def fold_and_select(
     cli_bin: Path,
     *,
@@ -299,9 +383,19 @@ def fold_and_select(
     scaffold_ids: dict[str, dict[str, str]],
     instance_id: str,
     tau_config: Optional[dict[str, int]],
+    initial_prices: Optional[list[dict[str, Any]]] = None,
 ) -> dict[str, Any]:
     """Routes over the full 4-lineage x 3-scaffold = 12-candidate space (PREREG Appendix A
-    lineage-expansion update)."""
+    lineage-expansion update).
+
+    `initial_prices` (Stage B' warm-start P, ADR-ECON-003 Decision 6.1/7.6, PREREG Appendix A
+    amendment #4): the pre-existing `econ_fold_cli.fold_and_suggest.request.v2` `initial_prices`
+    field, previously always sent empty (`[]`) by this driver. Each entry seeds one
+    `(domain_bucket, scaffold_id)` node's `P` for its *first* appearance in the fold (Decision
+    6.1: "P 在节点首次创建时定格") -- no new Rust plumbing, this is the same field
+    `run_fold_and_suggest` in `econ_fold_cli.rs` already reads. `None`/empty is
+    behavior-identical to the pre-Stage-B' call (every key falls back to the CLI's own
+    `P = 0.5` uninformative-prior default)."""
     candidate_routes = [
         {
             "route_id": f"{instance_id}::{arm}::{lineage}",
@@ -352,7 +446,7 @@ def fold_and_select(
             # schema-version note in econ_fold_cli.rs `run_fold_and_suggest`).
             "schema": "econ_fold_cli.fold_and_suggest.request.v2",
             "committed_routing_events": committed_routing_events,
-            "initial_prices": [],
+            "initial_prices": initial_prices or [],
             "candidate_routes": candidate_routes,
             "price_signal_hash": price_signal_hash,
             "pput_prior_hash": pput_prior_hash,
@@ -829,14 +923,39 @@ def _read_scoring_report(
         # `EvaluationError: Patch Apply Failed` (orchestrator addendum point 3).
         outcome = "ERROR"
 
+    # B2 remedy (independent audit B2, ADR-ECON-003 Decision 7.1, 2026-07-08 orchestrator
+    # ruling): distinguish "the harness actually determined a failure" (a real double-fail,
+    # `harness_error_reason` set -- `patch_apply_failed`/`empty_patch`) from "the harness
+    # never actually evaluated this run at all" (`infra_null_reason` set -- `incomplete`, or
+    # an ERROR-bucket outcome with no pinned patch-apply-failure marker, i.e. the per-instance
+    # report/log was malformed or never written). Only the latter is new behavior; RESOLVED/
+    # UNRESOLVED are untouched.
     tests_status: Optional[dict[str, Any]] = None
     harness_error_reason: Optional[str] = None
+    infra_null_reason: Optional[str] = None
     if outcome in ("RESOLVED", "UNRESOLVED"):
         tests_status = _read_per_instance_tests_status(instance_dir, instance_id)
-    else:
-        harness_error_reason = _classify_harness_error_reason(instance_dir)
+    elif outcome == "INCOMPLETE":
+        # The harness's own bucket for "never actually finished evaluating this instance" --
+        # a fabricated FAIL here was exactly B2's bug.
+        infra_null_reason = "incomplete"
+    elif outcome == "EMPTY_PATCH":
+        # The harness's *own* empty-patch classification (distinct from this driver's
+        # SKIPPED_NO_PATCH short-circuit in `_settle_one`, which never reaches the harness at
+        # all -- see B3). This is a real harness-side determination, same "legit fail"
+        # treatment as `patch_apply_failed`, not infra_null.
+        harness_error_reason = "empty_patch"
+    else:  # ERROR
+        reason = _classify_harness_error_reason(instance_dir)
+        if reason == "patch_apply_failed":
+            harness_error_reason = reason
+        else:
+            # No per-instance report/log at all and no pinned patch-apply-failure marker --
+            # the harness never actually evaluated this instance (report malformed/never
+            # written). B2: infra_null, not a fabricated FAIL.
+            infra_null_reason = "harness_error_no_report"
 
-    return {
+    result = {
         "status": "COMPLETED",
         "outcome": outcome,
         # Kept for back-compat/diagnostics only: this is the harness's own whole-test-suite
@@ -849,6 +968,62 @@ def _read_scoring_report(
         "log_path": str(report_dir / "run_evaluation.log"),
         "raw_report": aggregated_report,
     }
+    if infra_null_reason is not None:
+        # Deliberately omitted (not set to `None`) on every other outcome: the happy-path
+        # (RESOLVED/UNRESOLVED/EMPTY_PATCH/patch_apply_failed) return shape is byte-identical
+        # to the pre-B2 shape, so this is additive-only.
+        result["infra_null_reason"] = infra_null_reason
+    return result
+
+
+# B6 remedy (independent audit B6, ADR-ECON-003 Decision 7.5, 2026-07-08 orchestrator
+# ruling): "评分成功即写 SCORING_OK.marker(内容=报告 sha256);resume 仅在 marker 校验通过时
+# 信任盘上报告,否则重评分" -- eliminates the residual resume gap where a fresh run that ends
+# with scoring rc!=0 *after* the harness partially wrote a report returns SCORING_FAILED (no
+# settlement), but a later `--resume` treated the on-disk report as COMPLETED regardless (the
+# report's mere *existence* was the only signal `_read_scoring_report` ever checked). The
+# marker is written only from the one call site below where `_read_scoring_report` already
+# returned a COMPLETED result for a *successful* (`returncode == 0`) harness run -- never on
+# the SCORING_FAILED path -- so its presence is a positive attestation "this exact report was
+# produced by a run this driver itself judged successful", not just "a file exists".
+SCORING_OK_MARKER_FILENAME = "SCORING_OK.marker"
+MODEL_NAME = "wp9a-live-driver"
+
+
+def _scoring_ok_marker_path(report_dir: Path) -> Path:
+    return report_dir / SCORING_OK_MARKER_FILENAME
+
+
+def _aggregated_report_path(report_dir: Path, *, run_id: str, model_name: str = MODEL_NAME) -> Path:
+    return report_dir / f"{model_name}.{run_id}.json"
+
+
+def _write_scoring_ok_marker(report_dir: Path, report_path: Path) -> None:
+    """Atomic write (same tmp+`os.replace` discipline as `_write_settlement_checkpoint`):
+    content is the aggregated report file's own sha256 hex digest, so a later reader can
+    cheaply verify the marker still describes the report bytes actually on disk (not just
+    that a marker file happens to exist)."""
+    marker_path = _scoring_ok_marker_path(report_dir)
+    digest_hex = sha256_hex(report_path.read_bytes())
+    tmp_path = marker_path.with_name(marker_path.name + ".tmp")
+    tmp_path.write_text(digest_hex + "\n", encoding="utf-8")
+    os.replace(tmp_path, marker_path)
+
+
+def _scoring_ok_marker_valid(*, report_dir: Path, report_path: Path) -> bool:
+    """`True` only if `SCORING_OK.marker` exists *and* its recorded sha256 matches the
+    aggregated report file currently on disk -- both conditions absent/mismatched degrade to
+    `False` (never a crash), the resume caller's cue to re-score rather than trust the report."""
+    marker_path = _scoring_ok_marker_path(report_dir)
+    try:
+        marker_text = marker_path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return False
+    try:
+        report_bytes = report_path.read_bytes()
+    except OSError:
+        return False
+    return marker_text == sha256_hex(report_bytes)
 
 
 def score_with_official_harness(
@@ -866,7 +1041,7 @@ def score_with_official_harness(
     report_dir = report_dir.resolve()
     report_dir.mkdir(parents=True, exist_ok=True)
     predictions_path = report_dir / "predictions.jsonl"
-    model_name = "wp9a-live-driver"
+    model_name = MODEL_NAME
     row = {"instance_id": instance_id, "model_name_or_path": model_name, "model_patch": model_patch}
     predictions_path.write_text(json.dumps(row) + "\n", encoding="utf-8")
 
@@ -914,7 +1089,7 @@ def score_with_official_harness(
         }
     log_path.write_text(proc.stdout or "", encoding="utf-8")
 
-    report_path = report_dir / f"{model_name}.{run_id}.json"
+    report_path = _aggregated_report_path(report_dir, run_id=run_id, model_name=model_name)
     if proc.returncode != 0 or not report_path.exists():
         return {
             "status": "SCORING_FAILED",
@@ -935,6 +1110,13 @@ def score_with_official_harness(
             "returncode": proc.returncode,
             "log_path": str(log_path),
         }
+    # B6: this is the *only* call site that writes SCORING_OK.marker -- exactly the point
+    # where this function itself has just confirmed (`returncode == 0` above, plus a
+    # successfully-read-back `scoring_result`) that this report was produced by a run this
+    # driver judged successful. A future `--resume` may only trust an on-disk report when this
+    # marker validates against it (`_scoring_ok_marker_valid`); a report left behind by a run
+    # that hit SCORING_FAILED never gets a marker, closing the fresh/resume divergence.
+    _write_scoring_ok_marker(report_dir, report_path)
     return scoring_result
 
 
@@ -948,12 +1130,33 @@ def score_with_official_harness(
 LIVE_SPLIT_VERIFIER_SOURCE_ID = "verifier:live_split_verifier.v1"
 
 
-def _verifier_attestation_hash(*, instance_id: str, arm: str, lineage: str, live_split_result: dict[str, Any]) -> str:
+def _verifier_attestation_hash(
+    *,
+    instance_id: str,
+    arm: str,
+    lineage: str,
+    live_split_result: dict[str, Any],
+    run_label: str,
+    task_index: int,
+) -> str:
     """`sha256:`-prefixed 64-hex attestation digest over exactly what the independent
     verifier read (the verify-side test_id set and its own verdict, or the harness-error
     reason when there was no per-test data at all) -- not a re-derivation of any
     routing/selection formula, just an evidence digest so a later audit can recompute and
-    check it against the same fixed inputs (Art 0.2 style discipline)."""
+    check it against the same fixed inputs (Art 0.2 style discipline).
+
+    `run_label`/`task_index` (B5 remedy: independent audit B5, ADR-ECON-003 Decision 7.4,
+    2026-07-08 orchestrator ruling): `routing_prior_event_hash`'s pinned identity formula
+    (`crates/turing-economy/src/lib.rs::routing_prior_event_hash`) is *not* touched --
+    uniqueness is this caller's own contract instead. Without these two fields, a legitimately
+    repeated byte-identical re-attestation (same instance/arm/lineage/verdict/test_ids, e.g. a
+    resume that re-scores the same instance and reaches the same outcome) collides on
+    `event_hash` and hard-errors the whole fold (`RoutingFoldDuplicateEventHash`) instead of
+    counting a second, distinct observation. `task_index` is the driver's own per-task loop
+    counter (`run_driver`'s `enumerate(...)`); `run_label` is a per-invocation identifier the
+    caller supplies (`--run-label`, defaulting to the `--out` path -- see `main()`) so two
+    different driver invocations over the same task/arm/lineage (e.g. two Stage B' arms, or a
+    genuine independent rerun) never collide either, even at the same `task_index`."""
     payload = {
         "schema": "live_split_verifier.attestation.v1",
         "instance_id": instance_id,
@@ -962,6 +1165,8 @@ def _verifier_attestation_hash(*, instance_id: str, arm: str, lineage: str, live
         "verify_test_ids": live_split_result["verify_test_ids"],
         "verify_verdict": live_split_result["verify_verdict"],
         "harness_error_reason": live_split_result["harness_error_reason"],
+        "run_label": run_label,
+        "task_index": task_index,
     }
     return digest(json.dumps(payload, sort_keys=True))
 
@@ -976,21 +1181,41 @@ def _apply_live_split_verifier(
     route_scaffold: str,
     tests_status: Optional[dict[str, Any]],
     harness_error_reason: Optional[str],
+    infra_null_reason: Optional[str] = None,
+    run_label: str = "",
+    task_index: int = 0,
 ) -> tuple[dict[str, Any], dict[str, Any], Optional[dict[str, Any]]]:
     """ADR-ECON-003 Decision 2.4 wiring: independently judge this (task, arm, lineage)
-    settlement's harness report, then -- unless NOT_ENOUGH_TESTS -- ask `econ_fold_cli` to
-    build the fully-hashed `RoutingPriorUpdated` event for the verify-side verdict (never
-    recomputed in Python).
+    settlement's harness report, then -- unless NOT_ENOUGH_TESTS/infra_null -- ask
+    `econ_fold_cli` to build the fully-hashed `RoutingPriorUpdated` event for the verify-side
+    verdict (never recomputed in Python).
 
     `harness_error_reason` (orchestrator addendum, 2026-07-07, point 3): when set, this
     (task, arm, lineage) settlement never produced a per-instance report.json at all (the
     harness's own `error_ids` bucket), so `judge_harness_error` is used instead of `judge` --
     there is no `tests_status` to independently read.
 
+    `infra_null_reason` (B2 remedy, ADR-ECON-003 Decision 7.1, 2026-07-08): when set, the
+    harness never actually evaluated this run at all -- `judge_infra_null` is used, and this
+    function returns without calling `econ_fold_cli` at all (no fabricated verdict, no
+    settlement, no backup update, exactly the `NOT_ENOUGH_TESTS` branch's own "withhold, don't
+    invent" shape). Mutually exclusive with `harness_error_reason` by construction of this
+    function's only caller (`_read_scoring_report` never sets both).
+
+    `run_label`/`task_index` (B5 remedy, ADR-ECON-003 Decision 7.4): folded into the
+    attestation hash so a legitimately repeated (instance, arm, lineage, verdict) observation
+    across different invocations/tasks never collides on `event_hash` -- see
+    `_verifier_attestation_hash`'s own docstring.
+
     Returns `(live_split_result, backup_update, routing_prior_updated_event_or_none)`. The
     caller is responsible for appending the returned event onto its own
     `committed_routing_events` tape (this function has no tape-mutation side effect, to keep
     it a pure-ish, independently testable unit)."""
+    if infra_null_reason is not None:
+        live_split_result = live_split_verifier.judge_infra_null(infra_null_reason)
+        backup_update = {"applied": False, "reason": f"INFRA_NULL:{infra_null_reason}"}
+        return live_split_result, backup_update, None
+
     if harness_error_reason is not None:
         live_split_result = live_split_verifier.judge_harness_error(harness_error_reason)
     else:
@@ -1003,7 +1228,12 @@ def _apply_live_split_verifier(
         return live_split_result, backup_update, None
 
     attestation_hash = _verifier_attestation_hash(
-        instance_id=instance_id, arm=arm, lineage=lineage, live_split_result=live_split_result
+        instance_id=instance_id,
+        arm=arm,
+        lineage=lineage,
+        live_split_result=live_split_result,
+        run_label=run_label,
+        task_index=task_index,
     )
     build_response = call_cli(
         cli_bin,
@@ -1023,6 +1253,14 @@ def _apply_live_split_verifier(
     return live_split_result, backup_update, event
 
 
+#: B3 remedy (independent audit B3, ADR-ECON-003 Decision 7.2, 2026-07-08 orchestrator
+#: ruling): `harness_error_reason` passed to `_apply_live_split_verifier` for a worker that
+#: completed but produced an empty/whitespace-only patch -- SWE-bench semantics: an empty
+#: patch is a failed task, never "not evaluated". Distinct string from the harness's own
+#: `"empty_patch"` outcome (B2) for provenance: this case never reaches the harness at all.
+EMPTY_PATCH_WORKER_OUTPUT_REASON = "empty_patch_worker_output"
+
+
 def _settle_one(
     *,
     args: argparse.Namespace,
@@ -1035,11 +1273,15 @@ def _settle_one(
     cli_bin: Path,
     route_domain: str,
     route_scaffold: str,
+    run_label: str = "",
+    task_index: int = 0,
 ) -> dict[str, Any]:
     """Dispatch one (arm, lineage) pair for one task, score it if a patch was produced, and
     -- if scoring completed -- independently re-judge the harness's per-test report (WP9b,
     ADR-ECON-003 Decision 2.4). Never fabricates a verdict: `settlement_verdict_resolved`
-    and `live_split_verdict` stay `None` unless the real scorer actually completed.
+    and `live_split_verdict` stay `None` unless the real scorer actually completed, *or* the
+    worker's own output was determinate (B3: an empty patch is itself a determinate outcome
+    under SWE-bench semantics, scored without ever invoking the harness).
 
     Market settlement uses `accept_verdict` (Decision 2.4: "accept 裁决(市场结算侧)"),
     **not** the harness's own whole-test-suite `resolved` boolean -- the two differ whenever
@@ -1086,8 +1328,30 @@ def _settle_one(
                     route_scaffold=route_scaffold,
                     tests_status=scoring_result.get("tests_status"),
                     harness_error_reason=scoring_result.get("harness_error_reason"),
+                    infra_null_reason=scoring_result.get("infra_null_reason"),
+                    run_label=run_label,
+                    task_index=task_index,
                 )
                 settlement_verdict = live_split_result["accept_verdict"]
+        else:
+            # B3: worker COMPLETED but the patch is empty/whitespace-only -- under SWE-bench
+            # semantics this is a *determinate task failure*, never "not evaluated": settle
+            # FAIL, verify FAIL, no canary, normal feedback v=0, counted in the denominator
+            # (never funneled into infra_null). The harness is never invoked for this case
+            # (there is nothing for it to apply/run).
+            live_split_result, backup_update, routing_prior_updated_event = _apply_live_split_verifier(
+                cli_bin=cli_bin,
+                instance_id=instance_id,
+                arm=arm,
+                lineage=lineage,
+                route_domain=route_domain,
+                route_scaffold=route_scaffold,
+                tests_status=None,
+                harness_error_reason=EMPTY_PATCH_WORKER_OUTPUT_REASON,
+                run_label=run_label,
+                task_index=task_index,
+            )
+            settlement_verdict = live_split_result["accept_verdict"]
 
     return {
         "lineage": lineage,
@@ -1287,14 +1551,16 @@ def _settle_one_resume(
     cli_bin: Path,
     route_domain: str,
     route_scaffold: str,
+    run_label: str = "",
+    task_index: int = 0,
 ) -> dict[str, Any]:
     """Resume-aware counterpart of `_settle_one` for one (task, lineage): reuses on-disk
     worker/scoring artifacts when present instead of recalling the worker or (when the
-    aggregated scoring report already exists) the harness. Judgment code (`_apply_live_split_
-    verifier`) and return shape are shared verbatim with `_settle_one` -- this function differs
-    only in *how* `worker_result`/`scoring_result` are obtained, never in how they are judged,
-    so a resumed settlement and a fresh settlement of the same underlying artifacts are
-    byte-identical (`tests/test_live_driver_resume.py`).
+    aggregated scoring report already exists *and validates*, B6 below) the harness. Judgment
+    code (`_apply_live_split_verifier`) and return shape are shared verbatim with `_settle_one`
+    -- this function differs only in *how* `worker_result`/`scoring_result` are obtained,
+    never in how they are judged, so a resumed settlement and a fresh settlement of the same
+    underlying artifacts are byte-identical (`tests/test_live_driver_resume.py`).
     """
     instance_id = packet["instance_id"]
 
@@ -1315,6 +1581,8 @@ def _settle_one_resume(
             cli_bin=cli_bin,
             route_domain=route_domain,
             route_scaffold=route_scaffold,
+            run_label=run_label,
+            task_index=task_index,
         )
 
     scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
@@ -1333,7 +1601,18 @@ def _settle_one_resume(
     if model_patch.strip():
         run_id = f"wp9a-live-driver-{instance_id}-{lineage}"
         report_dir = (report_root / instance_id / lineage).resolve()
-        reused_scoring_result = _read_scoring_report(report_dir=report_dir, run_id=run_id, instance_id=instance_id)
+        report_path = _aggregated_report_path(report_dir, run_id=run_id)
+        # B6 remedy (independent audit B6, ADR-ECON-003 Decision 7.5, 2026-07-08 orchestrator
+        # ruling): only trust an on-disk aggregated report when `SCORING_OK.marker` validates
+        # against it -- a report left behind by a run that hit SCORING_FAILED (rc!=0 after the
+        # harness partially wrote a report) never got a marker, so it is unconditionally
+        # re-scored instead of silently treated as COMPLETED. Closes the residual fresh/resume
+        # divergence the patch-hash tamper guard below did not cover.
+        reused_scoring_result = (
+            _read_scoring_report(report_dir=report_dir, run_id=run_id, instance_id=instance_id)
+            if _scoring_ok_marker_valid(report_dir=report_dir, report_path=report_path)
+            else None
+        )
         if reused_scoring_result is not None and not _reused_report_matches_current_patch(
             report_dir=report_dir, instance_id=instance_id, model_patch=model_patch
         ):
@@ -1347,8 +1626,10 @@ def _settle_one_resume(
             # judge call would have computed; no harness subprocess, no worker call.
             scoring_result = reused_scoring_result
         else:
-            # "评分产物缺 -> 用既有补丁重跑评分" -- local docker only, zero API spend (the patch
-            # itself is reused verbatim; only the harness, never the worker, runs again).
+            # "评分产物缺(或 marker 未过校验)-> 用既有补丁重跑评分" -- local docker only, zero
+            # API spend (the patch itself is reused verbatim; only the harness, never the
+            # worker, runs again). This call site also (re-)writes SCORING_OK.marker on
+            # success (see `score_with_official_harness`).
             scoring_result = score_with_official_harness(
                 python_bin=args.scoring_python,
                 instance_id=instance_id,
@@ -1367,8 +1648,28 @@ def _settle_one_resume(
                 route_scaffold=route_scaffold,
                 tests_status=scoring_result.get("tests_status"),
                 harness_error_reason=scoring_result.get("harness_error_reason"),
+                infra_null_reason=scoring_result.get("infra_null_reason"),
+                run_label=run_label,
+                task_index=task_index,
             )
             settlement_verdict = live_split_result["accept_verdict"]
+    else:
+        # B3 (see `_settle_one`'s own comment): reconstructed worker artifacts with an
+        # empty/whitespace-only patch are the same determinate task failure a fresh run would
+        # settle -- never re-invokes the harness or the worker.
+        live_split_result, backup_update, routing_prior_updated_event = _apply_live_split_verifier(
+            cli_bin=cli_bin,
+            instance_id=instance_id,
+            arm=arm,
+            lineage=lineage,
+            route_domain=route_domain,
+            route_scaffold=route_scaffold,
+            tests_status=None,
+            harness_error_reason=EMPTY_PATCH_WORKER_OUTPUT_REASON,
+            run_label=run_label,
+            task_index=task_index,
+        )
+        settlement_verdict = live_split_result["accept_verdict"]
 
     return {
         "lineage": lineage,
@@ -1387,9 +1688,40 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     cli_bin = args.econ_fold_cli or find_default_cli_bin()
     evidence_class = EVIDENCE_CLASS_SMOKE if args.smoke else EVIDENCE_CLASS_REAL
 
-    packets = load_task_packets()
+    # Stage B' task-stream override (`--task-shard`, ADR-ECON-003 Decision 7.6 out-of-sample
+    # discipline: "评测任务与先验来源任务必须零交集"): defaults to the pre-existing S01 root
+    # (`SHARD_ROOT`) when absent -- behavior-identical to every pre-Stage-B' call.
+    task_shard_arg = getattr(args, "task_shard", None)
+    shard_root = Path(task_shard_arg) if task_shard_arg else SHARD_ROOT
+    packets = load_task_packets(shard_root)
     if not packets:
-        raise SystemExit(f"no task packets found under {SHARD_ROOT}/{TASKS_GLOB}")
+        raise SystemExit(f"no task packets found under {shard_root}/{TASKS_GLOB}")
+
+    # Stage B' warm-start priors (`--priors`, ADR-ECON-003 Decision 6.1/7.6): loaded once per
+    # run, applied per task below in `fold_and_select`'s `initial_prices`. Absent by default
+    # (empty map -> `stage_b_prime_initial_prices` returns `[]` -> behavior-identical to every
+    # pre-Stage-B' call, which always sent `initial_prices: []`).
+    priors_arg = getattr(args, "priors", None)
+    priors_map: dict[str, float] = {}
+    priors_sha256: Optional[str] = None
+    if priors_arg:
+        priors_map, priors_sha256 = load_stage_b_prime_priors(Path(priors_arg))
+
+    # Stage B' frozen-backup arm (`--frozen-backup`, ADR-ECON-003 Decision 7.7): the
+    # RoutingPriorUpdated event is still built and persisted (evidence complete -- see the
+    # checkpoint's own `routing_prior_updated_event` field below, unconditionally written),
+    # but is never appended to `committed_routing_events` (the fold's own event sequence), so
+    # every route's `Q_eff` stays pinned at its `P` for the whole run ("Q_eff 恒为 P").
+    frozen_backup = bool(getattr(args, "frozen_backup", False))
+
+    # B5 remedy (ADR-ECON-003 Decision 7.4): per-invocation identifier folded into every
+    # verifier attestation so two different driver invocations over the same (instance, arm,
+    # lineage, verdict) never collide on `event_hash` -- see `_verifier_attestation_hash`'s
+    # own docstring. `--run-label` lets a caller (e.g. `run_stage_b_prime.sh`) supply an
+    # explicit label; the default (`--out`'s own path) is already distinct per arm/run in
+    # every existing caller (`run_stage_a.sh` writes each arm to its own `--out`), so this is
+    # a safe zero-config default, not a new required flag.
+    run_label = getattr(args, "run_label", None) or str(args.out)
 
     scaffold_ids = derive_scaffold_ids(cli_bin)
     deepseek_native_provider_config = load_provider_config()
@@ -1438,6 +1770,9 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     canary_count = 0
     settled_dispatch_count = 0
     routing_prior_updated_applied_count = 0
+    # B2 remedy (ADR-ECON-003 Decision 7.1): dispatches the harness never actually evaluated
+    # at all (infra_null) -- counted, never settled, never fed back.
+    infra_null_count = 0
     # Per-domain_bucket settlement history for the N_eff/H_lineage estimator (WP5), lineage
     # labels only (module doc's lineage-label discipline). `settlement_index` is shared
     # across lineages settled on the *same* task/round (ADR-ECON-003 Decision 3: "对齐到
@@ -1468,8 +1803,12 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 settled = dict(stored_dispatch)
                 routing_prior_updated_event = settled.pop("routing_prior_updated_event", None)
                 if routing_prior_updated_event is not None:
-                    committed_routing_events.append(routing_prior_updated_event)
                     routing_prior_updated_applied_count += 1
+                    if not frozen_backup:
+                        # Stage B' frozen-backup (Decision 7.7): the event stays evidence-only
+                        # (already persisted in the checkpoint) but never enters the fold's
+                        # event sequence -- see the fresh-path branch's identical gate below.
+                        committed_routing_events.append(routing_prior_updated_event)
                 dispatches.append(settled)
 
                 if settled.get("worker_result_status") == "COMPLETED":
@@ -1480,6 +1819,7 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     settled_dispatch_count += 1
                     not_enough_tests_count += int(live_split_verdict["not_enough_tests"])
                     canary_count += int(live_split_verdict["canary"])
+                    infra_null_count += int(bool(live_split_verdict.get("infra_null", False)))
 
                 if settled.get("settlement_verdict_resolved") is not None:
                     diversity_history.setdefault(domain_bucket, []).append(
@@ -1500,6 +1840,9 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 scaffold_ids=scaffold_ids,
                 instance_id=instance_id,
                 tau_config=tau_config,
+                initial_prices=stage_b_prime_initial_prices(
+                    priors_map, domain_bucket=domain_bucket, scaffold_ids=scaffold_ids
+                ),
             )
             selected_route_id = selection["budget_suggestion"]["route_id"]
             _instance, selected_arm, selected_lineage = selected_route_id.split("::")
@@ -1543,6 +1886,8 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     cli_bin=cli_bin,
                     route_domain=domain_bucket,
                     route_scaffold=scaffold_ids[selected_arm][lineage],
+                    run_label=run_label,
+                    task_index=task_index,
                 )
                 if settled["worker_result_status"] == "COMPLETED":
                     real_worker_calls += 1
@@ -1550,11 +1895,15 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 # Decision 2.4 backup-update wiring: feed the independent verifier's
                 # RoutingPriorUpdated event (if one was built) back onto the tape this same
                 # driver run folds over for every subsequent task's selection -- this is the
-                # live "回灌" (feedback) WP9a lacked entirely.
+                # live "回灌" (feedback) WP9a lacked entirely. Checkpoint write below is
+                # unconditional (evidence complete, Decision 7.7); only the *fold* append is
+                # gated by `frozen_backup` (Stage B' frozen-backup arm: Q_eff stays pinned at
+                # P for the whole run).
                 routing_prior_updated_event = settled.pop("_routing_prior_updated_event", None)
                 if routing_prior_updated_event is not None:
-                    committed_routing_events.append(routing_prior_updated_event)
                     routing_prior_updated_applied_count += 1
+                    if not frozen_backup:
+                        committed_routing_events.append(routing_prior_updated_event)
                 dispatches.append(settled)
                 checkpoint_dispatches.append({**settled, "routing_prior_updated_event": routing_prior_updated_event})
 
@@ -1563,6 +1912,7 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     settled_dispatch_count += 1
                     not_enough_tests_count += int(live_split_verdict["not_enough_tests"])
                     canary_count += int(live_split_verdict["canary"])
+                    infra_null_count += int(bool(live_split_verdict.get("infra_null", False)))
 
                 if settled["settlement_verdict_resolved"] is not None:
                     diversity_history.setdefault(domain_bucket, []).append(
@@ -1633,6 +1983,22 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
             "not_enough_tests_count": not_enough_tests_count,
             "canary_count": canary_count,
             "routing_prior_updated_applied_count": routing_prior_updated_applied_count,
+            # B2 remedy (ADR-ECON-003 Decision 7.1): always present (usually 0) -- see
+            # `tests/test_live_driver_head_parity.py`'s own normalization note for why this
+            # key's mere presence is a legitimate, expected divergence from a pre-WP10 anchor.
+            "infra_null_count": infra_null_count,
+        },
+        # Stage B' run metadata (ADR-ECON-003 Decision 7.6/7.7, PREREG Appendix A amendment
+        # #4): always present (fields are `None`/`False` when the corresponding flag is
+        # unused), never a τ/λ/floor/B-zone value (Art III.4/F4) -- every field here is either
+        # a caller-supplied label/path or a sha256 digest.
+        "stage_b_prime_meta": {
+            "schema": "econ_lab.stage_b_prime_meta.v1",
+            "frozen_backup": frozen_backup,
+            "priors_path": str(priors_arg) if priors_arg else None,
+            "priors_sha256": priors_sha256,
+            "task_shard": str(task_shard_arg) if task_shard_arg else None,
+            "run_label": run_label,
         },
         "generated_at_unix": int(time.time()),
     }
@@ -1672,6 +2038,42 @@ def main(argv: Optional[list[str]] = None) -> int:
         "scoring reports) instead of recomputing; never re-invokes a worker when a prior "
         "candidate.patch/worker_receipt.json pair exists for a task -- --task-dir-root/"
         "--report-dir must point at the same directories the interrupted run used",
+    )
+    parser.add_argument(
+        "--priors",
+        type=Path,
+        default=None,
+        help="Stage B' warm-start P (ADR-ECON-003 Decision 6.1/7.6): path to a priors JSON "
+        "file -- either the pinned econ_lab.stage_b_prime_priors.v1 shape "
+        "({\"priors\": {\"<arm>::<lineage>\": p, ...}, ...}) or a bare "
+        "{\"<arm>::<lineage>\": p, ...} mapping. A route absent from the file gets the "
+        "existing P=0.5 uninformative-prior default. The file's sha256 is recorded in "
+        "verdict.json's stage_b_prime_meta.",
+    )
+    parser.add_argument(
+        "--frozen-backup",
+        action="store_true",
+        help="Stage B' frozen-backup arm (ADR-ECON-003 Decision 7.7): RoutingPriorUpdated "
+        "events are still built and persisted as evidence, but never appended to the fold's "
+        "own event sequence -- every route's Q_eff stays pinned at its P for the whole run.",
+    )
+    parser.add_argument(
+        "--task-shard",
+        type=Path,
+        default=None,
+        help="Task-stream root override (default: the S01 shard root baked into SHARD_ROOT); "
+        "Stage B' points this at the S02 shard so the evaluation task stream and the "
+        "--priors source task stream are disjoint (out-of-sample discipline, ADR-ECON-003 "
+        "Decision 7.6).",
+    )
+    parser.add_argument(
+        "--run-label",
+        default=None,
+        help="B5 remedy (ADR-ECON-003 Decision 7.4): per-invocation identifier folded into "
+        "every RoutingPriorUpdated verifier attestation, so two different driver invocations "
+        "over the same (instance, arm, lineage, verdict) never collide on event_hash. "
+        "Defaults to --out's own path (already distinct per arm/run in every existing "
+        "caller).",
     )
     args = parser.parse_args(argv)
 
