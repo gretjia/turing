@@ -24,6 +24,19 @@ branch's base (`hci/software3-20260705`) as of this harness's authorship. `node.
 is schedule-agnostic, so wiring the real tau(N)/N_eff-floor schedule in later is a
 plug-in point, not a rewrite: it only requires the caller to supply the schedule function
 in place of the constant `tau` used below.
+
+Addendum (2026-07-08, defect record -- independent audit 2026-07-07 finding B4): the
+static_oracle calibration round reads ``outcomes[chosen]["accept"]`` for every
+calibration trial regardless of ``split_side`` (that read is retained and hereby
+documented: the calibration round is accept-judged on all stream-head trials, including
+verify-side ones), but its calibration settlement events also carried a non-None accept
+outcome, so ``pass_at_budget`` / ``n_accept_settled`` counted the calibration round in
+the formal headline metric -- contradicting "before formal counting" above and biasing
+static_oracle vs the other arms whenever the stream head skews easy/hard. Fixed by
+excluding events with ``side == "calibration"`` from both formal counters (here and in
+``runner.run_stream``); calibration mechanics (label reads, ranking freeze, event
+recording) are unchanged, and aggregates for arms/streams with zero calibration trials
+are byte-identical to before the fix (pinned by tests/test_econ_lab_audit_fixes.py).
 """
 from __future__ import annotations
 
@@ -87,9 +100,13 @@ def _freeze_oracle_ranking(calibration_stats: Dict[str, List[int]]) -> List[str]
 
 
 def pass_at_budget(trace: BucketTrace) -> Optional[float]:
-    """Fraction of accept-side settled selections that passed. ``None`` if the bucket
-    had no accept-side settlement at all (NOT_ENOUGH_DATA, not zero)."""
-    settled = [e for e in trace.events if e.accept_pass is not None]
+    """Fraction of formally settled accept-side selections that passed. ``None`` if the
+    bucket had no formal accept-side settlement at all (NOT_ENOUGH_DATA, not zero).
+    Calibration-round events (``side == "calibration"``, static_oracle only) are
+    excluded from this formal counter (addendum 2026-07-08 in the module docstring)."""
+    settled = [
+        e for e in trace.events if e.accept_pass is not None and e.side != "calibration"
+    ]
     if not settled:
         return None
     return sum(1 for e in settled if e.accept_pass) / len(settled)

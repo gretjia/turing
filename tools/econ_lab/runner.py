@@ -83,7 +83,14 @@ def run_stream(stream: dict, arm_specs: Optional[List[ArmSpec]] = None) -> dict:
             trace = simulate_bucket(bucket_name, bucket_fixture, arm)
             bucket_result = {
                 "pass_at_budget": pass_at_budget(trace),
-                "n_accept_settled": sum(1 for e in trace.events if e.accept_pass is not None),
+                # Formal counter: calibration-round settlements (side == "calibration",
+                # static_oracle only) are excluded, mirroring `arms.pass_at_budget`
+                # (arms.py module-docstring addendum 2026-07-08, audit finding B4).
+                "n_accept_settled": sum(
+                    1
+                    for e in trace.events
+                    if e.accept_pass is not None and e.side != "calibration"
+                ),
                 "n_events": len(trace.events),
             }
             if arm.kind in _BACKUP_ACTIVE_KINDS:

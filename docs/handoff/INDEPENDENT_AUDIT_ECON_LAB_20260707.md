@@ -67,6 +67,21 @@ Fix list, each verified by targeted regression tests added in the same pass — 
 These alter preregistered or ADR-pinned behavior; unilateral mid-experiment change would
 exceed the implementer ceiling and/or pollute the live Stage A comparison.
 
+RESOLUTION STATUS (2026-07-08): all six findings are now ADDRESSED.
+- B1: fixed at `9f63da3` post-Stage-A / pre-Stage-B′ (details in the entry below);
+  PREREG appendix-A amendment #5 records the trail (owner session directive).
+- B2, B3, B5, B6: fixed by the orchestrator thread's WP10 (`179c4d5`, merged `7d230d6`)
+  under ADR-ECON-003 Decision 7 — B2 harness-never-evaluated → infra_null (no fabricated
+  verdict); B3 worker-COMPLETED empty patch → determinate failure in the denominator;
+  B5 attestations fold (run_label, task_index) so legit repeats never collide;
+  B6 SCORING_OK.marker (report sha256) gates resume report reuse. Spot-verified in
+  source + dedicated suite `tests/test_wp10_stage_b_prime.py` (24 tests).
+- B4: fixed 2026-07-08 (this trail): calibration-round settlements excluded from
+  `pass_at_budget` / `n_accept_settled` (offline WP7 harness only — live_driver does not
+  import arms/runner, verified); calibration mechanics retained and documented via dated
+  addendum in arms.py; zero-calibration aggregates pinned byte-identical
+  (sha256 `6684e94c…`); regression tests in `tests/test_econ_lab_audit_fixes.py`.
+
 B1. **CRITICAL — Rust seed derivation omits `trigger_event_hash` (ADR-ECON-003 Decision
     4).** — STATUS UPDATE 2026-07-08: ADDRESSED. Owner directed the remedy (option a);
     implemented after Stage A reached terminal state (5/5 arms DONE, all verdicts
