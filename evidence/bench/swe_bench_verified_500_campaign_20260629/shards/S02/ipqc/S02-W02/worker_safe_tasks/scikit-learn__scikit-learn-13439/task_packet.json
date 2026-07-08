@@ -1,0 +1,16 @@
+{
+  "base_commit": "a62775e99f2a5ea3d51db7160fad783f6cd8a4c5",
+  "candidate_source_policy": "worker_derived_patch_only",
+  "difficulty": "<15 min fix",
+  "environment_setup_commit": "7813f7efb5b2012412888b69e73d76f2df2b50b6",
+  "forbidden_field_count_removed": 5,
+  "instance_id": "scikit-learn__scikit-learn-13439",
+  "ipqc_window_id": "S02-W02",
+  "problem_statement": "Pipeline should implement __len__\n#### Description\r\n\r\nWith the new indexing support `pipe[:len(pipe)]` raises an error.\r\n\r\n#### Steps/Code to Reproduce\r\n\r\n```python\r\nfrom sklearn import svm\r\nfrom sklearn.datasets import samples_generator\r\nfrom sklearn.feature_selection import SelectKBest\r\nfrom sklearn.feature_selection import f_regression\r\nfrom sklearn.pipeline import Pipeline\r\n\r\n# generate some data to play with\r\nX, y = samples_generator.make_classification(\r\n    n_informative=5, n_redundant=0, random_state=42)\r\n\r\nanova_filter = SelectKBest(f_regression, k=5)\r\nclf = svm.SVC(kernel='linear')\r\npipe = Pipeline([('anova', anova_filter), ('svc', clf)])\r\n\r\nlen(pipe)\r\n```\r\n\r\n#### Versions\r\n\r\n```\r\nSystem:\r\n    python: 3.6.7 | packaged by conda-forge | (default, Feb 19 2019, 18:37:23)  [GCC 4.2.1 Compatible Clang 4.0.1 (tags/RELEASE_401/final)]\r\nexecutable: /Users/krisz/.conda/envs/arrow36/bin/python\r\n   machine: Darwin-18.2.0-x86_64-i386-64bit\r\n\r\nBLAS:\r\n    macros: HAVE_CBLAS=None\r\n  lib_dirs: /Users/krisz/.conda/envs/arrow36/lib\r\ncblas_libs: openblas, openblas\r\n\r\nPython deps:\r\n       pip: 19.0.3\r\nsetuptools: 40.8.0\r\n   sklearn: 0.21.dev0\r\n     numpy: 1.16.2\r\n     scipy: 1.2.1\r\n    Cython: 0.29.6\r\n    pandas: 0.24.1\r\n```\n",
+  "repo": "scikit-learn/scikit-learn",
+  "restricted_source_fields_removed": true,
+  "schema_id": "turingos.swebench_worker_safe_task_packet.v1",
+  "shard_id": "S02",
+  "version": "0.21",
+  "visible_to_worker": true
+}
