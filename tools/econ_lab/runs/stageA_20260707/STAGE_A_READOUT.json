@@ -1,0 +1,88 @@
+{
+  "alpha_prime_bonferroni": 0.016666666666666666,
+  "arm_stats": {
+    "0": {
+      "canary_count": 1,
+      "diagnostic_resolved": 2,
+      "infra_null": 6,
+      "k_pass": 3,
+      "n_settled": 44,
+      "not_enough_tests_count": 0,
+      "rate": 0.06818181818181818
+    },
+    "0.5": {
+      "canary_count": 1,
+      "diagnostic_resolved": 12,
+      "infra_null": 4,
+      "k_pass": 13,
+      "n_settled": 46,
+      "not_enough_tests_count": 0,
+      "rate": 0.2826086956521739
+    },
+    "1": {
+      "canary_count": 6,
+      "diagnostic_resolved": 4,
+      "infra_null": 3,
+      "k_pass": 10,
+      "n_settled": 47,
+      "not_enough_tests_count": 0,
+      "rate": 0.2127659574468085
+    },
+    "2": {
+      "canary_count": 3,
+      "diagnostic_resolved": 8,
+      "infra_null": 4,
+      "k_pass": 11,
+      "n_settled": 46,
+      "not_enough_tests_count": 0,
+      "rate": 0.2391304347826087
+    },
+    "inf": {
+      "canary_count": 2,
+      "diagnostic_resolved": 6,
+      "infra_null": 4,
+      "k_pass": 8,
+      "n_settled": 46,
+      "not_enough_tests_count": 0,
+      "rate": 0.17391304347826086
+    }
+  },
+  "detail": "interior arm(s) ['0.5', '1', '2'] directionally above both extremes but not significant at n~50; PREREG \u00a72 Stage B applies (n=171/arm; task-stream plan in amendment #2)",
+  "frozen_by": "PREREG Appendix A amendment #2",
+  "primary_metric": "settlement_verdict_resolved (accept-side, Decision 2.4)",
+  "schema": "econ_lab.stage_a_readout.v1",
+  "stage_a_outcome": "PROCEED_STAGE_B",
+  "status_ceiling": "ADDRESSED",
+  "tests": {
+    "0.5": {
+      "vs_tau_0": {
+        "p": 0.0039107112578664555,
+        "z": 2.65968300952237
+      },
+      "vs_tau_inf": {
+        "p": 0.10711643428440863,
+        "z": 1.2420100106410288
+      }
+    },
+    "1": {
+      "vs_tau_0": {
+        "p": 0.024437017358382267,
+        "z": 1.969688910363912
+      },
+      "vs_tau_inf": {
+        "p": 0.31769247271866724,
+        "z": 0.4741612195916727
+      }
+    },
+    "2": {
+      "vs_tau_0": {
+        "p": 0.012650695498149848,
+        "z": 2.2367697743504915
+      },
+      "vs_tau_inf": {
+        "p": 0.2198678641630152,
+        "z": 0.7726395548761354
+      }
+    }
+  }
+}
