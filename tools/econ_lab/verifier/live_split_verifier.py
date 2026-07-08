@@ -55,6 +55,14 @@ only categories, not part of the pass/fail determination either upstream (SWE-be
 ever produced at all (the harness's own `error_ids` bucket, e.g. `EvaluationError: Patch
 Apply Failed`) -- orchestrator addendum (ADR-ECON-003, 2026-07-07, point 3).
 
+`judge_infra_null()` below (independent audit `INDEPENDENT_AUDIT_ECON_LAB_20260707.md` B2,
+ADR-ECON-003 Decision 7.1, 2026-07-08) handles the sibling-of-the-sibling case: the harness
+never actually *evaluated* this run at all (INCOMPLETE, or an `error_ids` outcome with no
+per-instance report/log and no pinned patch-apply-failure marker -- i.e. malformed or never
+written). Unlike `judge_harness_error` (a real, determinate double-fail), this is "we have
+nothing to say" -- the "never fabricate a verdict" invariant wins over fail-closed here: no
+settlement, no backup update.
+
 Split-function reuse (Decision 2.4's own instruction: "切分函数应复用/对齐
 tools/econ_lab/verifier/split.py 已钉的 v0 实现语义...若 split.py 的现有签名不适配,薄
 封装,不重写哈希逻辑"): `split.split_side(case_id: str) -> str` already takes an arbitrary
@@ -90,6 +98,7 @@ __all__ = [
     "collect_test_outcomes",
     "judge",
     "judge_harness_error",
+    "judge_infra_null",
 ]
 
 
@@ -192,4 +201,37 @@ def judge_harness_error(reason: str) -> dict[str, Any]:
         "accept_test_ids": [],
         "verify_test_ids": [],
         "harness_error_reason": reason,
+    }
+
+
+def judge_infra_null(reason: str) -> dict[str, Any]:
+    """B2 remedy (independent audit `INDEPENDENT_AUDIT_ECON_LAB_20260707.md` B2; ADR-ECON-003
+    Decision 7.1, orchestrator ruling 2026-07-08): the harness never actually *evaluated* this
+    run at all -- `outcome == "INCOMPLETE"`, or an `error_ids` outcome with no per-instance
+    report/log at all and no pinned patch-apply-failure marker (report malformed or never
+    written). Distinct from `judge_harness_error` (a real, determinate double-fail: the harness
+    *did* run and *did* determine a failure, e.g. `patch_apply_failed`/`empty_patch`) -- here
+    the harness has nothing to say at all, so this must never be funneled into a fabricated
+    definite verdict (the pinned `error_ids` fail-closed path was exactly B2's bug).
+
+    `accept_verdict`/`verify_verdict` stay `None` (never settled); `not_enough_tests` stays
+    `False` (that field is reserved for `judge()`'s own "some data exists, verify side is
+    just empty" case -- a different condition from "no data exists at all"); `canary` stays
+    `False` (no accept/verify disagreement is possible without a determination on either
+    side). The caller (`live_driver.py`'s `_apply_live_split_verifier`) must not build a
+    `RoutingPriorUpdated` event for this result and must not count it toward any settled
+    denominator -- `infra_null=True`/`infra_null_reason` is this function's own signal for
+    that, read only by this module's callers, never fed into `EconomyEvent`/tape construction.
+    """
+    return {
+        "schema": LIVE_SPLIT_VERIFIER_SCHEMA,
+        "accept_verdict": None,
+        "verify_verdict": None,
+        "canary": False,
+        "not_enough_tests": False,
+        "accept_test_ids": [],
+        "verify_test_ids": [],
+        "harness_error_reason": None,
+        "infra_null": True,
+        "infra_null_reason": reason,
     }

@@ -89,6 +89,11 @@ def _args(run_root: Path, *, resume: bool, max_tasks: int = 1) -> argparse.Names
         task_dir_root=run_root / "task_runs",
         report_dir=run_root / "scoring",
         resume=resume,
+        # B5 (ADR-ECON-003 Decision 7.4): fixed, run_root-independent -- see the identical
+        # note in test_live_driver_resume.py's own `_args`; these crash-hardening tests
+        # compare a "baseline" run against a separately-rooted "killed"/corrupted-then-
+        # resumed run of the same conceptual scenario.
+        run_label="test-wp9c-crash-hardening",
     )
 
 

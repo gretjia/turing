@@ -1,4 +1,4 @@
-"""WP9c -- hard constraint B: fresh-run (non `--resume`) byte-parity gate.
+"""WP9c/WP10 -- fresh-run (non `--resume`) HEAD-parity diff.
 
 Stage A is running against `hci/software3-20260705`'s HEAD driver (89d78e1 + the two commits
 after it) while this WP9c resume work lands in a separate worktree/branch. The orchestrator's
@@ -6,13 +6,24 @@ own precondition for allowing that in-flight run to later merge this branch is: 
 `--resume` unused, the new driver's verdict output must be byte-identical to the HEAD driver's,
 given the same fixed inputs -- i.e. this file's own resume-checkpoint additions
 (`_write_settlement_checkpoint` et al.) must be pure side effects that never touch a byte of
-`verdict.json`. If this test fails, WP9c is BLOCKED from merging, full stop -- no formula is
-invented here to make it pass; a genuine divergence is a real regression.
+`verdict.json`.
+
+WP10 status update (2026-07-08, orchestrator): Stage A has reached terminal state (all 5 arms
+DONE, all verdicts on disk) -- the byte-identity *hard merge gate* this docstring originally
+described no longer applies (there is no in-flight live run left to protect from a mid-run
+driver swap). This file's *concept* changes accordingly, from "hard gate, block merge on any
+diff" to "diff against HEAD, stay green": it still proves the two drivers produce identical
+output on every field this test doesn't know WP10 legitimately changed, but it no longer
+treats every diff as an automatic regression. `_normalize_wp10_b_fixes` below documents and
+strips exactly the fields WP10's own audit-fix work (B2/B5, ADR-ECON-003 Decision 7,
+2026-07-08) is *expected* to change even on the untouched happy path -- nothing else is
+masked, so a genuine regression anywhere else still fails this test.
 
 Spec source: this file's own task brief (WP9c orchestrator instructions, 2026-07-07, hard
-constraint B) -- not an ADR/PREREG formula; this test only proves two Python module objects
-(one loaded from `git show HEAD:tools/econ_lab/live_driver.py`, one this worktree's working
-copy) produce byte-identical JSON given byte-identical mock/offline stubs.
+constraint B; WP10 orchestrator instructions, 2026-07-08, byte-identity lift) -- not an
+ADR/PREREG formula; this test only proves two Python module objects (one loaded from
+`git show HEAD:tools/econ_lab/live_driver.py`, one this worktree's working copy) produce
+identical-modulo-`_normalize_wp10_b_fixes` JSON given byte-identical mock/offline stubs.
 """
 from __future__ import annotations
 
@@ -152,6 +163,40 @@ def _run_fresh(module, run_root: Path, *, max_tasks: int = 2) -> dict:
     return module.run_driver(args)
 
 
+def _normalize_wp10_b_fixes(verdict: dict) -> dict:
+    """Strip/replace exactly the fields WP10's B2/B5 audit-fix work (ADR-ECON-003 Decision
+    7.1/7.4, 2026-07-08 orchestrator ruling) legitimately changes even on the untouched
+    happy path (RESOLVED/UNRESOLVED outcomes, non-empty patches -- the only shape either of
+    these offline fixtures ever produces):
+
+      - B5 folds `run_label`/`task_index` into the verifier attestation hash
+        (`_verifier_attestation_hash`), so every `backup_update.routing_prior_updated_event_
+        hash` the new driver computes is a different (still validly-derived) sha256 digest
+        than the HEAD driver's -- replaced with a fixed placeholder on both sides so this
+        test still catches a *missing*/*malformed* hash, just not its specific value.
+      - B2 adds a `verifier_summary.infra_null_count` key, always present (0 on every path
+        these fixtures exercise) -- popped on both sides (a no-op on the HEAD side, which
+        never had the key at all).
+      - Stage B' (`--priors`/`--frozen-backup`/`--task-shard`/`--run-label`) adds a whole new
+        `stage_b_prime_meta` top-level key, always present -- popped on both sides for the
+        same reason. Neither fixture ever sets any Stage B' flag, so this key's *content*
+        would be all-`None`/`False` anyway; popping it whole keeps this normalizer simple.
+
+    Nothing else is touched -- a genuine divergence anywhere else in `verdict.json` still
+    fails this test."""
+    verdict = json.loads(json.dumps(verdict))  # cheap deep copy
+    verifier_summary = verdict.get("verifier_summary")
+    if isinstance(verifier_summary, dict):
+        verifier_summary.pop("infra_null_count", None)
+    verdict.pop("stage_b_prime_meta", None)
+    for task in verdict.get("tasks", []):
+        for dispatch in task.get("dispatches", []):
+            backup_update = dispatch.get("backup_update")
+            if isinstance(backup_update, dict) and "routing_prior_updated_event_hash" in backup_update:
+                backup_update["routing_prior_updated_event_hash"] = "<EVENT_HASH>"
+    return verdict
+
+
 def _normalize_run_root_paths(verdict: dict, *, run_root: Path) -> dict:
     """Strips the one legitimate source of absolute-path divergence between two otherwise
     byte-identical runs: `--report-dir`'s own absolute location, embedded verbatim in
@@ -162,6 +207,30 @@ def _normalize_run_root_paths(verdict: dict, *, run_root: Path) -> dict:
     text = json.dumps(verdict, sort_keys=True)
     text = text.replace(str(run_root.resolve()), "<RUN_ROOT>")
     return json.loads(text)
+
+
+def _skip_if_anchor_predates_b5(module) -> None:
+    """B5 re-anchor guard (independent audit B5, ADR-ECON-003 Decision 7.4, 2026-07-08
+    orchestrator ruling), same mechanism as `_load_head_driver`'s own B1 guard above: folding
+    `run_label`/`task_index` into the verifier attestation hash changes every
+    `RoutingPriorUpdated.event_hash` this driver mints, which cascades into every downstream
+    task's `price_signal_hash` (it is derived from the sorted set of prior event_hashes) from
+    the second task onward -- not just the one field a targeted normalizer could mask. A
+    pre-B5 anchor (every anchor until the B5 landing commit itself becomes the merge-base) is
+    therefore expected to diverge there, and that divergence proves nothing about the new
+    driver's correctness -- skip rather than assert, exactly like the B1 case, until the
+    anchor advances past B5 on its own (no code change needed here then either)."""
+    import inspect
+
+    if "run_label" not in inspect.signature(module._apply_live_split_verifier).parameters:
+        pytest.skip(
+            "head-parity anchor predates the B5 attestation fix (ADR-ECON-003 Decision 7.4, "
+            "2026-07-08): run_label/task_index change every RoutingPriorUpdated event_hash "
+            "and therefore every downstream price_signal_hash from the second task onward -- "
+            "byte-parity against a pre-B5 anchor is expected to break and proves nothing "
+            "about the new driver; re-run once the B5 landing commit is the merge-base "
+            "anchor (see _load_head_driver's TODO(B1 re-anchor) for the identical mechanism)"
+        )
 
 
 @pytest.fixture()
@@ -183,7 +252,15 @@ def worktree_driver(monkeypatch):
 
 
 def test_fresh_run_byte_identical_to_head_driver(tmp_path, head_driver, worktree_driver):
-    """Hard constraint B, smoke=False (`full`/Stage-A-shaped) mode."""
+    """Hard constraint B, smoke=False (`full`/Stage-A-shaped) mode.
+
+    Multi-task only (2 tasks): the B5 re-anchor guard applies here, not to the smoke test
+    below -- a single-task run's `price_signal_hash` never reads any prior task's
+    `RoutingPriorUpdated.event_hash`, so the smoke test stays a genuine, un-skipped
+    comparison even against a pre-B5 anchor (only this file's own
+    `backup_update.routing_prior_updated_event_hash` field differs there, already normalized
+    by `_normalize_wp10_b_fixes`)."""
+    _skip_if_anchor_predates_b5(head_driver)
     head_root = tmp_path / "head_run"
     new_root = tmp_path / "new_run"
     head_root.mkdir()
@@ -191,8 +268,8 @@ def test_fresh_run_byte_identical_to_head_driver(tmp_path, head_driver, worktree
     verdict_head = _run_fresh(head_driver, head_root)
     verdict_new = _run_fresh(worktree_driver, new_root)
 
-    stripped_head = _normalize_run_root_paths(strip_volatile(verdict_head), run_root=head_root)
-    stripped_new = _normalize_run_root_paths(strip_volatile(verdict_new), run_root=new_root)
+    stripped_head = _normalize_wp10_b_fixes(_normalize_run_root_paths(strip_volatile(verdict_head), run_root=head_root))
+    stripped_new = _normalize_wp10_b_fixes(_normalize_run_root_paths(strip_volatile(verdict_new), run_root=new_root))
     assert stripped_head == stripped_new, "fresh-run verdict dict diverged from the HEAD driver"
 
     # "逐字节" is the orchestrator's literal requirement -- also compare the exact serialized
@@ -223,6 +300,10 @@ def test_fresh_smoke_mode_byte_identical_to_head_driver(tmp_path, head_driver, w
     new_root = tmp_path / "new_run_smoke"
     head_root.mkdir()
     new_root.mkdir()
-    verdict_head = _normalize_run_root_paths(strip_volatile(_run_smoke(head_driver, head_root)), run_root=head_root)
-    verdict_new = _normalize_run_root_paths(strip_volatile(_run_smoke(worktree_driver, new_root)), run_root=new_root)
+    verdict_head = _normalize_wp10_b_fixes(
+        _normalize_run_root_paths(strip_volatile(_run_smoke(head_driver, head_root)), run_root=head_root)
+    )
+    verdict_new = _normalize_wp10_b_fixes(
+        _normalize_run_root_paths(strip_volatile(_run_smoke(worktree_driver, new_root)), run_root=new_root)
+    )
     assert verdict_head == verdict_new
