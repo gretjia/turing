@@ -17,6 +17,11 @@ instance-matched verdicts, Bonferroni alpha' = 0.05/3:
   H-B2: W > F   (live learning on S02 beats static informed sorting)
   H-B3: W > C   (net value of cross-task price transfer)
 
+Addendum (2026-07-08, pre-data, defect record per freeze discipline): arm
+directory layout corrected from `arm_<X>/` to `<X>/` to match the actual
+run_stage_b_prime.sh layout, discovered at launch with ZERO S02 verdicts in
+existence. No judgment logic, test family, or alpha changed.
+
 Primary per-task metric: settlement_verdict_resolved under ADR-ECON-003
 Decision 7 rules (driver-side: infra_null only for never-evaluated; empty
 patch counts as a failed task). Rank-inversion in W is reported
@@ -178,7 +183,7 @@ def main(argv=None) -> int:
         return self_test()
     arms = {}
     for a in ARMS:
-        p = args.run_root / f"arm_{a}/verdict.json"
+        p = args.run_root / f"{a}/verdict.json"
         if not p.exists():
             print(json.dumps({"stage_b_outcome": "NOT_RUN_MISSING_VERDICT", "missing": str(p)}))
             return 1
