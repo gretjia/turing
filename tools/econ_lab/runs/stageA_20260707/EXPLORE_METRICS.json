@@ -1,0 +1,4271 @@
+{
+  "A1": {
+    "tau_0p5_vs_tau_0": {
+      "a_both_pass": 3,
+      "b_interior_pass_extreme_fail": 6,
+      "c_interior_fail_extreme_pass": 0,
+      "d_both_fail": 32,
+      "excluded_infra_null_instances": [
+        "django__django-11099",
+        "pylint-dev__pylint-6903",
+        "pytest-dev__pytest-5787",
+        "pytest-dev__pytest-6197",
+        "pytest-dev__pytest-6202",
+        "scikit-learn__scikit-learn-13135",
+        "sphinx-doc__sphinx-11445",
+        "sphinx-doc__sphinx-7440",
+        "sphinx-doc__sphinx-7454"
+      ],
+      "extreme_arm": "tau_0",
+      "interior_arm": "tau_0p5",
+      "mcnemar_exact": {
+        "n_discordant": 6,
+        "p_one_sided_interior_favored": 1.0,
+        "p_one_sided_interior_favored_standard_signtest_SUPPLEMENTARY": 0.015625,
+        "p_two_sided": 0.03125
+      },
+      "n_instances_common": 50,
+      "n_pairs_classified": 41,
+      "only_in_extreme": [],
+      "only_in_interior": [],
+      "phi_matched_pairs": 0.5298129428260175
+    },
+    "tau_0p5_vs_tau_inf": {
+      "a_both_pass": 7,
+      "b_interior_pass_extreme_fail": 4,
+      "c_interior_fail_extreme_pass": 1,
+      "d_both_fail": 30,
+      "excluded_infra_null_instances": [
+        "matplotlib__matplotlib-20859",
+        "psf__requests-2931",
+        "pylint-dev__pylint-6903",
+        "pytest-dev__pytest-5787",
+        "pytest-dev__pytest-6197",
+        "sphinx-doc__sphinx-11445",
+        "sphinx-doc__sphinx-7454",
+        "sympy__sympy-13372"
+      ],
+      "extreme_arm": "tau_inf",
+      "interior_arm": "tau_0p5",
+      "mcnemar_exact": {
+        "n_discordant": 5,
+        "p_one_sided_interior_favored": 0.96875,
+        "p_one_sided_interior_favored_standard_signtest_SUPPLEMENTARY": 0.1875,
+        "p_two_sided": 0.375
+      },
+      "n_instances_common": 50,
+      "n_pairs_classified": 42,
+      "only_in_extreme": [],
+      "only_in_interior": [],
+      "phi_matched_pairs": 0.6764030836859065
+    },
+    "tau_1_vs_tau_0": {
+      "a_both_pass": 2,
+      "b_interior_pass_extreme_fail": 6,
+      "c_interior_fail_extreme_pass": 1,
+      "d_both_fail": 33,
+      "excluded_infra_null_instances": [
+        "django__django-11099",
+        "pylint-dev__pylint-6528",
+        "pytest-dev__pytest-6197",
+        "pytest-dev__pytest-6202",
+        "scikit-learn__scikit-learn-13135",
+        "sphinx-doc__sphinx-11445",
+        "sphinx-doc__sphinx-7440",
+        "sympy__sympy-13031"
+      ],
+      "extreme_arm": "tau_0",
+      "interior_arm": "tau_1",
+      "mcnemar_exact": {
+        "n_discordant": 7,
+        "p_one_sided_interior_favored": 0.9921875,
+        "p_one_sided_interior_favored_standard_signtest_SUPPLEMENTARY": 0.0625,
+        "p_two_sided": 0.125
+      },
+      "n_instances_common": 50,
+      "n_pairs_classified": 42,
+      "only_in_extreme": [],
+      "only_in_interior": [],
+      "phi_matched_pairs": 0.33633639699815626
+    },
+    "tau_1_vs_tau_inf": {
+      "a_both_pass": 2,
+      "b_interior_pass_extreme_fail": 8,
+      "c_interior_fail_extreme_pass": 6,
+      "d_both_fail": 28,
+      "excluded_infra_null_instances": [
+        "matplotlib__matplotlib-20859",
+        "psf__requests-2931",
+        "pylint-dev__pylint-6528",
+        "sphinx-doc__sphinx-11445",
+        "sympy__sympy-13031",
+        "sympy__sympy-13372"
+      ],
+      "extreme_arm": "tau_inf",
+      "interior_arm": "tau_1",
+      "mcnemar_exact": {
+        "n_discordant": 14,
+        "p_one_sided_interior_favored": 0.78802490234375,
+        "p_one_sided_interior_favored_standard_signtest_SUPPLEMENTARY": 0.395263671875,
+        "p_two_sided": 0.79052734375
+      },
+      "n_instances_common": 50,
+      "n_pairs_classified": 44,
+      "only_in_extreme": [],
+      "only_in_interior": [],
+      "phi_matched_pairs": 0.025565499628245683
+    },
+    "tau_2_vs_tau_0": {
+      "a_both_pass": 3,
+      "b_interior_pass_extreme_fail": 6,
+      "c_interior_fail_extreme_pass": 0,
+      "d_both_fail": 31,
+      "excluded_infra_null_instances": [
+        "astropy__astropy-14182",
+        "django__django-11099",
+        "matplotlib__matplotlib-20859",
+        "pylint-dev__pylint-7277",
+        "pytest-dev__pytest-5809",
+        "pytest-dev__pytest-6197",
+        "pytest-dev__pytest-6202",
+        "scikit-learn__scikit-learn-13135",
+        "sphinx-doc__sphinx-11445",
+        "sphinx-doc__sphinx-7440"
+      ],
+      "extreme_arm": "tau_0",
+      "interior_arm": "tau_2",
+      "mcnemar_exact": {
+        "n_discordant": 6,
+        "p_one_sided_interior_favored": 1.0,
+        "p_one_sided_interior_favored_standard_signtest_SUPPLEMENTARY": 0.015625,
+        "p_two_sided": 0.03125
+      },
+      "n_instances_common": 50,
+      "n_pairs_classified": 40,
+      "only_in_extreme": [],
+      "only_in_interior": [],
+      "phi_matched_pairs": 0.5284688063445934
+    },
+    "tau_2_vs_tau_inf": {
+      "a_both_pass": 4,
+      "b_interior_pass_extreme_fail": 6,
+      "c_interior_fail_extreme_pass": 4,
+      "d_both_fail": 29,
+      "excluded_infra_null_instances": [
+        "astropy__astropy-14182",
+        "matplotlib__matplotlib-20859",
+        "psf__requests-2931",
+        "pylint-dev__pylint-7277",
+        "pytest-dev__pytest-5809",
+        "sphinx-doc__sphinx-11445",
+        "sympy__sympy-13372"
+      ],
+      "extreme_arm": "tau_inf",
+      "interior_arm": "tau_2",
+      "mcnemar_exact": {
+        "n_discordant": 10,
+        "p_one_sided_interior_favored": 0.828125,
+        "p_one_sided_interior_favored_standard_signtest_SUPPLEMENTARY": 0.376953125,
+        "p_two_sided": 0.75390625
+      },
+      "n_instances_common": 50,
+      "n_pairs_classified": 43,
+      "only_in_extreme": [],
+      "only_in_interior": [],
+      "phi_matched_pairs": 0.3026577796814937
+    }
+  },
+  "A2": {
+    "learning_deltas_interior_vs_tau_inf_DESCRIPTIVE_ONLY_NO_SIGNIFICANCE": {
+      "tau_0p5": 0.043478260869565244,
+      "tau_1": -0.009057971014492738,
+      "tau_2": 0.043478260869565216,
+      "tau_inf": 0.0
+    },
+    "note": "second_minus_first deltas are purely descriptive point estimates; no significance/p-value claim is attached to them anywhere in this file.",
+    "per_arm": {
+      "tau_0": {
+        "first_half": {
+          "k_pass": 1,
+          "n_infra_null": 0,
+          "n_settled": 25,
+          "rate": 0.04
+        },
+        "n": 50,
+        "second_half": {
+          "k_pass": 2,
+          "n_infra_null": 6,
+          "n_settled": 19,
+          "rate": 0.10526315789473684
+        },
+        "second_minus_first_delta_DESCRIPTIVE_ONLY_NO_SIGNIFICANCE": 0.06526315789473683,
+        "sliding_window_10_in_order": [
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 3,
+            "n_settled": 7,
+            "rate": 0.14285714285714285
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 4,
+            "n_settled": 6,
+            "rate": 0.16666666666666666
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 4,
+            "n_settled": 6,
+            "rate": 0.16666666666666666
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 4,
+            "n_settled": 6,
+            "rate": 0.3333333333333333
+          }
+        ]
+      },
+      "tau_0p5": {
+        "first_half": {
+          "k_pass": 6,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.2608695652173913
+        },
+        "n": 50,
+        "second_half": {
+          "k_pass": 7,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.30434782608695654
+        },
+        "second_minus_first_delta_DESCRIPTIVE_ONLY_NO_SIGNIFICANCE": 0.043478260869565244,
+        "sliding_window_10_in_order": [
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.25
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          },
+          {
+            "k_pass": 5,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.5
+          },
+          {
+            "k_pass": 6,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.6
+          },
+          {
+            "k_pass": 6,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.6666666666666666
+          },
+          {
+            "k_pass": 6,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.6666666666666666
+          }
+        ]
+      },
+      "tau_1": {
+        "first_half": {
+          "k_pass": 5,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.21739130434782608
+        },
+        "n": 50,
+        "second_half": {
+          "k_pass": 5,
+          "n_infra_null": 1,
+          "n_settled": 24,
+          "rate": 0.20833333333333334
+        },
+        "second_minus_first_delta_DESCRIPTIVE_ONLY_NO_SIGNIFICANCE": -0.009057971014492738,
+        "sliding_window_10_in_order": [
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          },
+          {
+            "k_pass": 5,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.5
+          },
+          {
+            "k_pass": 5,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.5
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.4444444444444444
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.4444444444444444
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          }
+        ]
+      },
+      "tau_2": {
+        "first_half": {
+          "k_pass": 5,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.21739130434782608
+        },
+        "n": 50,
+        "second_half": {
+          "k_pass": 6,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.2608695652173913
+        },
+        "second_minus_first_delta_DESCRIPTIVE_ONLY_NO_SIGNIFICANCE": 0.043478260869565216,
+        "sliding_window_10_in_order": [
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          }
+        ]
+      },
+      "tau_inf": {
+        "first_half": {
+          "k_pass": 4,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.17391304347826086
+        },
+        "n": 50,
+        "second_half": {
+          "k_pass": 4,
+          "n_infra_null": 2,
+          "n_settled": 23,
+          "rate": 0.17391304347826086
+        },
+        "second_minus_first_delta_DESCRIPTIVE_ONLY_NO_SIGNIFICANCE": 0.0,
+        "sliding_window_10_in_order": [
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.125
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 2,
+            "n_settled": 8,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.3
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.2
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.1
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 0,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.0
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 1,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.1111111111111111
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 2,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.2222222222222222
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 3,
+            "n_infra_null": 1,
+            "n_settled": 9,
+            "rate": 0.3333333333333333
+          },
+          {
+            "k_pass": 4,
+            "n_infra_null": 0,
+            "n_settled": 10,
+            "rate": 0.4
+          }
+        ]
+      }
+    }
+  },
+  "A3": {
+    "tau_0": {
+      "entropy_bits_first_half": 1.4619011889093372,
+      "entropy_bits_second_half": 1.8971245697587873,
+      "entropy_bits_whole": 2.3541859341591382,
+      "selection_counts_by_route": {
+        "armA::deepseek": 12,
+        "armA::glm": 13,
+        "armA::kimi": 9,
+        "armA::qwen": 10,
+        "armB::deepseek": 5,
+        "armB::glm": 0,
+        "armB::kimi": 0,
+        "armB::qwen": 1,
+        "armC::deepseek": 0,
+        "armC::glm": 0,
+        "armC::kimi": 0,
+        "armC::qwen": 0
+      },
+      "top1_route_share": 0.26,
+      "total_selections": 50
+    },
+    "tau_0p5": {
+      "entropy_bits_first_half": 3.2536606896881852,
+      "entropy_bits_second_half": 3.1092750707107135,
+      "entropy_bits_whole": 3.352305642071427,
+      "selection_counts_by_route": {
+        "armA::deepseek": 5,
+        "armA::glm": 5,
+        "armA::kimi": 2,
+        "armA::qwen": 4,
+        "armB::deepseek": 5,
+        "armB::glm": 4,
+        "armB::kimi": 9,
+        "armB::qwen": 2,
+        "armC::deepseek": 5,
+        "armC::glm": 0,
+        "armC::kimi": 5,
+        "armC::qwen": 4
+      },
+      "top1_route_share": 0.18,
+      "total_selections": 50
+    },
+    "tau_1": {
+      "entropy_bits_first_half": 2.793269689515108,
+      "entropy_bits_second_half": 3.1786885704510977,
+      "entropy_bits_whole": 3.424822001763704,
+      "selection_counts_by_route": {
+        "armA::deepseek": 3,
+        "armA::glm": 6,
+        "armA::kimi": 3,
+        "armA::qwen": 1,
+        "armB::deepseek": 6,
+        "armB::glm": 7,
+        "armB::kimi": 4,
+        "armB::qwen": 7,
+        "armC::deepseek": 2,
+        "armC::glm": 3,
+        "armC::kimi": 5,
+        "armC::qwen": 3
+      },
+      "top1_route_share": 0.14,
+      "total_selections": 50
+    },
+    "tau_2": {
+      "entropy_bits_first_half": 3.3034651896016474,
+      "entropy_bits_second_half": 3.1132696895151084,
+      "entropy_bits_whole": 3.2946939516467015,
+      "selection_counts_by_route": {
+        "armA::deepseek": 2,
+        "armA::glm": 3,
+        "armA::kimi": 10,
+        "armA::qwen": 8,
+        "armB::deepseek": 4,
+        "armB::glm": 0,
+        "armB::kimi": 3,
+        "armB::qwen": 3,
+        "armC::deepseek": 5,
+        "armC::glm": 3,
+        "armC::kimi": 4,
+        "armC::qwen": 5
+      },
+      "top1_route_share": 0.2,
+      "total_selections": 50
+    },
+    "tau_inf": {
+      "entropy_bits_first_half": 3.1892750707107136,
+      "entropy_bits_second_half": 3.40307418942857,
+      "entropy_bits_whole": 3.4239818205809045,
+      "selection_counts_by_route": {
+        "armA::deepseek": 4,
+        "armA::glm": 5,
+        "armA::kimi": 6,
+        "armA::qwen": 2,
+        "armB::deepseek": 4,
+        "armB::glm": 6,
+        "armB::kimi": 4,
+        "armB::qwen": 8,
+        "armC::deepseek": 5,
+        "armC::glm": 2,
+        "armC::kimi": 1,
+        "armC::qwen": 3
+      },
+      "top1_route_share": 0.16,
+      "total_selections": 50
+    }
+  },
+  "A4": {
+    "arm_actual_vs_oracle_gap": {
+      "tau_0": {
+        "actual_pass_rate": 0.06818181818181818,
+        "gap_actual_minus_oracle": -0.4318181818181818,
+        "k_pass": 3,
+        "n_settled": 44
+      },
+      "tau_0p5": {
+        "actual_pass_rate": 0.2826086956521739,
+        "gap_actual_minus_oracle": -0.2173913043478261,
+        "k_pass": 13,
+        "n_settled": 46
+      },
+      "tau_1": {
+        "actual_pass_rate": 0.2127659574468085,
+        "gap_actual_minus_oracle": -0.2872340425531915,
+        "k_pass": 10,
+        "n_settled": 47
+      },
+      "tau_2": {
+        "actual_pass_rate": 0.2391304347826087,
+        "gap_actual_minus_oracle": -0.2608695652173913,
+        "k_pass": 11,
+        "n_settled": 46
+      },
+      "tau_inf": {
+        "actual_pass_rate": 0.17391304347826086,
+        "gap_actual_minus_oracle": -0.32608695652173914,
+        "k_pass": 8,
+        "n_settled": 46
+      }
+    },
+    "arm_actual_vs_oracle_gap_bucket_scoped_SUPPLEMENTARY": {
+      "tau_0": {
+        "actual_pass_rate": 0.06818181818181818,
+        "gap_actual_minus_oracle": -0.7848181818181819,
+        "k_pass": 3,
+        "n_settled": 44
+      },
+      "tau_0p5": {
+        "actual_pass_rate": 0.2826086956521739,
+        "gap_actual_minus_oracle": -0.5703913043478261,
+        "k_pass": 13,
+        "n_settled": 46
+      },
+      "tau_1": {
+        "actual_pass_rate": 0.2127659574468085,
+        "gap_actual_minus_oracle": -0.6402340425531915,
+        "k_pass": 10,
+        "n_settled": 47
+      },
+      "tau_2": {
+        "actual_pass_rate": 0.2391304347826087,
+        "gap_actual_minus_oracle": -0.6138695652173913,
+        "k_pass": 11,
+        "n_settled": 46
+      },
+      "tau_inf": {
+        "actual_pass_rate": 0.17391304347826086,
+        "gap_actual_minus_oracle": -0.6790869565217391,
+        "k_pass": 8,
+        "n_settled": 46
+      }
+    },
+    "note_degenerate_oracle": "Per a literal reading of the spec text ('the table above'), the oracle route for every domain_bucket is chosen from the single GLOBAL pooled 12-route table, not a bucket-scoped table; since that table does not vary by bucket, the same best route/rate is picked for every bucket, making oracle_upper_bound_weighted mathematically identical to oracle_best_global_route_rate. See ANALYTIC CHOICES #8 in the module docstring. A non-degenerate supplementary variant is provided below.",
+    "oracle_best_global_route": "armC::glm",
+    "oracle_best_global_route_rate": 0.5,
+    "oracle_upper_bound_bucket_scoped_SUPPLEMENTARY": 0.853,
+    "oracle_upper_bound_weighted": 0.5,
+    "per_bucket_oracle_bucket_scoped_SUPPLEMENTARY": {
+      "astropy/astropy": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.25,
+        "oracle_route": "armB::kimi"
+      },
+      "django/django": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::deepseek"
+      },
+      "matplotlib/matplotlib": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::deepseek"
+      },
+      "psf/requests": {
+        "bucket_weight_task_instances": 15,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::kimi"
+      },
+      "pydata/xarray": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::deepseek"
+      },
+      "pylint-dev/pylint": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::glm"
+      },
+      "pytest-dev/pytest": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::kimi"
+      },
+      "scikit-learn/scikit-learn": {
+        "bucket_weight_task_instances": 30,
+        "oracle_rate": 0.4,
+        "oracle_route": "armC::kimi"
+      },
+      "sphinx-doc/sphinx": {
+        "bucket_weight_task_instances": 30,
+        "oracle_rate": 1.0,
+        "oracle_route": "armB::glm"
+      },
+      "sympy/sympy": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 1.0,
+        "oracle_route": "armC::glm"
+      }
+    },
+    "per_bucket_oracle_literal_spec": {
+      "astropy/astropy": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "django/django": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "matplotlib/matplotlib": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "psf/requests": {
+        "bucket_weight_task_instances": 15,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "pydata/xarray": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "pylint-dev/pylint": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "pytest-dev/pytest": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "scikit-learn/scikit-learn": {
+        "bucket_weight_task_instances": 30,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "sphinx-doc/sphinx": {
+        "bucket_weight_task_instances": 30,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      },
+      "sympy/sympy": {
+        "bucket_weight_task_instances": 25,
+        "oracle_rate": 0.5,
+        "oracle_route": "armC::glm"
+      }
+    },
+    "route_table_by_bucket_SUPPLEMENTARY": {
+      "astropy/astropy": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 1,
+          "n_settled": 4,
+          "rate": 0.25
+        },
+        "armB::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 6,
+          "rate": 0.0
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        }
+      },
+      "django/django": {
+        "armA::deepseek": {
+          "k_pass": 1,
+          "n_settled": 2,
+          "rate": 0.5
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 1,
+          "n_settled": 2,
+          "rate": 0.5
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 4,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armB::qwen": {
+          "k_pass": 3,
+          "n_settled": 4,
+          "rate": 0.75
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::glm": {
+          "k_pass": 1,
+          "n_settled": 3,
+          "rate": 0.3333333333333333
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        }
+      },
+      "matplotlib/matplotlib": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 5,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 2,
+          "n_settled": 2,
+          "rate": 1.0
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 1,
+          "n_settled": 3,
+          "rate": 0.3333333333333333
+        },
+        "armB::qwen": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::deepseek": {
+          "k_pass": 1,
+          "n_settled": 2,
+          "rate": 0.5
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        }
+      },
+      "psf/requests": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 2,
+          "n_settled": 2,
+          "rate": 1.0
+        },
+        "armB::qwen": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        }
+      },
+      "pydata/xarray": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 4,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 4,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 2,
+          "n_settled": 5,
+          "rate": 0.4
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 5,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armB::kimi": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::qwen": {
+          "k_pass": 2,
+          "n_settled": 3,
+          "rate": 0.6666666666666666
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::qwen": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        }
+      },
+      "pylint-dev/pylint": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 1,
+          "n_settled": 4,
+          "rate": 0.25
+        },
+        "armB::glm": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armB::kimi": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        }
+      },
+      "pytest-dev/pytest": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armB::qwen": {
+          "k_pass": 1,
+          "n_settled": 2,
+          "rate": 0.5
+        },
+        "armC::deepseek": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 1,
+          "n_settled": 1,
+          "rate": 1.0
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        }
+      },
+      "scikit-learn/scikit-learn": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 2,
+          "n_settled": 6,
+          "rate": 0.3333333333333333
+        },
+        "armA::kimi": {
+          "k_pass": 1,
+          "n_settled": 4,
+          "rate": 0.25
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 1,
+          "n_settled": 3,
+          "rate": 0.3333333333333333
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::qwen": {
+          "k_pass": 1,
+          "n_settled": 3,
+          "rate": 0.3333333333333333
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armC::kimi": {
+          "k_pass": 2,
+          "n_settled": 5,
+          "rate": 0.4
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        }
+      },
+      "sphinx-doc/sphinx": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 4,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 1,
+          "n_settled": 3,
+          "rate": 0.3333333333333333
+        },
+        "armB::glm": {
+          "k_pass": 2,
+          "n_settled": 2,
+          "rate": 1.0
+        },
+        "armB::kimi": {
+          "k_pass": 1,
+          "n_settled": 2,
+          "rate": 0.5
+        },
+        "armB::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armC::glm": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armC::qwen": {
+          "k_pass": 1,
+          "n_settled": 3,
+          "rate": 0.3333333333333333
+        }
+      },
+      "sympy/sympy": {
+        "armA::deepseek": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::glm": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::kimi": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armA::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "armB::deepseek": {
+          "k_pass": 2,
+          "n_settled": 3,
+          "rate": 0.6666666666666666
+        },
+        "armB::glm": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armB::kimi": {
+          "k_pass": 2,
+          "n_settled": 3,
+          "rate": 0.6666666666666666
+        },
+        "armB::qwen": {
+          "k_pass": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "armC::deepseek": {
+          "k_pass": 0,
+          "n_settled": 3,
+          "rate": 0.0
+        },
+        "armC::glm": {
+          "k_pass": 2,
+          "n_settled": 2,
+          "rate": 1.0
+        },
+        "armC::kimi": {
+          "k_pass": 0,
+          "n_settled": 0,
+          "rate": null
+        },
+        "armC::qwen": {
+          "k_pass": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        }
+      }
+    },
+    "route_table_pooled_across_all_5_arms": {
+      "armA::deepseek": {
+        "k_pass": 1,
+        "n_settled": 25,
+        "n_total_selected_incl_infra_null": 26,
+        "rate": 0.04
+      },
+      "armA::glm": {
+        "k_pass": 2,
+        "n_settled": 29,
+        "n_total_selected_incl_infra_null": 32,
+        "rate": 0.06896551724137931
+      },
+      "armA::kimi": {
+        "k_pass": 4,
+        "n_settled": 23,
+        "n_total_selected_incl_infra_null": 30,
+        "rate": 0.17391304347826086
+      },
+      "armA::qwen": {
+        "k_pass": 0,
+        "n_settled": 25,
+        "n_total_selected_incl_infra_null": 25,
+        "rate": 0.0
+      },
+      "armB::deepseek": {
+        "k_pass": 9,
+        "n_settled": 23,
+        "n_total_selected_incl_infra_null": 24,
+        "rate": 0.391304347826087
+      },
+      "armB::glm": {
+        "k_pass": 3,
+        "n_settled": 17,
+        "n_total_selected_incl_infra_null": 17,
+        "rate": 0.17647058823529413
+      },
+      "armB::kimi": {
+        "k_pass": 9,
+        "n_settled": 19,
+        "n_total_selected_incl_infra_null": 20,
+        "rate": 0.47368421052631576
+      },
+      "armB::qwen": {
+        "k_pass": 7,
+        "n_settled": 19,
+        "n_total_selected_incl_infra_null": 21,
+        "rate": 0.3684210526315789
+      },
+      "armC::deepseek": {
+        "k_pass": 2,
+        "n_settled": 17,
+        "n_total_selected_incl_infra_null": 17,
+        "rate": 0.11764705882352941
+      },
+      "armC::glm": {
+        "k_pass": 3,
+        "n_settled": 6,
+        "n_total_selected_incl_infra_null": 8,
+        "rate": 0.5
+      },
+      "armC::kimi": {
+        "k_pass": 3,
+        "n_settled": 14,
+        "n_total_selected_incl_infra_null": 15,
+        "rate": 0.21428571428571427
+      },
+      "armC::qwen": {
+        "k_pass": 2,
+        "n_settled": 12,
+        "n_total_selected_incl_infra_null": 15,
+        "rate": 0.16666666666666666
+      }
+    }
+  },
+  "A5": {
+    "tau_0p5": {
+      "end_of_run_route_table": {
+        "armA::deepseek": {
+          "N_final": 4,
+          "S_final": 0,
+          "q_eff_end": 0.1,
+          "raw_rate_end": 0.0
+        },
+        "armA::glm": {
+          "N_final": 4,
+          "S_final": 1,
+          "q_eff_end": 0.3,
+          "raw_rate_end": 0.25
+        },
+        "armA::kimi": {
+          "N_final": 2,
+          "S_final": 2,
+          "q_eff_end": 0.8333333333333334,
+          "raw_rate_end": 1.0
+        },
+        "armA::qwen": {
+          "N_final": 4,
+          "S_final": 0,
+          "q_eff_end": 0.1,
+          "raw_rate_end": 0.0
+        },
+        "armB::deepseek": {
+          "N_final": 5,
+          "S_final": 2,
+          "q_eff_end": 0.4166666666666667,
+          "raw_rate_end": 0.4
+        },
+        "armB::glm": {
+          "N_final": 4,
+          "S_final": 1,
+          "q_eff_end": 0.3,
+          "raw_rate_end": 0.25
+        },
+        "armB::kimi": {
+          "N_final": 9,
+          "S_final": 4,
+          "q_eff_end": 0.45,
+          "raw_rate_end": 0.4444444444444444
+        },
+        "armB::qwen": {
+          "N_final": 1,
+          "S_final": 1,
+          "q_eff_end": 0.75,
+          "raw_rate_end": 1.0
+        },
+        "armC::deepseek": {
+          "N_final": 5,
+          "S_final": 0,
+          "q_eff_end": 0.08333333333333333,
+          "raw_rate_end": 0.0
+        },
+        "armC::glm": {
+          "N_final": 0,
+          "S_final": 0,
+          "q_eff_end": 0.5,
+          "raw_rate_end": null
+        },
+        "armC::kimi": {
+          "N_final": 4,
+          "S_final": 1,
+          "q_eff_end": 0.3,
+          "raw_rate_end": 0.25
+        },
+        "armC::qwen": {
+          "N_final": 4,
+          "S_final": 1,
+          "q_eff_end": 0.3,
+          "raw_rate_end": 0.25
+        }
+      },
+      "first_half_calibration": {
+        "mean_abs_calibration_error": 0.2562222222222222,
+        "n": 25,
+        "n_skipped_null_final_rate": 0
+      },
+      "n_tasks": 50,
+      "per_task_detail_in_order": [
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armC::deepseek",
+          "task_order_index": 0
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.5,
+          "route": "armB::qwen",
+          "task_order_index": 1
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armC::qwen",
+          "task_order_index": 2
+        },
+        {
+          "abs_calibration_error": 0.05555555555555558,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 3
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armC::deepseek",
+          "task_order_index": 4
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armA::glm",
+          "task_order_index": 5
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::deepseek",
+          "task_order_index": 6
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.25,
+          "route": "armA::glm",
+          "task_order_index": 7
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::deepseek",
+          "task_order_index": 8
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armA::glm",
+          "task_order_index": 9
+        },
+        {
+          "abs_calibration_error": 0.3055555555555556,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.75,
+          "route": "armB::kimi",
+          "task_order_index": 10
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armA::deepseek",
+          "task_order_index": 11
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armC::kimi",
+          "task_order_index": 12
+        },
+        {
+          "abs_calibration_error": 0.05555555555555558,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 13
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::deepseek",
+          "task_order_index": 14
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.75,
+          "route": "armB::qwen",
+          "task_order_index": 15
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armB::glm",
+          "task_order_index": 16
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.5,
+          "route": "armA::kimi",
+          "task_order_index": 17
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::deepseek",
+          "task_order_index": 18
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.125,
+          "route": "armC::deepseek",
+          "task_order_index": 19
+        },
+        {
+          "abs_calibration_error": 0.18055555555555558,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.625,
+          "route": "armB::kimi",
+          "task_order_index": 20
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.25,
+          "route": "armB::glm",
+          "task_order_index": 21
+        },
+        {
+          "abs_calibration_error": 0.09999999999999998,
+          "final_rate_in_arm": 0.4,
+          "q_eff_before": 0.5,
+          "route": "armB::deepseek",
+          "task_order_index": 22
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::qwen",
+          "task_order_index": 23
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armA::qwen",
+          "task_order_index": 24
+        },
+        {
+          "abs_calibration_error": 0.05555555555555558,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 25
+        },
+        {
+          "abs_calibration_error": 0.08333333333333334,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armB::glm",
+          "task_order_index": 26
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.375,
+          "route": "armA::glm",
+          "task_order_index": 27
+        },
+        {
+          "abs_calibration_error": 0.35,
+          "final_rate_in_arm": 0.4,
+          "q_eff_before": 0.75,
+          "route": "armB::deepseek",
+          "task_order_index": 28
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.125,
+          "route": "armA::deepseek",
+          "task_order_index": 29
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::qwen",
+          "task_order_index": 30
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.25,
+          "route": "armC::qwen",
+          "task_order_index": 31
+        },
+        {
+          "abs_calibration_error": 0.08333333333333334,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::qwen",
+          "task_order_index": 32
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.125,
+          "route": "armA::qwen",
+          "task_order_index": 33
+        },
+        {
+          "abs_calibration_error": 0.09999999999999998,
+          "final_rate_in_arm": 0.4,
+          "q_eff_before": 0.5,
+          "route": "armB::deepseek",
+          "task_order_index": 34
+        },
+        {
+          "abs_calibration_error": 0.04999999999999999,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.3,
+          "route": "armA::glm",
+          "task_order_index": 35
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.25,
+          "route": "armC::kimi",
+          "task_order_index": 36
+        },
+        {
+          "abs_calibration_error": 0.08333333333333334,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::kimi",
+          "task_order_index": 37
+        },
+        {
+          "abs_calibration_error": 0.025000000000000022,
+          "final_rate_in_arm": 0.4,
+          "q_eff_before": 0.375,
+          "route": "armB::deepseek",
+          "task_order_index": 38
+        },
+        {
+          "abs_calibration_error": 0.10000000000000003,
+          "final_rate_in_arm": 0.4,
+          "q_eff_before": 0.3,
+          "route": "armB::deepseek",
+          "task_order_index": 39
+        },
+        {
+          "abs_calibration_error": 0.027777777777777735,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.4166666666666667,
+          "route": "armB::kimi",
+          "task_order_index": 40
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.75,
+          "route": "armA::kimi",
+          "task_order_index": 41
+        },
+        {
+          "abs_calibration_error": 0.08730158730158727,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.35714285714285715,
+          "route": "armB::kimi",
+          "task_order_index": 42
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.125,
+          "route": "armC::qwen",
+          "task_order_index": 43
+        },
+        {
+          "abs_calibration_error": 0.1,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.1,
+          "route": "armC::deepseek",
+          "task_order_index": 44
+        },
+        {
+          "abs_calibration_error": 0.13194444444444442,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.3125,
+          "route": "armB::kimi",
+          "task_order_index": 45
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.125,
+          "route": "armC::kimi",
+          "task_order_index": 46
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.125,
+          "route": "armB::glm",
+          "task_order_index": 47
+        },
+        {
+          "abs_calibration_error": 0.04999999999999999,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.3,
+          "route": "armC::kimi",
+          "task_order_index": 48
+        },
+        {
+          "abs_calibration_error": 0.055555555555555525,
+          "final_rate_in_arm": 0.4444444444444444,
+          "q_eff_before": 0.3888888888888889,
+          "route": "armB::kimi",
+          "task_order_index": 49
+        }
+      ],
+      "second_half_calibration": {
+        "mean_abs_calibration_error": 0.10199206349206345,
+        "n": 25,
+        "n_skipped_null_final_rate": 0
+      },
+      "spearman_n_routes_with_data": 11,
+      "spearman_note": "Q_eff and raw rate are both monotonic-in-S (for fixed N) functions of the same (S_final,N_final) pair, so rho near 1 is expected; reported unfiltered per spec, not skipped.",
+      "spearman_rho_qeff_vs_rawrate": 0.9903843920514593
+    },
+    "tau_1": {
+      "end_of_run_route_table": {
+        "armA::deepseek": {
+          "N_final": 3,
+          "S_final": 0,
+          "q_eff_end": 0.125,
+          "raw_rate_end": 0.0
+        },
+        "armA::glm": {
+          "N_final": 5,
+          "S_final": 1,
+          "q_eff_end": 0.25,
+          "raw_rate_end": 0.2
+        },
+        "armA::kimi": {
+          "N_final": 3,
+          "S_final": 1,
+          "q_eff_end": 0.375,
+          "raw_rate_end": 0.3333333333333333
+        },
+        "armA::qwen": {
+          "N_final": 1,
+          "S_final": 0,
+          "q_eff_end": 0.25,
+          "raw_rate_end": 0.0
+        },
+        "armB::deepseek": {
+          "N_final": 6,
+          "S_final": 1,
+          "q_eff_end": 0.21428571428571427,
+          "raw_rate_end": 0.16666666666666666
+        },
+        "armB::glm": {
+          "N_final": 7,
+          "S_final": 2,
+          "q_eff_end": 0.3125,
+          "raw_rate_end": 0.2857142857142857
+        },
+        "armB::kimi": {
+          "N_final": 3,
+          "S_final": 1,
+          "q_eff_end": 0.375,
+          "raw_rate_end": 0.3333333333333333
+        },
+        "armB::qwen": {
+          "N_final": 7,
+          "S_final": 2,
+          "q_eff_end": 0.3125,
+          "raw_rate_end": 0.2857142857142857
+        },
+        "armC::deepseek": {
+          "N_final": 2,
+          "S_final": 0,
+          "q_eff_end": 0.16666666666666666,
+          "raw_rate_end": 0.0
+        },
+        "armC::glm": {
+          "N_final": 2,
+          "S_final": 1,
+          "q_eff_end": 0.5,
+          "raw_rate_end": 0.5
+        },
+        "armC::kimi": {
+          "N_final": 5,
+          "S_final": 1,
+          "q_eff_end": 0.25,
+          "raw_rate_end": 0.2
+        },
+        "armC::qwen": {
+          "N_final": 3,
+          "S_final": 0,
+          "q_eff_end": 0.125,
+          "raw_rate_end": 0.0
+        }
+      },
+      "first_half_calibration": {
+        "mean_abs_calibration_error": 0.1912857142857143,
+        "n": 25,
+        "n_skipped_null_final_rate": 0
+      },
+      "n_tasks": 50,
+      "per_task_detail_in_order": [
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armC::deepseek",
+          "task_order_index": 0
+        },
+        {
+          "abs_calibration_error": 0.2142857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.5,
+          "route": "armB::qwen",
+          "task_order_index": 1
+        },
+        {
+          "abs_calibration_error": 0.3,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.5,
+          "route": "armA::glm",
+          "task_order_index": 2
+        },
+        {
+          "abs_calibration_error": 0.04999999999999999,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.25,
+          "route": "armA::glm",
+          "task_order_index": 3
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::qwen",
+          "task_order_index": 4
+        },
+        {
+          "abs_calibration_error": 0.033333333333333354,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::glm",
+          "task_order_index": 5
+        },
+        {
+          "abs_calibration_error": 0.33333333333333337,
+          "final_rate_in_arm": 0.16666666666666666,
+          "q_eff_before": 0.5,
+          "route": "armB::deepseek",
+          "task_order_index": 6
+        },
+        {
+          "abs_calibration_error": 0.2142857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.5,
+          "route": "armB::glm",
+          "task_order_index": 7
+        },
+        {
+          "abs_calibration_error": 0.0357142857142857,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.25,
+          "route": "armB::glm",
+          "task_order_index": 8
+        },
+        {
+          "abs_calibration_error": 0.08333333333333334,
+          "final_rate_in_arm": 0.16666666666666666,
+          "q_eff_before": 0.25,
+          "route": "armB::deepseek",
+          "task_order_index": 9
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.16666666666666666,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armB::deepseek",
+          "task_order_index": 10
+        },
+        {
+          "abs_calibration_error": 0.16666666666666669,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 11
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::deepseek",
+          "task_order_index": 12
+        },
+        {
+          "abs_calibration_error": 0.2142857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.5,
+          "route": "armB::glm",
+          "task_order_index": 13
+        },
+        {
+          "abs_calibration_error": 0.0357142857142857,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.25,
+          "route": "armB::qwen",
+          "task_order_index": 14
+        },
+        {
+          "abs_calibration_error": 0.04166666666666666,
+          "final_rate_in_arm": 0.16666666666666666,
+          "q_eff_before": 0.125,
+          "route": "armB::deepseek",
+          "task_order_index": 15
+        },
+        {
+          "abs_calibration_error": 0.2142857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.5,
+          "route": "armB::qwen",
+          "task_order_index": 16
+        },
+        {
+          "abs_calibration_error": 0.0892857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.375,
+          "route": "armB::glm",
+          "task_order_index": 17
+        },
+        {
+          "abs_calibration_error": 0.4166666666666667,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.75,
+          "route": "armB::kimi",
+          "task_order_index": 18
+        },
+        {
+          "abs_calibration_error": 0.16666666666666669,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 19
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armC::deepseek",
+          "task_order_index": 20
+        },
+        {
+          "abs_calibration_error": 0.01428571428571429,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.3,
+          "route": "armB::glm",
+          "task_order_index": 21
+        },
+        {
+          "abs_calibration_error": 0.033333333333333354,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::glm",
+          "task_order_index": 22
+        },
+        {
+          "abs_calibration_error": 0.0357142857142857,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.25,
+          "route": "armB::glm",
+          "task_order_index": 23
+        },
+        {
+          "abs_calibration_error": 0.3392857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.625,
+          "route": "armB::qwen",
+          "task_order_index": 24
+        },
+        {
+          "abs_calibration_error": 0.07142857142857142,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.21428571428571427,
+          "route": "armB::glm",
+          "task_order_index": 25
+        },
+        {
+          "abs_calibration_error": 0.2142857142857143,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.5,
+          "route": "armB::qwen",
+          "task_order_index": 26
+        },
+        {
+          "abs_calibration_error": 0.13333333333333333,
+          "final_rate_in_arm": 0.16666666666666666,
+          "q_eff_before": 0.3,
+          "route": "armB::deepseek",
+          "task_order_index": 27
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.5,
+          "q_eff_before": 0.5,
+          "route": "armC::glm",
+          "task_order_index": 28
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armC::qwen",
+          "task_order_index": 29
+        },
+        {
+          "abs_calibration_error": 0.08333333333333334,
+          "final_rate_in_arm": 0.16666666666666666,
+          "q_eff_before": 0.25,
+          "route": "armB::deepseek",
+          "task_order_index": 30
+        },
+        {
+          "abs_calibration_error": 0.3,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.5,
+          "route": "armC::kimi",
+          "task_order_index": 31
+        },
+        {
+          "abs_calibration_error": 0.16666666666666669,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 32
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armA::deepseek",
+          "task_order_index": 33
+        },
+        {
+          "abs_calibration_error": 0.16666666666666669,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.5,
+          "route": "armA::kimi",
+          "task_order_index": 34
+        },
+        {
+          "abs_calibration_error": 0.04999999999999999,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.25,
+          "route": "armC::kimi",
+          "task_order_index": 35
+        },
+        {
+          "abs_calibration_error": 0.130952380952381,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.4166666666666667,
+          "route": "armB::qwen",
+          "task_order_index": 36
+        },
+        {
+          "abs_calibration_error": 0.08333333333333331,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.25,
+          "route": "armA::kimi",
+          "task_order_index": 37
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armC::qwen",
+          "task_order_index": 38
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::qwen",
+          "task_order_index": 39
+        },
+        {
+          "abs_calibration_error": 0.07142857142857145,
+          "final_rate_in_arm": 0.2857142857142857,
+          "q_eff_before": 0.35714285714285715,
+          "route": "armB::qwen",
+          "task_order_index": 40
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.5,
+          "q_eff_before": 0.5,
+          "route": "armC::glm",
+          "task_order_index": 41
+        },
+        {
+          "abs_calibration_error": 0.3,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.5,
+          "route": "armC::kimi",
+          "task_order_index": 42
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.3333333333333333,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::kimi",
+          "task_order_index": 43
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::deepseek",
+          "task_order_index": 44
+        },
+        {
+          "abs_calibration_error": 0.07500000000000001,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.125,
+          "route": "armA::glm",
+          "task_order_index": 45
+        },
+        {
+          "abs_calibration_error": 0.1,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.1,
+          "route": "armA::glm",
+          "task_order_index": 46
+        },
+        {
+          "abs_calibration_error": 0.175,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.375,
+          "route": "armC::kimi",
+          "task_order_index": 47
+        },
+        {
+          "abs_calibration_error": 0.09999999999999998,
+          "final_rate_in_arm": 0.2,
+          "q_eff_before": 0.3,
+          "route": "armC::kimi",
+          "task_order_index": 48
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.5,
+          "q_eff_before": 0.25,
+          "route": "armC::glm",
+          "task_order_index": 49
+        }
+      ],
+      "second_half_calibration": {
+        "mean_abs_calibration_error": 0.15885714285714286,
+        "n": 25,
+        "n_skipped_null_final_rate": 0
+      },
+      "spearman_n_routes_with_data": 12,
+      "spearman_note": "Q_eff and raw rate are both monotonic-in-S (for fixed N) functions of the same (S_final,N_final) pair, so rho near 1 is expected; reported unfiltered per spec, not skipped.",
+      "spearman_rho_qeff_vs_rawrate": 0.9420846395991336
+    },
+    "tau_2": {
+      "end_of_run_route_table": {
+        "armA::deepseek": {
+          "N_final": 2,
+          "S_final": 0,
+          "q_eff_end": 0.16666666666666666,
+          "raw_rate_end": 0.0
+        },
+        "armA::glm": {
+          "N_final": 3,
+          "S_final": 0,
+          "q_eff_end": 0.125,
+          "raw_rate_end": 0.0
+        },
+        "armA::kimi": {
+          "N_final": 8,
+          "S_final": 1,
+          "q_eff_end": 0.16666666666666666,
+          "raw_rate_end": 0.125
+        },
+        "armA::qwen": {
+          "N_final": 8,
+          "S_final": 0,
+          "q_eff_end": 0.05555555555555555,
+          "raw_rate_end": 0.0
+        },
+        "armB::deepseek": {
+          "N_final": 4,
+          "S_final": 3,
+          "q_eff_end": 0.7,
+          "raw_rate_end": 0.75
+        },
+        "armB::glm": {
+          "N_final": 0,
+          "S_final": 0,
+          "q_eff_end": 0.5,
+          "raw_rate_end": null
+        },
+        "armB::kimi": {
+          "N_final": 3,
+          "S_final": 2,
+          "q_eff_end": 0.625,
+          "raw_rate_end": 0.6666666666666666
+        },
+        "armB::qwen": {
+          "N_final": 3,
+          "S_final": 2,
+          "q_eff_end": 0.625,
+          "raw_rate_end": 0.6666666666666666
+        },
+        "armC::deepseek": {
+          "N_final": 5,
+          "S_final": 0,
+          "q_eff_end": 0.08333333333333333,
+          "raw_rate_end": 0.0
+        },
+        "armC::glm": {
+          "N_final": 2,
+          "S_final": 2,
+          "q_eff_end": 0.8333333333333334,
+          "raw_rate_end": 1.0
+        },
+        "armC::kimi": {
+          "N_final": 4,
+          "S_final": 0,
+          "q_eff_end": 0.1,
+          "raw_rate_end": 0.0
+        },
+        "armC::qwen": {
+          "N_final": 4,
+          "S_final": 1,
+          "q_eff_end": 0.3,
+          "raw_rate_end": 0.25
+        }
+      },
+      "first_half_calibration": {
+        "mean_abs_calibration_error": 0.2616666666666667,
+        "n": 25,
+        "n_skipped_null_final_rate": 0
+      },
+      "n_tasks": 50,
+      "per_task_detail_in_order": [
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armC::deepseek",
+          "task_order_index": 0
+        },
+        {
+          "abs_calibration_error": 0.16666666666666663,
+          "final_rate_in_arm": 0.6666666666666666,
+          "q_eff_before": 0.5,
+          "route": "armB::qwen",
+          "task_order_index": 1
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armC::qwen",
+          "task_order_index": 2
+        },
+        {
+          "abs_calibration_error": 0.375,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.5,
+          "route": "armA::kimi",
+          "task_order_index": 3
+        },
+        {
+          "abs_calibration_error": 0.16666666666666663,
+          "final_rate_in_arm": 0.6666666666666666,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 4
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::qwen",
+          "task_order_index": 5
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::deepseek",
+          "task_order_index": 6
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armA::qwen",
+          "task_order_index": 7
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armC::kimi",
+          "task_order_index": 8
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armC::deepseek",
+          "task_order_index": 9
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armC::kimi",
+          "task_order_index": 10
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.5,
+          "route": "armC::glm",
+          "task_order_index": 11
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.25,
+          "route": "armA::kimi",
+          "task_order_index": 12
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.5,
+          "route": "armC::qwen",
+          "task_order_index": 13
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armA::deepseek",
+          "task_order_index": 14
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.25,
+          "route": "armC::qwen",
+          "task_order_index": 15
+        },
+        {
+          "abs_calibration_error": 0.04166666666666666,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::kimi",
+          "task_order_index": 16
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.75,
+          "q_eff_before": 0.5,
+          "route": "armB::deepseek",
+          "task_order_index": 17
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::qwen",
+          "task_order_index": 18
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.125,
+          "route": "armA::qwen",
+          "task_order_index": 19
+        },
+        {
+          "abs_calibration_error": 0.41666666666666663,
+          "final_rate_in_arm": 0.6666666666666666,
+          "q_eff_before": 0.25,
+          "route": "armB::kimi",
+          "task_order_index": 20
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::kimi",
+          "task_order_index": 21
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.75,
+          "q_eff_before": 0.75,
+          "route": "armB::deepseek",
+          "task_order_index": 22
+        },
+        {
+          "abs_calibration_error": 0.04166666666666666,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::kimi",
+          "task_order_index": 23
+        },
+        {
+          "abs_calibration_error": 0.5,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.5,
+          "route": "armA::glm",
+          "task_order_index": 24
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::deepseek",
+          "task_order_index": 25
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.25,
+          "route": "armA::glm",
+          "task_order_index": 26
+        },
+        {
+          "abs_calibration_error": 0.0,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.125,
+          "route": "armA::kimi",
+          "task_order_index": 27
+        },
+        {
+          "abs_calibration_error": 0.08333333333333337,
+          "final_rate_in_arm": 0.75,
+          "q_eff_before": 0.8333333333333334,
+          "route": "armB::deepseek",
+          "task_order_index": 28
+        },
+        {
+          "abs_calibration_error": 0.024999999999999994,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.1,
+          "route": "armA::kimi",
+          "task_order_index": 29
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.75,
+          "route": "armC::glm",
+          "task_order_index": 30
+        },
+        {
+          "abs_calibration_error": 0.1,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.1,
+          "route": "armA::qwen",
+          "task_order_index": 31
+        },
+        {
+          "abs_calibration_error": 0.04166666666666667,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.08333333333333333,
+          "route": "armA::kimi",
+          "task_order_index": 32
+        },
+        {
+          "abs_calibration_error": 0.053571428571428575,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.07142857142857142,
+          "route": "armA::kimi",
+          "task_order_index": 33
+        },
+        {
+          "abs_calibration_error": 0.0625,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.0625,
+          "route": "armA::kimi",
+          "task_order_index": 34
+        },
+        {
+          "abs_calibration_error": 0.08333333333333333,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.08333333333333333,
+          "route": "armA::qwen",
+          "task_order_index": 35
+        },
+        {
+          "abs_calibration_error": 0.07142857142857142,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.07142857142857142,
+          "route": "armA::qwen",
+          "task_order_index": 36
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.125,
+          "route": "armC::kimi",
+          "task_order_index": 37
+        },
+        {
+          "abs_calibration_error": 0.08333333333333334,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armC::qwen",
+          "task_order_index": 38
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.125,
+          "route": "armC::deepseek",
+          "task_order_index": 39
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.75,
+          "q_eff_before": 0.875,
+          "route": "armB::deepseek",
+          "task_order_index": 40
+        },
+        {
+          "abs_calibration_error": 0.125,
+          "final_rate_in_arm": 0.25,
+          "q_eff_before": 0.375,
+          "route": "armC::qwen",
+          "task_order_index": 41
+        },
+        {
+          "abs_calibration_error": 0.16666666666666663,
+          "final_rate_in_arm": 0.6666666666666666,
+          "q_eff_before": 0.5,
+          "route": "armB::kimi",
+          "task_order_index": 42
+        },
+        {
+          "abs_calibration_error": 0.0625,
+          "final_rate_in_arm": 0.125,
+          "q_eff_before": 0.0625,
+          "route": "armA::kimi",
+          "task_order_index": 43
+        },
+        {
+          "abs_calibration_error": 0.1,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.1,
+          "route": "armC::deepseek",
+          "task_order_index": 44
+        },
+        {
+          "abs_calibration_error": 0.0625,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.0625,
+          "route": "armA::qwen",
+          "task_order_index": 45
+        },
+        {
+          "abs_calibration_error": 0.08333333333333337,
+          "final_rate_in_arm": 0.6666666666666666,
+          "q_eff_before": 0.75,
+          "route": "armB::qwen",
+          "task_order_index": 46
+        },
+        {
+          "abs_calibration_error": 0.16666666666666674,
+          "final_rate_in_arm": 0.6666666666666666,
+          "q_eff_before": 0.8333333333333334,
+          "route": "armB::qwen",
+          "task_order_index": 47
+        },
+        {
+          "abs_calibration_error": 0.16666666666666666,
+          "final_rate_in_arm": 0.0,
+          "q_eff_before": 0.16666666666666666,
+          "route": "armA::glm",
+          "task_order_index": 48
+        },
+        {
+          "abs_calibration_error": 0.25,
+          "final_rate_in_arm": 1.0,
+          "q_eff_before": 0.75,
+          "route": "armC::glm",
+          "task_order_index": 49
+        }
+      ],
+      "second_half_calibration": {
+        "mean_abs_calibration_error": 0.11316666666666668,
+        "n": 25,
+        "n_skipped_null_final_rate": 0
+      },
+      "spearman_n_routes_with_data": 11,
+      "spearman_note": "Q_eff and raw rate are both monotonic-in-S (for fixed N) functions of the same (S_final,N_final) pair, so rho near 1 is expected; reported unfiltered per spec, not skipped.",
+      "spearman_rho_qeff_vs_rawrate": 0.9410252707724455
+    }
+  },
+  "A6": {
+    "canary_cross_tab_per_arm_lineage_x_scaffold": {
+      "tau_0": {
+        "deepseek": {
+          "armA": 1,
+          "armB": 0,
+          "armC": 0
+        },
+        "glm": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "kimi": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "qwen": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        }
+      },
+      "tau_0p5": {
+        "deepseek": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "glm": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "kimi": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "qwen": {
+          "armA": 0,
+          "armB": 1,
+          "armC": 0
+        }
+      },
+      "tau_1": {
+        "deepseek": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "glm": {
+          "armA": 1,
+          "armB": 2,
+          "armC": 1
+        },
+        "kimi": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "qwen": {
+          "armA": 0,
+          "armB": 2,
+          "armC": 0
+        }
+      },
+      "tau_2": {
+        "deepseek": {
+          "armA": 0,
+          "armB": 1,
+          "armC": 0
+        },
+        "glm": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "kimi": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "qwen": {
+          "armA": 0,
+          "armB": 1,
+          "armC": 1
+        }
+      },
+      "tau_inf": {
+        "deepseek": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "glm": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "kimi": {
+          "armA": 0,
+          "armB": 0,
+          "armC": 0
+        },
+        "qwen": {
+          "armA": 0,
+          "armB": 2,
+          "armC": 0
+        }
+      }
+    },
+    "canary_cross_tab_pooled_all_5_arms_lineage_x_scaffold": {
+      "deepseek": {
+        "armA": 1,
+        "armB": 1,
+        "armC": 0
+      },
+      "glm": {
+        "armA": 1,
+        "armB": 2,
+        "armC": 1
+      },
+      "kimi": {
+        "armA": 0,
+        "armB": 0,
+        "armC": 0
+      },
+      "qwen": {
+        "armA": 0,
+        "armB": 6,
+        "armC": 1
+      }
+    },
+    "discovery_events": [
+      {
+        "arm": "tau_0p5",
+        "instance_id": "django__django-10999",
+        "route": "armB::qwen",
+        "task_order_index": 1,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "psf__requests-2931",
+        "route": "armB::kimi",
+        "task_order_index": 3,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "scikit-learn__scikit-learn-11578",
+        "route": "armA::glm",
+        "task_order_index": 7,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "scikit-learn__scikit-learn-12585",
+        "route": "armA::kimi",
+        "task_order_index": 17,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "matplotlib__matplotlib-22719",
+        "route": "armB::deepseek",
+        "task_order_index": 22,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "pydata__xarray-4629",
+        "route": "armC::qwen",
+        "task_order_index": 43,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "scikit-learn__scikit-learn-13135",
+        "route": "armC::kimi",
+        "task_order_index": 46,
+        "was_minority_pick": true
+      },
+      {
+        "arm": "tau_0p5",
+        "instance_id": "sphinx-doc__sphinx-7440",
+        "route": "armB::glm",
+        "task_order_index": 47,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "sphinx-doc__sphinx-10614",
+        "route": "armB::glm",
+        "task_order_index": 8,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "django__django-11066",
+        "route": "armB::kimi",
+        "task_order_index": 11,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "pydata__xarray-4075",
+        "route": "armB::qwen",
+        "task_order_index": 14,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "pylint-dev__pylint-6903",
+        "route": "armB::deepseek",
+        "task_order_index": 15,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "pytest-dev__pytest-6197",
+        "route": "armC::kimi",
+        "task_order_index": 35,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "pydata__xarray-4629",
+        "route": "armA::kimi",
+        "task_order_index": 43,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "scikit-learn__scikit-learn-13135",
+        "route": "armA::glm",
+        "task_order_index": 46,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_1",
+        "instance_id": "sympy__sympy-13480",
+        "route": "armC::glm",
+        "task_order_index": 49,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_2",
+        "instance_id": "django__django-10999",
+        "route": "armB::qwen",
+        "task_order_index": 1,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_2",
+        "instance_id": "django__django-11066",
+        "route": "armC::glm",
+        "task_order_index": 11,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_2",
+        "instance_id": "scikit-learn__scikit-learn-12585",
+        "route": "armB::deepseek",
+        "task_order_index": 17,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_2",
+        "instance_id": "astropy__astropy-14096",
+        "route": "armB::kimi",
+        "task_order_index": 20,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_2",
+        "instance_id": "sphinx-doc__sphinx-11510",
+        "route": "armC::qwen",
+        "task_order_index": 38,
+        "was_minority_pick": false
+      },
+      {
+        "arm": "tau_2",
+        "instance_id": "pydata__xarray-4629",
+        "route": "armA::kimi",
+        "task_order_index": 43,
+        "was_minority_pick": false
+      }
+    ],
+    "per_arm_exploration_interior_only": {
+      "tau_0p5": {
+        "discovery_event_count_this_arm": 8,
+        "majority_pass_rate": {
+          "k_pass": 12,
+          "n_infra_null": 4,
+          "n_settled": 42,
+          "rate": 0.2857142857142857
+        },
+        "minority_pass_rate": {
+          "k_pass": 1,
+          "n_infra_null": 0,
+          "n_settled": 4,
+          "rate": 0.25
+        },
+        "minority_pick_count": 4,
+        "minority_pick_share": 0.08,
+        "total_selections": 50
+      },
+      "tau_1": {
+        "discovery_event_count_this_arm": 8,
+        "majority_pass_rate": {
+          "k_pass": 10,
+          "n_infra_null": 3,
+          "n_settled": 46,
+          "rate": 0.21739130434782608
+        },
+        "minority_pass_rate": {
+          "k_pass": 0,
+          "n_infra_null": 0,
+          "n_settled": 1,
+          "rate": 0.0
+        },
+        "minority_pick_count": 1,
+        "minority_pick_share": 0.02,
+        "total_selections": 50
+      },
+      "tau_2": {
+        "discovery_event_count_this_arm": 6,
+        "majority_pass_rate": {
+          "k_pass": 11,
+          "n_infra_null": 4,
+          "n_settled": 44,
+          "rate": 0.25
+        },
+        "minority_pass_rate": {
+          "k_pass": 0,
+          "n_infra_null": 0,
+          "n_settled": 2,
+          "rate": 0.0
+        },
+        "minority_pick_count": 2,
+        "minority_pick_share": 0.04,
+        "total_selections": 50
+      }
+    }
+  },
+  "meta": {
+    "arm_descriptors": {
+      "armA": "single_shot_capsule_repair",
+      "armB": "source_context_loop_repair",
+      "armC": "source_context_loop_repair_ablation"
+    },
+    "arm_descriptors_consistent_across_arms": true,
+    "arms": [
+      "tau_0",
+      "tau_0p5",
+      "tau_1",
+      "tau_2",
+      "tau_inf"
+    ],
+    "data_root": "/home/zephryj/turingos_backup/work/turing_fce_integration/tools/econ_lab/runs/stageA_20260707",
+    "domain_buckets": [
+      "astropy/astropy",
+      "django/django",
+      "matplotlib/matplotlib",
+      "psf/requests",
+      "pydata/xarray",
+      "pylint-dev/pylint",
+      "pytest-dev/pytest",
+      "scikit-learn/scikit-learn",
+      "sphinx-doc/sphinx",
+      "sympy/sympy"
+    ],
+    "extreme_arms": [
+      "tau_0",
+      "tau_inf"
+    ],
+    "infra_null_count_per_arm": {
+      "tau_0": 6,
+      "tau_0p5": 4,
+      "tau_1": 3,
+      "tau_2": 4,
+      "tau_inf": 4
+    },
+    "instance_count_per_arm": {
+      "tau_0": 50,
+      "tau_0p5": 50,
+      "tau_1": 50,
+      "tau_2": 50,
+      "tau_inf": 50
+    },
+    "interior_arms": [
+      "tau_0p5",
+      "tau_1",
+      "tau_2"
+    ],
+    "n_domain_buckets": 10,
+    "n_routes": 12,
+    "order_verification": {
+      "tau_0": {
+        "order_match": null,
+        "order_source": "verdict.json tasks[] array order (no settlement.json checkpoints exist for this arm; trusted as-is per spec)",
+        "settlement_json_available": false
+      },
+      "tau_0p5": {
+        "order_match": true,
+        "order_source": "verdict.json tasks[] array order (cross-checked against settlement.json task_index order: MATCH)",
+        "settlement_json_available": true
+      },
+      "tau_1": {
+        "order_match": true,
+        "order_source": "verdict.json tasks[] array order (cross-checked against settlement.json task_index order: MATCH)",
+        "settlement_json_available": true
+      },
+      "tau_2": {
+        "order_match": true,
+        "order_source": "verdict.json tasks[] array order (cross-checked against settlement.json task_index order: MATCH)",
+        "settlement_json_available": true
+      },
+      "tau_inf": {
+        "order_match": null,
+        "order_source": "verdict.json tasks[] array order (no settlement.json checkpoints exist for this arm; trusted as-is per spec)",
+        "settlement_json_available": false
+      }
+    },
+    "routes_canonical_order": [
+      "armA::deepseek",
+      "armA::glm",
+      "armA::kimi",
+      "armA::qwen",
+      "armB::deepseek",
+      "armB::glm",
+      "armB::kimi",
+      "armB::qwen",
+      "armC::deepseek",
+      "armC::glm",
+      "armC::kimi",
+      "armC::qwen"
+    ],
+    "settlement_verdict_resolved_semantics": "tri-state: true=pass, false=fail/reject, null=infra_null (harness never reached a verdict; excluded from all pass-rate denominators throughout this file -- matches STAGE_A_READOUT.json arm_stats n_settled/k_pass/rate convention exactly).",
+    "task_count_per_arm": {
+      "tau_0": 50,
+      "tau_0p5": 50,
+      "tau_1": 50,
+      "tau_2": 50,
+      "tau_inf": 50
+    },
+    "worker_lineages": [
+      "deepseek",
+      "qwen",
+      "glm",
+      "kimi"
+    ]
+  }
+}
