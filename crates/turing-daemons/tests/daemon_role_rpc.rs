@@ -49,7 +49,8 @@ fn marketd_serves_shadow_suggestions_without_authority() {
                 }
             ],
             "price_signal_hash": digest('a'),
-            "pput_prior_hash": digest('b')
+            "pput_prior_hash": digest('b'),
+            "trigger_event_hash": digest('c')
         }),
     );
 

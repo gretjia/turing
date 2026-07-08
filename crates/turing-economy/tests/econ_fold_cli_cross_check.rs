@@ -174,7 +174,7 @@ fn cli_fold_output_matches_direct_library_fold_call_byte_for_byte() {
         .map(|e| serde_json::to_value(e).expect("EconomyEvent serializes"))
         .collect();
     let request = json!({
-        "schema": "econ_fold_cli.fold_and_suggest.request.v1",
+        "schema": "econ_fold_cli.fold_and_suggest.request.v2",
         "committed_routing_events": events_json,
         "initial_prices": [],
         "candidate_routes": [
@@ -189,6 +189,7 @@ fn cli_fold_output_matches_direct_library_fold_call_byte_for_byte() {
         ],
         "price_signal_hash": digest("price-signal"),
         "pput_prior_hash": digest("pput-prior"),
+        "trigger_event_hash": digest("trigger-event"),
         "router_mode": {"kind": "SoftmaxArgmaxBypass"},
     });
     let response = run_cli("fold-and-suggest", &request);
@@ -225,7 +226,7 @@ fn cli_fold_output_matches_direct_library_fold_call_byte_for_byte() {
 #[test]
 fn cli_fold_and_suggest_rejects_duplicate_market_id_across_candidate_routes() {
     let request = json!({
-        "schema": "econ_fold_cli.fold_and_suggest.request.v1",
+        "schema": "econ_fold_cli.fold_and_suggest.request.v2",
         "committed_routing_events": [],
         "initial_prices": [],
         "candidate_routes": [
@@ -248,12 +249,47 @@ fn cli_fold_and_suggest_rejects_duplicate_market_id_across_candidate_routes() {
         ],
         "price_signal_hash": digest("price-signal"),
         "pput_prior_hash": digest("pput-prior"),
+        "trigger_event_hash": digest("trigger-event"),
         "router_mode": {"kind": "SoftmaxArgmaxBypass"},
     });
     let stderr = run_cli_expect_error("fold-and-suggest", &request);
     assert!(
         stderr.contains("duplicate market_id") && stderr.contains("mkt_shared"),
         "diagnostic must name the duplicate market_id; got stderr: {stderr}"
+    );
+}
+
+/// B1 remedy schema-versioning discipline (ADR-ECON-003 Decision 1's "new schema version,
+/// never implicit drift"): a pre-B1 `v1` fold-and-suggest request (which cannot carry the
+/// now-required `trigger_event_hash` seed input) must be rejected by version string with a
+/// diagnostic naming the expected `v2` -- not silently accepted, and not failed with an
+/// unrelated missing-field parse error.
+#[test]
+fn cli_fold_and_suggest_rejects_pre_b1_v1_request_schema() {
+    let request = json!({
+        "schema": "econ_fold_cli.fold_and_suggest.request.v1",
+        "committed_routing_events": [],
+        "initial_prices": [],
+        "candidate_routes": [
+            {
+                "route_id": "route_a",
+                "market_id": "mkt_a",
+                "expected_failure_domain": "provider_x",
+                "requested_tokens": 1,
+                "domain_bucket": "swe_bench_verified_500_campaign",
+                "scaffold_id": "scaffold:sha256:cross-check-armA",
+            }
+        ],
+        "price_signal_hash": digest("price-signal"),
+        "pput_prior_hash": digest("pput-prior"),
+        // Deliberately NO trigger_event_hash: this is the exact shape a pre-B1 caller sends.
+        "router_mode": {"kind": "SoftmaxArgmaxBypass"},
+    });
+    let stderr = run_cli_expect_error("fold-and-suggest", &request);
+    assert!(
+        stderr.contains("econ_fold_cli.fold_and_suggest.request.v2")
+            && stderr.contains("econ_fold_cli.fold_and_suggest.request.v1"),
+        "diagnostic must name both the expected v2 and the rejected v1 schema; got stderr: {stderr}"
     );
 }
 

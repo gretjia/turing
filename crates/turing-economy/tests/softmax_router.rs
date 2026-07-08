@@ -43,7 +43,7 @@ fn random_decimal_string(rng: &mut Xorshift64) -> String {
 fn random_fixture(
     rng: &mut Xorshift64,
     round: u64,
-) -> (Vec<CandidateRoute>, Vec<PriceSignal>, String, String) {
+) -> (Vec<CandidateRoute>, Vec<PriceSignal>, String, String, String) {
     let route_count = rng.range(1, 6) as usize;
     let mut routes = Vec::with_capacity(route_count);
     let mut signals = Vec::with_capacity(route_count);
@@ -64,7 +64,14 @@ fn random_fixture(
     }
     let price_signal_hash = format!("sha256:{:064x}", rng.next_u64());
     let pput_prior_hash = format!("sha256:{:064x}", rng.next_u64());
-    (routes, signals, price_signal_hash, pput_prior_hash)
+    let trigger_event_hash = format!("sha256:{:064x}", rng.next_u64());
+    (
+        routes,
+        signals,
+        price_signal_hash,
+        pput_prior_hash,
+        trigger_event_hash,
+    )
 }
 
 /// Every field of `BudgetSuggestion` *except* `mode` (which legitimately differs between a
@@ -96,14 +103,26 @@ fn softmax_tau_zero_is_byte_for_byte_equivalent_to_argmax() {
     let bypass_router = MarketRouter::new_softmax(SoftmaxTemperature::ArgmaxBypass);
 
     for round in 0..500u64 {
-        let (routes, signals, price_signal_hash, pput_prior_hash) =
+        let (routes, signals, price_signal_hash, pput_prior_hash, trigger_event_hash) =
             random_fixture(&mut rng, round);
 
         let argmax_suggestion = argmax_router
-            .suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash)
+            .suggest(
+                &routes,
+                &signals,
+                &price_signal_hash,
+                &pput_prior_hash,
+                &trigger_event_hash,
+            )
             .expect("argmax suggest must succeed on well-formed inputs");
         let bypass_suggestion = bypass_router
-            .suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash)
+            .suggest(
+                &routes,
+                &signals,
+                &price_signal_hash,
+                &pput_prior_hash,
+                &trigger_event_hash,
+            )
             .expect("softmax tau=0 suggest must succeed on well-formed inputs");
 
         assert_eq!(
@@ -130,14 +149,26 @@ fn softmax_repeated_call_on_identical_input_is_deterministic() {
 
     for router in routers {
         for round in 0..300u64 {
-            let (routes, signals, price_signal_hash, pput_prior_hash) =
+            let (routes, signals, price_signal_hash, pput_prior_hash, trigger_event_hash) =
                 random_fixture(&mut rng, round);
 
             let first = router
-                .suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash)
+                .suggest(
+                    &routes,
+                    &signals,
+                    &price_signal_hash,
+                    &pput_prior_hash,
+                    &trigger_event_hash,
+                )
                 .expect("suggestion 1");
             let second = router
-                .suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash)
+                .suggest(
+                    &routes,
+                    &signals,
+                    &price_signal_hash,
+                    &pput_prior_hash,
+                    &trigger_event_hash,
+                )
                 .expect("suggestion 2");
             assert_eq!(
                 first, second,
@@ -161,15 +192,74 @@ fn softmax_finite_tau_selects_more_than_one_route_across_fixtures() {
 
     let mut distinct_selections = std::collections::BTreeSet::new();
     for round in 0..200u64 {
-        let (routes, signals, price_signal_hash, pput_prior_hash) =
+        let (routes, signals, price_signal_hash, pput_prior_hash, trigger_event_hash) =
             random_fixture(&mut rng, round);
         let suggestion = router
-            .suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash)
+            .suggest(
+                &routes,
+                &signals,
+                &price_signal_hash,
+                &pput_prior_hash,
+                &trigger_event_hash,
+            )
             .expect("suggest must succeed");
         distinct_selections.insert(suggestion.route_id);
     }
     assert!(
         distinct_selections.len() > 1,
         "softmax selection never varied across 200 distinct fixtures -- looks degenerate"
+    );
+}
+
+/// B1 remedy (ADR-ECON-003 Decision 4, INDEPENDENT_AUDIT_ECON_LAB_20260707.md): the
+/// `trigger_event_hash` seed input must be load-bearing at the public API -- two suggestions
+/// that differ ONLY in `trigger_event_hash` must select different routes on this fixture.
+/// The two expected `route_id`s were computed with the Python reference
+/// (`tools/econ_lab/selection.py`: `derive_u` + `select_uniform` over `sorted(route_ids)`)
+/// for these exact literals, so this is also a cross-language selection-parity pin.
+#[test]
+fn uniform_selection_depends_on_trigger_event_hash_and_matches_python_reference() {
+    let price_signal_hash =
+        "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    let pput_prior_hash =
+        "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    let trigger_1 = "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+    let trigger_2 = "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+
+    let routes: Vec<CandidateRoute> = ["route_a", "route_b", "route_c"]
+        .iter()
+        .enumerate()
+        .map(|(i, route_id)| CandidateRoute {
+            route_id: (*route_id).to_string(),
+            market_id: format!("mkt_{i}"),
+            expected_failure_domain: "provider_x".to_string(),
+            requested_tokens: 100,
+        })
+        .collect();
+    let signals: Vec<PriceSignal> = routes
+        .iter()
+        .map(|route| PriceSignal {
+            market_id: route.market_id.clone(),
+            yes_price: "0.5".to_string(),
+            no_price: "0.5".to_string(),
+            truth_status: "statistical_signal_only".to_string(),
+        })
+        .collect();
+
+    let router = MarketRouter::new_softmax(SoftmaxTemperature::Uniform);
+    let suggestion_1 = router
+        .suggest(&routes, &signals, price_signal_hash, pput_prior_hash, trigger_1)
+        .expect("suggest with trigger_1");
+    let suggestion_2 = router
+        .suggest(&routes, &signals, price_signal_hash, pput_prior_hash, trigger_2)
+        .expect("suggest with trigger_2");
+
+    // Known answers from the Python reference for these literals: u(trigger_1) ~= 0.50560
+    // -> route_b, u(trigger_2) ~= 0.96587 -> route_c (uniform inverse-CDF over 3 sorted ids).
+    assert_eq!(suggestion_1.route_id, "route_b");
+    assert_eq!(suggestion_2.route_id, "route_c");
+    assert_ne!(
+        suggestion_1.route_id, suggestion_2.route_id,
+        "trigger_event_hash must be a load-bearing seed input (ADR-ECON-003 Decision 4)"
     );
 }

@@ -141,6 +141,10 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         &[price_signal],
         &digest_literal('b'),
         &digest_literal('c'),
+        // trigger_event_hash (ADR-ECON-003 Decision 4 fourth seed input; B1 remedy) -- this
+        // qualification flow routes in Shadow mode, so any well-formed committed digest
+        // literal satisfies the input contract.
+        &digest_literal('d'),
     )?;
     let budget_allocated = append_pass(
         &tape,

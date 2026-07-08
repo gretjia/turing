@@ -1091,12 +1091,21 @@ fn market_shadow_suggest_response(request: &Value, id: Value) -> Value {
         Ok(value) => value,
         Err(message) => return invalid_params(id, message),
     };
+    // ADR-ECON-003 Decision 4 (B1 remedy): `MarketRouter::suggest` now takes the pinned
+    // fourth seed input, so this RPC surface requires it from the caller exactly like the
+    // other two committed digests (Shadow mode never derives the seed, but the input
+    // contract is mode-independent and fails closed on a malformed digest).
+    let trigger_event_hash = match required_str(params, "trigger_event_hash") {
+        Ok(value) => value,
+        Err(message) => return invalid_params(id, message),
+    };
 
     match MarketRouter::new(MarketRouterMode::Shadow).suggest(
         &routes,
         &signals,
         &price_signal_hash,
         &pput_prior_hash,
+        &trigger_event_hash,
     ) {
         Ok(suggestion) => json!({
             "jsonrpc": "2.0",

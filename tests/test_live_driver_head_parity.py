@@ -75,7 +75,26 @@ def _load_head_driver():
     `REPO_ROOT = Path(__file__).resolve().parents[2]` still resolves to this repo's actual
     root (the module derives every repo-relative path from its own file location at import
     time); the temp file is removed immediately after `exec_module` whether or not the
-    import succeeds."""
+    import succeeds.
+
+    B1 anchor guard (ADR-ECON-003 Decision 4 remedy, INDEPENDENT_AUDIT_ECON_LAB_20260707.md
+    B1; owner decision: conform the kernel to the pin): the B1 fix adds the pinned
+    `trigger_event_hash` seed input to the routing seed, the `econ_fold_cli`
+    fold-and-suggest request (schema v1 -> v2), and this driver's own request builder.
+    Routing selections therefore *legitimately* differ from any pre-B1 anchor driver -- and
+    a pre-B1 anchor driver cannot even talk to the post-B1 CLI binary (its v1 request is
+    rejected by schema version). Byte-parity against a pre-B1 anchor is thus expected to
+    fail and is NOT evidence of a regression, so this fixture skips (never deletes/weakens
+    the assertions) when the anchor predates B1.
+
+    TODO(B1 re-anchor): once the commit that lands B1 is on `hci/software3-20260705`, the
+    `git merge-base HEAD hci/software3-20260705` anchor advances past B1 on its own for any
+    branch forked afterwards, the marker below is found in the anchored source, and the
+    byte-parity assertions resume automatically -- no code change needed here. If a branch
+    forked *before* B1 ever needs this parity gate against a post-B1 driver, its owner must
+    first merge (or rebase onto) the B1 landing commit so the fork point moves past it; the
+    corresponding Stage A comparison window also needs the PREREG-amendment trail the audit
+    doc's B1 entry requires (owner-level, not this test's call)."""
     head_ref = _head_commit_ref()
     head_source = subprocess.run(
         ["git", "show", f"{head_ref}:tools/econ_lab/live_driver.py"],
@@ -85,6 +104,14 @@ def _load_head_driver():
         check=True,
         text=True,
     ).stdout
+    if "trigger_event_hash" not in head_source:
+        pytest.skip(
+            "head-parity anchor commit "
+            f"{head_ref[:12]} predates the B1 seed fix (ADR-ECON-003 D4 trigger_event_hash); "
+            "byte-parity against it is expected to break and proves nothing about the new "
+            "driver -- re-run once the B1 landing commit is the merge-base anchor "
+            "(see _load_head_driver's TODO(B1 re-anchor))"
+        )
     snapshot_path = ECON_LAB_DIR / f"_wp9c_head_snapshot_{uuid.uuid4().hex}.py"
     return _load_module_from_source(
         source_text=head_source, module_path=snapshot_path, module_name="wp9c_head_driver_under_test"

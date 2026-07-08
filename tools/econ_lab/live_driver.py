@@ -323,6 +323,19 @@ def fold_and_select(
     )
     price_signal_hash = digest("price-signal.v1:" + tape_fingerprint)
     pput_prior_hash = digest("pput-prior.v1:" + instance_id)
+    # trigger_event_hash (ADR-ECON-003 Decision 4, B1 remedy -- the seed's pinned fourth
+    # input): the identity digest of the event that triggered this routing decision. In this
+    # driver the trigger is the arrival of one worker-safe task packet, and `instance_id` is
+    # that packet's committed identity (unique per routing decision: `fold_and_select` runs
+    # at most once per instance per run; resume replays the checkpoint instead of re-routing).
+    # Deterministic and replayable: derived only from the committed packet identity, never
+    # from wall-clock/live-random -- same discipline as the two hashes above. The ADR pins
+    # the seed formula, not a derivation for this digest; the WP7 fixture harness likewise
+    # carries a per-trial `trigger_event_hash` (tools/econ_lab/fixtures/
+    # generate_self_test_stream.py), which this per-task derivation mirrors for the live run.
+    # NOTE: `price_signal_hash`'s tape-fingerprint embedding above predates B1 and stays
+    # untouched (removing it would alter more preregistered behavior than B1 authorizes).
+    trigger_event_hash = digest("trigger-event.v1:" + instance_id)
 
     if tau_config is None:
         router_mode = {"kind": "SoftmaxArgmaxBypass"}
@@ -335,12 +348,15 @@ def fold_and_select(
         cli_bin,
         "fold-and-suggest",
         {
-            "schema": "econ_fold_cli.fold_and_suggest.request.v1",
+            # v2: adds the required `trigger_event_hash` (B1 remedy; see the CLI's own
+            # schema-version note in econ_fold_cli.rs `run_fold_and_suggest`).
+            "schema": "econ_fold_cli.fold_and_suggest.request.v2",
             "committed_routing_events": committed_routing_events,
             "initial_prices": [],
             "candidate_routes": candidate_routes,
             "price_signal_hash": price_signal_hash,
             "pput_prior_hash": pput_prior_hash,
+            "trigger_event_hash": trigger_event_hash,
             "router_mode": router_mode,
         },
     )

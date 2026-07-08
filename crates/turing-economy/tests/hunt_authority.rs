@@ -124,8 +124,15 @@ fn market_router_suggest_never_unlocks_authority_under_adversarial_signals() {
             }
             let price_signal_hash = format!("sha256:{:064x}", rng.next_u64());
             let pput_prior_hash = format!("sha256:{:064x}", rng.next_u64());
+            let trigger_event_hash = format!("sha256:{:064x}", rng.next_u64());
 
-            let result = router.suggest(&routes, &signals, &price_signal_hash, &pput_prior_hash);
+            let result = router.suggest(
+                &routes,
+                &signals,
+                &price_signal_hash,
+                &pput_prior_hash,
+                &trigger_event_hash,
+            );
             // A malformed digest never happens here (we always mint valid sha256:-prefixed
             // 64-hex strings), so this must always be Ok.
             let suggestion = result.expect("suggest must succeed on well-formed inputs");
@@ -161,6 +168,7 @@ fn market_router_suggest_with_no_price_signals_still_locks_authority() {
             &[],
             "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
         )
         .expect("suggest must succeed with zero signals");
     assert_authority_fields_locked(&suggestion, MarketRouterMode::AssistedFuture);

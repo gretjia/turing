@@ -199,6 +199,10 @@ enum RouterModeInput {
 
 #[derive(Deserialize)]
 struct FoldAndSuggestRequest {
+    /// Enforced (presence + exact v2 value) via the `SchemaOnly` pre-parse in
+    /// `run_fold_and_suggest`, which runs *before* this struct deserializes so a version
+    /// mismatch reports as such; kept here too so the full-struct parse still requires it.
+    #[allow(dead_code)]
     schema: String,
     #[serde(default)]
     committed_routing_events: Vec<EconomyEvent>,
@@ -207,6 +211,12 @@ struct FoldAndSuggestRequest {
     candidate_routes: Vec<CandidateRouteInput>,
     price_signal_hash: String,
     pput_prior_hash: String,
+    /// ADR-ECON-003 Decision 4's fourth selection-seed input (B1 remedy, owner decision
+    /// 2026-07: conform to the pin): the already-committed `sha256:`-prefixed identity
+    /// digest of the event that triggered this routing decision. Required -- its addition
+    /// is exactly why the request schema below is `v2` (a pre-B1 `v1` request carries no
+    /// such field and must be rejected by version, not by a confusing missing-field error).
+    trigger_event_hash: String,
     router_mode: RouterModeInput,
 }
 
@@ -295,15 +305,31 @@ fn q_eff_for_key(
         .unwrap_or(Q32_ONE / 2)
 }
 
+/// Just the `schema` discriminator, parsed ahead of the full request struct so a
+/// version mismatch is reported as a version mismatch -- not as whatever missing-field
+/// error the full struct would produce first (a pre-B1 `v1` request has no
+/// `trigger_event_hash` and would otherwise die on `missing field` before the version
+/// check ever ran).
+#[derive(Deserialize)]
+struct SchemaOnly {
+    schema: String,
+}
+
 fn run_fold_and_suggest(input: &str) -> Result<String, String> {
-    let request: FoldAndSuggestRequest = serde_json::from_str(input)
+    // v1 -> v2 (ADR-ECON-003 Decision 1's evolution rule -- new required input = new schema
+    // version, never implicit drift): v2 adds the required `trigger_event_hash` seed input
+    // pinned by Decision 4 (B1 remedy). A v1 request (no trigger_event_hash) is a pre-B1
+    // caller and is rejected here by version string, before full-struct deserialization.
+    let schema_probe: SchemaOnly = serde_json::from_str(input)
         .map_err(|e| format!("invalid fold-and-suggest request JSON: {e}"))?;
-    if request.schema != "econ_fold_cli.fold_and_suggest.request.v1" {
+    if schema_probe.schema != "econ_fold_cli.fold_and_suggest.request.v2" {
         return Err(format!(
-            "unrecognized request schema (expected econ_fold_cli.fold_and_suggest.request.v1, got {})",
-            request.schema
+            "unrecognized request schema (expected econ_fold_cli.fold_and_suggest.request.v2, got {})",
+            schema_probe.schema
         ));
     }
+    let request: FoldAndSuggestRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid fold-and-suggest request JSON: {e}"))?;
 
     let mut initial_prices: BTreeMap<RoutingKey, i128> = BTreeMap::new();
     for entry in &request.initial_prices {
@@ -378,7 +404,13 @@ fn run_fold_and_suggest(input: &str) -> Result<String, String> {
     // Single source of truth: turing_economy::MarketRouter::suggest (WP1) -- the
     // argmax/softmax/uniform selection math itself is never reimplemented here.
     let suggestion = router
-        .suggest(&routes, &signals, &request.price_signal_hash, &request.pput_prior_hash)
+        .suggest(
+            &routes,
+            &signals,
+            &request.price_signal_hash,
+            &request.pput_prior_hash,
+            &request.trigger_event_hash,
+        )
         .map_err(|e| format!("suggest failed: {e:?}"))?;
 
     let response = FoldAndSuggestResponse {

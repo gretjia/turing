@@ -68,7 +68,24 @@ These alter preregistered or ADR-pinned behavior; unilateral mid-experiment chan
 exceed the implementer ceiling and/or pollute the live Stage A comparison.
 
 B1. **CRITICAL — Rust seed derivation omits `trigger_event_hash` (ADR-ECON-003 Decision
-    4).** The ADR (line 69) pins
+    4).** — STATUS UPDATE 2026-07-08: ADDRESSED. Owner directed the remedy (option a);
+    implemented after Stage A reached terminal state (5/5 arms DONE, all verdicts
+    present, live binary constraint lifted). `derive_selection_seed_u64` /
+    `softmax_select` / `uniform_select` / `MarketRouter::suggest` now take
+    `trigger_event_hash` per the pin; CLI request bumped to
+    `econ_fold_cli.fold_and_suggest.request.v2` (v1 rejected with a version diagnostic
+    per ADR-ECON-003 D1 "new schema version, never implicit drift"); driver passes
+    `digest("trigger-event.v1:" + instance_id)` (per-trigger, deterministic, replayable;
+    ADR pins only the seed formula, not the digest derivation — documented in-source);
+    the unpinned tape-fingerprint in `price_signal_hash` deliberately left untouched.
+    New cross-language parity suite (`tests/test_econ_lab_selection_parity.py`, 48
+    selection points across τ∈{0, 0.5, 2.0, inf} × route sets × trigger hashes) proves
+    Rust↔Python seed/selection identity — previously impossible. Known-answer seed u64s
+    cross-computed with the Python reference pinned in Rust unit tests. Head-parity
+    tests skip against pre-B1 anchors by design (routing legitimately changes) and
+    resume automatically once the B1 landing commit is the merge-base anchor; the
+    Stage A comparison window still needs the owner-level PREREG amendment trail.
+    Original finding (kept for the record): The ADR (line 69) pins
     `LE(SHA256("routing-select.v1" ‖ price_signal_hash ‖ pput_prior_hash ‖
     join(sorted(route_ids),"\x00") ‖ trigger_event_hash)[0..8])`. `derive_selection_seed_u64`
     in `crates/turing-economy/src/lib.rs` hashes only the first three components; the term

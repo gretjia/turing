@@ -1317,15 +1317,23 @@ impl MarketRouter {
         self.mode
     }
 
+    /// `trigger_event_hash` is the per-trigger identity digest ADR-ECON-003 Decision 4 pins
+    /// as the fourth selection-seed input (`… ‖ join(sorted(route_ids), "\x00") ‖
+    /// trigger_event_hash`): the already-committed identity of the event that triggered this
+    /// routing decision. Validated exactly like the other two hash inputs, in every mode
+    /// (the argmax bypass ignores the seed, but a malformed digest is a caller bug in any
+    /// mode and must fail closed the same way).
     pub fn suggest(
         &self,
         routes: &[CandidateRoute],
         signals: &[PriceSignal],
         price_signal_hash: &str,
         pput_prior_hash: &str,
+        trigger_event_hash: &str,
     ) -> Result<BudgetSuggestion, EconomyError> {
         validate_digest(price_signal_hash)?;
         validate_digest(pput_prior_hash)?;
+        validate_digest(trigger_event_hash)?;
         if routes.is_empty() {
             return Err(EconomyError::NoCandidateRoutes);
         }
@@ -1350,12 +1358,19 @@ impl MarketRouter {
         // τ=0 is byte-for-byte equivalent to the pre-existing argmax behavior by
         // construction, not by separately re-implemented logic that merely agrees on paper.
         let route = match (self.mode, self.softmax_temperature) {
-            (MarketRouterMode::Softmax, SoftmaxTemperature::Finite(tau)) => {
-                softmax_select(&priced_routes, tau, price_signal_hash, pput_prior_hash)
-            }
-            (MarketRouterMode::Softmax, SoftmaxTemperature::Uniform) => {
-                uniform_select(&priced_routes, price_signal_hash, pput_prior_hash)
-            }
+            (MarketRouterMode::Softmax, SoftmaxTemperature::Finite(tau)) => softmax_select(
+                &priced_routes,
+                tau,
+                price_signal_hash,
+                pput_prior_hash,
+                trigger_event_hash,
+            ),
+            (MarketRouterMode::Softmax, SoftmaxTemperature::Uniform) => uniform_select(
+                &priced_routes,
+                price_signal_hash,
+                pput_prior_hash,
+                trigger_event_hash,
+            ),
             _ => argmax_select(&priced_routes),
         };
         Ok(BudgetSuggestion {
@@ -1398,18 +1413,21 @@ const ROUTING_SELECT_SEED_DOMAIN: &str = "routing-select.v1";
 /// ADR-ECON-003 Decision 4 pins `u64 = LE(SHA256(domain ‖ price_signal_hash ‖
 /// pput_prior_hash ‖ join(sorted(route_ids), "\x00") ‖ trigger_event_hash)[0..8])`. All
 /// inputs are already-committed caller-supplied literals, so identical inputs reproduce
-/// identical bytes (Art 0.2).
-// DEVIATION(ADR-ECON-003 D4): trigger_event_hash omitted; owner decision pending 2026-07-07
+/// identical bytes (Art 0.2). Byte layout matches the Python reference
+/// (`tools/econ_lab/selection.py::derive_u`) exactly: the four inputs are concatenated
+/// with no separators beyond the NUL join inside `sorted(route_ids)`.
 fn derive_selection_seed_u64(
     price_signal_hash: &str,
     pput_prior_hash: &str,
     sorted_route_ids: &[&str],
+    trigger_event_hash: &str,
 ) -> u64 {
     let mut hasher = Sha256::new();
     hasher.update(ROUTING_SELECT_SEED_DOMAIN.as_bytes());
     hasher.update(price_signal_hash.as_bytes());
     hasher.update(pput_prior_hash.as_bytes());
     hasher.update(sorted_route_ids.join("\0").as_bytes());
+    hasher.update(trigger_event_hash.as_bytes());
     let digest = hasher.finalize();
     u64::from_le_bytes(
         digest[0..8]
@@ -1532,6 +1550,7 @@ fn softmax_select<'a>(
     temperature: TauQ32,
     price_signal_hash: &str,
     pput_prior_hash: &str,
+    trigger_event_hash: &str,
 ) -> &'a CandidateRoute {
     let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
     sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
@@ -1557,7 +1576,8 @@ fn softmax_select<'a>(
         .iter()
         .map(|(route, _)| route.route_id.as_str())
         .collect();
-    let seed = derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids);
+    let seed =
+        derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids, trigger_event_hash);
     weighted_inverse_cdf_select(&weighted, seed)
 }
 
@@ -1568,6 +1588,7 @@ fn uniform_select<'a>(
     priced_routes: &[(&'a CandidateRoute, DecimalAmount)],
     price_signal_hash: &str,
     pput_prior_hash: &str,
+    trigger_event_hash: &str,
 ) -> &'a CandidateRoute {
     let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
     sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
@@ -1577,7 +1598,8 @@ fn uniform_select<'a>(
         .iter()
         .map(|(route, _)| route.route_id.as_str())
         .collect();
-    let seed = derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids);
+    let seed =
+        derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids, trigger_event_hash);
     weighted_inverse_cdf_select(&weighted, seed)
 }
 
@@ -1989,5 +2011,54 @@ mod exp2_saturation_tests {
                 "exp2_q32 must never go negative (floor_part={floor})"
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod selection_seed_tests {
+    //! Inline (not `tests/`) because `derive_selection_seed_u64` is private to this module.
+    //! B1 remedy (INDEPENDENT_AUDIT_ECON_LAB_20260707.md, owner decision: conform the Rust
+    //! kernel to the ADR-ECON-003 Decision 4 pin): the seed now hashes `trigger_event_hash`
+    //! as its fourth input, byte-for-byte identical to the Python reference
+    //! (`tools/econ_lab/selection.py::derive_u`).
+
+    use super::derive_selection_seed_u64;
+
+    const PRICE: &str = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    const PPUT: &str = "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    const TRIGGER_1: &str =
+        "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+    const TRIGGER_2: &str =
+        "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+    const ROUTE_IDS: [&str; 3] = ["route_a", "route_b", "route_c"];
+
+    /// Known-answer test pinning the exact seed u64 for fixed inputs. The two expected
+    /// values were computed with the *Python* reference implementation
+    /// (`tools/econ_lab/selection.py::derive_u`'s `int.from_bytes(SHA256(payload)[:8],
+    /// "little")` on the identical payload), so this test is a cross-language byte-parity
+    /// pin, not a self-referential re-derivation.
+    #[test]
+    fn selection_seed_known_answer_matches_python_reference() {
+        assert_eq!(
+            derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1),
+            9326763443915281982u64
+        );
+        assert_eq!(
+            derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_2),
+            17817110700657187936u64
+        );
+    }
+
+    /// ADR-ECON-003 Decision 4: `trigger_event_hash` is a load-bearing seed input -- two
+    /// different trigger identities under otherwise identical committed inputs must yield
+    /// different seeds (this was impossible before the B1 fix, when the term was dropped).
+    #[test]
+    fn selection_seed_differs_across_trigger_event_hashes() {
+        let seed_1 = derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1);
+        let seed_2 = derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_2);
+        assert_ne!(
+            seed_1, seed_2,
+            "seed must depend on trigger_event_hash (ADR-ECON-003 Decision 4)"
+        );
     }
 }

@@ -365,10 +365,10 @@ fn market_router_suggest_repeated_call_determinism_property() {
 
         let router = MarketRouter::new(MarketRouterMode::Shadow);
         let first = router
-            .suggest(&routes, &signals, &digest, &digest)
+            .suggest(&routes, &signals, &digest, &digest, &digest)
             .expect("suggestion 1");
         let second = router
-            .suggest(&routes, &signals, &digest, &digest)
+            .suggest(&routes, &signals, &digest, &digest, &digest)
             .expect("suggestion 2");
         assert_eq!(
             first, second,
