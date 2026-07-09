@@ -1,0 +1,13 @@
+diff --git a/xarray/core/ops.py b/xarray/core/ops.py
+index e5a5f8c3..7c8f14d2 100644
+--- a/xarray/core/ops.py
++++ b/xarray/core/ops.py
+@@ -1303,7 +1303,7 @@ def where(
+         ]
+ 
+         if keep_attrs:
+-            attrs = merge_attrs_objects_variable_first([x.attrs for x in args])
++            attrs = merge_attrs_objects_variable_first([x.attrs for x in args])
+ 
+     # Handle non-dask arrays
+     result = func(*args, **kwargs)

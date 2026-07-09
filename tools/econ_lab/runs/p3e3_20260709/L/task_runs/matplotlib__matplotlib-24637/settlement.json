@@ -1,0 +1,99 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:matplotlib/matplotlib:scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:b6f84450a22add98c5727502bbd78319e6072e749bbcc48a5c08d710761584a3",
+    "price_signal_hash": "sha256:cf22cdac8fca9b42462ca0bb939a2b6875bafe8bf8d14226e736abd7485b93f1",
+    "route_id": "matplotlib__matplotlib-24637::armB::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:638bf1229a3622478afaf8bdf09d30e2b9e3d9355e3f3d11e477778a63e348f2"
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [],
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:638bf1229a3622478afaf8bdf09d30e2b9e3d9355e3f3d11e477778a63e348f2",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "matplotlib/matplotlib",
+          "route_scaffold": "scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:cabc7787138b7040f04e3c348f0e34fe57529c3a5654b1c0f05bbebe876d42ed"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/L/scoring/matplotlib__matplotlib-24637/glm/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "matplotlib__matplotlib-24637"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "matplotlib__matplotlib-24637"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/L/scoring/matplotlib__matplotlib-24637/glm/wp9a-live-driver.wp9a-live-driver-matplotlib__matplotlib-24637-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 1482,
+        "candidate_patch_sha256": "sha256:39669eda51f94b392f4d17b9946124cbf42a52d6248ac4076b8d574f2bb3db5d",
+        "instance_id": "matplotlib__matplotlib-24637",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 168463
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "matplotlib/matplotlib",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "matplotlib__matplotlib-24637",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "glm",
+  "selected_route_id": "matplotlib__matplotlib-24637::armB::glm",
+  "task_index": 25
+}

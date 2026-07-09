@@ -1,0 +1,23 @@
+diff --git a/sympy/physics/quantum/tensorproduct.py b/sympy/physics/quantum/tensorproduct.py
+--- a/sympy/physics/quantum/tensorproduct.py
++++ b/sympy/physics/quantum/tensorproduct.py
+@@ -998,6 +998,20 @@ def tensor_product_simp(e, **kwargs):
+     if not isinstance(e, Expr):
+         return e
+ 
++    # Handle products of tensor products with the same first argument
++    if isinstance(e, Mul):
++        tensor_products = [arg for arg in e.args if isinstance(arg, TensorProduct)]
++        
++        if tensor_products:
++            # Check if all tensor products have the same first argument
++            first_arg = tensor_products[0].args[0]
++            if all(tp.args[0] == first_arg for tp in tensor_products):
++                # Multiply the second arguments
++                second_args_product = Mul(*[tp.args[1] for tp in tensor_products])
++                simplified_product = tensor_product_simp(second_args_product, **kwargs)
++                return TensorProduct(first_arg, simplified_product)
++
+     # TODO: add more rules, add mechanism to add rules, put rules in canonical order
+     if isinstance(e, Add):
+         return Add(*[tensor_product_simp(arg, **kwargs) for arg in e.args])

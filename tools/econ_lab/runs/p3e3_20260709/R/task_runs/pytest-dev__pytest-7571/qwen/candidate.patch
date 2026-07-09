@@ -1,0 +1,58 @@
+diff --git a/src/_pytest/logging.py b/src/_pytest/logging.py
+index 22625013a..890a114d2 100644
+--- a/src/_pytest/logging.py
++++ b/src/_pytest/logging.py
+@@ -276,6 +276,7 @@ class LogCaptureHandler(logging.StreamHandler):
+         self._old_level = None
+         self._initial_level = None
+         self._caplog = caplog
++        self._test_level = None
+ 
+     def set_level(self, level):
+         """Set the level for the captured logs."""
+@@ -296,6 +299,15 @@ class LogCaptureHandler(logging.StreamHandler):
+         """Set the level for the captured logs."""
+         if self._caplog is not None:
+             self._caplog.handler.setLevel(level)
++        # Store the test level to restore it later
++        if self._test_level is None:
++            self._test_level = level
++
+     def _set_level(self, level, logger=None):
+         """Internal method to set the level."""
+         if logger is None:
+@@ -314,6 +326,10 @@ class LogCaptureHandler(logging.StreamHandler):
+             self._caplog = caplog
+             self._old_level = self.level
+             self._initial_level = self.level
++            # Store the initial level for restoration
++            if self._test_level is None:
++                self._test_level = self.level
++
+     def _cleanup_after_test(self):
+         """Clean up the handler after a test."""
+         if self._caplog is not None:
+@@ -333,6 +340,12 @@ class LogCaptureHandler(logging.StreamHandler):
+         self._old_level = None
+         self._initial_level = None
+         self._caplog = None
++        # Restore the test level if we have one
++        if self._test_level is not None:
++            self.setLevel(self._test_level)
++            self._test_level = None
++
+     def setLevel(self, level):
+         """Set the level of the handler."""
+         super().setLevel(level)
+diff --git a/src/_pytest/python.py b/src/_pytest/python.py
+index 2b740d21b..66d876af6 100644
+--- a/src/_pytest/python.py
++++ b/src/_pytest/python.py
+@@ -484,10 +484,12 @@ def pytest_runtest_makereport(item, call):
+         # Clean up the log capture handler after the test
+         # This is needed for the caplog fixture to properly restore
+         # log levels after each test
+-        if hasattr(item, "caplog"):
+-            item.caplog.handler._cleanup_after_test()
++        if hasattr(item, "caplog") and item.caplog.handler:
++            item.caplog.handler._cleanup_after_test()

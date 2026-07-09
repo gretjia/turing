@@ -1,0 +1,292 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 23849b281..a04b310cc 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -208,7 +208,7 @@ class NumpyDocstring:
+         if ':' in line:
+             # Split the line on the first colon
+             name, rest = line.split(':', 1)
+-            if not rest.strip():
++            if not rest.strip() and not name.strip().endswith(','):
+                 # If there's no description, it's probably a variable header
+                 # and we should continue to treat it as a parameter
+                 continue
+@@ -222,6 +222,14 @@ class NumpyDocstring:
+         if ':' in line:
+             # Split the line on the first colon
+             name, rest = line.split(':', 1)
++            # Handle multiple parameters on the same line
++            if ',' in name and not name.strip().endswith(','):
++                params = [param.strip() for param in name.split(',') if param.strip()]
++                for param in params:
++                    self._parse_numpy_docstring_param_line(
++                        param + ':' + rest, docstring_lines, i, indent)
++                return True
++
+         # Check if it's a parameter line
+         if not self._is_param_line(name):
+@@ -239,14 +246,14 @@ class NumpyDocstring:
+         name = name.strip()
+ 
+         # Check if it's a parameter line
+-        if not self._is_param_line(name):
++        if not self._is_param_line(name) and not name.endswith(','):
+             return False
+ 
+         # If we have a parameter line, process it
+-        param_name, param_type, param_desc = self._parse_param_line(name, rest)
++        if ',' not in name:
++            param_name, param_type, param_desc = self._parse_param_line(name, rest)
++        else:
++            # Handle multiple parameters on the same line
++            param_names = [n.strip() for n in name.split(',') if n.strip()]
++            param_name = ', '.join(param_names)
++            param_type, param_desc = self._parse_param_line(param_names[0] + ':' + rest, None)[1:]
+ 
+         # If we have a parameter description, process it
+         if param_desc:
+@@ -289,6 +296,10 @@ class NumpyDocstring:
+         # Check if it's a parameter line (this should be more robust)
+         # This is a placeholder for more sophisticated parsing
+         line = line.strip()
++        if line.endswith(','):
++            # This is likely a multi-parameter line that we should process later
++            return True
++        if ',' in line and ':' in line and line.split(':', 1)[0].strip().endswith(','):
++            return True
++
+         return ':' in line and not line.startswith('    ')
+ 
+     def _parse_param_line(self, line, rest):
+@@ -310,6 +317,15 @@ class NumpyDocstring:
+         type_end = line.find(':')
+         param_name = line[:type_end].strip()
+         param_type = line[type_end+1:].strip()
++        # Handle the case where type contains comma (e.g., "array_like, optional")
++        if ', ' in param_type and param_type.endswith('optional'):
++            # Check if this is a multiple parameter case
++            if not rest or not rest.strip():
++                # We need to look ahead at the next lines to understand structure
++                return param_name, param_type, ''
++
+         # Remove any leading or trailing parentheses
+         if param_type.startswith('(') and param_type.endswith(')'):
+             param_type = param_type[1:-1]
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index a04b310cc..4d0f2c462 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -304,7 +304,14 @@ class NumpyDocstring:
+         # Remove any leading or trailing parentheses
+         if param_type.startswith('(') and param_type.endswith(')'):
+             param_type = param_type[1:-1]
+-        return param_name, param_type, param_desc
++
++        # Handle multiple parameters case - return a list of parameters
++        if ',' in param_name:
++            # This is a special case for multiple parameters in one line
++            param_names = [n.strip() for n in param_name.split(',')]
++            return param_names, param_type, param_desc
++
++        return param_name, param_type, param_desc
+ 
+     def _parse_numpy_docstring_param_line(self, line, docstring_lines, i, indent):
+         """
+@@ -211,10 +211,15 @@ class NumpyDocstring:
+         if ':' in line:
+             # Split the line on the first colon
+             name, rest = line.split(':', 1)
++
++            # Check if it's a multi-parameter case
++            if ',' in name and not name.strip().endswith(','):
++                # Split the parameters and process each one
++                param_names = [p.strip() for p in name.split(',') if p.strip()]
++                for param_name in param_names:
++                    self._parse_numpy_docstring_param_line(
++                        f"{param_name}:{rest}", docstring_lines, i, indent)
++                return True
++
+             if not rest.strip() and not name.strip().endswith(','):
+                 # If there's no description, it's probably a variable header
+                 # and we should continue to treat it as a parameter
+@@ -242,13 +247,14 @@ class NumpyDocstring:
+         # If we have a parameter line, process it
+         if ',' not in name:
+             param_name, param_type, param_desc = self._parse_param_line(name, rest)
+-        else:
+-            # Handle multiple parameters on the same line
+-            param_names = [n.strip() for n in name.split(',') if n.strip()]
+-            param_name = ', '.join(param_names)
+-            param_type, param_desc = self._parse_param_line(param_names[0] + ':' + rest, None)[1:]
++        else:
++            # Handle multiple parameters on the same line
++            param_names = [n.strip() for n in name.split(',') if n.strip()]
++            param_name = ', '.join(param_names)
++            # Get type and description from the first parameter to maintain compatibility
++            param_type, param_desc = self._parse_param_line(param_names[0] + ':' + rest, '')[1:]
+ 
+     def _is_param_line(self, line):
+         """
+@@ -291,11 +296,15 @@ class NumpyDocstring:
+         line = line.strip()
+         if line.endswith(','):
+             # This is likely a multi-parameter line that we should process later
+-            return True
++            return True
++
++        # Special case: multi-parameter line with comma in parameter name
++        if ',' in line and ':' in line and not line.strip().endswith(':'):
++            param_name_part = line.split(':', 1)[0]
++            return ',' in param_name_part and not param_name_part.endswith(',')
++
+         return ':' in line and not line.startswith('    ')
+ 
+     def _parse_param_line(self, line, rest):
+@@ -326,11 +329,15 @@ class NumpyDocstring:
+         if param_type.startswith('(') and param_type.endswith(')'):
+             param_type = param_type[1:-1]
+ 
++        # Special handling for multiple parameters case
++        if isinstance(param_name, list):
++            return param_name, param_type, param_desc
++
+         return param_name, param_type, param_desc
++
+     def _parse_numpy_docstring_param_line(self, line, docstring_lines, i, indent):
+         """
+@@ -257,7 +260,14 @@ class NumpyDocstring:
+         # If we have a parameter description, process it
+         if param_desc:
+             # Check for continuation of parameter description
+-            while i + 1 < len(docstring_lines) and docstring_lines[i + 1].startswith(indent + '    '):
++            while (i + 1 < len(docstring_lines) and 
++                   docstring_lines[i + 1].startswith(indent + '    ')):
+                 # Check if next line looks like a parameter (handle multi-line descriptions)
+                 next_line = docstring_lines[i + 1]
+                 if ':' in next_line and not next_line.startswith(indent + '    '):
+@@ -335,7 +338,10 @@ class NumpyDocstring:
+                 if ',' in param_name:
+                     # For multiple parameters, create individual entries
+                     for name in param_name:
+-                        self._add_param(name, param_type, param_desc)
++                        # Ensure we don't already have this parameter
++                        if not any(p[0] == name for p in self._params):
++                            self._add_param(name, param_type, param_desc)
+                 else:
+                     self._add_param(param_name, param_type, param_desc)
+ 
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 4d0f2c462..8e17d5f0f 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -249,7 +249,10 @@ class NumpyDocstring:
+         # If we have a parameter line, process it
+         if ',' not in name:
+             param_name, param_type, param_desc = self._parse_param_line(name, rest)
+-        else:
++        else:
+             # Handle multiple parameters on the same line
+             param_names = [n.strip() for n in name.split(',') if n.strip()]
+             param_name = ', '.join(param_names)
+@@ -334,6 +337,12 @@ class NumpyDocstring:
+                 if ',' in param_name:
+                     # For multiple parameters, create individual entries
+                     for name in param_name:
++                        # Skip if we already have this parameter
++                        if any(p[0] == name for p in self._params):
++                            continue
++                        # Handle special case where we need to reparse the line
++                        if isinstance(param_name, list):
++                            self._add_param(name, param_type, param_desc)
+                 else:
+                     self._add_param(param_name, param_type, param_desc)
+ 
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 8e17d5f0f..b72d2165b 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -263,7 +263,7 @@ class NumpyDocstring:
+         # If we have a parameter description, process it
+         if param_desc:
+             # Check for continuation of parameter description
+-            while (i + 1 < len(docstring_lines) and 
++            while (i + 1 < len(docstring_lines) and 
+                    docstring_lines[i + 1].startswith(indent + '    ')):
+                 # Check if next line looks like a parameter (handle multi-line descriptions)
+                 next_line = docstring_lines[i + 1]
+@@ -278,7 +278,11 @@ class NumpyDocstring:
+                 if ':' in next_line and not next_line.startswith(indent + '    '):
+                     # This may be a new parameter, so we should stop
+                     break
+-                param_desc += ' ' + next_line.strip()
++                if param_desc.strip():
++                    param_desc += ' ' + next_line.strip()
++                else:
++                    param_desc = next_line.strip()
++
+                 i += 1
+             # If we only have blank lines, treat as empty and stop
+             if not param_desc.strip():
+@@ -280,7 +280,10 @@ class NumpyDocstring:
+             # If we only have blank lines, treat as empty and stop
+             if not param_desc.strip():
+                 if i + 1 < len(docstring_lines) and docstring_lines[i + 1].strip() == '':
+-                    i += 1
++                    i += 1
+                 param_desc = ''
+             else:
+                 # Strip extra whitespace
+@@ -44,15 +44,16 @@ class NumpyDocstring:
+         # Handle multiline parameter descriptions
+         if state == 'param' and i + 1 < len(lines):
+             # Check for continuation lines
++            while (i + 1 < len(lines) and 
++                   lines[i + 1].startswith(lines[i].split(':', 1)[0].split(',')[0].strip() + '    ')):
+                 i += 1
+                 # Add spaces
+                 param_desc += lines[i] + '\n'
+ 
+     def _add_param(self, param_name, param_type, param_desc):
+         """
+         Add a parameter to the list of parameters.
+-        """
+-        self._params.append((param_name, param_type, param_desc))
++        """
++        # Check if parameter already exists to avoid duplicates
++        if not any(p[0] == param_name for p in self._params):
++            self._params.append((param_name, param_type, param_desc))
++
+     def _get_type_string(self, type_obj):
+         """
+         Get the string representation of a type object.
+@@ -285,6 +285,10 @@ class NumpyDocstring:
+         if not param_desc.strip():
+             if i + 1 < len(docstring_lines) and docstring_lines[i + 1].strip() == '':
+                 i += 1
++
++        # Handle case where we have a parameter name that was already processed
++        if not param_desc.strip() and rest and ':' in rest:
++            param_name, param_type, param_desc = self._parse_param_line(name, rest)
++
+         param_desc = param_desc.rstrip()
+         # Check if there are more lines that are part of this parameter description
+         if state == 'param' and i + 1 < len(lines):
+@@ -301,7 +301,10 @@ class NumpyDocstring:
+         param_name = line[:type_end].strip()
+         param_type = line[type_end+1:].strip()
+ 
+-        # Remove any leading or trailing parentheses
++        # Remove any leading or trailing parentheses
++        if param_type.startswith('(') and param_type.endswith(')'):
++            param_type = param_type[1:-1]
++
+         return param_name, param_type, param_desc
+@@ -336,6 +339,9 @@ class NumpyDocstring:
+         # Handle case where we have a parameter name that was already processed
+         if not param_desc.strip() and rest and ':' in rest:
+             param_name, param_type, param_desc = self._parse_param_line(name, rest)
++
++        # Special handling for multiple parameter case
++        if isinstance(param_name, list):
++            return param_name, param_type, param_desc
+         return param_name, param_type, param_desc

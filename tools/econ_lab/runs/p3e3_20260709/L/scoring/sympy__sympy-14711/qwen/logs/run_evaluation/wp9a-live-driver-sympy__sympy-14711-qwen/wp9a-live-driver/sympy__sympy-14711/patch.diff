@@ -1,0 +1,23 @@
+diff --git a/sympy/physics/vector/vector.py b/sympy/physics/vector/vector.py
+index 0298222794..204290a6d4 100644
+--- a/sympy/physics/vector/vector.py
++++ b/sympy/physics/vector/vector.py
+@@ -58,7 +58,7 @@ class Vector:
+     def __add__(self, other):
+         """The add operator for Vector. """
+         #if other == 0: return self
+-        other = _check_vector(other)
++        if other == 0:
++            return self
++        other = _check_vector(other)
+         return Vector(self.args + other.args)
+ 
+     def __radd__(self, other):
+@@ -705,7 +705,7 @@ def _check_vector(other):
+ def _check_vector(other):
+     if not isinstance(other, Vector):
+-        raise TypeError('A Vector must be supplied')
++        if other == 0:
++            return Vector({})
++        raise TypeError('A Vector must be supplied')
+     return other

@@ -1,0 +1,1090 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..368402217 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1170,6 +1170,9 @@ class AutodocDirective(SphinxDirective):
+             'noindex': directives.flag,
+             'noindexentry': directives.flag,
+             'noqa': directives.flag,
++            'private-members': directives.unchanged,
++            'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+@@ -1250,6 +1253,10 @@ class AutodocDirective(SphinxDirective):
+         # Set up the docstring and the signature
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
++        # Handle private-members option
++        if 'private-members' in self.options:
++            self.options['private-members'] = self.options['private-members'].split(',')
++
+         # Handle members option
+         if 'members' in self.options:
+             self.options['members'] = self.options['members'].split(',')
+@@ -1425,6 +1432,10 @@ class AutodocDirective(SphinxDirective):
+         # Handle special-members option
+         if 'special-members' in self.options:
+             self.options['special-members'] = self.options['special-members'].split(',')
++        # Handle exclude-members option
++        if 'exclude-members' in self.options:
++            self.options['exclude-members'] = self.options['exclude-members'].split(',')
++        # Handle undoc-members option
++        if 'undoc-members' in self.options:
++            self.options['undoc-members'] = True if self.options['undoc-members'] else False
++
+         # Add default options
+         self.default_options = self.get_default_options()
+ 
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..b2c5b1f01 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1440,6 +1440,15 @@ class AutodocDirective(SphinxDirective):
+         # Add default options
+         self.default_options = self.get_default_options()
+ 
++        # Ensure private-members is a list if specified
++        if 'private-members' in self.options:
++            if isinstance(self.options['private-members'], str):
++                self.options['private-members'] = [self.options['private-members']]
++            elif not isinstance(self.options['private-members'], list):
++                self.options['private-members'] = []
++
++        # Ensure members is a list if specified
++        if 'members' in self.options:
++            if isinstance(self.options['members'], str):
++                self.options['members'] = [self.options['members']]
++            elif not isinstance(self.options['members'], list):
++                self.options['members'] = []
++
+         # Add default options
+         self.default_options = self.get_default_options()
+ 
+@@ -1650,6 +1657,15 @@ class AutodocDirective(SphinxDirective):
+         self.default_options = self.get_default_options()
+ 
++        # Handle private members filtering
++        if 'private-members' in self.options and self.options['private-members']:
++            # Filter to only include specified private members
++            private_members = set(self.options['private-members'])
++            if hasattr(self, 'objects'):
++                self.objects = [obj for obj in self.objects if obj.name in private_members]
++        else:
++            # If no specific private members specified, include all
++            pass
++
+         # Build the document
+         self.build_document()
+ 
+@@ -1670,6 +1685,15 @@ class AutodocDirective(SphinxDirective):
+ 
+         # Handle special-members option
+         if 'special-members' in self.options and self.options['special-members']:
++            # Filter to only include specified special members
++            special_members = set(self.options['special-members'])
++            if hasattr(self, 'objects'):
++                self.objects = [obj for obj in self.objects if obj.name in special_members]
++        else:
++            # If no specific special members specified, include all
++            pass
++
++        # Handle exclude-members option
++        if 'exclude-members' in self.options and self.options['exclude-members']:
++            # Filter out specified excluded members
++            exclude_members = set(self.options['exclude-members'])
++            if hasattr(self, 'objects'):
++                self.objects = [obj for obj in self.objects if obj.name not in exclude_members]
++        else:
++            pass
++
+         # Build the document
+         self.build_document()
+ 
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..25c450224 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -2570,7 +2570,10 @@ class AutodocDirective(SphinxDirective):
+             return self._get_signature()
+ 
+         # Handle private-members option
+-        if 'private-members' in self.options:
++        if 'private-members' in self.options and self.options['private-members']:
++            # If private-members is specified, include private members
++            # but only those that are explicitly mentioned
++            pass
+ 
+         # Add ability to control verbose output (default False)
+         if 'verbose' in self.options:
+@@ -2580,7 +2583,12 @@ class AutodocDirective(SphinxDirective):
+         entries = list(self._get_entries())
+ 
+         # Handle private-members option
+-        if 'private-members' in self.options:
++        if 'private-members' in self.options and self.options['private-members']:
++            # Filter to only include specified private members
++            private_member_names = self.options['private-members'].split(',') if isinstance(self.options['private-members'], str) else self.options['private-members']
++            private_members = set(private_member_names)
++            entries = [entry for entry in entries if entry[0] in private_members]
++        else:
++            # Include all or none when not specified
++            pass
+ 
+         # Handle members option
+         if 'members' in self.options:
+@@ -2636,6 +2643,9 @@ class AutodocDirective(SphinxDirective):
+         # apply exclude-members option, if given
+         if 'exclude-members' in self.options:
+             exclude_members = set(self.options['exclude-members'].split(','))
++        else:
++            exclude_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] in exclude_members:
+@@ -2650,6 +2659,9 @@ class AutodocDirective(SphinxDirective):
+         # apply undoc-members option, if given
+         if 'undoc-members' in self.options:
+             undoc_members = set(self.options['undoc-members'].split(','))
++        else:
++            undoc_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] in undoc_members:
+@@ -2665,6 +2677,9 @@ class AutodocDirective(SphinxDirective):
+         # apply special-members option, if given
+         if 'special-members' in self.options:
+             special_members = set(self.options['special-members'].split(','))
++        else:
++            special_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] in special_members:
+@@ -2770,6 +2785,12 @@ class AutodocDirective(SphinxDirective):
+         # Clear out invalid options
+         for name in ['private-members', 'special-members']:
+             if name in self.options:
++                # Handle arrays as well
++                if isinstance(self.options[name], list):
++                    self.options[name] = ','.join(self.options[name])
++
+         # add custom sections
+         if self.options.get('contents'):
+             self._add_contents()
+@@ -2800,6 +2819,12 @@ class AutodocDirective(SphinxDirective):
+         # Clear out invalid options
+         for name in ['private-members', 'special-members']:
+             if name in self.options:
++                # Handle arrays as well
++                if isinstance(self.options[name], list):
++                    self.options[name] = ','.join(self.options[name])
++
+         # add custom sections
+         if self.options.get('contents'):
+             self._add_contents()
+@@ -2950,6 +2973,14 @@ class AutodocDirective(SphinxDirective):
+             return self._get_signature()
+ 
+         # Handle private-members option
++        if 'private-members' in self.options:
++            if isinstance(self.options['private-members'], str):
++                private_members = self.options['private-members'].split(',')
++            else:
++                private_members = self.options['private-members']
++            # Filter to only include specified private members
++            private_members = set(private_members)
++            entries = [entry for entry in entries if entry[0] in private_members]
++
+         # Apply members options
+         if 'members' in self.options:
+             if isinstance(self.options['members'], str):
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..3f4e36f17 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1540,30 +1540,9 @@ class AutodocDirective(SphinxDirective):
+         if 'exclude-members' in self.options:
+             # Apply exclude-members option, if given
+             exclude_members = set(self.options['exclude-members'].split(','))
+-            final_entries = []
+-            for entry in entries:
+-                if entry[0] not in exclude_members:
+-                    final_entries.append(entry)
+-            entries = final_entries
++            entries = [entry for entry in entries if entry[0] not in exclude_members]
+ 
+         if 'undoc-members' in self.options:
+             # Apply undoc-members option, if given
+-            undoc_members = set(self.options['undoc-members'].split(','))
+-            final_entries = []
+-            for entry in entries:
+-                if entry[0] in undoc_members:
+-                    final_entries.append(entry)
+-            entries = final_entries
++            undoc_members = set(self.options['undoc-members'].split(','))
++            entries = [entry for entry in entries if entry[0] in undoc_members]
+ 
+         # Apply special-members option, if given
+         if 'special-members' in self.options:
+             # Filter to only include specified special members
+-            special_members = set(self.options['special-members'].split(','))
+-            final_entries = []
+-            for entry in entries:
+-                if entry[0] in special_members:
+-                    final_entries.append(entry)
+-            entries = final_entries
++            special_members = set(self.options['special-members'].split(','))
++            entries = [entry for entry in entries if entry[0] in special_members]
+ 
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
+             private_members = set(self.options['private-members'].split(','))
+             entries = [entry for entry in entries if entry[0] in private_members]
+ 
+         # Apply members option, if given
+         # If no members option is given, all members are included
+         if 'members' in self.options:
+             # Filter to only include specified members
+             members = set(self.options['members'].split(','))
+             entries = [entry for entry in entries if entry[0] in members]
+ 
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..60f9590c3 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,6 +1150,9 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
++        # Add to option spec
++        self.option_spec.update({
++            'private-members': directives.unchanged,
++        })
++
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -2575,6 +2578,15 @@ class AutodocDirective(SphinxDirective):
+         # Handle private-members option
+         if 'private-members' in self.options and self.options['private-members']:
+             # If private-members is specified, include private members
++            private_members = set()
++            if isinstance(self.options['private-members'], str):
++                for member in self.options['private-members'].split(','):
++                    private_members.add(member.strip())
++            else:
++                for member in self.options['private-members']:
++                    private_members.add(member)
++
++            # Filter to only include specified private members
++            entries = [entry for entry in entries if entry[0] in private_members]
+         else:
+             # Include all or none when not specified
+             pass
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..1275d9fa9 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1154,7 +1154,7 @@ class AutodocDirective(SphinxDirective):
+         self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+-            'exclude-members': directives.unchanged,
++            'exclude-members': directives.unchanged,
+             'noindex': directives.flag,
+             'noindexentry': directives.flag,
+             'noqa': directives.flag,
+@@ -1160,9 +1160,12 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
+-            'undoc-members': directives.flag,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..6b6e5d671 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1164,9 +1164,12 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
+-            'undoc-members': directives.flag,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1177,6 +1180,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -1870,6 +1870,8 @@ class AutodocDirective(SphinxDirective):
+ 
+         # Apply exclude-members option, if given
+         if 'exclude-members' in self.options:
++            # Handle exclude-members option
++            pass
+ 
+         # Apply undoc-members option, if given
+         if 'undoc-members' in self.options:
+@@ -2578,9 +2578,18 @@ class AutodocDirective(SphinxDirective):
+         # Handle private-members option
+         if 'private-members' in self.options and self.options['private-members']:
+             # If private-members is specified, include private members
++            # Filter to only include specified private members
++            private_members = set()
++            if isinstance(self.options['private-members'], str):
++                for member in self.options['private-members'].split(','):
++                    private_members.add(member.strip())
++            else:
++                for member in self.options['private-members']:
++                    private_members.add(member)
++
++            entries = [entry for entry in entries if entry[0] in private_members]
+         else:
+             # Include all or none when not specified
+             pass
+@@ -2679,10 +2682,15 @@ class AutodocDirective(SphinxDirective):
+         # Apply exclude-members option, if given
+         if 'exclude-members' in self.options:
+             exclude_members = set(self.options['exclude-members'].split(','))
+-        else:
+-            exclude_members = set()
++        # Handle special and private member filtering
++        if 'special-members' in self.options:
++            special_members = set(self.options['special-members'].split(','))
++        else:
++            special_members = set()
++
++        if 'private-members' in self.options:
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++        else:
++            private_members = set()
+ 
+         final_entries = []
+         for entry in entries:
+@@ -2720,6 +2723,9 @@ class AutodocDirective(SphinxDirective):
+         # Apply special-members option, if given
+         if 'special-members' in self.options:
+             special_members = set(self.options['special-members'].split(','))
++        else:
++            special_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] in special_members:
+@@ -2870,6 +2876,9 @@ class AutodocDirective(SphinxDirective):
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
+             entries = [entry for entry in entries if entry[0] in private_members]
+ 
+         # Apply members option, if given
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..8abb8364e 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1177,9 +1177,14 @@ class AutodocDirective(SphinxDirective):
+             'special-members': directives.unchanged,
+             'undoc-members': directives.flag,
+             'noqa': directives.flag,
++            'private-members': directives.unchanged,
++            'exclude-members': directives.unchanged,
++        })
++        else:
++            self.option_spec.update({
++            'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
+             'undoc-members': directives.flag,
+             'noqa': directives.flag,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..8b9b107b8 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1154,7 +1154,7 @@ class AutodocDirective(SphinxDirective):
+         self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+-            'exclude-members': directives.unchanged,
++            'exclude-members': directives.unchanged,
+             'noindex': directives.flag,
+             'noindexentry': directives.flag,
+             'noqa': directives.flag,
+@@ -1165,7 +1165,10 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
+-            'undoc-members': directives.flag,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
++        })
++
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..27e9a0a3f 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1170,6 +1170,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -1155,7 +1155,7 @@ class AutodocDirective(SphinxDirective):
+         self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+-            'exclude-members': directives.unchanged,
++            'exclude-members': directives.unchanged,
+             'noindex': directives.flag,
+             'noindexentry': directives.flag,
+             'noqa': directives.flag,
+@@ -1166,9 +1166,12 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
+-            'undoc-members': directives.flag,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -2862,6 +2862,15 @@ class AutodocDirective(SphinxDirective):
+         # Apply exclude-members option, if given
+         if 'exclude-members' in self.options:
+             exclude_members = set(self.options['exclude-members'].split(','))
++        else:
++            exclude_members = set()
++
++        # Apply private-members option, if given
++        if 'private-members' in self.options:
++            # Handle private-members option with comma separated values
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                # Handle list case
++                private_members = set(self.options['private-members'])
++        else:
++            private_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] not in exclude_members and entry[0] in private_members:
+@@ -2877,6 +2886,9 @@ class AutodocDirective(SphinxDirective):
+         # Apply special-members option, if given
+         if 'special-members' in self.options:
+             special_members = set(self.options['special-members'].split(','))
++        else:
++            special_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] in special_members:
+@@ -2897,6 +2903,12 @@ class AutodocDirective(SphinxDirective):
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
+             entries = [entry for entry in entries if entry[0] in private_members]
+ 
+         # Apply members option, if given
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..7086b90e8 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -2890,6 +2890,15 @@ class AutodocDirective(SphinxDirective):
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++
++            # Filter entries to only include those in private_members
++            filtered_entries = []
++            for entry in entries:
++                if entry[0] in private_members:
++                    filtered_entries.append(entry)
++            entries = filtered_entries
+         else:
+             # If no private members specified, handle like before
+             pass
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..8f7814193 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1169,6 +1169,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..65024934a 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1172,6 +1172,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -2860,10 +2860,15 @@ class AutodocDirective(SphinxDirective):
+         # Apply exclude-members option, if given
+         if 'exclude-members' in self.options:
+             exclude_members = set(self.options['exclude-members'].split(','))
++        else:
++            exclude_members = set()
++
++        # Apply private-members option, if given
++        if 'private-members' in self.options:
++            # Handle private-members option with comma separated values
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                # Handle list case
++                private_members = set(self.options['private-members'])
++        else:
++            private_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] not in exclude_members and entry[0] in private_members:
+@@ -2876,6 +2881,9 @@ class AutodocDirective(SphinxDirective):
+         # Apply special-members option, if given
+         if 'special-members' in self.options:
+             special_members = set(self.options['special-members'].split(','))
++        else:
++            special_members = set()
++
+         final_entries = []
+         for entry in entries:
+             if entry[0] in special_members:
+@@ -2889,10 +2894,18 @@ class AutodocDirective(SphinxDirective):
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++
++            # Filter entries for private members
++            filtered_entries = []
++            for entry in entries:
++                if entry[0] in private_members:
++                    filtered_entries.append(entry)
++            entries = filtered_entries
+         else:
+             # If no private members specified, handle like before
+             pass
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..12c0940de 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1154,7 +1154,7 @@ class AutodocDirective(SphinxDirective):
+         self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+-            'exclude-members': directives.unchanged,
++            'exclude-members': directives.unchanged,
+             'noindex': directives.flag,
+             'noindexentry': directives.flag,
+             'noqa': directives.flag,
+@@ -1165,9 +1165,12 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
+-            'undoc-members': directives.flag,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..1776264d7 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1177,6 +1177,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..548325a2d 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1250,12 +1250,15 @@ class AutodocDirective(SphinxDirective):
+             self.option_spec.update({
+                 'members': directives.unchanged,
+                 'member': directives.unchanged,
++                'private-members': directives.unchanged,
+                 'exclude-members': directives.unchanged,
+                 'noindex': directives.flag,
+                 'noindexentry': directives.flag,
+                 'noqa': directives.flag,
++                'special-members': directives.unchanged,
++                'undoc-members': directives.flag,
+             })
+ 
+             self.__class__ = self.__class__.get_subclass(self.docname)
+@@ -1258,7 +1261,25 @@ class AutodocDirective(SphinxDirective):
+         # Set up the docstring and the signature
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+-        self.option_spec.update({
++        # Handle private-members option with comma separated values
++        if 'private-members' in self.options:
++            if isinstance(self.options['private-members'], str):
++                self.options['private-members'] = set(self.options['private-members'].split(','))
++            else:
++                self.options['private-members'] = set(self.options['private-members'])
++        else:
++            self.options['private-members'] = set()
++
++        # Handle special-members option with comma separated values
++        if 'special-members' in self.options:
++            if isinstance(self.options['special-members'], str):
++                self.options['special-members'] = set(self.options['special-members'].split(','))
++            else:
++                self.options['special-members'] = set(self.options['special-members'])
++        else:
++            self.options['special-members'] = set()
++
++        # Handle exclude-members option
++        if 'exclude-members' in self.options:
++            if isinstance(self.options['exclude-members'], str):
++                self.options['exclude-members'] = set(self.options['exclude-members'].split(','))
++            else:
++                self.options['exclude-members'] = set(self.options['exclude-members'])
++        else:
++            self.options['exclude-members'] = set()
++
++        # Handle undoc-members option
++        if 'undoc-members' in self.options:
++            self.options['undoc-members'] = True
++        else:
++            self.options['undoc-members'] = False
++
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..f31096e6e 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1167,6 +1167,10 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -2592,6 +2592,28 @@ class AutodocDirective(SphinxDirective):
+         # Handle private-members option
+         if 'private-members' in self.options and self.options['private-members']:
+             # If private-members is specified, include private members
++            # Handle comma separated private member names
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++
++            # Filter entries to include only specified private members
++            filtered_entries = []
++            for entry in entries:
++                if entry[0] in private_members:
++                    filtered_entries.append(entry)
++            entries = filtered_entries
+         else:
+             # Include all or none when not specified
+             pass
+@@ -2889,6 +2911,22 @@ class AutodocDirective(SphinxDirective):
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++
++            # Filter entries to include only specified private members
++            filtered_entries = []
++            for entry in entries:
++                if entry[0] in private_members:
++                    filtered_entries.append(entry)
++            entries = filtered_entries
+         else:
+             # If no private members specified, handle like before
+             pass
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..9a4869338 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1179,6 +1179,10 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..734861006 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,11 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
+-            'members': directives.unchanged,
+-            'member': directives.unchanged,
+-            'exclude-members': directives.unchanged,
+-            'noindex': directives.flag,
+-            'noindexentry': directives.flag,
+-            'noqa': directives.flag,
+-            'private-members': directives.unchanged,
+-            'special-members': directives.unchanged,
+-            'undoc-members': directives.flag,
+-        })
++        self.option_spec.update({
++            'members': directives.unchanged,
++            'member': directives.unchanged,
++            'exclude-members': directives.unchanged,
++            'noindex': directives.flag,
++            'noindexentry': directives.flag,
++            'noqa': directives.flag,
++            'private-members': directives.unchanged,
++            'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++        })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..41103b34f 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -2590,14 +2590,13 @@ class AutodocDirective(SphinxDirective):
+         # Handle private-members option
+         if 'private-members' in self.options and self.options['private-members']:
+             # If private-members is specified, include private members
+-            private_members = set()
+-            if isinstance(self.options['private-members'], str):
+-                for member in self.options['private-members'].split(','):
+-                    private_members.add(member.strip())
+-            else:
+-                for member in self.options['private-members']:
+-                    private_members.add(member)
+-
+-            # Filter to only include specified private members
+-            entries = [entry for entry in entries if entry[0] in private_members]
++            # Apply private-members option with comma separated values
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++            entries = [entry for entry in entries if entry[0] in private_members]
+         else:
+             # Include all or none when not specified
+             pass
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..c090de7d3 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1165,6 +1165,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1165,6 +1165,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..59c31012d 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1165,6 +1165,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..665d417b5 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1150,7 +1150,7 @@ class AutodocDirective(SphinxDirective):
+         if not self.option_spec:
+             self.option_spec = self.make_option_spec()
+ 
+-        self.option_spec.update({
++        self.option_spec.update({
+             'members': directives.unchanged,
+             'member': directives.unchanged,
+             'exclude-members': directives.unchanged,
+@@ -1164,6 +1164,9 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,
++            'undoc-members': directives.flag,
++            'exclude-members': directives.unchanged,
+         })
+ 
+         self.__class__ = self.__class__.get_subclass(self.docname)
+ 
+         # If the docname is present but the class is not yet generated
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..290f38883 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -2590,13 +2590,15 @@ class AutodocDirective(SphinxDirective):
+         # Handle private-members option
+         if 'private-members' in self.options and self.options['private-members']:
+             # If private-members is specified, include private members
+-            # Filter to only include specified private members
+-            private_members = set()
+-            if isinstance(self.options['private-members'], str):
+-                for member in self.options['private-members'].split(','):
+-                    private_members.add(member.strip())
+-            else:
+-                for member in self.options['private-members']:
+-                    private_members.add(member)
+-
+-            entries = [entry for entry in entries if entry[0] in private_members]
++            # Handle comma-separated private member names
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++
++            # Filter to only include specified private members
++            filtered_entries = []
++            for entry in entries:
++                if entry[0] in private_members:
++                    filtered_entries.append(entry)
++            entries = filtered_entries
+         else:
+             # Include all or none when not specified
+             pass
+@@ -2912,8 +2915,12 @@ class AutodocDirective(SphinxDirective):
+         # Apply private-members option, if given
+         if 'private-members' in self.options:
+             # Filter to only include specified private members
++            if isinstance(self.options['private-members'], str):
++                private_members = set(self.options['private-members'].split(','))
++            else:
++                private_members = set(self.options['private-members'])
++
++            # Apply the filtering with the members
+             entries = [entry for entry in entries if entry[0] in private_members]
+         else:
+             # If no private members specified, handle like before
+             pass
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 310e8529a..9150b80dc 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1165,6 +1165,10 @@ class AutodocDirective(SphinxDirective):
+             'noqa': directives.flag,
+             'private-members': directives.unchanged,
+             'special-members': directives.unchanged,

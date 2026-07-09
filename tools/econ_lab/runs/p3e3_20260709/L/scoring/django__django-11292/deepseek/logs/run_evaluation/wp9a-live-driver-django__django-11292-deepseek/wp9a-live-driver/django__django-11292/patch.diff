@@ -1,0 +1,60 @@
+diff --git a/django/core/management/base.py b/django/core/management/base.py
+index abc123..def456 100644
+--- a/django/core/management/base.py
++++ b/django/core/management/base.py
+@@ -1,6 +1,6 @@
+ """
+ Base classes for writing management commands (named commands which can
+-be executed through ``django-admin`` or ``manage.py``).
++be executed through ``django-admin`` or ``manage.py``). 
+ """
+ 
+ 
+@@ -50,6 +50,7 @@ class BaseCommand:
+         'no_color',
+         'force_color',
+         'skip_checks',
++        'skip_checks',
+     ]
+     requires_system_checks = True
+     requires_migrations_checks = False
+@@ -82,6 +83,7 @@ class BaseCommand:
+     def create_parser(self, prog_name, subcommand, **kwargs):
+         parser = CommandParser(
+             prog='%s %s' % (os.path.basename(prog_name), subcommand),
++            description=self.help or 'Run the %s command' % subcommand,
+             description=self.help or 'Run the %s command' % subcommand,
+             **kwargs
+         )
+@@ -110,9 +112,14 @@ class BaseCommand:
+             help='Tells Django to NOT use colored output.',
+         )
+         parser.add_argument(
++            '--skip-checks', action='store_true', default=False,
++            help='Skip system check framework (default: %(default)s).',
++        )
++        parser.add_argument(
+             '--skip-checks', action='store_true', default=False,
+             help='Skip system checks framework (default: %(default)s)',
+         )
++        self.add_arguments(parser)
+         self.add_arguments(parser)
+         return parser
+ 
+@@ -123,14 +130,13 @@ class BaseCommand:
+         # Trigger system checks.
+         if options['skip_checks']:
+             return
+-        if self.requires_system_checks:
++        if self.requires_system_checks and not options.get('skip_checks'):
+             self.check(
+                 display_num=True,
+                 app_configs=self.required_app_configs,
+                 tags=self.required_system_checks_tags,
+                 databases=self.required_databases,
+-                fail_level=checks.ERROR,
+-            )
++                fail_level=checks.ERROR)
+ 
+     def check(self, app_configs=None, tags=None, databases=None, display_num=False,
+               include_deployment_checks=True, fail_level=checks.ERROR):

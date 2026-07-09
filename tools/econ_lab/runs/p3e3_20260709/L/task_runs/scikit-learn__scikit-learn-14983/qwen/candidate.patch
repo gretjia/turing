@@ -1,0 +1,28 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+index 11ef7a3574..52158ba880 100644
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -1100,6 +1100,11 @@ class RepeatedKFold(BaseCrossValidator):
+         self.n_splits = n_splits
+         self.n_repeats = n_repeats
+         self.random_state = random_state
++
++    def __repr__(self):
++        return ("RepeatedKFold(n_splits=%d, n_repeats=%d, "
++                "random_state=%s)" % (
++                    self.n_splits, self.n_repeats, self.random_state))
+ 
+     def split(self, X, y=None):
+         """Generate indices to split data into training and test set.
+@@ -1150,6 +1155,11 @@ class RepeatedStratifiedKFold(BaseCrossValidator):
+         self.n_splits = n_splits
+         self.n_repeats = n_repeats
+         self.random_state = random_state
++
++    def __repr__(self):
++        return ("RepeatedStratifiedKFold(n_splits=%d, n_repeats=%d, "
++                "random_state=%s)" % (
++                    self.n_splits, self.n_repeats, self.random_state))
+ 
+     def split(self, X, y=None):
+         """Generate indices to split data into training and test set.

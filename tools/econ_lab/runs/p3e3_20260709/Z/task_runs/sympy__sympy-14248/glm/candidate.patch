@@ -1,0 +1,13 @@
+diff --git a/sympy/printing/str.py b/sympy/printing/str.py
+index 1d4f9a3e..0935e2c0 100644
+--- a/sympy/printing/str.py
++++ b/sympy/printing/str.py
+@@ -1071,7 +1071,7 @@ class StrPrinter(Printer):
+             return self.emptyPrinter(expr)
+ 
+         def is_negated(term):
+-            return term.is_Mul and term.args[0] == -1
++            return term.is_Mul and term.args[0].is_Number and term.args[0] == -1
+ 
+         # Handle the first term specially
+         if args[0].is_Number and _coeff_is_negative(args[0]):

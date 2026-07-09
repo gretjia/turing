@@ -1,0 +1,20 @@
+diff --git a/sklearn/svm/base.py b/sklearn/svm/base.py
+index 2f67b8f..f30fdd6 100644
+--- a/sklearn/svm/base.py
++++ b/sklearn/svm/base.py
+@@ -293,6 +293,14 @@ class BaseLibSVM(BaseEstimator, metaclass=ABCMeta):
+         X = sp.csr_matrix(X)
+         X.data = np.asarray(X.data, dtype=np.float64, order='C')
+ 
++        # Handle the case where no support vectors are found (e.g., all
++        # points are within epsilon-tube for SVR). In this case n_sv.sum()
++        # is zero, leading to division by zero later.
++        if libsvm_sparse.n_sv.sum() == 0:
++            self.support_ = np.empty(0, dtype=np.int32)
++            self.support_vectors_ = sp.csr_matrix(X.shape[0], dtype=np.float64)
++            self.dual_coef_ = sp.csr_matrix([])
++            return self
++
+         # In libsvm, for regression and one-class, n_class is 1, but for
+         # multiclass, it is the number of classes (>=2).
+         # The dual coefficients are stored as a sparse matrix, where each

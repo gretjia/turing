@@ -1,0 +1,10 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -141,5 +141,5 @@ def fixture(self, request):
+         if teardown is not None:
+             teardown()
+ 
+-    fixture.__name__ = "unittest_{}_fixture_{}".format(setup_name, obj.__name__)
++    fixture.__name__ = "_unittest_{}_fixture_{}".format(setup_name, obj.__name__)
+     return fixture

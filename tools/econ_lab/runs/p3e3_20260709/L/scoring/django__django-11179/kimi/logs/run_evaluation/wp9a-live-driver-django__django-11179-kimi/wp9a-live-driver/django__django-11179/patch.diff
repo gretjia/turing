@@ -1,0 +1,11 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -276,6 +276,7 @@ class Collector:
+             if fast_deletes:
+                 count = sql.DeleteQuery(fast_deletes[0]).delete_batch([instance.pk], self.using)
+                 deleted_counter[fast_deletes[0]._meta.label] = count
++                setattr(instance, fast_deletes[0]._meta.pk.attname, None)
+                 self.data = {}
+ 
+         # fast deletes

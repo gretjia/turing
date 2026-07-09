@@ -1,0 +1,36 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index d0a6d8e..8c50f1e 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -929,13 +929,27 @@
+         return mtransforms.Bbox.union([self.get_bbox_for_children(), self.xybox])
+ 
+     def draw(self, renderer):
++        if not self.get_visible():
++            return
++            
++        # The AnnotationBbox gid is not passed to the children for rendering,
++        # which causes the gid to be lost when saving to SVG.
++        # Fix this by temporarily setting the AnnotationBbox's gid on children
++        # that don't have a gid themselves.
++        original_gids = [artist.get_gid() for artist in self.get_children()]
++        
++        # Track which children had their gid changed
++        changed_gids = []
+         for idx, artist in enumerate(self.get_children()):
+-            artist.draw(renderer)
++            if artist.get_gid() is None:
++                changed_gids.append(idx)
++                artist.set_gid(self.get_gid())
+         
++        # Draw the children
+         for artist in self.get_children():
+             artist.draw(renderer)
++        
++        # Restore original gids
++        for idx in changed_gids:
++            self.get_children()[idx].set_gid(original_gids[idx])
++            
+     def contains(self, mouseevent):
+         """Test whether the mouse event occurred in the annotation."""
+         return self.stale and contains(self, mouseevent)

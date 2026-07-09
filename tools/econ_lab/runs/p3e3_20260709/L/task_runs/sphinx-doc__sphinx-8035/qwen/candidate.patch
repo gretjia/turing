@@ -1,0 +1,73 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 30b0d5930..6a82630f9 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1666,6 +1666,10 @@ class Documenter:
+             return []
+ 
+     def get_objects(self):
++        # Handle private-members option with specific member names
++        private_members = self.options.get('private-members', [])
++        if isinstance(private_members, str):
++            private_members = [private_members] if private_members else []
++
+         # Get all members of the object
+         all_members = self.get_members(False)
+         # Filter members based on options
+@@ -1677,7 +1681,14 @@ class Documenter:
+         # Get members that are explicitly included
+         includefunc = self.get_included_members()
+         members = self.get_members(includefunc)
+-        if self.options.get('private-members'):
++        
++        # Filter private members based on explicit listing
++        if self.options.get('private-members'):
++            if isinstance(self.options.get('private-members'), list):
++                # If private-members is a list, only include those specific members
++                private_members = self.options.get('private-members')
++                members = [(name, obj) for name, obj in members 
++                          if name in private_members and name.startswith('_')]
++            else:
++                # If private-members is True, include all private members
++                members = [(name, obj) for name, obj in members if name.startswith('_')]
++
+         # Filter by member names if specified
+         if self.options.get('members'):
+             member_names = self.options.get('members')
+@@ -1689,11 +1699,10 @@ class Documenter:
+             members = [(name, obj) for name, obj in members if name in member_names]
+ 
+         # Filter by private members if specified
+-        if self.options.get('private-members'):
+-            members = [(name, obj) for name, obj in members if name.startswith('_')]
+-
+         # Filter by special members if specified
+         if self.options.get('special-members'):
+             special_members = self.options.get('special-members')
+@@ -1720,10 +1729,12 @@ class ModuleDocumenter(Documenter):
+     def get_objects(self):
+         # Get all members of the module
+         all_members = self.get_members(False)
+-        if self.options.get('private-members'):
++        # Handle private-members option with specific member names
++        private_members = self.options.get('private-members', [])
++        if isinstance(private_members, str):
++            private_members = [private_members] if private_members else []
++
+         # Filter members based on options
+         members = self.get_members(self.get_included_members())
+ 
+@@ -1735,7 +1746,14 @@ class ModuleDocumenter(Documenter):
+         # Filter by private members if specified
+         if self.options.get('private-members'):
+             if isinstance(self.options.get('private-members'), list):
+-                members = [(name, obj) for name, obj in members if name.startswith('_')]
++                # If private-members is a list, only include those specific members
++                private_members = self.options.get('private-members')
++                members = [(name, obj) for name, obj in members 
++                          if name in private_members and name.startswith('_')]
++            else:
++                # If private-members is True, include all private members
++                members = [(name, obj) for name, obj in members if name.startswith('_')]
++
+         return members

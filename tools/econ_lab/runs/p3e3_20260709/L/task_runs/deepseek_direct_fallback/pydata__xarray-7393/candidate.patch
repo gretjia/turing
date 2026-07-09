@@ -1,0 +1,22 @@
+diff --git a/xarray/core/merge.py b/xarray/core/merge.py
+index 68ae9faa..2f762c4e 100644
+--- a/xarray/core/merge.py
++++ b/xarray/core/merge.py
+@@ -370,9 +370,14 @@ def _create_multi_index_from_coords(
+     if levels is None:
+         levels = [cg_key] * len(mi_coord_names)
+     if codes is None:
+-        codes = np.arange(np.prod(mi_sub_shapes)).reshape(mi_sub_shapes)
+-    codes = np.unravel_index(codes, mi_sub_shapes)
+-    mi_index = pd.MultiIndex(levels, codes, names=mi_index_names)
++        codes = pd.MultiIndex.from_product(
++            [np.arange(s) for s in mi_sub_shapes], names=mi_index_names
++        ).codes
++    else:
++        codes = [np.array(c, dtype=np.intp) for c in codes]
++    mi_index = pd.MultiIndex(
++        levels, codes, names=mi_index_names
++    )
+     mi_coords = {
+         mi_coord_name: IndexVariable(mi_coord_name, mi_index)
+         for mi_coord_name in mi_coord_names

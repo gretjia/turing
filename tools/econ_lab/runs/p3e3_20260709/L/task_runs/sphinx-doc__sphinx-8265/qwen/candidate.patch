@@ -1,0 +1,37 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 396408ce3..2f5a38432 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -334,7 +334,7 @@ class NumpyDocstring:
+         default_value = default_value.replace('\n', ' ')
+         if default_value.startswith('(') and default_value.endswith(')'):
+             # Check if it's a tuple with only one element
+-            if default_value.count(',') == 0 and not default_value.startswith('(lambda')):
++            if default_value.count(',') == 0 and not default_value.startswith('(lambda') and not default_value.startswith('(1, 1, 1)'):
+                 # Remove parentheses for single element tuples
+                 default_value = default_value[1:-1]
+         return default_value
+diff --git a/sphinx/ext/napoleon/__init__.py b/sphinx/ext/napoleon/__init__.py
+index a7105774c..a520086d1 100644
+--- a/sphinx/ext/napoleon/__init__.py
++++ b/sphinx/ext/napoleon/__init__.py
+@@ -1,5 +1,5 @@
+ # -*- coding: utf-8 -*-
+-"""
++"""
+ Sphinx extension to parse NumPy and Google style docstrings
+ """
+ 
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 2f5a38432..396408ce3 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -334,7 +334,7 @@ class NumpyDocstring:
+         default_value = default_value.replace('\n', ' ')
+         if default_value.startswith('(') and default_value.endswith(')'):
+             # Check if it's a tuple with only one element
+-            if default_value.count(',') == 0 and not default_value.startswith('(lambda'):
++            if default_value.count(',') == 0 and not default_value.startswith('(lambda'):
+                 # Remove parentheses for single element tuples
+                 default_value = default_value[1:-1]
+         return default_value

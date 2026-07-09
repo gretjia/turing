@@ -1,0 +1,124 @@
+{
+  "alpha_prime": 0.025,
+  "arm_stats_full": {
+    "L": {
+      "infra_null": 10,
+      "k_pass": 2,
+      "n_settled": 40,
+      "n_total": 50,
+      "rate": 0.05
+    },
+    "R": {
+      "infra_null": 3,
+      "k_pass": 3,
+      "n_settled": 47,
+      "n_total": 50,
+      "rate": 0.06382978723404255
+    },
+    "Z": {
+      "infra_null": 9,
+      "k_pass": 1,
+      "n_settled": 41,
+      "n_total": 50,
+      "rate": 0.024390243902439025
+    }
+  },
+  "arm_stats_phase1": {
+    "L": {
+      "infra_null": 6,
+      "k_pass": 1,
+      "n_settled": 16,
+      "n_total": 22,
+      "rate": 0.0625
+    },
+    "R": {
+      "infra_null": 2,
+      "k_pass": 2,
+      "n_settled": 20,
+      "n_total": 22,
+      "rate": 0.1
+    },
+    "Z": {
+      "infra_null": 6,
+      "k_pass": 0,
+      "n_settled": 16,
+      "n_total": 22,
+      "rate": 0.0
+    }
+  },
+  "arm_stats_phase2": {
+    "L": {
+      "infra_null": 4,
+      "k_pass": 1,
+      "n_settled": 24,
+      "n_total": 28,
+      "rate": 0.041666666666666664
+    },
+    "R": {
+      "infra_null": 1,
+      "k_pass": 1,
+      "n_settled": 27,
+      "n_total": 28,
+      "rate": 0.037037037037037035
+    },
+    "Z": {
+      "infra_null": 3,
+      "k_pass": 1,
+      "n_settled": 25,
+      "n_total": 28,
+      "rate": 0.04
+    }
+  },
+  "canaries": {
+    "L": 1,
+    "R": 1,
+    "Z": 0
+  },
+  "frozen_by": "CAPSULE_A_P3E3_grok_20260709 \u00a74",
+  "judgment_domain": "PHASE2",
+  "p3e3_outcome": "NULL_HONEST_RECORD",
+  "rank_inversions_descriptive_L_phase2": [
+    {
+      "instance_id": "scikit-learn__scikit-learn-14496",
+      "phase2_ordinal": 9,
+      "q_eff": 0.5338,
+      "route": "armA::deepseek"
+    }
+  ],
+  "schema": "econ_lab.p3e3_readout.v1",
+  "soundness_flag": false,
+  "status_ceiling": "ADDRESSED",
+  "supported": {
+    "H_E3a_L_gt_Z": false,
+    "H_E3b_L_gt_R": false
+  },
+  "t_half_descriptive_L": {
+    "note": "descriptive only; uses P=0.5 baseline for Q_eff recompute when priors not inlined",
+    "per_route_settlements_to_half_gap": {
+      "armA::deepseek": 1,
+      "armA::glm": 1,
+      "armA::kimi": 1,
+      "armB::deepseek": 1,
+      "armB::glm": 1,
+      "armB::kimi": 1,
+      "armB::qwen": 1,
+      "armC::deepseek": 1,
+      "armC::glm": 1,
+      "armC::qwen": 1
+    }
+  },
+  "tests": {
+    "H_E3a_L_gt_Z": {
+      "b_left_pass_right_fail": 0,
+      "c_left_fail_right_pass": 0,
+      "n_discordant": 0,
+      "p_one_sided": null
+    },
+    "H_E3b_L_gt_R": {
+      "b_left_pass_right_fail": 1,
+      "c_left_fail_right_pass": 1,
+      "n_discordant": 2,
+      "p_one_sided": 0.75
+    }
+  }
+}

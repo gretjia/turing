@@ -1,0 +1,14 @@
+diff --git a/astropy/units/decorators.py b/astropy/units/decorators.py
+index 0b3d4e8..c3f9e4a 100644
+--- a/astropy/units/decorators.py
++++ b/astropy/units/decorators.py
+@@ -222,7 +222,10 @@ def wrapper(*args, **kwargs):
+             # Get the return value of the function
+             return_ = func(*args, **kwargs)
+ 
+-            return return_.to(wrapped_signature.return_annotation)
++            # Skip unit conversion if return value is None
++            if return_ is not None:
++                return return_.to(wrapped_signature.return_annotation)
++
+         return wrapper

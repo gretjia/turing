@@ -1,0 +1,50 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pydata/xarray:scaffold:sha256:e884e538e0435436d4271a7479b1194b155264081804d6bf9597c875c75730ef",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:9ecf530a59ab068f365cb3888dd7ce1ba1ecddce361f1ec7244007e2c09f899a",
+    "price_signal_hash": "sha256:b77e7965d705360716424449e98fab4398ee160f11330706f5c6d213368e1b26",
+    "route_id": "pydata__xarray-6938::armC::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": null,
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armC",
+        "error_message": "The read operation timed out",
+        "error_type": "TimeoutError",
+        "instance_id": "pydata__xarray-6938",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "ERROR"
+      },
+      "worker_result_status": "ERROR"
+    }
+  ],
+  "domain_bucket": "pydata/xarray",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pydata__xarray-6938",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "kimi",
+  "selected_route_id": "pydata__xarray-6938::armC::kimi",
+  "task_index": 14
+}

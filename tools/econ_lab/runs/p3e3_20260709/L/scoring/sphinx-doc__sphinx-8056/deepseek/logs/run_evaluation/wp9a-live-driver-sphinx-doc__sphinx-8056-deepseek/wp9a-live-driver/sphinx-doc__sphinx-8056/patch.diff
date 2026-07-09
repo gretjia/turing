@@ -1,0 +1,25 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index f5a9b2c..e7d8f9a 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -350,13 +350,16 @@ class NumpyDocstring:
+         # existing code parsing lines
+         for line in section:
+             # match parameter line
+-            match = self._param_re.match(line)
++            match = re.match(r'^([^:]+?)\s*:\s*(.*?)\s*$', line)
+             if match:
+-                param_name = match.group(1).strip()
++                param_names = [n.strip() for n in match.group(1).split(',')]
+                 param_type = match.group(2).strip()
+                 # handle optional
+                 is_optional = False
+                 if param_type.lower().endswith(', optional'):
+                     is_optional = True
+                     param_type = param_type[:-len(', optional')].strip()
+                 # ... (rest of the processing for each parameter would then use param_name)
++                for param_name in param_names:
++                    # original append logic would go here
++                    fields.append((
++                        param_name, param_type, is_optional, ...
++                    ))

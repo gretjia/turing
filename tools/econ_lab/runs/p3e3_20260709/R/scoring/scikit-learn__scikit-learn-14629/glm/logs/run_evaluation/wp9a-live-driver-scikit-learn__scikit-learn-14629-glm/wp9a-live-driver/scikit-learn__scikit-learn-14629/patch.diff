@@ -1,0 +1,23 @@
+diff --git a/sklearn/model_selection/_validation.py b/sklearn/model_selection/_validation.py
+index 91c9e65..b082d6c 100644
+--- a/sklearn/model_selection/_validation.py
++++ b/sklearn/model_selection/_validation.py
+@@ -854,7 +854,15 @@
+             # predict may be a list or array (multi-output), we need to handle this
+             # case to get only the last label column
+             prediction = _safe_indexing(prediction, -1, axis=1)
+-
+-        # Get the classes of the estimator
+-        classes = estimator.classes_
++        
++        # Get the classes of the estimator
++        if (method in ['predict_proba', 'predict_log_proba'] and 
++               hasattr(estimator, 'estimators_')):
++            # For MultiOutputClassifier, collect classes from each estimator
++            classes = [est.classes_ for est in estimator.estimators_]
++        else:
++            # Regular case
++            classes = estimator.classes_
+ 
+         if prediction.ndim == 1:
+             # binary or multiclass

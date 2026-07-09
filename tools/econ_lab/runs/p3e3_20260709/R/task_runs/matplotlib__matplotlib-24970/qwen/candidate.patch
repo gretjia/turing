@@ -1,0 +1,16 @@
+diff --git a/lib/matplotlib/colors.py b/lib/matplotlib/colors.py
+index 85d450155b..e6e60e2d33 100644
+--- a/lib/matplotlib/colors.py
++++ b/lib/matplotlib/colors.py
+@@ -727,10 +727,10 @@ class ListedColormap:
+         # Handle out-of-bounds values
+         if self._i_under is not None:
+             xa[xa < 0] = self._i_under
+-        if self._i_over is not None:
++        if self._i_over is not None and self._i_over < 256:
+             xa[xa > self.N - 1] = self._i_over
+-        if self._i_bad is not None:
++        if self._i_bad is not None and self._i_bad < 256:
+             xa[mask_bad] = self._i_bad
+-        xa = xa.astype(np.uint8)
++        xa = xa.astype(np.uint8, casting='unsafe')

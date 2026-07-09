@@ -1,0 +1,27 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index a33e0d8..c78f8d6 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -100,7 +100,21 @@ class Documenter:
+         if match:
+             name, args = match.groups()
+-            args = [arg.strip() for arg in args.split(',')]
++            # Split on commas that are not inside parentheses
++            args_list = []
++            depth = 0
++            current = []
++            for ch in args:
++                if ch == '(':
++                    depth += 1
++                    current.append(ch)
++                elif ch == ')':
++                    depth -= 1
++                    current.append(ch)
++                elif ch == ',' and depth == 0:
++                    args_list.append(''.join(current).strip())
++                    current = []
++                else:
++                    current.append(ch)
++            if current:
++                args_list.append(''.join(current).strip())
++            args = args_list

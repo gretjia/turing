@@ -1,0 +1,46 @@
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index 941281075..893fe900f 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -3278,7 +3278,7 @@ class Dataset(DataWithCoords):
+         dims = tuple(dims)
+         if not dims:
+             raise ValueError("dims cannot be empty")
+-        index = pd.MultiIndex.from_arrays([self._variables[d].to_numpy() for d in dims])
++        index = pd.MultiIndex.from_arrays([self._variables[d].to_numpy() for d in dims], names=dims)
+         return self._replace_with_new_dims(index, dims)
+ 
+     def _replace_with_new_dims(self, index: pd.Index, dims: tuple) -> "Dataset":
+diff --git a/xarray/core/variable.py b/xarray/core/variable.py
+index 954c948f9..5d3b621c0 100644
+--- a/xarray/core/variable.py
++++ b/xarray/core/variable.py
+@@ -1912,7 +1912,10 @@ class Variable(DataWithCoords):
+             # to preserve dtype, we need to explicitly pass it
+             from . import dataarray
+             return dataarray.DataArray(
+-                self._data, dims=self.dims, coords=self.coords, name=self.name
++                self._data, dims=self.dims, coords=self.coords, name=self.name,
++                # preserve original dtype when converting to numpy array
++                dtype=self.dtype
+             )
+ 
+     def to_pandas(self) -> pd.Series:
+diff --git a/xarray/core/variable.py b/xarray/core/variable.py
+index 954c948f9..5d3b621c0 100644
+--- a/xarray/core/variable.py
++++ b/xarray/core/variable.py
+@@ -1910,10 +1910,12 @@ class Variable(DataWithCoords):
+             # to preserve dtype, we need to explicitly pass it
+             from . import dataarray
+             return dataarray.DataArray(
+-                self._data, dims=self.dims, coords=self.coords, name=self.name
++                self._data, dims=self.dims, coords=self.coords, name=self.name,
++                # preserve original dtype when converting to numpy array
++                dtype=self.dtype
+             )
+ 
+     def to_pandas(self) -> pd.Series:
+ 
+     def to_numpy(self) -> np.ndarray:
+         return np.asarray(self._data)

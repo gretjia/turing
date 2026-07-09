@@ -1,0 +1,13 @@
+diff --git a/xarray/core/computation.py b/xarray/core/computation.py
+index 5a55b46e6..9ef8ac78e 100644
+--- a/xarray/core/computation.py
++++ b/xarray/core/computation.py
+@@ -1646,7 +1646,7 @@ def where(cond, x, y, keep_attrs=None):
+         # exceptions in case of incompatible values; returns Variables.
+         keep_attrs_ = (
+             "drop_conflicts"
+-            if keep_attrs is not None and keep_attrs is not True
++            if keep_attrs is not None and keep_attrs is not True and keep_attrs != 'default'
+             else keep_attrs
+         )
+         dtype = result_dtype(x, y)

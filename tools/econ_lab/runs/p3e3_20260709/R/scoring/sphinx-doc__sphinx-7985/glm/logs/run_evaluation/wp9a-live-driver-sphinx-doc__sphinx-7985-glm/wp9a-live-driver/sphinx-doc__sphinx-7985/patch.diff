@@ -1,0 +1,124 @@
+diff --git a/sphinx/linkcheck/__init__.py b/sphinx/linkcheck/__init__.py
+index eeebac04e..13a814697 100644
+--- a/sphinx/linkcheck/__init__.py
++++ b/sphinx/linkcheck/__init__.py
+@@ -10,6 +10,7 @@
+ from typing import Any, Dict, Generator, List, NamedTuple, Optional, Set, Tuple
+ import posixpath
+ from urllib.parse import urlsplit, urlunsplit, urlparse, urljoin
++import os
+ 
+ import sphinx
+ from sphinx.application import Sphinx
+@@ -44,7 +45,20 @@ def check_links(app: Sphinx, env: BuildEnvironment) -> List[Tuple[str, Dict[str,
+         return []
+ 
+     config = app.config
+-    anchor_re = re.compile(r'^(.+?)(#[^#]*)?$')
++    # Patterns for both external and local links
++    external_anchor_re = re.compile(r'^(.+?)(#[^#]*)?$')
++    local_anchor_re = re.compile(r'^(.+?)(#[^#]*)?$')
++    
++    # Check for local files and anchors
++    local_file_re = re.compile(r'^([^\s#]+)(#[^#]*)?$')
++    project_root = os.path.abspath(app.confdir)
++    
++    # Get all source files
++    source_files = set()
++    for docname in env.found_docs:
++        filename = env.doc2path(docname)
++        source_files.add(os.path.abspath(filename))
++
+     urllist = getattr(config, 'linkcheck_ignore', [])
+     if config.linkcheck_timeout:
+         socket.setdefaulttimeout(config.linkcheck_timeout)
+@@ -58,7 +72,8 @@ def check_links(app: Sphinx, env: BuildEnvironment) -> List[Tuple[str, Dict[str,
+         docname = env.path2doc(docname)
+         if docname is None:
+             # ignore files not found in source tree
+-            continue
++            continue
+            
++        # Parse the document content for references
+         doctree = env.get_doctree(docname)
+         walker = doctree.traverse(nodes.reference)
+         for ref in walker:
+@@ -67,6 +82,7 @@ def check_links(app: Sphinx, env: BuildEnvironment) -> List[Tuple[str, Dict[str,
+                 # only check references with URI or reference
+                 if ref.get('refuri') is None and ref.get('refid') is None:
+                     continue
++                    
+                 if ref.get('refuri'):
+                     uri = ref['refuri']
+                 elif ref.get('refid'):
+@@ -74,20 +90,51 @@ def check_links(app: Sphinx, env: BuildEnvironment) -> List[Tuple[str, Dict[str,
+                 else:
+                     continue
+                    
+-                # check if we should ignore this URI
++                # check if we should ignore this URI
+                 if any(fxmatch.fnmatch(uri, pat) for pat in urllist):
+                     continue
+                    
+-                # Check if the URI is a local link (starts with #)
+-                if uri.startswith('#'):
++                # Case 1: Check for external links
++                if uri.startswith(('http:', 'https:', 'ftp:')):
+                     # Process external link
+-                    anchor = uri[1:]
+-                    anchor_id = anchor.replace(' ', '-')
+-                    msg = {'docname': docname, 'lineno': ref.get('line', 0),
+-                           'status': 'unchecked', 'uri': uri,
+-                           'info': ''}
+-                    yield msg
+-                    continue
++                    m = external_anchor_re.match(uri)
++                # Case 2: Check for internal local links
++                elif uri.startswith('#'):
++                    # Process local anchored link
++                    anchor = uri[1:]
++                    anchor_id = anchor.replace(' ', '-')
++                    msg = {'docname': docname, 'lineno': ref.get('line', 0),
++                           'status': 'local', 'uri': uri,
++                           'info': 'local anchor'}
++                    yield msg
++                    continue
++                # Case 3: Check for local file links (without extension)
++                else:
++                    # Process local file link
++                    m = local_file_re.match(uri)
++                
++                if m:
++                    base, fragment = m.groups()
++                    local_path = urljoin(docname, base)
++                    
++                    # Add .rst extension if missing
++                    if not os.path.splitext(local_path)[1]:
++                        local_path += '.rst'
++                    
++                    # Convert to absolute path
++                    abs_path = os.path.join(project_root, local_path)
++                    
++                    # Check if file exists
++                    if abs_path in source_files:
++                        msg = {'docname': docname, 'lineno': ref.get('line', 0),
++                               'status': 'ok', 'uri': uri,
++                               'info': 'local file found'}
++                    else:
++                        msg = {'docname': docname, 'lineno': ref.get('line', 0),
++                               'status': 'broken', 'uri': uri,
++                               'info': 'local file not found'}
++                    yield msg
++                    continue
+                     
+                 # check if we should ignore this URI
+                 if any(fxmatch.fnmatch(uri, pat) for pat in urllist):
+@@ -132,7 +179,7 @@ def check_links(app: Sphinx, env: BuildEnvironment) -> List[Tuple[str, Dict[str,
+                 return False
+             except Exception as err:
+                 logger.warning('exception occurred during linkcheck check: %r', err)
+-                return False
++                return True  # True for broken links
+         else:
+             response = urlreq.urlopen(url)
+             try:

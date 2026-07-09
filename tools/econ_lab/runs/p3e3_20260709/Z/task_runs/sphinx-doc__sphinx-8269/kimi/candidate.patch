@@ -1,0 +1,17 @@
+diff --git a/sphinx/builders/linkcheck.py b/sphinx/builders/linkcheck.py
+--- a/sphinx/builders/linkcheck.py
++++ b/sphinx/builders/linkcheck.py
+@@ -176,11 +176,11 @@ class CheckExternalLinksBuilder(Builder):
+         try:
+             if anchor and self.app.config.linkcheck_anchors:
+                 # Read the whole page and check for anchor
+                 response = requests.get(req_url, stream=True, timeout=timeout,
+                                         config=self.app.config, **kwargs)
+-                found = check_anchor(response, anchor)
+                 response.raise_for_status()
++                found = check_anchor(response, anchor)
+                 if not found:
+                     return 'broken', "Anchor '%s' not found" % anchor, 0
+             else:
+                 response = requests.head(req_url, timeout=timeout,
+                                          config=self.app.config, **kwargs)

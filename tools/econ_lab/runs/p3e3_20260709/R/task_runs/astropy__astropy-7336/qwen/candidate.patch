@@ -1,0 +1,17 @@
+diff --git a/astropy/units/decorators.py b/astropy/units/decorators.py
+index 40d8707684..30720537f3 100644
+--- a/astropy/units/decorators.py
++++ b/astropy/units/decorators.py
+@@ -222,7 +222,9 @@ def wrapper(*args, **kwargs):
+         # Check the return value if it is annotated
+         if (wrapped_signature.return_annotation is not None
+                 and wrapped_signature.return_annotation is not inspect.Signature.empty):
+-            return_ = func(*args, **kwargs)
+-            return return_.to(wrapped_signature.return_annotation)
++            return_ = func(*args, **kwargs)
++            # Skip unit checking for None return values
++            if return_ is not None:
++                return return_.to(wrapped_signature.return_annotation)
+         return return_
+ 
+     return wrapper

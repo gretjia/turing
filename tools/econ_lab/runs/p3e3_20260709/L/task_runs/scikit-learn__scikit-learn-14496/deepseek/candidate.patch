@@ -1,0 +1,13 @@
+diff --git a/sklearn/cluster/optics_.py b/sklearn/cluster/optics_.py
+index 9fec0fd7d..7bb2ee7be 100644
+--- a/sklearn/cluster/optics_.py
++++ b/sklearn/cluster/optics_.py
+@@ -435,7 +435,7 @@ def compute_optics_graph(X, min_samples, eps, eps_cluster, xi,
+     if min_samples <= 1:
+         min_samples = max(2, min_samples * n_samples)
+ 
+-    nbrs = NearestNeighbors(n_neighbors=min_samples,
++    nbrs = NearestNeighbors(n_neighbors=int(min_samples),
+                             metric=metric, metric_params=metric_params,
+                             algorithm=algorithm, leaf_size=leaf_size,
+                             n_jobs=n_jobs)

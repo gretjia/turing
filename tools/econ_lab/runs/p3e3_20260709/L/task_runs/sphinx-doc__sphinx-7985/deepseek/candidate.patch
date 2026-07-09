@@ -1,0 +1,81 @@
+diff --git a/sphinx/builders/linkcheck.py b/sphinx/builders/linkcheck.py
+index 1df8eb2c..17a87f69 100644
+--- a/sphinx/builders/linkcheck.py
++++ b/sphinx/builders/linkcheck.py
+@@ -30,6 +30,7 @@ from docutils import nodes
+ from sphinx.builders import Builder
+ from sphinx.locale import __
+ from sphinx.util import encode_uri, logging
++from sphinx.util.nodes import inline_all_toctrees
+ from sphinx.util.console import darkgray, darkgreen, darkred, red
+ from sphinx.util.requests import handle_exceptions
+ 
+@@ -155,6 +156,7 @@ class CheckExternalLinksBuilder(Builder):
+         self.hyperlinks = []
+         self.anchors = []
+         self.broken = []
++        self._internal_broken = []
+ 
+     def write(self, build_docnames, updated_docnames, method='update'):
+         self.build_docnames = build_docnames
+@@ -208,6 +210,8 @@ class CheckExternalLinksBuilder(Builder):
+ 
+     def process_doc(self, docname, doctree):
+         """Process a document to find hyperlinks."""
++        from sphinx.transforms.post_transforms import ReferencesResolver
++
+         # Sweep for external hyperlinks
+         for node in doctree.traverse(nodes.reference):
+             uri = None
+@@ -250,6 +254,21 @@ class CheckExternalLinksBuilder(Builder):
+                     self.anchors.append(uri)
+                     continue
+ 
++        # Sweep for unresolved internal references (broken local links)
++        for node in doctree.traverse(nodes.pending_xref):
++            # Only check if it is a pending cross-reference that wasn't resolved
++            if node.get('refdoc') and node.get('reftarget'):
++                uri = node['reftarget']
++                lineno = node.line or 0
++                self.hyperlinks.append({
++                    'uri': uri,
++                    'docname': docname,
++                    'lineno': lineno,
++                    'broken': True,
++                })
++                self._internal_broken.append(uri)
++                continue
++
+     def check_uri(self, hyperlink):
+         """Check a hyperlink for its validity."""
+         uri = hyperlink['uri']
+@@ -261,6 +280,16 @@ class CheckExternalLinksBuilder(Builder):
+ 
+         return info
+ 
++    def _write_internal_broken_links(self):
++        """Write broken internal links to output."""
++        for entry in self._internal_broken:
++            # No URI check needed for internal links;
++            # they are already determined as broken.
++            self.write_hyperlink(entry['uri'], entry['docname'],
++                                 entry['lineno'], 'broken',
++                                 'Internal link not found.')
++        self._internal_broken.clear()
++
+     def write_hyperlink(self, uri, docname, lineno, status, info, type_='local'):
+         """Write a hyperlink to output."""
+         if status == 'unchecked':
+@@ -300,6 +329,12 @@ class CheckExternalLinksBuilder(Builder):
+ 
+     def finish(self):
+         """Finish the checking process."""
++        # Write any broken internal links that have been collected.
++        # These are processed synchronously because they don't require network calls.
++        if hasattr(self, '_internal_broken'):
++            self._write_internal_broken_links()
++        else:
++            pass
+         # Output information about all checked links.
+         for hyperlink in self.hyperlinks:
+             self.write_hyperlink(**hyperlink)

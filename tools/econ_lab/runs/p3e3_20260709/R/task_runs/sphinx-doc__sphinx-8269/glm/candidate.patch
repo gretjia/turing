@@ -1,0 +1,19 @@
+diff --git a/sphinx/ext/linkcheck.py b/sphinx/ext/linkcheck.py
+index b46889ca..552467b8 100644
+--- a/sphinx/ext/linkcheck.py
++++ b/sphinx/ext/linkcheck.py
+@@ -500,7 +500,11 @@ class LinkcheckBuilder(Builder):
+                     'anchor': anchor,
+                     'status': 'broken',
+                     'message': msg,
+-                    'filename': docname,
+-                })
++                    'filename': docname,
++                })
++            # First check if there was an HTTP error before reporting anchor not found
++            if r.status >= 400:
++                return result("%s %s" % (r.status, r.reason), 'broken')
++            return result("Anchor '%s' not found" % anchor, 'broken')
+ 
+         if r.status >= 400:
+             # HTTP errors are considered broken links

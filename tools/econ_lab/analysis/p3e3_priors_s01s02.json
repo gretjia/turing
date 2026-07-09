@@ -1,0 +1,83 @@
+{
+  "priors": {
+    "armA::deepseek": 0.067568,
+    "armA::glm": 0.085366,
+    "armA::kimi": 0.171875,
+    "armA::qwen": 0.012821,
+    "armB::deepseek": 0.315217,
+    "armB::glm": 0.1,
+    "armB::kimi": 0.338235,
+    "armB::qwen": 0.24359,
+    "armC::deepseek": 0.203125,
+    "armC::glm": 0.173077,
+    "armC::kimi": 0.293103,
+    "armC::qwen": 0.086207
+  },
+  "provenance": "pooled S01 Stage A (5 tau arms) + S02 Stage B' (W/F/C/U) settled outcomes, P=(0.5+S)/(1+N), ADR-ECON-003 Decision 6",
+  "schema": "econ_lab.p3e3_priors.v1",
+  "source_runs": [
+    "stageA_20260707",
+    "stageBprime_20260708"
+  ],
+  "source_verdicts": [
+    "tools/econ_lab/runs/stageA_20260707/tau_0/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_0p5/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_1/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_2/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_inf/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/W/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/F/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/C/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/U/verdict.json"
+  ],
+  "support": {
+    "armA::deepseek": {
+      "k": 2,
+      "n": 36
+    },
+    "armA::glm": {
+      "k": 3,
+      "n": 40
+    },
+    "armA::kimi": {
+      "k": 5,
+      "n": 31
+    },
+    "armA::qwen": {
+      "k": 0,
+      "n": 38
+    },
+    "armB::deepseek": {
+      "k": 14,
+      "n": 45
+    },
+    "armB::glm": {
+      "k": 3,
+      "n": 34
+    },
+    "armB::kimi": {
+      "k": 11,
+      "n": 33
+    },
+    "armB::qwen": {
+      "k": 9,
+      "n": 38
+    },
+    "armC::deepseek": {
+      "k": 6,
+      "n": 31
+    },
+    "armC::glm": {
+      "k": 4,
+      "n": 25
+    },
+    "armC::kimi": {
+      "k": 8,
+      "n": 28
+    },
+    "armC::qwen": {
+      "k": 2,
+      "n": 28
+    }
+  }
+}

@@ -1,0 +1,22 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 68aa4fb29..7c8e6f1a5 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -962,11 +962,11 @@ class Documenter:
+                 for argname, annotation in annotations.items():
+                     if annotation:
+-                        formatted = restify(annotation)
++                        formatted = _format_annotation(annotation, self.config)
+                         try:
+                             if int(argname):
+                                 new_argname = argname
+                             else:
+                                 new_argname = argname
+                         except ValueError:
+                             new_argname = argname
+@@ -977,7 +977,7 @@ class Documenter:
+             if return_annotation:
+-                formatted_return = restify(return_annotation)
++                formatted_return = _format_annotation(return_annotation, self.config)
+                 ...
+             # ... append to new_doc

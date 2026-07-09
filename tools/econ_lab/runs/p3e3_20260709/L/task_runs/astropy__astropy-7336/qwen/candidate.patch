@@ -1,0 +1,19 @@
+diff --git a/astropy/units/decorators.py b/astropy/units/decorators.py
+index 13406c87f..96e820f11 100644
+--- a/astropy/units/decorators.py
++++ b/astropy/units/decorators.py
+@@ -222,7 +222,10 @@ def wrapper(*args, **kwargs):
+         # Get the return value from the original function
+         return_ = func(*args, **kwargs)
+ 
+-        # If the function has a return annotation, check that the return value
+-        # has the correct units
+-        if wrapped_signature.return_annotation is not None:
+-            return return_.to(wrapped_signature.return_annotation)
++        # If the function has a return annotation, check that the return value
++        # has the correct units
++        if (wrapped_signature.return_annotation is not None and
++                wrapped_signature.return_annotation != type(None)):
++            return return_.to(wrapped_signature.return_annotation)
+ 
+     return wrapper

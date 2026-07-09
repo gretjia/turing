@@ -1,0 +1,9 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -1180,7 +1180,7 @@
+-class _RepeatedSplits(metaclass=ABCMeta):
++class _RepeatedSplits(BaseEstimator, metaclass=ABCMeta):
+     """Repeated splits for KFold and StratifiedKFold.
+ 
+     Repeats K-Fold n times with different randomization in each repetition.

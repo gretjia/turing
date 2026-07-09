@@ -1,0 +1,192 @@
+diff --git a/sympy/core/operations.py b/sympy/core/operations.py
+index f79f0b3..a3b1b2d 100644
+--- a/sympy/core/operations.py
++++ b/sympy/core/operations.py
+@@ -1,4 +1,5 @@
+ from sympy.core.add import Add
++from sympy.core.mul import Mul
+ from sympy.core.expr import Expr
+ from sympy.core.mul import Mul
+ from sympy.core.power import Pow
+@@ -292,6 +293,15 @@ class Add(Expr):
+                 continue
+             rep.append(term)
+ 
++    @property
++    def _margs(self):
++        """Return Matrix-like arguments for Add instances"""
++        if not self.has(*self.symbols):
++            # If all elements are numbers, convert to matrix
++            if all(arg.is_Matrix for arg in self.args):
++                return tuple(Mul.fromiter(arg for arg in self.args if arg != 0))
++        return self.args
++
+     def __neg__(self):
+         # The total count of sign operations is n-1 so that we
+         # can collapse factors without having to reconstruct the
+diff --git a/sympy/matrices/expressions/matexpr.py b/sympy/matrices/expressions/matexpr.py
+index 9a3b4c5..7b2e1f3 100644
+--- a/sympy/matrices/expressions/matexpr.py
++++ b/sympy/matrices/expressions/matexpr.py
+@@ -1,4 +1,5 @@
+ from functools import wraps
++from sympy.core.add import Add
+ from sympy.core.decorators import _sympifyit
+ from sympy.core.expr import Expr
+ from sympy.core.function import Function
+@@ -269,17 +270,23 @@ class MatrixAdd(Add):
+         from sympy.matrices.expressions import MatrixExpr
+         if any(not isinstance(i, MatrixExpr) for i in args):
+             return super().__new__(cls, *args)
++
+         # Check for compatibility of matrices
+         for a in args[1:]:
+             if a.shape != args[0].shape:
+                 raise ValueError(
+                     "Matrices must have the same dimensions.")
+ 
++        # If all arguments are MatrixSymbols, flatten the expression
++        if all(isinstance(arg, MatrixSymbol) for arg in args):
++            flattened_args = []
++            for arg in args:
++                if isinstance(arg, Add):
++                    flattened_args.extend(arg._margs if hasattr(arg, '_margs') else arg.args)
++                else:
++                    flattened_args.append(arg)
++            args = flattened_args
++
+         return object.__new__(cls)
+-
+-    def __new__(cls, *args):
+-        from sympy.matrices.expressions import MatrixExpr
+-        if any(not isinstance(i, MatrixExpr) for i in args):
+-            return super().__new__(cls, *args)
+-        # Check for compatibility of matrices
+-        for a in args[1:]:
+-            if a.shape != args[0].shape:
+-                raise ValueError(
+-                    "Matrices must have the same dimensions.")
+-        return object.__new__(cls)
++    
++    def __new__(cls, *args):
++        obj = object.__new__(cls)
++        obj._args = args
++        return obj
++
+     @property
+     def shape(self):
+         return self.args[0].shape
+@@ -293,6 +300,7 @@ class MatrixAdd(Add):
+         return other
+ 
+     def _entry(self, i, j, **kwargs):
++        from sympy.core.add import Add
+         args = [arg._entry(i, j, **kwargs) for arg in self.args]
+         return Add(*args)
+ 
+@@ -367,3 +375,4 @@ class MatrixAdd(Add):
+ 
+         return out
++
++    @property
++    def _margs(self):
++        """Return Matrix-like arguments for MatrixAdd instances"""
++        return self.args
+diff --git a/sympy/matrices/expressions/matrixexpressions.py b/sympy/matrices/expressions/matrixexpressions.py
+index 5e3b7e2..6b9d0a4 100644
+--- a/sympy/matrices/expressions/matrixexpressions.py
++++ b/sympy/matrices/expressions/matrixexpressions.py
+@@ -1,4 +1,5 @@
+ from sympy.matrices.expressions.matadd import MatrixAdd
++from sympy.core.add import Add
+ from sympy.core.expr import Expr
+ from .matexpr import MatrixExpr
+ from .matmul import MatMul
+@@ -57,6 +58,7 @@ class MatrixExpression(Expr):
+     def __sub__(a, b):
+         if not isinstance(a, MatrixExpr) or not isinstance(b, MatrixExpr):
+             return a.__add__(-b)
++        from sympy import Add
+         from sympy.matrices.expressions import MatrixAdd
+         if a.shape != b.shape:
+             raise ValueError("Matrix size mismatch")
+@@ -80,6 +82,7 @@ class MatrixExpression(Expr):
+     def __rsub__(a, b):
+         if not isinstance(a, MatrixExpr):
+             return -a.__sub__(b)
++        from sympy import Add
+         from sympy.matrices.expressions import MatrixAdd
+         if a.shape != b.shape:
+             raise ValueError("Matrix size mismatch")
+diff --git a/sympy/matrices/expressions/printing/str.py b/sympy/matrices/expressions/printing/str.py
+index 2a3b8b1..3b4e5a6 100644
+--- a/sympy/matrices/expressions/printing/str.py
++++ b/sympy/matrices/expressions/printing/str.py
+@@ -67,7 +67,16 @@ class StrPrinter(StrPrinter):
+     def _print_MatrixAdd(self, expr):
+         s = []
+         for arg in expr.args:
+-            s.append(self._print(arg))
++            if isinstance(arg, Mul) and arg.args[0] == -1:
++                term = self._print(-arg)
++                s.append('-' + ' '.join(term.split()[1:])) if term.split()[0] == '-' else s.append('-' + term)
++            else:
++                s.append(self._print(arg))
++        
++        # Handle the first term specially if it's negative
++        if s[0].startswith('-'):
++            s = [s[0][1:]] + ['-' + term for term in s[1:]]
++        
+         return " + ".join(s).replace("+ -", "- ")
+ 
+     def _print_MatMul(self, expr):
+diff --git a/sympy/matrices/expressions/printing/pretty/pretty.py b/sympy/matrices/expressions/printing/pretty/pretty.py
+index 8c7a8b2..9c3d1e5 100644
+--- a/sympy/matrices/expressions/printing/pretty/pretty.py
++++ b/sympy/matrices/expressions/printing/pretty/pretty.py
+@@ -112,7 +112,16 @@ class PrettyPrinter(娛樂rettyPrinter):
+ 
+     def _print_MatrixAdd(self, expr):
+         terms = []
+-        for term in expr.args:
+-            terms.append(self._print(term))
++        for term in expr.args:
++            if isinstance(term, Mul) and term.args[0] == -1:
++                term = -term
++                terms.append(self._print(term))
++                terms[-1] = prettyForm(terms[-1].name[1:] if terms[-1].name[0] == '-' else terms[-1], terms[-1])
++            else:
++                terms.append(self._print(term))
++        
++        # Handle the first term specially if it's negative
++        if terms[0].name.startswith('-'):
++            terms[0] = prettyForm(terms[0].name[1:], terms[0])
++            for i in range(1, len(terms)):
++                terms[i] = prettyForm('-' + terms[i].name, terms[i])
+         
+         return prettyForm.__add__(*terms)
+ 
+diff --git a/sympy/matrices/expressions/printing/latex.py b/sympy/matrices/expressions/printing/latex.py
+index 5f0b6d4..8e1c2e3 100644
+--- a/sympy/matrices/expressions/printing/latex.py
++++ b/sympy/matrices/expressions/printing/latex.py
+@@ -88,7 +88,16 @@ class LatexPrinter(LatexPrinter):
+ 
+     def _print_MatrixAdd(self, expr):
+         s = []
+-        for term in expr.args:
+-            s.append(self._print(term))
++        for term in expr.args:
++            if isinstance(term, Mul) and term.args[0] == -1:
++                term = -term
++                s.append(self._print(term))
++                s[-1] = '-' + s[-1][1:] if s[-1].startswith('-') else '-' + s[-1]
++            else:
++                s.append(self._print(term))
++        
++        # Handle the first term specially if it's negative
++        if s[0].startswith('-'):
++            s[0] = s[0][1:]
++            s = ['-' + term if not term.startswith('-') else term for term in s]
++        
+         return " + ".join(s).replace("+ -", "- ")

@@ -1,0 +1,56 @@
+diff --git a/xarray/core/rolling.py b/xarray/core/rolling.py
+--- a/xarray/core/rolling.py
++++ b/xarray/core/rolling.py
+@@ -234,13 +234,24 @@ class DataArrayRolling(Rolling["DataArray"]):
+     def __iter__(self):
+         if self.ndim > 1:
+             raise ValueError(
+                 "Only 1D rolling objects can be iterated over. "
+                 "Use `.construct(...)` to iterate over multi-dimensional windows."
+             )
+ 
+         dim = self.dim[0]
+         window = self.window[0]
+-        for i in range(self.obj.sizes[dim]):
++        center = self.center[0]
++        offset = window // 2 if center else 0
++        size = self.obj.sizes[dim]
++        for i in range(size):
++            start = i - window + 1 + offset
++            stop = i + 1 + offset
++            if start < 0 or stop > size:
++                window_arr = self.obj.isel({dim: slice(0, 0)})
++            else:
++                window_arr = self.obj.isel({dim: slice(start, stop)})
+             yield (
+                 self.obj[dim].values[i],
+-                self.obj.isel({dim: slice(i - window + 1, i + 1)}),
++                window_arr,
+             )
+ 
+@@ -466,13 +477,24 @@ class DatasetRolling(Rolling["Dataset"]):
+     def __iter__(self):
+         if self.ndim > 1:
+             raise ValueError(
+                 "Only 1D rolling objects can be iterated over. "
+                 "Use `.construct(...)` to iterate over multi-dimensional windows."
+             )
+ 
+         dim = self.dim[0]
+         window = self.window[0]
+-        for i in range(self.obj.sizes[dim]):
++        center = self.center[0]
++        offset = window // 2 if center else 0
++        size = self.obj.sizes[dim]
++        for i in range(size):
++            start = i - window + 1 + offset
++            stop = i + 1 + offset
++            if start < 0 or stop > size:
++                window_arr = self.obj.isel({dim: slice(0, 0)})
++            else:
++                window_arr = self.obj.isel({dim: slice(start, stop)})
+             yield (
+                 self.obj[dim].values[i],
+-                self.obj.isel({dim: slice(i - window + 1, i + 1)}),
++                window_arr,
+             )

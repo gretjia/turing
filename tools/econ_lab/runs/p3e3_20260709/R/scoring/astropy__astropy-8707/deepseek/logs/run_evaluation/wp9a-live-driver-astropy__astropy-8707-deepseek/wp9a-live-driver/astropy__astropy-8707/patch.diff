@@ -1,0 +1,40 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+index c68a79f..1bbffc7 100644
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -101,8 +101,13 @@ class Card:
+     @classmethod
+     def fromstring(cls, image):
+         """
+-        Construct a card from a (raw) string.
++        Construct a card from a (raw) byte or Unicode string.
+         """
++        # If bytes, assume ASCII encoding (FITS standard)
++        if isinstance(image, bytes):
++            image = image.decode('ascii')
++        elif not isinstance(image, str):
++            raise TypeError('card string must be a bytes or str type')
+         return cls(image)
+ 
+     @classmethod
+diff --git a/astropy/io/fits/header.py b/astropy/io/fits/header.py
+index 2c0cd48..fef37e9 100644
+--- a/astropy/io/fits/header.py
++++ b/astropy/io/fits/header.py
+@@ -164,9 +164,14 @@ class Header:
+     @classmethod
+     def fromstring(cls, data, sep=''):
+         """
+-        Creates an HDU header from a byte string containing the entire header
+-        data.
++        Creates an HDU header from a byte or Unicode string containing the
++        entire header data.
+         """
++        # If bytes, assume ASCII encoding (FITS standard)
++        if isinstance(data, bytes):
++            data = data.decode('ascii')
++        elif not isinstance(data, str):
++            raise TypeError('header data must be a bytes or str type')
+         return cls(data, sep=sep)
+ 
+     @classmethod

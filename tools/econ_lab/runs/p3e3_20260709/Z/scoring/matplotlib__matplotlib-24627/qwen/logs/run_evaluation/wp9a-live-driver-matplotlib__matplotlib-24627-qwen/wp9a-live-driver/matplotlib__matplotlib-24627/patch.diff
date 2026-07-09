@@ -1,0 +1,25 @@
+diff --git a/lib/matplotlib/axes/_base.py b/lib/matplotlib/axes/_base.py
+index 4f7f7f7..b8c8c8c 100644
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -1400,6 +1400,8 @@ class Axes(_AxesBase):
+     def cla(self):
+         """
+         Clear the current axes.
++        
++        This method also unsets the `.axes` and `.figure` attributes of
++        artists that were in the axes before clearing it.
+         """
+         # Clear the axes
+         self.clear()
+@@ -1410,6 +1413,10 @@ class Axes(_AxesBase):
+         # Remove the artists from the axes
+         for artist in self.artists[:]:
+             artist.remove()
++        
++        # Unset axes and figure attributes of removed artists
++        for artist in self.artists:
++            artist._remove.artist = None
++            if hasattr(artist, '_remove'):
++                artist._remove.axes = None
++                artist._remove.figure = None

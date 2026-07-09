@@ -1,0 +1,40 @@
+diff --git a/xarray/core/rolling.py b/xarray/core/rolling.py
+index a0ca1c70..2a67aa3a 100644
+--- a/xarray/core/rolling.py
++++ b/xarray/core/rolling.py
+@@ -47,7 +47,6 @@ class Rolling:
+         center = self.center
+         window = self.window[0]
+ 
+-        num_windows = self.obj.sizes[self.dim] - window + 1
+         axis = self.obj.get_axis_num(self.dim)
+ 
+         for i in range(num_windows):
+@@ -59,15 +58,22 @@ class Rolling:
+         if center:
+             temp = [np.nan] * (window // 2) + list(trimmed) + [np.nan] * (window // 2)
+             return _Rolling_iter(
+-                self.center,
+-                self.window[0],
+-                temp,
+-                self.obj.sizes[self.dim],
++                temp
+             )
+         else:
+             return _Rolling_iter(
+-                self.center, self.window[0], trimmed, self.obj.sizes[self.dim]
++                trimmed
+             )
+ 
++        num_windows = self.obj.sizes[self.dim]
++        if center:
++            temp = [np.nan] * (window // 2) + list(trimmed) + [np.nan] * (window // 2)
++            return _Rolling_iter(
++                temp
++            )
++        else:
++            return _Rolling_iter(
++                trimmed
++            )
+ 
+ class DataArrayRolling(Rolling):

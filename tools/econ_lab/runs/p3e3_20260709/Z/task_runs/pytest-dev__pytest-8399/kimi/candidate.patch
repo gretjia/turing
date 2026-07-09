@@ -1,0 +1,14 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+index 000000000..000000000 100644
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -142,9 +142,9 @@ def _make_xunit_fixture(obj, setup_name, teardown_name, scope, pass_self=False):
+     setup = getattr(obj, setup_name, None)
+     teardown = getattr(obj, teardown_name, None)
+ 
+     @pytest.fixture(
+         scope=scope,
+-        name="unittest_%s_fixture_%s" % (setup_name, obj.__name__),
++        name="_unittest_%s_fixture_%s" % (setup_name, obj.__name__),
+         autouse=True,
+     )

@@ -1,0 +1,12 @@
+diff --git a/django/utils/numberformat.py b/django/utils/numberformat.py
+--- a/django/utils/numberformat.py
++++ b/django/utils/numberformat.py
+@@ -33,7 +33,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
+             number = abs(number)
+         # Format values with more than 200 digits (which is most likely an
+         # incomprehensible calculation result) in scientific notation.
+-        if number >= 1e+200 or (number and number <= Decimal('1E-200')):
++        if number >= 1e+200 or (decimal_pos is None and number and number <= Decimal('1E-200')):
+             str_number = '{:.{}e}'.format(number, decimal_pos if decimal_pos is not None else 10)
+         elif decimal_pos is not None:
+             str_number = str(number.quantize(Decimal(1) / 10 ** decimal_pos))

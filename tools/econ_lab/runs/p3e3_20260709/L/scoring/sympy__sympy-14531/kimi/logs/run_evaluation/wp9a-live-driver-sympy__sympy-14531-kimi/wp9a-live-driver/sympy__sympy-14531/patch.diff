@@ -1,0 +1,21 @@
+diff --git a/sympy/printing/str.py b/sympy/printing/str.py
+--- a/sympy/printing/str.py
++++ b/sympy/printing/str.py
+@@ -347,5 +347,5 @@
+     def _print_Equality(self, expr):
+-        return 'Eq(%s, %s)' % (expr.lhs, expr.rhs)
++        return 'Eq(%s, %s)' % (self._print(expr.lhs), self._print(expr.rhs))
+ 
+     def _print_Unequality(self, expr):
+-        return 'Ne(%s, %s)' % (expr.lhs, expr.rhs)
++        return 'Ne(%s, %s)' % (self._print(expr.lhs), self._print(expr.rhs))
+ 
+@@ -355,6 +355,6 @@
+     def _print_Limit(self, expr):
+         e, z, z0, dir = expr.args
+         if str(dir) == "+":
+-            return "Limit(%s, %s, %s)" % (e, z, z0)
++            return "Limit(%s, %s, %s)" % (self._print(e), self._print(z), self._print(z0))
+         else:
+-            return "Limit(%s, %s, %s, dir='%s')" % (e, z, z0, dir)
++            return "Limit(%s, %s, %s, dir='%s')" % (self._print(e), self._print(z), self._print(z0), self._print(dir))

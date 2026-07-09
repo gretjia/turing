@@ -1,0 +1,14 @@
+diff --git a/xarray/core/rolling.py b/xarray/core/rolling.py
+--- a/xarray/core/rolling.py
++++ b/xarray/core/rolling.py
+@@ -1148,9 +1148,9 @@
+         elif isinstance(self.obj, Dataset):
+             variables = {}
+             for name, var in self.obj.variables.items():
+                 if any(d in self.windows for d in var.dims):
+                     variables[name] = _reshape_var(var)
+                 else:
+                     variables[name] = var.copy()
+ 
+-            return Dataset(variables, attrs=self.obj.attrs)
++            return Dataset(variables, attrs=self.obj.attrs).set_coords(self.obj.coords)

@@ -1,0 +1,146 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:astropy/astropy:scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:97468c18d8fa833bdc87a82f76f9d37d51d7b2aeb55b1b1697d205f2ae6da7ef",
+    "price_signal_hash": "sha256:01e4d2470666472304bc37c792f5cb57d0f04e0b3bd2b2bf2596e46c870332b7",
+    "route_id": "astropy__astropy-8707::armB::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:eaa226892b932ce98feeee90381fca39e0b70bc7fbf021108e6420f6861af2a8"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_card_from_bytes",
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_floating_point_value_card",
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_string_value_card"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_boolean_value_card",
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_card_constructor_default_args",
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_complex_value_card",
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_long_integer_value_card",
+          "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_rename_keyword",
+          "astropy/io/fits/tests/test_header.py::test_init_with_dict",
+          "astropy/io/fits/tests/test_header.py::test_init_with_header",
+          "astropy/io/fits/tests/test_header.py::test_init_with_ordereddict",
+          "astropy/io/fits/tests/test_header.py::test_shallow_copy"
+        ],
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:eaa226892b932ce98feeee90381fca39e0b70bc7fbf021108e6420f6861af2a8",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "astropy/astropy",
+          "route_scaffold": "scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:6176aa3aefb4c4db1478efe4a464750cb0a577615b4da2fcdb041ec57efd51c5"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/Z/scoring/astropy__astropy-8707/kimi/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "astropy__astropy-8707"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "astropy__astropy-8707"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "astropy__astropy-8707"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/Z/scoring/astropy__astropy-8707/kimi/wp9a-live-driver.wp9a-live-driver-astropy__astropy-8707-kimi.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_card_from_bytes"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [
+              "astropy/io/fits/tests/test_header.py::test_shallow_copy",
+              "astropy/io/fits/tests/test_header.py::test_init_with_header",
+              "astropy/io/fits/tests/test_header.py::test_init_with_dict",
+              "astropy/io/fits/tests/test_header.py::test_init_with_ordereddict",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_rename_keyword",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_card_constructor_default_args",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_string_value_card",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_boolean_value_card",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_long_integer_value_card",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_floating_point_value_card",
+              "astropy/io/fits/tests/test_header.py::TestHeaderFunctions::test_complex_value_card"
+            ],
+            "success": []
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 755,
+        "candidate_patch_sha256": "sha256:2be9eb82ff4fc9fc0ab1ed15909da68476f87476c7fb38c9c3221792e3d4fb2d",
+        "instance_id": "astropy__astropy-8707",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 154666
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "astropy/astropy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "astropy__astropy-8707",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "kimi",
+  "selected_route_id": "astropy__astropy-8707::armB::kimi",
+  "task_index": 3
+}

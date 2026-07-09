@@ -1,0 +1,42 @@
+diff --git a/django/utils/html.py b/django/utils/html.py
+index 2d8d0a3a9f..6f4a577b3a 100644
+--- a/django/utils/html.py
++++ b/django/utils/html.py
+@@ -15,7 +15,7 @@
+ from urllib.parse import (
+     ParseResult, SplitResult, _splitnetloc, _splitparams, quote, scheme_chars, unquote,
+     urlparse, urlsplit, urlunparse, urlunsplit,
+-)
++)
+ 
+ from django.utils.regex_helper import _lazy_re_compile
+ from django.utils.datastructures import OrderedSet
+@@ -28,24 +28,7 @@ def format_html(format_string, *args, **kwargs):
+ 
+ 
+ def escape(s):
+-    """
+-    Replace special characters "&", "<" and ">" to HTML-safe sequences.
+-    If the optional flag `quote` is True (the default), the quotation mark
+-    characters, both double quote (") and single quote (') characters are also
+-    translated.
+-    """
+-    s = s.replace("&", "&amp;")
+-    s = s.replace("<", "&lt;")
+-    s = s.replace(">", "&gt;")
+-    if quote:
+-        s = s.replace('"', "&quot;")
+-        s = s.replace("'", "&#x27;")
+-    return s
++    return html.escape(s, quote=True)
+ 
+ 
+ def conditional_escape(s):
+@@ -66,6 +49,7 @@ def urlize_quoted_links(text, trim_url_limit=None, nofollow=False, autoescape=F
+     )
+ 
+ from html import escape as html_escape
++from html import escape as html_escape
+ from html import entities
+ from html import unescape
+ from html.parser import HTMLParser

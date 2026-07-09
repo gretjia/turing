@@ -1,0 +1,15 @@
+diff --git a/src/_pytest/logging.py b/src/_pytest/logging.py
+--- a/src/_pytest/logging.py
++++ b/src/_pytest/logging.py
+@@ -410,4 +411,5 @@ class LogCaptureFixture:
+         self._item = item
+         self._initial_logger_levels = {}  # type: Dict[Optional[str], int]
++        self._initial_handler_level = self.handler.level
+ 
+     @property
+@@ -445,4 +447,5 @@ class LogCaptureFixture:
+         for logger, level in self._initial_logger_levels.items():
+             logging.getLogger(logger).setLevel(level)
++        self.handler.setLevel(self._initial_handler_level)
+ 
+     @contextmanager

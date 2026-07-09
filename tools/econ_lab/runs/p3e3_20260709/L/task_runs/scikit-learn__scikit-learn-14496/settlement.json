@@ -1,0 +1,202 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:45f0326a87dfba9056bc9d8779292bc56c6be6dcc577b8f7e6a0d1ebeb86f55f",
+    "price_signal_hash": "sha256:12bf849227079e24780bf363a5e94c09142c7ad2ce691d5061ddd19771e825d6",
+    "route_id": "scikit-learn__scikit-learn-14496::armA::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:64865e72be863f52dbac5b7bdfe1df9b54df776af7f0abe51f70930f7ee1b8e2"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "sklearn/cluster/tests/test_optics.py::test_bad_extract",
+          "sklearn/cluster/tests/test_optics.py::test_close_extract",
+          "sklearn/cluster/tests/test_optics.py::test_compare_to_ELKI",
+          "sklearn/cluster/tests/test_optics.py::test_correct_number_of_clusters",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[20-0.1]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[20-0.3]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot2-4]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot3-4]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot0-6]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot1-0]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot2-0]",
+          "sklearn/cluster/tests/test_optics.py::test_extract_dbscan",
+          "sklearn/cluster/tests/test_optics.py::test_extract_xi",
+          "sklearn/cluster/tests/test_optics.py::test_min_cluster_size[2]",
+          "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[1.1]",
+          "sklearn/cluster/tests/test_optics.py::test_min_samples_edge_case",
+          "sklearn/cluster/tests/test_optics.py::test_precomputed_dists",
+          "sklearn/cluster/tests/test_optics.py::test_processing_order",
+          "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering0-clusters0-expected0]",
+          "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering1-clusters1-expected1]",
+          "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering2-clusters2-expected2]",
+          "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering3-clusters3-expected3]",
+          "sklearn/cluster/tests/test_optics.py::test_wrong_cluster_method"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [
+          "sklearn/cluster/tests/test_optics.py::test_bad_reachability",
+          "sklearn/cluster/tests/test_optics.py::test_cluster_hierarchy_",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[10-0.1]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[10-0.3]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[10-0.5]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[20-0.5]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[3-0.1]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[3-0.3]",
+          "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[3-0.5]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot0-3]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot1-0]",
+          "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot3-2]",
+          "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid2",
+          "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[-1]",
+          "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[0]",
+          "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[2.2]",
+          "sklearn/cluster/tests/test_optics.py::test_minimum_number_of_sample_check"
+        ],
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:64865e72be863f52dbac5b7bdfe1df9b54df776af7f0abe51f70930f7ee1b8e2",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:1ef1b0d9206ac32d12fa35ca8e8ed473db7cb1d38eb0a0269a4bac106146bbdd"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/L/scoring/scikit-learn__scikit-learn-14496/deepseek/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "scikit-learn__scikit-learn-14496"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-14496"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "scikit-learn__scikit-learn-14496"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/L/scoring/scikit-learn__scikit-learn-14496/deepseek/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-14496-deepseek.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "sklearn/cluster/tests/test_optics.py::test_extract_xi"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot0-3]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot1-0]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot2-4]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_downward[r_plot3-4]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot0-6]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot1-0]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot2-0]",
+              "sklearn/cluster/tests/test_optics.py::test_extend_upward[r_plot3-2]",
+              "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering0-clusters0-expected0]",
+              "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering1-clusters1-expected1]",
+              "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering2-clusters2-expected2]",
+              "sklearn/cluster/tests/test_optics.py::test_the_extract_xi_labels[ordering3-clusters3-expected3]",
+              "sklearn/cluster/tests/test_optics.py::test_cluster_hierarchy_",
+              "sklearn/cluster/tests/test_optics.py::test_correct_number_of_clusters",
+              "sklearn/cluster/tests/test_optics.py::test_minimum_number_of_sample_check",
+              "sklearn/cluster/tests/test_optics.py::test_bad_extract",
+              "sklearn/cluster/tests/test_optics.py::test_bad_reachability",
+              "sklearn/cluster/tests/test_optics.py::test_close_extract",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[3-0.1]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[3-0.3]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[3-0.5]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[10-0.1]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[10-0.3]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[10-0.5]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[20-0.1]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[20-0.3]",
+              "sklearn/cluster/tests/test_optics.py::test_dbscan_optics_parity[20-0.5]",
+              "sklearn/cluster/tests/test_optics.py::test_min_samples_edge_case",
+              "sklearn/cluster/tests/test_optics.py::test_min_cluster_size[2]",
+              "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[0]",
+              "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[-1]",
+              "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[1.1]",
+              "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid[2.2]",
+              "sklearn/cluster/tests/test_optics.py::test_min_cluster_size_invalid2",
+              "sklearn/cluster/tests/test_optics.py::test_processing_order",
+              "sklearn/cluster/tests/test_optics.py::test_compare_to_ELKI",
+              "sklearn/cluster/tests/test_optics.py::test_wrong_cluster_method",
+              "sklearn/cluster/tests/test_optics.py::test_extract_dbscan",
+              "sklearn/cluster/tests/test_optics.py::test_precomputed_dists"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 636,
+        "candidate_patch_sha256": "sha256:add64af20c9759570bf22b38eebecc1cd8041095c3470b55d02c60639eea3810",
+        "instance_id": "scikit-learn__scikit-learn-14496",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 9909
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-14496",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "scikit-learn__scikit-learn-14496::armA::deepseek",
+  "task_index": 31
+}

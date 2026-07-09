@@ -1,0 +1,11 @@
+diff --git a/django/db/backends/base/schema.py b/django/db/backends/base/schema.py
+index f9e59a9..aa8f4ea 100644
+--- a/django/db/backends/base/schema.py
++++ b/django/db/backends/base/schema.py
+@@ -371,5 +371,5 @@ class BaseDatabaseSchemaEditor:
+ 
+     def _check_constraint_sql(self, model, constraint):
+         check = constraint.expression
+-        sql, params = check.as_sql(self.connection.ops.quote_name, self.connection)
++        sql, params = check.as_sql(self.connection.ops.quote_name, self.connection, subquery=True)
+         return 'CHECK (%s)' % sql

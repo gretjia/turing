@@ -1,0 +1,22 @@
+diff --git a/sklearn/svm/base.py b/sklearn/svm/base.py
+index 5e822f588..108584cc3 100644
+--- a/sklearn/svm/base.py
++++ b/sklearn/svm/base.py
+@@ -299,7 +299,10 @@ class BaseSVM(BaseEstimator, LinearClassifierMixin,
+         # dual_coef_ is of shape (n_classes - 1, n_SV)
+         # where n_SV is the number of support vectors
+         dual_coef_indices = np.arange(n_class * n_SV)
+-        self.dual_coef_ = sp.csr_matrix((dual_coef_data,
+-                                         (dual_coef_indices,
+-                                         np.arange(n_SV)),
+-                                         (n_class - 1, n_SV)))
++        if n_SV == 0:
++            self.dual_coef_ = sp.csr_matrix((n_class - 1, 0))
++        else:
++            self.dual_coef_ = sp.csr_matrix((dual_coef_data,
++                                             (dual_coef_indices,
++                                             np.arange(n_SV)),
++                                             (n_class - 1, n_SV)))
+         self.support_ = np.arange(n_SV)
+         self.support_vectors_ = X[np.arange(n_SV)]
+         self.n_support_ = np.array([n_SV] * n_class)

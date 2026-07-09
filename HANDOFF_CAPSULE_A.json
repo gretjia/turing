@@ -1,0 +1,164 @@
+{
+  "baseline_commit": "0ebd7adecb38d1678c66a195b2add2187ebc4464",
+  "blocked": [],
+  "branch": "p3e3/grok-20260709",
+  "budget": {
+    "worker_calls_cap": 165,
+    "worker_calls_used": 138,
+    "breakdown": {
+      "smoke_LZR": 3,
+      "full_L": 42,
+      "full_Z": 46,
+      "full_R": 47
+    }
+  },
+  "capsule": "A",
+  "head_commit": null,
+  "notes": [
+    "prereg_freeze recorded before any real worker call (frozen_before_first_real_run=true)",
+    "smoke used max-tasks=1 single-winner path (1 call/arm) to stay within smoke budget <=3; reset path proven offline + full R arm reset_at=22",
+    "launcher aggregate LAUNCH_EXIT=1 observed despite all three arm status.json DONE exit=0 (likely early tee race on missing launcher.log parent); arm drivers themselves rc=0",
+    "p3e3_outcome from single frozen readout: NULL_HONEST_RECORD (neither H-E3a nor H-E3b supported at alpha'=0.025)",
+    "status_ceiling ADDRESSED; analysis rights remain with orchestrator"
+  ],
+  "prereg_freeze": {
+    "alpha_prime": 0.025,
+    "capsule_prereg": "CAPSULE_A_P3E3_grok_20260709 §4",
+    "frozen_at_unix": 1783564430,
+    "frozen_before_first_real_run": true,
+    "hypotheses": [
+      "H-E3a: L>Z on PHASE2",
+      "H-E3b: L>R on PHASE2"
+    ],
+    "outcomes": [
+      "CONTINUITY_AND_FLUCTUATION_SUPPORTED",
+      "FLUCTUATION_YES_CONTINUITY_UNPROVEN",
+      "CONTINUITY_YES_VS_FROZEN_UNPROVEN",
+      "NULL_HONEST_RECORD"
+    ],
+    "readout_path": "tools/econ_lab/analysis/p3e3_readout.py",
+    "readout_sha256": "bf9faca4b2d0b5a2ab3298e80a3c13bb360fb35df9449e16f87cc905df26b5b3"
+  },
+  "priors_sha256": "5bae2a6426a95c5126e0b1b46c4fa37eb8560ce17b60836624eed891d0c9e68f",
+  "readout_path": "tools/econ_lab/runs/p3e3_20260709/P3E3_READOUT.json",
+  "readout_outcome": "NULL_HONEST_RECORD",
+  "s03_fingerprint": "e0d965a8eff0fcb4f147edbe2ef4463805108bd3551fead5556f05d8e9882012",
+  "ship_gate": [
+    {
+      "id": 1,
+      "predicate": "S03 50/50 materialize + leak audit PASS + zero S01/S02 overlap + content fingerprint",
+      "command": "find evidence/bench/.../S03 -name task_packet.json | wc -l; audit all windows; overlap proof; content fingerprint",
+      "exit_code": 0,
+      "evidence": [
+        "S03 packet count=50",
+        "all 5 windows audit status=PASS",
+        "S03∩S01=0 S03∩S02=0",
+        "s03_fingerprint=e0d965a8eff0fcb4f147edbe2ef4463805108bd3551fead5556f05d8e9882012",
+        "tools/econ_lab/runs/p3e3_20260709/s03_overlap_proof.json"
+      ]
+    },
+    {
+      "id": 2,
+      "predicate": "driver extensions tested + baseline pytest/cargo/gate_f4 green",
+      "command": "python3 -m pytest tests/test_p3e3_driver.py tests/test_live_driver_replay.py tests/test_live_split_verifier.py tests/test_wp10_stage_b_prime.py tests/test_econ_lab_selection_parity.py -q; cargo test -p turing-economy -q; bash tools/gates/gate_f4_econ_leakage.sh",
+      "exit_code": 0,
+      "evidence": [
+        "pytest exit=0 (incl. reset determinism, stream manifest, L/Z/R meta)",
+        "cargo test -p turing-economy exit=0",
+        "F4_LEAK_PASS"
+      ]
+    },
+    {
+      "id": 3,
+      "predicate": "smoke 3 arms x 1 real call full chain",
+      "command": "live_driver --max-tasks 1 for L/Z/R",
+      "exit_code": 0,
+      "evidence": [
+        "tools/econ_lab/runs/p3e3_smoke_20260709/{L,Z,R}/verdict.json",
+        "each arm real_worker_calls_made=1 worker_status=COMPLETED"
+      ]
+    },
+    {
+      "id": 4,
+      "predicate": "readout self-test + sha frozen before first real run",
+      "command": "python3 tools/econ_lab/analysis/p3e3_readout.py --self-test; compare HANDOFF prereg_freeze.readout_sha256",
+      "exit_code": 0,
+      "evidence": [
+        "P3E3_READOUT_SELF_TEST_PASS",
+        "readout_sha256=bf9faca4b2d0b5a2ab3298e80a3c13bb360fb35df9449e16f87cc905df26b5b3",
+        "frozen_before_first_real_run=true"
+      ]
+    },
+    {
+      "id": 5,
+      "predicate": "three arm verdicts + P3E3_READOUT.json (single judgment)",
+      "command": "python3 tools/econ_lab/analysis/p3e3_readout.py --run-root tools/econ_lab/runs/p3e3_20260709 --out .../P3E3_READOUT.json",
+      "exit_code": 0,
+      "evidence": [
+        "tools/econ_lab/runs/p3e3_20260709/L/verdict.json",
+        "tools/econ_lab/runs/p3e3_20260709/Z/verdict.json",
+        "tools/econ_lab/runs/p3e3_20260709/R/verdict.json",
+        "tools/econ_lab/runs/p3e3_20260709/P3E3_READOUT.json",
+        "p3e3_outcome=NULL_HONEST_RECORD"
+      ]
+    },
+    {
+      "id": 6,
+      "predicate": "committed on p3e3/grok-20260709, tree clean, no push/merge",
+      "command": "git commit (no push)",
+      "exit_code": null,
+      "evidence": [
+        "branch p3e3/grok-20260709",
+        "no push performed"
+      ]
+    },
+    {
+      "id": 7,
+      "predicate": "deliverables at HANDOFF + report + runs root",
+      "command": "ls HANDOFF_CAPSULE_A.json docs/handoff/GROK_CAPSULE_A_P3E3_REPORT_20260709.md tools/econ_lab/runs/p3e3_20260709/{L,Z,R}",
+      "exit_code": 0,
+      "evidence": [
+        "HANDOFF_CAPSULE_A.json",
+        "docs/handoff/GROK_CAPSULE_A_P3E3_REPORT_20260709.md",
+        "tools/econ_lab/runs/p3e3_20260709/{L,Z,R}/"
+      ]
+    }
+  ],
+  "spec_gate": [
+    {
+      "id": 1,
+      "predicate": "constitution sha256",
+      "command": "echo a0174ef8... constitution_root_law.md | sha256sum -c -",
+      "exit_code": 0,
+      "evidence": "OK"
+    },
+    {
+      "id": 2,
+      "predicate": "governance verify_alignment GREEN",
+      "command": "bash PROJECT_PLAN_.../governance/verify_alignment.sh",
+      "exit_code": 0,
+      "evidence": "GREEN: authority chain verified against ADR-GOV-001"
+    },
+    {
+      "id": 3,
+      "predicate": "required specs sha16 match",
+      "command": "sha256sum ADR-ECON-003, RES_ECON phase3, RES_ECON price_signal_limits, PREREG",
+      "exit_code": 0,
+      "evidence": [
+        "ADR-ECON-003 prefix b6a33f9292458dfb",
+        "phase3 prefix ea2870070776c7de",
+        "limits report prefix f7a9bfd4f315c8ba",
+        "PREREG present"
+      ]
+    },
+    {
+      "id": 4,
+      "predicate": "baseline pytest + cargo + gate_f4",
+      "command": "pytest live_driver suite; cargo test -p turing-economy; gate_f4",
+      "exit_code": 0,
+      "evidence": "all green at SPEC GATE entry and again at SHIP GATE"
+    }
+  ],
+  "status_ceiling": "ADDRESSED",
+  "stream_manifest_sha256": "d9dca4dcf8649f30b9d1cca497f9ce54c47ee978141c1b66db9b87bd5e5c457d"
+}
