@@ -1331,6 +1331,54 @@ impl MarketRouter {
         pput_prior_hash: &str,
         trigger_event_hash: &str,
     ) -> Result<BudgetSuggestion, EconomyError> {
+        // No stage suffix: byte-identical to the pre-depth-k 12-route path (B1 discipline).
+        self.suggest_inner(
+            routes,
+            signals,
+            price_signal_hash,
+            pput_prior_hash,
+            trigger_event_hash,
+            None,
+        )
+    }
+
+    /// Stage-level selection (CAPSULE B / ADR-ECON-005 proposed): Decision 4 seed formula
+    /// with an additive domain separator `‖ stage_name` after `trigger_event_hash`. The
+    /// pre-existing [`Self::suggest`] path is untouched (no stage suffix). Different stages
+    /// under otherwise identical committed inputs therefore draw independent samples.
+    pub fn suggest_with_stage(
+        &self,
+        routes: &[CandidateRoute],
+        signals: &[PriceSignal],
+        price_signal_hash: &str,
+        pput_prior_hash: &str,
+        trigger_event_hash: &str,
+        stage_name: &str,
+    ) -> Result<BudgetSuggestion, EconomyError> {
+        if stage_name.is_empty() {
+            return Err(EconomyError::InvalidRoutingKeyDescriptor(
+                "stage_name must be non-empty for suggest_with_stage".to_string(),
+            ));
+        }
+        self.suggest_inner(
+            routes,
+            signals,
+            price_signal_hash,
+            pput_prior_hash,
+            trigger_event_hash,
+            Some(stage_name),
+        )
+    }
+
+    fn suggest_inner(
+        &self,
+        routes: &[CandidateRoute],
+        signals: &[PriceSignal],
+        price_signal_hash: &str,
+        pput_prior_hash: &str,
+        trigger_event_hash: &str,
+        stage_name: Option<&str>,
+    ) -> Result<BudgetSuggestion, EconomyError> {
         validate_digest(price_signal_hash)?;
         validate_digest(pput_prior_hash)?;
         validate_digest(trigger_event_hash)?;
@@ -1364,12 +1412,14 @@ impl MarketRouter {
                 price_signal_hash,
                 pput_prior_hash,
                 trigger_event_hash,
+                stage_name,
             ),
             (MarketRouterMode::Softmax, SoftmaxTemperature::Uniform) => uniform_select(
                 &priced_routes,
                 price_signal_hash,
                 pput_prior_hash,
                 trigger_event_hash,
+                stage_name,
             ),
             _ => argmax_select(&priced_routes),
         };
@@ -1416,11 +1466,32 @@ const ROUTING_SELECT_SEED_DOMAIN: &str = "routing-select.v1";
 /// identical bytes (Art 0.2). Byte layout matches the Python reference
 /// (`tools/econ_lab/selection.py::derive_u`) exactly: the four inputs are concatenated
 /// with no separators beyond the NUL join inside `sorted(route_ids)`.
+///
+/// CAPSULE B / ADR-ECON-005 proposed additive extension: when `stage_name` is `Some`, the
+/// seed payload appends `‖ stage_name` after `trigger_event_hash` (domain-separated stage
+/// draws). `None` is the pre-depth-k 12-route formula, bit-for-bit unchanged.
+#[cfg_attr(not(test), allow(dead_code))]
 fn derive_selection_seed_u64(
     price_signal_hash: &str,
     pput_prior_hash: &str,
     sorted_route_ids: &[&str],
     trigger_event_hash: &str,
+) -> u64 {
+    derive_selection_seed_u64_ext(
+        price_signal_hash,
+        pput_prior_hash,
+        sorted_route_ids,
+        trigger_event_hash,
+        None,
+    )
+}
+
+fn derive_selection_seed_u64_ext(
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+    sorted_route_ids: &[&str],
+    trigger_event_hash: &str,
+    stage_name: Option<&str>,
 ) -> u64 {
     let mut hasher = Sha256::new();
     hasher.update(ROUTING_SELECT_SEED_DOMAIN.as_bytes());
@@ -1428,6 +1499,9 @@ fn derive_selection_seed_u64(
     hasher.update(pput_prior_hash.as_bytes());
     hasher.update(sorted_route_ids.join("\0").as_bytes());
     hasher.update(trigger_event_hash.as_bytes());
+    if let Some(stage) = stage_name {
+        hasher.update(stage.as_bytes());
+    }
     let digest = hasher.finalize();
     u64::from_le_bytes(
         digest[0..8]
@@ -1551,6 +1625,7 @@ fn softmax_select<'a>(
     price_signal_hash: &str,
     pput_prior_hash: &str,
     trigger_event_hash: &str,
+    stage_name: Option<&str>,
 ) -> &'a CandidateRoute {
     let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
     sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
@@ -1576,8 +1651,13 @@ fn softmax_select<'a>(
         .iter()
         .map(|(route, _)| route.route_id.as_str())
         .collect();
-    let seed =
-        derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids, trigger_event_hash);
+    let seed = derive_selection_seed_u64_ext(
+        price_signal_hash,
+        pput_prior_hash,
+        &route_ids,
+        trigger_event_hash,
+        stage_name,
+    );
     weighted_inverse_cdf_select(&weighted, seed)
 }
 
@@ -1589,6 +1669,7 @@ fn uniform_select<'a>(
     price_signal_hash: &str,
     pput_prior_hash: &str,
     trigger_event_hash: &str,
+    stage_name: Option<&str>,
 ) -> &'a CandidateRoute {
     let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
     sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
@@ -1598,8 +1679,13 @@ fn uniform_select<'a>(
         .iter()
         .map(|(route, _)| route.route_id.as_str())
         .collect();
-    let seed =
-        derive_selection_seed_u64(price_signal_hash, pput_prior_hash, &route_ids, trigger_event_hash);
+    let seed = derive_selection_seed_u64_ext(
+        price_signal_hash,
+        pput_prior_hash,
+        &route_ids,
+        trigger_event_hash,
+        stage_name,
+    );
     weighted_inverse_cdf_select(&weighted, seed)
 }
 
@@ -2060,5 +2146,17 @@ mod selection_seed_tests {
             seed_1, seed_2,
             "seed must depend on trigger_event_hash (ADR-ECON-003 Decision 4)"
         );
+    }
+
+    /// CAPSULE B: stage suffix is load-bearing and must not collapse into the no-suffix seed.
+    #[test]
+    fn selection_seed_differs_across_stage_suffixes() {
+        use super::derive_selection_seed_u64_ext;
+        let base = derive_selection_seed_u64_ext(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1, None);
+        let ctx = derive_selection_seed_u64_ext(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1, Some("context"));
+        let repair =
+            derive_selection_seed_u64_ext(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1, Some("repair"));
+        assert_ne!(base, ctx, "stage suffix must change the seed");
+        assert_ne!(ctx, repair, "different stages must domain-separate");
     }
 }

@@ -205,6 +205,136 @@ pub struct RoutingKey {
 }
 
 // ---------------------------------------------------------------------------
+// CAPSULE B / depth-k (design doc §1.4; ADR-ECON-005 proposed): scaffold_descriptor.v2
+// stage decomposition + hierarchical market keys. Additive only -- scaffold_descriptor.v1
+// / RoutingKey / fold_routing_state are untouched (B1 versioning discipline).
+// ---------------------------------------------------------------------------
+
+/// Frozen v0 stage names for depth-2 layered markets (CAPSULE B dispatch 2026-07-09).
+pub const STAGE_CONTEXT: &str = "context";
+pub const STAGE_REPAIR: &str = "repair";
+pub const STAGE_VERIFY: &str = "verify";
+
+/// Frozen v0 option space per stage (2×2×2 composition; CAPSULE B).
+pub const CONTEXT_OPTIONS: &[&str] = &["minimal", "source_context"];
+pub const REPAIR_OPTIONS: &[&str] = &["single_shot", "loop"];
+pub const VERIFY_OPTIONS: &[&str] = &["none", "self_check"];
+
+/// `scaffold_descriptor.v2` (CAPSULE B): a complete scaffold is a *sequence* of stage
+/// option choices, not an atomic arm label. Orthogonalizes the v0 armA/B/C semantics:
+/// - armA ≈ (minimal, single_shot, none)
+/// - armB ≈ (source_context, loop, none)  [armB+ ≈ + self_check]
+/// - armC-like ablation sits on the verify stage (`self_check` vs `none`)
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ScaffoldDescriptorV2 {
+    pub context: String,
+    pub repair: String,
+    pub verify: String,
+    /// Lineage short label (same discipline as v1 `toolchain` single-entry): enters the
+    /// composed worker dispatch identity, not the per-stage market key.
+    pub lineage: String,
+}
+
+/// Hierarchical market key component triple (design doc §1.4 / CAPSULE B): each stage
+/// option is an independent fold node shared across scaffolds that pick the same option.
+/// Wire-encoded for the pre-existing `(domain_bucket, scaffold_id)` fold by setting
+/// `scaffold_id = stage_option_id(stage_name, option)` (see [`stage_option_id`]).
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct StageRoutingKey {
+    pub domain_bucket: String,
+    pub stage_name: String,
+    pub option: String,
+}
+
+impl StageRoutingKey {
+    /// Encode as the pre-existing fold [`RoutingKey`] so stage nodes reuse the (Q,N,P)
+    /// tape fold without a second event schema. `scaffold_id` carries the stage-option
+    /// identity digest, never a free-form label.
+    pub fn to_routing_key(&self) -> Result<RoutingKey, EconomyError> {
+        Ok(RoutingKey {
+            domain_bucket: self.domain_bucket.clone(),
+            scaffold_id: stage_option_id(&self.stage_name, &self.option)?,
+        })
+    }
+}
+
+/// `stage_option_id = "stage:sha256:" + hex(SHA256(JCS(stage_option.v1)))` — the per-stage
+/// market identity (CAPSULE B). Parallel to [`scaffold_id`]'s JCS-SHA256 discipline;
+/// distinct prefix (`stage:` vs `scaffold:`) so the two namespaces never collide.
+pub fn stage_option_id(stage_name: &str, option: &str) -> Result<String, EconomyError> {
+    let value = serde_json::json!({
+        "schema": "stage_option.v1",
+        "stage_name": stage_name,
+        "option": option,
+    });
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingKeyDescriptor(e.to_string()))?;
+    Ok(format!(
+        "stage:sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
+}
+
+/// Validate a v0 stage name / option pair against the frozen option space. Unknown pairs
+/// are hard errors (no silent expansion of the action space).
+pub fn validate_stage_option(stage_name: &str, option: &str) -> Result<(), EconomyError> {
+    let allowed: &[&str] = match stage_name {
+        STAGE_CONTEXT => CONTEXT_OPTIONS,
+        STAGE_REPAIR => REPAIR_OPTIONS,
+        STAGE_VERIFY => VERIFY_OPTIONS,
+        other => {
+            return Err(EconomyError::InvalidRoutingKeyDescriptor(format!(
+                "unknown stage_name {other:?} (v0: context|repair|verify)"
+            )));
+        }
+    };
+    if !allowed.contains(&option) {
+        return Err(EconomyError::InvalidRoutingKeyDescriptor(format!(
+            "option {option:?} not in frozen v0 space for stage {stage_name:?}"
+        )));
+    }
+    Ok(())
+}
+
+/// Map a complete stage triple to the closest live-driver arm label for worker dispatch
+/// (CAPSULE B assembly rule, honest approximation of the orthogonalized armA/B/C space):
+/// - context=minimal → armA (regardless of repair/verify; minimal context dominates)
+/// - context=source_context ∧ verify=self_check → armC (ablation axis)
+/// - context=source_context ∧ verify=none → armB
+///
+/// This is a *dispatch* mapping only (how to call the worker). Market fold keys stay on the
+/// three stage nodes; credit assignment is per-stage, not per-arm.
+#[must_use]
+pub fn compose_dispatch_arm(descriptor: &ScaffoldDescriptorV2) -> &'static str {
+    if descriptor.context == "minimal" {
+        "armA"
+    } else if descriptor.verify == "self_check" {
+        "armC"
+    } else {
+        "armB"
+    }
+}
+
+/// Frozen ordered stage walk for a depth-2 decision sequence.
+#[must_use]
+pub fn stage_walk_v0() -> [&'static str; 3] {
+    [STAGE_CONTEXT, STAGE_REPAIR, STAGE_VERIFY]
+}
+
+/// Options for one frozen v0 stage, in stable lexicographic order (matches Decision 4's
+/// sorted-route-id convention when the caller uses these as route_ids).
+pub fn options_for_stage(stage_name: &str) -> Result<&'static [&'static str], EconomyError> {
+    match stage_name {
+        STAGE_CONTEXT => Ok(CONTEXT_OPTIONS),
+        STAGE_REPAIR => Ok(REPAIR_OPTIONS),
+        STAGE_VERIFY => Ok(VERIFY_OPTIONS),
+        other => Err(EconomyError::InvalidRoutingKeyDescriptor(format!(
+            "unknown stage_name {other:?}"
+        ))),
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Decision 6 -- (Q, N, P) node state, tape pure fold.
 // ---------------------------------------------------------------------------
 

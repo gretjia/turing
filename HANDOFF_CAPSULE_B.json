@@ -1,0 +1,251 @@
+{
+  "capsule": "B",
+  "title": "depth-k layered scaffold market feasibility build",
+  "nature": "exploratory_feasibility_build",
+  "significance_claims": "NONE",
+  "status_ceiling": "ADDRESSED",
+  "branch": "depthk/grok-20260709",
+  "baseline_commit": "0ebd7adecb38d1678c66a195b2add2187ebc4464",
+  "head_commit": "PENDING_COMMIT",
+  "worktree": "/home/zephryj/turingos_backup/work/grok_depthk",
+  "dispatch": {
+    "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/dispatch/CAPSULE_B_DEPTHK_grok_20260709.md",
+    "sha256": "004f2f681c3138b7020718098184621cdc1be536d8326ac99ef8ccf8b71fe7b6"
+  },
+  "deliverables": [
+    {
+      "path": "tools/econ_lab/depthk/depth_driver.py",
+      "sha256": "74457e5f22ab90aec85ea1adf53a6b73d712c4936404b1eb3c0502e768894233"
+    },
+    {
+      "path": "tools/econ_lab/depthk/__init__.py",
+      "sha256": "72692bc35ca7e896970bd5444abb6229504852dcbd1e911eac62c880682379c4"
+    },
+    {
+      "path": "tests/test_depthk_driver.py",
+      "sha256": "3a90c29c671c3f1755d84d0cad985432a2b0239e665729856040693a81ce0ca6"
+    },
+    {
+      "path": "docs/handoff/GROK_CAPSULE_B_DEPTHK_MEMO_20260709.md",
+      "sha256": "edf61c96aff502e33488044523e6099f078d54e512e4d3170723c410eb5a5655"
+    },
+    {
+      "path": "docs/handoff/ADR-ECON-005-depthk-layered-market-DRAFT.md",
+      "sha256": "1bbf5d49d0038c75b19fca82051f15d1dc44e7ca58d7c68d475202bf4614c6b9",
+      "status": "proposed"
+    },
+    {
+      "path": "crates/turing-economy/src/routing_fold.rs",
+      "sha256": "c14f39b4bfcaaa26ff03d5a060e4084eaa41064363be0312c41597c8d49e1901"
+    },
+    {
+      "path": "crates/turing-economy/src/lib.rs",
+      "sha256": "1242781db6872ed10b8177f8cdf2da0875e3d130ec9ca88a51f9a544042a9d49"
+    },
+    {
+      "path": "crates/turing-economy/src/bin/econ_fold_cli.rs",
+      "sha256": "d7cc4088a35dca31d50d12e12509e02242b9c34fe5a70d2bb5c097070defe062"
+    },
+    {
+      "path": "crates/turing-economy/tests/econ_fold_cli_cross_check.rs",
+      "sha256": "2232bb988c9bc77dfb748b80cea4d475e5a86d00da9f7253b6346065d7e191cc"
+    },
+    {
+      "path": "tools/econ_lab/runs/depthk_smoke_20260709/verdict.json",
+      "sha256": "c9f966bb533c93f553f4c1f844b1695f681e64c8a6c82f4fb59ffaad2e2c01a3"
+    },
+    {
+      "path": "tools/econ_lab/runs/depthk_smoke_20260709/committed_routing_events.json",
+      "sha256": "63e83fe8908f19b5b80f9c0e724400d14e0700d7a6575351a58bd5aba89d9519"
+    },
+    {
+      "path": "HANDOFF_CAPSULE_B.json",
+      "sha256": "SELF"
+    }
+  ],
+  "smoke": {
+    "worker_calls_used": 2,
+    "budget_ceiling": 8,
+    "task_shard": "S02",
+    "tasks": [
+      "astropy__astropy-14365",
+      "astropy__astropy-14369"
+    ],
+    "credit_assignment": "v0_equal_share_not_causal",
+    "evidence_paths": [
+      "tools/econ_lab/runs/depthk_smoke_20260709/verdict.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/committed_routing_events.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/task_runs/astropy__astropy-14365/deepseek/worker_receipt.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/task_runs/astropy__astropy-14365/depthk_task_record.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/scoring/astropy__astropy-14365/deepseek/wp9a-live-driver.wp9a-live-driver-astropy__astropy-14365-deepseek.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/task_runs/astropy__astropy-14369/deepseek/worker_receipt.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/task_runs/astropy__astropy-14369/depthk_task_record.json",
+      "tools/econ_lab/runs/depthk_smoke_20260709/scoring/astropy__astropy-14369/deepseek/wp9a-live-driver.wp9a-live-driver-astropy__astropy-14369-deepseek.json"
+    ],
+    "stage_chain_summary": [
+      {
+        "instance_id": "astropy__astropy-14365",
+        "stage_choices": {
+          "context": "minimal",
+          "repair": "single_shot",
+          "verify": "none"
+        },
+        "dispatch_arm": "armA",
+        "lineage": "deepseek",
+        "worker_status": "COMPLETED",
+        "scoring_status": "COMPLETED",
+        "credit_events": 3,
+        "nodes_n_after": {
+          "context:minimal": 1,
+          "repair:single_shot": 1,
+          "verify:none": 1
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-14369",
+        "stage_choices": {
+          "context": "source_context",
+          "repair": "loop",
+          "verify": "self_check"
+        },
+        "dispatch_arm": "armC",
+        "lineage": "deepseek",
+        "worker_status": "COMPLETED",
+        "scoring_status": "COMPLETED",
+        "credit_events": 3,
+        "nodes_n_after": {
+          "context:source_context": 1,
+          "repair:loop": 1,
+          "verify:self_check": 1
+        }
+      }
+    ]
+  },
+  "spec_gate": [
+    {
+      "id": "SG1_constitution_sha",
+      "command": "echo \"a0174ef8a2be6914f86ea8e594e022c7ca6a4221ed63535d65a997e096ca3ad0  /home/zephryj/turingos_backup/work/turing_v5/pack_v5_3_1/00_authority/constitution_root_law.md\" | sha256sum -c -",
+      "exit_code": 0,
+      "result": "OK"
+    },
+    {
+      "id": "SG2_governance_alignment",
+      "command": "bash /home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/governance/verify_alignment.sh",
+      "exit_code": 0,
+      "result": "GREEN: authority chain verified against ADR-GOV-001."
+    },
+    {
+      "id": "SG3_required_specs",
+      "paths": [
+        {
+          "path": "PROJECT_PLAN_.../adr/ADR-ECON-003-emergence-routing-spec-pins.md",
+          "sha256_prefix16": "b6a33f9292458dfb",
+          "sha256": "b6a33f9292458dfbca0d5b14b396a78c56dc706381c595b91f0c290c56dcb538"
+        },
+        {
+          "path": "PROJECT_PLAN_.../research/RES_ECON_participant_learning_phase3_20260708.md",
+          "sha256_prefix16": "ea2870070776c7de",
+          "sha256": "ea2870070776c7def36609d732517df17c00ace006732712cc112c1035f5694a"
+        },
+        {
+          "path": "PROJECT_PLAN_.../research/RES_ECON_price_signal_limits_report_20260708.md",
+          "sha256_prefix16": "f7a9bfd4f315c8ba",
+          "sha256": "f7a9bfd4f315c8bab69f5710c97ed72058134b721fa31d0bd3fb2c90a253d96b"
+        },
+        {
+          "path": "PROJECT_PLAN_.../research/RES_ECON_emergence_toplevel_design_20260707.md",
+          "sha256": "9307435dc712a7e95c54d229b265f7a15c23c169fda21245c486cf149ba9d9e3",
+          "note": "§1.4 depth-k / §5 read"
+        }
+      ],
+      "result": "PASS"
+    },
+    {
+      "id": "SG4_baseline_pytest_fourpack",
+      "command": "python3 -m pytest tests/test_live_driver_replay.py tests/test_live_split_verifier.py tests/test_wp10_stage_b_prime.py tests/test_econ_lab_selection_parity.py -q",
+      "exit_code": 0,
+      "result": "PASS (pre-implementation and post-implementation)"
+    },
+    {
+      "id": "SG5_cargo_turing_economy",
+      "command": "cargo test -p turing-economy -q",
+      "exit_code": 0,
+      "result": "PASS (pre and post; post includes new stage cross-checks)"
+    },
+    {
+      "id": "SG6_gate_f4",
+      "command": "bash tools/gates/gate_f4_econ_leakage.sh",
+      "exit_code": 0,
+      "result": "F4_LEAK_PASS (12 surface files scanned, 12 patterns)"
+    }
+  ],
+  "ship_gate": [
+    {
+      "id": "SH1_rust_isolation_and_cross_check",
+      "command": "cargo test -p turing-economy --test econ_fold_cli_cross_check -q",
+      "exit_code": 0,
+      "result": "11 passed (includes derive-stage-keys, fold-and-suggest-stage, v1-reject isolation, shared-stage-ids)",
+      "paths": [
+        "crates/turing-economy/tests/econ_fold_cli_cross_check.rs"
+      ]
+    },
+    {
+      "id": "SH1b_full_cargo",
+      "command": "cargo test -p turing-economy -q",
+      "exit_code": 0,
+      "result": "PASS all suites"
+    },
+    {
+      "id": "SH2_depth_driver_offline",
+      "command": "python3 -m pytest tests/test_depthk_driver.py -q",
+      "exit_code": 0,
+      "result": "3 passed (determinism, shared nodes N=2, seed domain sep, A-territory clean)",
+      "paths": [
+        "tests/test_depthk_driver.py",
+        "tools/econ_lab/depthk/depth_driver.py"
+      ]
+    },
+    {
+      "id": "SH2b_a_territory_zero_touch",
+      "command": "git diff 0ebd7ad --name-only | grep -E 'live_driver\\.py|run_.*\\.sh|analysis/stage_|gen_' || true",
+      "exit_code": 0,
+      "result": "A_TERRITORY_CLEAN (no matches)"
+    },
+    {
+      "id": "SH3_gate_f4_post",
+      "command": "bash tools/gates/gate_f4_econ_leakage.sh",
+      "exit_code": 0,
+      "result": "F4_LEAK_PASS"
+    },
+    {
+      "id": "SH4_smoke_full_chain",
+      "command": "PYTHONPATH=src:tools/econ_lab:tools/bench python3 tools/econ_lab/depthk/depth_driver.py --smoke --out tools/econ_lab/runs/depthk_smoke_20260709 --max-tasks 2 --max-worker-calls 2",
+      "exit_code": 0,
+      "result": "worker_calls_used=2 ≤8; 2 tasks COMPLETED worker+score; 3-stage credit assign each",
+      "paths": [
+        "tools/econ_lab/runs/depthk_smoke_20260709/verdict.json"
+      ]
+    },
+    {
+      "id": "SH5_memo_and_adr_proposed",
+      "paths": [
+        "docs/handoff/GROK_CAPSULE_B_DEPTHK_MEMO_20260709.md",
+        "docs/handoff/ADR-ECON-005-depthk-layered-market-DRAFT.md"
+      ],
+      "result": "PASS; ADR status=proposed only"
+    },
+    {
+      "id": "SH6_branch_commit_no_push",
+      "result": "PENDING at write time; filled after commit",
+      "constraint": "no push, no merge by implementer"
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    "Exploratory only: no significance claims; E-transfer design left to orchestrator (memo §1).",
+    "Credit assignment v0 equal-share is an honest ceiling label, not a defect.",
+    "repair/verify worker semantics remain v0 approximations mapped onto existing armA/B/C dispatch.",
+    "Old 12-route fold-and-suggest v2 path byte-isolated (B1 versioning discipline).",
+    "Parallel-safe with CAPSULE A: only depthk/ + additive Rust; live_driver/run_*/analysis untouched."
+  ]
+}

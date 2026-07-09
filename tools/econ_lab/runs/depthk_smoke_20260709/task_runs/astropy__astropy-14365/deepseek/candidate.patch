@@ -1,0 +1,12 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+index 7c1c5f0..3a91f1c 100644
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -132,7 +132,7 @@ def _read_qdp(lines):
+ 
+         line = lines[i].strip()
+-        line = line.strip()
++        line = line.strip().upper()
+ 
+         # Skip empty lines
+         if line == '':
