@@ -6,7 +6,7 @@
   "status_ceiling": "ADDRESSED",
   "branch": "depthk/grok-20260709",
   "baseline_commit": "0ebd7adecb38d1678c66a195b2add2187ebc4464",
-  "head_commit": "e02bc9e3fc97a365efdb7cc78547688c80929134",
+  "head_commit": "ca6191b6baa3291805d3e8fa8d2979286ca16b0f",
   "worktree": "/home/zephryj/turingos_backup/work/grok_depthk",
   "dispatch": {
     "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/dispatch/CAPSULE_B_DEPTHK_grok_20260709.md",
@@ -236,10 +236,9 @@
     },
     {
       "id": "SH6_branch_commit_no_push",
-      "result": "branch depthk/grok-20260709 tip e02bc9e; deliverable ca6191b; no push, no merge",
+      "result": "deliverable ca6191b on depthk/grok-20260709; no push, no merge",
       "constraint": "no push, no merge by implementer",
-      "deliverable_commit": "ca6191b6baa3291805d3e8fa8d2979286ca16b0f",
-      "head_commit": "e02bc9e3fc97a365efdb7cc78547688c80929134"
+      "deliverable_commit": "ca6191b6baa3291805d3e8fa8d2979286ca16b0f"
     }
   ],
   "blocked": [],
@@ -249,5 +248,6 @@
     "repair/verify worker semantics remain v0 approximations mapped onto existing armA/B/C dispatch.",
     "Old 12-route fold-and-suggest v2 path byte-isolated (B1 versioning discipline).",
     "Parallel-safe with CAPSULE A: only depthk/ + additive Rust; live_driver/run_*/analysis untouched."
-  ]
+  ],
+  "handoff_pin_note": "head_commit names the deliverable commit (feat depthk). Branch tip after this pin commit is recorded by git log; self-referential tip pinning avoided."
 }
