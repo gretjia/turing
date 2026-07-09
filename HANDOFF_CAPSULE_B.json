@@ -6,7 +6,7 @@
   "status_ceiling": "ADDRESSED",
   "branch": "depthk/grok-20260709",
   "baseline_commit": "0ebd7adecb38d1678c66a195b2add2187ebc4464",
-  "head_commit": "PENDING_COMMIT",
+  "head_commit": "e02bc9e3fc97a365efdb7cc78547688c80929134",
   "worktree": "/home/zephryj/turingos_backup/work/grok_depthk",
   "dispatch": {
     "path": "/home/zephryj/turingos_backup/work/PROJECT_PLAN_TURINGOS_AGI_SUBSTRATE_20260702/dispatch/CAPSULE_B_DEPTHK_grok_20260709.md",
@@ -155,7 +155,7 @@
         {
           "path": "PROJECT_PLAN_.../research/RES_ECON_emergence_toplevel_design_20260707.md",
           "sha256": "9307435dc712a7e95c54d229b265f7a15c23c169fda21245c486cf149ba9d9e3",
-          "note": "§1.4 depth-k / §5 read"
+          "note": "\u00a71.4 depth-k / \u00a75 read"
         }
       ],
       "result": "PASS"
@@ -221,7 +221,7 @@
       "id": "SH4_smoke_full_chain",
       "command": "PYTHONPATH=src:tools/econ_lab:tools/bench python3 tools/econ_lab/depthk/depth_driver.py --smoke --out tools/econ_lab/runs/depthk_smoke_20260709 --max-tasks 2 --max-worker-calls 2",
       "exit_code": 0,
-      "result": "worker_calls_used=2 ≤8; 2 tasks COMPLETED worker+score; 3-stage credit assign each",
+      "result": "worker_calls_used=2 \u22648; 2 tasks COMPLETED worker+score; 3-stage credit assign each",
       "paths": [
         "tools/econ_lab/runs/depthk_smoke_20260709/verdict.json"
       ]
@@ -236,13 +236,15 @@
     },
     {
       "id": "SH6_branch_commit_no_push",
-      "result": "PENDING at write time; filled after commit",
-      "constraint": "no push, no merge by implementer"
+      "result": "branch depthk/grok-20260709 tip e02bc9e; deliverable ca6191b; no push, no merge",
+      "constraint": "no push, no merge by implementer",
+      "deliverable_commit": "ca6191b6baa3291805d3e8fa8d2979286ca16b0f",
+      "head_commit": "e02bc9e3fc97a365efdb7cc78547688c80929134"
     }
   ],
   "blocked": [],
   "notes": [
-    "Exploratory only: no significance claims; E-transfer design left to orchestrator (memo §1).",
+    "Exploratory only: no significance claims; E-transfer design left to orchestrator (memo \u00a71).",
     "Credit assignment v0 equal-share is an honest ceiling label, not a defect.",
     "repair/verify worker semantics remain v0 approximations mapped onto existing armA/B/C dispatch.",
     "Old 12-route fold-and-suggest v2 path byte-isolated (B1 versioning discipline).",
