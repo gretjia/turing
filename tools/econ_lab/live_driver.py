@@ -1381,6 +1381,7 @@ def _settle_one(
     run_label: str = "",
     task_index: int = 0,
     diagnostic_prefix: Optional[str] = None,
+    monitor_enabled: bool = False,
 ) -> dict[str, Any]:
     """Dispatch one (arm, lineage) pair for one task, score it if a patch was produced, and
     -- if scoring completed -- independently re-judge the harness's per-test report (WP9b,
@@ -1393,20 +1394,28 @@ def _settle_one(
     **not** the harness's own whole-test-suite `resolved` boolean -- the two differ whenever
     any grading-relevant test lands on the verify side of the held-out split.
 
-    `diagnostic_prefix` (WP-H2, `--monitor` only, default `None`): forwarded to
-    `dispatch_worker_for_lineage` -- see that function's own docstring. `None` is
-    behavior-identical to before this parameter existed.
+    `diagnostic_prefix` / `monitor_enabled` (WP-H2, `--monitor` only, both default to the
+    pre-WP-H2 "off" values): forwarded to `dispatch_worker_for_lineage` -- see that
+    function's own docstring. The `diagnostic_prefix` kwarg is only ever passed down to
+    `dispatch_worker_for_lineage` when `monitor_enabled` is `True` (mirroring `--monitor`
+    itself); when `monitor_enabled` is `False` (its default, and the value on every
+    pre-WP-H2 call site) the kwarg is *not passed at all* -- not merely passed as `None`
+    -- so any caller-supplied replacement of `dispatch_worker_for_lineage` (e.g. a test
+    monkeypatch or stub) that predates this parameter and does not accept it keeps
+    working unchanged. This is behavior-identical to before this parameter existed.
     """
     instance_id = packet["instance_id"]
-    worker_result = dispatch_worker_for_lineage(
-        arm=arm,
-        lineage=lineage,
-        packet=packet,
-        task_dir_root=task_dir_root,
-        run_id_prefix="wp9a-live-driver",
-        deepseek_native_provider_config=deepseek_native_provider_config,
-        diagnostic_prefix=diagnostic_prefix,
-    )
+    dispatch_kwargs: dict[str, Any] = {
+        "arm": arm,
+        "lineage": lineage,
+        "packet": packet,
+        "task_dir_root": task_dir_root,
+        "run_id_prefix": "wp9a-live-driver",
+        "deepseek_native_provider_config": deepseek_native_provider_config,
+    }
+    if monitor_enabled:
+        dispatch_kwargs["diagnostic_prefix"] = diagnostic_prefix
+    worker_result = dispatch_worker_for_lineage(**dispatch_kwargs)
 
     scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
     settlement_verdict: Optional[bool] = None
@@ -1667,6 +1676,7 @@ def _settle_one_resume(
     run_label: str = "",
     task_index: int = 0,
     diagnostic_prefix: Optional[str] = None,
+    monitor_enabled: bool = False,
 ) -> dict[str, Any]:
     """Resume-aware counterpart of `_settle_one` for one (task, lineage): reuses on-disk
     worker/scoring artifacts when present instead of recalling the worker or (when the
@@ -1676,10 +1686,13 @@ def _settle_one_resume(
     never in how they are judged, so a resumed settlement and a fresh settlement of the same
     underlying artifacts are byte-identical (`tests/test_live_driver_resume.py`).
 
-    `diagnostic_prefix` (WP-H2, `--monitor` only, default `None`): only reachable when
-    `worker_result is None` below (the "no artifact at all -> full fresh path" branch);
-    once real reconstructed worker artifacts exist, no new dispatch happens here for this
-    parameter to affect. `None` is behavior-identical to before this parameter existed.
+    `diagnostic_prefix` / `monitor_enabled` (WP-H2, `--monitor` only, both default to the
+    pre-WP-H2 "off" values): only reachable when `worker_result is None` below (the "no
+    artifact at all -> full fresh path" branch); once real reconstructed worker artifacts
+    exist, no new dispatch happens here for either parameter to affect. Both default to
+    behavior-identical-to-before-this-parameter-existed; see `_settle_one`'s own docstring
+    for how `monitor_enabled=False` (its default) keeps the forwarded kwarg from ever
+    reaching `dispatch_worker_for_lineage`.
     """
     instance_id = packet["instance_id"]
 
@@ -1703,6 +1716,7 @@ def _settle_one_resume(
             run_label=run_label,
             task_index=task_index,
             diagnostic_prefix=diagnostic_prefix,
+            monitor_enabled=monitor_enabled,
         )
 
     scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
@@ -2079,6 +2093,7 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     run_label=run_label,
                     task_index=task_index,
                     diagnostic_prefix=task_diagnostic_prefix,
+                    monitor_enabled=monitor_enabled,
                 )
                 if settled["worker_result_status"] == "COMPLETED":
                     real_worker_calls += 1
