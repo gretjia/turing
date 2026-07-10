@@ -47,10 +47,20 @@
 //!   echo '<build-routing-prior-updated request JSON>'  | econ_fold_cli build-routing-prior-updated
 //!   echo '<derive-stage-keys request JSON>'            | econ_fold_cli derive-stage-keys
 //!   echo '<fold-and-suggest-stage request JSON>'       | econ_fold_cli fold-and-suggest-stage
+//!   echo '<derive-route-keys request JSON>'            | econ_fold_cli derive-route-keys
+//!   echo '<fold-and-suggest-route request JSON>'       | econ_fold_cli fold-and-suggest-route
+//!   echo '<build-route-fuse-tripped request JSON>'     | econ_fold_cli build-route-fuse-tripped
+//!   echo '<build-route-falsified request JSON>'        | econ_fold_cli build-route-falsified
 //!
 //! CAPSULE B (depth-k): `derive-stage-keys` / `fold-and-suggest-stage` are additive new
 //! subcommands (B1 versioning discipline). Pre-existing subcommands and their schemas are
 //! byte-identical; stage selection seeds append `‖ stage_name` per ADR-ECON-005 proposed.
+//!
+//! WP-H4 (ADR-ECON-007 Decisions 2/4/5): `derive-route-keys` / `fold-and-suggest-route` /
+//! `build-route-fuse-tripped` / `build-route-falsified` are additive new subcommands. The
+//! route stage reuses `fold-and-suggest-stage`'s exact machinery (`stage_name = "route"`)
+//! plus a Decision 2 pause-mask filter applied to `candidate_routes` before selection; every
+//! pre-existing subcommand and schema above is untouched.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Read;
@@ -58,9 +68,14 @@ use std::io::Read;
 use serde::{Deserialize, Serialize};
 
 use turing_economy::diversity_metrics::{compute_n_eff_and_h_lineage, LineageSettlement, NEffHLineage};
+use turing_economy::route_pause_mask::{
+    compute_route_pause_mask, economy_events_to_route_fuse_trips, filter_paused_candidates,
+    RoutePauseConfig,
+};
 use turing_economy::routing_fold::{
-    domain_bucket, fold_routing_state_from_tape, options_for_stage, scaffold_id, stage_option_id,
-    stage_walk_v0, validate_stage_option, NodeState, RoutingKey, ScaffoldDescriptor, Q32_ONE,
+    domain_bucket, fold_routing_state_from_tape, options_for_stage, route_descriptor_id,
+    scaffold_id, stage_option_id, stage_walk_v0, validate_stage_option, NodeState, RouteDescriptor,
+    RoutingKey, ScaffoldDescriptor, STAGE_ROUTE, Q32_ONE,
 };
 use turing_economy::{
     BudgetSuggestion, CandidateRoute, EconomyEvent, MarketRouter, MarketRouterMode, PriceSignal,
@@ -805,6 +820,365 @@ fn run_fold_and_suggest_stage(input: &str) -> Result<String, String> {
 }
 
 // ---------------------------------------------------------------------------
+// derive-route-keys (WP-H4 / ADR-ECON-007 Decision 5; additive subcommand)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct RouteDescriptorInput {
+    route_label: String,
+    context: String,
+    repair: String,
+    verify: String,
+}
+
+#[derive(Deserialize)]
+struct DeriveRouteKeysRequest {
+    schema: String,
+    task_family: Option<String>,
+    routes: Vec<RouteDescriptorInput>,
+}
+
+#[derive(Serialize)]
+struct RouteKeyOutput {
+    route_label: String,
+    /// `route_descriptor.v1` JCS-SHA256 digest (Decision 5, Decision-1 precedent).
+    route_id: String,
+    /// The fully-encoded fold key (`stage_option_id(STAGE_ROUTE, route_id)`) -- exactly the
+    /// value a `CandidateRouteInput.scaffold_id` / `RouteFuseTripped.route_scaffold` must
+    /// carry for this route.
+    route_scaffold: String,
+}
+
+#[derive(Serialize)]
+struct DeriveRouteKeysResponse {
+    schema: &'static str,
+    domain_bucket: String,
+    route_keys: Vec<RouteKeyOutput>,
+}
+
+fn run_derive_route_keys(input: &str) -> Result<String, String> {
+    let request: DeriveRouteKeysRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid derive-route-keys request JSON: {e}"))?;
+    if request.schema != "econ_fold_cli.derive_route_keys.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.derive_route_keys.request.v1, got {})",
+            request.schema
+        ));
+    }
+
+    let bucket = domain_bucket(request.task_family.as_deref());
+
+    let mut route_keys = Vec::with_capacity(request.routes.len());
+    for route in &request.routes {
+        // Single source of truth: turing_economy::routing_fold::route_descriptor_id /
+        // stage_option_id (Decision 5) -- never re-derived with ad hoc JCS/hash ops here or
+        // in the Python driver.
+        let route_id = route_descriptor_id(&RouteDescriptor {
+            route_label: route.route_label.clone(),
+            context: route.context.clone(),
+            repair: route.repair.clone(),
+            verify: route.verify.clone(),
+        })
+        .map_err(|e| format!("route_descriptor_id derivation failed for {:?}: {e:?}", route.route_label))?;
+        let route_scaffold = stage_option_id(STAGE_ROUTE, &route_id)
+            .map_err(|e| format!("stage_option_id(route, ..) derivation failed: {e:?}"))?;
+        route_keys.push(RouteKeyOutput {
+            route_label: route.route_label.clone(),
+            route_id,
+            route_scaffold,
+        });
+    }
+
+    let response = DeriveRouteKeysResponse {
+        schema: "econ_fold_cli.derive_route_keys.response.v1",
+        domain_bucket: bucket,
+        route_keys,
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
+// fold-and-suggest-route (WP-H4 / ADR-ECON-007 Decision 2/5; additive subcommand)
+//
+// Same shape as fold-and-suggest-stage, PLUS the Decision 2 pause-mask filter applied to
+// `candidate_routes` before `suggest_with_stage(stage_name = STAGE_ROUTE)` ever runs. The
+// mask never touches `node_states`/Q -- it only narrows which candidates reach selection
+// (Decision 2: "掩码作用于 suggest 候选集过滤,不碰 Q").
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct FoldAndSuggestRouteRequest {
+    #[allow(dead_code)]
+    schema: String,
+    #[serde(default)]
+    committed_routing_events: Vec<EconomyEvent>,
+    #[serde(default)]
+    initial_prices: Vec<InitialPriceInput>,
+    candidate_routes: Vec<CandidateRouteInput>,
+    price_signal_hash: String,
+    pput_prior_hash: String,
+    trigger_event_hash: String,
+    router_mode: RouterModeInput,
+    /// ADR-ECON-007 Decision 2 pause validity window (B-zone value; caller reads it from
+    /// wherever the A-zone-existence/B-zone-value config mechanism lives -- consumed here
+    /// only to build a `RoutePauseConfig`, never echoed back in the response, same
+    /// discipline as `SoftmaxFinite`'s `tau_q32_mantissa` above).
+    pause_validity_window: u64,
+    /// The logical-clock position this selection is evaluated "as of" (see
+    /// `route_pause_mask`'s module doc). Must be `>=` every `RouteFuseTripped.event_ordinal`
+    /// on `committed_routing_events` that the caller intends to have already taken effect.
+    as_of_event_ordinal: u64,
+}
+
+#[derive(Serialize)]
+struct FoldAndSuggestRouteResponse {
+    schema: &'static str,
+    node_states: Vec<NodeStateOutput>,
+    /// The `route_id` label (the caller's own `CandidateRouteInput.route_id`, never a raw
+    /// B-zone threshold value -- Decision 3's no-numeric-leak discipline) of every candidate
+    /// the Decision 2 pause mask filtered out before selection ran.
+    paused_route_ids: Vec<String>,
+    budget_suggestion: BudgetSuggestionOutput,
+}
+
+fn run_fold_and_suggest_route(input: &str) -> Result<String, String> {
+    let schema_probe: SchemaOnly = serde_json::from_str(input)
+        .map_err(|e| format!("invalid fold-and-suggest-route request JSON: {e}"))?;
+    if schema_probe.schema != "econ_fold_cli.fold_and_suggest_route.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.fold_and_suggest_route.request.v1, got {})",
+            schema_probe.schema
+        ));
+    }
+    let request: FoldAndSuggestRouteRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid fold-and-suggest-route request JSON: {e}"))?;
+
+    let mut initial_prices: BTreeMap<RoutingKey, i128> = BTreeMap::new();
+    for entry in &request.initial_prices {
+        let key = RoutingKey {
+            domain_bucket: entry.domain_bucket.clone(),
+            scaffold_id: entry.scaffold_id.clone(),
+        };
+        let value = parse_i128_decimal(&entry.p_q32)?;
+        initial_prices.insert(key, value);
+    }
+
+    // Single source of truth: turing_economy::routing_fold::fold_routing_state_from_tape --
+    // the (Q, N, P) tape fold itself is never reimplemented here, and RouteFuseTripped
+    // events are never translated into it (Decision 2: "熔断不写 Q").
+    let nodes = fold_routing_state_from_tape(&initial_prices, &request.committed_routing_events)
+        .map_err(|e| format!("routing fold failed: {e:?}"))?;
+
+    let mut routes: Vec<CandidateRoute> = Vec::with_capacity(request.candidate_routes.len());
+    let mut route_keys: BTreeMap<String, RoutingKey> = BTreeMap::new();
+    let mut signals: Vec<PriceSignal> = Vec::with_capacity(request.candidate_routes.len());
+    let mut seen_market_ids: BTreeSet<&str> = BTreeSet::new();
+    for route_input in &request.candidate_routes {
+        if !seen_market_ids.insert(route_input.market_id.as_str()) {
+            return Err(format!(
+                "duplicate market_id {:?} across candidate_routes",
+                route_input.market_id
+            ));
+        }
+    }
+    for route_input in &request.candidate_routes {
+        let key = RoutingKey {
+            domain_bucket: route_input.domain_bucket.clone(),
+            scaffold_id: route_input.scaffold_id.clone(),
+        };
+        let q_eff = q_eff_for_key(&nodes, &key, &initial_prices);
+        let yes_price = q32_to_decimal_string(q_eff);
+        let no_price = q32_to_decimal_string(Q32_ONE - q_eff.clamp(0, Q32_ONE));
+        routes.push(CandidateRoute {
+            route_id: route_input.route_id.clone(),
+            market_id: route_input.market_id.clone(),
+            expected_failure_domain: route_input.expected_failure_domain.clone(),
+            requested_tokens: route_input.requested_tokens,
+        });
+        route_keys.insert(route_input.route_id.clone(), key);
+        signals.push(PriceSignal {
+            market_id: route_input.market_id.clone(),
+            yes_price,
+            no_price,
+            truth_status: "statistical_signal_only".to_string(),
+        });
+    }
+
+    // Decision 2 pause mask: pure fold over the RouteFuseTripped events already present on
+    // `committed_routing_events`, then a pure candidate-set filter -- never touches `nodes`
+    // (the Q/N/P fold output above) in any way.
+    let fuse_trips = economy_events_to_route_fuse_trips(&request.committed_routing_events);
+    let pause_cfg = RoutePauseConfig {
+        validity_window: request.pause_validity_window,
+    };
+    let paused = compute_route_pause_mask(&fuse_trips, &pause_cfg, request.as_of_event_ordinal);
+    let filtered_routes = filter_paused_candidates(
+        &routes,
+        |route| {
+            route_keys
+                .get(&route.route_id)
+                .cloned()
+                .unwrap_or_else(|| RoutingKey {
+                    domain_bucket: String::new(),
+                    scaffold_id: String::new(),
+                })
+        },
+        &paused,
+    );
+    let paused_route_ids: Vec<String> = routes
+        .iter()
+        .filter(|route| !filtered_routes.iter().any(|kept| kept.route_id == route.route_id))
+        .map(|route| route.route_id.clone())
+        .collect();
+
+    let router = match request.router_mode {
+        RouterModeInput::Shadow => MarketRouter::new(MarketRouterMode::Shadow),
+        RouterModeInput::AssistedFuture => MarketRouter::new(MarketRouterMode::AssistedFuture),
+        RouterModeInput::SoftmaxArgmaxBypass => {
+            MarketRouter::new_softmax(SoftmaxTemperature::ArgmaxBypass)
+        }
+        RouterModeInput::SoftmaxUniform => MarketRouter::new_softmax(SoftmaxTemperature::Uniform),
+        RouterModeInput::SoftmaxFinite { tau_q32_mantissa } => {
+            let tau = TauQ32::new(tau_q32_mantissa)
+                .map_err(|e| format!("invalid softmax temperature: {e:?}"))?;
+            MarketRouter::new_softmax(SoftmaxTemperature::Finite(tau))
+        }
+    };
+
+    // Signals must be filtered/joined the same way `suggest_with_stage` expects -- filtered
+    // by market_id membership in `filtered_routes` so a paused route's price never
+    // influences anything even incidentally.
+    let filtered_market_ids: BTreeSet<&str> =
+        filtered_routes.iter().map(|r| r.market_id.as_str()).collect();
+    let filtered_signals: Vec<PriceSignal> = signals
+        .into_iter()
+        .filter(|s| filtered_market_ids.contains(s.market_id.as_str()))
+        .collect();
+
+    // Single source of truth: MarketRouter::suggest_with_stage (Decision 4 + ‖ stage_name).
+    let suggestion = router
+        .suggest_with_stage(
+            &filtered_routes,
+            &filtered_signals,
+            &request.price_signal_hash,
+            &request.pput_prior_hash,
+            &request.trigger_event_hash,
+            STAGE_ROUTE,
+        )
+        .map_err(|e| format!("suggest_with_stage failed: {e:?}"))?;
+
+    let response = FoldAndSuggestRouteResponse {
+        schema: "econ_fold_cli.fold_and_suggest_route.response.v1",
+        node_states: node_state_outputs(&nodes),
+        paused_route_ids,
+        budget_suggestion: BudgetSuggestionOutput::from(&suggestion),
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
+// build-route-fuse-tripped (WP-H4 / ADR-ECON-007 Decision 2; additive subcommand)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct BuildRouteFuseTrippedRequest {
+    schema: String,
+    route_domain: String,
+    route_scaffold: String,
+    detector_rule_id: String,
+    /// `sha256:`-prefixed 64-hex digest over the off-tape diagnostic facts (validated by
+    /// `EconomyEvent::route_fuse_tripped` itself, not re-validated here).
+    diagnostic_digest: String,
+    event_ordinal: u64,
+}
+
+#[derive(Serialize)]
+struct BuildRouteFuseTrippedResponse {
+    schema: &'static str,
+    event: EconomyEvent,
+}
+
+fn run_build_route_fuse_tripped(input: &str) -> Result<String, String> {
+    let request: BuildRouteFuseTrippedRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid build-route-fuse-tripped request JSON: {e}"))?;
+    if request.schema != "econ_fold_cli.build_route_fuse_tripped.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.build_route_fuse_tripped.request.v1, got {})",
+            request.schema
+        ));
+    }
+
+    // Single source of truth: turing_economy::EconomyEvent::route_fuse_tripped (WP-H4) --
+    // never reimplemented here.
+    let event = EconomyEvent::route_fuse_tripped(
+        request.route_domain,
+        request.route_scaffold,
+        request.detector_rule_id,
+        request.diagnostic_digest,
+        request.event_ordinal,
+    )
+    .map_err(|e| format!("route_fuse_tripped construction failed: {e:?}"))?;
+
+    let response = BuildRouteFuseTrippedResponse {
+        schema: "econ_fold_cli.build_route_fuse_tripped.response.v1",
+        event,
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
+// build-route-falsified (WP-H4 / ADR-ECON-007 Decision 4; additive subcommand)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct BuildRouteFalsifiedRequest {
+    schema: String,
+    route_id: String,
+    attempts: u64,
+    #[serde(default)]
+    verifier_evidence: Vec<String>,
+    #[serde(default)]
+    detector_events: Vec<String>,
+    #[serde(default)]
+    remaining_candidates: Vec<String>,
+    recommendation: String,
+}
+
+#[derive(Serialize)]
+struct BuildRouteFalsifiedResponse {
+    schema: &'static str,
+    event: EconomyEvent,
+}
+
+fn run_build_route_falsified(input: &str) -> Result<String, String> {
+    let request: BuildRouteFalsifiedRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid build-route-falsified request JSON: {e}"))?;
+    if request.schema != "econ_fold_cli.build_route_falsified.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.build_route_falsified.request.v1, got {})",
+            request.schema
+        ));
+    }
+
+    // Single source of truth: turing_economy::EconomyEvent::route_falsified (WP-H4) -- never
+    // reimplemented here.
+    let event = EconomyEvent::route_falsified(
+        request.route_id,
+        request.attempts,
+        request.verifier_evidence,
+        request.detector_events,
+        request.remaining_candidates,
+        request.recommendation,
+    );
+
+    let response = BuildRouteFalsifiedResponse {
+        schema: "econ_fold_cli.build_route_falsified.response.v1",
+        event,
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
 // entry point
 // ---------------------------------------------------------------------------
 
@@ -823,10 +1197,15 @@ fn main() {
         "build-routing-prior-updated" => run_build_routing_prior_updated(&input),
         "derive-stage-keys" => run_derive_stage_keys(&input),
         "fold-and-suggest-stage" => run_fold_and_suggest_stage(&input),
+        "derive-route-keys" => run_derive_route_keys(&input),
+        "fold-and-suggest-route" => run_fold_and_suggest_route(&input),
+        "build-route-fuse-tripped" => run_build_route_fuse_tripped(&input),
+        "build-route-falsified" => run_build_route_falsified(&input),
         other => Err(format!(
             "unknown subcommand {other:?} (expected derive-keys, fold-and-suggest, \
              diversity-metrics, build-routing-prior-updated, derive-stage-keys, \
-             or fold-and-suggest-stage)"
+             fold-and-suggest-stage, derive-route-keys, fold-and-suggest-route, \
+             build-route-fuse-tripped, or build-route-falsified)"
         )),
     };
 

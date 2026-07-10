@@ -633,3 +633,347 @@ fn stage_option_ids_are_shared_across_scaffolds_conceptually() {
     assert_eq!(compose_dispatch_arm(&arm_b), "armB");
     assert_eq!(compose_dispatch_arm(&arm_c), "armC");
 }
+
+// ---------------------------------------------------------------------------
+// WP-H4 (ADR-ECON-007 Decision 2/5): route-stage key derivation + pause-mask cross-checks
+// ---------------------------------------------------------------------------
+
+#[test]
+fn cli_derive_route_keys_matches_direct_library_calls() {
+    use turing_economy::routing_fold::{
+        domain_bucket, route_descriptor_id, stage_option_id, RouteDescriptor, STAGE_ROUTE,
+    };
+
+    let descriptor = RouteDescriptor {
+        route_label: "conservative_repair".to_string(),
+        context: "minimal".to_string(),
+        repair: "single_shot".to_string(),
+        verify: "none".to_string(),
+    };
+    let expected_bucket = domain_bucket(Some("Astropy/Astropy"));
+    let expected_route_id = route_descriptor_id(&descriptor).expect("route_descriptor_id");
+    let expected_route_scaffold =
+        stage_option_id(STAGE_ROUTE, &expected_route_id).expect("stage_option_id");
+
+    let request = json!({
+        "schema": "econ_fold_cli.derive_route_keys.request.v1",
+        "task_family": "Astropy/Astropy",
+        "routes": [
+            {
+                "route_label": "conservative_repair",
+                "context": "minimal",
+                "repair": "single_shot",
+                "verify": "none",
+            }
+        ],
+    });
+    let response = run_cli("derive-route-keys", &request);
+
+    assert_eq!(response["schema"], "econ_fold_cli.derive_route_keys.response.v1");
+    assert_eq!(response["domain_bucket"].as_str().unwrap(), expected_bucket);
+    assert_eq!(
+        response["route_keys"][0]["route_id"].as_str().unwrap(),
+        expected_route_id
+    );
+    assert_eq!(
+        response["route_keys"][0]["route_scaffold"].as_str().unwrap(),
+        expected_route_scaffold
+    );
+}
+
+/// Core Decision 2 acceptance property, exercised end-to-end through the real CLI subprocess:
+/// a route with a `RouteFuseTripped` trip still active as of `as_of_event_ordinal` (a) is
+/// excluded from selection entirely (`budget_suggestion.route_id` can never be the paused
+/// route, even though it is the ONLY other candidate besides a low-value decoy) and (b) its
+/// `(Q, N, P)` node state in `node_states` is byte-identical to what the fold produces with
+/// no `RouteFuseTripped` events at all -- i.e. the trip never touched Q.
+#[test]
+fn cli_fold_and_suggest_route_pause_mask_excludes_tripped_route_and_never_touches_q() {
+    use turing_economy::routing_fold::{route_descriptor_id, stage_option_id, RouteDescriptor, STAGE_ROUTE};
+
+    let domain = "swe_bench_verified_500_campaign";
+    let route_a = RouteDescriptor {
+        route_label: "route_a".to_string(),
+        context: "minimal".to_string(),
+        repair: "single_shot".to_string(),
+        verify: "none".to_string(),
+    };
+    let route_b = RouteDescriptor {
+        route_label: "route_b".to_string(),
+        context: "source_context".to_string(),
+        repair: "loop".to_string(),
+        verify: "none".to_string(),
+    };
+    let route_a_id = route_descriptor_id(&route_a).unwrap();
+    let route_b_id = route_descriptor_id(&route_b).unwrap();
+    let route_a_scaffold = stage_option_id(STAGE_ROUTE, &route_a_id).unwrap();
+    let route_b_scaffold = stage_option_id(STAGE_ROUTE, &route_b_id).unwrap();
+
+    // Independent-verifier settlement so route_a has a strictly higher Q than route_b (an
+    // un-paused argmax would pick route_a): one PASS verdict on route_a, none on route_b.
+    let settle_a = json!({
+        "RoutingPriorUpdated": {
+            "schema_id": "routing_prior_updated.v1",
+            "event_type": "RoutingPriorUpdated",
+            "head_effect": "PRESERVE",
+            "route_domain": domain,
+            "route_scaffold": route_a_scaffold,
+            "verdict": true,
+            "verdict_source_id": "verifier:heldout-diff-checker-v1",
+            "verifier_attestation_hash": digest("attestation-route-a"),
+            "event_hash": turing_economy::EconomyEvent::routing_prior_updated(
+                domain,
+                route_a_scaffold.clone(),
+                true,
+                "verifier:heldout-diff-checker-v1",
+                digest("attestation-route-a"),
+            ).map(|e| match e { turing_economy::EconomyEvent::RoutingPriorUpdated(u) => u.event_hash, _ => unreachable!() }).unwrap(),
+        }
+    });
+
+    let fuse_trip = json!({
+        "RouteFuseTripped": {
+            "schema_id": "route_fuse_tripped.v1",
+            "event_type": "RouteFuseTripped",
+            "head_effect": "PRESERVE",
+            "route_domain": domain,
+            "route_scaffold": route_a_scaffold,
+            "detector_rule_id": "detector:loop_v1",
+            "diagnostic_digest": digest("diagnostic-facts-route-a"),
+            "event_ordinal": 5u64,
+        }
+    });
+
+    let committed = vec![settle_a, fuse_trip];
+
+    let request = json!({
+        "schema": "econ_fold_cli.fold_and_suggest_route.request.v1",
+        "committed_routing_events": committed,
+        "initial_prices": [],
+        "candidate_routes": [
+            {
+                "route_id": "route_a",
+                "market_id": format!("route:{domain}:{route_a_scaffold}"),
+                "expected_failure_domain": "swe_bench_worker_repair",
+                "requested_tokens": 12000u64,
+                "domain_bucket": domain,
+                "scaffold_id": route_a_scaffold,
+            },
+            {
+                "route_id": "route_b",
+                "market_id": format!("route:{domain}:{route_b_scaffold}"),
+                "expected_failure_domain": "swe_bench_worker_repair",
+                "requested_tokens": 12000u64,
+                "domain_bucket": domain,
+                "scaffold_id": route_b_scaffold,
+            }
+        ],
+        "price_signal_hash": digest("price-signal.v1:route-mask"),
+        "pput_prior_hash": digest("pput-prior.v1:route-mask"),
+        "trigger_event_hash": digest("trigger-event.v1:route-mask"),
+        "router_mode": {"kind": "SoftmaxArgmaxBypass"},
+        // Trip at ordinal 5, validity window 10 -> paused through ordinal 15.
+        "pause_validity_window": 10u64,
+        "as_of_event_ordinal": 12u64,
+    });
+
+    let response = run_cli("fold-and-suggest-route", &request);
+    assert_eq!(response["schema"], "econ_fold_cli.fold_and_suggest_route.response.v1");
+    assert_eq!(
+        response["budget_suggestion"]["route_id"].as_str().unwrap(),
+        "route_b",
+        "the higher-Q route_a is paused, so selection must fall through to route_b even \
+         though an un-paused argmax would have picked route_a"
+    );
+    assert_eq!(
+        response["paused_route_ids"].as_array().unwrap(),
+        &vec![Value::String("route_a".to_string())]
+    );
+
+    // Q untouched: fold node_states for route_a's key must be byte-identical to calling
+    // fold_routing_state_from_tape directly with ONLY the RoutingPriorUpdated event (i.e. as
+    // if RouteFuseTripped had never been on the tape at all).
+    let committed_without_trip: Vec<Value> = request["committed_routing_events"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|e| e.get("RouteFuseTripped").is_none())
+        .cloned()
+        .collect();
+    let events_without_trip: Vec<turing_economy::EconomyEvent> = committed_without_trip
+        .iter()
+        .map(|v| serde_json::from_value(v.clone()).expect("parse EconomyEvent"))
+        .collect();
+    let direct_nodes = fold_routing_state_from_tape(&BTreeMap::new(), &events_without_trip)
+        .expect("direct fold without the fuse trip");
+    let direct_node_a = direct_nodes
+        .iter()
+        .find(|(k, _)| k.scaffold_id == route_a_scaffold)
+        .map(|(_, node)| (node.p_q32(), node.n(), node.s(), node.q_eff_q32()))
+        .expect("route_a node present in direct fold");
+
+    let cli_node_a = response["node_states"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|n| n["scaffold_id"].as_str().unwrap() == route_a_scaffold)
+        .expect("route_a node present in CLI response");
+    assert_eq!(cli_node_a["p_q32"].as_str().unwrap(), direct_node_a.0.to_string());
+    assert_eq!(cli_node_a["n"].as_u64().unwrap(), direct_node_a.1);
+    assert_eq!(cli_node_a["s"].as_u64().unwrap(), direct_node_a.2);
+    assert_eq!(
+        cli_node_a["q_eff_q32"].as_str().unwrap(),
+        direct_node_a.3.to_string(),
+        "RouteFuseTripped must never change route_a's (Q, N, P) fold state"
+    );
+
+    // Determinism.
+    let response_2 = run_cli("fold-and-suggest-route", &request);
+    assert_eq!(response, response_2);
+}
+
+#[test]
+fn cli_fold_and_suggest_route_unpauses_once_validity_window_elapses() {
+    use turing_economy::routing_fold::{route_descriptor_id, stage_option_id, RouteDescriptor, STAGE_ROUTE};
+
+    let domain = "default";
+    let route_a = RouteDescriptor {
+        route_label: "route_a".to_string(),
+        context: "minimal".to_string(),
+        repair: "single_shot".to_string(),
+        verify: "none".to_string(),
+    };
+    let route_a_id = route_descriptor_id(&route_a).unwrap();
+    let route_a_scaffold = stage_option_id(STAGE_ROUTE, &route_a_id).unwrap();
+
+    let fuse_trip = json!({
+        "RouteFuseTripped": {
+            "schema_id": "route_fuse_tripped.v1",
+            "event_type": "RouteFuseTripped",
+            "head_effect": "PRESERVE",
+            "route_domain": domain,
+            "route_scaffold": route_a_scaffold,
+            "detector_rule_id": "detector:loop_v1",
+            "diagnostic_digest": digest("diagnostic-facts"),
+            "event_ordinal": 1u64,
+        }
+    });
+
+    let mk_request = |as_of: u64| {
+        json!({
+            "schema": "econ_fold_cli.fold_and_suggest_route.request.v1",
+            "committed_routing_events": [fuse_trip.clone()],
+            "initial_prices": [],
+            "candidate_routes": [
+                {
+                    "route_id": "route_a",
+                    "market_id": format!("route:{domain}:{route_a_scaffold}"),
+                    "expected_failure_domain": "x",
+                    "requested_tokens": 1000u64,
+                    "domain_bucket": domain,
+                    "scaffold_id": route_a_scaffold,
+                }
+            ],
+            "price_signal_hash": digest("price-signal.v1:route-expiry"),
+            "pput_prior_hash": digest("pput-prior.v1:route-expiry"),
+            "trigger_event_hash": digest("trigger-event.v1:route-expiry"),
+            "router_mode": {"kind": "SoftmaxArgmaxBypass"},
+            "pause_validity_window": 3u64,
+            "as_of_event_ordinal": as_of,
+        })
+    };
+
+    // as_of=4 is within [1, 1+3=4] -- still paused -> the ONLY candidate is filtered out ->
+    // suggest() must hard-error (NoCandidateRoutes), not silently bypass the mask.
+    let stderr = run_cli_expect_error("fold-and-suggest-route", &mk_request(4));
+    assert!(
+        stderr.contains("NoCandidateRoutes"),
+        "expected NoCandidateRoutes once the only candidate is paused; got: {stderr}"
+    );
+
+    // as_of=5 is one past expiry -> unpaused -> selection succeeds.
+    let response = run_cli("fold-and-suggest-route", &mk_request(5));
+    assert_eq!(
+        response["budget_suggestion"]["route_id"].as_str().unwrap(),
+        "route_a"
+    );
+    assert!(response["paused_route_ids"].as_array().unwrap().is_empty());
+}
+
+#[test]
+fn cli_build_route_fuse_tripped_and_route_falsified_round_trip() {
+    let tripped_request = json!({
+        "schema": "econ_fold_cli.build_route_fuse_tripped.request.v1",
+        "route_domain": "code_review",
+        "route_scaffold": "stage:sha256:aaaa",
+        "detector_rule_id": "detector:loop_v1",
+        "diagnostic_digest": digest("diagnostic-facts"),
+        "event_ordinal": 9u64,
+    });
+    let tripped_response = run_cli("build-route-fuse-tripped", &tripped_request);
+    assert_eq!(
+        tripped_response["schema"],
+        "econ_fold_cli.build_route_fuse_tripped.response.v1"
+    );
+    let event = &tripped_response["event"]["RouteFuseTripped"];
+    assert_eq!(event["head_effect"], "PRESERVE");
+    assert_eq!(event["route_domain"], "code_review");
+    assert_eq!(event["event_ordinal"], 9);
+
+    let falsified_request = json!({
+        "schema": "econ_fold_cli.build_route_falsified.request.v1",
+        "route_id": "route:sha256:bbbb",
+        "attempts": 3u64,
+        "verifier_evidence": ["ev-1"],
+        "detector_events": ["det-1"],
+        "remaining_candidates": ["route:sha256:cccc"],
+        "recommendation": "escalate to GRILL-ME",
+    });
+    let falsified_response = run_cli("build-route-falsified", &falsified_request);
+    assert_eq!(
+        falsified_response["schema"],
+        "econ_fold_cli.build_route_falsified.response.v1"
+    );
+    let falsified_event = &falsified_response["event"]["RouteFalsified"];
+    assert_eq!(falsified_event["head_effect"], "PRESERVE");
+    assert_eq!(falsified_event["proposal_only"], true);
+    assert_eq!(falsified_event["attempts"], 3);
+    assert_eq!(falsified_event["route_id"], "route:sha256:bbbb");
+}
+
+/// Isolation proof (WP-H4 red line "旧行为对拍不变"): the pre-existing `fold-and-suggest`
+/// subcommand's byte-for-byte parity with the direct library call (the very first test in
+/// this file) must still hold after adding the route-stage subcommands -- re-run here with a
+/// distinct fixture so this test does not merely duplicate the earlier one, but exercises the
+/// exact same code path after this WP's additions.
+#[test]
+fn cli_fold_and_suggest_still_matches_direct_library_call_after_wp_h4() {
+    let request = json!({
+        "schema": "econ_fold_cli.fold_and_suggest.request.v2",
+        "committed_routing_events": [],
+        "initial_prices": [],
+        "candidate_routes": [
+            {
+                "route_id": "route_only",
+                "market_id": "mkt_only",
+                "expected_failure_domain": "provider_x",
+                "requested_tokens": 42u64,
+                "domain_bucket": "default",
+                "scaffold_id": "scaffold:sha256:wp-h4-isolation-check",
+            }
+        ],
+        "price_signal_hash": digest("price-signal.v1:wp-h4-isolation"),
+        "pput_prior_hash": digest("pput-prior.v1:wp-h4-isolation"),
+        "trigger_event_hash": digest("trigger-event.v1:wp-h4-isolation"),
+        "router_mode": {"kind": "SoftmaxArgmaxBypass"},
+    });
+    let response = run_cli("fold-and-suggest", &request);
+    assert_eq!(response["schema"], "econ_fold_cli.fold_and_suggest.response.v1");
+    assert_eq!(
+        response["budget_suggestion"]["route_id"].as_str().unwrap(),
+        "route_only"
+    );
+    assert_eq!(response["budget_suggestion"]["head_effect"], "PRESERVE");
+    assert_eq!(response["budget_suggestion"]["emits_authorization"], false);
+    assert_eq!(response["budget_suggestion"]["can_move_accepted_head"], false);
+}

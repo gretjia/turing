@@ -430,6 +430,11 @@ fn economy_payload(event: &EconomyEvent) -> DemoResult<Value> {
         // future `RoutingPriorUpdated`/`RoutingPriorClawback` append would still serialize.
         EconomyEvent::RoutingPriorUpdated(inner) => to_value(inner),
         EconomyEvent::RoutingPriorClawback(inner) => to_value(inner),
+        // WP-H4 (ADR-ECON-007 Decision 2/4): likewise not emitted by this demo harness
+        // today; kept exhaustive so a future `RouteFuseTripped`/`RouteFalsified` append
+        // would still serialize, same precedent as the WP4 arms directly above.
+        EconomyEvent::RouteFuseTripped(inner) => to_value(inner),
+        EconomyEvent::RouteFalsified(inner) => to_value(inner),
     }
 }
 
