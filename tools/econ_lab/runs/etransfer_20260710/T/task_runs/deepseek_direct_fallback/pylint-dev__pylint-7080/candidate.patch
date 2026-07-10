@@ -1,0 +1,98 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 42fb77930..ff3bec2ae 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -14,9 +14,9 @@
+ import warnings
+ from collections.abc import Sequence
+ from pathlib import Path
+-from typing import Pattern, Union
++from typing import List, Pattern, Union
+ 
+-from pylint.lint.utils import _is_relative_to
++from pylint.lint.utils import _is_relative_to, _ignore_paths_match
+ 
+ if sys.version_info >= (3, 8):
+     from typing import TypedDict
+@@ -96,10 +96,14 @@ def expand_modules(
+     Something that depends on the current directory,
+     base can be set to something else.
+     """
++    if ignore_paths_re:
++        ignore_paths_re = [
++            re.compile(pattern) if isinstance(pattern, str) else pattern
++            for pattern in ignore_paths_re
++        ]
+     if isinstance(files_or_modules, Sequence):
+         files_or_modules = list(files_or_modules)
+     if isinstance(ignore_list, str):
+         ignore_list = [ignore_list]
+-    if isinstance(ignore_paths_re, str):
+-        ignore_paths_re = [ignore_paths_re]
++
+     modules: list[ModuleDescriptionDict] = []
+     errors: list[ErrorDescriptionDict] = []
+@@ -137,10 +141,16 @@ def expand_modules(
+         # `something.another`
+         if not modname and not is_namespace and not filepath.exists():
+             continue
++
++        if ignore_paths_re and any(
++            _ignore_paths_match(path, ignore_paths_re, is_namespace)
++            for path in [base / filepath, base / filepath.parent]
++        ):
++            continue
++
+         if not modname:
+             if not is_namespace:
+                 continue
+-        if is_namespace:
+             # This branch shares commonalities with the logic in
+             # ``AstroidManager._build_namespace_module()``.
+             if not modname:
+@@ -161,3 +171,4 @@ def expand_modules(
+                 is_namespace=False,
+             )
+         )
++
+     return modules, errors
+diff --git a/pylint/lint/utils.py b/pylint/lint/utils.py
+index 4f540f59f..575b2f4ef 100644
+--- a/pylint/lint/utils.py
++++ b/pylint/lint/utils.py
+@@ -13,7 +13,7 @@
+ 
+ import contextlib
+ import sys
+-from collections.abc import Iterator
++from collections.abc import Iterator, Sequence
+ from pathlib import Path
+ from typing import Pattern, Union
+ 
+@@ -148,3 +148,24 @@ def _is_relative_to(self: Path, *other: Path) -> bool:
+                 # Workaround for Python bug gh-91715
+                 me = self.resolve()
+             return me == other.resolve()
++
++
++def _ignore_paths_match(
++    path: Path,
++    ignore_paths_re: Sequence[Pattern[str]],
++    is_namespace: bool,
++) -> bool:
++    """Return True if the path matches one of the ignore paths regex."""
++    path_str = str(path)
++    for pattern in ignore_paths_re:
++        if pattern.match(path_str):
++            return True
++        # For namespace packages, also check the parent directory
++        if is_namespace and pattern.match(str(path.parent)):
++            return True
++        # Also check relative path from current directory
++        try:
++            rel_path = str(path.relative_to(Path.cwd()))
++        except ValueError:
++            continue
++        if pattern.match(rel_path):
++            return True
++    return False

@@ -1,0 +1,165 @@
+{
+  "capsule": "E",
+  "branch": "etransfer/grok-20260710",
+  "base_c_head": "dcd0eed5ca49cef74b8a9c25153c4e9d9a8c991f",
+  "c_handoff_head": "aae97ca1fe8955fc43c65801a7061c29824a1f6b",
+  "head_commit": "874d1558dc5657b4a491e4d27e6efcf42a0e49b5",
+  "status_ceiling": "ADDRESSED",
+  "nature": "confirmatory_experiment_prereg_readout_only",
+  "split_manifest_sha256": "7564bb1c01776d2f2b0f6ebd7fad44ddb51ab88081cb3a9c7a4435a339034f37",
+  "split_fingerprint_sha256": "1bc6725c70b64fa049f334f47b71d52d642cefa993cb22133daee7563b030c94",
+  "prereg_freeze": {
+    "readout_path": "tools/econ_lab/depthk/etransfer_readout.py",
+    "readout_sha256": "70fe44a80dd5c23e13b808a270638a12cabee44bc22a02e37735e798f021831b",
+    "frozen_before_first_real_run": true,
+    "freeze_unix_utc": "2026-07-10T06:00:51Z",
+    "freeze_record": "tools/econ_lab/runs/etransfer_20260710/READOUT_SHA256_FREEZE.txt"
+  },
+  "outcome": "NOT_RUN_STARVED",
+  "starvation_check": {
+    "T": {
+      "arm": "T",
+      "floor": 5,
+      "ok": true,
+      "stage_node_train_n": {
+        "context:minimal": 5,
+        "context:source_context": 12,
+        "repair:loop": 6,
+        "repair:single_shot": 11,
+        "verify:none": 7,
+        "verify:self_check": 10
+      },
+      "starved_nodes": []
+    },
+    "A": {
+      "arm": "A",
+      "floor_median": 3,
+      "ok": false,
+      "median_train_n": 1.0,
+      "note": "Frozen readout keys selected_route_id (instance-scoped). Recompute with selected_arm::selected_lineage also yields median_train_n=1.0 (STARVED unchanged)."
+    },
+    "ok": false
+  },
+  "budget": {
+    "cap": 115,
+    "used": 92,
+    "breakdown": {
+      "smoke_T": 1,
+      "smoke_A": 1,
+      "full_T": 50,
+      "full_A": 40
+    }
+  },
+  "arms": {
+    "T": {
+      "mode": "depthk_stage_market_GLOBAL",
+      "tau": 0.5,
+      "fractional_reward": true,
+      "domain_bucket": "global",
+      "domain_bucket_mode": "GLOBAL_CONSTANT",
+      "tasks": 50,
+      "worker_calls": 50,
+      "verdict": "tools/econ_lab/runs/etransfer_20260710/T/verdict.json"
+    },
+    "A": {
+      "mode": "flat_12route_GLOBAL",
+      "tau": 0.5,
+      "fractional_reward": true,
+      "domain_bucket_mode": "GLOBAL_CONSTANT",
+      "domain_buckets_observed": [
+        "global"
+      ],
+      "tasks": 50,
+      "worker_calls": 40,
+      "verdict": "tools/econ_lab/runs/etransfer_20260710/A/verdict.json"
+    }
+  },
+  "readout_path": "tools/econ_lab/runs/etransfer_20260710/ETRANSFER_READOUT.json",
+  "readout_once": true,
+  "spec_gate": [
+    {
+      "id": 1,
+      "predicate": "constitution + governance + C dependency",
+      "exit_code": 0,
+      "evidence": "constitution sha256 OK a0174ef8\u2026; verify_alignment.sh GREEN; HANDOFF_CAPSULE_C blocked=[]"
+    },
+    {
+      "id": 2,
+      "predicate": "ADR-ECON-005 draft + 006 + 003 + CAPSULE B memo",
+      "exit_code": 0,
+      "evidence": "docs/handoff/ADR-ECON-005\u2026; PROJECT_PLAN adr/ADR-ECON-006; CAPSULE B memo present"
+    },
+    {
+      "id": 3,
+      "predicate": "baseline pytest + cargo + gate_f4",
+      "exit_code": 0,
+      "evidence": "pytest live/depthk suite green; cargo test -p turing-economy green; F4_LEAK_PASS"
+    }
+  ],
+  "ship_gate": [
+    {
+      "id": 1,
+      "predicate": "split manifest TRAIN/HELDOUT + fingerprint recomputable",
+      "exit_code": 0,
+      "evidence": "tools/econ_lab/runs/etransfer_20260710/etransfer_split_manifest.json"
+    },
+    {
+      "id": 2,
+      "predicate": "existing files zero modification vs C tip",
+      "exit_code": 0,
+      "evidence": "git diff dcd0eed\u2026 --name-only empty; only untracked new paths under allowed prefixes"
+    },
+    {
+      "id": 3,
+      "predicate": "GLOBAL bucket mode evidence both arms",
+      "exit_code": 0,
+      "evidence": "T domain_bucket=global on all tasks + committed RPU route_domain=global; A domain_buckets_observed=[global]"
+    },
+    {
+      "id": 4,
+      "predicate": "readout self-test + sha freeze before first real call",
+      "exit_code": 0,
+      "evidence": "etransfer_readout.py --self-test SELF_TEST_PASS; freeze 70fe44a8\u2026 at 2026-07-10T06:00:51Z before smoke"
+    },
+    {
+      "id": 5,
+      "predicate": "smoke both arms + full both arms + single readout",
+      "exit_code": 0,
+      "evidence": "smoke GLOBAL_KEY_PROOF PASS; T/A status DONE; ETRANSFER_READOUT.json once"
+    },
+    {
+      "id": 6,
+      "predicate": "pytest/cargo/gate_f4 still green; commit; no push",
+      "exit_code": 0,
+      "evidence": "suite green at ship; commit on etransfer/grok-20260710; no push"
+    },
+    {
+      "id": 7,
+      "predicate": "HANDOFF + report",
+      "exit_code": 0,
+      "evidence": [
+        "HANDOFF_CAPSULE_E.json",
+        "docs/handoff/GROK_CAPSULE_E_ETRANSFER_REPORT_20260710.md"
+      ]
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    "Official prereg outcome NOT_RUN_STARVED: A arm TRAIN per-route N median < 3 (H-E1 not judged).",
+    "T arm stage-node TRAIN N floor satisfied (all six nodes N\u22655).",
+    "Quality floors also failed (settled < 0.8\u00d7 planned on several side/arm cells); starvation is the first failing gate.",
+    "No learned-function / \u5b66\u5230\u51fd\u6570 claims. Interpretation authority remains with orchestrator.",
+    "NEW FILES ONLY; depth_driver.py and live_driver.py unmodified.",
+    "Docker shared with D: arm concurrency 2, harness max_workers=1."
+  ],
+  "deliverables": [
+    "tools/econ_lab/depthk/etransfer_build_split.py",
+    "tools/econ_lab/depthk/etransfer_driver.py",
+    "tools/econ_lab/depthk/etransfer_flat_driver.py",
+    "tools/econ_lab/depthk/etransfer_readout.py",
+    "tools/econ_lab/run_etransfer.sh",
+    "tools/econ_lab/runs/etransfer_20260710/",
+    "docs/handoff/GROK_CAPSULE_E_ETRANSFER_REPORT_20260710.md",
+    "HANDOFF_CAPSULE_E.json"
+  ]
+}

@@ -1,0 +1,33 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -106,14 +106,16 @@
+     elif isinstance(node, ast.List):
+         result = [addnodes.desc_sig_punctuation('', '[')]
+         for elem in node.elts:
+             result.extend(unparse(elem))
+             result.append(addnodes.desc_sig_punctuation('', ', '))
+-        result.pop()
++        if node.elts:
++            result.pop()
+         result.append(addnodes.desc_sig_punctuation('', ']'))
+         return result
+     elif isinstance(node, ast.Module):
+         return sum((unparse(e) for e in node.body), [])
+     elif isinstance(node, ast.Name):
+         return [nodes.Text(node.id)]
+@@ -121,11 +123,14 @@
+         result = unparse(node.value)
+         result.append(addnodes.desc_sig_punctuation('', '['))
+         result.extend(unparse(node.slice))
+         result.append(addnodes.desc_sig_punctuation('', ']'))
+         return result
+     elif isinstance(node, ast.Tuple):
++        if not node.elts:
++            return [addnodes.desc_sig_punctuation('', '('),
++                    addnodes.desc_sig_punctuation('', ')')]
+         result = []
+         for elem in node.elts:
+             result.extend(unparse(elem))
+             result.append(addnodes.desc_sig_punctuation('', ', '))
+         result.pop()

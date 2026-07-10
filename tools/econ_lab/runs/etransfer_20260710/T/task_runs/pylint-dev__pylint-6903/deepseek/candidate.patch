@@ -1,0 +1,10 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -57,7 +57,7 @@ def _query_cpu() -> int:
+     elif cpu_shares is not None:
+-        cpu_count = int(cpu_shares / 1024)
++        cpu_count = int(cpu_shares / 1024) or 1
+     else:
+         cpu_count = multiprocessing.cpu_count()
+     return cpu_count

@@ -1,0 +1,105 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:global:scaffold:sha256:fc4cf68933c35ac01d7ec72f959d260473c61b0cf3a8f88ad2e9cf59ad47ff8c",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:e7c56cea4002c41877baf99e3ba39f7b791059ba68aa7a298b0920f555a30023",
+    "price_signal_hash": "sha256:4a07f366cfa259ad3a8339e27e404e9ae815640b4a2940d1e530b9cc9642363d",
+    "route_id": "matplotlib__matplotlib-24149::armA::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:0e2a28a48599d210bd099e3a87e51b375b5fa8a92c5f8e10d281b023c347169e",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:0e2a28a48599d210bd099e3a87e51b375b5fa8a92c5f8e10d281b023c347169e",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "global",
+          "route_scaffold": "scaffold:sha256:fc4cf68933c35ac01d7ec72f959d260473c61b0cf3a8f88ad2e9cf59ad47ff8c",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:15a238d8dd36496800f98d00c94741641ed9845af20a45fca85643627fbcd2f6"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/matplotlib__matplotlib-24149/kimi/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "matplotlib__matplotlib-24149"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "matplotlib__matplotlib-24149"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/matplotlib__matplotlib-24149/kimi/wp9a-live-driver.wp9a-live-driver-matplotlib__matplotlib-24149-kimi.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 665,
+        "candidate_patch_sha256": "sha256:7065fc326a50d783471ed1b64d4a938fa2a6d1f849ac520a0de3e723dfbe785f",
+        "instance_id": "matplotlib__matplotlib-24149",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 568961
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "global",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "matplotlib__matplotlib-24149",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "kimi",
+  "selected_route_id": "matplotlib__matplotlib-24149::armA::kimi",
+  "task_index": 11
+}

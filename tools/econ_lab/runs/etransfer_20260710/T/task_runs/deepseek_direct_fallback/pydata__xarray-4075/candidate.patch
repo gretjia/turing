@@ -1,0 +1,35 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index 8aad7XXXX..a1b2cXXXX 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -96,7 +96,8 @@ class Weighted:
+         The implementation should be such that `obj` and `weights` are
+         broadcastable to the same dimensions as ``self.obj`` and the *weights*,
+         respectively.
+         """
+         # We can't handle DataArrays with dots in their names
+         # because dot() interprets the dot as dimension separator.
+         if "." in self.obj.name:
+             raise ValueError(
+@@ -122,7 +123,7 @@ class Weighted:
+         """
+         return obj * self.weights
+ 
+     def _sum_of_weights(self, denom=None):
+-        weights = self.weights
++        weights = self.weights + self.weights.dtype.type(0)
+         if denom is not None:
+             weights = weights.where(denom, 0)
+         return dot(self.obj.notnull(), weights)
+@@ -143,7 +144,7 @@ class Weighted:
+             return self._weighted_sum(da) / self._sum_of_weights(denom=da.notnull())
+         if dim is not None:
+             # need to infer dims as we use `dot`
+             dim = self.obj.dims[dim] if isinstance(dim, int) else dim
+             denom = (self.weights.where(self.obj.notnull(), 0).sum(dim) /
+                      self._sum_of_weights(denom=self.obj.notnull()))
+-        return self._weighted_sum(da) / self._sum_of_weights()
++        return self._weighted_sum(da) / self._sum_of_weights().astype(da.dtype) if da.dtype.kind in 'fc' else self._weighted_sum(da) / self._sum_of_weights()
+         return self._reduce(da, dim, keep_attrs)
+ 
+     def _reduce(

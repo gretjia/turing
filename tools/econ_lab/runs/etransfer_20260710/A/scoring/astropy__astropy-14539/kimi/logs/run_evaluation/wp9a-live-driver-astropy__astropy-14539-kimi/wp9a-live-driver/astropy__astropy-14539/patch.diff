@@ -1,0 +1,34 @@
+diff --git a/astropy/io/fits/diff.py b/astropy/io/fits/diff.py
+--- a/astropy/io/fits/diff.py
++++ b/astropy/io/fits/diff.py
+@@ -31,7 +31,7 @@
+ 
+ from astropy.io.fits.column import Column, ColDefs
+ from astropy.io.fits.file import _File
+-from astropy.io.fits.fitsrec import FITS_rec
++from astropy.io.fits.fitsrec import FITS_rec, _VLF
+ from astropy.io.fits.hdu.hdulist import fitsopen
+ from astropy.io.fits.hdu.table import _TableBaseHDU
+ from astropy.io.fits.util import is_path_like, path_like
+@@ -1138,6 +1138,19 @@ def _diff(self):
+             for idx, name in enumerate(self.fieldnames):
+                 col_a = self.a.field(name)
+                 col_b = self.b.field(name)
++
++                # Variable-length array columns are represented as object arrays
++                # of numpy arrays.  numpy element-wise equality on such arrays
++                # does not reduce to a single boolean correctly, so compare each
++                # row's array individually.
++                if isinstance(col_a, _VLF) and isinstance(col_b, _VLF):
++                    for row_idx in range(len(col_a)):
++                        if not np.array_equal(col_a[row_idx], col_b[row_idx]):
++                            self.diff_column_data.append(
++                                (name, row_idx, col_a[row_idx], col_b[row_idx])
++                            )
++                            if len(self.diff_column_data) >= self.numdiffs:
++                                break
++                    continue
++
+                 if isinstance(col_a, np.ndarray) and isinstance(col_b, np.ndarray):
+                     if col_a.dtype != col_b.dtype:
+                         self.diff_column_data.append(name)

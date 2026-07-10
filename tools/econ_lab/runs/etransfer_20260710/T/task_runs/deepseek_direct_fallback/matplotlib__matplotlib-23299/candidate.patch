@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/_pylab_helpers.py b/lib/matplotlib/_pylab_helpers.py
+index 28ea2e4b4a..8eb9fa91e3 100644
+--- a/lib/matplotlib/_pylab_helpers.py
++++ b/lib/matplotlib/_pylab_helpers.py
+@@ -101,7 +101,7 @@ class Gcf:
+         """Return the active manager, or *None* if there is no manager."""
+         return next(reversed(cls.figs.values())) if cls.figs else None
+ 
+-    @classmethod
++    @staticmethod
+     def _set_new_active_manager(cls, manager):
+         """Adopt *manager* into pyplot and make it the active manager."""
+         if not hasattr(manager, "_cidgcf"):

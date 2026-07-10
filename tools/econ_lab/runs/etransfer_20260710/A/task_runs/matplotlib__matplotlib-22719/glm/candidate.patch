@@ -1,0 +1,16 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index 7e0a5f0..e2b3d1a 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -59,6 +59,10 @@ class CategoryConverter(units.ConversionInterface):
+             # We only accept strings.
+             if is_string_like:
+                 return value
++            # If the array is empty, return it as is without warning
++            if (isinstance(value, np.ndarray) and value.size == 0) or \
++               (isinstance(value, list) and len(value) == 0) or \
++               (isinstance(value, tuple) and len(value) == 0):
++                return value
+             _api.warn_deprecated(
+                 "3.5", message="Support for passing numbers through unit "
+                               "converters is deprecated since 3.5 and "

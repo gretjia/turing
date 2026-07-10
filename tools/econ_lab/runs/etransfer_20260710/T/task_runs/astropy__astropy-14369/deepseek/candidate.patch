@@ -1,0 +1,61 @@
+diff --git a/astropy/units/format/cds.py b/astropy/units/format/cds.py
+index d59a0e0c1b..63e94fe9d7 100644
+--- a/astropy/units/format/cds.py
++++ b/astropy/units/format/cds.py
+@@ -49,8 +49,6 @@ def _parse_unit(unit_string, detailed_exception=True):
+     return result
+ 
+ 
+-# TODO: Support multiple bases.
+-
+-
+ class CDS(Base):
+     """The CDS format for unit strings.
+ 
+@@ -148,24 +146,30 @@ def _parse_identifier(self, unit_string, pos, mode='unit_or_function'):
+ 
+     def _do_parse(self, unit_string):
+         unit_string = unit_string.strip()
+-        scale = 1.
++        scale = 1
+         parts = unit_string.split('/')
+-        if len(parts) > 2:
+-            raise ValueError(
+-                "Cannot parse unit string '{0}': "
+-                "more than one / is not supported "
+-                "in CDS format.".format(unit_string))
+-        if len(parts) == 2:
+-            denominator_str = parts[1]
+-            numerator_str = parts[0]
++        if len(parts) == 1:
++            numerator_str = parts[0]
++            denominator_str = ''
++        elif len(parts) >= 2:
++            # The denominator is the concatenation of all parts after
++            # the first.  The denominator is interpreted as a product,
++            # and already split on '*' or ' '.
++            numerator_str = parts[0]
++            denominator_str = ''.join(parts[1:])
++            # The denominator should be a product of units, but we
++            # need to account for possible scale factors embedded.
++            # However, the usual CDS format has no scale in denominator.
+         else:
+-            numerator_str = parts[0]
+-            denominator_str = ''
+-        # Numerator: parse product
+-        result = self._do_parse_product(numerator_str)
+-        if denominator_str:
+-            denominator = self._do_parse_product(denominator_str)
+-            result = result / denominator
++            numerator_str = parts[0]
++            denominator_str = ''
++
++        numerator = self._do_parse_product(numerator_str)
++        if denominator_str:
++            denominator = self._do_parse_product(denominator_str)
++            result = numerator / denominator
++        else:
++            result = numerator
+         scale = self._parse_intro_factor(unit_string)
+         if scale is not None:
+             result = scale * result

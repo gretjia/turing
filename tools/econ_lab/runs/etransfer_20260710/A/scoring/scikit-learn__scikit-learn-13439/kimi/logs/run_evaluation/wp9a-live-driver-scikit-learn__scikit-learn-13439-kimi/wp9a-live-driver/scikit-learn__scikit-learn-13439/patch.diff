@@ -1,0 +1,25 @@
+diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py
+index 1234567..abcdefg 100644
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -190,12 +190,16 @@ class Pipeline(_BaseComposition):
+     def __getitem__(self, ind):
+         """Return a parameter of the pipeline by name or a slice."""
+         if isinstance(ind, slice):
+             return self.__class__(self.steps[ind])
+         try:
+             return self.named_steps[ind]
+         except KeyError:
+             raise KeyError("Pipeline has no step named %r" % ind)
+ 
++    def __len__(self):
++        """Return the length of the Pipeline."""
++        return len(self.steps)
++
+     @property
+     def named_steps(self):
+         """Map the steps to a dictionary."""
+         # Use Bunch object to improve API
+         if not hasattr(self, '_named_steps'):
+             self._named_steps = Bunch(**dict(self.steps))
+         return self._named_steps

@@ -1,0 +1,457 @@
+{
+  "candidate_count": 100,
+  "candidate_pool": "S01\u222aS02",
+  "family_assignment": {
+    "astropy": "HELDOUT",
+    "django": "TRAIN",
+    "matplotlib": "TRAIN",
+    "psf": "HELDOUT",
+    "pydata": "HELDOUT",
+    "pylint-dev": "TRAIN",
+    "pytest-dev": "HELDOUT",
+    "scikit-learn": "HELDOUT",
+    "sphinx-doc": "TRAIN",
+    "sympy": "TRAIN"
+  },
+  "fingerprint_sha256": "1bc6725c70b64fa049f334f47b71d52d642cefa993cb22133daee7563b030c94",
+  "heldout_count": 25,
+  "heldout_families": [
+    "astropy",
+    "psf",
+    "pydata",
+    "pytest-dev",
+    "scikit-learn"
+  ],
+  "heldout_instance_ids": [
+    "astropy__astropy-14096",
+    "astropy__astropy-14539",
+    "astropy__astropy-7166",
+    "astropy__astropy-13579",
+    "astropy__astropy-13977",
+    "astropy__astropy-14182",
+    "astropy__astropy-14309",
+    "astropy__astropy-14365",
+    "astropy__astropy-14369",
+    "astropy__astropy-14508",
+    "psf__requests-2931",
+    "psf__requests-5414",
+    "pydata__xarray-4629",
+    "pydata__xarray-4075",
+    "pydata__xarray-6461",
+    "pydata__xarray-6721",
+    "pytest-dev__pytest-7205",
+    "pytest-dev__pytest-6202",
+    "pytest-dev__pytest-5809",
+    "pytest-dev__pytest-6197",
+    "scikit-learn__scikit-learn-12585",
+    "scikit-learn__scikit-learn-13135",
+    "scikit-learn__scikit-learn-13439",
+    "scikit-learn__scikit-learn-11578",
+    "scikit-learn__scikit-learn-13328"
+  ],
+  "heldout_start_index": 25,
+  "historical_verdict_count": 9,
+  "historical_verdict_paths": [
+    "tools/econ_lab/runs/stageA_20260707/tau_0/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_0p5/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_1/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_2/verdict.json",
+    "tools/econ_lab/runs/stageA_20260707/tau_inf/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/W/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/F/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/C/verdict.json",
+    "tools/econ_lab/runs/stageBprime_20260708/U/verdict.json"
+  ],
+  "instance_ids": [
+    "django__django-10999",
+    "django__django-11066",
+    "django__django-11099",
+    "django__django-11119",
+    "django__django-11163",
+    "django__django-11087",
+    "django__django-11095",
+    "matplotlib__matplotlib-22719",
+    "matplotlib__matplotlib-23299",
+    "matplotlib__matplotlib-23314",
+    "matplotlib__matplotlib-22871",
+    "matplotlib__matplotlib-24149",
+    "pylint-dev__pylint-6903",
+    "pylint-dev__pylint-7080",
+    "sphinx-doc__sphinx-7440",
+    "sphinx-doc__sphinx-10614",
+    "sphinx-doc__sphinx-11445",
+    "sphinx-doc__sphinx-11510",
+    "sphinx-doc__sphinx-7462",
+    "sphinx-doc__sphinx-7757",
+    "sympy__sympy-13480",
+    "sympy__sympy-13372",
+    "sympy__sympy-13551",
+    "sympy__sympy-13757",
+    "sympy__sympy-13877",
+    "astropy__astropy-14096",
+    "astropy__astropy-14539",
+    "astropy__astropy-7166",
+    "astropy__astropy-13579",
+    "astropy__astropy-13977",
+    "astropy__astropy-14182",
+    "astropy__astropy-14309",
+    "astropy__astropy-14365",
+    "astropy__astropy-14369",
+    "astropy__astropy-14508",
+    "psf__requests-2931",
+    "psf__requests-5414",
+    "pydata__xarray-4629",
+    "pydata__xarray-4075",
+    "pydata__xarray-6461",
+    "pydata__xarray-6721",
+    "pytest-dev__pytest-7205",
+    "pytest-dev__pytest-6202",
+    "pytest-dev__pytest-5809",
+    "pytest-dev__pytest-6197",
+    "scikit-learn__scikit-learn-12585",
+    "scikit-learn__scikit-learn-13135",
+    "scikit-learn__scikit-learn-13439",
+    "scikit-learn__scikit-learn-11578",
+    "scikit-learn__scikit-learn-13328"
+  ],
+  "instances": [
+    {
+      "family": "django",
+      "historical_accept_pass_count": 4,
+      "instance_id": "django__django-10999",
+      "side": "TRAIN"
+    },
+    {
+      "family": "django",
+      "historical_accept_pass_count": 2,
+      "instance_id": "django__django-11066",
+      "side": "TRAIN"
+    },
+    {
+      "family": "django",
+      "historical_accept_pass_count": 2,
+      "instance_id": "django__django-11099",
+      "side": "TRAIN"
+    },
+    {
+      "family": "django",
+      "historical_accept_pass_count": 1,
+      "instance_id": "django__django-11119",
+      "side": "TRAIN"
+    },
+    {
+      "family": "django",
+      "historical_accept_pass_count": 1,
+      "instance_id": "django__django-11163",
+      "side": "TRAIN"
+    },
+    {
+      "family": "django",
+      "historical_accept_pass_count": 0,
+      "instance_id": "django__django-11087",
+      "side": "TRAIN"
+    },
+    {
+      "family": "django",
+      "historical_accept_pass_count": 0,
+      "instance_id": "django__django-11095",
+      "side": "TRAIN"
+    },
+    {
+      "family": "matplotlib",
+      "historical_accept_pass_count": 3,
+      "instance_id": "matplotlib__matplotlib-22719",
+      "side": "TRAIN"
+    },
+    {
+      "family": "matplotlib",
+      "historical_accept_pass_count": 2,
+      "instance_id": "matplotlib__matplotlib-23299",
+      "side": "TRAIN"
+    },
+    {
+      "family": "matplotlib",
+      "historical_accept_pass_count": 2,
+      "instance_id": "matplotlib__matplotlib-23314",
+      "side": "TRAIN"
+    },
+    {
+      "family": "matplotlib",
+      "historical_accept_pass_count": 1,
+      "instance_id": "matplotlib__matplotlib-22871",
+      "side": "TRAIN"
+    },
+    {
+      "family": "matplotlib",
+      "historical_accept_pass_count": 1,
+      "instance_id": "matplotlib__matplotlib-24149",
+      "side": "TRAIN"
+    },
+    {
+      "family": "pylint-dev",
+      "historical_accept_pass_count": 1,
+      "instance_id": "pylint-dev__pylint-6903",
+      "side": "TRAIN"
+    },
+    {
+      "family": "pylint-dev",
+      "historical_accept_pass_count": 1,
+      "instance_id": "pylint-dev__pylint-7080",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sphinx-doc",
+      "historical_accept_pass_count": 2,
+      "instance_id": "sphinx-doc__sphinx-7440",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sphinx-doc",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sphinx-doc",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-11445",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sphinx-doc",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-11510",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sphinx-doc",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-7462",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sphinx-doc",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-7757",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sympy",
+      "historical_accept_pass_count": 5,
+      "instance_id": "sympy__sympy-13480",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sympy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13372",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sympy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13551",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sympy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13757",
+      "side": "TRAIN"
+    },
+    {
+      "family": "sympy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13877",
+      "side": "TRAIN"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "astropy__astropy-14096",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "astropy__astropy-14539",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 1,
+      "instance_id": "astropy__astropy-7166",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-13579",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-13977",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14182",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14309",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14365",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14369",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "astropy",
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14508",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "psf",
+      "historical_accept_pass_count": 1,
+      "instance_id": "psf__requests-2931",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "psf",
+      "historical_accept_pass_count": 1,
+      "instance_id": "psf__requests-5414",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pydata",
+      "historical_accept_pass_count": 4,
+      "instance_id": "pydata__xarray-4629",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pydata",
+      "historical_accept_pass_count": 2,
+      "instance_id": "pydata__xarray-4075",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pydata",
+      "historical_accept_pass_count": 1,
+      "instance_id": "pydata__xarray-6461",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pydata",
+      "historical_accept_pass_count": 1,
+      "instance_id": "pydata__xarray-6721",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pytest-dev",
+      "historical_accept_pass_count": 3,
+      "instance_id": "pytest-dev__pytest-7205",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pytest-dev",
+      "historical_accept_pass_count": 2,
+      "instance_id": "pytest-dev__pytest-6202",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pytest-dev",
+      "historical_accept_pass_count": 1,
+      "instance_id": "pytest-dev__pytest-5809",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "pytest-dev",
+      "historical_accept_pass_count": 1,
+      "instance_id": "pytest-dev__pytest-6197",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "scikit-learn",
+      "historical_accept_pass_count": 3,
+      "instance_id": "scikit-learn__scikit-learn-12585",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "scikit-learn",
+      "historical_accept_pass_count": 3,
+      "instance_id": "scikit-learn__scikit-learn-13135",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "scikit-learn",
+      "historical_accept_pass_count": 2,
+      "instance_id": "scikit-learn__scikit-learn-13439",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "scikit-learn",
+      "historical_accept_pass_count": 1,
+      "instance_id": "scikit-learn__scikit-learn-11578",
+      "side": "HELDOUT"
+    },
+    {
+      "family": "scikit-learn",
+      "historical_accept_pass_count": 1,
+      "instance_id": "scikit-learn__scikit-learn-13328",
+      "side": "HELDOUT"
+    }
+  ],
+  "schema": "econ_lab.etransfer_split_manifest.v1",
+  "split_rule": "family \u2192 TRAIN iff first byte of SHA256(\"etransfer-split.v1\"||family) is even; HELDOUT if odd. Within family: (historical accept-pass DESC, instance_id ASC). \u226425 per side by that ranking; stream = TRAIN (family name ASC) then HELDOUT.",
+  "split_salt": "etransfer-split.v1",
+  "train_count": 25,
+  "train_families": [
+    "django",
+    "matplotlib",
+    "pylint-dev",
+    "sphinx-doc",
+    "sympy"
+  ],
+  "train_instance_ids": [
+    "django__django-10999",
+    "django__django-11066",
+    "django__django-11099",
+    "django__django-11119",
+    "django__django-11163",
+    "django__django-11087",
+    "django__django-11095",
+    "matplotlib__matplotlib-22719",
+    "matplotlib__matplotlib-23299",
+    "matplotlib__matplotlib-23314",
+    "matplotlib__matplotlib-22871",
+    "matplotlib__matplotlib-24149",
+    "pylint-dev__pylint-6903",
+    "pylint-dev__pylint-7080",
+    "sphinx-doc__sphinx-7440",
+    "sphinx-doc__sphinx-10614",
+    "sphinx-doc__sphinx-11445",
+    "sphinx-doc__sphinx-11510",
+    "sphinx-doc__sphinx-7462",
+    "sphinx-doc__sphinx-7757",
+    "sympy__sympy-13480",
+    "sympy__sympy-13372",
+    "sympy__sympy-13551",
+    "sympy__sympy-13757",
+    "sympy__sympy-13877"
+  ]
+}

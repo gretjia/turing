@@ -1,0 +1,9 @@
+diff --git a/src/_pytest/python.py b/src/_pytest/python.py
+index 0036b6062..d8b6a8278 100644
+--- a/src/_pytest/python.py
++++ b/src/_pytest/python.py
+@@ -289,5 +289,5 @@ class PyobjMixin(PyobjContext):
+         parts.reverse()
+         s = ".".join(parts)
+-        return s.replace(".[", "[")
++        return s

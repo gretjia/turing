@@ -1,0 +1,105 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:global:scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:bb703d834dcf8dd6792afee59351c08db76c7e379466a43f5e87c69a517758d6",
+    "price_signal_hash": "sha256:6f74c3bbbbe10ae61b4f109988e6aa68b6faf7d3d737c202bb2fc337a28641fb",
+    "route_id": "sphinx-doc__sphinx-7440::armA::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:c82703a7dcf7a5d6fa9cac6ee5ceb458c91062a104778e0fa6c41d261ebffc3c",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:c82703a7dcf7a5d6fa9cac6ee5ceb458c91062a104778e0fa6c41d261ebffc3c",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "global",
+          "route_scaffold": "scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:d3fef8f0776e922601d90c87a659828548df72c09dca4ec08d28c9a6838b5ae2"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/sphinx-doc__sphinx-7440/glm/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "sphinx-doc__sphinx-7440"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sphinx-doc__sphinx-7440"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/sphinx-doc__sphinx-7440/glm/wp9a-live-driver.wp9a-live-driver-sphinx-doc__sphinx-7440-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 529,
+        "candidate_patch_sha256": "sha256:9db066af852d9e8a86c6346324493b0c297dfaedc50a8ca7741fd7bf48f57803",
+        "instance_id": "sphinx-doc__sphinx-7440",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 11292
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "global",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sphinx-doc__sphinx-7440",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "glm",
+  "selected_route_id": "sphinx-doc__sphinx-7440::armA::glm",
+  "task_index": 14
+}

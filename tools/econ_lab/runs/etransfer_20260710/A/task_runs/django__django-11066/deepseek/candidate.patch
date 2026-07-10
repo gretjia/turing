@@ -1,0 +1,8 @@
+diff --git a/django/contrib/contenttypes/management/__init__.py b/django/contrib/contenttypes/management/__init__.py
+--- a/django/contrib/contenttypes/management/__init__.py
++++ b/django/contrib/contenttypes/management/__init__.py
+@@ -24,7 +24,7 @@ def rename_contenttypes(model, old_model, db=None):
+             # Update the content type's model field.
+             with transaction.atomic(using=db):
+-                content_type.save(update_fields={'model'})
++                content_type.save(using=db, update_fields={'model'})

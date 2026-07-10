@@ -1,0 +1,16 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 3b8c3f8..315b7e0 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -104,6 +104,10 @@ def _parse_annotation(annotation: str) -> List[Node]:
+             result = []
+             for elem in node.elts:
+                 result.extend(unparse(elem))
++                # Add a space or comma after each element except the last one
+                 result.append(addnodes.desc_sig_punctuation('', ', '))
++            # Remove the last trailing comma and space
++            if result:
++                result.pop()
+             return result
+         else:
+             raise SyntaxError  # unsupported syntax

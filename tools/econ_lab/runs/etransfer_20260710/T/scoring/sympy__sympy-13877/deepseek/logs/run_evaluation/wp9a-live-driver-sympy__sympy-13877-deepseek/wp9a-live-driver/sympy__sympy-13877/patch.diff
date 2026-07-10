@@ -1,0 +1,26 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+index 8b0f8e3..7b3d9dd 100644
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -206,18 +206,13 @@ class MatrixBase(object):
+         return self._eval_det_bareiss()
+ 
+     def _eval_det_bareiss(self):
+-        det = None
+-        try:
+-            det = self._eval_det_bareiss_bareiss()
+-        except (ValueError, TypeError, ZeroDivisionError):
+-            pass
+-        return det or self._eval_det_det()
++        return self._eval_det_bareiss_bareiss()
+ 
+     def bareiss(mat, pivot_val=1):
+         sign = 1
+         def entry(i, j):
+-            ret = (mat[i, j]*mat[0, 0] - mat[i, 0]*mat[0, j])/pivot_val
+-            return cancel(ret)
++            ret = (mat[i, j]*mat[0, 0] - mat[i, 0]*mat[0, j]) / pivot_val
++            return factor_terms(ret)
+ 
+         if mat.rows == 1:
+             return mat[0, 0]

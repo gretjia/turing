@@ -1,0 +1,13 @@
+diff --git a/astropy/utils/misc.py b/astropy/utils/misc.py
+index 9d1a6d1..03b6ef1 100644
+--- a/astropy/utils/misc.py
++++ b/astropy/utils/misc.py
+@@ -787,7 +787,7 @@ class InheritDocstrings(type):
+             for key, val in dct.items():
+                 # Check if the item is a function or a property
+                 if (inspect.isfunction(val) or
+-                    inspect.isdatadescriptor(val)):
++                    isinstance(val, property)):
+                     # Get the docstring from the parent class
+                     for base in bases:
+                         if hasattr(base, key):

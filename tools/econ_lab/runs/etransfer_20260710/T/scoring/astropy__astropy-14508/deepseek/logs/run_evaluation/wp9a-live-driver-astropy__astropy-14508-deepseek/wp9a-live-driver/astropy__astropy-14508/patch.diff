@@ -1,0 +1,33 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+index 6f17b5d4c5..d2f1de3e7b 100644
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -1296,11 +1296,25 @@ class Card:
+ 
+     def _format_float(self, value):
+         """Format a floating number to a string for writing to a FITS card."""
+-        # Format the float
++        # Try Python's default str first, which often yields a shorter,
++        # more precise representation (e.g., 0.009125 instead of 0.009124999999999999).
++        float_str = str(value).upper()
++        # If the default representation is within the allowed width (20 chars),
++        # use it; otherwise fall back to the longer but precise .16G format.
++        if len(float_str) <= 20:
++            # However, .16G can produce a representation with 'D' exponent (like 1.0D-5)
++            # which is also valid FITS floating format.
++            # Since str(value) gives something like '1e-05', convert 'e' to 'E' and
++            # ensure the value fits.
++            # Also ensure the string is not empty.
++            if float_str:
++                return float_str
++
++        # Format with .16G as before.
+         r = f"{value:.16G}".upper()
+ 
+-        # If the string uses scientific notation, add a leading 0 before the
+-        # decimal point, if necessary, and adjust the exponent.
++        # If the string uses scientific notation, add a leading 0 before
++        # the decimal point, if necessary, and adjust the exponent.
+         # Otherwise "      - .1234E+002" will be written for negative small
+         # numbers (see ticket #1349).
+         if "E" in r:

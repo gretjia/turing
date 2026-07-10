@@ -1,0 +1,14 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 21ee8f4b7..e6f4a9e5d 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -402,6 +402,9 @@ class PyFunction(PyObject):
+             for i, param in enumerate(self.arguments):
+                 if param.default or param.type:
+                     break
++            else:
++                # no break, use last positional only
++                i = len(self.arguments)
+             self._signature_at_line_end = True
+         else:
+             self._signature_at_line_end = False

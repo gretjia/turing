@@ -1,0 +1,17 @@
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index 6cac6a4a8a..fc9bb9e9c1 100644
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -1071,6 +1071,12 @@ def __add__(self, other):
+ 
+     def __mul__(self, other):
+         return self.mul(other)
++
++    def __rmul__(self, other):
++        if isinstance(other, Poly) or not isinstance(other, Expr):
++            return NotImplemented
++        return self.mul(other)
++
+     def __pow__(self, other):
+         return self.pow(other)
+ 

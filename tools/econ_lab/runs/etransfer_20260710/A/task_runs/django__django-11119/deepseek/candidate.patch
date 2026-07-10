@@ -1,0 +1,12 @@
+diff --git a/django/template/engine.py b/django/template/engine.py
+index 0fdaaed3d6..8fdd14d6f3 100644
+--- a/django/template/engine.py
++++ b/django/template/engine.py
+@@ -120,4 +120,4 @@ class Engine:
+         # Django < 1.8 accepted a Context in `context` even though that's
+         # unintended. Preserve this ability but don't rewrap `context`.
+         if isinstance(context, Context):
+             return t.render(context)
+         else:
+-            return t.render(Context(context))
++            return t.render(Context(context, autoescape=self.autoescape))

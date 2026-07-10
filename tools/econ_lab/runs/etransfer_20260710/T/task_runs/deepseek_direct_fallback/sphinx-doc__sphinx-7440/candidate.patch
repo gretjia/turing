@@ -1,0 +1,20 @@
+diff --git a/sphinx/domains/std.py b/sphinx/domains/std.py
+index 3a753f3..6c3e368 100644
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -172,12 +172,13 @@ class StandardDomain(Domain):
+                         if termid in self.data['terms'] and termid != key:
+                             # take first conflicting arg as canonical
+                             srclen = len(self.data['termsep'])
++                            term_lower = term.lower()
+                             if self.data['terms'][termid][:srclen] in ('term:', 'taxonomy:'):
+                                 pass
+                             elif self.data['terms'][termid][:srclen] == 'glossary:':
+-                                node = newnodes[termid]
++                                node = newnodes.get(termid) or newnodes.get(termid.lower())
+                                 msg = __('duplicate term description of %s, '
+-                                         'other instance in %s') % (term, node['refuri'])
++                                         'other instance in %s') % (term, node['refuri'] if node else 'unknown')
+                                 logger.warning(msg, location=termnodes[termid])
+                                 continue
+                         self.data['terms'][termid] = 'term:%s' % docname

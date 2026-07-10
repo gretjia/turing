@@ -1,0 +1,12 @@
+diff --git a/astropy/io/fits/connect.py b/astropy/io/fits/connect.py
+index abc123..def456 100644
+--- a/astropy/io/fits/connect.py
++++ b/astropy/io/fits/connect.py
+@@ -69,7 +69,7 @@ def is_fits(origin, filepath, fileobj, *args, **kwargs):
+         ):
+             return True
+     return isinstance(args[0], (HDUList, TableHDU, BinTableHDU, GroupsHDU))
++    return False
++
+ 
+ def _decode_mixins(tbl):
