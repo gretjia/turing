@@ -1,0 +1,77 @@
+diff --git a/xarray/core/common.py b/xarray/core/common.py
+index a7c143809..724c1d542 100644
+--- a/xarray/core/common.py
++++ b/xarray/core/common.py
+@@ -1812,12 +1812,15 @@ def get_chunksizes(variables):
+     chunks: dict[Any, tuple[int, ...]] = {}
+     for v in variables:
+         if hasattr(v.data, "chunks"):
+-            for dim, c in v.chunksizes.items():
+-                if dim in chunks and c != chunks[dim]:
+-                    raise ValueError(
+-                        "inconsistent chunksizes for dimension %r: %s"
+-                        % (dim, ", ".join(str(c) for c in chunks[dim]))
+-                    )
+-                chunks[dim] = c
++            # Only access chunksizes if the variable has chunks
++            # This avoids triggering lazy loading of the full array
++            try:
++                for dim, c in v.chunksizes.items():
++                    if dim in chunks and c != chunks[dim]:
++                        raise ValueError(
++                            "inconsistent chunksizes for dimension %r: %s"
++                            % (dim, ", ".join(str(c) for c in chunks[dim]))
++                        )
++                    chunks[dim] = c
++            except AttributeError:
++                # If chunksizes is not available, skip this variable
++                pass
+     return chunks
+diff --git a/xarray/core/variable.py b/xarray/core/variable.py
+index 074c7898a..11c20846b 100644
+--- a/xarray/core/variable.py
++++ b/xarray/core/variable.py
+@@ -336,7 +336,7 @@ class Variable:
+         if self._data is not None:
+             return self._data
+         else:
+-            return self.values
++            return self._data
+ 
+     @property
+     def values(self):
+@@ -509,7 +509,7 @@ class Variable:
+     @property
+     def values(self):
+         """The variable's data as a numpy.ndarray"""
+-        return _as_array_or_item(self._data)
++        return _as_array_or_item(self._data)
+ 
+     def _item_key(self, key: Any) -> Any:
+         """Numpy-style indexing with a single key"""
+@@ -518,6 +518,10 @@ class Variable:
+         if hasattr(data, "shape"):
+             return data.shape
+         else:
+-            return _as_array_or_item(data).shape
++            # Avoid triggering lazy loading of full array for chunk inspection
++            if hasattr(data, "chunks") and hasattr(data, "shape"):
++                return data.shape
++            else:
++                return _as_array_or_item(data).shape
+ 
+     def _ensure_chunks(self):
+         """Ensure that chunks are set for this variable."""
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index 302a858c2..2e96290c0 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -2107,7 +2107,7 @@ class Dataset(Mapping[Hashable, "Variable"], DataStructure):
+     def chunks(self) -> Mapping[Hashable, tuple[int, ...]]:
+         """
+         Mapping from dimension names to block lengths for this dataset's data, or None if
+-        the underlying data is not a dask array.
++        the underlying data is not chunked.
+ 
+         Returns
+         -------

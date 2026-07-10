@@ -1,0 +1,144 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:django/django:scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:373ec53b6571ef8b3daeb884e4e15de1c9c01349971ed577be00e842cdb3e365",
+    "price_signal_hash": "sha256:07b6a9cfff79d47997cb3354f0266317fad88eaf09e060c7138f438ba46f8cb4",
+    "route_id": "django__django-11119::armC::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:59481f71861f1f66cce30cf635a9797f2dff6114af4e858aad56f0e51461ad12",
+        "verdict_fraction_q32": "4294967296"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "test_autoescape_off (template_tests.test_engine.RenderToStringTest)",
+          "test_multiple_engines_configured (template_tests.test_engine.GetDefaultTests)",
+          "test_single_engine_configured (template_tests.test_engine.GetDefaultTests)"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 5,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "test_basic_context (template_tests.test_engine.RenderToStringTest)",
+          "test_cached_loader_priority (template_tests.test_engine.LoaderTests)",
+          "test_loader_priority (template_tests.test_engine.LoaderTests)",
+          "test_no_engines_configured (template_tests.test_engine.GetDefaultTests)",
+          "test_origin (template_tests.test_engine.LoaderTests)"
+        ],
+        "verify_total_count": 5,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:59481f71861f1f66cce30cf635a9797f2dff6114af4e858aad56f0e51461ad12",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "django/django",
+          "route_scaffold": "scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": true,
+          "verdict_fraction_q32": "4294967296",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:15e031e4ed8b254b05e842e46be9a60e87e1fc48dc7f628e15858639b8e0289f"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/django__django-11119/deepseek/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "django__django-11119"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "django__django-11119"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "django__django-11119"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/django__django-11119/deepseek/wp9a-live-driver.wp9a-live-driver-django__django-11119-deepseek.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_autoescape_off (template_tests.test_engine.RenderToStringTest)"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_cached_loader_priority (template_tests.test_engine.LoaderTests)",
+              "test_loader_priority (template_tests.test_engine.LoaderTests)",
+              "test_origin (template_tests.test_engine.LoaderTests)",
+              "test_basic_context (template_tests.test_engine.RenderToStringTest)",
+              "test_multiple_engines_configured (template_tests.test_engine.GetDefaultTests)",
+              "test_no_engines_configured (template_tests.test_engine.GetDefaultTests)",
+              "test_single_engine_configured (template_tests.test_engine.GetDefaultTests)"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 485,
+        "candidate_patch_sha256": "sha256:3e5ca0cc1cddb13b1f5bd802763ecc04e987c1398bc218964768e2d5f51cf4a3",
+        "instance_id": "django__django-11119",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 8544
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "django/django",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "django__django-11119",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "django__django-11119::armC::deepseek",
+  "task_index": 18
+}

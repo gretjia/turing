@@ -1,0 +1,16 @@
+diff --git a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+index 8b36cd9f2..3c4e9df54 100644
+--- a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
++++ b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+@@ -205,9 +205,9 @@ class SlicedLowLevelWCS(BaseWCSWrapper):
+         for iworld in range(self._wcs.world_n_dim):
+             if iworld in self._world_keep:
+                 iworld_curr += 1
+-                world_arrays_new.append(world_arrays[iworld_curr])
++                world_arrays_new.append(world_arrays[iworld_curr - 1] if iworld_curr > 0 else 1.)
+             else:
+-                world_arrays_new.append(1.)
++                world_arrays_new.append(0.)
+ 
+         world_arrays_new = np.broadcast_arrays(*world_arrays_new)
+         pixel_arrays = list(self._wcs.world_to_pixel_values(*world_arrays_new))

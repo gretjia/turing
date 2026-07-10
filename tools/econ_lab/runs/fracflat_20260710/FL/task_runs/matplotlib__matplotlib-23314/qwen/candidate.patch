@@ -1,0 +1,72 @@
+diff --git a/lib/matplotlib/axes/_base.py b/lib/matplotlib/axes/_base.py
+index 57f2a048a2..82215111c8 100644
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -1780,6 +1780,9 @@ class Axes(_axes.Axes):
+         self._visible = visible
+         # We also need to hide the ticklabels and title
+         self._set_ticklabel_visibility(visible)
++        # For 3D axes, we also need to hide the 3D components
++        if hasattr(self, '_axis3d') and self._axis3d is not None:
++            self._axis3d.set_visible(visible)
+         # Make sure the artists are updated
+         for artist in self.artists:
+             if hasattr(artist, 'set_visible'):
+diff --git a/lib/matplotlib/axes/_subplots.py b/lib/matplotlib/axes/_subplots.py
+index 10ff470a6d..cf3b664297 100644
+--- a/lib/matplotlib/axes/_subplots.py
++++ b/lib/matplotlib/axes/_subplots.py
+@@ -118,6 +118,9 @@ class SubplotBase(_axes.Axes):
+         self._visible = visible
+         # We also need to hide the ticklabels and title
+         self._set_ticklabel_visibility(visible)
++        # For 3D axes, we also need to hide the 3D components
++        if hasattr(self, '_axis3d') and self._axis3d is not None:
++            self._axis3d.set_visible(visible)
+         # Make sure the artists are updated
+         for artist in self.artists:
+             if hasattr(artist, 'set_visible'):
+diff --git a/lib/matplotlib/projections/3d.py b/lib/matplotlib/projections/3d.py
+index c082aa78a2..9d355b3070 100644
+--- a/lib/matplotlib/projections/3d.py
++++ b/lib/matplotlib/projections/3d.py
+@@ -1018,6 +1018,9 @@ class Axes3D(_base.Axes):
+         self._visible = visible
+         # We also need to hide the ticklabels and title
+         self._set_ticklabel_visibility(visible)
++        # For 3D axes, we also need to hide the 3D components
++        if hasattr(self, '_axis3d') and self._axis3d is not None:
++            self._axis3d.set_visible(visible)
+         # Make sure the artists are updated
+         for artist in self.artists:
+             if hasattr(artist, 'set_visible'):
+diff --git a/lib/matplotlib/axes/_base.py b/lib/matplotlib/axes/_base.py
+index 57f2a048a2..72b371f1b4 100644
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -1780,6 +1780,9 @@ class Axes(_axes.Axes):
+         self._visible = visible
+         # We also need to hide the ticklabels and title
+         self._set_ticklabel_visibility(visible)
++        # For 3D axes, we also need to hide the 3D components
++        if hasattr(self, '_axis3d') and self._axis3d is not None:
++            self._axis3d.set_visible(visible)
+         # Make sure the artists are updated
+         for artist in self.artists:
+             if hasattr(artist, 'set_visible'):
+             artist.set_visible(visible)
+diff --git a/lib/matplotlib/projections/3d.py b/lib/matplotlib/projections/3d.py
+index c082aa78a2..115bc2d741 100644
+--- a/lib/matplotlib/projections/3d.py
++++ b/lib/matplotlib/projections/3d.py
+@@ -1018,6 +1018,9 @@ class Axes3D(_base.Axes):
+         self._visible = visible
+         # We also need to hide the ticklabels and title
+         self._set_ticklabel_visibility(visible)
++        # For 3D axes, we also need to hide the 3D components
++        if hasattr(self, '_axis3d') and self._axis3d is not None:
++            self._axis3d.set_visible(visible)
+         # Make sure the artists are updated
+         for artist in self.artists:
+             if hasattr(artist, 'set_visible'):
+             artist.set_visible(visible)

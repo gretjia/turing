@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/_pylab_helpers.py b/lib/matplotlib/_pylab_helpers.py
+index 1b9d2340c7..3b71dbaaa4 100644
+--- a/lib/matplotlib/_pylab_helpers.py
++++ b/lib/matplotlib/_pylab_helpers.py
+@@ -115,7 +115,7 @@ class Gcf:
+     def set_active(cls, manager):
+         """Make *manager* the active manager."""
+         cls.figs[manager.num] = manager
+-        cls.figs.move_to_end(manager.num)
++        cls.figs.move_to_end(manager.num, last=True)
+ 
+     @classmethod
+     def draw_all(cls, force=False):

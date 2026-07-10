@@ -1,0 +1,339 @@
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+index 202224442..814258229 100644
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -162,7 +162,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -171,6 +171,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -192,7 +192,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -201,6 +201,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -218,7 +218,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -227,6 +227,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -250,7 +250,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -259,6 +259,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -283,7 +283,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -292,6 +292,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -305,7 +305,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -314,6 +314,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -333,7 +333,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -342,6 +342,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -365,7 +365,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -374,6 +374,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -399,7 +399,7 @@ class PyLinter(BaseLinter):
+         if self.config.recursive:
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+-            if self.config.ignore_paths:
++            if self.config.ignore_paths and not self.config.recursive:
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -408,6 +408,9 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
++                for pattern in self.config.ignore_paths:
++                    if re.match(pattern, filepath):
++                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+index 814258229..be548a47a 100644
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -165,9 +165,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -174,9 +171,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -195,9 +192,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -204,9 +201,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -221,9 +218,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -230,9 +227,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -253,9 +250,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -262,9 +259,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -308,9 +305,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -317,9 +314,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -336,9 +333,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -345,9 +342,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -374,9 +371,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -383,9 +380,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -402,9 +399,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):
+@@ -411,9 +408,6 @@ class PyLinter(BaseLinter):
+             # If recursive, we need to check if the file should be ignored
+             # This is different from the normal ignore mechanism
+             if self.config.ignore_paths:
+-                for pattern in self.config.ignore_paths:
+-                    if re.match(pattern, filepath):
+-                        return
+                 ignores = self.config.ignore_paths
+                 for pattern in ignores:
+                     if re.match(pattern, filepath):

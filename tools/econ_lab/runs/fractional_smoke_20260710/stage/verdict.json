@@ -1,0 +1,144 @@
+{
+  "committed_routing_events_count": 0,
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_assignment_note": "v0 equal share of verify verdict across the three stage nodes used on the path; not causal credit assignment \u2014 known ceiling, not a defect",
+  "evidence_class": "SMOKE_FIXTURE",
+  "fractional_reward": true,
+  "max_worker_calls": 1,
+  "mode": "smoke",
+  "schema": "econ_lab.depthk.depth_driver.verdict.v1",
+  "significance_claims": "NONE \u2014 exploratory feasibility build only",
+  "task_shard": "S02",
+  "tasks": [
+    {
+      "credit_assignment": "v0_equal_share_not_causal",
+      "credit_events_count": 0,
+      "dispatch_arm": "armA",
+      "domain_bucket": "astropy/astropy",
+      "instance_id": "astropy__astropy-14365",
+      "lineage": "deepseek",
+      "live_split_verdict": null,
+      "nodes_after": {
+        "context:minimal": {
+          "n": 0,
+          "note": "absent_from_fold_map_means_N0_prior",
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 0,
+          "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        "repair:single_shot": {
+          "n": 0,
+          "note": "absent_from_fold_map_means_N0_prior",
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 0,
+          "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        "verify:none": {
+          "n": 0,
+          "note": "absent_from_fold_map_means_N0_prior",
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 0,
+          "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        }
+      },
+      "nodes_before": {
+        "context:minimal": {
+          "n": 0,
+          "note": "absent_from_fold_map_means_N0_prior",
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 0,
+          "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        "repair:single_shot": {
+          "n": 0,
+          "note": "absent_from_fold_map_means_N0_prior",
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 0,
+          "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        "verify:none": {
+          "n": 0,
+          "note": "absent_from_fold_map_means_N0_prior",
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 0,
+          "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        }
+      },
+      "provider_path": "deepseek_direct_fallback",
+      "scoring_report_paths": [],
+      "scoring_status": "SKIPPED_NO_PATCH",
+      "settlement_verdict_resolved": null,
+      "stage_chain": [
+        {
+          "budget_suggestion": {
+            "can_move_accepted_head": false,
+            "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+            "emits_authorization": false,
+            "head_effect": "PRESERVE",
+            "market_id": "stage:astropy/astropy:stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac",
+            "max_tokens": 12000,
+            "mode": "Softmax",
+            "pput_prior_hash": "sha256:5caf967c8053f729380882491e4f7d5e4a323be533c1b800e832b9ebb9a7dc65",
+            "price_signal_hash": "sha256:25f972f8302cfe5e906bd66b4ccbf37093cc1eca31192dede52253689d2540cf",
+            "route_id": "minimal",
+            "schema_id": "budget_allocated.v1"
+          },
+          "option": "minimal",
+          "stage_name": "context",
+          "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "budget_suggestion": {
+            "can_move_accepted_head": false,
+            "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+            "emits_authorization": false,
+            "head_effect": "PRESERVE",
+            "market_id": "stage:astropy/astropy:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+            "max_tokens": 12000,
+            "mode": "Softmax",
+            "pput_prior_hash": "sha256:7cd7b20e05e62e3daed4eb0eefdcc1cdb57119f770bc1b83d932b3970834086b",
+            "price_signal_hash": "sha256:25f972f8302cfe5e906bd66b4ccbf37093cc1eca31192dede52253689d2540cf",
+            "route_id": "single_shot",
+            "schema_id": "budget_allocated.v1"
+          },
+          "option": "single_shot",
+          "stage_name": "repair",
+          "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "budget_suggestion": {
+            "can_move_accepted_head": false,
+            "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+            "emits_authorization": false,
+            "head_effect": "PRESERVE",
+            "market_id": "stage:astropy/astropy:stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+            "max_tokens": 12000,
+            "mode": "Softmax",
+            "pput_prior_hash": "sha256:6dbfd74a25034bfaf1f225cc139c3583dcd3bf1f6550051fc1178e66d6353637",
+            "price_signal_hash": "sha256:25f972f8302cfe5e906bd66b4ccbf37093cc1eca31192dede52253689d2540cf",
+            "route_id": "none",
+            "schema_id": "budget_allocated.v1"
+          },
+          "option": "none",
+          "stage_name": "verify",
+          "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        }
+      ],
+      "stage_choices": {
+        "context": "minimal",
+        "repair": "single_shot",
+        "verify": "none"
+      },
+      "verify_verdict_for_credit": null,
+      "worker_receipt_paths": [],
+      "worker_result_status": "ERROR"
+    }
+  ],
+  "worker_calls_used": 1
+}

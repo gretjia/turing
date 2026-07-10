@@ -1,0 +1,72 @@
+diff --git a/astropy/io/fits/tests/test_diff.py b/astropy/io/fits/tests/test_diff.py
+index e8a7f8d7a..a9b599f45 100644
+--- a/astropy/io/fits/tests/test_diff.py
++++ b/astropy/io/fits/tests/test_diff.py
+@@ -235,6 +235,20 @@ class TestDiff(BaseTestCase):
+         self.assertNotIn("hdu list differs", diff_text)
+         self.assertIn("no differences found", diff_text)
+ 
++    def test_diff_identical_files_with_vla(self):
++        """Test that FITSDiff correctly handles identical files with VLAs."""
++        col = fits.Column('a', format='QD', array=[[0], [0, 0]])
++        hdu = fits.BinTableHDU.from_columns([col])
++        hdu.writeto('diffbug.fits', overwrite=True)
++
++        diff = fits.FITSDiff('diffbug.fits', 'diffbug.fits')
++        self.assertTrue(diff.identical)
++        self.assertIn("no differences found", diff.report())
++
++        # Test printdiff as well
++        with captured_stdout() as stdout:
++            fits.printdiff('diffbug.fits', 'diffbug.fits')
++            self.assertIn("no differences found", stdout.getvalue())
++
+     def test_diff_hdu_list_different(self):
+         hl1 = fits.HDUList([fits.PrimaryHDU(), fits.ImageHDU()])
+         hl2 = fits.HDUList([fits.PrimaryHDU(), fits.ImageHDU()])
+diff --git a/astropy/io/fits/fitsdiff.py b/astropy/io/fits/fitsdiff.py
+index 1a8e3a8b3..7a7f7c2d1 100644
+--- a/astropy/io/fits/fitsdiff.py
++++ b/astropy/io/fits/fitsdiff.py
+@@ -754,7 +754,7 @@ class FITSDiff:
+                 return False
+ 
+         # Compare HDUs one by one
+-        for hdu1, hdu2 in zip(self.hdu1, self.hdu2):
++        for hdu1, hdu2 in zip_longest(self.hdu1, self.hdu2, fillvalue=None):
+             if not self._compare_hdu(hdu1, hdu2):
+                 return False
+ 
+@@ -820,6 +820,24 @@ class FITSDiff:
+                 return False
+             return True
+ 
++    def _compare_vla_data(self, data1, data2, colname):
++        """Compare variable-length arrays."""
++        if len(data1) != len(data2):
++            return False
++
++        for arr1, arr2 in zip(data1, data2):
++            if not np.array_equal(arr1, arr2, equal_nan=True):
++                return False
++
++        return True
++
+     def _compare_data(self, hdu1, hdu2):
+         """
+         Compare the data in two HDUs.
+@@ -842,6 +860,10 @@ class FITSDiff:
+                 # Compare the column data
+                 for col in range(ncols):
+                     col1 = hdu1.columns[col]
+-                    col2 = hdu2.columns[col]
+-                    if not np.array_equal(col1.array, col2.array, equal_nan=True):
++                    col2 = hdu2.columns[col] if col < len(hdu2.columns) else None
++
++                    if col1.format.startswith('Q') or col1.format.startswith('P'):
++                        # VLA column
++                        if not self._compare_vla_data(col1.array, col2.array if col2 else None, col1.name):
++                            return False
++                    elif not np.array_equal(col1.array, col2.array if col2 else None, equal_nan=True):
+                         return False
+             return True

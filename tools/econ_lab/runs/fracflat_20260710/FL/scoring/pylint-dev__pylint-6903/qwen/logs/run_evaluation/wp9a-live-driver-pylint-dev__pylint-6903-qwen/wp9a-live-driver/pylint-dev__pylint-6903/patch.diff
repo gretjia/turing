@@ -1,0 +1,22 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index 319a76e92..4d503b6a2 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -57,7 +57,7 @@ def _query_cpu() -> int:
+         # As a fallback, return 1
+         return 1
+     # If cfs_quota_us is -1, it means no limit is set, so we can use the number of CPUs
+-    cpu_count = int(shares / 1024)
++    cpu_count = max(int(shares / 1024), 1)
+     if cpu_count < 1:
+         # If the calculated cpu count is less than 1, return 1
+         return 1
+@@ -65,7 +65,7 @@ def _query_cpu() -> int:
+         # As a fallback, return 1
+         return 1
+     # If cfs_quota_us is -1, it means no limit is set, so we can use the number of CPUs
+-    cpu_count = int(shares / 1024)
++    cpu_count = max(int(shares / 1024), 1)
+     if cpu_count < 1:
+         # If the calculated cpu count is less than 1, return 1
+         return 1

@@ -1,0 +1,42 @@
+{
+  "schema": "econ_fold_cli.derive_stage_keys.response.v1",
+  "domain_bucket": "astropy",
+  "stage_keys": [
+    {
+      "stage_name": "context",
+      "option": "minimal",
+      "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac",
+      "domain_bucket": "astropy"
+    },
+    {
+      "stage_name": "context",
+      "option": "source_context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+      "domain_bucket": "astropy"
+    },
+    {
+      "stage_name": "repair",
+      "option": "single_shot",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+      "domain_bucket": "astropy"
+    },
+    {
+      "stage_name": "repair",
+      "option": "loop",
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+      "domain_bucket": "astropy"
+    },
+    {
+      "stage_name": "verify",
+      "option": "none",
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+      "domain_bucket": "astropy"
+    },
+    {
+      "stage_name": "verify",
+      "option": "self_check",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+      "domain_bucket": "astropy"
+    }
+  ]
+}

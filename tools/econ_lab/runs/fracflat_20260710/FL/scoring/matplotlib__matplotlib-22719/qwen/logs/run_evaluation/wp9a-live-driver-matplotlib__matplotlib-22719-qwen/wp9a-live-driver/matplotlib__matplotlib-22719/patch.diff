@@ -1,0 +1,19 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index 417183863f..c4138005ff 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -58,10 +58,12 @@ def convert(value, unit, axis):
+     # check if the value is numeric
+     is_numlike = np.ndim(value) > 0 and np.issubdtype(np.array(value).dtype, np.number)
+     if is_numlike:
+-        _api.warn_deprecated(
+-            "3.5", message="Support for passing numbers through unit converters is deprecated since 3.5 and support will be removed two minor releases later; use Axis.convert_units instead."
+-        )
++        # Only warn if we actually have data to convert, not for empty arrays
++        if np.size(value) > 0:
++            _api.warn_deprecated(
++                "3.5", message="Support for passing numbers through unit converters is deprecated since 3.5 and support will be removed two minor releases later; use Axis.convert_units instead."
++            )
+     # We can only handle list-like inputs in this case
+     if not isinstance(value, (list, tuple, np.ndarray)):
+         raise ValueError("Only list-like inputs are supported for categorical data")

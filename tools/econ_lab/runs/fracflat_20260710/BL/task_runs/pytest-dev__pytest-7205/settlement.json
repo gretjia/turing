@@ -1,0 +1,179 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pytest-dev/pytest:scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:87293f1bdfc7547c4b938fc0752e9865b7a35a051ce51ad2f99f764ab5a06d98",
+    "price_signal_hash": "sha256:e8e684415126df83fe8a378815e672c0724240603630879ff4282d6a5e2f9e35",
+    "route_id": "pytest-dev__pytest-7205::armC::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:70f460b23872dc7b9e39e26eb0add246ee96a6d57cbfc7aea8acb2a33607d026",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "testing/test_setuponly.py::test_capturing",
+          "testing/test_setuponly.py::test_show_different_scopes[--setup-only]",
+          "testing/test_setuponly.py::test_show_different_scopes[--setup-show]",
+          "testing/test_setuponly.py::test_show_fixture_action_with_bytes",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-only]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-show]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-only]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-plan]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-show]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-show]",
+          "testing/test_setuponly.py::test_show_nested_fixtures[--setup-show]"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 15,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "testing/test_setuponly.py::test_dynamic_fixture_request",
+          "testing/test_setuponly.py::test_setup_show_with_KeyboardInterrupt_in_test",
+          "testing/test_setuponly.py::test_show_different_scopes[--setup-plan]",
+          "testing/test_setuponly.py::test_show_fixtures_and_execute_test",
+          "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-only]",
+          "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-plan]",
+          "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-show]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-plan]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-only]",
+          "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-plan]",
+          "testing/test_setuponly.py::test_show_nested_fixtures[--setup-only]",
+          "testing/test_setuponly.py::test_show_nested_fixtures[--setup-plan]",
+          "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-only]",
+          "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-plan]",
+          "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-show]"
+        ],
+        "verify_total_count": 15,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:70f460b23872dc7b9e39e26eb0add246ee96a6d57cbfc7aea8acb2a33607d026",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "pytest-dev/pytest",
+          "route_scaffold": "scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:fabba63500cfa96858a07cbd84539c227c486e109c75cb5e1e1af497e3adf747"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/pytest-dev__pytest-7205/deepseek/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "pytest-dev__pytest-7205"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "pytest-dev__pytest-7205"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "pytest-dev__pytest-7205"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/pytest-dev__pytest-7205/deepseek/wp9a-live-driver.wp9a-live-driver-pytest-dev__pytest-7205-deepseek.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-only]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-only]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-only]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-plan]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-plan]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-plan]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-show]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-show]",
+              "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-show]",
+              "testing/test_setuponly.py::test_show_fixture_action_with_bytes"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-only]",
+              "testing/test_setuponly.py::test_show_different_scopes[--setup-only]",
+              "testing/test_setuponly.py::test_show_nested_fixtures[--setup-only]",
+              "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-only]",
+              "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-plan]",
+              "testing/test_setuponly.py::test_show_different_scopes[--setup-plan]",
+              "testing/test_setuponly.py::test_show_nested_fixtures[--setup-plan]",
+              "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-plan]",
+              "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-show]",
+              "testing/test_setuponly.py::test_show_different_scopes[--setup-show]",
+              "testing/test_setuponly.py::test_show_nested_fixtures[--setup-show]",
+              "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-show]",
+              "testing/test_setuponly.py::test_dynamic_fixture_request",
+              "testing/test_setuponly.py::test_capturing",
+              "testing/test_setuponly.py::test_show_fixtures_and_execute_test",
+              "testing/test_setuponly.py::test_setup_show_with_KeyboardInterrupt_in_test"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 490,
+        "candidate_patch_sha256": "sha256:a24bdc8aa3fe748a5d7faac3a7e14da574076ea61a848facb27b1928cd3a2d84",
+        "instance_id": "pytest-dev__pytest-7205",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 217144
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "pytest-dev/pytest",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pytest-dev__pytest-7205",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "pytest-dev__pytest-7205::armC::deepseek",
+  "task_index": 4
+}

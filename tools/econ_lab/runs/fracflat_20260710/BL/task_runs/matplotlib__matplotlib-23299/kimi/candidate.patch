@@ -1,0 +1,16 @@
+diff --git a/lib/matplotlib/__init__.py b/lib/matplotlib/__init__.py
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -1178,6 +1178,12 @@ class rc_context:
+ 
+     def __exit__(self, *args):
++        # If the backend was resolved inside the context (e.g. a figure was
++        # created), don't restore the original auto backend sentinel, otherwise
++        # the next call to get_backend() will re-resolve the backend and switch
++        # away from the one used by the existing figures, closing them.
++        if self._orig['backend'] == rcsetup._auto_backend_sentinel:
++            self._orig['backend'] = rcParams['backend']
+         _restore(self._orig)
+ 
+ 
+ 

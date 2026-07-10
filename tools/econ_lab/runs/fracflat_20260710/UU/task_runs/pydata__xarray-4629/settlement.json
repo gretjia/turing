@@ -1,0 +1,193 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pydata/xarray:scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:a8335101ed8287bd8fe9a81281d3ede664de93b86d3ce3add721f891651dd598",
+    "price_signal_hash": "sha256:e479f261333bbb4c3ee8004a700513b908c359f1b279fca88686072bf317d0e2",
+    "route_id": "pydata__xarray-4629::armB::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:5ecb1dc0ec39e461e767c68ac9af14c4f368020158684d2291a62f1a64cefd7c",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_alignment_error",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[identical-var1_attrs6-var2_attrs6-expected_attrs6-True]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs0-var2_attrs0-expected_attrs0-False]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs1-var2_attrs1-expected_attrs1-False]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[override-var1_attrs7-var2_attrs7-expected_attrs7-False]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_datasets",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_dicts_simple",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_error",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_broadcast",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_multi_var",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_preserve_attrs",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_single_var",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_wrong_input_error",
+          "xarray/tests/test_merge.py::TestMergeInternals::test_broadcast_dimension_size",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_auto_align",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_broadcast_equals",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_no_conflicts"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 16,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[drop-var1_attrs4-var2_attrs4-expected_attrs4-False]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[identical-var1_attrs5-var2_attrs5-expected_attrs5-False]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs2-var2_attrs2-expected_attrs2-False]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs3-var2_attrs3-expected_attrs3-True]",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs_default",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_attrs_override_copy",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_dataarray_unnamed",
+          "xarray/tests/test_merge.py::TestMergeFunction::test_merge_dicts_dims",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_compat",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_dataarray",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[2.0]",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[2]",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[fill_value0]",
+          "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[fill_value3]"
+        ],
+        "verify_total_count": 16,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:5ecb1dc0ec39e461e767c68ac9af14c4f368020158684d2291a62f1a64cefd7c",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "pydata/xarray",
+          "route_scaffold": "scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:2fec19502813d0a60d86a3f967c5f87c28d10c396c16bfd3292e5147d9875820"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/pydata__xarray-4629/kimi/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "pydata__xarray-4629"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "pydata__xarray-4629"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "pydata__xarray-4629"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/pydata__xarray-4629/kimi/wp9a-live-driver.wp9a-live-driver-pydata__xarray-4629-kimi.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_attrs_override_copy"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "xarray/tests/test_merge.py::TestMergeInternals::test_broadcast_dimension_size",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_datasets",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_dataarray_unnamed",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs_default",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs0-var2_attrs0-expected_attrs0-False]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs1-var2_attrs1-expected_attrs1-False]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs2-var2_attrs2-expected_attrs2-False]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[no_conflicts-var1_attrs3-var2_attrs3-expected_attrs3-True]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[drop-var1_attrs4-var2_attrs4-expected_attrs4-False]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[identical-var1_attrs5-var2_attrs5-expected_attrs5-False]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[identical-var1_attrs6-var2_attrs6-expected_attrs6-True]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_arrays_attrs[override-var1_attrs7-var2_attrs7-expected_attrs7-False]",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_dicts_simple",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_dicts_dims",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_error",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_alignment_error",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_wrong_input_error",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_single_var",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_multi_var",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_preserve_attrs",
+              "xarray/tests/test_merge.py::TestMergeFunction::test_merge_no_conflicts_broadcast",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_broadcast_equals",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_compat",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_auto_align",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[fill_value0]",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[2]",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[2.0]",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_fill_value[fill_value3]",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_no_conflicts",
+              "xarray/tests/test_merge.py::TestMergeMethod::test_merge_dataarray"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 471,
+        "candidate_patch_sha256": "sha256:2d14d22404ac99712ca5fbe084fc6fe646388f2028a01aade72cfcabfdaca2bc",
+        "instance_id": "pydata__xarray-4629",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 8018
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "pydata/xarray",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pydata__xarray-4629",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "kimi",
+  "selected_route_id": "pydata__xarray-4629::armB::kimi",
+  "task_index": 2
+}

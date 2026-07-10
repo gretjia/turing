@@ -1,0 +1,57 @@
+{
+  "chosen_stage_options": {
+    "context": {
+      "domain_bucket": "astropy",
+      "option": "minimal",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+    },
+    "repair": {
+      "domain_bucket": "astropy",
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify": {
+      "domain_bucket": "astropy",
+      "option": "none",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "events_count": 6,
+  "expected": "each stage node n=2, s_q32=4294967296 (Q32_ONE), q_eff=(0.5+1.0)/3=0.5",
+  "half_q32": "2147483648",
+  "nodes_after": [
+    {
+      "domain_bucket": "astropy",
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 1,
+      "s_q32": "4294967296",
+      "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    },
+    {
+      "domain_bucket": "astropy",
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 1,
+      "s_q32": "4294967296",
+      "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "domain_bucket": "astropy",
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 1,
+      "s_q32": "4294967296",
+      "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+    }
+  ],
+  "nodes_before": [],
+  "note": "offline CLI-only demo of ADR-ECON-006 S accumulation on stage nodes (v=0.5 twice \u2192 S=Q32_ONE)",
+  "schema": "econ_lab.fractional_stage_offline_s_accum.v1"
+}

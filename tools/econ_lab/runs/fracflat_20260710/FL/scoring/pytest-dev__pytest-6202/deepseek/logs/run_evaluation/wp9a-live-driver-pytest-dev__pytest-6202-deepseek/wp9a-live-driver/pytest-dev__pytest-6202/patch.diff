@@ -1,0 +1,10 @@
+diff --git a/src/_pytest/python.py b/src/_pytest/python.py
+index 2222222..3333333 100644
+--- a/src/_pytest/python.py
++++ b/src/_pytest/python.py
+@@ -289,7 +289,7 @@
+             parts.append(self.name)
+         elif isinstance(parent, Class):
+             parts.append(parent.originalname or parent.name)
+-    return s.replace(".[", "[")
++    return s

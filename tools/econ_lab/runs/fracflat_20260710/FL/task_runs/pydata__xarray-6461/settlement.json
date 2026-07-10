@@ -1,0 +1,50 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pydata/xarray:scaffold:sha256:7c225e63133b5c759b5f075efbf281262240c24ae64cedd3fe202293fa24c4cd",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:51bb58c7442a4be473ffb9ad63f0114789ea9e0ffa961601363e12b5b7522781",
+    "price_signal_hash": "sha256:36128f37cd569813a8ef449dc3b47c16d046460abe058ba3d9198677f2784bf7",
+    "route_id": "pydata__xarray-6461::armC::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "glm",
+      "live_split_verdict": null,
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armC",
+        "error_body_sha256": "sha256:dfbab7a60201ec8d837a73bdd9d81ecf403f9cdf26f7a18005cd0300b377aea4",
+        "http_status": 503,
+        "instance_id": "pydata__xarray-6461",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "API_ERROR"
+      },
+      "worker_result_status": "API_ERROR"
+    }
+  ],
+  "domain_bucket": "pydata/xarray",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pydata__xarray-6461",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "glm",
+  "selected_route_id": "pydata__xarray-6461::armC::glm",
+  "task_index": 24
+}

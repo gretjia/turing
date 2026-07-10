@@ -301,9 +301,19 @@ def credit_assign_v0(
     lineage: str,
     run_label: str,
     task_index: int,
+    fractional_reward: bool = False,
+    verify_pass_fraction: float | None = None,
 ) -> list[dict[str, Any]]:
-    """Update all three stage nodes with the same verify verdict (equal share, not causal)."""
+    """Update all three stage nodes with the same verify reward (equal share, not causal).
+
+    ADR-ECON-006: when ``fractional_reward`` is True, each stage node receives
+    ``verdict_fraction_q32 = floor(verify_pass_fraction * 2^32)`` instead of binary v.
+    """
     events: list[dict[str, Any]] = []
+    frac_q32: str | None = None
+    if fractional_reward:
+        frac = 0.0 if verify_pass_fraction is None else max(0.0, min(1.0, float(verify_pass_fraction)))
+        frac_q32 = str(int(frac * (1 << 32)))
     for stage_name in STAGE_WALK:
         option = stage_choices[stage_name]
         sid = stage_option_ids[(stage_name, option)]
@@ -316,6 +326,8 @@ def credit_assign_v0(
                     "stage_name": stage_name,
                     "option": option,
                     "verify_verdict": verify_verdict,
+                    "verify_pass_fraction": verify_pass_fraction,
+                    "fractional_reward": fractional_reward,
                     "run_label": run_label,
                     "task_index": task_index,
                     "credit_assignment": CREDIT_ASSIGNMENT_V0,
@@ -323,17 +335,20 @@ def credit_assign_v0(
                 sort_keys=True,
             )
         )
+        build_req: dict[str, Any] = {
+            "schema": "econ_fold_cli.build_routing_prior_updated.request.v1",
+            "route_domain": domain_bucket,
+            "route_scaffold": sid,
+            "verdict": bool(verify_verdict),
+            "verdict_source_id": "verifier:depthk_credit_assign_v0",
+            "verifier_attestation_hash": attestation,
+        }
+        if frac_q32 is not None:
+            build_req["verdict_fraction_q32"] = frac_q32
         build = call_cli(
             cli_bin,
             "build-routing-prior-updated",
-            {
-                "schema": "econ_fold_cli.build_routing_prior_updated.request.v1",
-                "route_domain": domain_bucket,
-                "route_scaffold": sid,
-                "verdict": bool(verify_verdict),
-                "verdict_source_id": "verifier:depthk_credit_assign_v0",
-                "verifier_attestation_hash": attestation,
-            },
+            build_req,
         )
         events.append(build["event"])
     return events
@@ -490,6 +505,7 @@ def run_smoke(
     max_worker_calls: int,
     max_tasks: int,
     scoring_timeout_s: int,
+    fractional_reward: bool = False,
 ) -> dict[str, Any]:
     """Real smoke: ≤max_worker_calls worker dispatches on S02 tasks, full stage chain."""
     if max_worker_calls > 8:
@@ -562,6 +578,7 @@ def run_smoke(
         args = _Args()
         args.scoring_python = scoring_python
         args.scoring_timeout_s = scoring_timeout_s
+        args.fractional_reward = fractional_reward
 
         verify_sid = stage_ids[("verify", stage_choices["verify"])]
         settlement = ld._settle_one(
@@ -581,11 +598,14 @@ def run_smoke(
         worker_calls += 1
 
         verify_verdict: Optional[bool] = None
+        verify_pass_fraction: Optional[float] = None
         live = settlement.get("live_split_verdict") or {}
         if live and live.get("verify_verdict") is not None and not live.get("not_enough_tests"):
             verify_verdict = bool(live["verify_verdict"])
+            verify_pass_fraction = live.get("verify_pass_fraction")
         elif settlement.get("settlement_verdict_resolved") is not None:
             verify_verdict = bool(settlement["settlement_verdict_resolved"])
+            verify_pass_fraction = 1.0 if verify_verdict else 0.0
 
         credit_events: list[dict[str, Any]] = []
         if verify_verdict is not None:
@@ -599,6 +619,8 @@ def run_smoke(
                 lineage=lineage,
                 run_label=run_label,
                 task_index=task_index,
+                fractional_reward=fractional_reward,
+                verify_pass_fraction=verify_pass_fraction,
             )
             committed.extend(credit_events)
 
@@ -646,6 +668,7 @@ def run_smoke(
             "v0 equal share of verify verdict across the three stage nodes used on the path; "
             "not causal credit assignment — known ceiling, not a defect"
         ),
+        "fractional_reward": fractional_reward,
         "task_shard": "S02",
         "tasks": tasks_out,
         "worker_calls_used": worker_calls,
@@ -697,6 +720,11 @@ def main() -> None:
         default=str(Path.home() / ".turingos" / "swebench-venv" / "bin" / "python"),
     )
     parser.add_argument("--scoring-timeout-s", type=int, default=1800)
+    parser.add_argument(
+        "--fractional-reward",
+        action="store_true",
+        help="ADR-ECON-006: credit-assign verify-side pass fraction to stage nodes",
+    )
     args = parser.parse_args()
 
     if args.smoke and args.offline_mock:
@@ -718,6 +746,7 @@ def main() -> None:
             max_worker_calls=args.max_worker_calls,
             max_tasks=args.max_tasks,
             scoring_timeout_s=args.scoring_timeout_s,
+            fractional_reward=bool(args.fractional_reward),
         )
 
     print(

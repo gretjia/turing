@@ -1,0 +1,1 @@
+{"instance_id": "sympy__sympy-13757", "model_name_or_path": "wp9a-live-driver", "model_patch": "diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py\n--- a/sympy/polys/polytools.py\n+++ b/sympy/polys/polytools.py\n@@ -715,3 +715,4 @@ class Poly(Basic):\n     \"\"\"\n \n+    _op_priority = 11.0\n     __slots__ = ('rep', 'gens')\n"}

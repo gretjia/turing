@@ -1,0 +1,219 @@
+{
+  "H-D1_FL_gt_UU": {
+    "W_plus": 39.5,
+    "alpha_prime": 0.025,
+    "mean_diff": -0.07779345553431932,
+    "median_diff": 0.0,
+    "method": "exact_signed_rank_dp",
+    "n_neg": 8,
+    "n_nonzero": 14,
+    "n_paired": 35,
+    "n_pos": 6,
+    "n_zero": 21,
+    "p_one_sided": 0.799072265625,
+    "supported": false
+  },
+  "H-D1_supported": false,
+  "H-D2_FL_gt_BL": {
+    "W_plus": 54.5,
+    "alpha_prime": 0.025,
+    "mean_diff": -0.1027314572962466,
+    "median_diff": 0.0,
+    "method": "exact_signed_rank_dp",
+    "n_neg": 10,
+    "n_nonzero": 17,
+    "n_paired": 34,
+    "n_pos": 7,
+    "n_zero": 17,
+    "p_one_sided": 0.8571929931640625,
+    "supported": false
+  },
+  "H-D2_supported": false,
+  "arm_summaries": {
+    "BL": {
+      "binary_accept_rate": 0.375,
+      "infra_null_v": 10,
+      "k_binary_accept": 15,
+      "mean_v": 0.39901413690476184,
+      "n_binary_accept_settled": 40,
+      "n_computable_v": 40,
+      "n_total": 50
+    },
+    "FL": {
+      "binary_accept_rate": 0.3,
+      "infra_null_v": 10,
+      "k_binary_accept": 12,
+      "mean_v": 0.33669239820295227,
+      "n_binary_accept_settled": 40,
+      "n_computable_v": 40,
+      "n_total": 50
+    },
+    "UU": {
+      "binary_accept_rate": 0.19047619047619047,
+      "infra_null_v": 8,
+      "k_binary_accept": 8,
+      "mean_v": 0.38548730647188734,
+      "n_binary_accept_settled": 42,
+      "n_computable_v": 42,
+      "n_total": 50
+    }
+  },
+  "budget": {
+    "real_worker_calls_made_by_arm": {
+      "BL": 41,
+      "FL": 40,
+      "UU": 43
+    }
+  },
+  "capsule": "D",
+  "floor_ok": true,
+  "integrity_problems": [],
+  "meta_by_arm": {
+    "BL": {
+      "fractional_reward": false,
+      "frozen_backup": false,
+      "priors_path": null,
+      "priors_sha256": null,
+      "reset_at": null,
+      "reset_at_task_index": null,
+      "run_label": "BL",
+      "schema": "econ_lab.stage_b_prime_meta.v1",
+      "stream_manifest": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/analysis/fracflat_stream_manifest.json",
+      "stream_manifest_sha256": "bf3f8f8d79ed7e3370e2c1dbeb534809239bb7e3f6acb8236726df3485cc6d69",
+      "task_shard": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/analysis/fracflat_task_root"
+    },
+    "FL": {
+      "fractional_reward": true,
+      "frozen_backup": false,
+      "priors_path": null,
+      "priors_sha256": null,
+      "reset_at": null,
+      "reset_at_task_index": null,
+      "run_label": "FL",
+      "schema": "econ_lab.stage_b_prime_meta.v1",
+      "stream_manifest": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/analysis/fracflat_stream_manifest.json",
+      "stream_manifest_sha256": "bf3f8f8d79ed7e3370e2c1dbeb534809239bb7e3f6acb8236726df3485cc6d69",
+      "task_shard": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/analysis/fracflat_task_root"
+    },
+    "UU": {
+      "fractional_reward": false,
+      "frozen_backup": false,
+      "priors_path": null,
+      "priors_sha256": null,
+      "reset_at": null,
+      "reset_at_task_index": null,
+      "run_label": "UU",
+      "schema": "econ_lab.stage_b_prime_meta.v1",
+      "stream_manifest": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/analysis/fracflat_stream_manifest.json",
+      "stream_manifest_sha256": "bf3f8f8d79ed7e3370e2c1dbeb534809239bb7e3f6acb8236726df3485cc6d69",
+      "task_shard": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/analysis/fracflat_task_root"
+    }
+  },
+  "outcome": "NULL_EVEN_WITH_DENSE_SIGNAL",
+  "pool_manifest_sha256": "15afde7bfb4693fbfbf363d450eb920bc8fc2dd27cfbc35ea1d66a953c41a86b",
+  "prereg": {
+    "alpha_prime": 0.025,
+    "floor": "each arm n_computable_v >= 40/50",
+    "hypotheses": {
+      "H-D1": "FL > UU (paired Wilcoxon exact one-sided)",
+      "H-D2": "FL > BL (paired Wilcoxon exact one-sided)"
+    },
+    "outcome_map": {
+      "both": "PRICE_LEARNING_WORKS_WITH_DENSE_SIGNAL",
+      "floor_fail": "NOT_RUN",
+      "neither": "NULL_EVEN_WITH_DENSE_SIGNAL",
+      "only_H-D1": "LEARNING_YES_INGREDIENT_UNCLEAR",
+      "only_H-D2": "INGREDIENT_YES_VS_UNIFORM_UNPROVEN"
+    },
+    "primary_metric": "verify_pass_fraction v in [0,1]"
+  },
+  "schema": "econ_lab.fracflat_readout.v1",
+  "secondary_descriptive": {
+    "canary_counts": {
+      "BL": 5,
+      "FL": 2,
+      "UU": 1
+    },
+    "canary_soundness_flag": "OK_OR_UNKNOWN",
+    "fl_route_entropy_trajectory_tail": [
+      {
+        "H_bits": 5.5235619560570095,
+        "after_n": 46,
+        "n_distinct_routes": 46
+      },
+      {
+        "H_bits": 5.55458885167764,
+        "after_n": 47,
+        "n_distinct_routes": 47
+      },
+      {
+        "H_bits": 5.5849625007211605,
+        "after_n": 48,
+        "n_distinct_routes": 48
+      },
+      {
+        "H_bits": 5.614709844115208,
+        "after_n": 49,
+        "n_distinct_routes": 49
+      },
+      {
+        "H_bits": 5.643856189774728,
+        "after_n": 50,
+        "n_distinct_routes": 50
+      }
+    ],
+    "fl_route_frequency": {
+      "astropy__astropy-13579::armA::deepseek": 1,
+      "astropy__astropy-13977::armB::qwen": 1,
+      "astropy__astropy-14096::armC::kimi": 1,
+      "astropy__astropy-14182::armB::deepseek": 1,
+      "astropy__astropy-14309::armB::glm": 1,
+      "astropy__astropy-14365::armA::kimi": 1,
+      "astropy__astropy-14369::armB::qwen": 1,
+      "astropy__astropy-14508::armC::deepseek": 1,
+      "astropy__astropy-14539::armB::deepseek": 1,
+      "astropy__astropy-14598::armC::glm": 1,
+      "astropy__astropy-14995::armC::kimi": 1,
+      "astropy__astropy-7166::armC::deepseek": 1,
+      "django__django-10999::armC::qwen": 1,
+      "django__django-11066::armC::glm": 1,
+      "django__django-11099::armA::qwen": 1,
+      "django__django-11119::armC::deepseek": 1,
+      "django__django-11163::armB::glm": 1,
+      "matplotlib__matplotlib-22719::armA::qwen": 1,
+      "matplotlib__matplotlib-22871::armA::qwen": 1,
+      "matplotlib__matplotlib-23299::armA::glm": 1,
+      "matplotlib__matplotlib-23314::armC::qwen": 1,
+      "matplotlib__matplotlib-24149::armA::glm": 1,
+      "psf__requests-2931::armC::kimi": 1,
+      "psf__requests-5414::armA::deepseek": 1,
+      "pydata__xarray-4075::armA::qwen": 1,
+      "pydata__xarray-4629::armA::kimi": 1,
+      "pydata__xarray-6461::armC::glm": 1,
+      "pydata__xarray-6721::armB::qwen": 1,
+      "pylint-dev__pylint-6903::armA::qwen": 1,
+      "pylint-dev__pylint-7080::armB::qwen": 1,
+      "pytest-dev__pytest-5809::armC::kimi": 1,
+      "pytest-dev__pytest-6197::armA::kimi": 1,
+      "pytest-dev__pytest-6202::armA::deepseek": 1,
+      "pytest-dev__pytest-7205::armA::qwen": 1,
+      "scikit-learn__scikit-learn-11578::armB::glm": 1,
+      "scikit-learn__scikit-learn-12585::armB::glm": 1,
+      "scikit-learn__scikit-learn-13135::armC::qwen": 1,
+      "scikit-learn__scikit-learn-13328::armC::glm": 1,
+      "scikit-learn__scikit-learn-13439::armB::qwen": 1,
+      "sphinx-doc__sphinx-10614::armA::deepseek": 1,
+      "sphinx-doc__sphinx-11445::armC::kimi": 1,
+      "sphinx-doc__sphinx-11510::armC::kimi": 1,
+      "sphinx-doc__sphinx-7440::armA::qwen": 1,
+      "sphinx-doc__sphinx-7462::armB::qwen": 1,
+      "sphinx-doc__sphinx-7757::armB::kimi": 1,
+      "sympy__sympy-13372::armB::deepseek": 1,
+      "sympy__sympy-13480::armC::qwen": 1,
+      "sympy__sympy-13551::armA::deepseek": 1,
+      "sympy__sympy-13757::armC::qwen": 1,
+      "sympy__sympy-13877::armC::deepseek": 1
+    },
+    "note": "Secondary metrics are descriptive only; no significance claims."
+  }
+}

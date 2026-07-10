@@ -1,0 +1,104 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pydata/xarray:scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:a8335101ed8287bd8fe9a81281d3ede664de93b86d3ce3add721f891651dd598",
+    "price_signal_hash": "sha256:6f991b038a8e151cae0f1823e9473722c0bc5959f3177ee0d6249d2108ddabb4",
+    "route_id": "pydata__xarray-4629::armA::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:82ee1d4ba28f2f1f23e8179a604692826bb82c738698e536e93fc4a44db09cd9",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:82ee1d4ba28f2f1f23e8179a604692826bb82c738698e536e93fc4a44db09cd9",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "pydata/xarray",
+          "route_scaffold": "scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:9e6bffc72fb956e71a4b8f70e20db0008ef9c525d929bade8b985f375a673524"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/pydata__xarray-4629/glm/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "pydata__xarray-4629"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "pydata__xarray-4629"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/pydata__xarray-4629/glm/wp9a-live-driver.wp9a-live-driver-pydata__xarray-4629-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 681,
+        "candidate_patch_sha256": "sha256:2156fdf7fba96e259dd89961413ddabc0e60b4833888a0b786e16b3ab8cef322",
+        "instance_id": "pydata__xarray-4629",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 144456
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "pydata/xarray",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pydata__xarray-4629",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "glm",
+  "selected_route_id": "pydata__xarray-4629::armA::glm",
+  "task_index": 2
+}

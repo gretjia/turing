@@ -1,0 +1,14 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index XXXXXXX..XXXXXXX 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -71,6 +71,9 @@ class Weighted:
+         # need to mask invalid values in da, as `dot` does not implement skipna
+         if skipna or (skipna is None and da.dtype.kind in "cfO"):
+             da = da.fillna(0.0)
++        
++        # Convert weights to float to ensure proper behavior with boolean weights
++        weights = weights + 0.0
+ 
+         # `dot` does not broadcast arrays, so this avoids creating a large
+         # DataArray (if `weights` has additional dimensions)

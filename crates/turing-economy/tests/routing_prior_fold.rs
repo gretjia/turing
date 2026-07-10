@@ -91,16 +91,8 @@ fn economy_event_translation_agrees_with_hand_built_fold_events() {
                 .to_string(),
     };
     let hand_built = vec![
-        RoutingFoldEvent::PriorUpdated {
-            key: key.clone(),
-            verdict: true,
-            event_hash: parse_sha256(&update_1_hash),
-        },
-        RoutingFoldEvent::PriorUpdated {
-            key: key.clone(),
-            verdict: false,
-            event_hash: parse_sha256(&updated_payload(&update_2).event_hash),
-        },
+        RoutingFoldEvent::binary_update(key.clone(), true, parse_sha256(&update_1_hash)),
+        RoutingFoldEvent::binary_update(key.clone(), false, parse_sha256(&updated_payload(&update_2).event_hash)),
         RoutingFoldEvent::Clawback {
             updated_event_hash: parse_sha256(&update_1_hash),
         },
@@ -179,6 +171,7 @@ fn malformed_hash_is_a_hard_translation_error_not_swallowed() {
         route_domain: "code_review".to_string(),
         route_scaffold: "scaffold:sha256:deadbeef".to_string(),
         verdict: true,
+        verdict_fraction_q32: None,
         verdict_source_id: "verifier:x".to_string(),
         verifier_attestation_hash:
             "sha256:3333333333333333333333333333333333333333333333333333333333333333".to_string(),
@@ -264,6 +257,7 @@ fn tampered_event_hash_is_rejected_and_constructor_built_event_still_translates(
     // from the other side: the recomputed digest no longer matches the carried hash.
     let mut flipped_payload = updated_payload(&legit).clone();
     flipped_payload.verdict = false;
+    // fraction stays None (binary)
     let flipped = EconomyEvent::RoutingPriorUpdated(flipped_payload);
     assert_eq!(
         routing_fold::economy_event_to_routing_fold_event(&flipped),

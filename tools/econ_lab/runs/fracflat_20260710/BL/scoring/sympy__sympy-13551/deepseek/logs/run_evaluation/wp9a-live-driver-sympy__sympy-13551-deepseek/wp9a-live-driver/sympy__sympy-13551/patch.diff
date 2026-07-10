@@ -1,0 +1,126 @@
+diff --git a/sympy/concrete/products.py b/sympy/concrete/products.py
+index 8e6f2d7..a5dd5b6 100644
+--- a/sympy/concrete/products.py
++++ b/sympy/concrete/products.py
+@@ -2,10 +2,11 @@
+ 
+ from sympy.tensor.indexed import Idx
+ from sympy.core.mul import Mul
++from sympy.core.add import Add
+ from sympy.core.singleton import S
+ from sympy.core.symbol import symbols
+ from sympy.concrete.expr_with_intlimits import ExprWithIntLimits
+-from sympy.functions.elementary.exponential import exp, log
++from sympy.functions.elementary.exponential import exp, log, Pow
+ from sympy.polys import quo, roots
+ from sympy.simplify import powsimp
+ from sympy.core.compatibility import range
+@@ -240,20 +241,29 @@ def _eval_product(self, term, limits):
+ 
+         elif term.is_Add:
+             p, q = term.as_numer_denom()
+-            q = self._eval_product(q, (k, a, n))
+-            if q.is_Number:
+-
+-                # There is expression, which couldn't change by
+-                # as_numer_denom(). E.g. n**(2/3) + 1 --> (n**(2/3) + 1, 1).
+-                # We have to catch this case.
+-
+-                p = sum([self._eval_product(i, (k, a, n)) for i in p.as_coeff_Add()])
+-            else:
+-                p = self._eval_product(p, (k, a, n))
+-            return p / q
++            if q != 1 or not term.is_Add:
++                q = self._eval_product(q, (k, a, n))
++                if q.is_Number:
++                    # There is expression, which couldn't change by
++                    # as_numer_denom(). E.g. n**(2/3) + 1 --> (n**(2/3) + 1, 1).
++                    # We have to catch this case.
++                    p = sum([self._eval_product(i, (k, a, n)) for i in p.as_coeff_Add()])
++                else:
++                    p = self._eval_product(p, (k, a, n))
++                return p / q
++
++            # If term is a pure Add (no denominator), attempt to handle it
++            # by splitting into multiplicative factors. For something like
++            # n + 1/2**k, we try to rewrite as a product using factorization.
++            return self._eval_product_as_power(term, k, a, n)
+ 
+         elif term.is_Mul:
+             exclude, include = [], []
++            # Check if the Mul contains an Add that can be distributed
++            for t in term.args:
++                if t.is_Add:
++                    # Fall back to direct evaluation if there's an Add inside Mul
++                    return None
+ 
+             for t in term.args:
+                 p = self._eval_product(t, (k, a, n))
+@@ -276,6 +286,10 @@ def _eval_product(self, term, limits):
+             elif not term.exp.has(k):
+                 p = self._eval_product(term.base, (k, a, n))
+ 
++                if p is not None:
++                    return p**term.exp
++            # For constant base and exponent depending on k, try to handle
++            elif not term.base.has(k):
+                 if p is not None:
+                     return p**term.exp
+ 
+@@ -285,6 +299,55 @@ def _eval_product(self, term, limits):
+                 return self.func(evaluated, limits)
+             else:
+                 return f
++        return None
++
++    def _eval_product_as_power(self, term, k, a, n):
++        """
++        Try to evaluate product of an Add expression by factoring it into a product
++        of powers.
++        """
++        from sympy import Wild, collect
++        # Separate into terms that are constant wrt k and terms that depend on k
++        const_part = []
++        var_part = []
++        for t in term.args if term.is_Add else [term]:
++            if not t.has(k):
++                const_part.append(t)
++            else:
++                var_part.append(t)
++        # If there are no k-dependent terms, this should not happen
++        if not var_part:
++            return term**(n - a + 1)
++        # If there are no constant terms, try to factor
++        if not const_part:
++            # Try to evaluate the product directly by substitution
++            if (n - a).is_Integer:
++                return Mul(*[term.subs(k, a + i) for i in range(n - a + 1)])
++            return None
++        # Try to handle form like c + f(k) where c is constant
++        if len(var_part) == 1:
++            var_expr = var_part[0]
++            # Attempt to recognize as something like pow(base, exponent)
++            # For now, just fall back to direct substitution if possible
++            if (n - a).is_Integer:
++                return Mul(*[term.subs(k, a + i) for i in range(n - a + 1)])
++            # Otherwise try to use q-Pochhammer identification
++            if var_expr.is_Pow and var_expr.base.is_Symbol and not var_expr.exp.has(k):
++                # term = const + base**exp, e.g., n + 2**(-k)
++                # product_{k=a}^{n} (n + r**(-k)) where r is constant base
++                base = var_expr.base
++                exp_part = var_expr.exp
++                if exp_part.is_Mul and -1 in exp_part.args:
++                    # This is likely r**(-k) form
++                    r = 1 / base if base.is_Pow and base.exp == -1 else base
++                    # For now, we don't have a general q-Pochhammer routine, but
++                    # we can fall back to finite product computation.
++                    if (n - a).is_Integer:
++                        return Mul(*[term.subs(k, a + i) for i in range(n - a + 1)])
++        # Fall back: compute product by substitution if finite
++        if (n - a).is_Integer:
++            return Mul(*[term.subs(k, a + i) for i in range(n - a + 1)])
++        # Cannot handle symbolically
++        return None
+ 
+     def _eval_simplify(self, ratio, measure):
+         from sympy.simplify.simplify import product_simplify

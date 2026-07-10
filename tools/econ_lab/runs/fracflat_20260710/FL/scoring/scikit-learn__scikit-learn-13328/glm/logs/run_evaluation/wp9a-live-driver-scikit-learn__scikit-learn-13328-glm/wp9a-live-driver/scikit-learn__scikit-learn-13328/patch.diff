@@ -1,0 +1,21 @@
+diff --git a/sklearn/linear_model/huber.py b/sklearn/linear_model/huber.py
+index 3d8b4a8..1234567 100644
+--- a/sklearn/linear_model/huber.py
++++ b/sklearn/linear_model/huber.py
+@@ -45,7 +45,7 @@ from sklearn.utils import check_random_state, check_array
+ from sklearn.utils.optimize import newton_cg
+ from sklearn.utils.validation import check_consistent_length, check_X_y
+ 
+-def _huber_loss_and_gradient(w, X, y, epsilon, alpha, sample_weight):
++def _huber_loss_and_gradient(w, X, y, epsilon, alpha, sample_weight):
+     """Huber loss and its gradient."""
+ 
+     X = check_array(X, accept_sparse='csr', copy=False)
+@@ -89,7 +89,7 @@ def _huber_loss_and_gradient(w, X, y, epsilon, alpha, sample_weight):
+     # Gradient due to the squared loss.
+     # This is a complex operation, let's break it down:
+-    X_non_outliers = -axis0_safe_slice(X, ~outliers_mask, n_non_outliers)
++    X_non_outliers = axis0_safe_slice(X, ~outliers_mask, n_non_outliers)
+     grad[:n_features] = (
+         2. / sigma * safe_sparse_dot(weighted_non_outliers, X_non_outliers))
+     grad[1:n_features + 1] = -2. / sigma * weighted_non_outliers.sum(axis=0)

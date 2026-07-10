@@ -1,0 +1,14 @@
+diff --git a/sphinx/ext/inheritance_diagram.py b/sphinx/ext/inheritance_diagram.py
+index 40c6be6e10..aa0b6f1af5 100644
+--- a/sphinx/ext/inheritance_diagram.py
++++ b/sphinx/ext/inheritance_diagram.py
+@@ -384,7 +384,8 @@ class InheritanceGraph:
+         for obj in self.objects:
+             if obj.fullname in self.class_resolver:
+                 url = self.class_resolver[obj.fullname]
+-                link = relative_url(self.filename, url)
++                # The SVG is embedded via an <object> tag, so any relative links
++                # inside the SVG must be relative to the SVG file itself.
+                 node = f'<a xlink:base="{self.filename}" xlink:href="{url}"/>'
+                 g1_label = g1.newNode(obj.label, tooltip=obj.tooltip, node=node)
+                 g1_edge[g1_label] = g1_edge.get(g1_label, set())

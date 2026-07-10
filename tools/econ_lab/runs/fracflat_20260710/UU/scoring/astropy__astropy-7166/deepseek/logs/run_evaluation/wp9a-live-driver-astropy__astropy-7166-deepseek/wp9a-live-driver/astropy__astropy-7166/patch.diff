@@ -1,0 +1,16 @@
+diff --git a/astropy/utils/misc.py b/astropy/utils/misc.py
+index 6b5b7c5..0a9b2c1 100644
+--- a/astropy/utils/misc.py
++++ b/astropy/utils/misc.py
+@@ -40,6 +40,12 @@ class InheritDocstrings(type):
+                 if attr_name not in base.__dict__:
+                     continue
++                if isinstance(attr_value, property):
++                    if attr_value.__doc__ is None:
++                        parent_attr = getattr(base, attr_name)
++                        if isinstance(parent_attr, property) and parent_attr.__doc__ is not None:
++                            attr_value.__doc__ = parent_attr.__doc__
++                    continue
+                 if not inspect.isfunction(attr_value):
+                     continue
+                 if attr_value.__doc__ is not None:

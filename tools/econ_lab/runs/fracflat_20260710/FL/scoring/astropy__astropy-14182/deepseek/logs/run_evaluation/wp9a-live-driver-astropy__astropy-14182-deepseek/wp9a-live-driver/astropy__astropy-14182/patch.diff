@@ -1,0 +1,21 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 3b8d7f6b3e..df0baf3f18 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -49,8 +49,12 @@ class RST(FixedWidth):
+     data_class = SimpleRSTData
+     header_class = SimpleRSTHeader
+ 
+-    def __init__(self):
+-        super().__init__(delimiter_pad=None, bookend=False)
++    def __init__(self, header_rows=None):
++        super().__init__(delimiter_pad=None, bookend=False, header_rows=header_rows)
+ 
+     def write(self, lines):
+         lines = super().write(lines)
++        # If we have a multi-line header (e.g. with units), the rst table
++        # rule should appear after all header lines, not just the first.
++        if hasattr(self, 'header') and self.header.header_rows > 1:
++            return lines
+         lines = [lines[1]] + lines + [lines[1]]
+         return lines

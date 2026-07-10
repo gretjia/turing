@@ -1,0 +1,33 @@
+diff --git a/astropy/nddata/nddata.py b/astropy/nddata/nddata.py
+index 56f0c35a0..e5f839376 100644
+--- a/astropy/nddata/nddata.py
++++ b/astropy/nddata/nddata.py
+@@ -2271,11 +2271,23 @@ class NDDataRef(NDData):
+         # Get the masks from this object and the operand
+         mask1 = self.mask
+         mask2 = operand.mask
++
+         # If handle_mask is a function, call it on the masks
+         try:
+             result_mask = handle_mask(mask1, mask2)
+         except TypeError:
+-            if mask1 is None and mask2 is None:
++            # Check if both masks are None
+             if mask1 is None and mask2 is None:
+                 result_mask = None
+-            else:
++            # One of the masks is None
++            elif mask1 is None:
++                result_mask = mask2
++            elif mask2 is None:
++                result_mask = mask1
++            else:
+                 # the masks are allowed to be None
+                 result_mask = self._combine_masks_first(mask1, mask2)
+         else:
+             # if handle_mask returns None set to None
+             if result_mask is None:
+                 result_mask = None
++        # End of try/except block for handling masks
+         self._arithmetic_simplify_data_inplace(result_data)
+         self._arithmetic_simplify_masks_inplace(result_mask)

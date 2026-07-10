@@ -1,0 +1,14 @@
+diff --git a/xarray/core/merge.py b/xarray/core/merge.py
+index 0000000..0000000 100644
+--- a/xarray/core/merge.py
++++ b/xarray/core/merge.py
+@@ -502,8 +502,8 @@ def combine_attrs_by_coords(variables, attrs, coord_names):
+         elif combine_attrs == "drop":
+             return None
+         elif combine_attrs == "override":
+             # From the xarray merge() docstring: "If override, attrs from the first dataset are used"
+-            return variable_attrs[0]
++            return dict(variable_attrs[0])
+         elif combine_attrs == "join":
+             # The 'join' combine_attrs method was defined in _calc_concat_compat()
+             for attr in variable_attrs[1:]:

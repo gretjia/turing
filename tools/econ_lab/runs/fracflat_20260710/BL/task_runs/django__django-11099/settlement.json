@@ -1,0 +1,171 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:django/django:scaffold:sha256:fc4cf68933c35ac01d7ec72f959d260473c61b0cf3a8f88ad2e9cf59ad47ff8c",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:9af099ccac588702c7abcb7fa5228828804f43f79bc5e49af2451721033ba06b",
+    "price_signal_hash": "sha256:38158e0885a2bc70ade7e977d3bfe5aaa8ea89192712f7d4d5e98ee4e0b41ef7",
+    "route_id": "django__django-11099::armA::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:09361ce3f864647d7ff99f5370c93b3f5f0c8c26f9f5975f839a6d6834b16525",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "test_ascii_validator (auth_tests.test_validators.UsernameValidatorsTests)",
+          "test_help_text (auth_tests.test_validators.MinimumLengthValidatorTest)",
+          "test_password_validators_help_text_html (auth_tests.test_validators.PasswordValidationTest)",
+          "test_password_validators_help_text_html_escaping (auth_tests.test_validators.PasswordValidationTest)",
+          "test_unicode_validator (auth_tests.test_validators.UsernameValidatorsTests)",
+          "test_validate (auth_tests.test_validators.CommonPasswordValidatorTest)",
+          "test_validate (auth_tests.test_validators.MinimumLengthValidatorTest)",
+          "test_validate (auth_tests.test_validators.NumericPasswordValidatorTest)",
+          "test_validate (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)",
+          "test_validate_custom_list (auth_tests.test_validators.CommonPasswordValidatorTest)",
+          "test_validate_django_supplied_file (auth_tests.test_validators.CommonPasswordValidatorTest)",
+          "test_validate_password (auth_tests.test_validators.PasswordValidationTest)"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 10,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "test_empty_password_validator_help_text_html (auth_tests.test_validators.PasswordValidationTest)",
+          "test_get_default_password_validators (auth_tests.test_validators.PasswordValidationTest)",
+          "test_get_password_validators_custom (auth_tests.test_validators.PasswordValidationTest)",
+          "test_help_text (auth_tests.test_validators.CommonPasswordValidatorTest)",
+          "test_help_text (auth_tests.test_validators.NumericPasswordValidatorTest)",
+          "test_help_text (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)",
+          "test_password_changed (auth_tests.test_validators.PasswordValidationTest)",
+          "test_password_changed_with_custom_validator (auth_tests.test_validators.PasswordValidationTest)",
+          "test_password_validators_help_texts (auth_tests.test_validators.PasswordValidationTest)",
+          "test_validate_property (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)"
+        ],
+        "verify_total_count": 10,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:09361ce3f864647d7ff99f5370c93b3f5f0c8c26f9f5975f839a6d6834b16525",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "django/django",
+          "route_scaffold": "scaffold:sha256:fc4cf68933c35ac01d7ec72f959d260473c61b0cf3a8f88ad2e9cf59ad47ff8c",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:1ce541774706d6b268513b5e9ff88e886d66649ba2774e90b46122cda9f0cbcf"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/django__django-11099/kimi/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "django__django-11099"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "django__django-11099"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "django__django-11099"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/django__django-11099/kimi/wp9a-live-driver.wp9a-live-driver-django__django-11099-kimi.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_ascii_validator (auth_tests.test_validators.UsernameValidatorsTests)",
+              "test_unicode_validator (auth_tests.test_validators.UsernameValidatorsTests)",
+              "test_help_text (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_help_text (auth_tests.test_validators.MinimumLengthValidatorTest)",
+              "test_validate (auth_tests.test_validators.MinimumLengthValidatorTest)",
+              "test_help_text (auth_tests.test_validators.NumericPasswordValidatorTest)",
+              "test_validate (auth_tests.test_validators.NumericPasswordValidatorTest)",
+              "test_validate (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)",
+              "test_validate_property (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)",
+              "test_empty_password_validator_help_text_html (auth_tests.test_validators.PasswordValidationTest)",
+              "test_get_default_password_validators (auth_tests.test_validators.PasswordValidationTest)",
+              "test_get_password_validators_custom (auth_tests.test_validators.PasswordValidationTest)",
+              "test_password_changed (auth_tests.test_validators.PasswordValidationTest)",
+              "test_password_changed_with_custom_validator (auth_tests.test_validators.PasswordValidationTest)",
+              "test_password_validators_help_text_html (auth_tests.test_validators.PasswordValidationTest)",
+              "test_password_validators_help_text_html_escaping (auth_tests.test_validators.PasswordValidationTest)",
+              "test_password_validators_help_texts (auth_tests.test_validators.PasswordValidationTest)",
+              "test_validate_password (auth_tests.test_validators.PasswordValidationTest)",
+              "test_help_text (auth_tests.test_validators.CommonPasswordValidatorTest)",
+              "test_validate (auth_tests.test_validators.CommonPasswordValidatorTest)",
+              "test_validate_custom_list (auth_tests.test_validators.CommonPasswordValidatorTest)",
+              "test_validate_django_supplied_file (auth_tests.test_validators.CommonPasswordValidatorTest)"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 779,
+        "candidate_patch_sha256": "sha256:1e6f61e4c18584a93dfb3a3af7d49e7a829962d93f2f31e7c18abdd4bf7c2ad3",
+        "instance_id": "django__django-11099",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 15489
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "django/django",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "django__django-11099",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "kimi",
+  "selected_route_id": "django__django-11099::armA::kimi",
+  "task_index": 8
+}

@@ -1,0 +1,104 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sympy/sympy:scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:e0961a642322cb32d7d497c38029b8ad0d2480c86d900d6eb6e036813972d056",
+    "price_signal_hash": "sha256:716737072a51b17ee2f69dcf6ac6aa5fe9ad10bba7324bf90d28198d7bcef11e",
+    "route_id": "sympy__sympy-13551::armC::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:437289a09aa1dca878045a9c64abe12ebe8950ba3963b4fa3c922ef713b4b2a1",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:437289a09aa1dca878045a9c64abe12ebe8950ba3963b4fa3c922ef713b4b2a1",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "sympy/sympy",
+          "route_scaffold": "scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:03001fb3a2d1af42f1693b8c489d9b56d0a08a1b5b9772e95888024c28268cb0"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sympy__sympy-13551/qwen/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "sympy__sympy-13551"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sympy__sympy-13551"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sympy__sympy-13551/qwen/wp9a-live-driver.wp9a-live-driver-sympy__sympy-13551-qwen.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 3496,
+        "candidate_patch_sha256": "sha256:da1a8cd55f53a806d220d2fa17d4a6def790321f64402821e88b24f4f8e1c6ed",
+        "instance_id": "sympy__sympy-13551",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 20938
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "sympy/sympy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sympy__sympy-13551",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "qwen",
+  "selected_route_id": "sympy__sympy-13551::armC::qwen",
+  "task_index": 38
+}

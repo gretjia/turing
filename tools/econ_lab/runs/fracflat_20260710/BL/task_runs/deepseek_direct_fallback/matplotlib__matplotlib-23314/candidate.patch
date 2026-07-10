@@ -1,0 +1,21 @@
+diff --git a/lib/mpl_toolkits/mplot3d/axes3d.py b/lib/mpl_toolkits/mplot3d/axes3d.py
+index 00000000..7e83af88 100644
+--- a/lib/mpl_toolkits/mplot3d/axes3d.py
++++ b/lib/mpl_toolkits/mplot3d/axes3d.py
+@@ -374,6 +374,16 @@ class Axes3D(Axes):
+         self.set_ylabel('')
+         self.set_zlabel('')
+ 
++    def set_visible(self, b):
++        # Override set_visible to also control the visibility of the Axis3D
++        # objects (panels), otherwise they stay visible.
++        super().set_visible(b)
++        if hasattr(self, '_axis3don'):
++            for axis in self._axis3don.values():
++                axis.set_visible(b)
++        # Mark this Axes3D as stale to trigger a redraw.
++        self.stale = True
++
+     def set_xlabel(self, xlabel, fontdict=None, labelpad=None, **kwargs):
+         """
+         Set the xlabel for this axes.

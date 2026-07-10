@@ -1,0 +1,229 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sphinx-doc/sphinx:scaffold:sha256:7c225e63133b5c759b5f075efbf281262240c24ae64cedd3fe202293fa24c4cd",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:c369175de2b1ef3071c378d4a26217f99468f0b59f16d9dc74735a0c04952389",
+    "price_signal_hash": "sha256:7af52e46e36cc4bf53d20fdba03398d999ade158073494450ecec0f1876d6c90",
+    "route_id": "sphinx-doc__sphinx-7462::armC::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:8daa52cd81a0632f3af428d45b82efade6c5a8cce4c4d50303b3c1b4cc8c6cc7",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "tests/test_domain_py.py::test_domain_py_objects",
+          "tests/test_domain_py.py::test_domain_py_xrefs",
+          "tests/test_domain_py.py::test_function_signatures",
+          "tests/test_domain_py.py::test_get_full_qualified_name",
+          "tests/test_domain_py.py::test_module_index_not_collapsed",
+          "tests/test_domain_py.py::test_optional_pyfunction_signature",
+          "tests/test_domain_py.py::test_parse_annotation",
+          "tests/test_domain_py.py::test_pydata",
+          "tests/test_domain_py.py::test_pydecorator_signature",
+          "tests/test_domain_py.py::test_pyfunction_signature_full_py38",
+          "tests/test_domain_py.py::test_pymethod_options",
+          "tests/test_domain_py.py::test_pyobject_prefix",
+          "tests/test_pycode_ast.py::test_unparse[-",
+          "tests/test_pycode_ast.py::test_unparse[...-...]",
+          "tests/test_pycode_ast.py::test_unparse[1",
+          "tests/test_pycode_ast.py::test_unparse[1234-1234_0]",
+          "tests/test_pycode_ast.py::test_unparse[b'bytes'-b'bytes']",
+          "tests/test_pycode_ast.py::test_unparse[not",
+          "tests/test_pycode_ast.py::test_unparse[object()-object()]",
+          "tests/test_pycode_ast.py::test_unparse[os.path-os.path]",
+          "tests/test_pycode_ast.py::test_unparse[sys-sys]",
+          "tests/test_pycode_ast.py::test_unparse[{'key1':",
+          "tests/test_pycode_ast.py::test_unparse_py38"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 27,
+        "verify_pass_fraction": 0.9642857142857143,
+        "verify_test_ids": [
+          "tests/test_domain_py.py::test_domain_py_find_obj",
+          "tests/test_domain_py.py::test_exceptions_module_is_ignored",
+          "tests/test_domain_py.py::test_modindex_common_prefix",
+          "tests/test_domain_py.py::test_module_index",
+          "tests/test_domain_py.py::test_module_index_submodule",
+          "tests/test_domain_py.py::test_pyattribute",
+          "tests/test_domain_py.py::test_pyclassmethod",
+          "tests/test_domain_py.py::test_pydata_signature",
+          "tests/test_domain_py.py::test_pydata_signature_old",
+          "tests/test_domain_py.py::test_pydecoratormethod_signature",
+          "tests/test_domain_py.py::test_pyexception_signature",
+          "tests/test_domain_py.py::test_pyfunction",
+          "tests/test_domain_py.py::test_pyfunction_signature",
+          "tests/test_domain_py.py::test_pyfunction_signature_full",
+          "tests/test_domain_py.py::test_pystaticmethod",
+          "tests/test_domain_py.py::test_resolve_xref_for_properties",
+          "tests/test_pycode_ast.py::test_unparse['str'-'str']",
+          "tests/test_pycode_ast.py::test_unparse[()-()]",
+          "tests/test_pycode_ast.py::test_unparse[(1,",
+          "tests/test_pycode_ast.py::test_unparse[+",
+          "tests/test_pycode_ast.py::test_unparse[1234-1234_1]",
+          "tests/test_pycode_ast.py::test_unparse[Tuple[int,",
+          "tests/test_pycode_ast.py::test_unparse[[1,",
+          "tests/test_pycode_ast.py::test_unparse[a",
+          "tests/test_pycode_ast.py::test_unparse[lambda",
+          "tests/test_pycode_ast.py::test_unparse[{1,",
+          "tests/test_pycode_ast.py::test_unparse[~",
+          "tests/test_pycode_ast.py::test_unparse_None"
+        ],
+        "verify_total_count": 28,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:8daa52cd81a0632f3af428d45b82efade6c5a8cce4c4d50303b3c1b4cc8c6cc7",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "sphinx-doc/sphinx",
+          "route_scaffold": "scaffold:sha256:7c225e63133b5c759b5f075efbf281262240c24ae64cedd3fe202293fa24c4cd",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:8257f2d524c9377cc52a28abb00682c8876128765a464d9d028944c4db01d251"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sphinx-doc__sphinx-7462/glm/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "sphinx-doc__sphinx-7462"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sphinx-doc__sphinx-7462"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "sphinx-doc__sphinx-7462"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sphinx-doc__sphinx-7462/glm/wp9a-live-driver.wp9a-live-driver-sphinx-doc__sphinx-7462-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "tests/test_domain_py.py::test_parse_annotation",
+              "tests/test_pycode_ast.py::test_unparse[()-()]"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "tests/test_domain_py.py::test_function_signatures",
+              "tests/test_domain_py.py::test_domain_py_xrefs",
+              "tests/test_domain_py.py::test_domain_py_objects",
+              "tests/test_domain_py.py::test_resolve_xref_for_properties",
+              "tests/test_domain_py.py::test_domain_py_find_obj",
+              "tests/test_domain_py.py::test_get_full_qualified_name",
+              "tests/test_domain_py.py::test_pyfunction_signature",
+              "tests/test_domain_py.py::test_pyfunction_signature_full",
+              "tests/test_domain_py.py::test_pyfunction_signature_full_py38",
+              "tests/test_domain_py.py::test_optional_pyfunction_signature",
+              "tests/test_domain_py.py::test_pyexception_signature",
+              "tests/test_domain_py.py::test_exceptions_module_is_ignored",
+              "tests/test_domain_py.py::test_pydata_signature",
+              "tests/test_domain_py.py::test_pydata_signature_old",
+              "tests/test_domain_py.py::test_pyobject_prefix",
+              "tests/test_domain_py.py::test_pydata",
+              "tests/test_domain_py.py::test_pyfunction",
+              "tests/test_domain_py.py::test_pymethod_options",
+              "tests/test_domain_py.py::test_pyclassmethod",
+              "tests/test_domain_py.py::test_pystaticmethod",
+              "tests/test_domain_py.py::test_pyattribute",
+              "tests/test_domain_py.py::test_pydecorator_signature",
+              "tests/test_domain_py.py::test_pydecoratormethod_signature",
+              "tests/test_domain_py.py::test_module_index",
+              "tests/test_domain_py.py::test_module_index_submodule",
+              "tests/test_domain_py.py::test_module_index_not_collapsed",
+              "tests/test_domain_py.py::test_modindex_common_prefix",
+              "tests/test_pycode_ast.py::test_unparse[a",
+              "tests/test_pycode_ast.py::test_unparse[os.path-os.path]",
+              "tests/test_pycode_ast.py::test_unparse[1",
+              "tests/test_pycode_ast.py::test_unparse[b'bytes'-b'bytes']",
+              "tests/test_pycode_ast.py::test_unparse[object()-object()]",
+              "tests/test_pycode_ast.py::test_unparse[1234-1234_0]",
+              "tests/test_pycode_ast.py::test_unparse[{'key1':",
+              "tests/test_pycode_ast.py::test_unparse[...-...]",
+              "tests/test_pycode_ast.py::test_unparse[Tuple[int,",
+              "tests/test_pycode_ast.py::test_unparse[~",
+              "tests/test_pycode_ast.py::test_unparse[lambda",
+              "tests/test_pycode_ast.py::test_unparse[[1,",
+              "tests/test_pycode_ast.py::test_unparse[sys-sys]",
+              "tests/test_pycode_ast.py::test_unparse[1234-1234_1]",
+              "tests/test_pycode_ast.py::test_unparse[not",
+              "tests/test_pycode_ast.py::test_unparse[{1,",
+              "tests/test_pycode_ast.py::test_unparse['str'-'str']",
+              "tests/test_pycode_ast.py::test_unparse[+",
+              "tests/test_pycode_ast.py::test_unparse[-",
+              "tests/test_pycode_ast.py::test_unparse[(1,",
+              "tests/test_pycode_ast.py::test_unparse_None",
+              "tests/test_pycode_ast.py::test_unparse_py38"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 751,
+        "candidate_patch_sha256": "sha256:5adc59a48559ba3f086b24a8738a5a192f362ef09c0e2cd2bb44df368c385514",
+        "instance_id": "sphinx-doc__sphinx-7462",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 5604
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "sphinx-doc/sphinx",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sphinx-doc__sphinx-7462",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "glm",
+  "selected_route_id": "sphinx-doc__sphinx-7462::armC::glm",
+  "task_index": 35
+}

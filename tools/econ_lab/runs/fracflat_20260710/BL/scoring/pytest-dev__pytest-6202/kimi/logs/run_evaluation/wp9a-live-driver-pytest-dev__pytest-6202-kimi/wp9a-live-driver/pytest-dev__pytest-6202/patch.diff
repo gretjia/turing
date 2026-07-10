@@ -1,0 +1,10 @@
+diff --git a/src/_pytest/python.py b/src/_pytest/python.py
+--- a/src/_pytest/python.py
++++ b/src/_pytest/python.py
+@@ -286,7 +286,7 @@
+         parts.reverse()
+         s = ".".join(parts)
+         if includemodule:
+             s = self.module.__name__ + "." + s
+-        return s.replace(".[", "[")
++        return s

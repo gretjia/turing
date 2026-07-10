@@ -1,0 +1,21 @@
+diff --git a/django/template/engine.py b/django/template/engine.py
+index 749cf0b20a..677672b445 100644
+--- a/django/template/engine.py
++++ b/django/template/engine.py
+@@ -119,7 +119,7 @@ class Engine:
+         """
+         if isinstance(template_name, (list, tuple)):
+             t = self.select_template(template_name)
+-        else:
+-            t = self.get_template(template_name)
++        else:
++            t = self.get_template(template_name)
+         # Django < 1.8 accepted a Context in `context` even though that's
+         # unintended. Preserve this ability but don't rewrap `context`.
+         if isinstance(context, Context):
+@@ -127,5 +127,5 @@ class Engine:
+         else:
+-            return t.render(Context(context))
++            return t.render(Context(context, autoescape=self.autoescape))
+-
++  

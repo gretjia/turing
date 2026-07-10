@@ -162,6 +162,16 @@ def judge(tests_status: Optional[dict[str, Any]]) -> dict[str, Any]:
 
     canary = bool(accept_verdict is True and verify_verdict is False)
 
+    # ADR-ECON-006: verify-side pass ratio ∈ [0,1]. Empty verify side → None (withheld).
+    if not_enough_tests:
+        verify_pass_fraction: Optional[float] = None
+        verify_pass_count = 0
+        verify_total_count = 0
+    else:
+        verify_pass_count = sum(1 for t in verify_ids if outcomes[t])
+        verify_total_count = len(verify_ids)
+        verify_pass_fraction = verify_pass_count / verify_total_count
+
     return {
         "schema": LIVE_SPLIT_VERIFIER_SCHEMA,
         "accept_verdict": accept_verdict,
@@ -170,6 +180,10 @@ def judge(tests_status: Optional[dict[str, Any]]) -> dict[str, Any]:
         "not_enough_tests": not_enough_tests,
         "accept_test_ids": accept_ids,
         "verify_test_ids": verify_ids,
+        # ADR-ECON-006 fractional reward inputs (descriptive; binary paths ignore them).
+        "verify_pass_fraction": verify_pass_fraction,
+        "verify_pass_count": verify_pass_count,
+        "verify_total_count": verify_total_count,
         # Only ever set by `judge_harness_error` below; present here too (always None) so
         # both this module's return shapes are uniform for callers.
         "harness_error_reason": None,
@@ -200,6 +214,10 @@ def judge_harness_error(reason: str) -> dict[str, Any]:
         "not_enough_tests": False,
         "accept_test_ids": [],
         "verify_test_ids": [],
+        # Double-fail: no tests ran successfully → fraction 0 (ADR-ECON-006 Decision 1).
+        "verify_pass_fraction": 0.0,
+        "verify_pass_count": 0,
+        "verify_total_count": 0,
         "harness_error_reason": reason,
     }
 
@@ -231,6 +249,9 @@ def judge_infra_null(reason: str) -> dict[str, Any]:
         "not_enough_tests": False,
         "accept_test_ids": [],
         "verify_test_ids": [],
+        "verify_pass_fraction": None,
+        "verify_pass_count": 0,
+        "verify_total_count": 0,
         "harness_error_reason": None,
         "infra_null": True,
         "infra_null_reason": reason,

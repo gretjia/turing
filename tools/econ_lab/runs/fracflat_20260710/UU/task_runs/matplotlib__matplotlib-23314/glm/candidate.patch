@@ -1,0 +1,23 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index 1234567..89abcde 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -749,6 +749,16 @@ class Axes(Artist):
+         return self._get_view().get_aspect()
+ 
+ 
++    def set_visible(self, visible):
++        """
++        Set the visibility of the axes.
++        """
++        super().set_visible(visible)
++        if not visible and hasattr(self, 'axis'):
++            # For 3D axes, we need to hide the axis artists as well
++            for axis_artists in self.axis.values():
++                for artist in axis_artists:
++                    artist.set_visible(False)
++        return self
++
+     def share(self, other):
+         """
+         Share this axes with other axes.

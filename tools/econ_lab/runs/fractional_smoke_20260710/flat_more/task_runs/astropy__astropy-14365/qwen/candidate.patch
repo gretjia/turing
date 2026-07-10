@@ -1,0 +1,46 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+index 5239010211..e795148243 100644
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -28,7 +28,7 @@ def _line_type(line, delimiter=None):
+     _decimal_re = r"[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?"
+     _command_re = r"READ [TS]ERR(\s+[0-9]+)+"
+ 
+-    sep = delimiter
++    sep = delimiter
+     if delimiter is None:
+         sep = r"\s+"
+     _new_re = rf"NO({sep}NO)+"
+@@ -80,7 +80,7 @@ def _get_tables_from_qdp_file(qdp_file, input_colnames=None, delimiter=None):
+             if err_specs == {} and command_lines != "":
+                 for cline in command_lines.strip().split("\n"):
+                     command = cline.strip().split()
+-                    # This should never happen, but just in case.
++                    # This should never happen, but just in case.
+                     if len(command) < 3:
+                         continue
+                     err_specs[command[1].lower()] = [int(c) for c in command[2:]]
+@@ -87,7 +87,7 @@ def _get_tables_from_qdp_file(qdp_file, input_colnames=None, delimiter=None):
+             if colnames is None:
+                 colnames = _interpret_err_lines(err_specs, ncol, names=input_colnames)
+ 
+-            if current_rows is None:
++            if current_rows is None:
+                 current_rows = []
+ 
+             values = []
+@@ -108,7 +108,7 @@ def _read_table_qdp(qdp_file, names=None, table_id=None, delimiter=None):
+     if table_id is None:
+         warnings.warn(
+             "table_id not specified. Reading the first available table",
+             AstropyUserWarning,
+         )
+         table_id = 0
+ 
+-    tables = _get_tables_from_qdp_file(
++    tables = _get_tables_from_qdp_file(
+         qdp_file, input_colnames=names, delimiter=delimiter
+     )
+ 
+-    return tables[table_id]
++    return tables[table_id]

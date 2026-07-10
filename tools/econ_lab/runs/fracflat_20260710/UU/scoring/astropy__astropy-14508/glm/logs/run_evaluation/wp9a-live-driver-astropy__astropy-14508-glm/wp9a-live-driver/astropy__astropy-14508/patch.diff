@@ -1,0 +1,23 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+index e4a7e8c..e2f3a7d 100644
+--- a/astropy/io/fits/card.py
+--- b/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -1297,9 +1297,14 @@ class Card:
+         return self._format_value(value, self._format_float)
+ 
+     @staticmethod
+-    def _format_float(value):
++    def _format_float(value):
+         """Format a floating point value for a FITS header."""
+-        return f"{value:.16G}"
++        # First try Python's default string representation
++        default_str = str(value)
++        if len(default_str) <= 20:
++            return default_str
++
++        # Fall back to the original formatting if needed
++        return f"{value:.16G}"
+ 
+     @staticmethod
+     def _format_complex(value):

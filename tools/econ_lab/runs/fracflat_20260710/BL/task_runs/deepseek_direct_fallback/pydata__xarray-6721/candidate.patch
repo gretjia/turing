@@ -1,0 +1,38 @@
+diff --git a/xarray/core/common.py b/xarray/core/common.py
+index 3c9a745d..f9e5c6da 100644
+--- a/xarray/core/common.py
++++ b/xarray/core/common.py
+@@ -1812,7 +1812,7 @@ class DataWithCoords:
+ def get_chunksizes(variables):
+     chunks: dict[Any, tuple[int, ...]] = {}
+     for v in variables:
+-        if hasattr(v.data, "chunks"):
++        if hasattr(v._data, "chunks"):
+             for dim, c in v.chunksizes.items():
+                 if dim in chunks and c != chunks[dim]:
+                     raise ValueError(
+diff --git a/xarray/core/variable.py b/xarray/core/variable.py
+index 3f3a9a93..40e65d0f 100644
+--- a/xarray/core/variable.py
++++ b/xarray/core/variable.py
+@@ -336,10 +336,16 @@ class Variable(AbstractArray, NdimSizeLenMixin, VariableArithmetic):
+         """The variable's data as a numpy/dask array."""
+         if isinstance(self._data, dask_array_type):
+             return self._data
++        elif hasattr(self._data, "chunks") and not isinstance(self._data, np.ndarray):
++            return self._data
+         else:
+             return self.values
+ 
+     @data.setter
+     def data(self, data):
+         self._data = data
+ 
+@@ -510,9 +516,9 @@ class Variable(AbstractArray, NdimSizeLenMixin, VariableArithmetic):
+ 
+     @property
+     def values(self):
+-        """The variable's data as a numpy.ndarray"""
+-        return _as_array_or_item(self._data)
++        """The variable's data as a numpy.ndarray (or same as data if already in memory)"""
++        return _as_array_or_item(self._data if isinstance(self._data, np.ndarray) else np.asarray(self._data))
