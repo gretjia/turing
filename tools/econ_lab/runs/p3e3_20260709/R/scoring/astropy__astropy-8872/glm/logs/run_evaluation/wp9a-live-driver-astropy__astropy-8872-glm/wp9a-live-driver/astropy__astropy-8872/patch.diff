@@ -1,0 +1,33 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index a24c1c8a3..a6e8d4b21 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -191,7 +191,7 @@ class Quantity(np.ndarray):
+         new = super().__new__(cls, obj, *args, **kwargs)
+         if not new._unit:
+             try:
+-                new._unit = unit.Unit(obj)
++                new._unit = unit.Unit(obj if not isinstance(obj, (np.floating, float)) else obj.item())
+             except TypeError:
+                 if hasattr(obj, '_unit'):
+                     new._unit = obj._unit
+@@ -225,8 +225,8 @@ class Quantity(np.ndarray):
+         value = getattr(value, 'value', value)
+ 
+         # Set the unit, which, if present, may result in a view.
+-        self._unit, value = self._validate_unit(value, unit, parse_strict)
+-
++        self._unit, value = self._validate_unit(value, value.dtype if isinstance(value, np.ndarray) else value, parse_strict)
++
+         self.value = value
+         self.flags.writeable = writeable
+     value = property(_get_value, _set_value, doc="""
+@@ -245,7 +245,7 @@ class Quantity(np.ndarray):
+         If ``unit`` is not None, convert the quantity to that unit.
+         """
+         # Convert to Quantity if not already (this does not copy)
+-        value, unit = cls._prepare_unit(value, unit, parse_strict, copy, order)
++        value, unit = cls._prepare_unit(value if not isinstance(value, (np.floating, float)) else value.item(), unit if not isinstance(unit, (np.floating, float)) else unit.item(), parse_strict, copy, order)
+ 
+         # If the array is already a Quantity, use its __array_finalize__
+         method = getattr(value, '__array_finalize__', None)

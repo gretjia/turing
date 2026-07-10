@@ -1,0 +1,16 @@
+diff --git a/sklearn/svm/base.py b/sklearn/svm/base.py
+index b0a2e5d..a4f7025 100644
+--- a/sklearn/svm/base.py
++++ b/sklearn/svm/base.py
+@@ -299,7 +299,10 @@ class BaseLibSVM(svm_base.BaseSVM):
+         # sparse case
+         if self.kernel == 'linear':
+             # workaround for empty support vectors
+-            if dual_coef_indices.size == 0:
++            if dual_coef_indices.size == 0:
++                # Handle empty support vectors case
++                self.dual_coef_ = sp.csr_matrix((0, n_class))
++                return
+             dual_coef_indices = dual_coef_indices.astype(np.intp)
+             # sparse case
+             # ... (rest of the method remains unchanged)

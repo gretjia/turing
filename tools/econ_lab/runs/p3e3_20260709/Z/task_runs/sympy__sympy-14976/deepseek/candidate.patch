@@ -1,0 +1,17 @@
+diff --git a/sympy/utilities/lambdify.py b/sympy/utilities/lambdify.py
+--- a/sympy/utilities/lambdify.py
++++ b/sympy/utilities/lambdify.py
+@@ -250,6 +250,14 @@ class LambdaPrinter(StrPrinter):
+         else:
+             return "%s(%s)" % (self._module, self._print(expr.args[0]))
+ 
++    def _print_Rational(self, expr):
++        # For mpmath, wrap rationals with mp.mpf to preserve precision
++        if self._module and 'mpmath' in self._module:
++            return "mp.mpf(%s)/mp.mpf(%s)" % (expr.p, expr.q)
++        else:
++            return "%s/%s" % (expr.p, expr.q)
++
+     def _print_NumberSymbol(self, expr):
+         # existing method
+         ...

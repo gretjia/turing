@@ -1,0 +1,13 @@
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index 8a8d101b9..20f1a9f66 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -365,7 +365,7 @@ class DataVariables(Mapping):
+         # TODO: this is a temporary workaround to make the repr work
+         # when there are more coord_names than variables
+         # (e.g. after set_index + reset_index)
+-        return len(self._dataset._variables) - len(self._dataset._coord_names)
++        return max(0, len(self._dataset._variables) - len(self._dataset._coord_names))
+ 
+     def __iter__(self):
+         return iter(self._dataset._variables)

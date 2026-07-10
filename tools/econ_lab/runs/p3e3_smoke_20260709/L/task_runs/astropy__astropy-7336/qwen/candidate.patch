@@ -1,0 +1,23 @@
+diff --git a/astropy/units/decorators.py b/astropy/units/decorators.py
+index 33b614d35..8d2b6016e 100644
+--- a/astropy/units/decorators.py
++++ b/astropy/units/decorators.py
+@@ -222,7 +222,10 @@ def wrapper(*args, **kwargs):
+             # If we have a return annotation, check that the return value
+             # has the correct units
+             if (wrapped_signature.return_annotation is not None and
+-                wrapped_signature.return_annotation != inspect._empty):
++                wrapped_signature.return_annotation != inspect._empty and
++                wrapped_signature.return_annotation is not None):
+                 # If the return annotation is None, we don't need to check units
+                 if (hasattr(return_, 'to') and
+                     not return_.unit.is_equivalent(
+@@ -230,7 +233,7 @@ def wrapper(*args, **kwargs):
+                     # This could be a problem if the function doesn't actually
+                     # return anything, but that's a separate issue
+                     raise u.UnitsError(
+-                        'return value {0} does not have correct units'
++                        'return value {0} does not have correct units'
+                         .format(return_))
+ 
+             return return_

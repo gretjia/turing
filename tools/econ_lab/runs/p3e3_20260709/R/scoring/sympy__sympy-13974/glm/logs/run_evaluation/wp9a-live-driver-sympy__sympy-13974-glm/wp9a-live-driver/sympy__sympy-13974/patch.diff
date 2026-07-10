@@ -1,0 +1,47 @@
+diff --git a/sympy/physics/quantum/tensorproduct.py b/sympy/physics/quantum/tensorproduct.py
+index 0000000..1111111 100644
+--- a/sympy/physics/quantum/tensorproduct.py
++++ b/sympy/physics/quantum/tensorproduct.py
+@@ -42,6 +42,10 @@ class TensorProduct(Expr):
+         _print_latex_textmeth = inheritedAttr('_print_latex_textmeth')
+ 
+     def __mul__(self, other):
++        # Handle the case where a TensorProduct is multiplied by itself
++        if isinstance(other, TensorProduct) and self == other:
++            return Pow(self, 2)
++
+         if isinstance(other, TensorProduct):
+             # Check if we can multiply the components
+             if len(self.args) == len(other.args):
+-                if self.args == other.args:
+-                    return Mul(self, other)
+                 return TensorProduct(*(a*b for a, b in zip(self.args, other.args)))
+         return Mul(self, other)
+diff --git a/sympy/physics/quantum/qapply.py b/sympy/physics/quantum/qapply.py
+index 0000000..1111111 100644
+--- a/sympy/physics/quantum/qapply.py
++++ b/sympy/physics/quantum/qapply.py
+@@ -68,6 +68,22 @@ def tensor_product_simp(expr):
+     from .tensorproduct import TensorProduct
+ 
+     # Handle powers of tensor products
++    if isinstance(expr, Pow) and isinstance(expr.base, TensorProduct):
++        # Check if the exponent is an integer
++        if expr.exp.is_integer:
++            # Evaluate the power of each component
++            components = []
++            for comp in expr.base.args:
++                comp_pow = Pow(comp, expr.exp)
++                # Use the _eval_power method if available
++                if hasattr(comp, '_eval_power'):
++                    simplified_comp = comp._eval_power(expr.exp)
++                    if simplified_comp is not None:
++                        components.append(simplified_comp)
++                        continue
++                # If no simplification is possible, keep the original component
++                components.append(comp_pow)
++            return TensorProduct(*components)
++
+     # Base case: simplify the components
+     if isinstance(expr, TensorProduct):
+         return TensorProduct(*[expand(x) for x in expr.args])

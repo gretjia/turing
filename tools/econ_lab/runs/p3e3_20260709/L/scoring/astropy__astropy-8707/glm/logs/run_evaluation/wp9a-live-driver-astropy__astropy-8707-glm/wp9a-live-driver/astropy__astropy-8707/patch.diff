@@ -1,0 +1,72 @@
+diff --git a/astropy/io/fits/header.py b/astropy/io/fits/header.py
+index a5f3d5f..c7a8b2d 100644
+--- a/astropy/io/fits/header.py
++++ b/astropy/io/fits/header.py
+@@ -311,7 +311,7 @@ class Header(dict):
+ 
+     @classmethod
+     def fromstring(cls, data, padding=True):
+-        """Creates an HDU header from a byte string containing the entire header
++        """Creates an HDU header from a string or bytes string containing the entire header
+           data.
+ 
+           Note: A byte string is expected, which on Python 2 is the native
+@@ -321,12 +321,20 @@ class Header(dict):
+                 the above the case, the method may still work fine.
+           """
+-        if data is None:
+-            return cls()
++        # If data is None, return an empty header
++        if data is None:
++            return cls()
+ 
+-        if not isinstance(data, str):
+-            if not PY3:
++        # Handle both str and bytes types
++        if isinstance(data, bytes):
++            if PY3:
++                try:
++                    data = data.decode('ascii')
++                except UnicodeDecodeError:
++                    raise ValueError("Header.fromstring() only supports bytes "
++                                     "that can be decoded as ASCII")
++            else:
+                 data = data.decode('ascii')
+-            else:
++        elif not isinstance(data, str):
+                 raise TypeError("data argument must be a string or bytes "
+                                 "object")
+ 
+@@ -724,7 +732,7 @@ class Header(dict):
+ 
+     @classmethod
+     def fromstring(cls, data, key=None):
+-        """Creates a new Card from a byte string containing the entire card.
++        """Creates a new Card from a string or bytes string containing the entire card.
+ 
+           The method assumes that the input string ends in a newline character,
+           unless the END keyword is specified.
+@@ -735,12 +743,20 @@ class Header(dict):
+ 
+         """
+         if not data:
+-            if key:
+-                return cls(key, '')
++            if key is not None:
++                return cls(key, '')
+             else:
+                 return None
+ 
++        # Handle both str and bytes types
++        if isinstance(data, bytes):
++            try:
++                data = data.decode('ascii')
++            except UnicodeDecodeError:
++                raise ValueError("Card.fromstring() only supports bytes "
++                                 "that can be decoded as ASCII")
++        elif not isinstance(data, str):
++            raise TypeError("data argument must be a string or bytes object")
++
+         # Check for END card without equals sign
+         if len(data.strip()) == 3 and data.strip() == 'END':
+             return cls('END')

@@ -1,0 +1,112 @@
+diff --git a/sympy/utilities/lambdify.py b/sympy/utilities/lambdify.py
+index 42c859dc53..966a16a35d 100644
+--- a/sympy/utilities/lambdify.py
++++ b/sympy/utilities/lambdify.py
+@@ -203,6 +203,9 @@ def _lambdifygenerated(*args, **kwargs):
+         return _lambdifygenerated
+ 
+ 
++def _wrap_rational(expr):
++    from sympy.core.numbers import Rational
++    if isinstance(expr, Rational):
++        return 'mpmath.mpf(%s)' % expr
++    return expr
++
+ def lambdify(args, expr, modules=None, dummify=True):
+     """
+     Convert a SymPy expression to a function that evaluates numerically.
+@@ -250,7 +253,11 @@ def lambdify(args, expr, modules=None, dummify=True):
+         # Generate the code for the function
+         if modules == 'mpmath':
+             # Make sure we have the right imports
++            from sympy.core.numbers import Rational
+             from mpmath import *
+             # Wrap any Rational numbers to ensure proper precision
++            expr = _wrap_rational(expr)
+             
+             # Generate function string
+             if hasattr(expr, '_lambdifygenerated'):
+@@ -262,6 +267,9 @@ def lambdify(args, expr, modules=None, dummify=True):
+     else:
+         # Generate the code for the function
+         if modules == 'mpmath':
++            from sympy.core.numbers import Rational
+             from mpmath import *
+             # Wrap any Rational numbers to ensure proper precision
++            expr = _wrap_rational(expr)
++            
+             # Generate function string
+             if hasattr(expr, '_lambdifygenerated'):
+                 return expr
+@@ -280,6 +286,7 @@ def lambdify(args, expr, modules=None, dummify=True):
+     # Make sure we have the right imports
+     from mpmath import *
+     # Wrap any Rational numbers to ensure proper precision
++    expr = _wrap_rational(expr)
+     
+     # Generate function string
+     if hasattr(expr, '_lambdifygenerated'):
+@@ -293,11 +297,13 @@ def lambdify(args, expr, modules=None, dummify=True):
+     # Additionally, we have to make sure that Rational numbers are
+     # converted to mpmath floats.
+     if hasattr(expr, '_lambdifygenerated'):
++        from sympy.core.numbers import Rational
++        expr = _wrap_rational(expr)
+         return expr
+     else:
+         # Generate the code for the function
+         if modules == 'mpmath':
++            from sympy.core.numbers import Rational
+             from mpmath import *
+             # Wrap any Rational numbers to ensure proper precision
+             expr = _wrap_rational(expr)
+@@ -320,6 +326,9 @@ def lambdify(args, expr, modules=None, dummify=True):
+     # Make sure we have the right imports
+     from mpmath import *
+     # Wrap any Rational numbers to ensure proper precision
++    expr = _wrap_rational(expr)
++    
+     # Generate function string
+     if hasattr(expr, '_lambdifygenerated'):
+         return expr
+@@ -424,11 +431,11 @@ def _lambdifygenerated(*args, **kwargs):
+                 # If we're using mpmath, we need to make sure that
+                 # Rational numbers are converted to mpmath floats.
+                 if modules == 'mpmath':
+-                    import mpmath
++                    import mpmath
+                     from mpmath import *
+                     # Wrap any Rational numbers to ensure proper precision
+                     # This wraps the entire expression in a single call to
+-                    expr = _wrap_rational(expr)
++                    expr = _wrap_rational(expr)
+                     # Generate function string
+                     funcstr = _print_node(expr, {})[0]
+                 else:
+@@ -445,6 +448,7 @@ def _lambdifygenerated(*args, **kwargs):
+                     # If we're using mpmath, we need to make sure that
+                     # Rational numbers are converted to mpmath floats.
+                     if modules == 'mpmath':
++                        from sympy.core.numbers import Rational
+                         from mpmath import *
+                         # Wrap any Rational numbers to ensure proper precision
+                         expr = _wrap_rational(expr)
+@@ -476,6 +479,10 @@ def _lambdifygenerated(*args, **kwargs):
+                     # If we're using mpmath, we need to make sure that
+                     # Rational numbers are converted to mpmath floats.
+                     if modules == 'mpmath':
++                        from sympy.core.numbers import Rational
++                        expr = _wrap_rational(expr)
++                        
+                         return expr
+                     else:
+                         return _lambdifygenerated(*args, **kwargs)
+@@ -490,6 +495,8 @@ def _lambdifygenerated(*args, **kwargs):
+             # If we're using mpmath, we need to make sure that
+             # Rational numbers are converted to mpmath floats.
+             if modules == 'mpmath':
++                from sympy.core.numbers import Rational
++                expr = _wrap_rational(expr)
+                 # Generate function string
+                 funcstr = _print_node(expr, {})[0]
+             else:

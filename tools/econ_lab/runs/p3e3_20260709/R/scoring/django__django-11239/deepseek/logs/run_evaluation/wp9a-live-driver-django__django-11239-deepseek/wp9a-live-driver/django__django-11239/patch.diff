@@ -1,0 +1,22 @@
+diff --git a/django/db/backends/postgresql/client.py b/django/db/backends/postgresql/client.py
+index 6e33f2a5b1..f4f1e63bee 100644
+--- a/django/db/backends/postgresql/client.py
++++ b/django/db/backends/postgresql/client.py
+@@ -36,6 +36,10 @@ class DatabaseClient(BaseDatabaseClient):
+             env['PGSSLMODE'] = options['sslmode']
+         if 'sslrootcert' in options:
+             env['PGSSLROOTCERT'] = options['sslrootcert']
++        if 'sslcert' in options:
++            env['PGSSLCERT'] = options['sslcert']
++        if 'sslkey' in options:
++            env['PGSSLKEY'] = options['sslkey']
+ 
+         return args, (env or None)
+ 
+@@ -48,4 +52,4 @@ class DatabaseClient(BaseDatabaseClient):
+         if settings_dict['NAME']:
+             args.extend(['-d', settings_dict['NAME']])
+         return args
+-
+\ No newline at end of file
++

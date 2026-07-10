@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/contour.py b/lib/matplotlib/contour.py
+--- a/lib/matplotlib/contour.py
++++ b/lib/matplotlib/contour.py
+@@ -1490,5 +1490,11 @@ class QuadContourSet(ContourSet):
+         if corner_mask is None:
+             corner_mask = mpl.rcParams['contour.corner_mask']
+         self._corner_mask = corner_mask
++        # Boolean data only contains the values 0 and 1, so the only useful
++        # default is a single contour at 0.5.
++        if self._levels is None and args:
++            z_arg = args[0] if len(args) <= 2 else args[2]
++            if np.asarray(z_arg).dtype == bool:
++                self._levels = [0.5]
+ 
+         x, y, z = self._contour_args(args, kwargs)

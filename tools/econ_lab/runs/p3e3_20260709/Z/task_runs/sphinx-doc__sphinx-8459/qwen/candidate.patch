@@ -1,0 +1,41 @@
+diff --git a/sphinx/ext/autodoc/typehints.py b/sphinx/ext/autodoc/typehints.py
+index 2c5c3b345..e6f18d9a6 100644
+--- a/sphinx/ext/autodoc/typehints.py
++++ b/sphinx/ext/autodoc/typehints.py
+@@ -120,7 +120,7 @@ def _get_typehint_description(annotation: TypeHint,
+         if config.autodoc_type_aliases and annotation_name in config.autodoc_type_aliases:
+             return config.autodoc_type_aliases[annotation_name]
+         # If the annotation is a generic alias (e.g., Dict[str, int]), we need to
+-        # traverse the type hints to replace them with their aliases.
++        # traverse the type hints to replace them with their aliases if available.
+         if hasattr(annotation, '__origin__'):
+             args = annotation.__args__
+             if args:
+@@ -135,13 +135,16 @@ def _get_typehint_description(annotation: TypeHint,
+         # If the annotation is a typing module class (e.g., typing.Dict),
+         # we need to replace it with its alias if available.
+         elif hasattr(annotation, '__module__') and annotation.__module__ == 'typing':
++            if (config.autodoc_type_aliases and annotation_name in config.autodoc_type_aliases):
++                return config.autodoc_type_aliases[annotation_name]
++
+             # Handle special typing classes
+             if annotation_name in ('Dict', 'List', 'Tuple', 'Set', 'FrozenSet',
+                                    'Callable', 'Optional', 'Union', 'Type'):
+                 return _get_typehint_description(annotation, config, name)
+-            return annotation_name
++            return annotation_name
+         else:
+             # For other cases, try to get the full name
+             if hasattr(annotation, '__qualname__'):
+@@ -159,7 +159,8 @@ def _get_typehint_description(annotation: TypeHint,
+     if config.autodoc_type_aliases:
+         # When type_aliases is set, replace the annotation
+         # with the user-defined alias
+-        if annotation_name in config.autodoc_type_aliases:
+-            return config.autodoc_type_aliases[annotation_name]
++        if (annotation_name in config.autodoc_type_aliases and
++                not (hasattr(annotation, '__origin__') or
++                     (hasattr(annotation, '__module__') and annotation.__module__ == 'typing'))):
++            return config.autodoc_type_aliases[annotation_name]
+ 
+     return annotation_name if annotation_name else str(annotation)

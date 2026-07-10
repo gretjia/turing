@@ -1,0 +1,70 @@
+diff --git a/src/_pytest/logging.py b/src/_pytest/logging.py
+index eebf226c4..3f226c5e7 100644
+--- a/src/_pytest/logging.py
++++ b/src/_pytest/logging.py
+@@ -327,6 +327,7 @@ class LogCaptureFixture:
+         self,
+         item: nodes.Node,
+         *,
++        _ispytest_internal: bool = False,
+         _request: "SubRequest" = None,
+         _propagate: bool = True,
+         _manager: "LogCaptureHandler" = None,
+@@ -339,10 +340,12 @@ class LogCaptureFixture:
+         self._propagate = _propagate
+         if _manager:
+             self.handler = _manager
++            self._original_level = _manager.level
+         else:
+             self.handler = LogCaptureHandler()
++            self._original_level = self.handler.level
+             _request.addfinalizer(self.finalize)
+-        self._initial_handler_level = self.handler.level
++            _request.addfinalizer(self._restore_log_level)
+ 
+     def finalize(self) -> None:
+         """Finalize the fixture.
+@@ -362,7 +365,7 @@ class LogCaptureFixture:
+         # log level which was set externally, so in that case we just do not
+         # restore
+         if self.handler.level != self._initial_handler_level:
+-            self.handler.setLevel(self._initial_handler_level)
++            self.handler.setLevel(self._original_level)
+ 
+     @property
+     def records(self) -> List[logging.LogRecord]:
+@@ -421,10 +424,11 @@ class LogCaptureFixture:
+         logger = logging.getLogger()
+         logger.addHandler(self.handler)
+         logger.propagate = self._propagate
++        self._initial_handler_level = self.handler.level
+ 
+     def set_level(self, level: Union[int, str], logger: str = None) -> None:
+         """Set the level of a logger for the duration of a test.
+-        The log levels set are restored automatically at the end of the test.
++        The log levels set are automatically restored at the end of the test.
+ 
+         .. versionchanged:: 3.4
+             The levels of the loggers changed by this function will be
+@@ -537,6 +541,9 @@ class LogCaptureFixture:
+         """
+         self.handler.records = []
+ 
++    def _restore_log_level(self) -> None:
++        self.handler.setLevel(self._original_level)
++
+ 
+ @fixture
+ def caplog(request: FixtureRequest) -> Generator[LogCaptureFixture, None, None]:
+@@ -547,9 +554,11 @@ def caplog(request: FixtureRequest) -> Generator[LogCaptureFixture, None, None]:
+     result = LogCaptureFixture(
+         request.node,
+         _request=request,
++        _ispytest_internal=True,
+         _propagate=_propagate,
+         _manager=_manager,
+     )
++    result._finalize = result.finalize  # keep original finalize for fixture teardown
+     yield result
+-    result.finalize()
++    result._finalize()

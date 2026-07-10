@@ -483,6 +483,50 @@ def load_task_packets(shard_root: Path = SHARD_ROOT) -> list[dict[str, Any]]:
     return packets
 
 
+def load_stream_manifest(manifest_path: Path) -> tuple[list[str], str]:
+    """Load a P3-E3 (or generic) ordered instance_id stream manifest.
+
+    Accepts either:
+      {"schema": "...", "instance_ids": ["id1", ...], ...}
+      ["id1", "id2", ...]  (bare list)
+
+    Returns (instance_ids_in_order, file_sha256_hex). Order is authoritative for
+    the evaluation stream when --stream-manifest is set; load_task_packets' glob
+    sort is overridden by this order (missing ids are rejected).
+    """
+    raw_bytes = manifest_path.read_bytes()
+    file_sha256 = sha256_hex(raw_bytes)
+    parsed = json.loads(raw_bytes.decode("utf-8"))
+    if isinstance(parsed, dict) and isinstance(parsed.get("instance_ids"), list):
+        ids = [str(x) for x in parsed["instance_ids"]]
+    elif isinstance(parsed, list):
+        ids = [str(x) for x in parsed]
+    else:
+        raise ValueError(
+            f"--stream-manifest {manifest_path} must be a JSON object with "
+            f"'instance_ids' list or a bare list of instance_id strings"
+        )
+    if not ids:
+        raise ValueError(f"--stream-manifest {manifest_path} has empty instance_ids")
+    if len(ids) != len(set(ids)):
+        raise ValueError(f"--stream-manifest {manifest_path} contains duplicate instance_ids")
+    return ids, file_sha256
+
+
+def order_packets_by_stream_manifest(
+    packets: list[dict[str, Any]], instance_ids: list[str]
+) -> list[dict[str, Any]]:
+    """Reorder/filter loaded packets to match the stream manifest order exactly."""
+    by_id = {p["instance_id"]: p for p in packets}
+    missing = [iid for iid in instance_ids if iid not in by_id]
+    if missing:
+        raise SystemExit(
+            f"--stream-manifest references {len(missing)} instance_id(s) not found "
+            f"under the task shard (first missing: {missing[0]})"
+        )
+    return [by_id[iid] for iid in instance_ids]
+
+
 def task_family_for_packet(packet: dict[str, Any]) -> Optional[str]:
     # See module doc's "known, reported spec gap" note: worker-safe packets carry no literal
     # task_family key, so this driver feeds the packet's `repo` field to the CLI's pinned
@@ -1697,6 +1741,17 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     if not packets:
         raise SystemExit(f"no task packets found under {shard_root}/{TASKS_GLOB}")
 
+    # P3-E3 ordered stream (`--stream-manifest`): when present, the evaluation order is the
+    # manifest's instance_id list (PHASE1 then PHASE2 family blocks for P3-E3), not the
+    # default glob sort of load_task_packets. Absent -> behavior-identical to every
+    # pre-P3-E3 call.
+    stream_manifest_arg = getattr(args, "stream_manifest", None)
+    stream_manifest_sha256: Optional[str] = None
+    stream_instance_ids: Optional[list[str]] = None
+    if stream_manifest_arg:
+        stream_instance_ids, stream_manifest_sha256 = load_stream_manifest(Path(stream_manifest_arg))
+        packets = order_packets_by_stream_manifest(packets, stream_instance_ids)
+
     # Stage B' warm-start priors (`--priors`, ADR-ECON-003 Decision 6.1/7.6): loaded once per
     # run, applied per task below in `fold_and_select`'s `initial_prices`. Absent by default
     # (empty map -> `stage_b_prime_initial_prices` returns `[]` -> behavior-identical to every
@@ -1713,6 +1768,16 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     # but is never appended to `committed_routing_events` (the fold's own event sequence), so
     # every route's `Q_eff` stays pinned at its `P` for the whole run ("Q_eff 恒为 P").
     frozen_backup = bool(getattr(args, "frozen_backup", False))
+
+    # P3-E3 reset arm (`--reset-at-task-index`, CAPSULE A §3 R arm): when task_index reaches
+    # this 0-based index (i.e. after finishing the previous task, before routing the current
+    # one), clear committed_routing_events so the fold restarts with the same injected priors
+    # (Q/N/S zeroed, P re-pinned via initial_prices on first post-reset appearance). Pure
+    # deterministic bookkeeping -- no new fold formula. None/absent -> no reset (L/Z arms).
+    reset_at_task_index = getattr(args, "reset_at_task_index", None)
+    if reset_at_task_index is not None:
+        reset_at_task_index = int(reset_at_task_index)
+    reset_applied_at: Optional[int] = None
 
     # B5 remedy (ADR-ECON-003 Decision 7.4): per-invocation identifier folded into every
     # verifier attestation so two different driver invocations over the same (instance, arm,
@@ -1783,6 +1848,13 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
 
     for task_index, packet in enumerate(packets[:max_tasks]):
         instance_id = packet["instance_id"]
+
+        # P3-E3 R-arm reset: at the switch point, drop pre-switch fold events so subsequent
+        # routing re-seeds from the same injected priors. Applied on both the fresh path and
+        # the resume-replay path so a resumed R arm reconstructs the same post-reset tape.
+        if reset_at_task_index is not None and task_index == reset_at_task_index:
+            committed_routing_events = []
+            reset_applied_at = task_index
 
         # WP9c point 1: "若该题存在增量检查点 settlement.json -> 逐字节采用其中的 fold 事件
         # 与结算记录,不重算" -- when a checkpoint exists, this task's entire settlement
@@ -1988,10 +2060,10 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
             # key's mere presence is a legitimate, expected divergence from a pre-WP10 anchor.
             "infra_null_count": infra_null_count,
         },
-        # Stage B' run metadata (ADR-ECON-003 Decision 7.6/7.7, PREREG Appendix A amendment
-        # #4): always present (fields are `None`/`False` when the corresponding flag is
-        # unused), never a τ/λ/floor/B-zone value (Art III.4/F4) -- every field here is either
-        # a caller-supplied label/path or a sha256 digest.
+        # Stage B' / P3-E3 run metadata (ADR-ECON-003 Decision 7.6/7.7, CAPSULE A §3):
+        # always present (fields are `None`/`False` when the corresponding flag is unused),
+        # never a τ/λ/floor/B-zone value (Art III.4/F4) -- every field here is either a
+        # caller-supplied label/path/index or a sha256 digest.
         "stage_b_prime_meta": {
             "schema": "econ_lab.stage_b_prime_meta.v1",
             "frozen_backup": frozen_backup,
@@ -1999,6 +2071,10 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
             "priors_sha256": priors_sha256,
             "task_shard": str(task_shard_arg) if task_shard_arg else None,
             "run_label": run_label,
+            "stream_manifest": str(stream_manifest_arg) if stream_manifest_arg else None,
+            "stream_manifest_sha256": stream_manifest_sha256,
+            "reset_at_task_index": reset_at_task_index,
+            "reset_at": reset_applied_at,
         },
         "generated_at_unix": int(time.time()),
     }
@@ -2074,6 +2150,24 @@ def main(argv: Optional[list[str]] = None) -> int:
         "over the same (instance, arm, lineage, verdict) never collide on event_hash. "
         "Defaults to --out's own path (already distinct per arm/run in every existing "
         "caller).",
+    )
+    parser.add_argument(
+        "--stream-manifest",
+        type=Path,
+        default=None,
+        help="P3-E3 ordered evaluation stream: path to a JSON file with an 'instance_ids' "
+        "list (or a bare list of instance_id strings). When set, packets are reordered to "
+        "match this list exactly (CAPSULE A §3: PHASE1 families then PHASE2 families). "
+        "File sha256 is recorded in verdict stage_b_prime_meta.",
+    )
+    parser.add_argument(
+        "--reset-at-task-index",
+        type=int,
+        default=None,
+        help="P3-E3 R-arm switch-point reset (CAPSULE A §3): 0-based task index at which "
+        "committed_routing_events is cleared before routing (Q/N/S zeroed; P re-seeded from "
+        "--priors via initial_prices). Deterministic pure bookkeeping; recorded as "
+        "stage_b_prime_meta.reset_at when applied.",
     )
     args = parser.parse_args(argv)
 

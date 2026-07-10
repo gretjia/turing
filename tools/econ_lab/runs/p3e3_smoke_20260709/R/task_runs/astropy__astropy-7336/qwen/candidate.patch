@@ -1,0 +1,26 @@
+diff --git a/astropy/units/decorators.py b/astropy/units/decorators.py
+index a4f65f9d82..8ab61b5353 100644
+--- a/astropy/units/decorators.py
++++ b/astropy/units/decorators.py
+@@ -222,7 +222,10 @@ def wrapper(*args, **kwargs):
+             # If the function has a return annotation, we need to check it
+             if (wrapped_signature.return_annotation is not None and
+                 wrapped_signature.return_annotation is not inspect.Signature.empty):
+-                return_ = args[0] if args else kwargs.get('self')
+-                return_.to(wrapped_signature.return_annotation)
++                # Skip unit checking for None return type
++                if wrapped_signature.return_annotation is not None:
++                    return_ = args[0] if args else kwargs.get('self')
++                    # Only check units if return value is not None
++                    if return_ is not None:
++                        return_.to(wrapped_signature.return_annotation)
+ 
+             return result
+ 
+@@ -228,4 +231,4 @@ def wrapper(*args, **kwargs):
+     return wrapper
+ 
+ 
+-    return wrapper
++    return wrapper
+\ No newline at end of file

@@ -1,0 +1,53 @@
+diff --git a/django/db/backends/postgresql/operations.py b/django/db/backends/postgresql/operations.py
+index 3b6a7c0..b6d5e2d 100644
+--- a/django/db/backends/postgresql/operations.py
++++ b/django/db/backends/postgresql/operations.py
+@@ -131,7 +131,9 @@ class DatabaseOperations(BaseDatabaseOperations):
+             # options.
+             if 'sslmode' in options:
+                 self._set_sslmode(options['sslmode'])
+-            if 'sslcert' in options:
++            if 'sslcert' in options:
+                 self._set_sslcert(options['sslcert'])
++            if 'sslkey' in options:
++                self._set_sslkey(options['sslkey'])
+ 
+     def _set_sslmode(self, sslmode):
+         # Implementation details...
+@@ -140,6 +143,12 @@ class DatabaseOperations(BaseDatabaseOperations):
+         # Implementation details...
+ 
+     def _set_sslcert(self, sslcert):
++        # Implementation details...
++
++    def _set_sslkey(self, sslkey):
++        # Implementation details...
++
++    def get_database_version(self):
+         return self.connection.pg_version
+diff --git a/django/db/backends/postgresql/base.py b/django/db/backends/postgresql/base.py
+index 20f9a1e..4611d6a 100644
+--- a/django/db/backends/postgresql/base.py
++++ b/django/db/backends/postgresql/base.py
+@@ -142,6 +142,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
+         # options.
+         if 'sslmode' in options:
+             self._set_sslmode(options['sslmode'])
++        if 'sslcert' in options:
++            self._set_sslcert(options['sslcert'])
++        if 'sslkey' in options:
++            self._set_sslkey(options['sslkey'])
+ 
+     def _set_sslmode(self, sslmode):
+         # Implementation details...
+@@ -150,6 +153,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
+         # Implementation details...
+ 
+     def _set_sslcert(self, sslcert):
++        # Implementation details...
++
++    def _set_sslkey(self, sslkey):
++        # Implementation details...
++
++    def create_cursor(self, name=None):
+         # Implementation details...

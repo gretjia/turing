@@ -1,0 +1,144 @@
+diff --git a/sphinx/builders/linkcheck.py b/sphinx/builders/linkcheck.py
+index c07b3b4..ec3f96e 100644
+--- a/sphinx/builders/linkcheck.py
++++ b/sphinx/builders/linkcheck.py
+@@ -19,6 +19,7 @@ import requests
+ from requests.exceptions import ConnectionError, HTTPError, SSLError, Timeout
+ from urllib3.exceptions import HTTPError as BaseHTTPError
+ 
++from sphinx import nodes
+ from sphinx.builders import Builder
+ from sphinx.util import encode_uri, logging, requests as sphinx_requests
+ from sphinx.util.console import darkgray, darkgreen, darkred, red
+@@ -88,6 +89,7 @@ class CheckExternalLinksBuilder(Builder):
+             self.write_msg = darkgreen + 'ok' + darkgray + '    '
+             self.success_counter = 0
+             self.ignored_counter = 0
++            self.internal_failure_counter = 0
+ 
+         if self._write_serial or len(docnames) == 1:
+             for docname in docnames:
+@@ -100,6 +102,12 @@ class CheckExternalLinksBuilder(Builder):
+                         if uri.startswith(('http:', 'https:', 'ftp:')):
+                             # ignore mailto links
+                             self.check_uri(uri, docname)
++                        elif node.get('internal'):
++                            # internal link: check if target exists
++                            self.check_internal_link(node, docname)
++                        else:
++                            # other links (e.g., file://, relative paths) are skipped
++                            pass
+         else:
+             # chunked processing
+             self.hyperlinks = {}
+@@ -140,6 +148,9 @@ class CheckExternalLinksBuilder(Builder):
+                     else:
+                         if hyperlink:  # URI with scheme
+                             self.check_uri(hyperlink, docname)
++                        else:
++                            # internal or other links, skip in chunked mode
++                            pass
+                 self._write_serial = True
+                 self.hyperlinks = {}
+                 for docname in docnames:
+@@ -166,6 +177,90 @@ class CheckExternalLinksBuilder(Builder):
+             if self.result == 'broken':
+                 self.broken_counter += 1
+                 failure_msg = 'broken    ' + self._format_status_message(uri, message)
++                logger.warning(failure_msg, location=docname, type='linkcheck', subtype='external')
++            else:
++                failure_msg = self._format_status_message(uri, message)
++                logger.info(failure_msg, location=docname, type='linkcheck', subtype='external')
++
++    def check_internal_link(self, node, docname):
++        """Check if an internal link (reference) is valid.
++
++        Verifies that the target document exists and that the anchor (if any)
++        exists in the target document.
++        """
++        uri = node.get('refuri', '')
++        if not uri:
++            return
++
++        # Parse the URI to extract docname and optional anchor
++        # Internal URIs are like "docname.html" or "docname.html#anchor"
++        if '#' in uri:
++            uri_part, anchor = uri.split('#', 1)
++        else:
++            uri_part = uri
++            anchor = None
++
++        # Remove .html extension if present; docname is everything before
++        if uri_part.endswith('.html'):
++            target_docname = uri_part[:-5]
++        else:
++            target_docname = uri_part
++
++        # Normalize path separators (Sphinx uses forward slash internally)
++        target_docname = target_docname.replace('\\', '/')
++
++        # Check if target document exists in the environment
++        if target_docname not in self.env.all_docs:
++            # Check if the target might be an external file (skip)
++            # (this should not happen for internal=True nodes)
++            return
++
++        # Now check anchor existence if anchor is specified
++        if anchor:
++            # Retrieve the target document's doctree (caching loaded doctrees)
++            if not hasattr(self, '_internal_anchor_cache'):
++                self._internal_anchor_cache = {}
++            cache = self._internal_anchor_cache
++            if target_docname not in cache:
++                try:
++                    target_doctree = self.env.get_doctree(target_docname)
++                except Exception:
++                    # Document might not be parseable; mark as broken
++                    logger.warning('(internal) broken    %s - cannot load target document',
++                                    uri, location=docname,
++                                    type='linkcheck', subtype='internal')
++                    self.broken_counter += 1
++                    return
++                # Collect all target ids (from explicit targets, headings, etc.)
++                ids = set()
++                for target_node in target_doctree.traverse(nodes.target):
++                    for id_ in target_node.get('ids', []):
++                        ids.add(id_)
++                # Also include reference nodes with explicit ids (from labels)
++                for ref_node in target_doctree.traverse(nodes.reference):
++                    for id_ in ref_node.get('ids', []):
++                        ids.add(id_)
++                cache[target_docname] = ids
++
++            if anchor not in cache.get(target_docname, set()):
++                logger.warning('(internal) broken    %s - missing anchor',
++                                uri, location=docname,
++                                type='linkcheck', subtype='internal')
++                self.broken_counter += 1
++                return
++            else:
++                # Anchor exists
++                logger.info('(internal) ok        %s',
++                            uri, location=docname,
++                            type='linkcheck', subtype='internal')
++        else:
++            # No anchor, just document existence already checked
++            logger.info('(internal) ok        %s',
++                        uri, location=docname,
++                        type='linkcheck', subtype='internal')
++
++    def _format_status_message(self, uri, message):
++        # Helper to format status message (copied from existing)
++        if isinstance(message, bytes):
++            message = message.decode('utf-8', errors='replace')
+         return '%-8s %-7s %-12s %s' % (status, color, uri, message)
+ 
+     def write_ok(self, uri, docname):
+@@ -214,6 +309,7 @@ class CheckExternalLinksBuilder(Builder):
+         if self.broken_counter != 0:
+             return False
+         return True
++
+ 
+     def finish(self):
+         logger.info('')

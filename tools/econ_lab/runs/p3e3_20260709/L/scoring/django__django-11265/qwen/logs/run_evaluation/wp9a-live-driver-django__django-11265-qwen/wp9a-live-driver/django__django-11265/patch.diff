@@ -1,0 +1,16 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 8c108b1478..b858331490 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -1600,7 +1600,10 @@ class Query(BaseExpression):
+         # For excludes, the logic is inverted - the filter is added to the
+         # main query, but the condition is inverted.
+         # This is a temporary query to hold the filter conditions.
+-        query = self.__class__(self.model, alias_map=self.alias_map)
++        query = self.__class__(self.model, alias_map=self.alias_map)
++        # Copy extra_select and annotation_select from the original query
++        query.extra_select = self.extra_select.copy()
++        query.annotation_select = self.annotation_select.copy()
+         query.add_filter(filter_expr)
+         # Note that the query we're building is not the same as self,
+         # but we still want to be able to reference fields from the original

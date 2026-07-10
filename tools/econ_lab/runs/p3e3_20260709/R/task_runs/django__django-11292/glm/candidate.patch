@@ -1,0 +1,33 @@
+diff --git a/django/core/management/base.py b/django/core/management/base.py
+index xxxxxxx..xxxxxxx 100644
+--- a/django/core/management/base.py
++++ b/django/core/management/base.py
+@@ -180,6 +180,7 @@ class BaseCommand:
+         '--version', action='store_true', dest='version',
+         help='Show program's version number and exit.',
+     )
++    skip_checks = make_option('--skip-checks', action='store_true', dest='skip_checks', help='Skip system checks.')
+ 
+     def __init__(self, stdout=None, stderr=None, no_color=False):
+         self.stdout = OutputWrapper(stdout or sys.stdout, self.style)
+diff --git a/django/core/management/__init__.py b/django/core/management/__init__.py
+index xxxxxxx..xxxxxxx 100644
+--- a/django/core/management/__init__.py
++++ b/django/core/management/__init__.py
+@@ -9,6 +9,7 @@ from django.core.management.commands.makemigrations import Command as Makemigratio
+ from django.core.management.commands.makemessages import Command as Makemessages
+ from django.core.management.commands.migrate import Command as Migrate
+ from django.core.management.commands.runserver import Command as Runserver
++from django.core.management.base import BaseCommand
+ from django.core.management.color import no_style, color_style
+ from django.core.management.sql import sql ",", custom ", tablespace ", sql_connections ","
+ from django.db import (DEFAULT_DB_ALIAS, connections, router, transaction)
+@@ -62,6 +63,7 @@ def call_command(command_name, *args, **kwargs):
+     """
+     parser = command.create_parser('manage.py', command_name)
+     cmd = command(stdout=stdout, stderr=stderr, no_color=no_color)
++    cmd.skip_checks = kwargs.get('skip_checks', False)
+     options, args = parser.parse_args(list(args) + [arg for kwarg in kwargs.values() if kwarg is not None])
+     # Raise an error if the command wasn't found.
+     if options is None:
+     # Move positional arguments out of the options dictionary.

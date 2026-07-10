@@ -1,0 +1,53 @@
+diff --git a/xarray/core/coordinates.py b/xarray/core/coordinates.py
+index 88161e5..1a8b9e6 100644
+--- a/xarray/core/coordinates.py
++++ b/xarray/core/coordinates.py
+@@ -16,7 +16,7 @@ from . import (
+     dtypes,
+     formatting,
+     ops,
+-    utils,
++    utils as xarray_utils,
+ )
+ from . import duck_array_ops
+ from .alignment import align
+@@ -356,10 +356,10 @@ class Coordinates:
+                 key = item
+             elif isinstance(item, tuple):
+                 key, index = item
+-                return xarray._get_nested_dict(self._dims, key, index)
++                return xarray_utils._get_nested_dict(self._dims, key, index)
+             else:
+-                return xarray._get_nested_dict(self._dims, item)
+-        return xarray._get_nested_dict(self._dims)
++                return xarray_utils._get_nested_dict(self._dims, item)
++        return xarray_utils._get_nested_dict(self._dims)
+ 
+     def __setitem__(self, key, value):
+         if isinstance(key, tuple) and len(key) == 2:
+@@ -563,7 +563,7 @@ class Coordinates(
+         if not all(isinstance(dim, str) for dim in dims):
+             raise TypeError("dims must be strings")
+ 
+-        dims_in_coords = xarray._get_indexes_from_coords(self)
++        dims_in_coords = xarray_utils._get_indexes_from_coords(self)
+ 
+         if any(d not in self.dimensions for d in dims):
+             raise ValueError(f"all dimensions must be in {self.dimensions}")
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index 476d1e8..9b0c7e6 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -3440,8 +3440,8 @@ class Dataset(Mapping, DatasetCoordinates, DatasetFilters, Dataset reductions):
+         """
+         if isinstance(dim, dict):
+             return self.map(
+-                lambda ds: ds.swap_dims(dim, inplace=True).reset_coords(drop=True),
++                lambda ds: ds.swap_dims(dim, inplace=False).reset_coords(drop=True),
+                 dim.keys(),
+             )
+-        return super().swap_dims(dim, inplace=True).reset_coords(drop=True)
++        return super().swap_dims(dim, inplace=False).reset_coords(drop=True)
+ 
+     def pad_with_fill_value(self, pad_widths, fill_value=dtypes.NA):
+         """Pad arrays with specified fill values along the specified dimension.

@@ -1,0 +1,7 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -143,2 +143,2 @@ def _make_xunit_fixture(
+-    fixture.__name__ = "unittest_%s_fixture_%s" % (name, obj.__name__)
++    fixture.__name__ = "_unittest_%s_fixture_%s" % (name, obj.__name__)
+     return fixture

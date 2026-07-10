@@ -1,0 +1,176 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:e884e538e0435436d4271a7479b1194b155264081804d6bf9597c875c75730ef",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:eec8773e0014c58f1b6b81f3ce046e814d73d447f129058af2ee4ffaef7f01d6",
+    "price_signal_hash": "sha256:01e4d2470666472304bc37c792f5cb57d0f04e0b3bd2b2bf2596e46c870332b7",
+    "route_id": "scikit-learn__scikit-learn-14629::armC::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:090ccd32335ed0a255a9ac7104516f380e4ff9beb6fa3d1d71fe9278647abc38"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "sklearn/tests/test_multioutput.py::test_base_chain_crossval_fit_and_predict",
+          "sklearn/tests/test_multioutput.py::test_base_chain_fit_and_predict",
+          "sklearn/tests/test_multioutput.py::test_classifier_chain_vs_independent_models",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classes_[estimator1]",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classes_[estimator2]",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit_no_first_classes_exception",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit_parallelism",
+          "sklearn/tests/test_multioutput.py::test_multi_output_exceptions",
+          "sklearn/tests/test_multioutput.py::test_multi_output_predict_proba",
+          "sklearn/tests/test_multioutput.py::test_multi_target_regression",
+          "sklearn/tests/test_multioutput.py::test_multi_target_sample_weights_api",
+          "sklearn/tests/test_multioutput.py::test_multi_target_sparse_regression",
+          "sklearn/tests/test_multioutput.py::test_multiclass_multioutput_estimator_predict_proba"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [
+          "sklearn/tests/test_multioutput.py::test_base_chain_fit_and_predict_with_sparse_data_and_cv",
+          "sklearn/tests/test_multioutput.py::test_base_chain_random_order",
+          "sklearn/tests/test_multioutput.py::test_classifier_chain_fit_and_predict_with_linear_svc",
+          "sklearn/tests/test_multioutput.py::test_classifier_chain_fit_and_predict_with_sparse_data",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classes_[estimator0]",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classification",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit_sample_weights",
+          "sklearn/tests/test_multioutput.py::test_multi_output_classification_sample_weights",
+          "sklearn/tests/test_multioutput.py::test_multi_target_regression_one_target",
+          "sklearn/tests/test_multioutput.py::test_multi_target_regression_partial_fit",
+          "sklearn/tests/test_multioutput.py::test_multi_target_sample_weight_partial_fit",
+          "sklearn/tests/test_multioutput.py::test_multi_target_sample_weights",
+          "sklearn/tests/test_multioutput.py::test_multiclass_multioutput_estimator"
+        ],
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:090ccd32335ed0a255a9ac7104516f380e4ff9beb6fa3d1d71fe9278647abc38",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:e884e538e0435436d4271a7479b1194b155264081804d6bf9597c875c75730ef",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:6fc0d42f2b862a1518abad680c54b801ae086554420ec56541522f0f3e85a58b"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/Z/scoring/scikit-learn__scikit-learn-14629/kimi/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "scikit-learn__scikit-learn-14629"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-14629"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "scikit-learn__scikit-learn-14629"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/Z/scoring/scikit-learn__scikit-learn-14629/kimi/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-14629-kimi.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "sklearn/tests/test_multioutput.py::test_multi_output_classes_[estimator1]"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "sklearn/tests/test_multioutput.py::test_multi_target_regression",
+              "sklearn/tests/test_multioutput.py::test_multi_target_regression_partial_fit",
+              "sklearn/tests/test_multioutput.py::test_multi_target_regression_one_target",
+              "sklearn/tests/test_multioutput.py::test_multi_target_sparse_regression",
+              "sklearn/tests/test_multioutput.py::test_multi_target_sample_weights_api",
+              "sklearn/tests/test_multioutput.py::test_multi_target_sample_weight_partial_fit",
+              "sklearn/tests/test_multioutput.py::test_multi_target_sample_weights",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit_parallelism",
+              "sklearn/tests/test_multioutput.py::test_multi_output_predict_proba",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit_no_first_classes_exception",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classification",
+              "sklearn/tests/test_multioutput.py::test_multiclass_multioutput_estimator",
+              "sklearn/tests/test_multioutput.py::test_multiclass_multioutput_estimator_predict_proba",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classification_sample_weights",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classification_partial_fit_sample_weights",
+              "sklearn/tests/test_multioutput.py::test_multi_output_exceptions",
+              "sklearn/tests/test_multioutput.py::test_classifier_chain_fit_and_predict_with_linear_svc",
+              "sklearn/tests/test_multioutput.py::test_classifier_chain_fit_and_predict_with_sparse_data",
+              "sklearn/tests/test_multioutput.py::test_classifier_chain_vs_independent_models",
+              "sklearn/tests/test_multioutput.py::test_base_chain_fit_and_predict",
+              "sklearn/tests/test_multioutput.py::test_base_chain_fit_and_predict_with_sparse_data_and_cv",
+              "sklearn/tests/test_multioutput.py::test_base_chain_random_order",
+              "sklearn/tests/test_multioutput.py::test_base_chain_crossval_fit_and_predict",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classes_[estimator0]",
+              "sklearn/tests/test_multioutput.py::test_multi_output_classes_[estimator2]"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 651,
+        "candidate_patch_sha256": "sha256:0a2effaa4c39d7bd3fc70bd4ed953077357b81f934b2047e3be57d856e1e366a",
+        "instance_id": "scikit-learn__scikit-learn-14629",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 550913
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-14629",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "kimi",
+  "selected_route_id": "scikit-learn__scikit-learn-14629::armC::kimi",
+  "task_index": 32
+}

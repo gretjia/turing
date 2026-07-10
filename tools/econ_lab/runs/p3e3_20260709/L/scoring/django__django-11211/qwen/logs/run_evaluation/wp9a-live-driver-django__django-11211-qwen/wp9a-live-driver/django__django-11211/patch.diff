@@ -1,0 +1,71 @@
+diff --git a/django/contrib/contenttypes/fields.py b/django/contrib/contenttypes/fields.py
+index 000a1f1300..5172a1db0c 100644
+--- a/django/contrib/contenttypes/fields.py
++++ b/django/contrib/contenttypes/fields.py
+@@ -373,9 +373,12 @@ class GenericForeignKey:
+         # If the content type and object ID aren't None, then we have
+         # a GFK.
+         if self.content_type_field and self.object_id_field:
+-            content_type = getattr(instance, self.content_type_field)
+-            object_id = getattr(instance, self.object_id_field)
++            content_type = getattr(instance, self.content_type_field)
++            object_id = getattr(instance, self.object_id_field)
++            # Handle UUID primary keys by converting to string if needed
++            if content_type and object_id:
++                try:
++                    object_id = str(object_id)
+             if content_type and object_id:
+                 # We need to defer this import because it's only needed in
+                 # certain circumstances.
+@@ -386,7 +389,10 @@ class GenericForeignKey:
+             # If we're using an inherited model, we need to get the
+             # latest value of the foreign key.
+             if self.content_type_field and self.object_id_field:
+-                content_type = getattr(instance, self.content_type_field)
+-                object_id = getattr(instance, self.object_id_field)
++                content_type = getattr(instance, self.content_type_field)
++                object_id = getattr(instance, self.object_id_field)
++                # Handle UUID primary keys by converting to string if needed
++                if content_type and object_id:
++                    object_id = str(object_id)
+                 if content_type and object_id:
+                     # We need to defer this import because it's only needed in
+                     # certain circumstances.
+@@ -403,7 +409,10 @@ class GenericForeignKey:
+             # If we're using an inherited model, we need to get the
+             # latest value of the foreign key.
+             if self.content_type_field and self.object_id_field:
+-                content_type = getattr(instance, self.content_type_field)
+-                object_id = getattr(instance, self.object_id_field)
++                content_type = getattr(instance, self.content_type_field)
++                object_id = getattr(instance, self.object_id_field)
++                # Handle UUID primary keys by converting to string if needed
++                if content_type and object_id:
++                    object_id = str(object_id)
+                 if content_type and object_id:
+                     # We need to defer this import because it's only needed in
+                     # certain circumstances.
+@@ -421,7 +427,10 @@ class GenericForeignKey:
+             # special case for related managers to avoid a circular import
+             if self.content_type_field and self.object_id_field:
+                 content_type = getattr(instance, self.content_type_field)
+-                object_id = getattr(instance, self.object_id_field)
++                object_id = getattr(instance, self.object_id_field)
++                # Handle UUID primary keys by converting to string if needed
++                if content_type and object_id:
++                    object_id = str(object_id)
+                 if content_type and object_id:
+                     # We need to defer this import because it's only needed in
+                     # certain circumstances.
+@@ -442,7 +448,10 @@ class GenericForeignKey:
+             # special case for related managers to avoid a circular import
+             if self.content_type_field and self.object_id_field:
+                 content_type = getattr(instance, self.content_type_field)
+-                object_id = getattr(instance, self.object_id_field)
++                object_id = getattr(instance, self.object_id_field)
++                # Handle UUID primary keys by converting to string if needed
++                if content_type and object_id:
++                    object_id = str(object_id)
+                 if content_type and object_id:
+                     # We need to defer this import because it's only needed in
+                     # certain circumstances.

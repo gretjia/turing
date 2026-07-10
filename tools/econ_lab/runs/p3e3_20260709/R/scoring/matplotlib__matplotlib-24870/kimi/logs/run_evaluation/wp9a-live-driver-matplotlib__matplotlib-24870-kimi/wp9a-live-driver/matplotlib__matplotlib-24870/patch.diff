@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/contour.py b/lib/matplotlib/contour.py
+--- a/lib/matplotlib/contour.py
++++ b/lib/matplotlib/contour.py
+@@ -895,6 +895,9 @@ class QuadContourSet(ContourSet):
+         if args and self.levels is None:
+             self.levels = args[0]
+             args = args[1:]
++
++        if self.levels is None and z.dtype.kind == 'b':
++            self.levels = [0.5]
+ 
+         _mask = ma.getmask(z)
+         if _mask is not ma.nomask:

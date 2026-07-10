@@ -1,0 +1,14 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -...,.. +...,.. @@ class Documenter:
+                     annotations = self._get_annotations()
+                     for name, annotation in annotations.items():
+                         if name in typed_annotations:
+-                            formatted_annotation = restify(annotation)
++                            formatted_annotation = self._format_type_annotation(annotation)
+                             ...
+                     ...
+                     if return_annotation is not inspect.Parameter.empty:
+-                        ret_annotation = restify(return_annotation)
++                        ret_annotation = self._format_type_annotation(return_annotation)

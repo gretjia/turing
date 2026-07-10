@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 1234567..abcdefg 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -... +... @@
+             if self.align == "top":
+-                y = 0
++                y = height - child_height
+             elif self.align == "bottom":
+-                y = height - child_height
++                y = 0
+             elif self.align == "center":
+                 y = (height - child_height) / 2.

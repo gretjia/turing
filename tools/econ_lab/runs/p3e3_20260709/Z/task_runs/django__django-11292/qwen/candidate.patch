@@ -1,0 +1,69 @@
+diff --git a/django/core/management/base.py b/django/core/management/base.py
+index 1234567..89abcde 100644
+--- a/django/core/management/base.py
++++ b/django/core/management/base.py
+@@ -28,6 +28,7 @@ class Command(BaseCommand):
+     def __init__(self):
+         self.stderr = None
+         self.stdout = None
++        self.skip_checks = False
+ 
+     def run_from_argv(self, argv):
+         """
+@@ -40,6 +41,9 @@ class Command(BaseCommand):
+         parser = self.create_parser(argv[0], argv[1])
+         options = parser.parse_args(argv[2:])
+         cmd_options = vars(options)
++        # Set skip_checks option
++        if hasattr(options, 'skip_checks'):
++            self.skip_checks = options.skip_checks
+         # Move command name to the end of the options list
+         for key, value in cmd_options.items():
+             if key in self.option_list:
+@@ -80,6 +84,11 @@ class Command(BaseCommand):
+             return self.handle(*args, **options)
+ 
+     def create_parser(self, prog_name, subcommand):
++        """
++        Create an OptionParser instance for this command.
++        """
++        # The default parser without skip_checks option
++        parser = super().create_parser(prog_name, subcommand)
++
+         # Add skip_checks option to all commands
+         parser.add_argument(
+             '--skip-checks',
+             action='store_true',
+             help='Skip system checks.',
+         )
+         return parser
+ diff --git a/django/core/management/commands/check.py b/django/core/management/commands/check.py
+index abc1234..5678901 100644
+--- a/django/core/management/commands/check.py
++++ b/django/core/management/commands/check.py
+@@ -1,4 +1,5 @@
+ from django.core.management.base import BaseCommand
++from django.core.management import CommandError
+ 
+ 
+ class Command(BaseCommand):
+@@ -16,6 +17,9 @@ class Command(BaseCommand):
+ 
+     def handle(self, *args, **options):
+         if options.get('deploy'):
++            # If skip_checks is set, bypass the check
++            if self.skip_checks:
++                return
+             self.check(deploy=True, tags=options['tag'])
+         else:
+             # If skip_checks is set, bypass the check
+@@ -24,6 +27,9 @@ class Command(BaseCommand):
+             if options.get('fail_level') == 'ERROR':
+                 self.check(fail_level='ERROR', tags=options['tag'])
+         else:
++            # If skip_checks is set, bypass the check
++            if self.skip_checks:
++                return
+             self.check(tags=options['tag'])
+ 
+     def add_arguments(self, parser):

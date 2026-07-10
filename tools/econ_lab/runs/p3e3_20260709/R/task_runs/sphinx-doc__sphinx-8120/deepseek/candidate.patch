@@ -1,0 +1,30 @@
+diff --git a/sphinx/locale/__init__.py b/sphinx/locale/__init__.py
+index 8a14e5c..e24d6a8 100644
+--- a/sphinx/locale/__init__.py
++++ b/sphinx/locale/__init__.py
+@@ -80,6 +80,12 @@ def init_locale_dirs(localedirs: List[Optional[str]], language: str) -> List[Opt
+     return catalogs
+ 
+ 
++def _get_translator_has_translations(catalog: Any) -> bool:
++    """Check if a catalog has any non-empty translations for the given message."""
++    # if the catalog is None or has no messages, return False
++    return bool(catalog) and bool(catalog._catalog)
++
++
+ def set_message(domain: str, locale_dir: str, language: str) -> str:
+     """Set the message for the given domain and locale directory."""
+     if not language:
+@@ -93,7 +99,11 @@ def set_message(domain: str, locale_dir: str, language: str) -> str:
+         raise SphinxError(_('The locale directory %r, %r, or %r is not a directory')
+                           % (locale_dir, locale_utf8_dir, locale_dir_latin1))
+     try:
+-        _translators[domain] = gettext_module.translation(domain, localedir, [language])
++        t = gettext_module.translation(domain, localedir, [language])
++        if _get_translator_has_translations(t):
++            _translators[domain] = t
++        else:
++            _translators.setdefault(domain, gettext_module.NullTranslations())
+     except Exception:
+         # Race condition: someone has already removed the directory.
+         pass

@@ -1,0 +1,14 @@
+diff --git a/lib/matplotlib/contour.py b/lib/matplotlib/contour.py
+--- a/lib/matplotlib/contour.py
++++ b/lib/matplotlib/contour.py
+@@ -1230,6 +1230,10 @@ class QuadContourSet(ContourSet):
+         else:
+             raise TypeError("Too many arguments to %s; see help(%s)" %
+                             (fn, fn))
++
++        if self.levels is None and z.dtype == bool:
++            self.levels = [0.5]
++
+         x, y, z = self._update_xys(x, y, z)
+         _mask = ma.getmaskarray(z)
+         if not _mask.any():

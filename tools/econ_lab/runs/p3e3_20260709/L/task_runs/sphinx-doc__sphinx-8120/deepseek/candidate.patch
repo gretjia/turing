@@ -1,0 +1,12 @@
+diff --git a/sphinx/locale/__init__.py b/sphinx/locale/__init__.py
+--- a/sphinx/locale/__init__.py
++++ b/sphinx/locale/__init__.py
+@@ -XX,XX +XX,XX @@
+ 
+     for domain in catalog_files:
+         try:
+-            trans = gettext.translation(domain, localedir=[sphinx_locale_dir] + locale_dirs,
++            trans = gettext.translation(domain, localedir=locale_dirs + [sphinx_locale_dir],
+                                         languages=[language])
+         except IOError:
+             trans = NullTranslations()

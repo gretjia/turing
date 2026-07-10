@@ -1,0 +1,7 @@
+diff --git a/sklearn/cluster/optics_.py b/sklearn/cluster/optics_.py
+--- a/sklearn/cluster/optics_.py
++++ b/sklearn/cluster/optics_.py
+@@ -437,7 +437,7 @@
+     if min_samples <= 1:
+-        min_samples = max(2, min_samples * n_samples)
++        min_samples = int(round(max(2, min_samples * n_samples)))

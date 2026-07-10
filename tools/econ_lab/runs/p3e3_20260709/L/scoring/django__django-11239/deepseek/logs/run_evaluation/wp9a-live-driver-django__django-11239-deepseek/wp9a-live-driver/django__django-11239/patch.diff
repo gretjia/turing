@@ -1,0 +1,13 @@
+diff --git a/django/db/backends/postgresql/client.py b/django/db/backends/postgresql/client.py
+--- a/django/db/backends/postgresql/client.py
++++ b/django/db/backends/postgresql/client.py
+@@ -38,6 +38,10 @@ def settings_to_cmd_args_env(self):
+         if 'sslrootcert' in opt:
+             env['PGSSLROOTCERT'] = opt['sslrootcert']
++        if 'sslcert' in opt:
++            env['PGSSLCERT'] = opt['sslcert']
++        if 'sslkey' in opt:
++            env['PGSSLKEY'] = opt['sslkey']
+ 
+         args = [self.executable_name]
+         if self.parameters_name:

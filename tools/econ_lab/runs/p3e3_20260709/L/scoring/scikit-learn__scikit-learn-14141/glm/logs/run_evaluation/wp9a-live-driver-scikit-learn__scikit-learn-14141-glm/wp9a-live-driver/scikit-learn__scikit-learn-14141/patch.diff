@@ -1,0 +1,22 @@
+diff --git a/sklearn/utils/_show_versions.py b/sklearn/utils/_show_versions.py
+index 0e0c4e1..b3b7a3f 100644
+--- a/sklearn/utils/_show_versions.py
++++ b/sklearn/utils/_show_versions.py
+@@ -24,6 +24,7 @@ def show_versions():
+         ('numpy', np.__version__),
+         ('scipy', scipy.__version__),
+         ('Cython', Cython.__version__),
++        ('joblib', joblib.__version__),
+         ('Python', Python_version),
+     ]
+     # try importing libsvm_info
+@@ -66,6 +67,9 @@ def show_versions():
+         deps += [dep]
+ 
+     deps += [('sklearn', sklearn.__version__)]
++    if sklearn.__version__.split('.')[0] + '.' + sklearn.__version__.split('.')[1] > '0.20':
++        deps.append(('joblib', joblib.__version__))
++
+     deps_metadata = [("Dependency", "Version")]
+ 
+     for dep, version in deps:

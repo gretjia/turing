@@ -1,0 +1,12 @@
+diff --git a/sphinx/locale/__init__.py b/sphinx/locale/__init__.py
+--- a/sphinx/locale/__init__.py
++++ b/sphinx/locale/__init__.py
+@@ -198,7 +198,7 @@ def get_translation(catalog, namespace='general', locale_dirs=None):
+         return translation
+ 
+     locale_dirs = list(locale_dirs)
+-    locale_dirs.insert(0, os.path.join(package_dir, 'locale'))
++    locale_dirs.append(os.path.join(package_dir, 'locale'))
+ 
+     translation = None
+     for domain in (namespace, catalog):
