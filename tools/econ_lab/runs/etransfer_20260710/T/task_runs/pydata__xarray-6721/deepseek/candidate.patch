@@ -1,0 +1,53 @@
+diff --git a/xarray/core/common.py b/xarray/core/common.py
+index bf4f0b36..9c8ae5df 100644
+--- a/xarray/core/common.py
++++ b/xarray/core/common.py
+@@ -1809,10 +1809,14 @@ def get_chunksizes(variables):
+     # TODO: what if they are not from the same dataset? see
+     # https://github.com/pydata/xarray/issues/4320
+     chunks: dict[Any, tuple[int, ...]] = {}
++    from xarray.core.variable import Variable
++
+     for v in variables:
+-        if hasattr(v.data, "chunks"):
+-            for dim, c in v.chunksizes.items():
+-                if dim in chunks and c != chunks[dim]:
+-                    raise ValueError(
+-                        f"Variable '{v.name}' has chunks {c} for dimension '{dim}', "
+-                        f"but another variable has chunks {chunks[dim]}."
+-                    )
+-                chunks[dim] = c
++        if isinstance(v, Variable):
++            # Use .chunks property on Variable which can inspect encoding
++            # without loading data for certain backends (e.g., zarr).
++            if v.chunks is not None:
++                for dim, c in v.chunks.items():
++                    if dim in chunks and c != chunks[dim]:
++                        raise ValueError(
++                            f"Variable '{v.name}' has chunks {c} for dimension '{dim}', "
++                            f"but another variable has chunks {chunks[dim]}."
++                        )
++                    chunks[dim] = c
+     return chunks
+diff --git a/xarray/core/variable.py b/xarray/core/variable.py
+index 31cf1b5b..a8d7b0f5 100644
+--- a/xarray/core/variable.py
++++ b/xarray/core/variable.py
+@@ -329,7 +329,15 @@ class Variable(AbstractArray, Duplicated, NdimSizeLenMixin):
+     @data.setter
+     def data(self, data):
+         data = _possibly_convert_objects(data)
+-        self._data = as_compatible_data(data)
++        from xarray.backends.common import BackendArray
++        from xarray.core.indexing import ImplicitToExplicitIndexingWrapper
++
++        # Preserve backend arrays that already have chunk metadata (e.g., zarr)
++        if isinstance(data, BackendArray):
++            self._data = data
++        elif isinstance(data, ImplicitToExplicitIndexingWrapper) and isinstance(data.array, BackendArray):
++            self._data = data
++        else:
++            self._data = as_compatible_data(data)
+ 
+     def _as_array_or_item(self, data):
+         # TODO: remove this (replace with np.asarray) once these issues are fixed

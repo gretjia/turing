@@ -1,0 +1,14 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 7a43a1e2f..1a6e15baf 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -358,6 +358,9 @@ class Session(nodes.FSCollector):
+                         # always store a list in the cache, matchnodes expects it
+                         self._node_cache[col[0].fspath] = [col[0]]
+ 
++        # Don't collect __init__.py as a test file when it's only passed implicitly via directory recursion
++        if argpath.basename == "__init__.py":
++            return
+         # If it's a directory argument, recurse and look for any Subpackages.
+         # Let the Package collector deal with subnodes, don't collect here.
+         if argpath.check(dir=1):

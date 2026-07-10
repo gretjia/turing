@@ -1,0 +1,452 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:942889acd19cbcc24c6a053e0d9081aaf32ee1d654efa34e4f9d7cae2aa20c1a",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:5d436ae90a4e284939cdfd291ce5930a385b0abcd47a25f5ab75e0a0078260bd"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:f5921dea40e7252de8fec0639cd546a8583672bbab07c8d57f26790ad165c13c",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:a3a312e1d1275dff54f42fabd36038d2744871a922483a77d3ca8f1309be2dfd"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:89988aa9b6cd6df3013a562569d62728390bd6cfaa69684c9278a9d13682d597",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:1714fc8748bfe64c8b5b4d96fc7c9233f66cb5939461f0c98bf68e5cb2fe20f8"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armC",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "scikit-learn__scikit-learn-11578",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "sklearn/linear_model/tests/test_logistic.py::test_check_solver_option[LogisticRegressionCV]",
+      "sklearn/linear_model/tests/test_logistic.py::test_consistency_path",
+      "sklearn/linear_model/tests/test_logistic.py::test_dtype_match",
+      "sklearn/linear_model/tests/test_logistic.py::test_error",
+      "sklearn/linear_model/tests/test_logistic.py::test_inconsistent_input",
+      "sklearn/linear_model/tests/test_logistic.py::test_liblinear_logregcv_sparse",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_mock_scorer",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_multinomial_score[accuracy-multiclass_agg_list0]",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_multinomial_score[f1-multiclass_agg_list2]",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_multinomial_score[neg_log_loss-multiclass_agg_list3]",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_score_does_not_warn_by_default",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_grad_hess",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regression_multinomial",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regression_sample_weights",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regression_solvers",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regression_solvers_multiclass",
+      "sklearn/linear_model/tests/test_logistic.py::test_logreg_intercept_scaling",
+      "sklearn/linear_model/tests/test_logistic.py::test_logreg_intercept_scaling_zero",
+      "sklearn/linear_model/tests/test_logistic.py::test_logreg_l1_sparse_data",
+      "sklearn/linear_model/tests/test_logistic.py::test_logreg_predict_proba_multinomial",
+      "sklearn/linear_model/tests/test_logistic.py::test_lr_liblinear_warning",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_binary[sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_logistic_regression_string_inputs",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_validation[lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_validation[newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_validation[saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_n_iter[liblinear]",
+      "sklearn/linear_model/tests/test_logistic.py::test_n_iter[newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_n_iter[sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_n_iter[saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_nan",
+      "sklearn/linear_model/tests/test_logistic.py::test_ovr_multinomial_iris",
+      "sklearn/linear_model/tests/test_logistic.py::test_predict_2_classes",
+      "sklearn/linear_model/tests/test_logistic.py::test_predict_iris",
+      "sklearn/linear_model/tests/test_logistic.py::test_saga_sparse",
+      "sklearn/linear_model/tests/test_logistic.py::test_saga_vs_liblinear",
+      "sklearn/linear_model/tests/test_logistic.py::test_sparsify",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-False-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-False-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-False-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-True-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-True-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-False-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-False-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-True-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-True-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-False-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-False-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-True-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-True-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-True-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-False-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-False-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-True-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-True-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-True-saga]"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 37,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "sklearn/linear_model/tests/test_logistic.py::test_check_solver_option[LogisticRegression]",
+      "sklearn/linear_model/tests/test_logistic.py::test_intercept_logistic_helper",
+      "sklearn/linear_model/tests/test_logistic.py::test_liblinear_decision_function_zero",
+      "sklearn/linear_model/tests/test_logistic.py::test_liblinear_dual_random_state",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_multinomial_score[precision-multiclass_agg_list1]",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_multinomial_score[recall-multiclass_agg_list4]",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_cv_sparse",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_loss_and_grad",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regression_class_weights",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regression_path_convergence_fail",
+      "sklearn/linear_model/tests/test_logistic.py::test_logistic_regressioncv_class_weights",
+      "sklearn/linear_model/tests/test_logistic.py::test_logreg_cv_penalty",
+      "sklearn/linear_model/tests/test_logistic.py::test_logreg_l1",
+      "sklearn/linear_model/tests/test_logistic.py::test_max_iter",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_binary[lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_binary[newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_binary[saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_binary_probabilities",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_grad_hess",
+      "sklearn/linear_model/tests/test_logistic.py::test_multinomial_validation[sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_n_iter[lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_predict_3_classes",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-False-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-True-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-False-True-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-False-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-False-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-True-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[multinomial-True-True-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-False-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-False-saga]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-False-True-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-False-lbfgs]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-False-newton-cg]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start[ovr-True-True-sag]",
+      "sklearn/linear_model/tests/test_logistic.py::test_warm_start_converge_LR",
+      "sklearn/linear_model/tests/test_logistic.py::test_write_parameters"
+    ],
+    "verify_total_count": 37,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 25,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2557038745",
+      "s": 14,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:loop": {
+      "n": 13,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2352005900",
+      "s": 7,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:self_check": {
+      "n": 18,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2108498932",
+      "s": 8,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 24,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2487521603",
+      "s": 13,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:loop": {
+      "n": 12,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2202547331",
+      "s": 6,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:self_check": {
+      "n": 17,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1987028467",
+      "s": 7,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/scikit-learn__scikit-learn-11578/deepseek/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-11578-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "HELDOUT",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:06114d3a96fe56134d41cb49a6474d6f3a8f00e0d2d648a7b17540b0216732ea",
+        "price_signal_hash": "sha256:5e2e51307558cdd718739f6f0ac25b73b064e50a6e65ac5d0550ed2fae350913",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 17,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1987028467",
+          "s": 7,
+          "s_q32": "33619028766",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 17,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2064385883",
+          "s": 8,
+          "s_q32": "35011462260",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 22,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1925754044",
+          "s": 9,
+          "s_q32": "42144859368",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2202547331",
+          "s": 6,
+          "s_q32": "26485631658",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 24,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2487521603",
+          "s": 13,
+          "s_q32": "60040556434",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:0c66a920c7991bcf1c0fbde0f03268678c13437cbe194ca122f8847e9b343563",
+        "price_signal_hash": "sha256:5e2e51307558cdd718739f6f0ac25b73b064e50a6e65ac5d0550ed2fae350913",
+        "route_id": "loop",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 17,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1987028467",
+          "s": 7,
+          "s_q32": "33619028766",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 17,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2064385883",
+          "s": 8,
+          "s_q32": "35011462260",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 22,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1925754044",
+          "s": 9,
+          "s_q32": "42144859368",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2202547331",
+          "s": 6,
+          "s_q32": "26485631658",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 24,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2487521603",
+          "s": 13,
+          "s_q32": "60040556434",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "loop",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:8e105ab6abe633d8dd0e43dd1060a9e8eac3d212d2a0e7c0c4c05ec75789ad57",
+        "price_signal_hash": "sha256:5e2e51307558cdd718739f6f0ac25b73b064e50a6e65ac5d0550ed2fae350913",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 17,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1987028467",
+          "s": 7,
+          "s_q32": "33619028766",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 17,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2064385883",
+          "s": 8,
+          "s_q32": "35011462260",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 22,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1925754044",
+          "s": 9,
+          "s_q32": "42144859368",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2202547331",
+          "s": 6,
+          "s_q32": "26485631658",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 24,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2487521603",
+          "s": 13,
+          "s_q32": "60040556434",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "loop",
+    "verify": "self_check"
+  },
+  "task_index": 48,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/scikit-learn__scikit-learn-11578/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

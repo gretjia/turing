@@ -1,0 +1,297 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [],
+  "credit_events_count": 0,
+  "dispatch_arm": "armC",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "astropy__astropy-13579",
+  "lineage": "deepseek",
+  "live_split_verdict": null,
+  "nodes_after": {
+    "context:source_context": {
+      "n": 13,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2317144152",
+      "s": 7,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 12,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2109940227",
+      "s": 5,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 12,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1779558127",
+      "s": 4,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 13,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2317144152",
+      "s": 7,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 12,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2109940227",
+      "s": 5,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 12,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1779558127",
+      "s": 4,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "deepseek_direct_fallback",
+  "scoring_report_paths": [],
+  "scoring_status": "SKIPPED_NO_PATCH",
+  "settlement_verdict_resolved": null,
+  "side": "HELDOUT",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:24eb050df34177598c4ba09bb16413a3fc5f0cec7e38eeb668f9407ea609ed39",
+        "price_signal_hash": "sha256:ded121aa0098841d02e0c8b5a8d6ffebacbaa490bb637ed811ebed9239e26c32",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1779558127",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 7,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2109940227",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1533916891",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 7,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1968526677",
+          "s": 3,
+          "s_q32": "13600729770",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 13,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2317144152",
+          "s": 7,
+          "s_q32": "30292534488",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:77cec160a7998a9864cb0637e867d032c1171281b824a84a422479b90d90bcb3",
+        "price_signal_hash": "sha256:ded121aa0098841d02e0c8b5a8d6ffebacbaa490bb637ed811ebed9239e26c32",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1779558127",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 7,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2109940227",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1533916891",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 7,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1968526677",
+          "s": 3,
+          "s_q32": "13600729770",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 13,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2317144152",
+          "s": 7,
+          "s_q32": "30292534488",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:1721f097755cb845b6ad0c05a983911d2b8eec6aa7b2fdda54b4a01699597985",
+        "price_signal_hash": "sha256:ded121aa0098841d02e0c8b5a8d6ffebacbaa490bb637ed811ebed9239e26c32",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1779558127",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 7,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 12,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2109940227",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1533916891",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 7,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1968526677",
+          "s": 3,
+          "s_q32": "13600729770",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 13,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2317144152",
+          "s": 7,
+          "s_q32": "30292534488",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "self_check"
+  },
+  "task_index": 28,
+  "verify_pass_fraction": null,
+  "verify_verdict_for_credit": null,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [],
+  "worker_result_status": "ERROR"
+}

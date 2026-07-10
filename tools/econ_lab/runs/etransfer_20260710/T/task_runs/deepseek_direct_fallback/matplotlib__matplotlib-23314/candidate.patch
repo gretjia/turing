@@ -1,0 +1,27 @@
+diff --git a/lib/mpl_toolkits/mplot3d/axes3d.py b/lib/mpl_toolkits/mplot3d/axes3d.py
+index 00000000..11111111 100644
+--- a/lib/mpl_toolkits/mplot3d/axes3d.py
++++ b/lib/mpl_toolkits/mplot3d/axes3d.py
+@@ -334,6 +334,9 @@ class Axes3D(Axes):
+         self.mouse_init()
+         self.figure.add_axes(self)
+ 
++        # Override set_visible to also update child artists
++        self.set_visible = self._set_visible
++
+         if self._sharez is not None:
+             self.tz = self._sharez.tz
+             self._sharez = None
+@@ -341,6 +344,12 @@ class Axes3D(Axes):
+         if self._shareview is not None:
+             self._shareview._shared_axes["z"].join(self, self._shareview)
+ 
++    def _set_visible(self, b):
++        super().set_visible(b)
++        for child in self.get_children():
++            child.set_visible(b)
++        self.stale = True
++
+     def set_proj_type(self, proj_type, focal_length=None):
+         """
+         Set the projection type.

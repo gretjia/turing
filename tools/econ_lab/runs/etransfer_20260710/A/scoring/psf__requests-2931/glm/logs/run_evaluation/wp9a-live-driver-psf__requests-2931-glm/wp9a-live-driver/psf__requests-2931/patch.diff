@@ -1,0 +1,22 @@
+diff --git a/requests/models.py b/requests/models.py
+index 5f7a3a7..ed12345 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -502,7 +502,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+                         rf.make_multipart(content_type=ft)
+                         new_fields.append(rf)
+ 
+-        body, content_type = encode_multipart_formdata(new_fields)
++        body, content_type = encode_multipart_formdata(new_fields) if new_fields else (None, None)
+ 
+         return body, content_type
+ 
+@@ -605,7 +605,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+             # Multi-part file uploads.
+             if files:
+                 (body, content_type) = self._encode_files(files, data)
+-            else:
++            elif data:
+                 if data:
+                     body = self._encode_params(data)
+                     if isinstance(data, basestring) or hasattr(data, 'read'):

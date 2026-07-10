@@ -1,0 +1,105 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:global:scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:107d2ebc9f939859606d4573aa459397b4fbd8b77a80454cae9b1a1c98b35e7a",
+    "price_signal_hash": "sha256:75848ef13cbe3ad8995f5e37a2274d8584e7317061deafa1ac516099059e1c1f",
+    "route_id": "astropy__astropy-14096::armC::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:d7da21e4f9741686c81eb8a2f1cbe5e49a2cbcb022a729833872dc46315f4057",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:d7da21e4f9741686c81eb8a2f1cbe5e49a2cbcb022a729833872dc46315f4057",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "global",
+          "route_scaffold": "scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:25a52cd63069cca2c2ce9938f9f62c3473bec219b333c9ed189d281d4acb76e7"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/astropy__astropy-14096/qwen/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "astropy__astropy-14096"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "astropy__astropy-14096"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/astropy__astropy-14096/qwen/wp9a-live-driver.wp9a-live-driver-astropy__astropy-14096-qwen.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 2437,
+        "candidate_patch_sha256": "sha256:972b25c4b4ea7ec59353a8a97b7f518f783f298f414d42d141efa3b640a9ff8f",
+        "instance_id": "astropy__astropy-14096",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 17438
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "global",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "astropy__astropy-14096",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "qwen",
+  "selected_route_id": "astropy__astropy-14096::armC::qwen",
+  "task_index": 25
+}

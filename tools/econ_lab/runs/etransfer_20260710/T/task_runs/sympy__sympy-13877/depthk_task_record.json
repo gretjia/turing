@@ -1,0 +1,356 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:c6e4501f64be0a6a2601f35d341cafea25770b7930942bffd1ed29b1202a7f40",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "0",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:c8ff0ea992a536cfe68349c96e0b592829f8a759df36542c73719e496fa266f2"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:1a909d5d22349b8beaf96224083b9c3b5fe7f0c22fe18f029c8f3f78a43b9719",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "0",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:9f018a1b5cc82ebd37d1a9186640b0626e9853a485a6b6dbd04982e3d04354bc"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:b1efc0a3439d3f10cc10cab7c448c1496af0102c5fd013897efc4263d2ef1ead",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "0",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:5d16b63fcfda046e5cf5751dcf780a8cad01e71072da172efdd570b3278ab29d"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armB",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "sympy__sympy-13877",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [],
+    "accept_verdict": false,
+    "canary": false,
+    "harness_error_reason": "patch_apply_failed",
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 0,
+    "verify_pass_fraction": 0.0,
+    "verify_test_ids": [],
+    "verify_total_count": 0,
+    "verify_verdict": false
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 12,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2495386010",
+      "s": 7,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 11,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2285768579",
+      "s": 5,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:none": {
+      "n": 7,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2505397589",
+      "s": 4,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 11,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2703334844",
+      "s": 7,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 10,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2493565723",
+      "s": 5,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:none": {
+      "n": 6,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2863311530",
+      "s": 4,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/sympy__sympy-13877/deepseek/wp9a-live-driver.wp9a-live-driver-sympy__sympy-13877-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": false,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:f8be56dd5e0eb21133cd32c3f288198791d46113998539a0b232439838dae1b9",
+        "price_signal_hash": "sha256:62cffcb5bff2974e671865a3160af17b79a7b7134d425258fbd6c9cde920e5b9",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2103114151",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2863311530",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2493565723",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1789569706",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2249744774",
+          "s": 3,
+          "s_q32": "13600729770",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 11,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2703334844",
+          "s": 7,
+          "s_q32": "30292534488",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:02efe9755f9b95b2df128b5e4e26d42d56a206a81d128c51a6869d88be909204",
+        "price_signal_hash": "sha256:62cffcb5bff2974e671865a3160af17b79a7b7134d425258fbd6c9cde920e5b9",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2103114151",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2863311530",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2493565723",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1789569706",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2249744774",
+          "s": 3,
+          "s_q32": "13600729770",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 11,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2703334844",
+          "s": 7,
+          "s_q32": "30292534488",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:f8bf798fa68ad0f841428ded87c83009e92e3a6c3b597f5342dd097e4aeaa810",
+        "price_signal_hash": "sha256:62cffcb5bff2974e671865a3160af17b79a7b7134d425258fbd6c9cde920e5b9",
+        "route_id": "none",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2103114151",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2863311530",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2493565723",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1789569706",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2249744774",
+          "s": 3,
+          "s_q32": "13600729770",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 11,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2703334844",
+          "s": 7,
+          "s_q32": "30292534488",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "none",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "none"
+  },
+  "task_index": 24,
+  "verify_pass_fraction": 0.0,
+  "verify_verdict_for_credit": false,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/sympy__sympy-13877/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

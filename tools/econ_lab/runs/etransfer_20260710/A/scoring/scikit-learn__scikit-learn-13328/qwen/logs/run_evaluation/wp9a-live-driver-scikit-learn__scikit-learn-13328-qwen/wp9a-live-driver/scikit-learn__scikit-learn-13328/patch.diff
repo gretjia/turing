@@ -1,0 +1,15 @@
+diff --git a/sklearn/linear_model/huber.py b/sklearn/linear_model/huber.py
+index 695b03352..82eb4355d 100644
+--- a/sklearn/linear_model/huber.py
++++ b/sklearn/linear_model/huber.py
+@@ -86,6 +86,10 @@ def _huber_loss_and_gradient(w, X, y, epsilon, alpha, sample_weight):
+     # Compute the number of non-outliers.
+     n_non_outliers = outliers_mask.shape[0] - np.sum(outliers_mask)
+ 
++    # Ensure X is float for numerical stability
++    if X.dtype != np.float64:
++        X = X.astype(np.float64)
++
+     # Gradient due to the squared loss.
+     X_non_outliers = -axis0_safe_slice(X, ~outliers_mask, n_non_outliers)
+     grad[:n_features] = (

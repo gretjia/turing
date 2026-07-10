@@ -1,0 +1,64 @@
+diff --git a/sphinx/io.py b/sphinx/io.py
+index 36091aef27..e007601d73 100644
+--- a/sphinx/io.py
++++ b/sphinx/io.py
+@@ -65,7 +65,7 @@ class SphinxStandaloneReader(SphinxBaseReader):
+ 
+     def read_source(self, env: BuildEnvironment) -> str:
+         """Read content from source and do post-process."""
+-        content = self.source.read()
++        content = self.source.read()
+ 
+         # emit "source-read" event
+         arg = [content]
+@@ -73,6 +73,10 @@ class SphinxStandaloneReader(SphinxBaseReader):
+         return arg[0]
+ 
+ 
++class IncludeAwareReader(SphinxStandaloneReader):
++    """A reader that properly handles include directives during source-read events."""
++
++    def read_source(self, env: BuildEnvironment) -> str:
++        content = self.source.read()
++        # emit "source-read" event for included files too
++        arg = [content]
++        env.events.emit('source-read', env.docname, arg)
++        return arg[0]
++
++
+ class SphinxI18nReader(SphinxBaseReader):
+     """
+     A document reader for i18n.
+@@ -105,7 +108,10 @@ def create_publisher(app: Sphinx, filetype: str) -> Publisher:
+     parser = app.registry.create_source_parser(app, filetype)
+     if parser.__class__.__name__ == 'CommonMarkParser' and parser.settings_spec == ():
+         # a workaround for recommonmark
+-        #   If recommonmark.AutoStrictify is enabled, the parser invokes reST parser
++        #   If recommonmark.AutoStrictify is enabled, the parser invokes reST parser
+         #   internally.  But recommonmark-0.4.0 does not provide settings_spec for reST
+         #   parser.  As a workaround, this copies settings_spec for RSTParser to the
+         #   CommonMarkParser.
+@@ -117,12 +123,16 @@ def create_publisher(app: Sphinx, filetype: str) -> Publisher:
+     pub = Publisher(
+         reader=reader,
+         parser=parser,
+-        writer=SphinxDummyWriter(),
+-        source_class=SphinxFileInput,
+-        destination=NullOutput(),
++        writer=SphinxDummyWriter(),
++        source_class=SphinxFileInput,
++        destination=NullOutput(),
+     )
++
++    # For inclusion handling, use IncludeAwareReader instead of SphinxStandaloneReader
++    if hasattr(reader, '_app') and hasattr(reader._app.env, 'docname'):
++        reader.__class__ = IncludeAwareReader
++
+     # Propagate exceptions by default when used programmatically:
+     defaults = {"traceback": True, **app.env.settings}
+     # Set default settings
++    if docutils.__version_info__[:2] >= (0, 19):
++        pub.get_settings(**defaults)
++    else:
++        pub.settings = pub.setup_option_parser(**defaults).get_default_values()
++    return pub

@@ -1,0 +1,12 @@
+diff --git a/sklearn/preprocessing/_discretization.py b/sklearn/preprocessing/_discretization.py
+index 2c4a75ef4..bf5f6c57d 100644
+--- a/sklearn/preprocessing/_discretization.py
++++ b/sklearn/preprocessing/_discretization.py
+@@ -238,6 +238,7 @@ class KBinsDiscretizer(BaseEstimator, TransformerMixin):
+                     % self.strategy)
+ 
+         self.bin_edges_ = bin_edges
++        self.bin_edges_ = [np.sort(edge) for edge in self.bin_edges_]
+         self.n_bins_ = self.bin_edges_[0].size - 1
+ 
+         return self

@@ -1,0 +1,431 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:5fd9690f3ee0b2bc4fcd330564a90e54f24a324cabc9a7f90a244c90ee3696c5",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:c6c009512e0966b3c37eed56de5e0f58c004769b2d45178123b5155bb0766b27"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:e02ea5739d6950693f16454b58c76d64ddfcea9f8d2d8d2f4bdbb7dae8e75d72",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:4f26bc711e422cd5dd022ceef99bfac7ddd9cdb5ecd00c326c2513b1658153c1"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:9d9c960fd01e738419aa2e068fe35c4947c76444fbdcaf066032a116af306ff2",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:ab982ab276066fd7a09f53d5cd2af2fcd8082d20b09bf1155a1f1aed29c31b49"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armC",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "pytest-dev__pytest-6202",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "testing/test_collection.py::TestCollectFS::test__in_venv[activate.csh]",
+      "testing/test_collection.py::TestCollectFS::test__in_venv[activate]",
+      "testing/test_collection.py::TestCollectFS::test_custom_norecursedirs",
+      "testing/test_collection.py::TestCollectFS::test_ignored_certain_directories",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs[Activate.bat]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs[activate.csh]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs[activate]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs_norecursedirs_precedence[Activate.bat]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs_norecursedirs_precedence[Activate]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs_norecursedirs_precedence[activate.csh]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs_norecursedirs_precedence[activate.fish]",
+      "testing/test_collection.py::TestCollectFS::test_testpaths_ini",
+      "testing/test_collection.py::TestCollectPluginHookRelay::test_pytest_collect_file",
+      "testing/test_collection.py::TestCollector::test_check_equality",
+      "testing/test_collection.py::TestCollector::test_getcustomfile_roundtrip",
+      "testing/test_collection.py::TestCustomConftests::test_collectignore_exclude_on_option",
+      "testing/test_collection.py::TestCustomConftests::test_ignore_collect_path",
+      "testing/test_collection.py::TestCustomConftests::test_pytest_fs_collect_hooks_are_seen",
+      "testing/test_collection.py::TestNodekeywords::test_issue345",
+      "testing/test_collection.py::TestPrunetraceback::test_custom_repr_failure",
+      "testing/test_collection.py::TestSession::test_collect_protocol_method",
+      "testing/test_collection.py::TestSession::test_collect_subdir_event_ordering",
+      "testing/test_collection.py::TestSession::test_collect_topdir",
+      "testing/test_collection.py::TestSession::test_find_byid_without_instance_parents",
+      "testing/test_collection.py::TestSession::test_serialization_byid",
+      "testing/test_collection.py::Test_genitems::test_class_and_functions_discovery_using_glob",
+      "testing/test_collection.py::Test_getinitialnodes::test_pkgfile",
+      "testing/test_collection.py::test_collect_handles_raising_on_dunder_class",
+      "testing/test_collection.py::test_collect_init_tests",
+      "testing/test_collection.py::test_collect_pkg_init_and_file_in_args",
+      "testing/test_collection.py::test_collect_sub_with_symlinks[False]",
+      "testing/test_collection.py::test_collect_symlink_out_of_tree",
+      "testing/test_collection.py::test_collect_with_chdir_during_import",
+      "testing/test_collection.py::test_collectignore_via_conftest",
+      "testing/test_collection.py::test_collector_respects_tbstyle",
+      "testing/test_collection.py::test_continue_on_collection_errors_maxfail",
+      "testing/test_collection.py::test_does_not_eagerly_collect_packages",
+      "testing/test_collection.py::test_does_not_put_src_on_path",
+      "testing/test_collection.py::test_exit_on_collection_error"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 34,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "testing/test_collection.py::TestCollectFS::test__in_venv[Activate.bat]",
+      "testing/test_collection.py::TestCollectFS::test__in_venv[Activate.ps1]",
+      "testing/test_collection.py::TestCollectFS::test__in_venv[Activate]",
+      "testing/test_collection.py::TestCollectFS::test__in_venv[activate.fish]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs[Activate.ps1]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs[Activate]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs[activate.fish]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs_norecursedirs_precedence[Activate.ps1]",
+      "testing/test_collection.py::TestCollectFS::test_ignored_virtualenvs_norecursedirs_precedence[activate]",
+      "testing/test_collection.py::TestCollectPluginHookRelay::test_pytest_collect_directory",
+      "testing/test_collection.py::TestCollector::test_can_skip_class_with_test_attr",
+      "testing/test_collection.py::TestCollector::test_collect_versus_item",
+      "testing/test_collection.py::TestCollector::test_getparent",
+      "testing/test_collection.py::TestCustomConftests::test_collectignoreglob_exclude_on_option",
+      "testing/test_collection.py::TestCustomConftests::test_ignore_collect_not_called_on_argument",
+      "testing/test_collection.py::TestCustomConftests::test_pytest_collect_file_from_sister_dir",
+      "testing/test_collection.py::TestNodekeywords::test_no_under",
+      "testing/test_collection.py::TestSession::test_collect_custom_nodes_multi_id",
+      "testing/test_collection.py::TestSession::test_collect_protocol_single_function",
+      "testing/test_collection.py::TestSession::test_collect_two_commandline_args",
+      "testing/test_collection.py::TestSession::test_parsearg",
+      "testing/test_collection.py::Test_genitems::test_check_collect_hashes",
+      "testing/test_collection.py::Test_genitems::test_example_items1",
+      "testing/test_collection.py::Test_getinitialnodes::test_global_file",
+      "testing/test_collection.py::test_collect_invalid_signature_message",
+      "testing/test_collection.py::test_collect_pkg_init_only",
+      "testing/test_collection.py::test_collect_pyargs_with_testpaths",
+      "testing/test_collection.py::test_collect_sub_with_symlinks[True]",
+      "testing/test_collection.py::test_collect_symlink_file_arg",
+      "testing/test_collection.py::test_continue_on_collection_errors",
+      "testing/test_collection.py::test_exit_on_collection_with_maxfail_bigger_than_n_errors",
+      "testing/test_collection.py::test_exit_on_collection_with_maxfail_smaller_than_n_errors",
+      "testing/test_collection.py::test_fixture_scope_sibling_conftests",
+      "testing/test_collection.py::test_matchnodes_two_collections_same_file"
+    ],
+    "verify_total_count": 34,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 20,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2158329524",
+      "s": 10,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 19,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1586209512",
+      "s": 6,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 15,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1714326434",
+      "s": 5,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 19,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2051497636",
+      "s": 9,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 18,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1443643313",
+      "s": 5,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 14,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1542283710",
+      "s": 4,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/pytest-dev__pytest-6202/deepseek/wp9a-live-driver.wp9a-live-driver-pytest-dev__pytest-6202-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "HELDOUT",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:d1b97dacd99427b957e23b30962c0d6bb16ecdc9ecfc4506923c3d8c0f5ab13a",
+        "price_signal_hash": "sha256:60abdacd606c048b93629750db9d72f0b18dc419f8b335ee4e04f03c7dda750f",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1542283710",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 15,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1789569706",
+          "s": 6,
+          "s_q32": "26485631658",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1443643313",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 11,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2028179000",
+          "s": 5,
+          "s_q32": "22190664362",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 19,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2051497636",
+          "s": 9,
+          "s_q32": "38882469080",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:708afcebbd90aab467270a5c3660e7df36278f01a4e6b7fca62f12d5e6f474c3",
+        "price_signal_hash": "sha256:60abdacd606c048b93629750db9d72f0b18dc419f8b335ee4e04f03c7dda750f",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1542283710",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 15,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1789569706",
+          "s": 6,
+          "s_q32": "26485631658",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1443643313",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 11,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2028179000",
+          "s": 5,
+          "s_q32": "22190664362",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 19,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2051497636",
+          "s": 9,
+          "s_q32": "38882469080",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:28f4789f2cac37df2b0ea7b190c63175b977baf671aeb0d38290ccdcf5979723",
+        "price_signal_hash": "sha256:60abdacd606c048b93629750db9d72f0b18dc419f8b335ee4e04f03c7dda750f",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1542283710",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 15,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1789569706",
+          "s": 6,
+          "s_q32": "26485631658",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1443643313",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 11,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2028179000",
+          "s": 5,
+          "s_q32": "22190664362",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 19,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2051497636",
+          "s": 9,
+          "s_q32": "38882469080",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "self_check"
+  },
+  "task_index": 42,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/pytest-dev__pytest-6202/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

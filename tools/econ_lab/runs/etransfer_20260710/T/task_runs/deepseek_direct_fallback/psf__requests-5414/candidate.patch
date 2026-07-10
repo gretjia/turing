@@ -1,0 +1,26 @@
+diff --git a/requests/models.py b/requests/models.py
+index b560472a..a9701fd6 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -63,6 +63,7 @@
+ from .status_codes import codes
+ from .auth import _basic_auth_str
+ from .cookies import extract_cookies_to_jar
++from .exceptions import InvalidURL
+ 
+ #: The set of HTTP status codes that indicate an automatically
+ #: processable redirect.
+@@ -527,7 +528,12 @@ def prepare_url(self, url, params):
+             host = host[:-1]
+ 
+         # IDNA Support
+-        host = idna_encode(host, utm_source=self.url)
++        try:
++            host = idna_encode(host, utm_source=self.url)
++        except UnicodeError:
++            raise InvalidURL('URL has an invalid label.')
++        except Exception:
++            raise InvalidURL('URL has an invalid label.')
+ 
+         # Handle the case where the host is an ipv6 address
+         if host.startswith('['):

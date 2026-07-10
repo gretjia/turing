@@ -1,0 +1,327 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:3b8be1b32867e296e06247871b27a45df3a3af0bffb20f8b6d1cddeb433c651d",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:728f5b85cd2698c63540e3e7e97f2572dc8fd2efa5ffb4b8f2494972c41d9310"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:bb0646d28b66e74ec951deb8d95853f18f9b46088158e6317983cda01992586b",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:e0b4b6570207d42b47db048f66d69fdb4d1d01cd01bb47c345008fb78ab6e80c"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:b06dcba15b0df71362c4a16bcc55f45b29fae03d339168c5f1e7d35a6260c757",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:9e750b3f493c229f55efadb6e6ff117de648299cf0dea5be441ed723e45ce303"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armC",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "django__django-11099",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "test_ascii_validator (auth_tests.test_validators.UsernameValidatorsTests)",
+      "test_help_text (auth_tests.test_validators.MinimumLengthValidatorTest)",
+      "test_password_validators_help_text_html (auth_tests.test_validators.PasswordValidationTest)",
+      "test_password_validators_help_text_html_escaping (auth_tests.test_validators.PasswordValidationTest)",
+      "test_unicode_validator (auth_tests.test_validators.UsernameValidatorsTests)",
+      "test_validate (auth_tests.test_validators.CommonPasswordValidatorTest)",
+      "test_validate (auth_tests.test_validators.MinimumLengthValidatorTest)",
+      "test_validate (auth_tests.test_validators.NumericPasswordValidatorTest)",
+      "test_validate (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)",
+      "test_validate_custom_list (auth_tests.test_validators.CommonPasswordValidatorTest)",
+      "test_validate_django_supplied_file (auth_tests.test_validators.CommonPasswordValidatorTest)",
+      "test_validate_password (auth_tests.test_validators.PasswordValidationTest)"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 10,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "test_empty_password_validator_help_text_html (auth_tests.test_validators.PasswordValidationTest)",
+      "test_get_default_password_validators (auth_tests.test_validators.PasswordValidationTest)",
+      "test_get_password_validators_custom (auth_tests.test_validators.PasswordValidationTest)",
+      "test_help_text (auth_tests.test_validators.CommonPasswordValidatorTest)",
+      "test_help_text (auth_tests.test_validators.NumericPasswordValidatorTest)",
+      "test_help_text (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)",
+      "test_password_changed (auth_tests.test_validators.PasswordValidationTest)",
+      "test_password_changed_with_custom_validator (auth_tests.test_validators.PasswordValidationTest)",
+      "test_password_validators_help_texts (auth_tests.test_validators.PasswordValidationTest)",
+      "test_validate_property (auth_tests.test_validators.UserAttributeSimilarityValidatorTest)"
+    ],
+    "verify_total_count": 10,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 3,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3400182442",
+      "s": 2,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3579139413",
+      "s": 2,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3221225472",
+      "s": 1,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3101920824",
+      "s": 1,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3221225472",
+      "s": 1,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 0,
+      "note": "absent_from_fold_map_means_N0_prior",
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 0,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/django__django-11099/deepseek/wp9a-live-driver.wp9a-live-driver-django__django-11099-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:948a9c22c8f3e2b6dc350ed9dd1f0a6b25e0fbb484a464e70c5c076fc15c9984",
+        "price_signal_hash": "sha256:cae448147e213d728a682cc2cdea7236a0da1cdc119f4a8a5afeca70603b458c",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3221225472",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:855344a7438b391671fbb4c6405136365fa462cdc8826edfa06e47e0ddfe1116",
+        "price_signal_hash": "sha256:cae448147e213d728a682cc2cdea7236a0da1cdc119f4a8a5afeca70603b458c",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3221225472",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:6a38727872bcd60c6d246815648d28a87bdf498fb8882d6ab3cb44b8db84d660",
+        "price_signal_hash": "sha256:cae448147e213d728a682cc2cdea7236a0da1cdc119f4a8a5afeca70603b458c",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3221225472",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "self_check"
+  },
+  "task_index": 2,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/django__django-11099/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

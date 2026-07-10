@@ -1,0 +1,29 @@
+diff --git a/sympy/concrete/products.py b/sympy/concrete/products.py
+index 66fa2e5e2..e47c2db6c 100644
+--- a/sympy/concrete/products.py
++++ b/sympy/concrete/products.py
+@@ -201,8 +201,8 @@ def _eval_product(self, term, limits):
+ 
+         elif term.is_polynomial(k):
+             poly = term.as_poly(k)
+-
+-            A = B = Q = S.One
++            from sympy.polys.polytools import Poly
++            A = B = S.One
+ 
+             all_roots = roots(poly)
+ 
+@@ -210,10 +210,11 @@ def _eval_product(self, term, limits):
+             for r, m in all_roots.items():
+                 M += m
+                 A *= RisingFactorial(a - r, n - a + 1)**m
+-                Q *= (n - r)**m
+ 
+             if M < poly.degree():
+-                arg = quo(poly, Q.as_poly(k))
++                Q = Poly(1, k)
++                for r, m in all_roots.items():
++                    Q *= (k - r)**m
+                 B = self.func(arg, (k, a, n)).doit()
+ 
+             return poly.LC()**(n - a + 1) * A * B

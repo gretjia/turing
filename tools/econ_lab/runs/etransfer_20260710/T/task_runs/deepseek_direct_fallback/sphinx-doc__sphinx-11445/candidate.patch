@@ -1,0 +1,27 @@
+diff --git a/sphinx/transforms/i18n.py b/sphinx/transforms/i18n.py
+index 1e3a88e3a..f5cc5f483 100644
+--- a/sphinx/transforms/i18n.py
++++ b/sphinx/transforms/i18n.py
+@@ -55,16 +55,12 @@ def publish_msgstr(app: Sphinx, source: str, source_path: str, source_line: int,
+         config.rst_prolog = None  # type: ignore[attr-defined]
+ 
+         from sphinx.io import SphinxI18nReader
+-        reader = SphinxI18nReader()
+-        reader.setup(app)
+-        filetype = get_filetype(config.source_suffix, source_path)
+-        parser = app.registry.create_source_parser(app, filetype)
+-        doc = reader.read(
+-            source=StringInput(source=source,
+-                               source_path=f"{source_path}:{source_line}:<translated>"),
+-            parser=parser,
+-            settings=settings,
+-        )
++        reader = SphinxI18nReader(app)
++        reader.set_lineno_for_reporter(source_line)
++        doc = reader.read(
++            source=StringInput(source=f"{rst_prolog}\n{source}" if rst_prolog else source,
++                               source_path=f"{source_path}:{source_line}:<translated>"),
++            settings=settings)
+         with contextlib.suppress(IndexError):  # empty node
+             return doc[0]  # type: ignore[return-value]
+         return doc

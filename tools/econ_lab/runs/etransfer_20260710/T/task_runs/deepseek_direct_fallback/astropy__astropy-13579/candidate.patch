@@ -1,0 +1,14 @@
+diff --git a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+index 4e8f9eb6b..2e2b197fd 100644
+--- a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
++++ b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+@@ -107,7 +107,8 @@ class SlicedLowLevelWCS(BaseWCSWrapper):
+             ipixel_new = wcs.pixel_n_dim - 1 - ipixel
+             slices_original[ipixel_orig] = combine_slices(slices_original[ipixel_orig],
+                                                           slices[ipixel_new])
+-            self._slices_array = slices_original
++            self._slices_pixel = slices_original
++            self._slices_array = self._slices_pixel[::-1]
+         else:
+             self._wcs = wcs
+             self._slices_array = slices

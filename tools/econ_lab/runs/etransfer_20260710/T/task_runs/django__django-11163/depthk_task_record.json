@@ -1,0 +1,474 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:63aff83d52fe0ca666596ae48f8ac7cc3006bd6cc4063df7c476d67c4b4a7394",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:e1b281b5e8d1ce0c62fb600e95c8c1015d4c3fcfbdfe3cb2d2fd84bcf57b3572"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:6c237112cffdc547c03b6138176408f6cbbeadb78c9b3668068dd904c72feb8f",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:71e91885a82e677c3455236d527bfdf3e01c9b8ab971dbc35cb60f804df81459"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:556aef1b37c356569718032e772f9baae3d4a5f81e73a400718262b0e80836cf",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:bdb3d8717b1b6ad89a726d8e893c2e0aaf9670f62b55114b05be474da5dae483"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armA",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "django__django-11163",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "A custom formfield_callback is used if provided",
+      "Check basic URL field validation on model forms",
+      "Data for a ManyToManyField is a list rather than a lazy QuerySet.",
+      "Ensure keys and blank character strings are tested for uniqueness.",
+      "FilePathField(blank=True) includes the empty option.",
+      "ModelForm test of unique_together constraint",
+      "Test for primary_key being in the form and failing validation.",
+      "test_abstract_inherited_unique (model_forms.tests.UniqueTest)",
+      "test_abstract_inherited_unique_together (model_forms.tests.UniqueTest)",
+      "test_article_form (model_forms.tests.ModelFormBaseTest)",
+      "test_assignment_of_none_null_false (model_forms.tests.ModelOneToOneFieldTests)",
+      "test_auto_id (model_forms.tests.ModelFormBasicTests)",
+      "test_bad_callback (model_forms.tests.FormFieldCallbackTests)",
+      "test_bad_form (model_forms.tests.ModelFormBaseTest)",
+      "test_base_form (model_forms.tests.ModelFormBasicTests)",
+      "test_basic_creation (model_forms.tests.ModelFormBasicTests)",
+      "test_big_integer_field (model_forms.tests.ModelOtherFieldTests)",
+      "test_blank_false_with_null_true_foreign_key_field (model_forms.tests.ModelFormBaseTest)",
+      "test_callable_field_default (model_forms.tests.OtherModelFormTests)",
+      "test_choices_type (model_forms.tests.OtherModelFormTests)",
+      "test_custom_error_messages (model_forms.tests.ModelFormCustomErrorTests)",
+      "test_default_filefield (model_forms.tests.ModelFormBaseTest)",
+      "test_default_not_populated_on_checkboxselectmultiple (model_forms.tests.ModelFormBaseTest)",
+      "test_default_not_populated_on_selectmultiple (model_forms.tests.ModelFormBaseTest)",
+      "test_empty_fields_to_construct_instance (model_forms.tests.ModelFormBaseTest)",
+      "test_exclude_fields (model_forms.tests.ModelFormBaseTest)",
+      "test_exclude_nonexistent_field (model_forms.tests.ModelFormBaseTest)",
+      "test_extra_field_model_form (model_forms.tests.ModelFormBaseTest)",
+      "test_extra_fields (model_forms.tests.ModelFormBaseTest)",
+      "test_field_removal (model_forms.tests.ModelFormInheritanceTests)",
+      "test_field_removal_name_clashes (model_forms.tests.ModelFormInheritanceTests)",
+      "test_file_field_data (model_forms.tests.FileAndImageFieldTests)",
+      "test_filefield_required_false (model_forms.tests.FileAndImageFieldTests)",
+      "test_foreignkeys_which_use_to_field (model_forms.tests.OtherModelFormTests)",
+      "test_form_subclass_inheritance (model_forms.tests.ModelFormInheritanceTests)",
+      "test_http_prefixing (model_forms.tests.ModelOtherFieldTests)",
+      "test_inherit_after_custom_callback (model_forms.tests.FormFieldCallbackTests)",
+      "test_inherited_unique_for_date (model_forms.tests.UniqueTest)",
+      "test_inherited_unique_together (model_forms.tests.UniqueTest)",
+      "test_initial_values (model_forms.tests.ModelFormBasicTests)",
+      "test_invalid_meta_model (model_forms.tests.ModelFormBaseTest)",
+      "test_iterable_model_m2m (model_forms.tests.OtherModelFormTests)",
+      "test_limit_choices_to_callable_for_m2m_rel (model_forms.tests.LimitChoicesToTests)",
+      "test_limit_fields_with_string (model_forms.tests.ModelFormBaseTest)",
+      "test_limit_nonexistent_field (model_forms.tests.ModelFormBaseTest)",
+      "test_m2m_editing (model_forms.tests.ModelFormBasicTests)",
+      "test_m2m_initial_callable (model_forms.tests.ModelFormBasicTests)",
+      "test_missing_fields_attribute (model_forms.tests.ModelFormBaseTest)",
+      "test_model_clean_error_messages (model_forms.tests.ModelFormCustomErrorTests)",
+      "test_model_form_applies_localize_to_all_fields (model_forms.tests.LocalizedModelFormTest)",
+      "test_model_form_applies_localize_to_some_fields (model_forms.tests.LocalizedModelFormTest)",
+      "test_model_form_refuses_arbitrary_string (model_forms.tests.LocalizedModelFormTest)",
+      "test_model_multiple_choice_field (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_model_multiple_choice_run_validators (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_modelform_factory_metaclass (model_forms.tests.CustomMetaclassTestCase)",
+      "test_modelform_subclassed_model (model_forms.tests.ModelOneToOneFieldTests)",
+      "test_multi_fields (model_forms.tests.ModelFormBasicTests)",
+      "test_multiple_field_unique_together (model_forms.tests.UniqueTest)",
+      "test_no_model_class (model_forms.tests.ModelFormBaseTest)",
+      "test_notrequired_overrides_notblank (model_forms.tests.ValidationTest)",
+      "test_prefixed_form_with_default_field (model_forms.tests.ModelFormBaseTest)",
+      "test_replace_field (model_forms.tests.ModelFormBaseTest)",
+      "test_replace_field_variant_2 (model_forms.tests.ModelFormBaseTest)",
+      "test_replace_field_variant_3 (model_forms.tests.ModelFormBaseTest)",
+      "test_save_blank_false_with_required_false (model_forms.tests.ModelFormBaseTest)",
+      "test_save_blank_null_unique_charfield_saves_null (model_forms.tests.ModelFormBaseTest)",
+      "test_save_with_data_errors (model_forms.tests.ModelFormBasicTests)",
+      "test_subclassmeta_form (model_forms.tests.ModelFormBaseTest)",
+      "test_unique_for_date (model_forms.tests.UniqueTest)",
+      "test_unique_for_date_in_exclude (model_forms.tests.UniqueTest)",
+      "test_unique_for_date_with_nullable_date (model_forms.tests.UniqueTest)",
+      "test_unique_null (model_forms.tests.UniqueTest)",
+      "test_validates_with_replaced_field_excluded (model_forms.tests.ValidationTest)"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 69,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "Regression for #13095: Using base forms with widgets defined in Meta should not raise errors.",
+      "Regression for #15315: modelform_factory should accept widgets",
+      "Regression for #19733",
+      "test_assignment_of_none (model_forms.tests.ModelOneToOneFieldTests)",
+      "test_base_form (model_forms.tests.ModelFormBaseTest)",
+      "test_blank_with_null_foreign_key_field (model_forms.tests.ModelFormBaseTest)",
+      "test_callable_called_each_time_form_is_instantiated (model_forms.tests.LimitChoicesToTests)",
+      "test_clean_does_deduplicate_values (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_clean_false (model_forms.tests.FileAndImageFieldTests)",
+      "test_clean_false_required (model_forms.tests.FileAndImageFieldTests)",
+      "test_clear_and_file_contradiction (model_forms.tests.FileAndImageFieldTests)",
+      "test_confused_form (model_forms.tests.ModelFormBaseTest)",
+      "test_custom_field_with_queryset_but_no_limit_choices_to (model_forms.tests.LimitChoicesToTests)",
+      "test_custom_file_field_save (model_forms.tests.FileAndImageFieldTests)",
+      "test_custom_form_fields (model_forms.tests.ModelFormBasicTests)",
+      "test_default_not_populated_on_optional_checkbox_input (model_forms.tests.ModelFormBaseTest)",
+      "test_default_populated_on_optional_field (model_forms.tests.ModelFormBaseTest)",
+      "test_default_selectdatewidget (model_forms.tests.ModelFormBaseTest)",
+      "test_default_splitdatetime_field (model_forms.tests.ModelFormBaseTest)",
+      "test_empty_fields_on_modelform (model_forms.tests.ModelFormBaseTest)",
+      "test_empty_fields_to_fields_for_model (model_forms.tests.ModelFormBaseTest)",
+      "test_error_messages_overrides (model_forms.tests.TestFieldOverridesByFormMeta)",
+      "test_exclude_and_validation (model_forms.tests.ModelFormBaseTest)",
+      "test_exclude_fields_with_string (model_forms.tests.ModelFormBaseTest)",
+      "test_extra_declared_field_model_form (model_forms.tests.ModelFormBaseTest)",
+      "test_extra_field_modelform_factory (model_forms.tests.ModelFormBaseTest)",
+      "test_field_type_overrides (model_forms.tests.TestFieldOverridesByFormMeta)",
+      "test_fields_for_model_applies_limit_choices_to (model_forms.tests.LimitChoicesToTests)",
+      "test_file_field_multiple_save (model_forms.tests.FileAndImageFieldTests)",
+      "test_full_clear (model_forms.tests.FileAndImageFieldTests)",
+      "test_help_text_overrides (model_forms.tests.TestFieldOverridesByFormMeta)",
+      "test_image_field (model_forms.tests.FileAndImageFieldTests)",
+      "test_inherited_unique (model_forms.tests.UniqueTest)",
+      "test_label_overrides (model_forms.tests.TestFieldOverridesByFormMeta)",
+      "test_limit_choices_to_callable_for_fk_rel (model_forms.tests.LimitChoicesToTests)",
+      "test_media_on_modelform (model_forms.tests.OtherModelFormTests)",
+      "test_mixmodel_form (model_forms.tests.ModelFormBaseTest)",
+      "test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields (model_forms.tests.OtherModelFormTests)",
+      "test_model_form_clean_applies_to_model (model_forms.tests.CustomCleanTests)",
+      "test_model_multiple_choice_field_22745 (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_model_multiple_choice_number_of_queries (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_model_multiple_choice_required_false (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_model_multiple_choice_show_hidden_initial (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_modelform_non_editable_field (model_forms.tests.ModelOtherFieldTests)",
+      "test_modelform_onetoonefield (model_forms.tests.ModelOneToOneFieldTests)",
+      "test_onetoonefield (model_forms.tests.ModelOneToOneFieldTests)",
+      "test_orderfields2_form (model_forms.tests.ModelFormBaseTest)",
+      "test_orderfields_form (model_forms.tests.ModelFormBaseTest)",
+      "test_override_clean (model_forms.tests.CustomCleanTests)",
+      "test_override_field (model_forms.tests.ModelFormBaseTest)",
+      "test_override_unique_for_date_message (model_forms.tests.UniqueTest)",
+      "test_override_unique_message (model_forms.tests.UniqueTest)",
+      "test_override_unique_together_message (model_forms.tests.UniqueTest)",
+      "test_prefetch_related_queryset (model_forms.tests.OtherModelFormTests)",
+      "test_recleaning_model_form_instance (model_forms.tests.ModelFormBasicTests)",
+      "test_render_empty_file_field (model_forms.tests.FileAndImageFieldTests)",
+      "test_renderer_kwarg (model_forms.tests.ModelFormBaseTest)",
+      "test_runtime_choicefield_populated (model_forms.tests.ModelFormBasicTests)",
+      "test_save_commit_false (model_forms.tests.ModelFormBasicTests)",
+      "test_setattr_raises_validation_error_field_specific (model_forms.tests.StrictAssignmentTests)",
+      "test_setattr_raises_validation_error_non_field (model_forms.tests.StrictAssignmentTests)",
+      "test_show_hidden_initial_changed_queries_efficiently (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_simple_unique (model_forms.tests.UniqueTest)",
+      "test_subcategory_form (model_forms.tests.ModelFormBaseTest)",
+      "test_subset_fields (model_forms.tests.ModelFormBasicTests)",
+      "test_to_field_name_with_initial_data (model_forms.tests.ModelMultipleChoiceFieldTests)",
+      "test_unique_together_exclusion (model_forms.tests.UniqueTest)",
+      "test_validates_with_replaced_field_not_specified (model_forms.tests.ValidationTest)",
+      "test_widget_overrides (model_forms.tests.TestFieldOverridesByFormMeta)"
+    ],
+    "verify_total_count": 69,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:minimal": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3221225472",
+      "s": 1,
+      "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+    },
+    "repair:loop": {
+      "n": 3,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3400182442",
+      "s": 2,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:self_check": {
+      "n": 3,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3758096384",
+      "s": 3,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:minimal": {
+      "n": 0,
+      "note": "absent_from_fold_map_means_N0_prior",
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 0,
+      "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+    },
+    "repair:loop": {
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3101920824",
+      "s": 1,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:self_check": {
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3579139413",
+      "s": 2,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/django__django-11163/deepseek/wp9a-live-driver.wp9a-live-driver-django__django-11163-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:2eb327c0647aa358f7fe4874a2e6c1022667610a13d5b4abc63aa69a7965a0d8",
+        "price_signal_hash": "sha256:c0b570ae807f95e54b3671b5b80cda6b2a9b31eea0582709e2e7f5b467f50596",
+        "route_id": "minimal",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 3,
+          "s_q32": "15748213418",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "minimal",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:cb7066096519d293615ad5a900178935f5c05d90be5a0ebc9c52c95da7cae0e3",
+        "price_signal_hash": "sha256:c0b570ae807f95e54b3671b5b80cda6b2a9b31eea0582709e2e7f5b467f50596",
+        "route_id": "loop",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 3,
+          "s_q32": "15748213418",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "loop",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:4b52e98caec7dd1987166b5062c05b9bca56852efa3da875baf0d872a775884a",
+        "price_signal_hash": "sha256:c0b570ae807f95e54b3671b5b80cda6b2a9b31eea0582709e2e7f5b467f50596",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3101920824",
+          "s": 1,
+          "s_q32": "7158278826",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3579139413",
+          "s": 3,
+          "s_q32": "15748213418",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "minimal",
+    "repair": "loop",
+    "verify": "self_check"
+  },
+  "task_index": 4,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/django__django-11163/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

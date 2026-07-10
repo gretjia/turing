@@ -1,0 +1,53 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 25e8ddc0e..b8dfb8d9e 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -355,6 +355,10 @@ class Session(nodes.FSCollector):
+             for parent in reversed(argpath.parts()):
+                 if pm._confcutdir and pm._confcutdir.relto(parent):
+                     break
++
++                if parent == self.config.rootdir and parent != argpath:
++                    # Do not recurse above the rootdir.
++                    break
+ 
+                 if parent.isdir():
+                     pkginit = parent.join("__init__.py")
+@@ -399,16 +403,18 @@ class Session(nodes.FSCollector):
+         else:
+             assert argpath.check(file=1)
+ 
+-            if argpath in self._node_cache:
+-                col = self._node_cache[argpath]
+-            else:
+-                collect_root = self._pkg_roots.get(argpath.dirname, self)
+-                col = collect_root._collectfile(argpath, handle_dupes=False)
+-                if col:
+-                    self._node_cache[argpath] = col
+-            m = self.matchnodes(col, names)
++            # If argpath is an __init__.py that is not explicitly requested,
++            # do not collect it, because it would trigger unwanted package imports.
++            if argpath.basename == "__init__.py" and argpath not in self._initialpaths:
++                # Only collect __init__.py files when they are explicitly in the command line.
++                if argpath in self._node_cache:
++                    col = self._node_cache[argpath]
++                else:
++                    collect_root = self._pkg_roots.get(argpath.dirname, self)
++                    col = collect_root._collectfile(argpath, handle_dupes=False)
++                    if col:
++                        self._node_cache[argpath] = col
++                m = self.matchnodes(col, names)
++            else:
++                return  # skip non-explicit __init__.py
+             # If __init__.py was the only file requested, then the matched node will be
+             # the corresponding Package, and the first yielded item will be the __init__
+             # Module itself, so just use that. If this special case isn't taken, then all
+@@ -416,7 +422,7 @@ class Session(nodes.FSCollector):
+             if argpath.basename == "__init__.py":
+                 try:
+                     yield next(m[0].collect())
+-                except StopIteration:
++                except (StopIteration, TypeError):
+                     # The package collects nothing with only an __init__.py
+                     # file in it, which gets ignored by the default
+                     # "python_files" option.
