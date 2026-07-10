@@ -1,0 +1,13 @@
+diff --git a/sklearn/base.py b/sklearn/base.py
+index 0e9e0a9..f0a8b3c 100644
+--- a/sklearn/base.py
++++ b/sklearn/base.py
+@@ -48,7 +48,7 @@ def _first_and_last_element(arr):
+     estimator_type = type(estimator)
+     # XXX: not handling dictionaries
+     if estimator_type in (list, tuple, set, frozenset):
+-        return estimator_type([clone(e, safe=safe) for e in estimator])
++        return estimator_type([clone(e, safe=safe) for e in estimator])
+     elif not hasattr(estimator, 'get_params'):
+         if not safe:
+             return copy.deepcopy(estimator)

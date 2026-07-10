@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index 4030db8951..692392339e 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -58,6 +58,10 @@ def convert(value, unit, axis):
+     # If the value is a scalar, we can check if it's a number
+     is_numlike = np.isscalar(value) and np.isreal(value)
+ 
++    # Skip the deprecation warning for empty arrays
++    if hasattr(value, '__len__') and len(value) == 0:
++        return value
++
+     if is_numlike:
+         _api.warn_deprecated(
+             "3.5", message="Support for passing numbers through unit converters is deprecated since 3.5 and support will be removed two minor releases later; use Axis.convert_units instead."

@@ -1,0 +1,56 @@
+diff --git a/sphinx/environment/adapters/indexentries.py b/sphinx/environment/adapters/indexentries.py
+index 03843c29d..720dd7097 100644
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -30,7 +30,7 @@ class IndexEntries:
+             # If the first node is a title, it is the document's title
+             # and should be skipped.
+             if (nodes.title and isinstance(nodes.title[0], nodes.title)
+-                and nodes.title[0].astext() == title):
++                and nodes.title[0].astext().strip() == title.strip()):
+                 # The heading is the document's title; skip it.
+                 # This is a workaround for issue #11445.
+                 # When rst_prolog is set, the title may have extra whitespace
+diff --git a/sphinx/environment/adapters/toctree.py b/sphinx/environment/adapters/toctree.py
+index 827a938df..1d4b48123 100644
+--- a/sphinx/environment/adapters/toctree.py
++++ b/sphinx/environment/adapters/toctree.py
+@@ -357,7 +357,7 @@ class TocTree:
+             # If the first node is a title, it is the document's title
+             # and should be skipped.
+             if (nodes.title and isinstance(nodes.title[0], nodes.title)
+-                and nodes.title[0].astext() == title):
++                and nodes.title[0].astext().strip() == title.strip()):
+                 # The heading is the document's title; skip it.
+                 # This is a workaround for issue #11445.
+                 # When rst_prolog is set, the title may have extra whitespace
+                 # due to the prolog content being processed before the title.
+                 return True
+diff --git a/sphinx/environment/adapters/toctree.py b/sphinx/environment/adapters/toctree.py
+index 827a938df..1d4b48123 100644
+--- a/sphinx/environment/adapters/toctree.py
++++ b/sphinx/environment/adapters/toctree.py
+@@ -360,6 +360,10 @@ class TocTree:
+                 # This is a workaround for issue #11445.
+                 # When rst_prolog is set, the title may have extra whitespace
+                 # due to the prolog content being processed before the title.
++                # Also, when the first heading is a domain directive
++                # (like :mod:`name`), the title may be processed differently
++                # and the simple text comparison fails.
++                # Strip whitespace to handle these cases consistently.
+                 return True
+             return False
+diff --git a/sphinx/environment/adapters/indexentries.py b/sphinx/environment/adapters/indexentries.py
+index 03843c29d..720dd7097 100644
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -33,6 +33,10 @@ class IndexEntries:
+                 # This is a workaround for issue #11445.
+                 # When rst_prolog is set, the title may have extra whitespace
+                 # due to the prolog content being processed before the title.
++                # Also, when the first heading is a domain directive
++                # (like :mod:`name`), the title may be processed differently
++                # and the simple text comparison fails.
++                # Strip whitespace to handle these cases consistently.
+                 return True
+             return False

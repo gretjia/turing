@@ -1,0 +1,40 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -792,6 +792,7 @@ class Card:
+     def _format_string_value(self, value):
+         """
+         Format the value of a string and ready to be written to the file.
++
+         """
+         # Check whether the value is a Python string or unicode
+         value_is_str = isinstance(value, str)
+@@ -816,9 +817,18 @@ class Card:
+                 # re-encoding to utf-8.  This will still be incorrect for some
+                 # cases but probably the best we can do.
+                 value = str(value).replace("'", "''")
+-
+         return "'" + value + "'"
+ 
++    def _format_value(self, value):
++        """Format the value string of a Card image.
++        """
++        if isinstance(value, str):
++            # Special case: handle NULL strings (double single quotes)
++            # See GitHub Issue #14598
++            if value == "''":
++                return "''"
++        return super()._format_value(value)
++
+     @classmethod
+     def fromstring(cls, card):
+         """
+@@ -832,7 +842,7 @@ class Card:
+         # Process the value
+         if self._value is not None:
+             if self._value.strip() == '':
+-                self._value = ''
++                self._value = ""  # Empty string, not single quote
+             else:
+                 if self._value.startswith("'") and self._value.endswith("'"):
+                     self._value = self._value[1:-1]

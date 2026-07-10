@@ -1,0 +1,50 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:astropy/astropy:scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:127cf78efb83361ee759800b775f8551c622e4970f818ec426156011aedb1827",
+    "price_signal_hash": "sha256:9a111d5673b9633575763d792afbe20552982c9eff9c3ec6709fc272e6c6a4de",
+    "route_id": "astropy__astropy-14598::armB::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": null,
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armB",
+        "error_message": "The read operation timed out",
+        "error_type": "TimeoutError",
+        "instance_id": "astropy__astropy-14598",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "ERROR"
+      },
+      "worker_result_status": "ERROR"
+    }
+  ],
+  "domain_bucket": "astropy/astropy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "astropy__astropy-14598",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "kimi",
+  "selected_route_id": "astropy__astropy-14598::armB::kimi",
+  "task_index": 48
+}

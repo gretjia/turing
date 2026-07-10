@@ -1,0 +1,27 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index xxxx..xxxx 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -38,6 +38,16 @@ class RST(FixedWidth):
+     _format_name = "rst"
+     _description = "reStructuredText simple table"
+     data_class = SimpleRSTData
+     header_class = SimpleRSTHeader
+ 
+-    def __init__(self):
+-        super().__init__(delimiter_pad=None, bookend=False)
++    def __init__(self, header_rows=None):
++        super().__init__(delimiter_pad=None, bookend=False, header_rows=header_rows)
++
++    def write(self, lines):
++        if self.header_rows is not None:
++            # Create the header separator line
++            header_sep_line = ""
++            for col in self.cols:
++                width = max(len(col.name), len(str(col.unit)) if self.header_rows and "unit" in self.header_rows else 0)
++                header_sep_line += "=" * width + " "
++            lines = [header_sep_line.strip()] + lines + [header_sep_line.strip()]
++        else:
++            lines = super().write(lines)
++            lines = [lines[1]] + lines + [lines[1]]
++        return lines

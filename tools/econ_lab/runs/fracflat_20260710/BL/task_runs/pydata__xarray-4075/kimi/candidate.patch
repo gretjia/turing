@@ -1,0 +1,15 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -62,6 +62,10 @@ def __init__(self, obj, weights):  # noqa: F811
+                 "`weights` cannot contain missing values. "
+                 "Missing values can be replaced by `weights.fillna(0)`."
+             )
+ 
++        # boolean weights must be numeric for reductions such as sum_of_weights
++        if weights.dtype.kind == "b":
++            weights = weights.astype(int)
++
+         self.obj = obj
+         self.weights = weights
+ 

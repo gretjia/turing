@@ -1,0 +1,42 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index d4c5d2cf33..8e8a4e3c28 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -590,14 +590,19 @@ class SkyCoord(ShapedLikeNDArray):
+         """
+         if "_sky_coord_frame" in self.__dict__:
+             if self._is_name(attr):
+-                return self  # Should this be a deepcopy of self?
++                return self
+ 
+-            # Anything in the set of all possible frame_attr_names is handled
+-            # here. If the attr is relevant for the current frame then delegate
+-            # to self.frame otherwise get it from self._<attr>.
+             if attr in frame_transform_graph.frame_attributes:
+                 if attr in self.frame.frame_attributes:
+-                    return getattr(self.frame, attr)
++                    try:
++                        return getattr(self.frame, attr)
++                    except AttributeError:
++                        # If the underlying frame itself raises an AttributeError,
++                        # we want to re-raise it correctly, not catch it and
++                        # claim that this SkyCoord does not have the attribute.
++                        raise AttributeError(
++                            f"'{self.__class__.__name__}' object has no attribute '{attr}'"
++                        ) from None
+                 else:
+                     return getattr(self, "_" + attr, None)
+ 
+@@ -606,7 +611,11 @@ class SkyCoord(ShapedLikeNDArray):
+                 return getattr(self._sky_coord_frame, attr)
+ 
+             if not attr.startswith("_"):
+-                # Try to interpret as a new frame for transforming.
++                try:
++                    # Try to interpret as a new frame for transforming.
++                    return self.transform_to(attr)
++                except Exception:
++                    pass
+                 frame_cls = frame_transform_graph.lookup_name(attr)
+                 if frame_cls is not None and self.frame.is_transformable_to(frame_cls):
+                     return self.transform_to(attr)

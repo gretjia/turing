@@ -1,0 +1,10 @@
+diff --git a/src/_pytest/setuponly.py b/src/_pytest/setuponly.py
+index 2687de4542..303147e6b6 100644
+--- a/src/_pytest/setuponly.py
++++ b/src/_pytest/setuponly.py
+@@ -66,4 +66,4 @@ def _show_fixture_action(fixturedef, msg):
+         if hasattr(fixturedef, "cached_param"):
+             # this is a parametrized fixture
+             # show the param value
+-            tw.write("[{}]".format(fixturedef.cached_param))
++            tw.write("[{}]".format(repr(fixturedef.cached_param)))

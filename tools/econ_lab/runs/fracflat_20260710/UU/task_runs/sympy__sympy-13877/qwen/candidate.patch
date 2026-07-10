@@ -1,0 +1,17 @@
+diff --git a/sympy/matrices/matrices.py b/sympy/matrices/matrices.py
+index d11197013d..7700441f49 100644
+--- a/sympy/matrices/matrices.py
++++ b/sympy/matrices/matrices.py
+@@ -208,7 +208,7 @@ def entry(self, i, j):
+             ret = self._entry(i, j)
+             if not ret.is_number:
+                 # Non-symbolic entries need to be cancelled
+-                ret = cancel(ret)
++                try:
++                    ret = cancel(ret)
++                except (TypeError, ValueError):
++                    # Handle cases where cancel fails (e.g. NaN comparisons)
++                    pass
+             return ret
+         else:
+             raise NotImplementedError("Unknown entry type")

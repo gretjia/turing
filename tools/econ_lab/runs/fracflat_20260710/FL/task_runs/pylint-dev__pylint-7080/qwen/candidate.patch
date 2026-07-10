@@ -1,0 +1,16 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 49c8a2e09..90a5b77d9 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -124,6 +124,10 @@ def expand_modules(
+             for subfilepath in modutils.get_module_files(
+                 os.path.dirname(filepath), ignore_list, list_all=is_namespace
+             ):
++                # Check if the subfile should be ignored based on ignore-paths
++                if _is_ignored_file(
++                    subfilepath, ignore_list, ignore_list_re, ignore_list_paths_re
++                ):
++                    continue
+                 if _is_in_ignore_list_re(
+                     os.path.basename(subfilepath), ignore_list_re
+                 ) or _is_in_ignore_list_re(subfilepath, ignore_list_paths_re):

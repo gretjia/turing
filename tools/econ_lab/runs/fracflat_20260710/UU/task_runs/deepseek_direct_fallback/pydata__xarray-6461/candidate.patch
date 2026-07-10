@@ -1,0 +1,12 @@
+diff --git a/xarray/core/computation.py b/xarray/core/computation.py
+index 3b6c37a2..97ff3f3d 100644
+--- a/xarray/core/computation.py
++++ b/xarray/core/computation.py
+@@ -1808,7 +1808,7 @@ def where(cond, x, y, keep_attrs=None):
+     if keep_attrs is None:
+         keep_attrs = _get_keep_attrs(default=False)
+     if keep_attrs is True:
+-        # keep the attributes of x, the second parameter, by default to
++        # keep the attributes of x, the second argument, by default to
+         # be consistent with the `where` method of `DataArray` and `Dataset`
+         keep_attrs = lambda attrs, context: attrs[1]

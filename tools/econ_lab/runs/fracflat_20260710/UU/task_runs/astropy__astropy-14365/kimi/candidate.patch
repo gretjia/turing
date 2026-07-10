@@ -1,0 +1,24 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -40,7 +40,7 @@ def _line_type(line):
+     if line[0] in '-+.0123456789':
+         return 'data'
+ 
+-    if line[:4] in ('READ', 'NO'):
++    if line[:4].upper() in ('READ', 'NO'):
+         return 'command'
+ 
+     raise ValueError(f'Unrecognized QDP line: {line}')
+@@ -55,7 +55,10 @@ def _get_tables(lines):
+         if line_type == 'comment':
+             continue
+ 
+-        if line_type == 'command' and line[:2] == 'NO':
++        if line_type == 'command' and line[:2].upper() == 'NO':
+             tables.append([])
++        elif line_type == 'command':
++            tables[-1].append(line.upper())
+         else:
+             tables[-1].append(line)
+     return tables

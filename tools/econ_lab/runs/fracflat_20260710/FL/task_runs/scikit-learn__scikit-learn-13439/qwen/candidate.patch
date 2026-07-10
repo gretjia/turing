@@ -1,0 +1,14 @@
+diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py
+index 651090867b..a7f0c440bf 100644
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -366,6 +366,10 @@ class Pipeline(_BaseComposition):
+         """
+         return self._final_estimator
+ 
++    def __len__(self):
++        """Return the length of the pipeline."""
++        return len(self.steps)
++
+     def __repr__(self):
+         return self._repr_html_()

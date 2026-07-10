@@ -1,0 +1,105 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pylint-dev/pylint:scaffold:sha256:12519be626cc7450373e61c0fa9da71fe3fd04efebefe197d46b31b85fbd5dd4",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:ac34cc1a6ec631fd9916e94b1fdd5842ebe1330e2b8d32d4d37c8e52e68691ad",
+    "price_signal_hash": "sha256:061eb51ecc83f8b947b2b9293a4bd29cf6bf713e87eefc8698e6c106364994f0",
+    "route_id": "pylint-dev__pylint-6903::armA::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:7c78cca31ecea7b933241a66acfe3f69f8fc7f8a038a2e1caf6e717d2881e6d5",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:7c78cca31ecea7b933241a66acfe3f69f8fc7f8a038a2e1caf6e717d2881e6d5",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "pylint-dev/pylint",
+          "route_scaffold": "scaffold:sha256:12519be626cc7450373e61c0fa9da71fe3fd04efebefe197d46b31b85fbd5dd4",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:a9719fcccafc2756551b632633e2d092568e32dd74e5d7abe114b9ebbc681053"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/pylint-dev__pylint-6903/qwen/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "pylint-dev__pylint-6903"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "pylint-dev__pylint-6903"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/pylint-dev__pylint-6903/qwen/wp9a-live-driver.wp9a-live-driver-pylint-dev__pylint-6903-qwen.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 877,
+        "candidate_patch_sha256": "sha256:7c509fc0cee04a599236f8f6ea627a54b2a6232fa8ea10abb909cec1db713bdb",
+        "instance_id": "pylint-dev__pylint-6903",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 7863
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "pylint-dev/pylint",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pylint-dev__pylint-6903",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "qwen",
+  "selected_route_id": "pylint-dev__pylint-6903::armA::qwen",
+  "task_index": 26
+}

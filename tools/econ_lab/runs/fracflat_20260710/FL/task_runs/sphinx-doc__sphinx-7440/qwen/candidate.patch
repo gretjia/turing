@@ -1,0 +1,22 @@
+diff --git a/sphinx/environment/adapters/indexentries.py b/sphinx/environment/adapters/indexentries.py
+index 2bb86f4a5..92a6c51f9 100644
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -100,7 +100,7 @@ class IndexEntries:
+             # allow case insensitive lookup
+             for item in self.indexentries[term]:
+                 if item[1] == desc:
+-                    self.env.warn(self.docname, 'duplicate term description of %s, other instance in %s' % (term, item[0]))
++                    self.env.warn(self.docname, 'duplicate term description of %s, other instance in %s' % (term, item[0]), location=item[0])
+                     break
+             else:
+                 self.indexentries[term].append((self.docname, desc))
+@@ -128,7 +128,7 @@ class IndexEntries:
+                     # allow case insensitive lookup
+                     for item in self.indexentries[term]:
+                         if item[1] == desc:
+-                            self.env.warn(self.docname, 'duplicate term description of %s, other instance in %s' % (term, item[0]))
++                            self.env.warn(self.docname, 'duplicate term description of %s, other instance in %s' % (term, item[0]), location=item[0])
+                             break
+                     else:
+                         self.indexentries[term].append((self.docname, desc))

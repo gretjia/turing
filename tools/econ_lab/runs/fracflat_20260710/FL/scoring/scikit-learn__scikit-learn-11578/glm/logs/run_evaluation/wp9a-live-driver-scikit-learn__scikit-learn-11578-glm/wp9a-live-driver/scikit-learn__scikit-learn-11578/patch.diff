@@ -1,0 +1,29 @@
+diff --git a/sklearn/linear_model/logistic.py b/sklearn/linear_model/logistic.py
+index a3680c88d..5a5e8919e 100644
+--- a/sklearn/linear_model/logistic.py
++++ b/sklearn/linear_model/logistic.py
+@@ -922,7 +922,7 @@ def _log_reg_scoring_path(X, y, train, test, pos_class=None, Cs=10,
+                           scoring=None, fit_intercept=False,
+                           max_iter=100, tol=1e-4, class_weight=None,
+                           verbose=0, solver='lbfgs', penalty='l2',
+-                          dual=False, intercept_scaling=1.,
++                          dual=False, intercept_scaling=1.0,
+                           multi_class='ovr', random_state=None,
+                           max_squared_sum=None, sample_weight=None):
+     """Computes scores across logistic_regression_path
+@@ -954,7 +954,7 @@ def _log_reg_scoring_path(X, y, train, test, pos_class=None, Cs=10,
+         If not provided, then each sample is given unit weight.
+     """
+     _check_solver_option(solver, multi_class, penalty, dual)
+-
++    
+     X_train = X[train]
+     X_test = X[test]
+     y_train = y[train]
+@@ -995,7 +995,8 @@ def _log_reg_scoring_path(X, y, train, test, pos_class=None, Cs=10,
+     log_reg = LogisticRegression(fit_intercept=fit_intercept)
+ 
+     # The score method of Logistic Regression has a classes_ attribute.
+     if multi_class == 'ovr':
+         log_reg.classes_ = np.array([-1, 1])
+     elif multi_class == 'multinomial':

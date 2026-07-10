@@ -1,0 +1,19 @@
+diff --git a/sphinx/transforms/i18n.py b/sphinx/transforms/i18n.py
+index 1a7720be04..50226842b2 100644
+--- a/sphinx/transforms/i18n.py
++++ b/sphinx/transforms/i18n.py
+@@ -100,7 +100,7 @@ def publish_msgstr(app: Sphinx, source: str, source_path: str, source_line: int
+     try:
+         # clear rst_prolog temporarily
+         rst_prolog = config.rst_prolog
+-        config.rst_prolog = None  # type: ignore[attr-defined]
++        config.rst_prolog = None  # type: ignore[attr-defined]
+ 
+         from sphinx.io import SphinxI18nReader
+         reader = SphinxI18nReader()
+@@ -109,5 +109,5 @@ def publish_msgstr(app: Sphinx, source: str, source_path: str, source_line: int
+         return doc
+     finally:
+         config.rst_prolog = rst_prolog  # type: ignore[attr-defined]
+-        config.rst_prolog = rst_prolog  # type: ignore[attr-defined]
++        config.rst_prolog = rst_prolog  # type: ignore[attr-defined]

@@ -1,0 +1,13 @@
+diff --git a/requests/models.py b/requests/models.py
+index 3a6b0a3..6e9178e 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -385,7 +385,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         # non-ASCII characters. This allows users to automatically get the correct IDNA
+         # behaviour. For strings containing only ASCII characters, we need to also verify
+         # it doesn't start with a wildcard (*), before allowing the unencoded hostname.
+-        if not unicode_is_ascii(host):
++        if not unicode_is_ascii(host) or host == u'.':
+             try:
+                 host = self._get_idna_encoded_host(host)
+             except UnicodeError:

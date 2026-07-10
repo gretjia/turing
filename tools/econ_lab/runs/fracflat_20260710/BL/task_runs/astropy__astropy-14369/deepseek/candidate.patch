@@ -1,0 +1,13 @@
+diff --git a/astropy/io/ascii/cds.py b/astropy/io/ascii/cds.py
+index 0b9ba0b8c3..3a6db9baf4 100644
+--- a/astropy/io/ascii/cds.py
++++ b/astropy/io/ascii/cds.py
+@@ -207,7 +207,7 @@ def _get_col_units(self, col):
+                     unit = col.raw_units[i]
+ 
+         if unit is not None:
+-            unit = unit.replace(' ', '')
++            unit = unit.replace(' ', '').replace('/', ' / ').replace('**', '')
+             unit = unit.replace('10+', '1e+')
+             unit = unit.replace('10-', '1e-')
+             unit = unit.replace('10', '1e+')

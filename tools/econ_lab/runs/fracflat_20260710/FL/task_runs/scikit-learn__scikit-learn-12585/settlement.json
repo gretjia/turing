@@ -1,0 +1,174 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:ec44b3fbaed7c6ef8b9f0b7db3b973140172bf5123edbf6592c8cdc0827e6d01",
+    "price_signal_hash": "sha256:1f4ad82a7770c875a95112a4b126de650a867083aeba1e17f8cf25e3a2e47098",
+    "route_id": "scikit-learn__scikit-learn-12585::armB::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:bd005353705e8b85957284b09f1269d24d77b3a6b4bb85b71dbc129c18b55d58",
+        "verdict_fraction_q32": "4294967296"
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "sklearn/tests/test_base.py::test_clone_2",
+          "sklearn/tests/test_base.py::test_clone_nan",
+          "sklearn/tests/test_base.py::test_clone_pandas_dataframe",
+          "sklearn/tests/test_base.py::test_clone_sparse_matrices",
+          "sklearn/tests/test_base.py::test_pickle_version_warning_is_issued_upon_different_version",
+          "sklearn/tests/test_base.py::test_pickle_version_warning_is_issued_when_no_version_info_in_pickle",
+          "sklearn/tests/test_base.py::test_pickle_version_warning_is_not_raised_with_matching_version",
+          "sklearn/tests/test_base.py::test_pickling_works_when_getstate_is_overwritten_in_the_child_class",
+          "sklearn/tests/test_base.py::test_set_params_passes_all_parameters"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 14,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "sklearn/tests/test_base.py::test_clone",
+          "sklearn/tests/test_base.py::test_clone_buggy",
+          "sklearn/tests/test_base.py::test_clone_empty_array",
+          "sklearn/tests/test_base.py::test_clone_estimator_types",
+          "sklearn/tests/test_base.py::test_get_params",
+          "sklearn/tests/test_base.py::test_is_classifier",
+          "sklearn/tests/test_base.py::test_pickle_version_no_warning_is_issued_with_non_sklearn_estimator",
+          "sklearn/tests/test_base.py::test_pickling_when_getstate_is_overwritten_by_mixin",
+          "sklearn/tests/test_base.py::test_pickling_when_getstate_is_overwritten_by_mixin_outside_of_sklearn",
+          "sklearn/tests/test_base.py::test_repr",
+          "sklearn/tests/test_base.py::test_score_sample_weight",
+          "sklearn/tests/test_base.py::test_set_params",
+          "sklearn/tests/test_base.py::test_set_params_updates_valid_params",
+          "sklearn/tests/test_base.py::test_str"
+        ],
+        "verify_total_count": 14,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:bd005353705e8b85957284b09f1269d24d77b3a6b4bb85b71dbc129c18b55d58",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": true,
+          "verdict_fraction_q32": "4294967296",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:e0b2783522018da24f3d7004e39d9e3c3140fed955854e4710a853016cf7942c"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/scikit-learn__scikit-learn-12585/glm/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "scikit-learn__scikit-learn-12585"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "scikit-learn__scikit-learn-12585"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-12585"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/scikit-learn__scikit-learn-12585/glm/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-12585-glm.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "sklearn/tests/test_base.py::test_clone_estimator_types"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "sklearn/tests/test_base.py::test_clone",
+              "sklearn/tests/test_base.py::test_clone_2",
+              "sklearn/tests/test_base.py::test_clone_buggy",
+              "sklearn/tests/test_base.py::test_clone_empty_array",
+              "sklearn/tests/test_base.py::test_clone_nan",
+              "sklearn/tests/test_base.py::test_clone_sparse_matrices",
+              "sklearn/tests/test_base.py::test_repr",
+              "sklearn/tests/test_base.py::test_str",
+              "sklearn/tests/test_base.py::test_get_params",
+              "sklearn/tests/test_base.py::test_is_classifier",
+              "sklearn/tests/test_base.py::test_set_params",
+              "sklearn/tests/test_base.py::test_set_params_passes_all_parameters",
+              "sklearn/tests/test_base.py::test_set_params_updates_valid_params",
+              "sklearn/tests/test_base.py::test_score_sample_weight",
+              "sklearn/tests/test_base.py::test_clone_pandas_dataframe",
+              "sklearn/tests/test_base.py::test_pickle_version_warning_is_not_raised_with_matching_version",
+              "sklearn/tests/test_base.py::test_pickle_version_warning_is_issued_upon_different_version",
+              "sklearn/tests/test_base.py::test_pickle_version_warning_is_issued_when_no_version_info_in_pickle",
+              "sklearn/tests/test_base.py::test_pickle_version_no_warning_is_issued_with_non_sklearn_estimator",
+              "sklearn/tests/test_base.py::test_pickling_when_getstate_is_overwritten_by_mixin",
+              "sklearn/tests/test_base.py::test_pickling_when_getstate_is_overwritten_by_mixin_outside_of_sklearn",
+              "sklearn/tests/test_base.py::test_pickling_works_when_getstate_is_overwritten_in_the_child_class"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 454,
+        "candidate_patch_sha256": "sha256:99dc1d17ad5247ffdfcf5834517d973d70efa75ebdfbd29eebc1830fb72c86ce",
+        "instance_id": "scikit-learn__scikit-learn-12585",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 97253
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-12585",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "glm",
+  "selected_route_id": "scikit-learn__scikit-learn-12585::armB::glm",
+  "task_index": 5
+}

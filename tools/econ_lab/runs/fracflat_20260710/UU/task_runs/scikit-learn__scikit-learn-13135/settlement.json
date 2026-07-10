@@ -1,0 +1,104 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:12519be626cc7450373e61c0fa9da71fe3fd04efebefe197d46b31b85fbd5dd4",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:52ddb663b2f5bb82dce72d8edf11d887fb874fa7fcdfb65475c77ca3f9a6b6e9",
+    "price_signal_hash": "sha256:ae62c1140984dbdd790273e45c256eb59b79ff61e4d31bd654b19c0fb2539e38",
+    "route_id": "scikit-learn__scikit-learn-13135::armA::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:49efbdaa901ec421e18a5f669b63f1d5567d7bd0b27c2b6fca94930e0c2826f9",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:49efbdaa901ec421e18a5f669b63f1d5567d7bd0b27c2b6fca94930e0c2826f9",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:12519be626cc7450373e61c0fa9da71fe3fd04efebefe197d46b31b85fbd5dd4",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:ef1a92e59aa76b51f0d5f50a0475dce5dbcf6e4e23b53168b69d5848ceda5a96"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/scikit-learn__scikit-learn-13135/qwen/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "scikit-learn__scikit-learn-13135"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-13135"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/scikit-learn__scikit-learn-13135/qwen/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-13135-qwen.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 713,
+        "candidate_patch_sha256": "sha256:e5be8d08037dce530ca5d72a0e314c2830bbaf5280d82c847af07b71b9196725",
+        "instance_id": "scikit-learn__scikit-learn-13135",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 10011
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-13135",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "qwen",
+  "selected_route_id": "scikit-learn__scikit-learn-13135::armA::qwen",
+  "task_index": 6
+}

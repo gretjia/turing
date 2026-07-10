@@ -1,0 +1,27 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+index abc1234..def5678 100644
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -1297,7 +1297,21 @@ class Card:
+         value_str = str(value).strip()
+ 
+         if isinstance(value, float):
+-            value_str = f"{value:.16G}"
++            # First try using Python's default string representation
++            default_str = str(value).strip()
++            
++            # Format with 16 significant digits only if the default representation
++            # is longer than 20 characters or contains scientific notation
++            if (len(default_str) > 20 or "e" in default_str.lower()):
++                value_str = f"{value:.16G}"
++            else:
++                # Use the default representation if it's clean and fits
++                value_str = default_str
++            
++            # Final check: if the string representation is still too long,
++            # try with fewer decimal places
++            if len(value_str) > 20:
++                value_str = f"{value:.{max(1, 16 - len(str(abs(int(value)))))}G}"
+ 
+         # For HIERarch keywords, we need to prepend 'HIERARCH ' to the keyword
+         # if it's not already there. But for the record, we still keep the short form.

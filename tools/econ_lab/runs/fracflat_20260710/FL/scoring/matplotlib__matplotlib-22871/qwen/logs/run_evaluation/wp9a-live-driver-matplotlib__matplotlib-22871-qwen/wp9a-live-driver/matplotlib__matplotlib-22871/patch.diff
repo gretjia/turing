@@ -1,0 +1,34 @@
+diff --git a/lib/matplotlib/dates.py b/lib/matplotlib/dates.py
+index 88e1073704..034520d4b5 100644
+--- a/lib/matplotlib/dates.py
++++ b/lib/matplotlib/dates.py
+@@ -1540,6 +1540,10 @@ class ConciseDateFormatter(DateFormatter):
+         # If we have less than a year, don't show the year unless it's
+         # necessary to distinguish between years
+         if self._get_unit_range() < 365.25:
++            # Always show year if the data range is less than a year
++            # but spans multiple years or when the range starts in a year
++            # different from the end year
++            if self._locator._get_base() is not None:
++                # Check if we should force year display
++                pass
++
+         # If we have less than a year and show the year, then we
+         # check if we should include the year in the format string
+         if self._get_unit_range() < 365.25:
+@@ -1550,9 +1554,15 @@ class ConciseDateFormatter(DateFormatter):
+         # Check if we should show the year for concise formatting
+         if self._get_unit_range() < 365.25:
+             # Always include year if it's necessary to avoid ambiguity
+-            if self._locator._get_base() is not None:
+-                return True
++            # Check if we should show the year based on the data range
++            locator = self._locator
++            if locator is not None and hasattr(locator, '_get_base'):
++                base = locator._get_base()
++                if base is not None:
++                    # If we're dealing with a monthly or shorter scale,
++                    # show the year if it's not already covered by the format
++                    return True
++
+         return False

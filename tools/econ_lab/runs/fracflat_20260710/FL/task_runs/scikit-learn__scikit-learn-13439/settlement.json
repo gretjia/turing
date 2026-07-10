@@ -1,0 +1,210 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:6f150a164b715d0ffe3c7beac8a1edf03be870840add539055d3e34e74dcc5d0",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:61c387651c2c198a298ff26f19bd43e65a11fb2f467bbc2e6ec4864fc1852a79",
+    "price_signal_hash": "sha256:6c82b9e0dbf52358990b77afdf28c4e29c76a21b6db77afc54dd5bf4b928f177",
+    "route_id": "scikit-learn__scikit-learn-13439::armB::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:581f6bbe2fd3b841a275bc32b05810bf31657cd7ee735a0fb3c29aefaefd9f4c",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "sklearn/tests/test_pipeline.py::test_classes_property",
+          "sklearn/tests/test_pipeline.py::test_feature_union",
+          "sklearn/tests/test_pipeline.py::test_feature_union_parallel",
+          "sklearn/tests/test_pipeline.py::test_fit_predict_on_pipeline",
+          "sklearn/tests/test_pipeline.py::test_fit_predict_on_pipeline_without_fit_predict",
+          "sklearn/tests/test_pipeline.py::test_make_pipeline",
+          "sklearn/tests/test_pipeline.py::test_pipeline_correctly_adjusts_steps[None]",
+          "sklearn/tests/test_pipeline.py::test_pipeline_correctly_adjusts_steps[passthrough]",
+          "sklearn/tests/test_pipeline.py::test_pipeline_ducktyping",
+          "sklearn/tests/test_pipeline.py::test_pipeline_fit_params",
+          "sklearn/tests/test_pipeline.py::test_pipeline_fit_transform",
+          "sklearn/tests/test_pipeline.py::test_pipeline_init_tuple",
+          "sklearn/tests/test_pipeline.py::test_pipeline_methods_anova",
+          "sklearn/tests/test_pipeline.py::test_pipeline_named_steps",
+          "sklearn/tests/test_pipeline.py::test_pipeline_raise_set_params_error",
+          "sklearn/tests/test_pipeline.py::test_pipeline_sample_weight_supported",
+          "sklearn/tests/test_pipeline.py::test_pipeline_slice",
+          "sklearn/tests/test_pipeline.py::test_pipeline_transform",
+          "sklearn/tests/test_pipeline.py::test_pipeline_with_cache_attribute",
+          "sklearn/tests/test_pipeline.py::test_pipeline_wrong_memory",
+          "sklearn/tests/test_pipeline.py::test_set_pipeline_step_passthrough[None]",
+          "sklearn/tests/test_pipeline.py::test_set_pipeline_step_passthrough[passthrough]",
+          "sklearn/tests/test_pipeline.py::test_set_pipeline_steps",
+          "sklearn/tests/test_pipeline.py::test_step_name_validation"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [
+          "sklearn/tests/test_pipeline.py::test_feature_union_feature_names",
+          "sklearn/tests/test_pipeline.py::test_feature_union_weights",
+          "sklearn/tests/test_pipeline.py::test_fit_predict_with_intermediate_fit_params",
+          "sklearn/tests/test_pipeline.py::test_make_pipeline_memory",
+          "sklearn/tests/test_pipeline.py::test_make_union",
+          "sklearn/tests/test_pipeline.py::test_make_union_kwargs",
+          "sklearn/tests/test_pipeline.py::test_pipeline_index",
+          "sklearn/tests/test_pipeline.py::test_pipeline_init",
+          "sklearn/tests/test_pipeline.py::test_pipeline_memory",
+          "sklearn/tests/test_pipeline.py::test_pipeline_methods_pca_svm",
+          "sklearn/tests/test_pipeline.py::test_pipeline_methods_preprocessing_svm",
+          "sklearn/tests/test_pipeline.py::test_pipeline_sample_weight_unsupported",
+          "sklearn/tests/test_pipeline.py::test_predict_with_predict_params",
+          "sklearn/tests/test_pipeline.py::test_set_feature_union_step_drop[None]",
+          "sklearn/tests/test_pipeline.py::test_set_feature_union_step_drop[drop]",
+          "sklearn/tests/test_pipeline.py::test_set_feature_union_steps",
+          "sklearn/tests/test_pipeline.py::test_set_params_nested_pipeline"
+        ],
+        "verify_total_count": 17,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:581f6bbe2fd3b841a275bc32b05810bf31657cd7ee735a0fb3c29aefaefd9f4c",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:6f150a164b715d0ffe3c7beac8a1edf03be870840add539055d3e34e74dcc5d0",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:c065f0c518f29aad4ac1ba2ec4e44bd43ad4c4396fc40220bcda5438e5676de1"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/scikit-learn__scikit-learn-13439/qwen/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "scikit-learn__scikit-learn-13439"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-13439"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "scikit-learn__scikit-learn-13439"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/scikit-learn__scikit-learn-13439/qwen/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-13439-qwen.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "sklearn/tests/test_pipeline.py::test_make_pipeline_memory"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [
+              "sklearn/tests/test_pipeline.py::test_pipeline_init",
+              "sklearn/tests/test_pipeline.py::test_pipeline_init_tuple",
+              "sklearn/tests/test_pipeline.py::test_pipeline_methods_anova",
+              "sklearn/tests/test_pipeline.py::test_pipeline_fit_params",
+              "sklearn/tests/test_pipeline.py::test_pipeline_sample_weight_supported",
+              "sklearn/tests/test_pipeline.py::test_pipeline_sample_weight_unsupported",
+              "sklearn/tests/test_pipeline.py::test_pipeline_raise_set_params_error",
+              "sklearn/tests/test_pipeline.py::test_pipeline_methods_pca_svm",
+              "sklearn/tests/test_pipeline.py::test_pipeline_methods_preprocessing_svm",
+              "sklearn/tests/test_pipeline.py::test_fit_predict_on_pipeline",
+              "sklearn/tests/test_pipeline.py::test_fit_predict_on_pipeline_without_fit_predict",
+              "sklearn/tests/test_pipeline.py::test_fit_predict_with_intermediate_fit_params",
+              "sklearn/tests/test_pipeline.py::test_predict_with_predict_params",
+              "sklearn/tests/test_pipeline.py::test_feature_union",
+              "sklearn/tests/test_pipeline.py::test_make_union",
+              "sklearn/tests/test_pipeline.py::test_make_union_kwargs",
+              "sklearn/tests/test_pipeline.py::test_pipeline_transform",
+              "sklearn/tests/test_pipeline.py::test_pipeline_fit_transform",
+              "sklearn/tests/test_pipeline.py::test_pipeline_slice",
+              "sklearn/tests/test_pipeline.py::test_pipeline_index",
+              "sklearn/tests/test_pipeline.py::test_set_pipeline_steps",
+              "sklearn/tests/test_pipeline.py::test_pipeline_named_steps",
+              "sklearn/tests/test_pipeline.py::test_pipeline_correctly_adjusts_steps[None]",
+              "sklearn/tests/test_pipeline.py::test_pipeline_correctly_adjusts_steps[passthrough]",
+              "sklearn/tests/test_pipeline.py::test_set_pipeline_step_passthrough[None]",
+              "sklearn/tests/test_pipeline.py::test_set_pipeline_step_passthrough[passthrough]",
+              "sklearn/tests/test_pipeline.py::test_pipeline_ducktyping",
+              "sklearn/tests/test_pipeline.py::test_make_pipeline",
+              "sklearn/tests/test_pipeline.py::test_feature_union_weights",
+              "sklearn/tests/test_pipeline.py::test_feature_union_parallel",
+              "sklearn/tests/test_pipeline.py::test_feature_union_feature_names",
+              "sklearn/tests/test_pipeline.py::test_classes_property",
+              "sklearn/tests/test_pipeline.py::test_set_feature_union_steps",
+              "sklearn/tests/test_pipeline.py::test_set_feature_union_step_drop[drop]",
+              "sklearn/tests/test_pipeline.py::test_set_feature_union_step_drop[None]",
+              "sklearn/tests/test_pipeline.py::test_step_name_validation",
+              "sklearn/tests/test_pipeline.py::test_set_params_nested_pipeline",
+              "sklearn/tests/test_pipeline.py::test_pipeline_wrong_memory",
+              "sklearn/tests/test_pipeline.py::test_pipeline_with_cache_attribute",
+              "sklearn/tests/test_pipeline.py::test_pipeline_memory"
+            ],
+            "success": []
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 419,
+        "candidate_patch_sha256": "sha256:9f164df9efe9e5d6f328f1d778bda14f740985807359841348792657b67bc632",
+        "instance_id": "scikit-learn__scikit-learn-13439",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 119638
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-13439",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "qwen",
+  "selected_route_id": "scikit-learn__scikit-learn-13439::armB::qwen",
+  "task_index": 13
+}

@@ -1,0 +1,64 @@
+diff --git a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+--- a/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
++++ b/astropy/wcs/wcsapi/wrappers/sliced_wcs.py
+@@ -76,8 +76,46 @@ class SlicedLowLevelWCS(BaseLowLevelWCS):
+         self._slices_pixel = list(slices)
+ 
+     def _pixel_to_world_values(self, *pixel_arrays):
+-        pixel_arrays_new = []
+-        ipix = 0
++        # Build full pixel arrays with the stored pixel values for the sliced dimensions.
++        # The ipix index tracks position in the caller's pixel_arrays.
++        pixel_arrays_new = [None] * self._pixel_dim
++        ipix = 0  # index over the provided pixel_arrays (dimensions kept)
++        stored_used = {}  # keep track of stored pixel value usage per axis
++        if not hasattr(self, '_stored_pixel_values'):
++            # The stored pixel values for the sliced dimensions were set during __init__.
++            # We need to use them when reconstructing the full pixel array.
++            self._stored_pixel_values = []
++        else:
++            pass
++
++        # We must map each full pixel dimension to either a stored value (if sliced) or to the next provided array.
++        # In __init__ we built self._slices_pixel which holds the integer pixel value when an integer slice was given,
++        # or a slice object when a slice was given. The same logic is in ModifiedSlicedLowLevelWCS but we keep
++        # the standard behavior.
++        
++        # Build list of stored values (for integer-sliced axes) in order.
++        stored = []
++        for s in self._slices_pixel:
++            if isinstance(s, int):
++                stored.append(s)
++        stored_idx = 0  # counter over the stored list
++
++        ipix = 0
++        for i in range(self._pixel_dim):
++            if isinstance(self._slices_pixel[i], int):
++                # This dimension was sliced with an integer, so we use the stored pixel value.
++                # The stored value may be a float after scaling; we use the original integer index.
++                # The parent WCS expects pixel arrays of length equal to the number of input coordinate arrays.
++                pixel = float(self._slices_pixel[i])
++                # expand to same length as the provided arrays
++                pixel_arrays_new[i] = np.zeros_like(pixel_arrays[0]) + pixel
++            else:
++                pixel_arrays_new[i] = pixel_arrays[ipix]
++                ipix += 1
++
++        # old code (kept for reference but removed because it didn't handle integer slices properly):
++        # pixel_arrays_new = []
++        # ipix = 0
+         for i in range(self._pixel_dim):
+             if i in self._pixel_keep:
+                 pixel_arrays_new.append(self._slices_pixel[i])
+@@ -85,9 +123,9 @@ class SlicedLowLevelWCS(BaseLowLevelWCS):
+                 pixel_arrays_new.append(pixel_arrays[ipix])
+                 ipix += 1
+ 
+-        pixel_arrays_new = np.broadcast_arrays(*pixel_arrays_new)
++        pixel_arrays_new = np.broadcast_arrays(*pixel_arrays_new, subok=True)
+         return self._wcs.pixel_to_world_values(*pixel_arrays_new)
+-
++    
+     @property
+     def pixel_n_dim(self):
+         return self._n_sliced_dims

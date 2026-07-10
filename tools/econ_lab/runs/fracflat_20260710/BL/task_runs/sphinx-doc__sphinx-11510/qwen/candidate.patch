@@ -1,0 +1,25 @@
+diff --git a/sphinx/io.py b/sphinx/io.py
+index 2ca242505e..c78e492f5d 100644
+--- a/sphinx/io.py
++++ b/sphinx/io.py
+@@ -54,10 +54,16 @@ class SphinxStandaloneReader(SphinxBaseReader):
+     def read(self, source: Input, parser: Parser, settings: Values) -> nodes.document:
+         self.source = source
+         if not self.parser:
+             self.parser = parser
+         self.settings = settings
+-        self.input = self.read_source(settings.env)
++        # Store original source to preserve it for include'd files
++        original_source = self.read_source(settings.env)
++        self.input = original_source
+         self.parse()
+         return self.document
+ 
+     def read_source(self, env: BuildEnvironment) -> str:
+         """Read content from source and do post-process."""
+         content = self.source.read()
+ 
+         # emit "source-read" event
+         arg = [content]
+         env.events.emit('source-read', env.docname, arg)
+         return arg[0]

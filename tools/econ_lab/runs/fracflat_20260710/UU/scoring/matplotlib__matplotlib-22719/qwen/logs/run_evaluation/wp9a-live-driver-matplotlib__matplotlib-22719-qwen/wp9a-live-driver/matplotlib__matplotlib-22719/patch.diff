@@ -1,0 +1,21 @@
+diff --git a/lib/matplotlib/category.py b/lib/matplotlib/category.py
+index 628f041143..4f756151b8 100644
+--- a/lib/matplotlib/category.py
++++ b/lib/matplotlib/category.py
+@@ -58,12 +58,14 @@ def convert(value, unit, axis):
+         # pass through sequence of non binary numbers
+         with _api.suppress_matplotlib_deprecation_warning():
+             is_numlike = all(units.ConversionInterface.is_numlike(v)
+-                             and not isinstance(v, (str, bytes))
++                             and not isinstance(v, (str, bytes))
+                              for v in values)
+         if is_numlike:
+             _api.warn_deprecated(
+                 "3.5", message="Support for passing numbers through unit "
+                 "converters is deprecated since %(since)s and support will be "
+                 "removed %(removal)s; use Axis.convert_units instead.")
+-            return np.asarray(values, dtype=float)
++            # For empty arrays, suppress the warning and return as-is
++            if len(values) == 0:
++                return values
++            return np.asarray(values, dtype=float)

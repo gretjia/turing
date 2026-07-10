@@ -1,0 +1,43 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -586,6 +586,17 @@
+         # Determine required conversion functions -- to bring the unit of the
+         # input to that expected (e.g., radian for np.sin), or to get
+         # consistent units between two inputs (e.g., in np.add) --
+         # and the unit of the result (or tuple of units for nout > 1).
+-        converters, unit = converters_and_unit(function, method, *inputs)
++        try:
++            converters, unit = converters_and_unit(function, method, *inputs)
++        except ValueError:
++            # If another operand may know how to handle this operation,
++            # give it a chance by returning NotImplemented.
++            if any(
++                getattr(inp, "__array_ufunc__", None) is not None
++                and not isinstance(inp, (Quantity, np.ndarray))
++                for inp in inputs
++            ):
++                return NotImplemented
++            raise
+ 
+         out = kwargs.get("out", None)
+@@ -613,6 +624,17 @@
+         # Same for inputs, but here also convert if necessary.
+         arrays = []
+         for input_, converter in zip(inputs, converters):
+             input_ = getattr(input_, "value", input_)
+-            arrays.append(converter(input_) if converter else input_)
++            try:
++                arrays.append(converter(input_) if converter else input_)
++            except ValueError:
++                # Defer to another __array_ufunc__ implementer that may
++                # know how to handle this input.
++                if any(
++                    getattr(inp, "__array_ufunc__", None) is not None
++                    and not isinstance(inp, (Quantity, np.ndarray))
++                    for inp in inputs
++                ):
++                    return NotImplemented
++                raise
+ 
+         # Call our superclass's __array_ufunc__

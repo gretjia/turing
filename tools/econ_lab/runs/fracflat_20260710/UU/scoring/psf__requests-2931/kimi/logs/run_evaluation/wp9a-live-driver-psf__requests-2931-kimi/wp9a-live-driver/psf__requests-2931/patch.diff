@@ -1,0 +1,9 @@
+diff --git a/requests/models.py b/requests/models.py
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -453,7 +453,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         # Add content-type if it wasn't explicitly provided.
+         if content_type and 'content-type' not in self.headers:
+             self.headers['Content-Type'] = content_type
+-        self.body = to_native_string(body)
++        self.body = body

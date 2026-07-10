@@ -1,0 +1,25 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+index 1e48fa4030..7d2cd6fa5f 100644
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -1296,10 +1296,19 @@ def _format_float(value):
+     # optimum.  According to the FITS standard, `G` is not supported.
+     # So we need to use `E` or `F` or pick between `D` and `E`.
+     # Similarly, we cannot use the scientific notation with a
+-    # small exponent which `G` produces.
++    # small exponent which `G` produces. Starting from 20 characters
++    # that `str(value)` would ideally fit into, we fall through to
++    # use repr if that's within our budget. Otherwise we use the
++    # fixed-precision G format.
+ 
+     # TODO: Maybe there is a better way to do this; e.g. use
+     # choices in the order that `G` would produce.
++    value_str = str(value)
++    if len(value_str) <= 20:
++        return value_str
++    value_str = f"{value:.16G}"
++    if len(value_str) <= 20:
++        return value_str
+     value_str = f"{value:.16G}"
+     if len(value_str) > 20:
+         # The maximum number of digits in a FITS float is 16

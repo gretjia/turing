@@ -1,0 +1,224 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index 8798d940..42a359af 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -129,7 +129,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -138,7 +138,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -152,7 +152,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -166,7 +166,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -181,7 +181,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -196,7 +196,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -216,7 +216,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -231,7 +231,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -251,7 +251,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -264,7 +264,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -278,7 +278,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -296,7 +296,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.dot(dta.notnull())
++        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index 42a359af..8798d940 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -129,7 +129,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -138,7 +138,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -152,7 +152,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -166,7 +166,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -181,7 +181,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -196,7 +196,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -216,7 +216,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -231,7 +231,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -251,7 +251,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -264,7 +264,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -278,7 +278,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights
+@@ -296,7 +296,7 @@ class Weighted:
+         if self._weights is None:
+             raise ValueError("No weights found")
+ 
+-        sum_of_weights = self._weights.astype(float).dot(dta.notnull())
++        sum_of_weights = self._weights.dot(dta.notnull())
+ 
+         if keepdims:
+             return dta.weighted(self._weights).sum(dim=dim, keepdims=keepdims) / sum_of_weights

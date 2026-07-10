@@ -1,0 +1,105 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:astropy/astropy:scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:857e9cf67c0268140ecb7a378ebf62bac8bc4f0a280cc63390d585d59395bc4f",
+    "price_signal_hash": "sha256:8a196deb4cc8421719b5915f51f78c7748f899fbf7dccb40b8f2771f8b690ae2",
+    "route_id": "astropy__astropy-7166::armC::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:0d185914b0c1b4eeb786c9c15559c863fb985061b9ed805e37353771f408fd18",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:0d185914b0c1b4eeb786c9c15559c863fb985061b9ed805e37353771f408fd18",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "astropy/astropy",
+          "route_scaffold": "scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:bf41caa864973131b8fc0afebb7cf71bd55196f7799b2b3d8e8cf351308825ba"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/astropy__astropy-7166/deepseek/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "astropy__astropy-7166"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "astropy__astropy-7166"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/astropy__astropy-7166/deepseek/wp9a-live-driver.wp9a-live-driver-astropy__astropy-7166-deepseek.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 1201,
+        "candidate_patch_sha256": "sha256:c0ee9b0bbbc0dc08dd44054e26778a01799c8b2634762eeeeb5a476a38e4f1bb",
+        "instance_id": "astropy__astropy-7166",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 204295
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "astropy/astropy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "astropy__astropy-7166",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "astropy__astropy-7166::armC::deepseek",
+  "task_index": 17
+}

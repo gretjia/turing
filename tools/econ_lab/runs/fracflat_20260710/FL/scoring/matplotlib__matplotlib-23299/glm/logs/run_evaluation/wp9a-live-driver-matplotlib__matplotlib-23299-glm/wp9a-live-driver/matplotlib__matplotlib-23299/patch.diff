@@ -1,0 +1,71 @@
+diff --git a/lib/matplotlib/__init__.py b/lib/matplotlib/__init__.py
+index a4c1c4f6b..1a6b2a8c4 100644
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -64,6 +64,8 @@
+ import matplotlib.pylab as plt
+ from matplotlib import rcParams, cbook, interactive
+ from matplotlib._pylab_helpers import Gcf
++from matplotlib.figure import Figure
++
+ 
+ __author__ = "John D. Hunter <jdhunter@ace.bsd.uchicago.edu>"
+ __license__ = "PSF"
+@@ -172,11 +174,19 @@ class _ReprEncoder:
+ 
+ def get_backend():
+     """
+-    Return the name of the current backend.
++    Return the name of the current backend.
+ 
+     See %s for more information.
+     """
+     from matplotlib.backends import pylab_setup
++
++    # Fix issue where get_backend() clears figures from Gcf.figs if they were
++    # created under rc_context. The issue was caused by importing pylab_setup
++    # inside the function, which triggered a new rc_context and cleared figures
++    # that were created in a previous rc_context.
++    active_figures = list(Gcf.figs.values())
+     backend, renderers, _ = pylab_setup()
++    
++    # Restore any figures that might have been cleared
++    for fig in active_figures:
++        if fig.number not in Gcf.figs:
++            Gcf.figs[fig.number] = FigureManager(fig)
++
+     return backend
+diff --git a/lib/matplotlib/backends/__init__.py b/lib/matplotlib/backends/__init__.py
+index 1a8b7c3d5..d4a9b9f54 100644
+--- a/lib/matplotlib/backends/__init__.py
++++ b/lib/matplotlib/backends/__init__.py
+@@ -320,7 +320,7 @@ def pylab_setup():
+     """
+     # This is a bit hackish: we want to avoid the import checks happening
+     # multiple times, so we store the results in the backend registry.
+-    global _backend_mod, _backend_mod_list
++    # global _backend_mod, _backend_mod_list  # Commented out to prevent global state changes
+ 
+     if backend_name is None:
+         backend_name = mpl.rcParams['backend']
+diff --git a/lib/matplotlib/backends/backend_qt.py b/lib/matplotlib/backends/backend_qt.py
+index 689a4b56c..e1b7d5e8c 100644
+--- a/lib/matplotlib/backends/backend_qt.py
++++ b/lib/matplotlib/backends/backend_qt.py
+@@ -25,6 +25,7 @@
+ 
+ import os
+ import io
++from collections import OrderedDict
+ 
+ import numpy as np
+ import numpy.ma as ma
+@@ -1063,7 +1064,7 @@ class FigureManagerQT(FigureManagerBase):
+         self.canvas.draw_idle()
+ 
+ 
+-class FigureManagerQTAgg(FigureManagerQT):
++class FigureManagerQTAgg(FigureManagerQT):
+     """
+     Window manager with Agg renderer.
+     """

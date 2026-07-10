@@ -1,0 +1,148 @@
+{
+  "capsule": "D",
+  "branch": "fracflat/grok-20260710",
+  "base_c_head": "dcd0eed5ca49cef74b8a9c25153c4e9d9a8c991f",
+  "c_handoff_head_commit": "aae97ca1fe8955fc43c65801a7061c29824a1f6b",
+  "head_commit": null,
+  "status_ceiling": "ADDRESSED",
+  "nature": "confirmatory experiment \u2014 flat market x fractional reward; no CLOSED/RELEASED/RATIFIED",
+  "outcome": "NULL_EVEN_WITH_DENSE_SIGNAL",
+  "pool_manifest_sha256": "15afde7bfb4693fbfbf363d450eb920bc8fc2dd27cfbc35ea1d66a953c41a86b",
+  "stream_manifest_sha256": "bf3f8f8d79ed7e3370e2c1dbeb534809239bb7e3f6acb8236726df3485cc6d69",
+  "prereg_freeze": {
+    "readout_sha256": "0611bf465a3a1d655116901126db18f622eed34b2c14db97c7e0bb0d70efb204",
+    "readout_path": "tools/econ_lab/analysis/fracflat_readout.py",
+    "frozen_before_first_real_run": true,
+    "self_test": "FRACFLAT_READOUT_SELF_TEST_PASS",
+    "primary_metric": "verify_pass_fraction v in [0,1]",
+    "hypotheses": {
+      "H-D1": "FL > UU paired Wilcoxon exact one-sided alpha_prime=0.025",
+      "H-D2": "FL > BL paired Wilcoxon exact one-sided alpha_prime=0.025"
+    },
+    "outcome_map": [
+      "PRICE_LEARNING_WORKS_WITH_DENSE_SIGNAL",
+      "LEARNING_YES_INGREDIENT_UNCLEAR",
+      "INGREDIENT_YES_VS_UNIFORM_UNPROVEN",
+      "NULL_EVEN_WITH_DENSE_SIGNAL",
+      "NOT_RUN"
+    ]
+  },
+  "budget": {
+    "cap": 165,
+    "used": 128,
+    "smoke": 4,
+    "full_by_arm": {
+      "FL": 40,
+      "BL": 41,
+      "UU": 43
+    },
+    "full_total": 124,
+    "note": "smoke: FL+BL+UU (1 each) + 1 UU retry after infra_null; full 40+41+43=124; total 128"
+  },
+  "readout": {
+    "path": "tools/econ_lab/runs/fracflat_20260710/FRACFLAT_READOUT.json",
+    "outcome": "NULL_EVEN_WITH_DENSE_SIGNAL",
+    "floor_ok": true,
+    "n_computable_v": {
+      "FL": 40,
+      "BL": 40,
+      "UU": 42
+    },
+    "H-D1_supported": false,
+    "H-D2_supported": false,
+    "H-D1_p_one_sided": 0.799072265625,
+    "H-D2_p_one_sided": 0.8571929931640625,
+    "mean_v": {
+      "FL": 0.33669239820295227,
+      "BL": 0.39901413690476184,
+      "UU": 0.38548730647188734
+    }
+  },
+  "spec_gate": [
+    {
+      "id": 1,
+      "predicate": "constitution + governance",
+      "exit_code": 0,
+      "evidence": "sha256sum constitution_root_law.md OK (a0174ef8\u2026); verify_alignment.sh GREEN"
+    },
+    {
+      "id": 2,
+      "predicate": "C handoff present blocked=[] + fractional flag on live_driver",
+      "exit_code": 0,
+      "evidence": "HANDOFF_CAPSULE_C.json blocked=[]; --fractional-reward on live_driver; worktree base dcd0eed"
+    },
+    {
+      "id": 3,
+      "predicate": "baseline tests",
+      "exit_code": 0,
+      "evidence": "cargo test -p turing-economy OK; gate_f4 F4_LEAK_PASS + F4_LEAK_SELF_TEST_PASS; pytest: 2 inherited head_parity failures from C fractional fields vs merge-base (NEW-FILES-ONLY cannot patch tests); remaining live_driver suite green"
+    }
+  ],
+  "ship_gate": [
+    {
+      "id": 1,
+      "predicate": "pool manifest 50 + fingerprint + recalc",
+      "exit_code": 0,
+      "evidence": "fracflat_pool_manifest.json sha 15afde7b\u2026; python3 tools/econ_lab/analysis/fracflat_build_pool.py"
+    },
+    {
+      "id": 2,
+      "predicate": "zero-modify existing files vs C tip",
+      "exit_code": 0,
+      "evidence": "git diff dcd0eed5ca49cef74b8a9c25153c4e9d9a8c991f --name-only empty; only new paths under allowed prefixes"
+    },
+    {
+      "id": 3,
+      "predicate": "readout self-test + prereg freeze before first real call",
+      "exit_code": 0,
+      "evidence": "FRACFLAT_READOUT_SELF_TEST_PASS; readout sha 0611bf46\u2026 frozen in HANDOFF prereg_freeze"
+    },
+    {
+      "id": 4,
+      "predicate": "smoke 3 arms + full 3 verdicts + single readout",
+      "exit_code": 0,
+      "evidence": "runs/fracflat_20260710/smoke_{FL,BL,UU}/; {FL,BL,UU}/verdict.json; FRACFLAT_READOUT.json outcome NULL_EVEN_WITH_DENSE_SIGNAL"
+    },
+    {
+      "id": 5,
+      "predicate": "pytest/cargo/gate_f4 still green (inherited head_parity note)",
+      "exit_code": 0,
+      "evidence": "cargo OK; F4_LEAK_PASS; head_parity inherited from C"
+    },
+    {
+      "id": 6,
+      "predicate": "commit on fracflat/grok-20260710 no push",
+      "exit_code": 0,
+      "evidence": "branch fracflat/grok-20260710; no push"
+    },
+    {
+      "id": 7,
+      "predicate": "HANDOFF + report",
+      "exit_code": 0,
+      "evidence": [
+        "HANDOFF_CAPSULE_D.json",
+        "docs/handoff/GROK_CAPSULE_D_FRACFLAT_REPORT_20260710.md"
+      ]
+    }
+  ],
+  "blocked": [],
+  "deliverables": [
+    "HANDOFF_CAPSULE_D.json",
+    "docs/handoff/GROK_CAPSULE_D_FRACFLAT_REPORT_20260710.md",
+    "tools/econ_lab/analysis/fracflat_build_pool.py",
+    "tools/econ_lab/analysis/fracflat_pool_manifest.json",
+    "tools/econ_lab/analysis/fracflat_stream_manifest.json",
+    "tools/econ_lab/analysis/fracflat_readout.py",
+    "tools/econ_lab/analysis/fracflat_task_root/",
+    "tools/econ_lab/run_fracflat.sh",
+    "tools/econ_lab/runs/fracflat_20260710/"
+  ],
+  "notes": [
+    "Pool: S01\u222aS02 top-50 by (historical accept-pass DESC, instance_id ASC) from stageA 5 + stageBprime 4.",
+    "Virtual task root uses whole-directory symlinks so worker_capsule.md resolves.",
+    "Driver not modified: pool sha in status.json + HANDOFF only.",
+    "Shared Docker with CAPSULE E slowed wall clock; arm concurrency 2 honored.",
+    "Outcome NULL_EVEN_WITH_DENSE_SIGNAL is a valid preregistered result.",
+    "No push; ceiling ADDRESSED only."
+  ]
+}

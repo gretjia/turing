@@ -1,0 +1,195 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:fd3a4aa896d508dd2cf46e51a4a04cb89f4c1f44878b4956582f234dfcb70d08",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:52ddb663b2f5bb82dce72d8edf11d887fb874fa7fcdfb65475c77ca3f9a6b6e9",
+    "price_signal_hash": "sha256:57d95b007a13220759f8cda478f0016e7d56f2b51b8d22c76b6e51be22e35bc5",
+    "route_id": "scikit-learn__scikit-learn-13135::armB::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:acc72cfbea1dcf6bfa1df28013f50060e0a436c2aa5bd42bca8bd9dbc264ac34",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform[uniform-expected0]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform_n_bins_array[kmeans-expected1]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform_n_bins_array[uniform-expected0]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_invalid_n_bins_array",
+          "sklearn/preprocessing/tests/test_discretization.py::test_invalid_n_features",
+          "sklearn/preprocessing/tests/test_discretization.py::test_invalid_strategy_option",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-dense-uniform]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-quantile]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[ordinal-quantile]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_nonuniform_strategies[quantile-expected_2bins2-expected_3bins2-expected_5bins2]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_overwrite",
+          "sklearn/preprocessing/tests/test_discretization.py::test_same_min_max[quantile]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_same_min_max[uniform]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_transform_outside_fit_range[kmeans]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_transform_outside_fit_range[quantile]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_transform_outside_fit_range[uniform]"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 18,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "sklearn/preprocessing/tests/test_discretization.py::test_encode_options",
+          "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform[kmeans-expected1]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform[quantile-expected2]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform_n_bins_array[quantile-expected2]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_invalid_encode_option",
+          "sklearn/preprocessing/tests/test_discretization.py::test_invalid_n_bins",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-dense-kmeans]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-dense-quantile]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-kmeans]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-uniform]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[ordinal-kmeans]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[ordinal-uniform]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_nonuniform_strategies[kmeans-expected_2bins1-expected_3bins1-expected_5bins1]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_nonuniform_strategies[uniform-expected_2bins0-expected_3bins0-expected_5bins0]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_numeric_stability",
+          "sklearn/preprocessing/tests/test_discretization.py::test_same_min_max[kmeans]",
+          "sklearn/preprocessing/tests/test_discretization.py::test_transform_1d_behavior",
+          "sklearn/preprocessing/tests/test_discretization.py::test_valid_n_bins"
+        ],
+        "verify_total_count": 18,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:acc72cfbea1dcf6bfa1df28013f50060e0a436c2aa5bd42bca8bd9dbc264ac34",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:fd3a4aa896d508dd2cf46e51a4a04cb89f4c1f44878b4956582f234dfcb70d08",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:201e21086c87ef3cd2115b2d0cf6fceecd3972f33a3975eaf87fd62e58aeea57"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/scikit-learn__scikit-learn-13135/deepseek/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "scikit-learn__scikit-learn-13135"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "scikit-learn__scikit-learn-13135"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-13135"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/scikit-learn__scikit-learn-13135/deepseek/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-13135-deepseek.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "sklearn/preprocessing/tests/test_discretization.py::test_nonuniform_strategies[kmeans-expected_2bins1-expected_3bins1-expected_5bins1]"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform[uniform-expected0]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform[kmeans-expected1]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform[quantile-expected2]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_valid_n_bins",
+              "sklearn/preprocessing/tests/test_discretization.py::test_invalid_n_bins",
+              "sklearn/preprocessing/tests/test_discretization.py::test_invalid_n_bins_array",
+              "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform_n_bins_array[uniform-expected0]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform_n_bins_array[kmeans-expected1]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_fit_transform_n_bins_array[quantile-expected2]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_invalid_n_features",
+              "sklearn/preprocessing/tests/test_discretization.py::test_same_min_max[uniform]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_same_min_max[kmeans]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_same_min_max[quantile]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_transform_1d_behavior",
+              "sklearn/preprocessing/tests/test_discretization.py::test_numeric_stability",
+              "sklearn/preprocessing/tests/test_discretization.py::test_invalid_encode_option",
+              "sklearn/preprocessing/tests/test_discretization.py::test_encode_options",
+              "sklearn/preprocessing/tests/test_discretization.py::test_invalid_strategy_option",
+              "sklearn/preprocessing/tests/test_discretization.py::test_nonuniform_strategies[uniform-expected_2bins0-expected_3bins0-expected_5bins0]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_nonuniform_strategies[quantile-expected_2bins2-expected_3bins2-expected_5bins2]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[ordinal-uniform]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[ordinal-kmeans]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[ordinal-quantile]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-uniform]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-kmeans]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-quantile]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-dense-uniform]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-dense-kmeans]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_inverse_transform[onehot-dense-quantile]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_transform_outside_fit_range[uniform]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_transform_outside_fit_range[kmeans]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_transform_outside_fit_range[quantile]",
+              "sklearn/preprocessing/tests/test_discretization.py::test_overwrite"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 639,
+        "candidate_patch_sha256": "sha256:ceac7818ba8ab4af4a9c42a97de949f2385d311059dcd4accc1513a2ff6cb6a6",
+        "instance_id": "scikit-learn__scikit-learn-13135",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 35682
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-13135",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "scikit-learn__scikit-learn-13135::armB::deepseek",
+  "task_index": 6
+}

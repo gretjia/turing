@@ -1,0 +1,104 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pydata/xarray:scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:51bb58c7442a4be473ffb9ad63f0114789ea9e0ffa961601363e12b5b7522781",
+    "price_signal_hash": "sha256:368690ad19bb32479d8161dff785d4561c7fc846d7ded312d88aeb1888a8a3db",
+    "route_id": "pydata__xarray-6461::armB::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:29937ff891440d1186ca7587bc710a8be5b79f8350fd2296026801d7de4bbb09",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:29937ff891440d1186ca7587bc710a8be5b79f8350fd2296026801d7de4bbb09",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "pydata/xarray",
+          "route_scaffold": "scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:2ea513864aa7e9530165b7ce65b33d89788f4526f7bb5dc58cd69b793ceba940"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/pydata__xarray-6461/kimi/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "pydata__xarray-6461"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "pydata__xarray-6461"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/pydata__xarray-6461/kimi/wp9a-live-driver.wp9a-live-driver-pydata__xarray-6461-kimi.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 668,
+        "candidate_patch_sha256": "sha256:45253f3725a0da3ba07c0ed4a024bec7028aa06951398b5b64c5d342c5ff6e8b",
+        "instance_id": "pydata__xarray-6461",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 91892
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "pydata/xarray",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pydata__xarray-6461",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "kimi",
+  "selected_route_id": "pydata__xarray-6461::armB::kimi",
+  "task_index": 24
+}

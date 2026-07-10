@@ -1,0 +1,44 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 57a8ab2799..91684505f1 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -1,5 +1,7 @@
+ # Licensed under a 3-clause BSD style license
+ """
++:Author: Simon Gibbons (simongibbons@gmail.com)
++"""
+ 
+ 
+ from .core import DefaultSplitter
+@@ -29,10 +31,14 @@ class RST(FixedWidth):
+     _description = "reStructuredText simple table"
+     data_class = SimpleRSTData
+     header_class = SimpleRSTHeader
+ 
+-    def __init__(self):
+-        super().__init__(delimiter_pad=None, bookend=False)
++    def __init__(self, header_rows=None, **kwargs):
++        super().__init__(delimiter_pad=None, bookend=False, **kwargs)
++        self.header_rows = header_rows
+ 
+     def write(self, lines):
+-        lines = super().write(lines)
+-        lines = [lines[1]] + lines + [lines[1]]
+-        return lines
++        # Get the original lines
++        lines = super().write(lines)
++
++        # Insert header rows if specified
++        if self.header_rows:
++            # Add empty line before header
++            lines.insert(0, '')
++            # Insert header rows
++            for header_row in self.header_rows:
++                lines.insert(0, header_row)
++
++        # Add the border lines at the beginning and end
++        if lines:
++            border_line = lines[1] if len(lines) > 1 else ''
++            lines = [border_line] + lines + [border_line]
++
++        return lines

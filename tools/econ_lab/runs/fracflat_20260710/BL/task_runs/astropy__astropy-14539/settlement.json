@@ -1,0 +1,104 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:astropy/astropy:scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:3094891626f870ea1d4905a5d31ddca57c2f80aacd50d07bd05a2fb65b2707ea",
+    "price_signal_hash": "sha256:afbcd0c047057204facc546f7ba4fdf4f12491986ae91092e3a6db3c96db4012",
+    "route_id": "astropy__astropy-14539::armA::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:8730f1d042d4f7604870250dea8b01b8a3e5d42f0c997df17879835077df18f9",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:8730f1d042d4f7604870250dea8b01b8a3e5d42f0c997df17879835077df18f9",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "astropy/astropy",
+          "route_scaffold": "scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:896e484306b0f9228fb1f6362a7ffda5e70359f6e97a9569ff1a108cf7447739"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/astropy__astropy-14539/glm/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "astropy__astropy-14539"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "astropy__astropy-14539"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/BL/scoring/astropy__astropy-14539/glm/wp9a-live-driver.wp9a-live-driver-astropy__astropy-14539-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 3062,
+        "candidate_patch_sha256": "sha256:bc3bb2b9b7c4b6747582d5e718389b71af6a4109ee3955cd9bc61fa01014813c",
+        "instance_id": "astropy__astropy-14539",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 23759
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "astropy/astropy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "astropy__astropy-14539",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "glm",
+  "selected_route_id": "astropy__astropy-14539::armA::glm",
+  "task_index": 16
+}

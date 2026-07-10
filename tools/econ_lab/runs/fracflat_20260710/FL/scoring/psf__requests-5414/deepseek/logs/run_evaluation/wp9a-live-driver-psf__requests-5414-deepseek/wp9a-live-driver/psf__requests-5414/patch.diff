@@ -1,0 +1,13 @@
+diff --git a/requests/models.py b/requests/models.py
+index 4f30daf7..f20b54d7 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -396,6 +396,8 @@ class PreparedRequest(RequestEncodingMixin, requests.packages.urllib3.disable_wa
+             try:
+                 host = host.encode('idna').decode('utf-8')
+             except UnicodeError:
++                raise InvalidURL(u'URL has an invalid label.')
++        except UnicodeError:
+             raise InvalidURL(u'URL has an invalid label.')
+         elif host:
+             raise InvalidURL(u'URL has an invalid label.')

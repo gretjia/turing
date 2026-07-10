@@ -1,0 +1,444 @@
+{
+  "arm_summaries": [
+    {
+      "accept_pass_count": 3,
+      "path": "tools/econ_lab/runs/stageA_20260707/tau_0/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 13,
+      "path": "tools/econ_lab/runs/stageA_20260707/tau_0p5/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 10,
+      "path": "tools/econ_lab/runs/stageA_20260707/tau_1/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 11,
+      "path": "tools/econ_lab/runs/stageA_20260707/tau_2/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 8,
+      "path": "tools/econ_lab/runs/stageA_20260707/tau_inf/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 6,
+      "path": "tools/econ_lab/runs/stageBprime_20260708/W/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 4,
+      "path": "tools/econ_lab/runs/stageBprime_20260708/F/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 6,
+      "path": "tools/econ_lab/runs/stageBprime_20260708/C/verdict.json",
+      "task_count": 50
+    },
+    {
+      "accept_pass_count": 6,
+      "path": "tools/econ_lab/runs/stageBprime_20260708/U/verdict.json",
+      "task_count": 50
+    }
+  ],
+  "candidate_pool": {
+    "n_candidates": 100,
+    "s01_count": 50,
+    "s02_count": 50,
+    "shards": [
+      "S01",
+      "S02"
+    ]
+  },
+  "capsule": "D",
+  "count_histogram": {
+    "0": 59,
+    "1": 26,
+    "2": 8,
+    "3": 4,
+    "4": 2,
+    "5": 1
+  },
+  "entries": [
+    {
+      "historical_accept_pass_count": 5,
+      "instance_id": "sympy__sympy-13480",
+      "rank": 0,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 4,
+      "instance_id": "django__django-10999",
+      "rank": 1,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 4,
+      "instance_id": "pydata__xarray-4629",
+      "rank": 2,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 3,
+      "instance_id": "matplotlib__matplotlib-22719",
+      "rank": 3,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 3,
+      "instance_id": "pytest-dev__pytest-7205",
+      "rank": 4,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 3,
+      "instance_id": "scikit-learn__scikit-learn-12585",
+      "rank": 5,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 3,
+      "instance_id": "scikit-learn__scikit-learn-13135",
+      "rank": 6,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "django__django-11066",
+      "rank": 7,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "django__django-11099",
+      "rank": 8,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "matplotlib__matplotlib-23299",
+      "rank": 9,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "matplotlib__matplotlib-23314",
+      "rank": 10,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "pydata__xarray-4075",
+      "rank": 11,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "pytest-dev__pytest-6202",
+      "rank": 12,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "scikit-learn__scikit-learn-13439",
+      "rank": 13,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 2,
+      "instance_id": "sphinx-doc__sphinx-7440",
+      "rank": 14,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "astropy__astropy-14096",
+      "rank": 15,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "astropy__astropy-14539",
+      "rank": 16,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "astropy__astropy-7166",
+      "rank": 17,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "django__django-11119",
+      "rank": 18,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "django__django-11163",
+      "rank": 19,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "matplotlib__matplotlib-22871",
+      "rank": 20,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "matplotlib__matplotlib-24149",
+      "rank": 21,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "psf__requests-2931",
+      "rank": 22,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "psf__requests-5414",
+      "rank": 23,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "pydata__xarray-6461",
+      "rank": 24,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "pydata__xarray-6721",
+      "rank": 25,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "pylint-dev__pylint-6903",
+      "rank": 26,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "pylint-dev__pylint-7080",
+      "rank": 27,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "pytest-dev__pytest-5809",
+      "rank": 28,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "pytest-dev__pytest-6197",
+      "rank": 29,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "scikit-learn__scikit-learn-11578",
+      "rank": 30,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "scikit-learn__scikit-learn-13328",
+      "rank": 31,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-10614",
+      "rank": 32,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-11445",
+      "rank": 33,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-11510",
+      "rank": 34,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-7462",
+      "rank": 35,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sphinx-doc__sphinx-7757",
+      "rank": 36,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13372",
+      "rank": 37,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13551",
+      "rank": 38,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13757",
+      "rank": 39,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 1,
+      "instance_id": "sympy__sympy-13877",
+      "rank": 40,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-13579",
+      "rank": 41,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-13977",
+      "rank": 42,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14182",
+      "rank": 43,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14309",
+      "rank": 44,
+      "source_shard": "S01"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14365",
+      "rank": 45,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14369",
+      "rank": 46,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14508",
+      "rank": 47,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14598",
+      "rank": 48,
+      "source_shard": "S02"
+    },
+    {
+      "historical_accept_pass_count": 0,
+      "instance_id": "astropy__astropy-14995",
+      "rank": 49,
+      "source_shard": "S02"
+    }
+  ],
+  "historical_arms": {
+    "accept_definition": "settlement_verdict_resolved==True (fallback live_split.accept_verdict)",
+    "n_arms": 9,
+    "stageA": [
+      "tau_0",
+      "tau_0p5",
+      "tau_1",
+      "tau_2",
+      "tau_inf"
+    ],
+    "stageBprime": [
+      "W",
+      "F",
+      "C",
+      "U"
+    ]
+  },
+  "instance_ids": [
+    "sympy__sympy-13480",
+    "django__django-10999",
+    "pydata__xarray-4629",
+    "matplotlib__matplotlib-22719",
+    "pytest-dev__pytest-7205",
+    "scikit-learn__scikit-learn-12585",
+    "scikit-learn__scikit-learn-13135",
+    "django__django-11066",
+    "django__django-11099",
+    "matplotlib__matplotlib-23299",
+    "matplotlib__matplotlib-23314",
+    "pydata__xarray-4075",
+    "pytest-dev__pytest-6202",
+    "scikit-learn__scikit-learn-13439",
+    "sphinx-doc__sphinx-7440",
+    "astropy__astropy-14096",
+    "astropy__astropy-14539",
+    "astropy__astropy-7166",
+    "django__django-11119",
+    "django__django-11163",
+    "matplotlib__matplotlib-22871",
+    "matplotlib__matplotlib-24149",
+    "psf__requests-2931",
+    "psf__requests-5414",
+    "pydata__xarray-6461",
+    "pydata__xarray-6721",
+    "pylint-dev__pylint-6903",
+    "pylint-dev__pylint-7080",
+    "pytest-dev__pytest-5809",
+    "pytest-dev__pytest-6197",
+    "scikit-learn__scikit-learn-11578",
+    "scikit-learn__scikit-learn-13328",
+    "sphinx-doc__sphinx-10614",
+    "sphinx-doc__sphinx-11445",
+    "sphinx-doc__sphinx-11510",
+    "sphinx-doc__sphinx-7462",
+    "sphinx-doc__sphinx-7757",
+    "sympy__sympy-13372",
+    "sympy__sympy-13551",
+    "sympy__sympy-13757",
+    "sympy__sympy-13877",
+    "astropy__astropy-13579",
+    "astropy__astropy-13977",
+    "astropy__astropy-14182",
+    "astropy__astropy-14309",
+    "astropy__astropy-14365",
+    "astropy__astropy-14369",
+    "astropy__astropy-14508",
+    "astropy__astropy-14598",
+    "astropy__astropy-14995"
+  ],
+  "schema": "econ_lab.fracflat_pool_manifest.v1",
+  "sort_key": "(historical_accept_pass_count DESC, instance_id ASC)",
+  "stream_order": "instance_ids (same as sort order)",
+  "task_root_packet_count": 100,
+  "task_root_relative": "tools/econ_lab/analysis/fracflat_task_root",
+  "top_k": 50
+}
