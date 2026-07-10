@@ -7,6 +7,8 @@
 **Branch:** `fracflat/grok-20260710`  
 **Base (C tip):** `dcd0eed5ca49cef74b8a9c25153c4e9d9a8c991f`  
 **C HANDOFF head_commit:** `aae97ca1fe8955fc43c65801a7061c29824a1f6b`  
+**Deliverable head_commit:** `9bef0abba8a01d23278b171517f50c75058fd7ff`  
+**Branch tip (HANDOFF pin):** `58db6c7056866822bc6f955293db7f19838e0f48`  
 **Dispatch:** `CAPSULE_D_FRACFLAT_grok_20260710.md` sha `977764b1…`
 
 This report records process, gate evidence, and the single frozen readout outcome.  
