@@ -123,6 +123,12 @@ sys.path.insert(0, str(REPO_ROOT / "tools" / "bench"))
 
 from verifier import live_split_verifier  # noqa: E402
 import run_deepseek_arm_a_worker as arm_a_worker  # noqa: E402
+# WP-H2 (ADR-ECON-007 Decision 1/2/3): loop-detector + diagnostic-injection/rollback hook,
+# gated end-to-end by `--monitor` (default off -- see `run_driver`'s own "monitor_enabled"
+# block and its docstring note there). A bare import is a static, side-effect-free binding
+# and therefore never itself perturbs a byte of `--monitor`-absent output.
+from monitor import interventions as monitor_interventions  # noqa: E402
+from monitor import loop_detector as monitor_loop_detector  # noqa: E402
 
 SHARD_ROOT = REPO_ROOT / "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01"
 # Shard-name-agnostic (Stage B', `--task-shard`, ADR-ECON-003 Decision 7.6): `shard_root`
@@ -598,8 +604,20 @@ def dispatch_worker(
     provider_config: dict[str, Any],
     task_dir_root: Path,
     run_id_prefix: str,
+    diagnostic_prefix: Optional[str] = None,
 ) -> dict[str, Any]:
-    """DeepSeek-direct native adapter (deepseek lineage's fallback path)."""
+    """DeepSeek-direct native adapter (deepseek lineage's fallback path).
+
+    `diagnostic_prefix` (WP-H2, ADR-ECON-007 Decision 1/3, `--monitor` only): a
+    Decision-3-legal `interventions.Diagnostic.text` string to inject into this
+    dispatch's worker-visible context, written to an on-disk
+    `diagnostic_context.md` sibling and threaded through
+    `run_one_task`'s pre-existing `extra_context_file` plumbing point (never a new
+    mechanism -- this reuses the same field the DeepSeek-direct path already exposes
+    for `--broadcast-rules`-adjacent extra context). `None` (the default, and the only
+    value any pre-WP-H2 call site ever passed) is fully behavior-identical to before
+    this parameter existed.
+    """
     import os
 
     instance_id = packet["instance_id"]
@@ -612,6 +630,13 @@ def dispatch_worker(
             "instance_id": instance_id,
             "arm": arm,
         }
+
+    extra_context_file = None
+    if diagnostic_prefix:
+        diagnostic_context_path = task_dir_root / instance_id / "diagnostic_context.md"
+        diagnostic_context_path.parent.mkdir(parents=True, exist_ok=True)
+        diagnostic_context_path.write_text(diagnostic_prefix, encoding="utf-8")
+        extra_context_file = diagnostic_context_path
 
     price_table = {"models": {}}  # no cost-table entry available offline; cost_microusd best-effort 0
     try:
@@ -629,7 +654,7 @@ def dispatch_worker(
             thinking_type="disabled",
             reasoning_effort=None,
             source_context_name=ARM_DESCRIPTORS[arm]["source_context_name"],
-            extra_context_file=None,
+            extra_context_file=extra_context_file,
             broadcast_rules=None,
             broadcast_rules_file=None,
             broadcast_section_mode="none",
@@ -721,8 +746,16 @@ def dispatch_via_siliconflow(
     packet: dict[str, Any],
     task_dir_root: Path,
     timeout_s: int = 600,
+    diagnostic_prefix: Optional[str] = None,
 ) -> dict[str, Any]:
-    """Generic OpenAI-compatible dispatch (SiliconFlow primary path for all 4 lineages)."""
+    """Generic OpenAI-compatible dispatch (SiliconFlow primary path for all 4 lineages).
+
+    `diagnostic_prefix` (WP-H2, ADR-ECON-007 Decision 1/3, `--monitor` only): when set,
+    a Decision-3-legal `interventions.Diagnostic.text` string prepended (as its own
+    markdown section) to the worker-visible capsule text before dispatch -- "注入诊断
+    到下一次 worker 上下文". `None` (the default, and the only value any pre-WP-H2 call
+    site ever passed) is fully behavior-identical to before this parameter existed.
+    """
     import os
 
     instance_id = packet["instance_id"]
@@ -744,6 +777,11 @@ def dispatch_via_siliconflow(
         capsule_text, _source_meta = arm_a_worker.load_worker_visible_context(
             capsule_path, source_context_name=source_context_name
         )
+        if diagnostic_prefix:
+            capsule_text = (
+                "## Prior-step diagnostic (external loop detector)\n\n"
+                f"{diagnostic_prefix}\n\n---\n\n" + capsule_text
+            )
         request_payload = _build_generic_chat_request(model=model_id, capsule_text=capsule_text, max_tokens=12000)
         response, response_raw, wall_time_ms = _call_openai_compatible(
             base_url=SILICONFLOW_BASE_URL, api_key=api_key, request_payload=request_payload, timeout_s=timeout_s
@@ -817,15 +855,21 @@ def dispatch_worker_for_lineage(
     task_dir_root: Path,
     run_id_prefix: str,
     deepseek_native_provider_config: Optional[dict[str, Any]],
+    diagnostic_prefix: Optional[str] = None,
 ) -> dict[str, Any]:
     """Dispatch one (arm, lineage) pair, applying the deepseek-only SiliconFlow-primary /
     DeepSeek-direct-fallback rule (PREREG Appendix A, frozen; see module doc's fallback-
     trigger note for the exact condition this driver uses). A `None`
     `deepseek_native_provider_config` (no `~/.turingos/provider-profiles.json` on this
     machine -- see `load_provider_config`) makes the fallback leg NOT_RUN with a
-    "provider config missing" detail; the SiliconFlow-primary leg is unaffected."""
+    "provider config missing" detail; the SiliconFlow-primary leg is unaffected.
+
+    `diagnostic_prefix` (WP-H2, `--monitor` only, default `None`): forwarded verbatim to
+    both the SiliconFlow-primary and DeepSeek-direct-fallback dispatch calls below -- see
+    each of their own docstrings for how it is injected. `None` is behavior-identical to
+    before this parameter existed."""
     primary_result = dispatch_via_siliconflow(
-        arm=arm, lineage=lineage, packet=packet, task_dir_root=task_dir_root
+        arm=arm, lineage=lineage, packet=packet, task_dir_root=task_dir_root, diagnostic_prefix=diagnostic_prefix
     )
     if (
         lineage == "deepseek"
@@ -848,6 +892,7 @@ def dispatch_worker_for_lineage(
             provider_config=deepseek_native_provider_config,
             task_dir_root=task_dir_root / "deepseek_direct_fallback",
             run_id_prefix=run_id_prefix,
+            diagnostic_prefix=diagnostic_prefix,
         )
         fallback_result["lineage"] = lineage
         fallback_result["provider_path"] = "deepseek_direct_fallback"
@@ -1335,6 +1380,7 @@ def _settle_one(
     route_scaffold: str,
     run_label: str = "",
     task_index: int = 0,
+    diagnostic_prefix: Optional[str] = None,
 ) -> dict[str, Any]:
     """Dispatch one (arm, lineage) pair for one task, score it if a patch was produced, and
     -- if scoring completed -- independently re-judge the harness's per-test report (WP9b,
@@ -1346,6 +1392,10 @@ def _settle_one(
     Market settlement uses `accept_verdict` (Decision 2.4: "accept 裁决(市场结算侧)"),
     **not** the harness's own whole-test-suite `resolved` boolean -- the two differ whenever
     any grading-relevant test lands on the verify side of the held-out split.
+
+    `diagnostic_prefix` (WP-H2, `--monitor` only, default `None`): forwarded to
+    `dispatch_worker_for_lineage` -- see that function's own docstring. `None` is
+    behavior-identical to before this parameter existed.
     """
     instance_id = packet["instance_id"]
     worker_result = dispatch_worker_for_lineage(
@@ -1355,6 +1405,7 @@ def _settle_one(
         task_dir_root=task_dir_root,
         run_id_prefix="wp9a-live-driver",
         deepseek_native_provider_config=deepseek_native_provider_config,
+        diagnostic_prefix=diagnostic_prefix,
     )
 
     scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
@@ -1615,6 +1666,7 @@ def _settle_one_resume(
     route_scaffold: str,
     run_label: str = "",
     task_index: int = 0,
+    diagnostic_prefix: Optional[str] = None,
 ) -> dict[str, Any]:
     """Resume-aware counterpart of `_settle_one` for one (task, lineage): reuses on-disk
     worker/scoring artifacts when present instead of recalling the worker or (when the
@@ -1623,6 +1675,11 @@ def _settle_one_resume(
     -- this function differs only in *how* `worker_result`/`scoring_result` are obtained,
     never in how they are judged, so a resumed settlement and a fresh settlement of the same
     underlying artifacts are byte-identical (`tests/test_live_driver_resume.py`).
+
+    `diagnostic_prefix` (WP-H2, `--monitor` only, default `None`): only reachable when
+    `worker_result is None` below (the "no artifact at all -> full fresh path" branch);
+    once real reconstructed worker artifacts exist, no new dispatch happens here for this
+    parameter to affect. `None` is behavior-identical to before this parameter existed.
     """
     instance_id = packet["instance_id"]
 
@@ -1645,6 +1702,7 @@ def _settle_one_resume(
             route_scaffold=route_scaffold,
             run_label=run_label,
             task_index=task_index,
+            diagnostic_prefix=diagnostic_prefix,
         )
 
     scoring_result: dict[str, Any] = {"status": "SKIPPED_NO_PATCH"}
@@ -1866,6 +1924,38 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
 
     resume_mode = bool(getattr(args, "resume", False))
 
+    # WP-H2 (ADR-ECON-007 Decision 1/2/3): --monitor hook state. `monitor_enabled` gates
+    # every single line below in this block and every use of `pending_diagnostic_text`
+    # further down the task loop -- when it is False (the default; every pre-WP-H2 call
+    # site never set --monitor at all), none of this runs and `verdict["monitor_summary"]`
+    # is never added, so a --monitor-absent run stays byte-identical to a pre-WP-H2 run
+    # (see tests/test_live_driver_monitor_hook.py).
+    monitor_enabled = bool(getattr(args, "monitor", False))
+    monitor_cfg: Optional["monitor_loop_detector.LoopDetectorConfig"] = None
+    monitor_rollback_cap = monitor_interventions.DEFAULT_MAX_ROLLBACKS_PER_FORK_POINT
+    monitor_rollback_cap_arg = getattr(args, "monitor_rollback_cap", None)
+    if monitor_rollback_cap_arg is not None:
+        monitor_rollback_cap = int(monitor_rollback_cap_arg)
+    if monitor_enabled:
+        monitor_config_path = getattr(args, "monitor_config", None)
+        if not monitor_config_path:
+            raise SystemExit(
+                "--monitor requires --monitor-config (ADR-ECON-007 Decision 3: no B-zone "
+                "loop-detector threshold may be hardcoded in this file)"
+            )
+        with open(monitor_config_path, "r", encoding="utf-8") as handle:
+            monitor_cfg_raw = json.load(handle)
+        monitor_cfg = monitor_loop_detector.LoopDetectorConfig(**monitor_cfg_raw)
+    # `monitor_tape`: append-only full history (ADR-ECON-007 Decision 1: "回滚绝不改写
+    # tape"). `monitor_workspace`: the working trajectory a rollback resets to its fork
+    # point; execution (i.e. this driver's own next-task dispatch) continues from it.
+    monitor_tape: list[dict[str, Any]] = []
+    monitor_workspace: list[dict[str, Any]] = []
+    monitor_diagnostics_issued: list[dict[str, Any]] = []
+    # Consumed exactly once, by the *next* task's dispatch calls below (Decision 1/3's
+    # "触发时注入诊断到下一次 worker 上下文并回滚") -- never re-used across two tasks.
+    pending_diagnostic_text: Optional[str] = None
+
     for task_index, packet in enumerate(packets[:max_tasks]):
         instance_id = packet["instance_id"]
 
@@ -1948,6 +2038,14 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                 dispatch_mode = "single_winner"
                 lineages_to_dispatch = [selected_lineage]
 
+            # WP-H2 (ADR-ECON-007 Decision 1/3): the diagnostic queued by a rollback
+            # detected on the *previous* task (if any) is injected into every lineage
+            # dispatch of *this* task, then consumed (never re-used on a later task).
+            # `monitor_enabled` is False on every pre-WP-H2 call site, so
+            # `task_diagnostic_prefix` is always `None` there -- zero behavior change.
+            task_diagnostic_prefix = pending_diagnostic_text if monitor_enabled else None
+            pending_diagnostic_text = None
+
             dispatches = []
             checkpoint_dispatches: list[dict[str, Any]] = []
             for lineage in lineages_to_dispatch:
@@ -1980,6 +2078,7 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     route_scaffold=scaffold_ids[selected_arm][lineage],
                     run_label=run_label,
                     task_index=task_index,
+                    diagnostic_prefix=task_diagnostic_prefix,
                 )
                 if settled["worker_result_status"] == "COMPLETED":
                     real_worker_calls += 1
@@ -2036,6 +2135,73 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                     "dispatches": checkpoint_dispatches,
                 },
             )
+
+            # WP-H2 (ADR-ECON-007 Decision 1/2/3): feed this task's just-settled
+            # dispatches to the external loop detector, one call per task (this
+            # driver's finest available trajectory granularity -- see WP-H1's own
+            # documented spec gap: no per-edit trace exists on disk yet, so
+            # `events_from_real_settlement_checkpoint` is the honest empirical
+            # bridge, reused verbatim rather than re-derived). `monitor_tape` is
+            # append-only (Decision 1: never rewritten/truncated); `monitor_workspace`
+            # is the working view a rollback resets to its fork point -- the two are
+            # allowed to diverge in their own internal `seq` numbering after a
+            # rollback (each is independently renumbered going forward), which is
+            # harmless: `seq` only needs to be locally monotonic within whichever list
+            # the detector/hash logic is given, and the one event whose identity must
+            # stay stable across repeated reference (the fork point itself) is never
+            # touched by `renumber_and_append` -- only *newly appended* events are.
+            if monitor_enabled:
+                task_settlement_for_monitor = {
+                    "instance_id": instance_id,
+                    "selected_route_id": selected_route_id,
+                    "dispatches": checkpoint_dispatches,
+                }
+                task_events = monitor_loop_detector.events_from_real_settlement_checkpoint(
+                    task_settlement_for_monitor
+                )
+                monitor_tape = monitor_interventions.renumber_and_append(monitor_tape, task_events)
+                monitor_workspace = monitor_interventions.renumber_and_append(monitor_workspace, task_events)
+
+                trip_dict = monitor_loop_detector.detect(monitor_workspace, monitor_cfg)
+                if trip_dict["tripped"]:
+                    trip = monitor_loop_detector.LoopTrip(
+                        rule_id=trip_dict["rule_id"], at_seq=trip_dict["at_seq"], evidence=trip_dict["evidence"]
+                    )
+                    diagnostic = monitor_interventions.build_diagnostic(trip)
+                    try:
+                        rollback_result = monitor_interventions.execute_rollback(
+                            tape=monitor_tape,
+                            workspace=monitor_workspace,
+                            trip=trip,
+                            diagnostic=diagnostic,
+                            max_rollbacks_per_fork_point=monitor_rollback_cap,
+                        )
+                    except monitor_interventions.RollbackCapExceededError as cap_error:
+                        # Decision 1: "禁止再回滚该点" -- this fork point stays
+                        # un-rolled-back; execution continues without intervention for
+                        # it (no diagnostic injected, no workspace reset). Recorded as
+                        # evidence, never silently swallowed.
+                        monitor_diagnostics_issued.append(
+                            {
+                                "task_index": task_index,
+                                "rule_id": trip.rule_id,
+                                "outcome": "ROLLBACK_CAP_EXCEEDED",
+                                "detail": str(cap_error),
+                            }
+                        )
+                    else:
+                        monitor_tape = list(rollback_result.tape)
+                        monitor_workspace = list(rollback_result.workspace)
+                        pending_diagnostic_text = diagnostic.text
+                        monitor_diagnostics_issued.append(
+                            {
+                                "task_index": task_index,
+                                "rule_id": trip.rule_id,
+                                "outcome": "ROLLED_BACK",
+                                "diagnostic_digest": diagnostic.digest,
+                                "rollback_event_hash": rollback_result.event["event_hash"],
+                            }
+                        )
 
         task_results.append(
             {
@@ -2099,6 +2265,20 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
         },
         "generated_at_unix": int(time.time()),
     }
+    # WP-H2: `monitor_summary` is added ONLY when --monitor was set -- never present
+    # (not even as a null-valued key) on a --monitor-absent run, so verdict.json stays
+    # byte-identical to a pre-WP-H2 run when the flag is unused (see
+    # tests/test_live_driver_monitor_hook.py). This block is evidence/ledger
+    # bookkeeping (tape/workspace/diagnostics already issued to workers), not a new
+    # worker-visible surface itself.
+    if monitor_enabled:
+        verdict["monitor_summary"] = {
+            "schema": "econ_lab.live_driver.monitor_summary.v1",
+            "tape_event_count": len(monitor_tape),
+            "workspace_event_count": len(monitor_workspace),
+            "diagnostics_issued": monitor_diagnostics_issued,
+            "tape": monitor_tape,
+        }
     return verdict
 
 
@@ -2195,6 +2375,32 @@ def main(argv: Optional[list[str]] = None) -> int:
         action="store_true",
         help="ADR-ECON-006: use verify-side pass fraction as RoutingPriorUpdated reward "
         "(Q32.32); default is binary verify-all-pass. Mode is recorded in stage_b_prime_meta.",
+    )
+    parser.add_argument(
+        "--monitor",
+        action="store_true",
+        help="WP-H2 (ADR-ECON-007 Decision 1/2/3): enable the external loop-detector + "
+        "diagnostic-injection + ledger-compliant-rollback hook. Off by default -- every "
+        "code path this flag gates is additive-only and never executes when absent, so a "
+        "run without --monitor is byte-identical to a pre-WP-H2 run.",
+    )
+    parser.add_argument(
+        "--monitor-config",
+        type=Path,
+        default=None,
+        help="Required when --monitor is set: path to a JSON object with the B-zone "
+        "loop-detector thresholds (same_fragment_failure_threshold/action_window_size/"
+        "action_window_repeat_threshold/phase_timeout_steps -- ADR-ECON-007 Decision 3; "
+        "never hardcoded in this file).",
+    )
+    parser.add_argument(
+        "--monitor-rollback-cap",
+        type=int,
+        default=None,
+        help="Per-fork-point rollback cap (ADR-ECON-007 Decision 1: published A-zone "
+        "constant, initial value 2). Defaults to "
+        "interventions.DEFAULT_MAX_ROLLBACKS_PER_FORK_POINT when --monitor is set and "
+        "this is absent.",
     )
     args = parser.parse_args(argv)
 

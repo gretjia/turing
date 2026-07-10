@@ -96,8 +96,15 @@ def stub_dispatch_worker_for_lineage(
     task_dir_root: Path,
     run_id_prefix: str,
     deepseek_native_provider_config: dict,
+    diagnostic_prefix=None,
 ):
     """Offline stand-in for `dispatch_worker_for_lineage`: no network call, deterministic
+
+    `diagnostic_prefix` (WP-H2, ADR-ECON-007 Decision 1/3, `--monitor` only): accepted
+    and ignored -- this stub never builds a real worker-visible capsule to inject into,
+    so there is nothing for it to do here; the WP-H2 driver's own `_settle_one` always
+    forwards this kwarg (as `None` when `--monitor` is unused), so any stub replacing
+    `dispatch_worker_for_lineage` must at least accept it.
     content, and -- unlike `test_live_driver_replay.py`'s own stub -- also writes a
     `worker_receipt.json` sibling to `candidate.patch` (mirroring the real
     `dispatch_via_siliconflow` artifact pair exactly), so this module's resume tests can
