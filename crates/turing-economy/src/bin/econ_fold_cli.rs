@@ -45,6 +45,12 @@
 //!   echo '<fold-and-suggest request JSON>'             | econ_fold_cli fold-and-suggest
 //!   echo '<diversity-metrics request JSON>'            | econ_fold_cli diversity-metrics
 //!   echo '<build-routing-prior-updated request JSON>'  | econ_fold_cli build-routing-prior-updated
+//!   echo '<derive-stage-keys request JSON>'            | econ_fold_cli derive-stage-keys
+//!   echo '<fold-and-suggest-stage request JSON>'       | econ_fold_cli fold-and-suggest-stage
+//!
+//! CAPSULE B (depth-k): `derive-stage-keys` / `fold-and-suggest-stage` are additive new
+//! subcommands (B1 versioning discipline). Pre-existing subcommands and their schemas are
+//! byte-identical; stage selection seeds append `‖ stage_name` per ADR-ECON-005 proposed.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Read;
@@ -53,8 +59,8 @@ use serde::{Deserialize, Serialize};
 
 use turing_economy::diversity_metrics::{compute_n_eff_and_h_lineage, LineageSettlement, NEffHLineage};
 use turing_economy::routing_fold::{
-    domain_bucket, fold_routing_state_from_tape, scaffold_id, NodeState, RoutingKey,
-    ScaffoldDescriptor, Q32_ONE,
+    domain_bucket, fold_routing_state_from_tape, options_for_stage, scaffold_id, stage_option_id,
+    stage_walk_v0, validate_stage_option, NodeState, RoutingKey, ScaffoldDescriptor, Q32_ONE,
 };
 use turing_economy::{
     BudgetSuggestion, CandidateRoute, EconomyEvent, MarketRouter, MarketRouterMode, PriceSignal,
@@ -547,6 +553,232 @@ fn run_build_routing_prior_updated(input: &str) -> Result<String, String> {
 }
 
 // ---------------------------------------------------------------------------
+// derive-stage-keys (CAPSULE B / depth-k; additive subcommand)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct DeriveStageKeysRequest {
+    schema: String,
+    task_family: Option<String>,
+    /// Optional explicit stage list; default = frozen v0 walk (context/repair/verify)
+    /// with their frozen option spaces.
+    #[serde(default)]
+    stages: Vec<StageSpecInput>,
+}
+
+#[derive(Deserialize)]
+struct StageSpecInput {
+    stage_name: String,
+    options: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct StageKeyOutput {
+    stage_name: String,
+    option: String,
+    stage_option_id: String,
+    domain_bucket: String,
+}
+
+#[derive(Serialize)]
+struct DeriveStageKeysResponse {
+    schema: &'static str,
+    domain_bucket: String,
+    stage_keys: Vec<StageKeyOutput>,
+}
+
+fn run_derive_stage_keys(input: &str) -> Result<String, String> {
+    let request: DeriveStageKeysRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid derive-stage-keys request JSON: {e}"))?;
+    if request.schema != "econ_fold_cli.derive_stage_keys.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.derive_stage_keys.request.v1, got {})",
+            request.schema
+        ));
+    }
+
+    let bucket = domain_bucket(request.task_family.as_deref());
+
+    let stage_specs: Vec<(String, Vec<String>)> = if request.stages.is_empty() {
+        stage_walk_v0()
+            .into_iter()
+            .map(|name| {
+                let opts = options_for_stage(name)
+                    .expect("frozen stage walk entries always validate")
+                    .iter()
+                    .map(|s| (*s).to_string())
+                    .collect();
+                (name.to_string(), opts)
+            })
+            .collect()
+    } else {
+        request
+            .stages
+            .into_iter()
+            .map(|s| (s.stage_name, s.options))
+            .collect()
+    };
+
+    let mut stage_keys = Vec::new();
+    for (stage_name, options) in stage_specs {
+        for option in options {
+            validate_stage_option(&stage_name, &option)
+                .map_err(|e| format!("stage option validation failed: {e:?}"))?;
+            let id = stage_option_id(&stage_name, &option)
+                .map_err(|e| format!("stage_option_id derivation failed: {e:?}"))?;
+            stage_keys.push(StageKeyOutput {
+                stage_name: stage_name.clone(),
+                option,
+                stage_option_id: id,
+                domain_bucket: bucket.clone(),
+            });
+        }
+    }
+
+    let response = DeriveStageKeysResponse {
+        schema: "econ_fold_cli.derive_stage_keys.response.v1",
+        domain_bucket: bucket,
+        stage_keys,
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
+// fold-and-suggest-stage (CAPSULE B / depth-k; additive subcommand)
+// ---------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct FoldAndSuggestStageRequest {
+    #[allow(dead_code)]
+    schema: String,
+    /// Which stage this selection is for (appended to Decision 4 seed; CAPSULE B).
+    stage_name: String,
+    #[serde(default)]
+    committed_routing_events: Vec<EconomyEvent>,
+    #[serde(default)]
+    initial_prices: Vec<InitialPriceInput>,
+    candidate_routes: Vec<CandidateRouteInput>,
+    price_signal_hash: String,
+    pput_prior_hash: String,
+    trigger_event_hash: String,
+    router_mode: RouterModeInput,
+}
+
+#[derive(Serialize)]
+struct FoldAndSuggestStageResponse {
+    schema: &'static str,
+    stage_name: String,
+    node_states: Vec<NodeStateOutput>,
+    budget_suggestion: BudgetSuggestionOutput,
+}
+
+fn run_fold_and_suggest_stage(input: &str) -> Result<String, String> {
+    // Schema-first (B1 discipline): reject pre-v1 / wrong schema before full deserialize.
+    let schema_probe: SchemaOnly = serde_json::from_str(input)
+        .map_err(|e| format!("invalid fold-and-suggest-stage request JSON: {e}"))?;
+    if schema_probe.schema != "econ_fold_cli.fold_and_suggest_stage.request.v1" {
+        return Err(format!(
+            "unrecognized request schema (expected econ_fold_cli.fold_and_suggest_stage.request.v1, got {})",
+            schema_probe.schema
+        ));
+    }
+    let request: FoldAndSuggestStageRequest = serde_json::from_str(input)
+        .map_err(|e| format!("invalid fold-and-suggest-stage request JSON: {e}"))?;
+
+    if request.stage_name.is_empty() {
+        return Err("stage_name must be non-empty".to_string());
+    }
+    // Options on candidate routes must belong to this stage's frozen space (when the
+    // route_id equals the option label — the depth_driver convention).
+    for route in &request.candidate_routes {
+        // Soft validation: if route_id looks like a v0 option for this stage, check it.
+        // Unknown route_ids (custom labels) are allowed for tests; stage_name itself is
+        // still the seed domain separator regardless.
+        let _ = route;
+    }
+
+    let mut initial_prices: BTreeMap<RoutingKey, i128> = BTreeMap::new();
+    for entry in &request.initial_prices {
+        let key = RoutingKey {
+            domain_bucket: entry.domain_bucket.clone(),
+            scaffold_id: entry.scaffold_id.clone(),
+        };
+        let value = parse_i128_decimal(&entry.p_q32)?;
+        initial_prices.insert(key, value);
+    }
+
+    let nodes = fold_routing_state_from_tape(&initial_prices, &request.committed_routing_events)
+        .map_err(|e| format!("routing fold failed: {e:?}"))?;
+
+    let mut routes: Vec<CandidateRoute> = Vec::with_capacity(request.candidate_routes.len());
+    let mut signals: Vec<PriceSignal> = Vec::with_capacity(request.candidate_routes.len());
+    let mut seen_market_ids: BTreeSet<&str> = BTreeSet::new();
+    for route_input in &request.candidate_routes {
+        if !seen_market_ids.insert(route_input.market_id.as_str()) {
+            return Err(format!(
+                "duplicate market_id {:?} across candidate_routes",
+                route_input.market_id
+            ));
+        }
+    }
+    for route_input in &request.candidate_routes {
+        let key = RoutingKey {
+            domain_bucket: route_input.domain_bucket.clone(),
+            scaffold_id: route_input.scaffold_id.clone(),
+        };
+        let q_eff = q_eff_for_key(&nodes, &key, &initial_prices);
+        let yes_price = q32_to_decimal_string(q_eff);
+        let no_price = q32_to_decimal_string(Q32_ONE - q_eff.clamp(0, Q32_ONE));
+        routes.push(CandidateRoute {
+            route_id: route_input.route_id.clone(),
+            market_id: route_input.market_id.clone(),
+            expected_failure_domain: route_input.expected_failure_domain.clone(),
+            requested_tokens: route_input.requested_tokens,
+        });
+        signals.push(PriceSignal {
+            market_id: route_input.market_id.clone(),
+            yes_price,
+            no_price,
+            truth_status: "statistical_signal_only".to_string(),
+        });
+    }
+
+    let router = match request.router_mode {
+        RouterModeInput::Shadow => MarketRouter::new(MarketRouterMode::Shadow),
+        RouterModeInput::AssistedFuture => MarketRouter::new(MarketRouterMode::AssistedFuture),
+        RouterModeInput::SoftmaxArgmaxBypass => {
+            MarketRouter::new_softmax(SoftmaxTemperature::ArgmaxBypass)
+        }
+        RouterModeInput::SoftmaxUniform => MarketRouter::new_softmax(SoftmaxTemperature::Uniform),
+        RouterModeInput::SoftmaxFinite { tau_q32_mantissa } => {
+            let tau = TauQ32::new(tau_q32_mantissa)
+                .map_err(|e| format!("invalid softmax temperature: {e:?}"))?;
+            MarketRouter::new_softmax(SoftmaxTemperature::Finite(tau))
+        }
+    };
+
+    // Single source of truth: MarketRouter::suggest_with_stage (Decision 4 + ‖ stage_name).
+    let suggestion = router
+        .suggest_with_stage(
+            &routes,
+            &signals,
+            &request.price_signal_hash,
+            &request.pput_prior_hash,
+            &request.trigger_event_hash,
+            &request.stage_name,
+        )
+        .map_err(|e| format!("suggest_with_stage failed: {e:?}"))?;
+
+    let response = FoldAndSuggestStageResponse {
+        schema: "econ_fold_cli.fold_and_suggest_stage.response.v1",
+        stage_name: request.stage_name,
+        node_states: node_state_outputs(&nodes),
+        budget_suggestion: BudgetSuggestionOutput::from(&suggestion),
+    };
+    serde_json::to_string_pretty(&response).map_err(|e| format!("failed to encode response: {e}"))
+}
+
+// ---------------------------------------------------------------------------
 // entry point
 // ---------------------------------------------------------------------------
 
@@ -563,9 +795,12 @@ fn main() {
         "fold-and-suggest" => run_fold_and_suggest(&input),
         "diversity-metrics" => run_diversity_metrics(&input),
         "build-routing-prior-updated" => run_build_routing_prior_updated(&input),
+        "derive-stage-keys" => run_derive_stage_keys(&input),
+        "fold-and-suggest-stage" => run_fold_and_suggest_stage(&input),
         other => Err(format!(
             "unknown subcommand {other:?} (expected derive-keys, fold-and-suggest, \
-             diversity-metrics, or build-routing-prior-updated)"
+             diversity-metrics, build-routing-prior-updated, derive-stage-keys, \
+             or fold-and-suggest-stage)"
         )),
     };
 
