@@ -1,0 +1,118 @@
+diff --git a/lib/matplotlib/backends/_backend_tk.py b/lib/matplotlib/backends/_backend_tk.py
+index f57c8a4b5..f9e84d355 100644
+--- a/lib/matplotlib/backends/_backend_tk.py
++++ b/lib/matplotlib/backends/_backend_tk.py
+@@ -616,7 +616,7 @@ class FigureManagerTk(FigureManagerBase):
+         return super().__new__(cls)
+ 
+     def __init__(self, canvas, num):
+-        super().__init__(canvas, num)
++        super().__init__(canvas, num=Gcf.figs[next(reversed(Gcf.figs))].num+1 if Gcf.figs else num)
+         self.window = tkinter.Tk()
+         self.window.wm_title("Figure %d" % num)
+         self.window.protocol("WM_DELETE_WINDOW", self._destroy_window)
+diff --git a/lib/matplotlib/backends/backend_agg.py b/lib/matplotlib/backends/backend_agg.py
+index 4a03835c6..f9e84d355 100644
+--- a/lib/matplotlib/backends/backend_agg.py
++++ b/lib/matplotlib/backends/backend_agg.py
+@@ -19,7 +19,7 @@ class FigureManagerAgg(FigureManagerBase):
+ 
+     def __init__(self, canvas, num):
+         if num is None:
+-            num = new_figure_manager_given_figure(canvas.figure)
++            num = new_figure_manager_given_figure(canvas.figure, num=Gcf.figs[next(reversed(Gcf.figs))].num+1 if Gcf.figs else num)
+ 
+         FigureManagerBase.__init__(self, canvas, num)
+         self._last_key = None
+diff --git a/lib/matplotlib/backends/backend_macosx.py b/lib/matplotlib/backends/backend_macosx.py
+index 5d4b9c3e4..f9e84d355 100644
+--- a/lib/matplotlib/backends/backend_macosx.py
++++ b/lib/matplotlib/backends/backend_macosx.py
+@@ -24,7 +24,7 @@ class FigureManagerMac(FigureManagerBase):
+         """
+         Add the figure to the dock.
+         """
+-        super().__init__(canvas, num)
++        super().__init__(canvas, num=Gcf.figs[next(reversed(Gcf.figs))].num+1 if Gcf.figs else num)
+         self.window = FigureWindowMac(self, num)
+         self.set_window_title("Figure %d" % num)
+         self.ui = FigureCanvasMac(self.canvas, self.window)
+diff --git a/lib/matplotlib/backends/backend_qt.py b/lib/matplotlib/backends/backend_qt.py
+index a5e3d32b9..f9e84d355 100644
+--- a/lib/matplotlib/backends/backend_qt.py
++++ b/lib/matplotlib/backends/backend_qt.py
+@@ -373,7 +373,7 @@ class FigureManagerQT(FigureManagerBase):
+         if num is None:
+             num = new_figure_manager_given_figure(canvas.figure)
+ 
+-        if num is None:
++        if num is None or num == len(Gcf.figs):
+             num = max(Gcf.figs.keys()) + 1 if Gcf.figs else 1
+ 
+         FigureManagerBase.__init__(self, canvas, num)
+diff --git a/lib/matplotlib/pyplot.py b/lib/matplotlib/pyplot.py
+index 30a3a1f2d..f9e84d355 100644
+--- a/lib/matplotlib/pyplot.py
++++ b/lib/matplotlib/pyplot.py
+@@ -344,7 +344,7 @@ def new_figure_manager(num, *args, **kwargs):
+ 
+ def new_figure_manager_given_figure(fig, num=None):
+     """
+     Create a new figure manager that manages the given figure.
+-    
++
+     It is assumed that the figure does **not** have a manager, and
+     that its number is set.
+     """
+diff --git a/lib/matplotlib/_pylab_helpers.py b/lib/matplotlib/_pylab_helpers.py
+index f5c8b2a1d..f9e84d355 100644
+--- a/lib/matplotlib/_pylab_helpers.py
++++ b/lib/matplotlib/_pylab_helpers.py
+@@ -94,7 +94,7 @@ class Gcf:
+ 
+     @classmethod
+     def get_active(cls):
+-        """Return the active manager, or *None* if there is no manager."""
++        """Return the active manager, or *None* if there is no manager."""
+         return next(reversed(cls.figs.values())) if cls.figs else None
+ 
+     @classmethod
+diff --git a/lib/matplotlib/backends/backend_qt5agg.py b/lib/matplotlib/backends/backend_qt5agg.py
+index a5e3d32b9..f9e84d355 100644
+--- a/lib/matplotlib/backends/backend_qt5agg.py
++++ b/lib/matplotlib/backends/backend_qt5agg.py
+@@ -373,7 +373,7 @@ class FigureManagerQT(FigureManagerBase):
+         if num is None:
+             num = new_figure_manager_given_figure(canvas.figure)
+         
+-        if num is None:
++        if num is None or num == len(Gcf.figs):
+             num = max(Gcf.figs.keys()) + 1 if Gcf.figs else 1
+         
+         FigureManagerBase.__init__(self, canvas, num)
+diff --git a/lib/matplotlib/backends/backend_gtk3.py b/lib/matplotlib/backends/backend_gtk3.py
+index 5d4b9c3e4..f9e84d355 100644
+--- a/lib/matplotlib/backends/backend_gtk3.py
++++ b/lib/matplotlib/backends/backend_gtk3.py
+@@ -24,7 +24,7 @@ class FigureManagerGTK3(FigureManagerBase):
+         """
+         Add the figure to the dock.
+         """
+-        super().__init__(canvas, num)
++        super().__init__(canvas, num=Gcf.figs[next(reversed(Gcf.figs))].num+1 if Gcf.figs else num)
+         self.window = FigureWindowGTK3(self, num)
+         self.set_window_title("Figure %d" % num)
+         self.ui = FigureCanvasGTK3(self.canvas, self.window)
+diff --git a/lib/matplotlib/backends/backend_qt5.py b/lib/matplotlib/backends/backend_qt5.py
+index a5e3d32b9..f9e84d355 100644
+--- a/lib/matplotlib/backends/backend_qt5.py
++++ b/lib/matplotlib/backends/backend_qt5.py
+@@ -373,7 +373,7 @@ class FigureManagerQT(FigureManagerBase):
+         if num is None:
+             num = new_figure_manager_given_figure(canvas.figure)
+         
+-        if num is None:
++        if num is None or num == len(Gcf.figs):
+             num = max(Gcf.figs.keys()) + 1 if Gcf.figs else 1
+         
+         FigureManagerBase.__init__(self, canvas, num)

@@ -1,0 +1,13 @@
+diff --git a/astropy/io/ascii/cds.py b/astropy/io/ascii/cds.py
+index c93e7f9..b5e9b6e 100644
+--- a/astropy/io/ascii/cds.py
++++ b/astropy/io/ascii/cds.py
+@@ -155,7 +155,7 @@ class CdsHeader(core.BaseHeader):
+ 
+                 col.start = int(
+                     re.sub(r'[-\s]', '', match.group('start') or match.group('end'))) - 1  # fmt: skip
+-                col.end = int(match.group("end"))
++                col.end = int(re.match(r'\d+', match.group("end"))[0])
+                 unit = match.group("units")
+                 if unit == "---":
+                     col.unit = None  # "---" is the marker for no unit in CDS/MRT table

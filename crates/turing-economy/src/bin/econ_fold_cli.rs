@@ -232,7 +232,10 @@ struct NodeStateOutput {
     scaffold_id: String,
     p_q32: String,
     n: u64,
+    /// Binary success count (legacy; exact under binary mode).
     s: u64,
+    /// ADR-ECON-006: Q32.32 success sum as decimal-literal string.
+    s_q32: String,
     q_eff_q32: String,
 }
 
@@ -286,7 +289,10 @@ fn node_state_outputs(
             scaffold_id: key.scaffold_id.clone(),
             p_q32: node.p_q32().to_string(),
             n: node.n(),
+            // Binary success count (legacy field; exact under binary mode).
             s: node.s(),
+            // ADR-ECON-006: Q32.32 success sum (always present for fractional consumers).
+            s_q32: node.s_q32().to_string(),
             q_eff_q32: node.q_eff_q32().to_string(),
         })
         .collect()
@@ -507,6 +513,10 @@ struct BuildRoutingPriorUpdatedRequest {
     route_domain: String,
     route_scaffold: String,
     verdict: bool,
+    /// ADR-ECON-006: optional Q32.32 fraction as decimal-literal string. Absent ⇒ binary
+    /// constructor (pre-006 byte-identical event). Present ⇒ fractional v2 event.
+    #[serde(default)]
+    verdict_fraction_q32: Option<String>,
     verdict_source_id: String,
     /// `sha256:`-prefixed 64-hex attestation digest (validated by
     /// `EconomyEvent::routing_prior_updated` itself, not re-validated here).
@@ -533,17 +543,33 @@ fn run_build_routing_prior_updated(input: &str) -> Result<String, String> {
         ));
     }
 
-    // Single source of truth: turing_economy::EconomyEvent::routing_prior_updated (WP4) --
-    // the event_hash JCS-SHA256 identity digest is never recomputed in this file or in the
-    // Python driver.
-    let event = EconomyEvent::routing_prior_updated(
-        request.route_domain,
-        request.route_scaffold,
-        request.verdict,
-        request.verdict_source_id,
-        request.verifier_attestation_hash,
-    )
-    .map_err(|e| format!("routing_prior_updated construction failed: {e:?}"))?;
+    // Single source of truth: turing_economy::EconomyEvent::routing_prior_updated (WP4) /
+    // routing_prior_updated_fractional (ADR-ECON-006) -- the event_hash JCS-SHA256 identity
+    // digest is never recomputed in this file or in the Python driver.
+    let event = match request.verdict_fraction_q32 {
+        None => EconomyEvent::routing_prior_updated(
+            request.route_domain,
+            request.route_scaffold,
+            request.verdict,
+            request.verdict_source_id,
+            request.verifier_attestation_hash,
+        )
+        .map_err(|e| format!("routing_prior_updated construction failed: {e:?}"))?,
+        Some(frac_str) => {
+            let frac: i128 = frac_str
+                .parse()
+                .map_err(|e| format!("invalid verdict_fraction_q32 {frac_str:?}: {e}"))?;
+            EconomyEvent::routing_prior_updated_fractional(
+                request.route_domain,
+                request.route_scaffold,
+                request.verdict,
+                frac,
+                request.verdict_source_id,
+                request.verifier_attestation_hash,
+            )
+            .map_err(|e| format!("routing_prior_updated_fractional construction failed: {e:?}"))?
+        }
+    };
 
     let response = BuildRoutingPriorUpdatedResponse {
         schema: "econ_fold_cli.build_routing_prior_updated.response.v1",

@@ -192,6 +192,7 @@ impl EconomyEvent {
             verdict,
             &verdict_source_id,
             &verifier_attestation_hash,
+            None, // binary mode (ADR-ECON-006 default)
         )?;
 
         Ok(EconomyEvent::RoutingPriorUpdated(RoutingPriorUpdated {
@@ -201,6 +202,54 @@ impl EconomyEvent {
             route_domain,
             route_scaffold,
             verdict,
+            // Binary mode: field absent (None) so pre-006 readers and event_hash stay
+            // byte-identical to the ADR-ECON-003 Decision 6 wire shape.
+            verdict_fraction_q32: None,
+            verdict_source_id,
+            verifier_attestation_hash,
+            event_hash,
+        }))
+    }
+
+    /// ADR-ECON-006 fractional verify reward: same as [`Self::routing_prior_updated`] but
+    /// carries `verdict_fraction_q32` (Q32.32 mantissa as decimal string) and uses schema
+    /// `routing_prior_updated.v2`. `verdict_fraction_q32` must be in `[0, Q32_ONE]`.
+    pub fn routing_prior_updated_fractional(
+        route_domain: impl Into<String>,
+        route_scaffold: impl Into<String>,
+        verdict: bool,
+        verdict_fraction_q32: i128,
+        verdict_source_id: impl Into<String>,
+        verifier_attestation_hash: impl Into<String>,
+    ) -> Result<Self, EconomyError> {
+        use crate::routing_fold::Q32_ONE;
+        if !(0..=Q32_ONE).contains(&verdict_fraction_q32) {
+            return Err(EconomyError::RoutingFoldFractionOutOfRange);
+        }
+        let route_domain = route_domain.into();
+        let route_scaffold = route_scaffold.into();
+        let verdict_source_id = verdict_source_id.into();
+        let verifier_attestation_hash = verifier_attestation_hash.into();
+        validate_digest(&verifier_attestation_hash)?;
+        let fraction_str = verdict_fraction_q32.to_string();
+
+        let event_hash = routing_prior_event_hash(
+            &route_domain,
+            &route_scaffold,
+            verdict,
+            &verdict_source_id,
+            &verifier_attestation_hash,
+            Some(fraction_str.as_str()),
+        )?;
+
+        Ok(EconomyEvent::RoutingPriorUpdated(RoutingPriorUpdated {
+            schema_id: "routing_prior_updated.v2".to_string(),
+            event_type: "RoutingPriorUpdated".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_domain,
+            route_scaffold,
+            verdict,
+            verdict_fraction_q32: Some(fraction_str),
             verdict_source_id,
             verifier_attestation_hash,
             event_hash,
@@ -225,26 +274,41 @@ impl EconomyEvent {
     }
 }
 
-/// `event_hash` for a `RoutingPriorUpdated` event (ADR-ECON-003 Decision 6.3 dedup key):
-/// JCS-canonicalize the event's own identity fields and SHA-256 them, same codec used by
-/// `routing_fold::scaffold_id` (`turing_contracts::jcs`). Pure function of its five
-/// arguments only (Art 0.2) -- never reads clock/random/global state, so the same tape
-/// replayed twice always derives byte-identical `event_hash`es.
+/// `event_hash` for a `RoutingPriorUpdated` event (ADR-ECON-003 Decision 6.3 dedup key +
+/// ADR-ECON-006): JCS-canonicalize the event's own identity fields and SHA-256 them.
+/// Pure function of its arguments only (Art 0.2).
+///
+/// - Binary mode (`verdict_fraction_q32 = None`): identity schema v1 — **byte-identical**
+///   to the pre-006 five-field digest so old events keep their hashes.
+/// - Fractional mode (`Some(frac)`): identity schema v2 includes the fraction string so
+///   clawback can reverse the exact reward that was applied.
 pub(crate) fn routing_prior_event_hash(
     route_domain: &str,
     route_scaffold: &str,
     verdict: bool,
     verdict_source_id: &str,
     verifier_attestation_hash: &str,
+    verdict_fraction_q32: Option<&str>,
 ) -> Result<String, EconomyError> {
-    let value = serde_json::json!({
-        "schema": "routing_prior_updated_identity.v1",
-        "route_domain": route_domain,
-        "route_scaffold": route_scaffold,
-        "verdict": verdict,
-        "verdict_source_id": verdict_source_id,
-        "verifier_attestation_hash": verifier_attestation_hash,
-    });
+    let value = match verdict_fraction_q32 {
+        None => serde_json::json!({
+            "schema": "routing_prior_updated_identity.v1",
+            "route_domain": route_domain,
+            "route_scaffold": route_scaffold,
+            "verdict": verdict,
+            "verdict_source_id": verdict_source_id,
+            "verifier_attestation_hash": verifier_attestation_hash,
+        }),
+        Some(frac) => serde_json::json!({
+            "schema": "routing_prior_updated_identity.v2",
+            "route_domain": route_domain,
+            "route_scaffold": route_scaffold,
+            "verdict": verdict,
+            "verdict_fraction_q32": frac,
+            "verdict_source_id": verdict_source_id,
+            "verifier_attestation_hash": verifier_attestation_hash,
+        }),
+    };
     let canonical = turing_contracts::jcs::canonicalize(&value)
         .map_err(|e| EconomyError::InvalidRoutingEventIdentity(e.to_string()))?;
     Ok(format!(
@@ -367,6 +431,11 @@ pub struct RoutingPriorUpdated {
     pub route_scaffold: String,
     /// Independent verifier's verdict (ADR-ECON-003 Decision 2; `true` = PASS).
     pub verdict: bool,
+    /// ADR-ECON-006: Q32.32 verify-side pass-ratio reward as a decimal-literal string.
+    /// Absent (`None` / missing on wire) ⇒ binary fallback `v = verdict ? 1 : 0`.
+    /// Present ⇒ fractional mode; schema_id is `routing_prior_updated.v2`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verdict_fraction_q32: Option<String>,
     /// Identifies which independent verifier instance produced this verdict (ADR-ECON-003
     /// Decision 2.2: structurally separate from the ∏p accept predicate). Opaque string.
     pub verdict_source_id: String,
@@ -1970,6 +2039,10 @@ pub enum EconomyError {
     /// the identity digest re-derived from the event's own fields
     /// (`routing_prior_event_hash`) -- a forged/tampered tape row, never folded.
     RoutingFoldEventHashMismatch,
+    /// ADR-ECON-006 Decision 5: a single fold tape mixed binary and fractional reward modes.
+    RoutingFoldRewardModeMix,
+    /// ADR-ECON-006 Decision 1/2: fractional reward outside `[0, Q32_ONE]` or non-parseable.
+    RoutingFoldFractionOutOfRange,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -2053,6 +2126,18 @@ impl std::fmt::Display for EconomyError {
                 write!(
                     f,
                     "routing fold: event_hash does not match the digest re-derived from the event's own fields"
+                )
+            }
+            EconomyError::RoutingFoldRewardModeMix => {
+                write!(
+                    f,
+                    "routing fold: binary and fractional reward modes mixed on one tape"
+                )
+            }
+            EconomyError::RoutingFoldFractionOutOfRange => {
+                write!(
+                    f,
+                    "routing fold: verdict_fraction_q32 out of [0, Q32_ONE] or unparseable"
                 )
             }
         }

@@ -1,0 +1,122 @@
+{
+  "capsule": "C",
+  "branch": "fractional/grok-20260710",
+  "baseline_commit": "4fb5263f827601fec3f80f64b75d69e21212231c",
+  "head_commit": null,
+  "status_ceiling": "ADDRESSED",
+  "nature": "base_construction_no_experimental_claims",
+  "adr": "ADR-ECON-006-fractional-verify-reward.md",
+  "deliverables": [
+    {
+      "path": "crates/turing-economy/src/routing_fold.rs",
+      "role": "S as Q32.32; fractional fold; mode mix hard-err"
+    },
+    {
+      "path": "crates/turing-economy/src/lib.rs",
+      "role": "RoutingPriorUpdated.verdict_fraction_q32 + fractional constructor"
+    },
+    {
+      "path": "crates/turing-economy/src/bin/econ_fold_cli.rs",
+      "role": "CLI fraction field + s_q32 node output"
+    },
+    {
+      "path": "tools/econ_lab/live_driver.py",
+      "role": "--fractional-reward flat driver"
+    },
+    {
+      "path": "tools/econ_lab/depthk/depth_driver.py",
+      "role": "--fractional-reward stage driver"
+    },
+    {
+      "path": "tools/econ_lab/verifier/live_split_verifier.py",
+      "role": "verify_pass_fraction"
+    },
+    {
+      "path": "tools/econ_lab/runs/fractional_smoke_20260710/",
+      "role": "smoke evidence root"
+    },
+    {
+      "path": "docs/handoff/GROK_CAPSULE_C_FRACTIONAL_REPORT_20260710.md",
+      "role": "final report"
+    }
+  ],
+  "smoke": {
+    "calls_used": 6,
+    "calls_cap": 6,
+    "nontrivial_fraction_observed": true,
+    "nontrivial_example": {
+      "instance_id": "astropy__astropy-14369",
+      "verify_pass_fraction": 0.9947229551451188,
+      "verdict_fraction_q32": "4272302560",
+      "path": "tools/econ_lab/runs/fractional_smoke_20260710/flat_more/verdict.json"
+    },
+    "evidence_paths": [
+      "tools/econ_lab/runs/fractional_smoke_20260710/flat/verdict.json",
+      "tools/econ_lab/runs/fractional_smoke_20260710/flat_more/verdict.json",
+      "tools/econ_lab/runs/fractional_smoke_20260710/stage/verdict.json",
+      "tools/econ_lab/runs/fractional_smoke_20260710/stage_offline_s_accum/S_ACCUM.json"
+    ],
+    "notes": [
+      "flat path: worker→score→fraction→RPU with v2 field; nontrivial fraction observed",
+      "stage smoke: 1 real call with fractional_reward=true; credit withheld (not_enough_tests on that task)",
+      "stage_offline_s_accum: CLI-only proof v=0.5 twice → S=Q32_ONE on three stage nodes (0 API)"
+    ]
+  },
+  "spec_gate": [
+    {
+      "id": 1,
+      "predicate": "constitution + governance",
+      "exit_code": 0,
+      "evidence": "sha256sum OK; verify_alignment GREEN"
+    },
+    {
+      "id": 2,
+      "predicate": "ADR-ECON-006 + 003 + 005 draft present",
+      "exit_code": 0,
+      "evidence": "PROJECT_PLAN adr/ADR-ECON-006; docs/handoff/ADR-ECON-005-depthk-layered-market-DRAFT.md"
+    },
+    {
+      "id": 3,
+      "predicate": "baseline tests",
+      "exit_code": 0,
+      "evidence": "pytest live_driver/depthk suite; cargo test -p turing-economy; F4_LEAK_PASS"
+    }
+  ],
+  "ship_gate": [
+    {
+      "id": 1,
+      "predicate": "cargo + fractional math fixtures + mode mix + clawback",
+      "exit_code": 0,
+      "evidence": "fractional_half_twice / fractional_clawback / reward_mode_mix / missing_fraction fallback tests green"
+    },
+    {
+      "id": 2,
+      "predicate": "flat+stage fractional smoke + S accum evidence",
+      "exit_code": 0,
+      "evidence": "runs/fractional_smoke_20260710/{flat,flat_more,stage,stage_offline_s_accum}"
+    },
+    {
+      "id": 3,
+      "predicate": "pytest + gate_f4",
+      "exit_code": 0,
+      "evidence": "suite green; F4_LEAK_PASS"
+    },
+    {
+      "id": 4,
+      "predicate": "commit on fractional/grok-20260710 no push",
+      "exit_code": null,
+      "evidence": "pending commit"
+    },
+    {
+      "id": 5,
+      "predicate": "HANDOFF + report",
+      "exit_code": 0,
+      "evidence": ["HANDOFF_CAPSULE_C.json", "docs/handoff/GROK_CAPSULE_C_FRACTIONAL_REPORT_20260710.md"]
+    }
+  ],
+  "blocked": [],
+  "notes": [
+    "No experimental claims. D/E should branch from head_commit after commit.",
+    "Budget hard-stopped at 6 real worker calls."
+  ]
+}

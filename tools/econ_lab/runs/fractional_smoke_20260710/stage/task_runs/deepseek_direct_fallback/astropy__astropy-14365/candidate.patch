@@ -1,0 +1,120 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+index 53d310d91d..b5469df60f 100644
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -69,7 +69,7 @@ def _line_type(line, delimiter=None):
+     If the line is of a known type, the function returns a string
+     identifying the type.  Otherwise, ``False`` is returned.
+     """
+-    _decimal_re = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'
++    _decimal_re = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?[DdEe]?'
+     _command_re = r'READ [TS]ERR(\s+[0-9]+)+'
+ 
+     sep = delimiter
+@@ -84,7 +84,7 @@ def _line_type(line, delimiter=None):
+             return "comment"
+         else:
+             return "new"
+-    elif re.match(_command_re, line):
++    elif re.match(_command_re, line, re.IGNORECASE):
+         return "command"
+     else:
+         return False
+@@ -239,11 +239,11 @@ def _get_tables_from_qdp_file(qdp_file, input_colnames=None, delimiter=None):
+                         values = []
+                         for v in line.split(delimiter):
+                             if field == 'data':
+-                                values.append(float(v))
++                                values.append(_read_val(v))
+                                 new_table['data'].append(values)
+                             else:
+                                 values.append(float(v))
+-                        new_table[field].append(values)
++                                new_table[field].append(values)
+                     elif field == "command":
+                         # The line contains a command, so we must identify it
+                         # and set the err_specs accordingly
+@@ -273,7 +273,7 @@ def _get_tables_from_qdp_file(qdp_file, input_colnames=None, delimiter=None):
+                             new_table["data"] = [list(i) for i in zip(*new_table["data"])]
+                             tables.append(new_table)
+ 
+-                        match = re.match(r'READ [TS]ERR(\s+[0-9]+)+',
++                        match = re.match(r'READ [TS]ERR(\s+[0-9]+)+',
+                                         line.upper())
+                         if not match:
+                             raise ValueError(f'Unrecognized QDP line: {line}')
+@@ -288,6 +288,27 @@ def _get_tables_from_qdp_file(qdp_file, input_colnames=None, delimiter=None):
+     return tables
+ 
+ 
++def _read_val(val):
++    """Convert a string to float, handling D or d as exponent."""
++    # In QDP, D (or d) is often used instead of E for exponent
++    # For example, 1.0D-2 instead of 1.0E-2
++    try:
++        return float(val)
++    except ValueError:
++        # Try replacing D/d with E before conversion
++        if 'D' in val or 'd' in val:
++            # Only replace the first occurrence that looks like an exponent
++            # Simple approach: replace all D/d with E as a last resort
++            val = val.replace('D', 'E').replace('d', 'E')
++            try:
++                return float(val)
++            except ValueError:
++                pass
++        raise ValueError(f'Unable to convert {val} to float')
++
++
++
++
+ def _interpret_err_lines(err_specs, ncols, table_name):
+     """Interpret the list of READ SERR and READ TERR commands.
+ 
+@@ -355,8 +376,8 @@ def _parse_data(lines, err_specs, delimiter=None):
+         colnames = [col.name for col in err_specs if col.colname is not None]
+         if len(colnames) != ncols:
+             raise ValueError('Number of column names does not match number of columns')
+-        colnames = [col.name for col in err_specs]
+-    else:
++        colnames = [col.name for col in err_specs if col.colname is not None]
++    else:
+         # if colnames not specified, assign default column names
+         colnames_default = ['MJD', 'RATE']
+         if ncols == 2:
+@@ -371,6 +392,11 @@ def _parse_data(lines, err_specs, delimiter=None):
+     data = np.array(data)
+ 
+     # Initialize the table with the appropriate columns
++    # Also handle case where there are more columns than colnames
++    if ncols > len(colnames):
++        for i in range(len(colnames), ncols):
++            colnames.append(f'col{i}')
++
+     table = Table(names=colnames)
+ 
+     # Add the data columns to the table
+@@ -395,20 +421,3 @@ def _parse_data(lines, err_specs, delimiter=None):
+             table.add_column(s_col, index=idx + 1, name=name)
+ 
+     return table
+-
+-
+-def _read_val(val):
+-    """Convert a string to float, handling D or d as exponent."""
+-    # In QDP, D (or d) is often used instead of E for exponent
+-    # For example, 1.0D-2 instead of 1.0E-2
+-    try:
+-        return float(val)
+-    except ValueError:
+-        # Try replacing D/d with E before conversion
+-        if 'D' in val or 'd' in val:
+-            # Only replace the first occurrence that looks like an exponent
+-            # Simple approach: replace all D/d with E as a last resort
+-            val = val.replace('D', 'E').replace('d', 'E')
+-            try:
+-                return float(val)
+-            except ValueError:
+-                pass
+-
++        raise ValueError(f'Unable to convert {val} to float')

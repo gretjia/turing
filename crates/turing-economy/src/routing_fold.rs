@@ -338,14 +338,26 @@ pub fn options_for_stage(stage_name: &str) -> Result<&'static [&'static str], Ec
 // Decision 6 -- (Q, N, P) node state, tape pure fold.
 // ---------------------------------------------------------------------------
 
-/// Per-`RoutingKey` node state (ADR-ECON-003 Decision 6): `P` (frozen prior), `N` (visit /
-/// settlement count), `S` (verified-success sum). `Q_eff` is derived on read, never
-/// stored, so the same information is never double-counted.
+/// Reward mode for a single fold tape (ADR-ECON-006 Decision 5): binary (default) or
+/// fractional. Mixing modes on the same fold is a hard error.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RewardMode {
+    /// Classic 0/1 verify-all-pass reward (ADR-ECON-003 Decision 6).
+    Binary,
+    /// Fractional verify-side pass ratio ∈ [0,1] as Q32.32 (ADR-ECON-006 Decision 1).
+    Fractional,
+}
+
+/// Per-`RoutingKey` node state (ADR-ECON-003 Decision 6 + ADR-ECON-006): `P` (frozen prior),
+/// `N` (visit / settlement count), `S` (verified-success sum as **Q32.32** non-negative
+/// fixed-point — binary mode contributes `0` or `Q32_ONE` per settlement; fractional mode
+/// contributes arbitrary `v ∈ [0,1]`). `Q_eff` is derived on read, never stored.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NodeState {
     p_q32: i128,
     n: u64,
-    s: u64,
+    /// Q32.32 success sum (ADR-ECON-006 Decision 2).
+    s_q32: i128,
 }
 
 impl NodeState {
@@ -359,37 +371,82 @@ impl NodeState {
         self.n
     }
 
+    /// Q32.32 verified-success sum (ADR-ECON-006). Prefer this over [`Self::s`] for any
+    /// fractional-aware consumer.
+    #[must_use]
+    pub fn s_q32(&self) -> i128 {
+        self.s_q32
+    }
+
+    /// Binary success *count* (legacy accessor): `s_q32 / Q32_ONE` when `s_q32` is an exact
+    /// multiple of `Q32_ONE` (always true under binary mode). Truncates toward zero otherwise
+    /// so fractional nodes still expose a coarse integer for pre-006 CLI fields.
     #[must_use]
     pub fn s(&self) -> u64 {
-        self.s
+        (self.s_q32 / Q32_ONE) as u64
     }
 
     /// `Q_eff = (P*N0 + S) / (N0+N)`, `N0 = 1` (ADR-ECON-003 Decision 6.2), Q32.32,
-    /// truncated toward zero. `N=0` reduces exactly to `Q_eff = P` (pure prior); as `N`
-    /// grows, `Q_eff` approaches the empirical success rate.
+    /// truncated toward zero. `S` is itself Q32.32 (ADR-ECON-006), so no extra scale.
+    /// `N=0` reduces exactly to `Q_eff = P` (pure prior).
     #[must_use]
     pub fn q_eff_q32(&self) -> i128 {
-        let numerator = self.p_q32 + (self.s as i128) * Q32_ONE;
+        let numerator = self.p_q32 + self.s_q32;
         let denominator = 1i128 + self.n as i128;
         numerator / denominator
     }
 }
 
-/// A single applied fold input (ADR-ECON-003 Decision 6). WP4 translates committed
-/// `EconomyEvent::RoutingPriorUpdated` / `RoutingPriorClawback` tape events into this
-/// contract; this module never reads `EconomyEvent` directly.
+/// A single applied fold input (ADR-ECON-003 Decision 6 + ADR-ECON-006). WP4 translates
+/// committed `EconomyEvent::RoutingPriorUpdated` / `RoutingPriorClawback` tape events into
+/// this contract; this module never reads `EconomyEvent` directly.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RoutingFoldEvent {
-    /// Independent-verifier verdict (ADR-ECON-003 Decision 2/6.2). `event_hash` uniquely
-    /// identifies this update for clawback dedup (Decision 6.3).
+    /// Independent-verifier verdict (ADR-ECON-003 Decision 2/6.2 + ADR-ECON-006).
+    /// `event_hash` uniquely identifies this update for clawback dedup (Decision 6.3).
+    /// `verdict_fraction_q32` is the Q32.32 reward contribution (binary: 0 or `Q32_ONE`).
     PriorUpdated {
         key: RoutingKey,
         verdict: bool,
+        verdict_fraction_q32: i128,
+        reward_mode: RewardMode,
         event_hash: [u8; 32],
     },
     /// Exact inverse of one earlier `PriorUpdated`, referenced by its `event_hash`
     /// (ADR-ECON-003 Decision 6.3). At most one clawback per original event.
     Clawback { updated_event_hash: [u8; 32] },
+}
+
+impl RoutingFoldEvent {
+    /// Binary-mode prior update (ADR-ECON-003 default): fraction is 0 or `Q32_ONE`.
+    #[must_use]
+    pub fn binary_update(key: RoutingKey, verdict: bool, event_hash: [u8; 32]) -> Self {
+        RoutingFoldEvent::PriorUpdated {
+            key,
+            verdict,
+            verdict_fraction_q32: if verdict { Q32_ONE } else { 0 },
+            reward_mode: RewardMode::Binary,
+            event_hash,
+        }
+    }
+
+    /// Fractional-mode prior update (ADR-ECON-006): `verdict_fraction_q32` clamped to
+    /// `[0, Q32_ONE]` by the caller (fold hard-errors on out-of-range).
+    #[must_use]
+    pub fn fractional_update(
+        key: RoutingKey,
+        verdict: bool,
+        verdict_fraction_q32: i128,
+        event_hash: [u8; 32],
+    ) -> Self {
+        RoutingFoldEvent::PriorUpdated {
+            key,
+            verdict,
+            verdict_fraction_q32,
+            reward_mode: RewardMode::Fractional,
+            event_hash,
+        }
+    }
 }
 
 /// Pure fold: `(initial_prices, events) -> per-key NodeState` (ADR-ECON-003 Decision 6).
@@ -406,19 +463,35 @@ pub fn fold_routing_state(
     events: &[RoutingFoldEvent],
 ) -> Result<BTreeMap<RoutingKey, NodeState>, EconomyError> {
     let mut nodes: BTreeMap<RoutingKey, NodeState> = BTreeMap::new();
-    // event_hash -> (key, verdict) for every update seen and not yet clawed back.
-    let mut outstanding: BTreeMap<[u8; 32], (RoutingKey, bool)> = BTreeMap::new();
+    // event_hash -> (key, fraction_q32) for every update seen and not yet clawed back.
+    // Fraction is the exact reward that must be reversed on clawback (ADR-ECON-006 §2).
+    let mut outstanding: BTreeMap<[u8; 32], (RoutingKey, i128)> = BTreeMap::new();
     let mut clawed_back: BTreeSet<[u8; 32]> = BTreeSet::new();
+    // ADR-ECON-006 Decision 5: first update freezes the tape's reward mode; mixing is hard err.
+    let mut tape_mode: Option<RewardMode> = None;
 
     for event in events {
         match event {
             RoutingFoldEvent::PriorUpdated {
                 key,
-                verdict,
+                verdict: _,
+                verdict_fraction_q32,
+                reward_mode,
                 event_hash,
             } => {
                 if outstanding.contains_key(event_hash) || clawed_back.contains(event_hash) {
                     return Err(EconomyError::RoutingFoldDuplicateEventHash);
+                }
+                match tape_mode {
+                    None => tape_mode = Some(*reward_mode),
+                    Some(m) if m != *reward_mode => {
+                        return Err(EconomyError::RoutingFoldRewardModeMix);
+                    }
+                    Some(_) => {}
+                }
+                // Clamp domain: v must live in [0, 1] Q32.32 (ADR-ECON-006 Decision 1).
+                if *verdict_fraction_q32 < 0 || *verdict_fraction_q32 > Q32_ONE {
+                    return Err(EconomyError::RoutingFoldFractionOutOfRange);
                 }
                 let node = nodes.entry(key.clone()).or_insert_with(|| {
                     let p_q32 = initial_prices
@@ -426,24 +499,26 @@ pub fn fold_routing_state(
                         .copied()
                         .map(clamp_unit_interval)
                         .unwrap_or(Q32_HALF);
-                    NodeState { p_q32, n: 0, s: 0 }
+                    NodeState {
+                        p_q32,
+                        n: 0,
+                        s_q32: 0,
+                    }
                 });
                 node.n = node
                     .n
                     .checked_add(1)
                     .ok_or(EconomyError::RoutingFoldCounterOverflow)?;
-                if *verdict {
-                    node.s = node
-                        .s
-                        .checked_add(1)
-                        .ok_or(EconomyError::RoutingFoldCounterOverflow)?;
-                }
-                outstanding.insert(*event_hash, (key.clone(), *verdict));
+                node.s_q32 = node
+                    .s_q32
+                    .checked_add(*verdict_fraction_q32)
+                    .ok_or(EconomyError::RoutingFoldCounterOverflow)?;
+                outstanding.insert(*event_hash, (key.clone(), *verdict_fraction_q32));
             }
             RoutingFoldEvent::Clawback {
                 updated_event_hash,
             } => {
-                let (key, verdict) = outstanding
+                let (key, frac_q32) = outstanding
                     .remove(updated_event_hash)
                     .ok_or(EconomyError::RoutingFoldUnknownClawbackTarget)?;
                 clawed_back.insert(*updated_event_hash);
@@ -454,11 +529,13 @@ pub fn fold_routing_state(
                     .n
                     .checked_sub(1)
                     .ok_or(EconomyError::RoutingFoldNegativeCounter)?;
-                if verdict {
-                    node.s = node
-                        .s
-                        .checked_sub(1)
-                        .ok_or(EconomyError::RoutingFoldNegativeCounter)?;
+                // Exact inverse S ← S − v_original (ADR-ECON-006 Decision 2).
+                node.s_q32 = node
+                    .s_q32
+                    .checked_sub(frac_q32)
+                    .ok_or(EconomyError::RoutingFoldNegativeCounter)?;
+                if node.s_q32 < 0 {
+                    return Err(EconomyError::RoutingFoldNegativeCounter);
                 }
             }
         }
@@ -533,13 +610,29 @@ pub fn economy_event_to_routing_fold_event(
                 updated.verdict,
                 &updated.verdict_source_id,
                 &updated.verifier_attestation_hash,
+                updated.verdict_fraction_q32.as_deref(),
             )?;
             if updated.event_hash != expected_event_hash {
                 return Err(EconomyError::RoutingFoldEventHashMismatch);
             }
+            // ADR-ECON-006 Decision 3: missing field → binary fallback v = verdict?1:0.
+            let (verdict_fraction_q32, reward_mode) = match &updated.verdict_fraction_q32 {
+                Some(raw) => {
+                    let frac = raw
+                        .parse::<i128>()
+                        .map_err(|_| EconomyError::RoutingFoldFractionOutOfRange)?;
+                    (frac, RewardMode::Fractional)
+                }
+                None => (
+                    if updated.verdict { Q32_ONE } else { 0 },
+                    RewardMode::Binary,
+                ),
+            };
             Ok(Some(RoutingFoldEvent::PriorUpdated {
                 key,
                 verdict: updated.verdict,
+                verdict_fraction_q32,
+                reward_mode,
                 event_hash,
             }))
         }
@@ -743,21 +836,9 @@ mod tests {
         prices.insert(k1.clone(), q32_from_ratio(3, 4).unwrap());
 
         let events = vec![
-            RoutingFoldEvent::PriorUpdated {
-                key: k1.clone(),
-                verdict: true,
-                event_hash: event_hash(1),
-            },
-            RoutingFoldEvent::PriorUpdated {
-                key: k2.clone(),
-                verdict: false,
-                event_hash: event_hash(2),
-            },
-            RoutingFoldEvent::PriorUpdated {
-                key: k1.clone(),
-                verdict: false,
-                event_hash: event_hash(3),
-            },
+            RoutingFoldEvent::binary_update(k1.clone(), true, event_hash(1)),
+            RoutingFoldEvent::binary_update(k2.clone(), false, event_hash(2)),
+            RoutingFoldEvent::binary_update(k1.clone(), false, event_hash(3)),
             RoutingFoldEvent::Clawback {
                 updated_event_hash: event_hash(2),
             },
@@ -789,11 +870,7 @@ mod tests {
     fn fold_defaults_uninformative_prior_when_no_price_supplied() {
         let k = key("code_review", "scaffold:sha256:ccc");
         let prices = BTreeMap::new();
-        let events = vec![RoutingFoldEvent::PriorUpdated {
-            key: k.clone(),
-            verdict: true,
-            event_hash: event_hash(9),
-        }];
+        let events = vec![RoutingFoldEvent::binary_update(k.clone(), true, event_hash(9))];
         let nodes = fold_routing_state(&prices, &events).expect("fold");
         assert_eq!(nodes.get(&k).unwrap().p_q32(), Q32_ONE / 2);
     }
@@ -803,11 +880,7 @@ mod tests {
         let k = key("code_review", "scaffold:sha256:ddd");
         let prices = BTreeMap::new();
         let good = vec![
-            RoutingFoldEvent::PriorUpdated {
-                key: k.clone(),
-                verdict: true,
-                event_hash: event_hash(5),
-            },
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(5)),
             RoutingFoldEvent::Clawback {
                 updated_event_hash: event_hash(5),
             },
@@ -815,11 +888,7 @@ mod tests {
         assert!(fold_routing_state(&prices, &good).is_ok());
 
         let double_clawback = vec![
-            RoutingFoldEvent::PriorUpdated {
-                key: k.clone(),
-                verdict: true,
-                event_hash: event_hash(6),
-            },
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(6)),
             RoutingFoldEvent::Clawback {
                 updated_event_hash: event_hash(6),
             },
@@ -841,16 +910,8 @@ mod tests {
         );
 
         let duplicate_update_hash = vec![
-            RoutingFoldEvent::PriorUpdated {
-                key: k.clone(),
-                verdict: true,
-                event_hash: event_hash(8),
-            },
-            RoutingFoldEvent::PriorUpdated {
-                key: k.clone(),
-                verdict: false,
-                event_hash: event_hash(8),
-            },
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(8)),
+            RoutingFoldEvent::binary_update(k.clone(), false, event_hash(8)),
         ];
         assert_eq!(
             fold_routing_state(&prices, &duplicate_update_hash),
@@ -1028,5 +1089,92 @@ mod tests {
         let m2 = arbitrate_anneal_mode(AnnealMode::Annealing, below, &floor);
         assert_eq!(m1, m2);
         assert_eq!(m1, AnnealMode::Paused);
+    }
+
+    // -- ADR-ECON-006 fractional reward ---------------------------------------------
+
+    #[test]
+    fn fractional_half_twice_yields_s_one_and_q_eff_half_plus_one_over_three() {
+        // Hand fixture (CAPSULE C): v=0.5 twice → S=1.0 Q32, N=2, P=0.5
+        // Q_eff = (0.5 + 1.0) / (1+2) = 1.5/3 = 0.5
+        let k = key("code_review", "scaffold:sha256:frac");
+        let prices = BTreeMap::new();
+        let half = Q32_ONE / 2;
+        let events = vec![
+            RoutingFoldEvent::fractional_update(k.clone(), false, half, event_hash(1)),
+            RoutingFoldEvent::fractional_update(k.clone(), false, half, event_hash(2)),
+        ];
+        let nodes = fold_routing_state(&prices, &events).expect("fold");
+        let n = nodes.get(&k).expect("node");
+        assert_eq!(n.n(), 2);
+        assert_eq!(n.s_q32(), Q32_ONE, "two half-rewards must sum to Q32_ONE");
+        assert_eq!(n.p_q32(), half);
+        // (P + S) / (1+N) = (half + Q32_ONE) / 3
+        let expected_q = (half + Q32_ONE) / 3;
+        assert_eq!(n.q_eff_q32(), expected_q);
+        assert_eq!(
+            n.q_eff_q32(),
+            half,
+            "with P=0.5 and S=1.0 over N=2, Q_eff collapses to 0.5"
+        );
+    }
+
+    #[test]
+    fn fractional_clawback_is_exact_inverse() {
+        let k = key("code_review", "scaffold:sha256:frac-cb");
+        let prices = BTreeMap::new();
+        let half = Q32_ONE / 2;
+        let events = vec![
+            RoutingFoldEvent::fractional_update(k.clone(), true, half, event_hash(1)),
+            RoutingFoldEvent::fractional_update(k.clone(), false, half / 2, event_hash(2)),
+            RoutingFoldEvent::Clawback {
+                updated_event_hash: event_hash(1),
+            },
+        ];
+        let nodes = fold_routing_state(&prices, &events).expect("fold");
+        let n = nodes.get(&k).expect("node");
+        assert_eq!(n.n(), 1);
+        assert_eq!(n.s_q32(), half / 2);
+    }
+
+    #[test]
+    fn reward_mode_mix_is_hard_error() {
+        let k = key("code_review", "scaffold:sha256:mix");
+        let prices = BTreeMap::new();
+        let events = vec![
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(1)),
+            RoutingFoldEvent::fractional_update(k.clone(), false, Q32_ONE / 2, event_hash(2)),
+        ];
+        assert_eq!(
+            fold_routing_state(&prices, &events),
+            Err(EconomyError::RoutingFoldRewardModeMix)
+        );
+    }
+
+    #[test]
+    fn missing_fraction_field_falls_back_to_binary() {
+        // Construct via EconomyEvent::routing_prior_updated (no fraction) and translate.
+        let event = crate::EconomyEvent::routing_prior_updated(
+            "code_review",
+            "scaffold:sha256:legacy",
+            true,
+            "verifier:x",
+            "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        )
+        .expect("construct");
+        let fold_ev = economy_event_to_routing_fold_event(&event)
+            .expect("translate")
+            .expect("some");
+        match fold_ev {
+            RoutingFoldEvent::PriorUpdated {
+                reward_mode,
+                verdict_fraction_q32,
+                ..
+            } => {
+                assert_eq!(reward_mode, RewardMode::Binary);
+                assert_eq!(verdict_fraction_q32, Q32_ONE);
+            }
+            other => panic!("unexpected {other:?}"),
+        }
     }
 }

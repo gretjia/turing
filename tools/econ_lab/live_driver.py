@@ -1228,6 +1228,7 @@ def _apply_live_split_verifier(
     infra_null_reason: Optional[str] = None,
     run_label: str = "",
     task_index: int = 0,
+    fractional_reward: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any], Optional[dict[str, Any]]]:
     """ADR-ECON-003 Decision 2.4 wiring: independently judge this (task, arm, lineage)
     settlement's harness report, then -- unless NOT_ENOUGH_TESTS/infra_null -- ask
@@ -1279,21 +1280,36 @@ def _apply_live_split_verifier(
         run_label=run_label,
         task_index=task_index,
     )
+    # ADR-ECON-006: fractional verify reward. Q32.32 mantissa = floor(v * 2^32), same
+    # truncation as --tau / Decision 4. Binary path omits the field (byte-identical event).
+    build_req: dict[str, Any] = {
+        "schema": "econ_fold_cli.build_routing_prior_updated.request.v1",
+        "route_domain": route_domain,
+        "route_scaffold": route_scaffold,
+        "verdict": bool(live_split_result["verify_verdict"]),
+        "verdict_source_id": LIVE_SPLIT_VERIFIER_SOURCE_ID,
+        "verifier_attestation_hash": attestation_hash,
+    }
+    if fractional_reward:
+        frac = live_split_result.get("verify_pass_fraction")
+        if frac is None:
+            # not_enough_tests already returned above; harness_error uses 0.0.
+            frac = 0.0
+        frac = max(0.0, min(1.0, float(frac)))
+        build_req["verdict_fraction_q32"] = str(int(frac * (1 << 32)))
     build_response = call_cli(
         cli_bin,
         "build-routing-prior-updated",
-        {
-            "schema": "econ_fold_cli.build_routing_prior_updated.request.v1",
-            "route_domain": route_domain,
-            "route_scaffold": route_scaffold,
-            "verdict": bool(live_split_result["verify_verdict"]),
-            "verdict_source_id": LIVE_SPLIT_VERIFIER_SOURCE_ID,
-            "verifier_attestation_hash": attestation_hash,
-        },
+        build_req,
     )
     event = build_response["event"]
     event_hash = event["RoutingPriorUpdated"]["event_hash"]
-    backup_update = {"applied": True, "routing_prior_updated_event_hash": event_hash}
+    backup_update = {
+        "applied": True,
+        "routing_prior_updated_event_hash": event_hash,
+        "fractional_reward": fractional_reward,
+        "verdict_fraction_q32": build_req.get("verdict_fraction_q32"),
+    }
     return live_split_result, backup_update, event
 
 
@@ -1375,6 +1391,7 @@ def _settle_one(
                     infra_null_reason=scoring_result.get("infra_null_reason"),
                     run_label=run_label,
                     task_index=task_index,
+                    fractional_reward=bool(getattr(args, "fractional_reward", False)),
                 )
                 settlement_verdict = live_split_result["accept_verdict"]
         else:
@@ -1394,6 +1411,7 @@ def _settle_one(
                 harness_error_reason=EMPTY_PATCH_WORKER_OUTPUT_REASON,
                 run_label=run_label,
                 task_index=task_index,
+                fractional_reward=bool(getattr(args, "fractional_reward", False)),
             )
             settlement_verdict = live_split_result["accept_verdict"]
 
@@ -1695,6 +1713,7 @@ def _settle_one_resume(
                 infra_null_reason=scoring_result.get("infra_null_reason"),
                 run_label=run_label,
                 task_index=task_index,
+                fractional_reward=bool(getattr(args, "fractional_reward", False)),
             )
             settlement_verdict = live_split_result["accept_verdict"]
     else:
@@ -1712,6 +1731,7 @@ def _settle_one_resume(
             harness_error_reason=EMPTY_PATCH_WORKER_OUTPUT_REASON,
             run_label=run_label,
             task_index=task_index,
+            fractional_reward=bool(getattr(args, "fractional_reward", False)),
         )
         settlement_verdict = live_split_result["accept_verdict"]
 
@@ -2075,6 +2095,7 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
             "stream_manifest_sha256": stream_manifest_sha256,
             "reset_at_task_index": reset_at_task_index,
             "reset_at": reset_applied_at,
+            "fractional_reward": bool(getattr(args, "fractional_reward", False)),
         },
         "generated_at_unix": int(time.time()),
     }
@@ -2168,6 +2189,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         "committed_routing_events is cleared before routing (Q/N/S zeroed; P re-seeded from "
         "--priors via initial_prices). Deterministic pure bookkeeping; recorded as "
         "stage_b_prime_meta.reset_at when applied.",
+    )
+    parser.add_argument(
+        "--fractional-reward",
+        action="store_true",
+        help="ADR-ECON-006: use verify-side pass fraction as RoutingPriorUpdated reward "
+        "(Q32.32); default is binary verify-all-pass. Mode is recorded in stage_b_prime_meta.",
     )
     args = parser.parse_args(argv)
 
