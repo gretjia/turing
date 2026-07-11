@@ -1,0 +1,29 @@
+# TuringOS worker-safe capsule
+
+Instance: sphinx-doc__sphinx-7462
+Repo: sphinx-doc/sphinx
+
+## Task
+
+IndexError: pop from empty list for empty tuple type annotation
+
+Following notation for empty tuple from a mypy issue like:
+
+from typing import Tuple
+
+def foo() -> Tuple[()]:
+    """Sample text."""
+    return ()
+
+the documentation build crashes with an IndexError.
+
+Steps to reproduce: write a module containing a function annotated to return Tuple[()] (the empty-tuple type notation), then build the Sphinx documentation for that module.
+
+Expected behavior: the docs build successfully and the function's type annotation renders as an empty tuple, instead of the build crashing.
+
+Edit the checked-out repository only. Make the smallest plausible fix. Do not edit test files. When done, leave the patch in the worktree.
+
+## TuringOS Failure-Memory Broadcast Rules
+<!-- BEGIN_TURINGOS_BROADCAST_RULES -->
+(none)
+<!-- END_TURINGOS_BROADCAST_RULES -->

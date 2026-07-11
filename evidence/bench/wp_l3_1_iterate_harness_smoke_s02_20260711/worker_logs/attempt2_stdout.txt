@@ -1,0 +1,1 @@
+I'll investigate the IndexError for empty tuple type annotations (`Tuple[()]`) in Sphinx and apply a minimal fix.Searching the codebase for where empty-tuple type annotations are parsed and where the IndexError is raised.Looking at the Python domain type-annotation parser — that `stack.pop()` path looks like the crash site.
