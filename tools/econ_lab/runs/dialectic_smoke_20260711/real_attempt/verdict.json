@@ -1,0 +1,10 @@
+{
+  "missing_env": [
+    "SILICONFLOW_API_KEY"
+  ],
+  "reason": "SILICONFLOW_API_KEY is unset; SiliconFlowLLMClient cannot make a real call (role='proposer_1')",
+  "schema": "econ_lab.dialectic.dialectic_smoke.v1",
+  "significance_claims": "NONE -- credential missing, no call was made",
+  "status": "NOT_RUN",
+  "worker_calls_used": 0
+}

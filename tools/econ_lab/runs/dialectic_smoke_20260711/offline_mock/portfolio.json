@@ -1,0 +1,83 @@
+{
+  "candidates": [
+    {
+      "exit_criteria": "abandon if schema validation fails on two consecutive real attempts",
+      "predicted_failure_modes": [
+        "LLM output does not parse as strict JSON",
+        "judge fails to reach three candidates"
+      ],
+      "prior_estimate": {
+        "p": "0.55",
+        "provenance": "offline-mock canned estimate, not a real call"
+      },
+      "probe_design": "run one offline mock pass through the full three-role pipeline first",
+      "route_descriptor": {
+        "key_choices": [
+          "small self-contained package",
+          "reuse existing scanner read-only"
+        ],
+        "label": "conservative-package",
+        "summary": "Offline-mock synthesized route for the dialectic gate itself, perspective: conservative reuse."
+      }
+    },
+    {
+      "exit_criteria": "abandon if schema validation fails on two consecutive real attempts",
+      "predicted_failure_modes": [
+        "LLM output does not parse as strict JSON",
+        "judge fails to reach three candidates"
+      ],
+      "prior_estimate": {
+        "p": "0.35",
+        "provenance": "offline-mock canned estimate, not a real call"
+      },
+      "probe_design": "run one offline mock pass through the full three-role pipeline first",
+      "route_descriptor": {
+        "key_choices": [
+          "small self-contained package",
+          "reuse existing scanner read-only"
+        ],
+        "label": "structural-package",
+        "summary": "Offline-mock synthesized route for the dialectic gate itself, perspective: structural redesign."
+      }
+    },
+    {
+      "exit_criteria": "abandon if schema validation fails on two consecutive real attempts",
+      "predicted_failure_modes": [
+        "LLM output does not parse as strict JSON",
+        "judge fails to reach three candidates"
+      ],
+      "prior_estimate": {
+        "p": "0.45",
+        "provenance": "offline-mock canned estimate, not a real call"
+      },
+      "probe_design": "run one offline mock pass through the full three-role pipeline first",
+      "route_descriptor": {
+        "key_choices": [
+          "small self-contained package",
+          "reuse existing scanner read-only"
+        ],
+        "label": "hybrid-package",
+        "summary": "Offline-mock synthesized route for the dialectic gate itself, perspective: judge-synthesized hybrid."
+      }
+    }
+  ],
+  "portfolio_digest": "sha256:d5ec1ea6c847c27e9e1ddd781d913feac2385a2548738897435b6c400c844994",
+  "proposal_only": true,
+  "provenance": {
+    "gate": "dialectic_gate.v1",
+    "raw_completion_digests": {
+      "critic": "sha256:b64e616133d9ec9df84f3fff245a520149f985b152a4350291e327f808d8d93d",
+      "judge": "sha256:8dccafa0159a4ca7c77933bf46ed454772ef9ef4b7a1029c8a2a1d8491515e8f",
+      "proposer_1": "sha256:2e829b20efbcaa45c86e1f7e4654410a7382a7e548f2a85752cb1fbd6fd85ad3",
+      "proposer_2": "sha256:e1f65cfc6a1f2b70264a897645c7d154fac24b2f1578d5e691edbbe1f483d2b1"
+    },
+    "role_chain": [
+      "proposer_1",
+      "proposer_2",
+      "critic",
+      "judge"
+    ]
+  },
+  "schema": "econ_lab.dialectic.route_portfolio.v1",
+  "task_context_digest": "sha256:4497dd3acacb7c0f9eb9964cb4ae5e91d69c00a5aa6e6abd0fe851dbc3e77b17"
+}
