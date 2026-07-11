@@ -43,7 +43,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Callable, Dict, List, Mapping, Optional
 
 DIALECTIC_DIR = Path(__file__).resolve().parent
 PROMPTS_DIR = DIALECTIC_DIR / "prompts"
@@ -379,6 +379,107 @@ class DialecticGateResult:
     raw_completions: Dict[str, str]
 
 
+# A real chat model has no visibility into `termination._FORBIDDEN_KEY_TOKENS` (this
+# module never renders that list into any worker-visible prompt -- doing so would
+# itself be the exact B-zone leak this module exists to prevent) and can innocently
+# collide with an ordinary-English blacklisted word (e.g. "threshold") while writing
+# plain critique prose. `MAX_BZONE_RETRIES_PER_RUN` gives the pipeline a small, fixed,
+# budget-bounded number of one-shot "rephrase in plain prose" retries (this WP's own
+# smoke-driver docstring: 4 baseline calls, "<= 6 call budget with headroom" -- this
+# constant is that headroom) rather than either (a) crashing the whole run on a single
+# incidental word choice, or (b) silently downgrading/patching the flagged text
+# in-process (which `DialecticGateError`'s own docstring rules out). Exhausting the
+# budget still fails loud -- this is a bounded retry, never an unbounded one.
+MAX_BZONE_RETRIES_PER_RUN = 2
+
+# Generic on purpose -- names no specific blacklisted token (see constant above).
+# Scanned by `test_bzone_retry_notice_itself_passes_bzone_scan` so this constant can
+# never itself regress into a leak.
+_BZONE_RETRY_NOTICE = (
+    "\n\nNOTE: an automated content filter rejected your previous draft because it "
+    "contained disallowed shorthand/jargon wording. Rewrite your ENTIRE response "
+    "from scratch, keeping the exact same JSON shape and the exact same substantive "
+    "content, but expressed only in plain, everyday descriptive English prose -- no "
+    "abbreviations, no single- or two-letter technical symbols, no terse shorthand "
+    "words for cutoffs, limits, rates, or counters."
+)
+
+
+def _complete_with_role_retry(
+    llm_client: Any,
+    *,
+    role: str,
+    system: str,
+    user: str,
+    retry_budget: Dict[str, int],
+    process: Callable[[str], Any],
+) -> "tuple[str, Any]":
+    """Wraps one `llm_client.complete(...)` call, then `process(raw)` -- `process`
+    both B-zone-scans the completion (`scan_worker_text`/`scan_structure_for_bzone_
+    leak`) AND performs this role's own JSON-shape validation; both are the same
+    underlying condition from this function's own point of view ("the model's
+    completion cannot be used as-is", `DialecticGateError`). Retries with
+    `_BZONE_RETRY_NOTICE` appended to `system` (its own wording already covers both
+    "wrong vocabulary" and "keep the exact same JSON shape") for as long as the
+    run-wide `retry_budget` still has calls left AND `process` keeps raising -- a
+    single stubborn call site may spend the whole shared budget if no other role
+    needed any of it. Exhausting the budget still fails loud -- the LAST
+    `DialecticGateError` raised propagates uncaught, never a further silent retry.
+    Returns `(raw, process(raw))` from whichever attempt finally succeeded."""
+    base_system = system
+    attempt_system = system
+    while True:
+        raw = llm_client.complete(role=role, system=attempt_system, user=user)
+        try:
+            return raw, process(raw)
+        except DialecticGateError:
+            if retry_budget["remaining"] <= 0:
+                raise
+            retry_budget["remaining"] -= 1
+            attempt_system = base_system + _BZONE_RETRY_NOTICE
+
+
+def _process_proposer_completion(raw: str, *, role: str) -> Dict[str, Any]:
+    scan_worker_text(label=f"completion:{role}", text=raw)
+    candidate = validate_candidate(_extract_json(raw, role=role), path=role)
+    _scan_candidate_text(candidate, path=role)
+    return candidate
+
+
+def _process_critic_completion(raw: str) -> Dict[str, Any]:
+    scan_worker_text(label="completion:critic", text=raw)
+    critiques_raw = _extract_json(raw, role="critic")
+    if not isinstance(critiques_raw, Mapping) or not isinstance(critiques_raw.get("critiques"), list):
+        raise DialecticGateError('critic response must be a JSON object with a "critiques" list')
+    normalized_critiques = [
+        _normalize_critique_entry(entry, index=i) for i, entry in enumerate(critiques_raw["critiques"])
+    ]
+    for entry in normalized_critiques:
+        for key in ("probe_design_critique", "exit_criteria_critique"):
+            scan_worker_text(label=f"critique.{entry['route_label']}.{key}", text=entry[key])
+        for i, mode in enumerate(entry["additional_failure_modes"]):
+            scan_worker_text(label=f"critique.{entry['route_label']}.additional_failure_modes[{i}]", text=mode)
+    critiques = {"schema": CRITIQUE_SET_SCHEMA, "critiques": normalized_critiques}
+    scan_structure_for_bzone_leak(label="critiques", value=critiques)
+    return critiques
+
+
+def _process_judge_completion(raw: str) -> List[Dict[str, Any]]:
+    scan_worker_text(label="completion:judge", text=raw)
+    judge_output = _extract_json(raw, role="judge")
+    if not isinstance(judge_output, list):
+        raise DialecticGateError("judge response must be a JSON array of candidate routes")
+    candidates = [validate_candidate(c, path=f"portfolio.candidates[{i}]") for i, c in enumerate(judge_output)]
+    if len(candidates) < MIN_CANDIDATES:
+        raise DialecticGateError(
+            f"judge synthesized only {len(candidates)} candidate route(s); this WP's own brief "
+            f"requires >= {MIN_CANDIDATES} -- never silently padded here"
+        )
+    for i, candidate in enumerate(candidates):
+        _scan_candidate_text(candidate, path=f"portfolio.candidates[{i}]")
+    return candidates
+
+
 def run_dialectic_gate(
     *,
     task_context: Any,
@@ -402,6 +503,7 @@ def run_dialectic_gate(
     reentry_block = _reentry_block(falsification_report)
 
     raw_completions: Dict[str, str] = {}
+    retry_budget = {"remaining": MAX_BZONE_RETRIES_PER_RUN}
 
     # Step 1: two forced-heterogeneous proposers.
     proposals: List[Dict[str, Any]] = []
@@ -416,11 +518,15 @@ def run_dialectic_gate(
         user = render_prompt(
             "proposer_user.txt", TASK_CONTEXT=task_context_text, REENTRY_BLOCK=reentry_block
         )
-        raw = llm_client.complete(role=role, system=system, user=user)
+        raw, candidate = _complete_with_role_retry(
+            llm_client,
+            role=role,
+            system=system,
+            user=user,
+            retry_budget=retry_budget,
+            process=lambda text, role=role: _process_proposer_completion(text, role=role),
+        )
         raw_completions[role] = raw
-        scan_worker_text(label=f"completion:{role}", text=raw)
-        candidate = validate_candidate(_extract_json(raw, role=role), path=role)
-        _scan_candidate_text(candidate, path=role)
         proposals.append(candidate)
 
     proposals_json = json.dumps(proposals, indent=2, sort_keys=True)
@@ -433,23 +539,15 @@ def run_dialectic_gate(
         PROPOSALS_JSON=proposals_json,
         REENTRY_BLOCK=reentry_block,
     )
-    critic_raw = llm_client.complete(role="critic", system=critic_system, user=critic_user)
+    critic_raw, critiques = _complete_with_role_retry(
+        llm_client,
+        role="critic",
+        system=critic_system,
+        user=critic_user,
+        retry_budget=retry_budget,
+        process=_process_critic_completion,
+    )
     raw_completions["critic"] = critic_raw
-    scan_worker_text(label="completion:critic", text=critic_raw)
-    critiques_raw = _extract_json(critic_raw, role="critic")
-    if not isinstance(critiques_raw, Mapping) or not isinstance(critiques_raw.get("critiques"), list):
-        raise DialecticGateError('critic response must be a JSON object with a "critiques" list')
-    normalized_critiques = [
-        _normalize_critique_entry(entry, index=i) for i, entry in enumerate(critiques_raw["critiques"])
-    ]
-    for entry in normalized_critiques:
-        for key in ("probe_design_critique", "exit_criteria_critique"):
-            scan_worker_text(label=f"critique.{entry['route_label']}.{key}", text=entry[key])
-        for i, mode in enumerate(entry["additional_failure_modes"]):
-            scan_worker_text(label=f"critique.{entry['route_label']}.additional_failure_modes[{i}]", text=mode)
-
-    critiques = {"schema": CRITIQUE_SET_SCHEMA, "critiques": normalized_critiques}
-    scan_structure_for_bzone_leak(label="critiques", value=critiques)
     critiques_json = json.dumps(critiques, indent=2, sort_keys=True)
 
     # Step 3: one judge call synthesizing the final portfolio.
@@ -461,20 +559,15 @@ def run_dialectic_gate(
         CRITIQUES_JSON=critiques_json,
         REENTRY_BLOCK=reentry_block,
     )
-    judge_raw = llm_client.complete(role="judge", system=judge_system, user=judge_user)
+    judge_raw, candidates = _complete_with_role_retry(
+        llm_client,
+        role="judge",
+        system=judge_system,
+        user=judge_user,
+        retry_budget=retry_budget,
+        process=_process_judge_completion,
+    )
     raw_completions["judge"] = judge_raw
-    scan_worker_text(label="completion:judge", text=judge_raw)
-    judge_output = _extract_json(judge_raw, role="judge")
-    if not isinstance(judge_output, list):
-        raise DialecticGateError("judge response must be a JSON array of candidate routes")
-    candidates = [validate_candidate(c, path=f"portfolio.candidates[{i}]") for i, c in enumerate(judge_output)]
-    if len(candidates) < MIN_CANDIDATES:
-        raise DialecticGateError(
-            f"judge synthesized only {len(candidates)} candidate route(s); this WP's own brief "
-            f"requires >= {MIN_CANDIDATES} -- never silently padded here"
-        )
-    for i, candidate in enumerate(candidates):
-        _scan_candidate_text(candidate, path=f"portfolio.candidates[{i}]")
 
     portfolio: Dict[str, Any] = {
         "schema": ROUTE_PORTFOLIO_SCHEMA,
@@ -513,6 +606,7 @@ __all__ = [
     "MIN_CANDIDATES",
     "PROPOSER_COUNT",
     "PERSPECTIVES",
+    "MAX_BZONE_RETRIES_PER_RUN",
     "DialecticGateError",
     "jcs_sha256",
     "scan_worker_text",

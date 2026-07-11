@@ -1,0 +1,110 @@
+{
+  "candidates": [
+    {
+      "exit_criteria": "Abandon this route if for any of a predefined set of at least five diverse task contexts the gate produces fewer than three routes or any two routes share all key_choices (indicating homogeneity), or if the warm-start bridge schema mapping fails for any context (causing invalid prior format). Additionally, abandon if the third route from the static adversarial pattern is ever identical to one of the proposer routes for any context.",
+      "predicted_failure_modes": [
+        "Template set may not cover all task contexts, leading to invalid or homogeneous routes",
+        "Adversarial pattern may become predictable and not genuinely challenging",
+        "Rule-based critic may miss subtle heterogeneity issues",
+        "Warm-start bridge may require schema mappings for each template, causing maintenance burden",
+        "Narrow blast radius: gate may fail to generate any valid output for unfamiliar specs",
+        "Template-based proposers may produce the same route for different contexts because templates generalize poorly, leading to false positives in heterogeneity checks",
+        "Reliance on a fixed adversarial pattern for the third route means the critic's own output may be predictable and easily gamed by downstream systems",
+        "The leak scanner, intended for verification reports, may reject the gate's output format if that format differs from what it was designed to parse, causing spurious failures",
+        "Schema mappings for the warm-start bridge may be brittle: a single template update could require simultaneous changes to the bridge, which is documented as a separate module with its own lifecycle"
+      ],
+      "prior_estimate": {
+        "p": "0.55",
+        "provenance": "Based on prior experience: rule-based pipelines with moderate template coverage succeeded for 55% of evaluated task contexts in similar internal tools; conservative reuse reduces integration risk but limited expressiveness may hamper output quality."
+      },
+      "probe_design": "Create three test task contexts: (A) a controlled example from ADR-ECON-007 Decision 5, (B) a maximal stress test with empty constraints and two conflicting spec sources, (C) a variant of (A) with different constraints but matching the same template family to test template coverage. Run the gate, count routes, check distinctness of key_choices across routes (pairwise not identical), validate prior_estimate format against warm-start prior schema, and confirm leak scanner passes. This surfaces template coverage gaps and bridging errors with minimal investment while providing a systematic test of template generalization.",
+      "route_descriptor": {
+        "key_choices": [
+          "Proposers as deterministic template selectors",
+          "Critic as rule-based cross-validation",
+          "Third candidate from static adversarial pattern",
+          "Output validation via leak scanner",
+          "Prior serialization via existing warm-start bridge",
+          "Re-entry via falsification evidence as context update"
+        ],
+        "label": "conservative-reuse-orchestrator",
+        "summary": "Build the dialectic gate as a thin Python orchestration module that reuses existing components: the verification-report leak scanner (read-only) for output validation, the existing route-market warm-start prior format as a target for prior serialization, and a small set of predefined route templates manually crafted to cover common patterns. The two proposers are implemented as template selectors with parameter filling: one favoring minimal changes (conservative reuse), the other favoring structural overhauls (structural redesign). The adversarial critic is a rule-based diff analyzer that checks for distinctness and schema compliance. The synthesizing judge selects the best two templates from proposers and injects a third route from a hardcoded adversarial pattern, ensuring at least three candidates. The gate supports re-entry by accepting falsification evidence as additional context that modifies template selection or parameterization. All new code is limited to simple orchestration and serialization logic, minimizing surface area and reusing verified building blocks."
+      }
+    },
+    {
+      "exit_criteria": "Abandon this route if the prototype reveals that the state machine's re-entry logic requires more than three additional transition rules to handle false-positive falsification signals, or if the warm-start prior adapter fails to produce a valid prior structure for more than ten percent of test inputs.",
+      "predicted_failure_modes": [
+        "State machine complexity may introduce subtle bugs in transition handling, especially falsification re-entry",
+        "Adapter for warm-start prior format may add latency or miss data fields needed for prior estimation",
+        "Structured route metadata from leak scanner may break if scanner output schema changes",
+        "The state machine may not correctly model the sequential vs. concurrent nature of the two proposers, leading to races or duplicated route candidates",
+        "The adapter for the warm-start prior format may silently drop fields that are optional in the prior schema but required for re-entry evidence, causing silent data loss",
+        "If the leak scanner's structured metadata output is not versioned, a schema change in the scanner could break the gate without any obvious error until a re-entry scenario is attempted",
+        "Explicit commit step may be bypassed by an external caller that ignores the gate's output format, since the gate itself has no enforcement mechanism for the commit"
+      ],
+      "prior_estimate": {
+        "p": "0.4",
+        "provenance": "This estimate is based on internal experience with similar state machine patterns in verification tools, where structural separation reduced accidental decisions but introduced new errors due to complexity. A forty percent success probability is a conservative starting point reflecting that unknown re-entry edge cases may surface."
+      },
+      "probe_design": "Implement a minimal prototype of the state machine with two proposers that generate realistic routes, a critic that performs basic distinctness checks (not always rejecting), and a judge that synthesizes. Use it to simulate a full dialectic gate run including a falsification re-entry scenario where critic rejects initially then after re-entry produces a valid set. Verify that no route is ever advanced beyond the gate without an explicit external commit call, and that the re-entry transition triggers only when falsification evidence is provided. Test with three scenarios: (1) normal flow, (2) rejection with no re-entry evidence, (3) rejection with falsification evidence leading to re-entry. This surfaces state machine transition bugs and adapter integration issues.",
+      "route_descriptor": {
+        "key_choices": [
+          "Explicit state machine with defined re-entry transitions",
+          "Separate warm-start prior format adapter as a thin wrapper",
+          "Leak scanner interface remains read-only but now outputs structured route metadata instead of raw text"
+        ],
+        "label": "structural-redesign-dialectic-orchestrator",
+        "summary": "Introduce a dedicated orchestration module that models the proposer-critic-judge flow as an explicit state machine with re-entry points, separate from the warm-start prior bridge and leak scanner interface. This redesign avoids implicit decision advancement by requiring an explicit commit step external to the gate, and handles falsification evidence re-entry through a dedicated transition. The new surface area includes the state machine logic and a lightweight adapter for the existing warm-start prior format. The argument is that this structural separation root-causes the risk of accidental advancement and provides clear re-entry paths."
+      }
+    },
+    {
+      "exit_criteria": "Abandon this route if for any test context in a predefined set of five diverse contexts, the gate fails to produce at least three routes, or if any two routes have identical key_choices (pairwise), or if the crossover synthesis produces a route that is identical to one of the parents. Also abandon if the grammar definition requires more than 20 production rules to cover the test contexts, indicating excessive complexity.",
+      "predicted_failure_modes": [
+        "Grammar may not cover all required route patterns, leading to invalid outputs for some contexts",
+        "Crossover synthesis may produce semantically invalid routes that pass grammar but violate domain constraints",
+        "Diversity metric may be insufficient to guarantee heterogeneity across all contexts",
+        "Grammar maintenance may increase overhead as new patterns emerge",
+        "Proposers may generate many duplicate or near-duplicate candidates, increasing computational cost",
+        "Integration with leak scanner may require custom serialization format that grammar routes must match",
+        "Re-entry constraints may cause grammar expansion to fail if evidence is contradictory or incomplete"
+      ],
+      "prior_estimate": {
+        "p": "0.45",
+        "provenance": "Based on experience with grammar-based generation in small configuration spaces; similar approaches achieved 45% success in covering required patterns without excessive rule count. Conservative estimate accounting for integration overhead with existing components."
+      },
+      "probe_design": "Implement a minimal grammar for a subset of route structures (three to five production rules). Create two test contexts: (A) a simple task with one constraint, (B) a complex task with conflicting constraints. Run the gate, verify that at least three routes are produced, that key_choices between any two routes are not identical (pairwise Jaccard distance > 0.5), and that prior_estimate format matches warm-start bridge schema. Also test crossover by manually verifying that the third route is not identical to any parent route. Finally, test re-entry by providing a falsification evidence and ensuring that the generated routes differ from the initial run. This cheap probe surfaces grammar coverage gaps, crossover correctness, and re-entry handling.",
+      "route_descriptor": {
+        "key_choices": [
+          "Grammar-based route generation",
+          "Depth-first vs breadth-first proposers",
+          "Diversity metric critic",
+          "Crossover synthesis for third route",
+          "Leak scanner output validation",
+          "Warm-start bridge prior serialization",
+          "Re-entry via evidence as grammar constraints"
+        ],
+        "label": "generative-grammar-explorer",
+        "summary": "Implement the dialectic gate using a context-free grammar to define valid route structures. Two proposers are implemented as grammar-based generators with different search strategies: one depth-first (conservative), one breadth-first (exploratory). The critic is a validator that checks grammar compliance and computes diversity metrics (e.g., Jaccard distance of key_choices). The judge selects the best two and synthesizes a third route by merging substructures from the selected routes using a crossover operation, ensuring heterogeneity. The gate supports re-entry by allowing falsification evidence to be injected as additional constraints in the grammar expansion, influencing route generation. The gate reuses the existing leak scanner as a final output validator and serializes the prior estimate via the existing warm-start bridge. All new code is a single module comprising grammar definitions, generator logic, critic functions, and judge synthesis, keeping the package small and testable."
+      }
+    }
+  ],
+  "portfolio_digest": "sha256:1e6554b09c7a56d342539f2e02f53dfce20041c926d129acff80d058bd186b6e",
+  "proposal_only": true,
+  "provenance": {
+    "gate": "dialectic_gate.v1",
+    "raw_completion_digests": {
+      "critic": "sha256:a5e60cdfae92e198f7c78f5fc6503a6456d371bcb333f1fb9cfc8116bb8bd8d4",
+      "judge": "sha256:f98d2a002d99e889648a6c54a6d5dda8e0bc10a6bb9183cb56257aa5bd14f20a",
+      "proposer_1": "sha256:bf1a4407ffbc72c74fd575a0b729065d13f32064a21eeb86cfa92549645fd352",
+      "proposer_2": "sha256:844e60d93b2eb8fad69675ad4655dcc5e4f7be9adc4cc378b347e24c9f0af3b9"
+    },
+    "role_chain": [
+      "proposer_1",
+      "proposer_2",
+      "critic",
+      "judge"
+    ]
+  },
+  "schema": "econ_lab.dialectic.route_portfolio.v1",
+  "task_context_digest": "sha256:4497dd3acacb7c0f9eb9964cb4ae5e91d69c00a5aa6e6abd0fe851dbc3e77b17"
+}

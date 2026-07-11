@@ -1,10 +1,21 @@
 {
-  "missing_env": [
-    "SILICONFLOW_API_KEY"
+  "candidate_labels": [
+    "conservative-reuse-orchestrator",
+    "structural-redesign-dialectic-orchestrator",
+    "generative-grammar-explorer"
   ],
-  "reason": "SILICONFLOW_API_KEY is unset; SiliconFlowLLMClient cannot make a real call (role='proposer_1')",
+  "evidence_class": "SMOKE_FIXTURE",
+  "mode": "real",
+  "portfolio_digest": "sha256:1e6554b09c7a56d342539f2e02f53dfce20041c926d129acff80d058bd186b6e",
+  "route_market_bridge": {
+    "route_candidates_digest": "sha256:5696913fd9323530b78db2e08170cbe9e5aa64286ac715ca4e11b85ddff16301",
+    "route_candidates_path": "tools/econ_lab/runs/dialectic_smoke_20260711/real_attempt/route_market_bridge/route_candidates.json",
+    "route_priors_digest": "sha256:05e291ed9f0d9d0f3b8f5c87f688fe611c0094ca4fa6e12eb4814ec8a1e5abed",
+    "route_priors_path": "tools/econ_lab/runs/dialectic_smoke_20260711/real_attempt/route_market_bridge/route_priors.json"
+  },
   "schema": "econ_lab.dialectic.dialectic_smoke.v1",
-  "significance_claims": "NONE -- credential missing, no call was made",
-  "status": "NOT_RUN",
-  "worker_calls_used": 0
+  "significance_claims": "NONE -- exploratory smoke fixture only",
+  "status": "COMPLETED",
+  "task_context_digest": "sha256:4497dd3acacb7c0f9eb9964cb4ae5e91d69c00a5aa6e6abd0fe851dbc3e77b17",
+  "worker_calls_used": 5
 }

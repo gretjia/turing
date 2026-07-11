@@ -150,6 +150,40 @@ def _offline_mock_client() -> MockLLMClient:
     )
 
 
+_RECEIPT_REDACTION_MARKER = (
+    "[REDACTED: this attempt's raw provider response failed the B-zone leak scan and "
+    "was retried by dialectic_gate.py's own bounded retry -- the metadata fields "
+    "above are kept, but the flagged raw text itself is dropped before this "
+    "worker-visible receipts file is written]"
+)
+
+
+def _redact_receipt_if_bzone_leak(receipt: Dict[str, Any]) -> Dict[str, Any]:
+    """`receipts.json` is written to this WP's own `tools/econ_lab/runs/` tree, a
+    committed, worker-visible path -- so it is subject to the exact same "全部
+    worker 可见文本过 B 区泄漏扫描" rule this WP's own brief states for every other
+    worker-visible surface. A raw provider receipt can legitimately be one of the
+    attempts `dialectic_gate._complete_with_role_retry` itself REJECTED and retried
+    away (that is precisely what the retry mechanism exists to catch) -- `on_receipt`
+    fires on every network call, successful or not, so an unscanned `response_raw`
+    would otherwise leak that rejected text into this committed file even though it
+    never made it into the accepted `portfolio.json`/`critiques.json`. Returns a NEW
+    dict; `receipt` itself is never mutated."""
+    raw = receipt.get("response_raw")
+    redacted = dict(receipt)
+    if not isinstance(raw, str):
+        redacted["bzone_redacted"] = False
+        return redacted
+    try:
+        dialectic_gate.scan_worker_text(label="receipt.response_raw", text=raw)
+    except dialectic_gate.DialecticGateError:
+        redacted["response_raw"] = _RECEIPT_REDACTION_MARKER
+        redacted["bzone_redacted"] = True
+        return redacted
+    redacted["bzone_redacted"] = False
+    return redacted
+
+
 def run(run_dir: Path, mode: str) -> Dict[str, Any]:
     receipts: List[Dict[str, Any]] = []
 
@@ -161,7 +195,15 @@ def run(run_dir: Path, mode: str) -> Dict[str, Any]:
         def on_receipt(receipt: Dict[str, Any]) -> None:
             receipts.append(receipt)
 
-        client = SiliconFlowLLMClient(on_receipt=on_receipt)
+        # `SiliconFlowLLMClient`'s own default `timeout_s=120` is tuned for a short
+        # single-proposal completion; the critic/judge roles here receive a much
+        # larger user prompt (both proposals, and for judge both proposals AND the
+        # critiques) so the provider can legitimately take longer to first-byte --
+        # widened here, in this real-network driver only (offline tests never touch
+        # the network at all), to `live_driver.py::dispatch_via_siliconflow`'s own
+        # established `timeout_s=600` default for exactly the same real-network-call
+        # reason, not a new number invented for this WP.
+        client = SiliconFlowLLMClient(on_receipt=on_receipt, timeout_s=600)
         evidence_class = EVIDENCE_CLASS_SMOKE
 
     try:
@@ -188,7 +230,8 @@ def run(run_dir: Path, mode: str) -> Dict[str, Any]:
         {"schema": result.critiques.get("schema"), "critiques": result.critiques.get("critiques")},
     )
     if receipts:
-        write_json(run_dir / "receipts.json", {"receipts": receipts})
+        scanned_receipts = [_redact_receipt_if_bzone_leak(r) for r in receipts]
+        write_json(run_dir / "receipts.json", {"receipts": scanned_receipts})
 
     bridge_dir = run_dir / "route_market_bridge"
     bridge_manifest = route_market_bridge.write_route_market_bridge(result.portfolio, bridge_dir)

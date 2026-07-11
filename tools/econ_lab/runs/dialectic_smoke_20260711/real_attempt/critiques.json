@@ -1,0 +1,29 @@
+{
+  "critiques": [
+    {
+      "additional_failure_modes": [
+        "Template-based proposers may produce the same route for different contexts because templates generalize poorly, leading to false positives in heterogeneity checks",
+        "Reliance on a fixed adversarial pattern for the third route means the critic's own output may be predictable and easily gamed by downstream systems",
+        "The leak scanner, intended for verification reports, may reject the gate's output format if that format differs from what it was designed to parse, causing spurious failures",
+        "Schema mappings for the warm-start bridge may be brittle: a single template update could require simultaneous changes to the bridge, which is documented as a separate module with its own lifecycle"
+      ],
+      "exit_criteria_critique": "The exit criterion 'abandon if any two routes share all key_choices' is concrete and observable: a human can run the gate on a given context and check whether the list of key_choices for each route is identical pairwise. However, the second clause 'abandon in favor of a more generative system' is vague; what constitutes 'more generative' is not defined, so the criterion is only partly falsifiable.",
+      "predicted_failure_modes_adequate": "false",
+      "probe_design_critique": "The probe design uses two hand-picked test contexts, but does not include a context that matches the same template as one of the probes but with different constraints; this would be the cheap test to surface template coverage gaps. The human would need to create these test contexts manually, run the gate, count routes, and compare key_choices before any significant integration work, which is cheap enough but the selection of contexts is not systematic, so a miss is likely.",
+      "route_label": "conservative-reuse-orchestrator"
+    },
+    {
+      "additional_failure_modes": [
+        "The state machine may not correctly model the sequential vs. concurrent nature of the two proposers, leading to races or duplicated route candidates",
+        "The adapter for the warm-start prior format may silently drop fields that are optional in the prior schema but required for re-entry evidence, causing silent data loss",
+        "If the leak scanner's structured metadata output is not versioned, a schema change in the scanner could break the gate without any obvious error until a re-entry scenario is attempted",
+        "Explicit commit step may be bypassed by an external caller that ignores the gate's output format, since the gate itself has no enforcement mechanism for the commit"
+      ],
+      "exit_criteria_critique": "The first part of the exit criterion ('more than three additional transition rules') is concrete: a human can count the transition rules in the state machine and determine if the re-entry logic required more rules than the initial design. The second part ('invalid prior structure for more than ten percent of test inputs') is also concrete: a human can define a set of test inputs, run the adapter, and tally failures. Both are observable and falsifiable.",
+      "predicted_failure_modes_adequate": "false",
+      "probe_design_critique": "The probe design proposes mocking proposers that always reject, which means the critic's own logic is never actually tested; the probe would not surface failure modes related to critic misclassification or re-entry transition bugs. The human would implement the minimal prototype, run one simulation, and check that no route advances without a commit; but this test is too shallow to catch the subtle transition errors listed in the predicted failure modes. It is cheap but not sufficient to surface those modes.",
+      "route_label": "structural-redesign-dialectic-orchestrator"
+    }
+  ],
+  "schema": "econ_lab.dialectic.critique_set.v1"
+}

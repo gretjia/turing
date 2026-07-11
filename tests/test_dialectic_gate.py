@@ -244,6 +244,9 @@ def test_judge_fewer_than_three_candidates_is_blocked():
 
 
 def test_malformed_json_from_a_role_is_blocked():
+    # Persistently malformed on every attempt -- exhausts the shared retry budget
+    # (see `test_proposer_malformed_json_is_retried_once_and_recovers` below for the
+    # transient-glitch-that-recovers case) and still fails loud in the end.
     client = MockLLMClient(
         responses={
             "proposer_1": "not json at all",
@@ -254,6 +257,35 @@ def test_malformed_json_from_a_role_is_blocked():
     )
     with pytest.raises(dg.DialecticGateError, match="not valid JSON"):
         dg.run_dialectic_gate(task_context="Fix a bug.", llm_client=client)
+
+
+def test_proposer_malformed_json_is_retried_once_and_recovers():
+    # A real model can emit a one-off malformed-JSON glitch (e.g. a stray missing
+    # comma) -- the SAME shared retry budget that recovers a B-zone-vocabulary
+    # collision also recovers this failure class, since both are just "this
+    # completion cannot be used as-is" from `_complete_with_role_retry`'s own point
+    # of view.
+    call_counts = {"proposer_1": 0}
+
+    def flaky_proposer_1() -> str:
+        call_counts["proposer_1"] += 1
+        if call_counts["proposer_1"] == 1:
+            return "{not valid json"
+        return _proposal_json("route-a", "0.4")
+
+    client = MockLLMClient(
+        responses={
+            "proposer_1": flaky_proposer_1,
+            "proposer_2": _proposal_json("route-b", "0.5"),
+            "critic": _critique_json(["route-a", "route-b"]),
+            "judge": json.dumps([json.loads(_proposal_json(l, "0.4")) for l in ("route-a", "route-b", "route-c-hybrid")]),
+        }
+    )
+
+    result = dg.run_dialectic_gate(task_context="Fix a bug.", llm_client=client)
+
+    assert call_counts["proposer_1"] == 2
+    assert len(result.portfolio["candidates"]) >= dg.MIN_CANDIDATES
 
 
 # ---------------------------------------------------------------------------
@@ -311,3 +343,129 @@ def test_proposers_receive_distinct_perspectives():
     assert p1_system != p2_system
     assert dg.PERSPECTIVES[0] in p1_system
     assert dg.PERSPECTIVES[1] in p2_system
+
+
+# ---------------------------------------------------------------------------
+# 8. A real model's own ordinary-English word choice colliding with the B-zone
+# blacklist (e.g. "threshold" used in its plain-English sense) is retried once,
+# bounded, in-budget -- never crashes the whole run outright, and never a second
+# silent retry.
+# ---------------------------------------------------------------------------
+
+
+def test_bzone_retry_notice_itself_passes_bzone_scan_and_names_no_token():
+    # The corrective notice is itself worker-visible text (appended to a real
+    # system prompt sent back to the model) -- it must clear the same scanner it is
+    # trying to steer the model away from tripping, and it must name no specific
+    # blacklisted token verbatim (that would itself be the leak this module exists
+    # to stop -- same reasoning `test_prompt_template_files_pass_bzone_scan` applies
+    # to the static prompt files).
+    dg.scan_worker_text(label="bzone_retry_notice", text=dg._BZONE_RETRY_NOTICE)
+
+
+def test_proposer_bzone_leak_is_retried_once_and_recovers():
+    call_counts = {"proposer_1": 0}
+
+    def flaky_proposer_1() -> str:
+        call_counts["proposer_1"] += 1
+        if call_counts["proposer_1"] == 1:
+            # a real model's ordinary-English word choice, not a fabricated attack
+            return _proposal_json("route-a", "0.4", summary="needs a clear failure threshold")
+        return _proposal_json("route-a", "0.4", summary="needs a clear failure cutoff point")
+
+    client = MockLLMClient(
+        responses={
+            "proposer_1": flaky_proposer_1,
+            "proposer_2": _proposal_json("route-b", "0.5"),
+            "critic": _critique_json(["route-a", "route-b"]),
+            "judge": json.dumps(
+                [
+                    json.loads(_proposal_json(l, "0.4"))
+                    for l in ("route-a", "route-b", "route-c-hybrid")
+                ]
+            ),
+        }
+    )
+
+    result = dg.run_dialectic_gate(task_context="Fix a bug.", llm_client=client)
+
+    assert call_counts["proposer_1"] == 2
+    proposer_1_calls = [c for c in client.calls if c["role"] == "proposer_1"]
+    assert len(proposer_1_calls) == 2
+    assert dg._BZONE_RETRY_NOTICE in proposer_1_calls[1]["system"]
+    assert dg._BZONE_RETRY_NOTICE not in proposer_1_calls[0]["system"]
+    assert len(result.portfolio["candidates"]) >= dg.MIN_CANDIDATES
+    # total real calls stayed within the WP's own <= 6 smoke-call budget: 2 proposers
+    # (one retried once = 3 calls) + 1 critic + 1 judge = 5.
+    assert len(client.calls) == 5
+
+
+def test_bzone_leak_persisting_through_the_retry_still_fails_loud():
+    # EVERY attempt uses the blacklisted word -- the whole run-wide retry budget is
+    # spent on this one call site (1 initial + MAX_BZONE_RETRIES_PER_RUN retries),
+    # and the LAST failure propagates uncaught: never a further silent retry once
+    # the budget is exhausted.
+    client = MockLLMClient(
+        responses={
+            "proposer_1": _proposal_json("route-a", "0.4", summary="needs a clear failure threshold"),
+            "proposer_2": _proposal_json("route-b", "0.5"),
+            "critic": _critique_json(["route-a", "route-b"]),
+            "judge": json.dumps([json.loads(_proposal_json(l, "0.4")) for l in ("a", "b", "c")]),
+        }
+    )
+    with pytest.raises(dg.DialecticGateError, match="B-zone leak"):
+        dg.run_dialectic_gate(task_context="Fix a bug.", llm_client=client)
+
+    proposer_1_calls = [c for c in client.calls if c["role"] == "proposer_1"]
+    assert len(proposer_1_calls) == 1 + dg.MAX_BZONE_RETRIES_PER_RUN  # budget fully spent, then gives up
+
+
+def test_bzone_retry_budget_is_shared_and_bounded_across_the_whole_run():
+    # Two DIFFERENT roles each trip the scan once -- both are within the run-wide
+    # MAX_BZONE_RETRIES_PER_RUN budget of 2, so both recover.
+    call_counts = {"proposer_1": 0, "critic": 0}
+
+    def flaky_proposer_1() -> str:
+        call_counts["proposer_1"] += 1
+        summary = "needs a clear failure threshold" if call_counts["proposer_1"] == 1 else "needs a clear cutoff"
+        return _proposal_json("route-a", "0.4", summary=summary)
+
+    def flaky_critic() -> str:
+        call_counts["critic"] += 1
+        if call_counts["critic"] == 1:
+            return json.dumps(
+                {
+                    "critiques": [
+                        {
+                            "route_label": "route-a",
+                            "additional_failure_modes": ["missing a lambda check"],
+                            "predicted_failure_modes_adequate": "true",
+                            "probe_design_critique": "fine",
+                            "exit_criteria_critique": "fine",
+                        },
+                        {
+                            "route_label": "route-b",
+                            "additional_failure_modes": [],
+                            "predicted_failure_modes_adequate": "true",
+                            "probe_design_critique": "fine",
+                            "exit_criteria_critique": "fine",
+                        },
+                    ]
+                }
+            )
+        return _critique_json(["route-a", "route-b"])
+
+    client = MockLLMClient(
+        responses={
+            "proposer_1": flaky_proposer_1,
+            "proposer_2": _proposal_json("route-b", "0.5"),
+            "critic": flaky_critic,
+            "judge": json.dumps([json.loads(_proposal_json(l, "0.4")) for l in ("a", "b", "c")]),
+        }
+    )
+
+    result = dg.run_dialectic_gate(task_context="Fix a bug.", llm_client=client)
+
+    assert call_counts["proposer_1"] == 2
+    assert call_counts["critic"] == 2
+    assert len(result.portfolio["candidates"]) >= dg.MIN_CANDIDATES
