@@ -1,0 +1,89 @@
+{
+  "candidates": [
+    {
+      "exit_criteria": "If the test suite shows a clear degradation in runtime performance or a 50% increase in test failures unrelated to the original bug, this route should be abandoned even though it was initially considered robust. This route must stay because it enables rapid experimental closure, preventing slower IDE-based debugging cycles. The exit criteria is designed to detect deployment-level regressions but can be refined to measure more specific observable signals during the early probe stage.",
+      "predicted_failure_modes": [
+        "The existing error handling pattern in the codebase does not provide sufficient context to resolve the underlying issue",
+        "The wrapping mechanism introduces performance overhead or obscures the original stack trace in ways that make debugging more difficult",
+        "The fix fails to address the root cause and only masks symptoms, leading to cascading issues in related parts of the test suite",
+        "The logging statement added in the try-except block may interfere with existing exception handling logic that depends on specific exception types or messages, potentially causing silent failures or incorrect test outcomes",
+        "The wrapped function might have side effects that are masked by the exception handling, leading to state corruption or incomplete test executions that don't manifest until later in the test suite run",
+        "If the error context added by the logging is insufficient or misleading, it could lead to incorrect debugging conclusions and wasted effort in fixing the wrong symptom"
+      ],
+      "prior_estimate": {
+        "p": "0.65",
+        "provenance": "The existing codebase demonstrates that similar defensive wrapping has been successfully used before in comparable modules. A conservative approach of leveraging pre-existing patterns reduces risk of introducing behavioral changes beyond what is necessary to fix the bug."
+      },
+      "probe_design": "Create a minimal patch that wraps the targeted function in a try-except block with a logging statement, then run a focused test suite of the affected module to ensure the new logging does not cause timeouts or incorrect test results. Additionally, inspect the exception propagation and test execution states for anomalies that could indicate side effects or incorrect handling.",
+      "route_descriptor": {
+        "key_choices": [
+          "worker_context: capsule_only"
+        ],
+        "label": "conservative-reuse-wrap",
+        "summary": "This route leverages existing error handling mechanisms within the pytest codebase to wrap the problematic functionality in a defensive manner, avoiding any new abstractions or large-scale changes. The worker will modify only the specific error-prone call-site by adding wrapping logic that catches and re-raises exceptions with additional context, using patterns already established in the codebase. This approach preserves the current architecture and relies on verified components to contain the issue."
+      }
+    },
+    {
+      "exit_criteria": "If the new collector logic fails to load tests in non-trivial directory structures, or if tests from one file start unexpectedly interfering with others in legacy test suites, this route should be abandoned for this task. Despite this being a likely failure mode, it remains in the portfolio because it provides structural clarity and is critical to isolate the root-cause risk. The exit criteria includes checking for interference in the test loading process, but can be more concretely specified to measure test metadata balance and consistent execution across test files.",
+      "predicted_failure_modes": [
+        "The new collector abstraction is too narrowly tailored to the current bug case and does not generalize to other collection scenarios",
+        "The redesign increases the internal surface area and introduces subtle performance regressions in test collection",
+        "Unintended side effects due to rewriting core collection logic might break existing test suites that depend on fragile behavioral assumptions",
+        "The redesign may introduce incompatibility with existing test runners or older pytest behaviors that are not explicitly covered by the test cases provided by the bug report or known legacy behaviors",
+        "The new collector abstraction could be slower than the legacy system in identifying test files due to suboptimal heuristics for filesystem traversal or redundant operations",
+        "The change might not correctly handle edge cases in symbol resolution or test metadata representation that were previously dealt with implicitly by the legacy logic"
+      ],
+      "prior_estimate": {
+        "p": "0.25",
+        "provenance": "This approach is ambitious and introduces a fundamental change to a core component. Its success probability depends heavily on how well the abstraction generalizes across use cases, which is uncertain without testing. The structural redesign carries inherent risk, but it addresses the root issue directly."
+      },
+      "probe_design": "Create a small test suite with multiple test files sharing a directory and simulate the specific file-naming pattern from the bug report. Execute a collection run which would previously fail and verify that the newly rewritten logic correctly identifies and loads all tests without relying on the old, fragile behavior. In addition, analyze the internal structure of the collector to ensure it handles edge cases and respects expected test metadata without introducing performance penalties.",
+      "route_descriptor": {
+        "key_choices": [
+          "worker_context: capsule_only"
+        ],
+        "label": "structural-redesign-rewrite",
+        "summary": "This route introduces a new internal mechanism to handle test collection in pytest by redesigning how the collection phase interacts with the test runner's core loop. It replaces the current ad-hoc file-resolution approach with a fresh abstraction layer that encapsulates filesystem traversal and test discovery into a dedicated collector module. This restructuring removes a root-cause risk related to inconsistent test loading behavior when multiple test files reside in the same directory. The worker sees only the bug report, no repository listing, but the new structure is designed to be robust across different file layouts."
+      }
+    },
+    {
+      "exit_criteria": "If the assertion fails during the test execution of the bug reproduction scenario or if it produces a non-obvious error that obscures the real issue, this route should be abandoned. This route is included to provide diversity in the approaches and is low-cost to probe, enabling early adoption without high-risk modifications.",
+      "predicted_failure_modes": [
+        "The assertion may mask the root cause by failing too early or too late in execution, missing the actual point of the fix",
+        "Assertion failure may produce misleading error messages that do not accurately describe the underlying issue",
+        "An overly strict assertion could prevent valid but unconventional test execution patterns from passing"
+      ],
+      "prior_estimate": {
+        "p": "0.40",
+        "provenance": "This approach addresses the immediate symptom rather than the root cause but can be a quick win for diagnosing and potentially ruling out other issues. Its low-risk profile makes it suitable as a cheap diagnosis strategy."
+      },
+      "probe_design": "Place a targeted assertion before the line identified in the bug report that checks for a known invariant in the test environment. Run a revised version of the test that reproduces the original issue with the added assertion to verify if it catches the failure condition early and produces a clear diagnostic message.",
+      "route_descriptor": {
+        "key_choices": [
+          "worker_context: source_context_loop"
+        ],
+        "label": "minimal-assertion-check",
+        "summary": "This route takes a minimalistic approach by placing an assertion immediately before the problematic operation to detect inconsistencies before they propagate. The worker modifies the code to validate key assumptions in the failing scenario, ensuring early detection of deviations from expected behavior. This route does not alter existing logic but adds a lightweight check to improve early diagnostics."
+      }
+    }
+  ],
+  "portfolio_digest": "sha256:da6506629f78f97a7bdff9d3739e06adca67e148183e3cbb0a70093515067d4c",
+  "proposal_only": true,
+  "provenance": {
+    "gate": "dialectic_gate.v1",
+    "raw_completion_digests": {
+      "critic": "sha256:c1f9c2a5eff4d28e9ccb2e4ebb26e0f205407c0c4795b91a67705a471b75d3d1",
+      "judge": "sha256:8d1f42e99707a943baedc2459ae3852b7964c108425fddc67531321b06d63d2c",
+      "proposer_1": "sha256:cdfcae715c9012dca00e1dd320081435d7da29ef93d6870b470c3ef0dcc8acc2",
+      "proposer_2": "sha256:6587a8f87e5970d4d9f30d85ad759931c3db7616abc35f8638905f48ab72498b"
+    },
+    "role_chain": [
+      "proposer_1",
+      "proposer_2",
+      "critic",
+      "judge"
+    ]
+  },
+  "schema": "econ_lab.dialectic.route_portfolio.v1",
+  "task_context_digest": "sha256:949546c7cc2fafbde2fdcbb249c84d9d9adeca3b9ae815465a812c3d5d05b3f9"
+}

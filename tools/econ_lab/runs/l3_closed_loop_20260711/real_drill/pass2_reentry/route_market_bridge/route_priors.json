@@ -1,0 +1,18 @@
+{
+  "priors": {
+    "conservative-reuse-wrap": 0.45,
+    "focused-meta-inspection": 0.35,
+    "structural-redesign-isolate": 0.55
+  },
+  "provenance": {
+    "origin": "dialectic_gate.v1",
+    "portfolio_digest": "sha256:6898a2d158591a6bea050d90c983cab07623e2485a2f01229a79a0ced21c3fe1",
+    "role_chain": [
+      "proposer_1",
+      "proposer_2",
+      "critic",
+      "judge"
+    ]
+  },
+  "schema": "econ_lab.dialectic.route_market_bridge.route_priors.v1"
+}

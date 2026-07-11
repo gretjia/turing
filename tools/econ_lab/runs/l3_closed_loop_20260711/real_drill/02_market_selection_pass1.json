@@ -1,0 +1,35 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "route:pytest-dev/pytest:scaffold:sha256:6be50116db6f1db3d35d2f0dc624c186d7d0a9a091fe1252c101e570fed3f826",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:5631999bbb3ea4078ef2c3351c9dcf4468237dd64c60bbfd41b4739a786ba827",
+    "price_signal_hash": "sha256:031a3813813c8c9a88c9100488896468076fd4f2332f87f5999cdf18eaef3811",
+    "route_id": "conservative-reuse-wrap",
+    "schema_id": "budget_allocated.v1"
+  },
+  "chosen_route": "conservative-reuse-wrap",
+  "domain_bucket": "pytest-dev/pytest",
+  "pass_label": "pass1",
+  "paused_route_ids": [],
+  "priors_used": {
+    "conservative-reuse-wrap": 0.65,
+    "minimal-assertion-check": 0.4,
+    "structural-redesign-rewrite": 0.25
+  },
+  "route_labels": [
+    "conservative-reuse-wrap",
+    "structural-redesign-rewrite",
+    "minimal-assertion-check"
+  ],
+  "route_market_bridge": {
+    "route_candidates_digest": "sha256:08ade6146eff6d6a7f7bf90d337005b46f149107532258e1c18199cd8a2e5cdf",
+    "route_candidates_path": "tools/econ_lab/runs/l3_closed_loop_20260711/real_drill/pass1/route_market_bridge/route_candidates.json",
+    "route_priors_digest": "sha256:ba4471718b3e07a5730aeef2903848e7acc71c79ffe11b61fc8b35574314c029",
+    "route_priors_path": "tools/econ_lab/runs/l3_closed_loop_20260711/real_drill/pass1/route_market_bridge/route_priors.json"
+  }
+}

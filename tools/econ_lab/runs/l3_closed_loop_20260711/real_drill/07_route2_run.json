@@ -1,0 +1,134 @@
+{
+  "accepted_head": "mu:3449ef7fea3ca69f4108cecff5ab86a7ec13c036dbf94dc20d2a44eb03e2b4fa",
+  "attempt_records": [
+    {
+      "attempt_index": 1,
+      "resolved": false,
+      "result": "FAIL",
+      "route_label": "structural-redesign-isolate",
+      "scoring_status": "COMPLETED",
+      "touched_files": [],
+      "wall_time_ms": 24318
+    },
+    {
+      "attempt_index": 2,
+      "resolved": false,
+      "result": "FAIL",
+      "route_label": "structural-redesign-isolate",
+      "scoring_status": "COMPLETED",
+      "touched_files": [],
+      "wall_time_ms": 33083
+    }
+  ],
+  "attempts_total": 2,
+  "authorization_head": "mu:2d139388b01b1b8213b89d2c82eef46dcfad2ed9334a8ec040c9b440db562b2b",
+  "authorization_mode": "required",
+  "basis": "iterate_harness_wp_l3_1",
+  "detector_stream_length": 9,
+  "detector_trips": [
+    {
+      "at_seq": 1,
+      "evidence": {
+        "attempted_action_signatures": [
+          "sha256:56600e2299d83c59a04de19be0b8e1e1f92105099fcb314bbeb6b9d400c78fa9"
+        ],
+        "fact_class": "REPEATED_FAILED_EDIT",
+        "file_path": "src/_pytest/unittest.py",
+        "fragment_id": null
+      },
+      "rule_id": "SAME_FRAGMENT_REPEATED_FAILURE",
+      "tripped": true
+    },
+    {
+      "at_seq": 5,
+      "evidence": {
+        "attempted_action_signatures": [
+          "sha256:666f55ad068185388a12b80cfe2680ae4aad38b5c8015afbbb7adf643b8a949a"
+        ],
+        "fact_class": "REPEATED_FAILED_EDIT",
+        "file_path": "src/_pytest/unittest.py",
+        "fragment_id": null
+      },
+      "rule_id": "SAME_FRAGMENT_REPEATED_FAILURE",
+      "tripped": true
+    }
+  ],
+  "instance_id": "pytest-dev__pytest-7236",
+  "market_id": "mkt_iterate_d6c75be8e78bd2c6",
+  "micro_tape_bundle": "tools/econ_lab/runs/l3_closed_loop_20260711/real_drill/route2_tape/turingos/instances/pytest-dev__pytest-7236/micro_tape.bundle",
+  "micro_tape_bundle_sha256": "sha256:a00cddeb81cd4c5ccb3bcd79da577cccf56d39fe378d48acedd47479732154d7",
+  "outcome_status": "ESCALATED",
+  "route_falsification_report": {
+    "attempts": [
+      {
+        "attempt_index": "1",
+        "fact_class": "ATTEMPT_FAILED",
+        "failure_class": "SEMANTIC_FAIL",
+        "note": "attempt 1 on route structural-redesign-isolate: real dispatch + real official-harness verdict"
+      },
+      {
+        "attempt_index": "2",
+        "fact_class": "ATTEMPT_FAILED",
+        "failure_class": "SEMANTIC_FAIL",
+        "note": "attempt 2 on route structural-redesign-isolate: real dispatch + real official-harness verdict"
+      }
+    ],
+    "detector_events": [
+      {
+        "evidence": {
+          "attempted_action_signatures": [
+            "sha256:56600e2299d83c59a04de19be0b8e1e1f92105099fcb314bbeb6b9d400c78fa9"
+          ],
+          "fact_class": "REPEATED_FAILED_EDIT",
+          "file_path": "src/_pytest/unittest.py",
+          "fragment_id": null
+        },
+        "fact_class": "DETECTOR_TRIP",
+        "rule_id": "SAME_FRAGMENT_REPEATED_FAILURE"
+      },
+      {
+        "evidence": {
+          "attempted_action_signatures": [
+            "sha256:666f55ad068185388a12b80cfe2680ae4aad38b5c8015afbbb7adf643b8a949a"
+          ],
+          "fact_class": "REPEATED_FAILED_EDIT",
+          "file_path": "src/_pytest/unittest.py",
+          "fragment_id": null
+        },
+        "fact_class": "DETECTOR_TRIP",
+        "rule_id": "SAME_FRAGMENT_REPEATED_FAILURE"
+      }
+    ],
+    "digest": "sha256:64c321023aa1f7e0ea5317f300c781cf49454147a24c0df1ca7411c326bbd630",
+    "proposal_only": true,
+    "recommendation": "The same failure signature repeated on consecutive attempts of this route; recommend GRILL-ME review of the remaining route candidates before further dispatch.",
+    "remaining_candidates": [
+      "conservative-reuse-wrap",
+      "focused-meta-inspection"
+    ],
+    "route_id": "structural-redesign-isolate",
+    "schema": "econ_lab.monitor.route_falsification_report.v1",
+    "verifier_evidence": [
+      {
+        "phase": null,
+        "result": "fail"
+      },
+      {
+        "phase": null,
+        "result": "fail"
+      }
+    ]
+  },
+  "route_falsified_event": {
+    "event_hash": "sha256:78ba65e8b3704a2da0dcee11c637d11d2774752ab24d081eb51da67cb7f2f03e",
+    "event_type": "RouteFalsified",
+    "head_effect": "PRESERVE",
+    "report_digest": "sha256:64c321023aa1f7e0ea5317f300c781cf49454147a24c0df1ca7411c326bbd630",
+    "route_id": "structural-redesign-isolate",
+    "schema_id": "route_falsified.v1",
+    "seq": 8
+  },
+  "route_id": "structural-redesign-isolate",
+  "tape_tip": "mu:dc962eca9286f62aada6449e46bf0b1bff0693e2236d8c380138eab2721d4cf8",
+  "worker_id": "worker:sha256:e366ca3acd004290ca25676c8d310a7f2e0b58f3b95efb7234276729892cf19a"
+}

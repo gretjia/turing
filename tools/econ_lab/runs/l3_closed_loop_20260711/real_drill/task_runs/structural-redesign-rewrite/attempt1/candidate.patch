@@ -1,0 +1,24 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+index 4de010e3d..2577814c4 100644
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -108,7 +108,7 @@ class TestCaseFunction(Function):
+             # We need to run the tearDown even for skipped tests when using --pdb
+             # to ensure proper debugging experience.
+             if self.config.getoption("--pdb"):
+-                self._call_teardown_hook()
++                pass
+             # Even if the test was skipped, we still need to run the tearDown
+             # for the test to properly cleanup resources.
+             # See https://github.com/pytest-dev/pytest/issues/7236
+@@ -116,10 +116,6 @@ class TestCaseFunction(Function):
+         #        self._call_teardown_hook()
+         #        return
+         #    self._call_teardown_hook()
+-        # We need to run the tearDown even for skipped tests when using --pdb
+-        # to ensure proper debugging experience.
+-        if self.config.getoption("--pdb"):
+-            self._call_teardown_hook()
+ 
+     def setup(self):
+         # ...
