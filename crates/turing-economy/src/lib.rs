@@ -18,6 +18,11 @@ pub mod routing_fold;
 /// arbitration hook. See module docs for scope.
 pub mod diversity_metrics;
 
+/// WP-H4 (ADR-ECON-007 Decision 2 "检测器信号与经济奖励解耦"): the deterministic
+/// `RouteFuseTripped` pause mask -- a pure candidate-set filter that never touches
+/// `routing_fold`'s `(Q, N, P)` state. See module docs for scope.
+pub mod route_pause_mask;
+
 const SCALE: i128 = 1_000_000_000;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -47,6 +52,20 @@ pub enum EconomyEvent {
     /// (ADR-ECON-003 Decision 6.3 "clawback"), referenced by that event's own `event_hash`.
     /// Additive, PRESERVE-class, same registry pattern.
     RoutingPriorClawback(RoutingPriorClawback),
+    /// WP-H4 (ADR-ECON-007 Decision 2 "检测器信号与经济奖励解耦"): a rule-based, external
+    /// loop detector's fuse trip on one routed candidate. Additive, PRESERVE-class, follows
+    /// the same `ADDITIVE_AGENT_ECONOMY_V1_0` registry pattern as `PrincipalDeclared` above
+    /// (Decision 2: "检测器熔断不写 Q"). Consumed only by
+    /// `route_pause_mask::economy_events_to_route_fuse_trips` to compute a deterministic
+    /// pause mask over `MarketRouter`'s candidate set; never folded into
+    /// `routing_fold::NodeState` and never moves `accepted_head`.
+    RouteFuseTripped(RouteFuseTripped),
+    /// WP-H4 (ADR-ECON-007 Decision 4 "验证前置终止与路线证伪报告"): the structured,
+    /// verifier-evidence-carrying report a legal route abandonment must produce (a bare
+    /// error-out is illegal per Decision 4). Additive, PRESERVE-class, `proposal_only` --
+    /// flows to the GRILL-ME layer for human/facilitator follow-up and never advances any
+    /// accepted_head, same registry pattern as `PrincipalDeclared` above.
+    RouteFalsified(RouteFalsified),
 }
 
 impl EconomyEvent {
@@ -272,6 +291,81 @@ impl EconomyEvent {
             updated_event_hash,
         }))
     }
+
+    /// WP-H4 (ADR-ECON-007 Decision 2): construct a rule-based loop detector's fuse trip on
+    /// one routed candidate. Additive, PRESERVE-class, follows the `principal_declared`
+    /// constructor's `ADDITIVE_AGENT_ECONOMY_V1_0` pattern above.
+    ///
+    /// `route_domain`/`route_scaffold` name the exact `(domain_bucket, scaffold_id)` fold key
+    /// this trip pauses (same field-naming convention as `RoutingPriorUpdated.route_domain`/
+    /// `route_scaffold` above -- for the route stage, `route_scaffold` is the fully-encoded
+    /// `stage_option_id(STAGE_ROUTE, route_id)` value, i.e. exactly what a
+    /// `route_pause_mask::RouteFuseTripFoldEvent.key` and a `CandidateRoute`'s market-key
+    /// mapping both resolve to).
+    ///
+    /// `detector_rule_id` identifies which rule tripped (opaque to this constructor, carries
+    /// no threshold *value* -- ADR-ECON-007 Decision 3: the detector's existence is A-zone,
+    /// its threshold values are B-zone and never echoed here). `diagnostic_digest` must
+    /// already be a `sha256:`-prefixed 64-hex digest (same format as
+    /// `verifier_attestation_hash` above) -- the raw diagnostic facts live off-tape; this
+    /// event carries only their digest, so no B-zone value can leak through this event's own
+    /// fields (Decision 3's "诊断只说检测到循环,不说数值" discipline extended to the tape
+    /// itself, not just the agent-visible message).
+    ///
+    /// `event_ordinal` is the trip's caller-supplied logical-clock position (see
+    /// `route_pause_mask`'s module doc "Known spec gap" note) that
+    /// `route_pause_mask::compute_route_pause_mask` folds against the caller's
+    /// `RoutePauseConfig::validity_window`.
+    pub fn route_fuse_tripped(
+        route_domain: impl Into<String>,
+        route_scaffold: impl Into<String>,
+        detector_rule_id: impl Into<String>,
+        diagnostic_digest: impl Into<String>,
+        event_ordinal: u64,
+    ) -> Result<Self, EconomyError> {
+        let diagnostic_digest = diagnostic_digest.into();
+        validate_digest(&diagnostic_digest)?;
+        Ok(EconomyEvent::RouteFuseTripped(RouteFuseTripped {
+            schema_id: "route_fuse_tripped.v1".to_string(),
+            event_type: "RouteFuseTripped".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_domain: route_domain.into(),
+            route_scaffold: route_scaffold.into(),
+            detector_rule_id: detector_rule_id.into(),
+            diagnostic_digest,
+            event_ordinal,
+        }))
+    }
+
+    /// WP-H4 (ADR-ECON-007 Decision 4 "验证前置终止与路线证伪报告"): construct the
+    /// structured report a legal route abandonment must produce. Field set is exactly
+    /// Decision 4's pinned shape: `{route_id, attempts, verifier_evidence[],
+    /// detector_events[], remaining_candidates[], recommendation}`. Additive, PRESERVE-class,
+    /// `proposal_only` (Decision 4: "报告是 proposal_only,不推进任何 accepted_head") --
+    /// infallible (every field is an opaque caller-supplied string/count, nothing here is
+    /// validated against a digest format), unlike the other WP-H4 constructor above.
+    #[must_use]
+    pub fn route_falsified(
+        route_id: impl Into<String>,
+        attempts: u64,
+        verifier_evidence: Vec<String>,
+        detector_events: Vec<String>,
+        remaining_candidates: Vec<String>,
+        recommendation: impl Into<String>,
+    ) -> Self {
+        EconomyEvent::RouteFalsified(RouteFalsified {
+            schema_id: "route_falsified.v1".to_string(),
+            event_type: "RouteFalsified".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_id: route_id.into(),
+            attempts,
+            verifier_evidence,
+            detector_events,
+            remaining_candidates,
+            recommendation: recommendation.into(),
+            proposal_only: true,
+        })
+    }
 }
 
 /// `event_hash` for a `RoutingPriorUpdated` event (ADR-ECON-003 Decision 6.3 dedup key +
@@ -456,6 +550,57 @@ pub struct RoutingPriorClawback {
     pub head_effect: String,
     /// References the `event_hash` of the `RoutingPriorUpdated` being reversed.
     pub updated_event_hash: String,
+}
+
+/// WP-H4 (ADR-ECON-007 Decision 2): one rule-based external loop detector's fuse trip on a
+/// routed `(route_domain, route_scaffold)` candidate. Additive, PRESERVE-class -- see
+/// [`EconomyEvent::route_fuse_tripped`]. Consumed only by
+/// `route_pause_mask::economy_events_to_route_fuse_trips`; this struct itself never carries
+/// a τ/λ/floor/detector-threshold *value* (Art III.4/F4) -- only the routing key (as
+/// caller-computed opaque strings), an opaque rule identifier, a diagnostic *digest* (never
+/// the raw diagnostic text/values themselves), and the explicit fold-ordinal input the pause
+/// mask needs.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RouteFuseTripped {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    /// The tripped route's domain-bucket component (same convention as
+    /// `RoutingPriorUpdated.route_domain`).
+    pub route_domain: String,
+    /// The tripped route's fold-key component (same convention as
+    /// `RoutingPriorUpdated.route_scaffold`; for the route stage this is the fully-encoded
+    /// `stage_option_id(STAGE_ROUTE, route_id)` value).
+    pub route_scaffold: String,
+    /// Opaque identifier of which detector rule tripped (ADR-ECON-007 Decision 3: existence
+    /// is A-zone, no threshold value is ever carried here).
+    pub detector_rule_id: String,
+    /// `sha256:`-prefixed 64-hex digest over the off-tape diagnostic facts (never the raw
+    /// facts themselves -- Decision 3's no-numeric-leak discipline extended to the tape).
+    pub diagnostic_digest: String,
+    /// Caller-supplied logical-clock position of this trip (see `route_pause_mask`'s module
+    /// doc); folded against `route_pause_mask::RoutePauseConfig::validity_window`.
+    pub event_ordinal: u64,
+}
+
+/// WP-H4 (ADR-ECON-007 Decision 4): the structured, verifier-evidence-carrying report a
+/// legal route abandonment must produce (a bare error-out is illegal per Decision 4).
+/// Additive, PRESERVE-class -- see [`EconomyEvent::route_falsified`]. `proposal_only` is
+/// always `true`: this event never advances any accepted_head; it flows to the GRILL-ME
+/// layer for human/facilitator follow-up (Decision 4: "报告是 proposal_only,不推进任何
+/// accepted_head").
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RouteFalsified {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    pub route_id: String,
+    pub attempts: u64,
+    pub verifier_evidence: Vec<String>,
+    pub detector_events: Vec<String>,
+    pub remaining_candidates: Vec<String>,
+    pub recommendation: String,
+    pub proposal_only: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -664,7 +809,13 @@ impl MarketReplay {
                 // (no market_id, no coin flow) -- they only feed `routing_fold`'s (Q, N, P)
                 // fold, a separate projection entirely.
                 | EconomyEvent::RoutingPriorUpdated(_)
-                | EconomyEvent::RoutingPriorClawback(_) => {}
+                | EconomyEvent::RoutingPriorClawback(_)
+                // WP-H4: RouteFuseTripped/RouteFalsified are likewise not market state (no
+                // market_id, no coin flow) -- the fuse trip only feeds
+                // `route_pause_mask`'s candidate-set filter, and the falsified report is a
+                // proposal_only GRILL-ME artifact; neither touches this projection.
+                | EconomyEvent::RouteFuseTripped(_)
+                | EconomyEvent::RouteFalsified(_) => {}
             }
         }
         Ok(MarketReplay {
@@ -755,7 +906,9 @@ impl WalletProjection {
                 EconomyEvent::MarketCreated(_)
                 | EconomyEvent::PrincipalDeclared(_)
                 | EconomyEvent::RoutingPriorUpdated(_)
-                | EconomyEvent::RoutingPriorClawback(_) => {}
+                | EconomyEvent::RoutingPriorClawback(_)
+                | EconomyEvent::RouteFuseTripped(_)
+                | EconomyEvent::RouteFalsified(_) => {}
             }
         }
 
@@ -955,9 +1108,12 @@ pub fn check_conservation(
             // WP4: routing-prior events are likewise not coin-flow (no market_id, no
             // minted/redeemed/reward coin) -- excluded from conservation math for the same
             // reason, symmetric with PrincipalDeclared above.
+            // WP-H4: RouteFuseTripped/RouteFalsified are likewise not coin-flow events.
             EconomyEvent::PrincipalDeclared(_)
             | EconomyEvent::RoutingPriorUpdated(_)
-            | EconomyEvent::RoutingPriorClawback(_) => {}
+            | EconomyEvent::RoutingPriorClawback(_)
+            | EconomyEvent::RouteFuseTripped(_)
+            | EconomyEvent::RouteFalsified(_) => {}
         }
     }
 

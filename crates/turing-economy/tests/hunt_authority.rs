@@ -312,3 +312,53 @@ fn routing_prior_events_are_preserve_class_in_both_the_constructor_and_the_regis
         );
     }
 }
+
+/// WP-H4 (ADR-ECON-007 Decision 2/4) -- PRESERVE assertion for the new
+/// `RouteFuseTripped`/`RouteFalsified` events, same `PrincipalDeclared`-precedent pattern as
+/// the WP4 test directly above: constructed via the public constructor (never a hand-rolled
+/// struct literal), asserting `head_effect == "PRESERVE"` directly on the event. Unlike the
+/// WP4 test above, this does NOT cross-check `turing_contracts::registry` -- WP-H4's file
+/// zone is `crates/turing-economy` only (the ratified `pack/04_registries/
+/// event_registry_v5_3_1.json` closed table lives outside it), so registering these two
+/// event names into that closed table is out of scope for this WP and left to a follow-up
+/// change that owns that file.
+#[test]
+fn route_events_are_preserve_class_via_their_public_constructors() {
+    let tripped = EconomyEvent::route_fuse_tripped(
+        "code_review",
+        "route:sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "detector:loop_v1",
+        "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        3,
+    )
+    .expect("route_fuse_tripped constructs on well-formed input");
+    let EconomyEvent::RouteFuseTripped(tripped_payload) = &tripped else {
+        panic!("route_fuse_tripped must return EconomyEvent::RouteFuseTripped");
+    };
+    assert_eq!(
+        tripped_payload.head_effect, "PRESERVE",
+        "OBSERVED head_effect={:?}, EXPECTED \"PRESERVE\" for RouteFuseTripped",
+        tripped_payload.head_effect
+    );
+
+    let falsified = EconomyEvent::route_falsified(
+        "route:sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        4,
+        vec!["verifier:evidence-1".to_string()],
+        vec!["detector:trip-1".to_string()],
+        vec!["route:sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd".to_string()],
+        "escalate to GRILL-ME",
+    );
+    let EconomyEvent::RouteFalsified(falsified_payload) = &falsified else {
+        panic!("route_falsified must return EconomyEvent::RouteFalsified");
+    };
+    assert_eq!(
+        falsified_payload.head_effect, "PRESERVE",
+        "OBSERVED head_effect={:?}, EXPECTED \"PRESERVE\" for RouteFalsified",
+        falsified_payload.head_effect
+    );
+    assert!(
+        falsified_payload.proposal_only,
+        "RouteFalsified must always be proposal_only=true (Decision 4: never advances accepted_head)"
+    );
+}

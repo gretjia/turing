@@ -321,6 +321,57 @@ pub fn stage_walk_v0() -> [&'static str; 3] {
     [STAGE_CONTEXT, STAGE_REPAIR, STAGE_VERIFY]
 }
 
+// ---------------------------------------------------------------------------
+// WP-H4 (ADR-ECON-007 Decision 5 "路线作为一等定价对象"): route stage atop the depth-k
+// stage hierarchy. Additive only -- every symbol above (stage_option_id, StageRoutingKey,
+// the frozen v0 context/repair/verify stages) is untouched. Decision 5 pins the key shape
+// verbatim as `(bucket, "route", route_id)`, i.e. exactly [`StageRoutingKey`] with
+// `stage_name = STAGE_ROUTE` and `option = route_id` -- so the route layer reuses the
+// pre-existing fold / softmax / τ-anneal / N_eff-floor machinery byte-for-byte, with zero
+// new selection math (Decision 5: "选择=同一 softmax/温度机制的复用").
+// ---------------------------------------------------------------------------
+
+/// Frozen stage-name literal for the route layer (ADR-ECON-007 Decision 5). Unlike
+/// `STAGE_CONTEXT`/`STAGE_REPAIR`/`STAGE_VERIFY`, the route layer's option space is open
+/// (a route is a free-form descriptor, not a frozen small enum), so route options are never
+/// checked by [`validate_stage_option`] -- callers derive them via [`route_descriptor_id`]
+/// below instead of picking from a fixed list.
+pub const STAGE_ROUTE: &str = "route";
+
+/// `route_descriptor.v1` (ADR-ECON-007 Decision 5: "route_id=路线描述子 JCS 哈希,照
+/// Decision 1 先例"): the normalized descriptor whose JCS-SHA256 is `route_id`. One layer
+/// above [`ScaffoldDescriptorV2`] -- a route is a labeled composition of the three stage
+/// choices it commits to, not a single stage option.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct RouteDescriptor {
+    pub route_label: String,
+    pub context: String,
+    pub repair: String,
+    pub verify: String,
+}
+
+/// `route_id = "route:sha256:" + hex(SHA256(JCS(descriptor)))` (ADR-ECON-007 Decision 5,
+/// Decision-1 precedent). Distinct prefix from `scaffold:`/`stage:` so all three namespaces
+/// stay disjoint even after `StageRoutingKey::to_routing_key`'s downstream `stage_option_id`
+/// re-hash (the route layer's fold key is `stage_option_id(STAGE_ROUTE, route_id)`, i.e. a
+/// hash-of-a-hash, exactly mirroring how a `context`/`repair`/`verify` option string is
+/// itself hashed a second time to become that stage's fold key).
+pub fn route_descriptor_id(descriptor: &RouteDescriptor) -> Result<String, EconomyError> {
+    let value = serde_json::json!({
+        "schema": "route_descriptor.v1",
+        "route_label": descriptor.route_label,
+        "context": descriptor.context,
+        "repair": descriptor.repair,
+        "verify": descriptor.verify,
+    });
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingKeyDescriptor(e.to_string()))?;
+    Ok(format!(
+        "route:sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
+}
+
 /// Options for one frozen v0 stage, in stable lexicographic order (matches Decision 4's
 /// sorted-route-id convention when the caller uses these as route_ids).
 pub fn options_for_stage(stage_name: &str) -> Result<&'static [&'static str], EconomyError> {
@@ -824,6 +875,80 @@ mod tests {
         let composed = "\u{00e9}"; // "é" (single code point)
         let decomposed = "e\u{0301}"; // "e" + combining acute accent
         assert_eq!(domain_bucket(Some(composed)), domain_bucket(Some(decomposed)));
+    }
+
+    // -- WP-H4 (ADR-ECON-007 Decision 5): route_descriptor_id / route stage key -----
+
+    #[test]
+    fn route_descriptor_id_is_deterministic_and_distinct() {
+        let a = RouteDescriptor {
+            route_label: "conservative_repair".to_string(),
+            context: "minimal".to_string(),
+            repair: "single_shot".to_string(),
+            verify: "none".to_string(),
+        };
+        let b = RouteDescriptor {
+            route_label: "aggressive_repair".to_string(),
+            ..a.clone()
+        };
+        let id_a1 = route_descriptor_id(&a).expect("route_descriptor_id(a) 1");
+        let id_a2 = route_descriptor_id(&a).expect("route_descriptor_id(a) 2");
+        let id_b = route_descriptor_id(&b).expect("route_descriptor_id(b)");
+        assert_eq!(id_a1, id_a2, "same descriptor must hash to the same route_id");
+        assert_ne!(id_a1, id_b, "different route_label must hash to a different route_id");
+        assert!(id_a1.starts_with("route:sha256:"));
+    }
+
+    #[test]
+    fn route_descriptor_id_namespace_never_collides_with_scaffold_or_stage_ids() {
+        // Decision 5's "route:" prefix must stay disjoint from "scaffold:"/"stage:" even
+        // when the underlying JCS payload bytes could otherwise coincide.
+        let route = RouteDescriptor {
+            route_label: "x".to_string(),
+            context: "minimal".to_string(),
+            repair: "single_shot".to_string(),
+            verify: "none".to_string(),
+        };
+        let route_id = route_descriptor_id(&route).expect("route_descriptor_id");
+        let stage_id = stage_option_id(STAGE_CONTEXT, "minimal").expect("stage_option_id");
+        assert_ne!(route_id, stage_id);
+        assert!(!route_id.starts_with("stage:"));
+        assert!(!route_id.starts_with("scaffold:"));
+    }
+
+    #[test]
+    fn route_stage_key_reuses_stage_routing_key_verbatim() {
+        // Decision 5: key = (bucket, "route", route_id) -- exactly StageRoutingKey with
+        // stage_name = STAGE_ROUTE, so the route layer folds through the pre-existing
+        // (Q, N, P) machinery with zero new code.
+        let route = RouteDescriptor {
+            route_label: "conservative_repair".to_string(),
+            context: "minimal".to_string(),
+            repair: "single_shot".to_string(),
+            verify: "none".to_string(),
+        };
+        let route_id = route_descriptor_id(&route).expect("route_descriptor_id");
+        let stage_key = StageRoutingKey {
+            domain_bucket: "code_review".to_string(),
+            stage_name: STAGE_ROUTE.to_string(),
+            option: route_id.clone(),
+        };
+        let routing_key = stage_key.to_routing_key().expect("to_routing_key");
+        assert_eq!(routing_key.domain_bucket, "code_review");
+        assert_eq!(
+            routing_key.scaffold_id,
+            stage_option_id(STAGE_ROUTE, &route_id).expect("stage_option_id(route, route_id)")
+        );
+        // The route layer participates in the SAME fold as every other stage: a
+        // PriorUpdated event against this exact key must be foldable with no new fold code.
+        let prices = BTreeMap::new();
+        let events = vec![RoutingFoldEvent::binary_update(
+            routing_key.clone(),
+            true,
+            event_hash(0xA1),
+        )];
+        let nodes = fold_routing_state(&prices, &events).expect("route-key fold");
+        assert_eq!(nodes.get(&routing_key).expect("route node present").n(), 1);
     }
 
     // -- Decision 6: fold determinism ----------------------------------------------
