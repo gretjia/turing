@@ -129,6 +129,12 @@ import run_deepseek_arm_a_worker as arm_a_worker  # noqa: E402
 # and therefore never itself perturbs a byte of `--monitor`-absent output.
 from monitor import interventions as monitor_interventions  # noqa: E402
 from monitor import loop_detector as monitor_loop_detector  # noqa: E402
+# WP-H3 (ADR-ECON-007 Decision 4): verification-gated termination guard +
+# route-falsification report, invoked only where WP-H2's own rollback remedy is
+# already exhausted (`RollbackCapExceededError`, that module's own documented
+# extension point) -- see `run_driver`'s "monitor_enabled" block below and
+# `monitor/termination.py`'s module docstring for the full hook-placement note.
+from monitor import termination as monitor_termination  # noqa: E402
 
 SHARD_ROOT = REPO_ROOT / "evidence/bench/swe_bench_verified_500_campaign_20260629/shards/S01"
 # Shard-name-agnostic (Stage B', `--task-shard`, ADR-ECON-003 Decision 7.6): `shard_root`
@@ -1966,6 +1972,11 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
     monitor_tape: list[dict[str, Any]] = []
     monitor_workspace: list[dict[str, Any]] = []
     monitor_diagnostics_issued: list[dict[str, Any]] = []
+    # WP-H3 (ADR-ECON-007 Decision 4): populated only when WP-H2's rollback remedy is
+    # already exhausted for a fork point (see the `RollbackCapExceededError` branch
+    # below) -- Decision 4's "放弃" report path. Always present under `--monitor`
+    # (defaulting to `[]`, exactly WP-H2's own `monitor_diagnostics_issued` discipline).
+    monitor_route_falsification_reports: list[dict[str, Any]] = []
     # Consumed exactly once, by the *next* task's dispatch calls below (Decision 1/3's
     # "触发时注入诊断到下一次 worker 上下文并回滚") -- never re-used across two tasks.
     pending_diagnostic_text: Optional[str] = None
@@ -2204,6 +2215,52 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
                                 "detail": str(cap_error),
                             }
                         )
+                        # WP-H3 (ADR-ECON-007 Decision 4): WP-H2's own documented
+                        # extension point ("the caller decides how to degrade
+                        # gracefully") -- remediation for this fork point is exhausted,
+                        # which is exactly Decision 4's "放弃" (abandon) case. The
+                        # bare `except` above is never allowed to just fall through to
+                        # the next task silently; it must produce a `RouteFalsified`
+                        # PRESERVE event + structured report instead. Every field
+                        # fed to `terminate_falsified` below is fact-only (Decision 3):
+                        # `trip.evidence` is already guaranteed Decision-3-legal by
+                        # `loop_detector`'s own construction, and the two harness-
+                        # authored strings below (`fact_class`/`recommendation`) carry
+                        # no B-zone token or digit.
+                        falsified_route_id = selected_route_id
+                        falsified_verifier_evidence = [
+                            {"phase": e.get("phase"), "result": e["result"]}
+                            for e in monitor_workspace
+                            if e.get("event_type") == "verification"
+                        ]
+                        falsified_detector_events = [{"rule_id": trip.rule_id, "evidence": dict(trip.evidence)}]
+                        # Honest gap, not a guess (this WP's own red line): the
+                        # driver's current selection is single-winner dispatch and
+                        # does not enumerate alternate route candidates anywhere --
+                        # `remaining_candidates` stays `[]` rather than inventing IDs.
+                        falsified_remaining_candidates: list[str] = []
+                        next_tape_seq = max((e.get("seq", -1) for e in monitor_tape), default=-1) + 1
+                        termination_outcome = monitor_termination.terminate_falsified(
+                            route_id=falsified_route_id,
+                            attempts=[
+                                {
+                                    "fact_class": "REMEDIATION_EXHAUSTED",
+                                    "detector_rule_id": trip.rule_id,
+                                }
+                            ],
+                            verifier_evidence=falsified_verifier_evidence,
+                            detector_events=falsified_detector_events,
+                            remaining_candidates=falsified_remaining_candidates,
+                            recommendation=(
+                                "Rollback remediation is exhausted for this route's "
+                                "detected fork point without verifier evidence; "
+                                "recommend GRILL-ME review before further dispatch on "
+                                "this route."
+                            ),
+                            seq=next_tape_seq,
+                        )
+                        monitor_tape = list(monitor_tape) + [termination_outcome.event]
+                        monitor_route_falsification_reports.append(termination_outcome.report)
                     else:
                         monitor_tape = list(rollback_result.tape)
                         monitor_workspace = list(rollback_result.workspace)
@@ -2292,6 +2349,11 @@ def run_driver(args: argparse.Namespace) -> dict[str, Any]:
             "tape_event_count": len(monitor_tape),
             "workspace_event_count": len(monitor_workspace),
             "diagnostics_issued": monitor_diagnostics_issued,
+            # WP-H3 (ADR-ECON-007 Decision 4): always present under --monitor
+            # (defaulting to `[]`, WP-H2's own additive-only discipline) -- one
+            # `RouteFalsificationReport.to_dict()` per exhausted-remediation fork
+            # point (see the `RollbackCapExceededError` branch above).
+            "route_falsification_reports": monitor_route_falsification_reports,
             "tape": monitor_tape,
         }
     return verdict
