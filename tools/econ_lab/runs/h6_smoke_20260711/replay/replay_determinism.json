@@ -1,0 +1,9 @@
+{
+  "byte_identical_across_two_runs": true,
+  "evidence_class": "SMOKE_FIXTURE",
+  "instance_id": "pytest-dev__pytest-5787",
+  "note": "detect()/build_diagnostic()/execute_rollback() run twice over the identical step-1 fixture input; the full result dict (event stream + trip + diagnostic + rollback) must compare byte-identical dict-equal both times (Art 0.2).",
+  "run1_sha256": "sha256:9b498de8793b4ded6548c3a0ded32d12a1b1ff1a881ebc4b6864900cf19989d2",
+  "run2_sha256": "sha256:9b498de8793b4ded6548c3a0ded32d12a1b1ff1a881ebc4b6864900cf19989d2",
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.replay_determinism"
+}

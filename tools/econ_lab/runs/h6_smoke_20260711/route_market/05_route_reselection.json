@@ -1,0 +1,12 @@
+{
+  "after_mask_chosen_route": "armB_normal_route",
+  "assertions": {
+    "bad_route_excluded_after_mask": true,
+    "bad_route_wins_before_mask": true,
+    "normal_route_wins_after_mask": true,
+    "q_untouched_by_trip": true
+  },
+  "before_mask_chosen_route": "armA_bad_route",
+  "evidence_class": "SMOKE_FIXTURE",
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.route_reselection"
+}

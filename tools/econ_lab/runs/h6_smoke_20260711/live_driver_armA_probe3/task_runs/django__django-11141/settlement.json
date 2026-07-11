@@ -1,0 +1,104 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:django/django:scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:012aa5bcd9fb520fa6beb131c5207f9ca5286b621ecd7d80b8f6a7356f8b0709",
+    "price_signal_hash": "sha256:01e4d2470666472304bc37c792f5cb57d0f04e0b3bd2b2bf2596e46c870332b7",
+    "route_id": "django__django-11141::armA::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:18602ecbd835f21e8492a1b2832ac40c1dacff547387ab6ef01e42df56498578",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:18602ecbd835f21e8492a1b2832ac40c1dacff547387ab6ef01e42df56498578",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "django/django",
+          "route_scaffold": "scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:fc546ea6915af700f47b5c218b8d09ae957cfa5d2bf0fdefde494adbdb687934"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/tmp/claude-1000/-home-zephryj-turingos-backup-work/24418ebd-2a05-4466-90f1-b996127e7f1b/scratchpad/wp-h6-smoke/tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA_probe3/scoring/django__django-11141/deepseek/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "django__django-11141"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "django__django-11141"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/tmp/claude-1000/-home-zephryj-turingos-backup-work/24418ebd-2a05-4466-90f1-b996127e7f1b/scratchpad/wp-h6-smoke/tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA_probe3/scoring/django__django-11141/deepseek/wp9a-live-driver.wp9a-live-driver-django__django-11141-deepseek.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 1602,
+        "candidate_patch_sha256": "sha256:311366782dabd6269c72c2fc61abec86e1e6f1c10f073af341781993b55bcb95",
+        "instance_id": "django__django-11141",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 26225
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "django/django",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "django__django-11141",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "django__django-11141::armA::deepseek",
+  "task_index": 0
+}

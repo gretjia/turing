@@ -1,0 +1,28 @@
+diff --git a/django/db/migrations/loader.py b/django/db/migrations/loader.py
+index 7b0be8d7a3..9f4a0e5a23 100644
+--- a/django/db/migrations/loader.py
++++ b/django/db/migrations/loader.py
+@@ -71,10 +71,10 @@ class MigrationLoader:
+                     app_label = app_config.label
+                 except LookupError:
+                     raise KeyError("No installed app with label '%s'" % app_label)
+-                if app_config.name in self.migrateable_apps:
+-                    app_path = self._build_app_path(app_config)
++                if app_config.name in self.migrateable_apps and hasattr(app_config, 'path'):
++                    app_path = app_config.path
+                     # Load migrations from the app's migrations module.
+-                    if hasattr(app_path, '__file__'):
++                    if True:
+                         app_package = app_path
+                     else:
+                         # If the app has no __file__ attribute, it's a
+@@ -89,8 +89,7 @@ class MigrationLoader:
+                 # No app_config, we're dealing with an app that doesn't have one
+                 # yet (e.g. the DEFAULT_APPS). Look through a path for all the
+                 # apps it provides, and get to the ones that can have migrations.
+-                for path in self.migrateable_paths:
+-                    app_path = self._build_app_path(path)
++                for path in self.migrateable_paths:
+                     # Load migrations from the app's migrations module.
+                     if hasattr(app_path, '__file__'):
+                         app_package = app_path

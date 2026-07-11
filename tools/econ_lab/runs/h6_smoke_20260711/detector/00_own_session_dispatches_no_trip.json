@@ -1,0 +1,32 @@
+{
+  "dispatches": [
+    {
+      "instance_id": "django__django-11119",
+      "path": "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA/task_runs/django__django-11119/settlement.json",
+      "tripped": false
+    },
+    {
+      "instance_id": "django__django-11133",
+      "path": "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA/task_runs/django__django-11133/settlement.json",
+      "tripped": false
+    },
+    {
+      "instance_id": "django__django-11141",
+      "path": "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA_probe3/task_runs/django__django-11141/settlement.json",
+      "tripped": false
+    },
+    {
+      "instance_id": "sphinx-doc__sphinx-7590",
+      "path": "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA_probe4/task_runs/sphinx-doc__sphinx-7590/settlement.json",
+      "tripped": false
+    },
+    {
+      "instance_id": "django__django-11138",
+      "path": "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armB/task_runs/django__django-11138/settlement.json",
+      "tripped": false
+    }
+  ],
+  "evidence_class": "SMOKE_FIXTURE",
+  "note": "every one of this session's own fresh real S02 dispatches settled a determinate FAIL WITH verifier evidence (patch_apply_failed) -- rule4 correctly did not trip on any of them; see step 1's fixture replay for a genuine trip.",
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.own_session_dispatches"
+}

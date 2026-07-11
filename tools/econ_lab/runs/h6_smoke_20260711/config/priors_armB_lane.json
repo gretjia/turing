@@ -1,0 +1,16 @@
+{
+  "priors": {
+    "armB::deepseek": 0.9,
+    "armB::qwen": 0.85,
+    "armB::glm": 0.85,
+    "armB::kimi": 0.85,
+    "armA::deepseek": 0.3,
+    "armA::qwen": 0.3,
+    "armA::glm": 0.3,
+    "armA::kimi": 0.3,
+    "armC::deepseek": 0.3,
+    "armC::qwen": 0.3,
+    "armC::glm": 0.3,
+    "armC::kimi": 0.3
+  }
+}
