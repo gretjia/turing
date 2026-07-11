@@ -1,0 +1,52 @@
+{
+  "attempts": [
+    {
+      "active_broadcast_rule_ids": [],
+      "attempt_index": 1,
+      "diff_bytes": 0,
+      "diff_scope": "no_patch",
+      "diff_stat": "",
+      "exit_code": 1,
+      "touched_files": []
+    },
+    {
+      "active_broadcast_rule_ids": [
+        "br_smoke_s02_sphinx-doc__sphinx-7462_attempt1"
+      ],
+      "attempt_index": 2,
+      "diff_bytes": 0,
+      "diff_scope": "no_patch",
+      "diff_stat": "",
+      "exit_code": 1,
+      "touched_files": []
+    }
+  ],
+  "attempts_total": 2,
+  "base_commit": "b3e26a6c851133b82b50f4b68b53692076574d13",
+  "broadcast_rules_emitted": [
+    {
+      "failure_class": "CONTEXT_MISSING",
+      "guidance": "Read the worker-visible source context section before editing; do not guess at code that was never shown.",
+      "rule_id": "br_smoke_s02_sphinx-doc__sphinx-7462_attempt1"
+    },
+    {
+      "failure_class": "CONTEXT_MISSING",
+      "guidance": "Read the worker-visible source context section before editing; do not guess at code that was never shown.",
+      "rule_id": "br_smoke_s02_sphinx-doc__sphinx-7462_attempt2"
+    }
+  ],
+  "expected_fix_file_proxy": "sphinx/domains/python.py",
+  "final_same_signature_streak": 2,
+  "instance_id": "sphinx-doc__sphinx-7462",
+  "max_real_worker_calls_budget": 6,
+  "organic_attempt_2_occurred": true,
+  "real_worker_calls": 2,
+  "repo": "sphinx-doc/sphinx",
+  "route_id": "sphinx-doc__sphinx-7462::grok_real::smoke_route",
+  "s02_execution_order_index": 107,
+  "s02_original_manifest_index": 391,
+  "s02_shard_id": "S02",
+  "schema_id": "iterate_harness.smoke_s02_real.v1",
+  "scientific_status": "SMOKE_FIXTURE_ORGANIC_LOOP_NOT_OFFICIAL_SWEBENCH_EVAL",
+  "smoke_fixture": true
+}

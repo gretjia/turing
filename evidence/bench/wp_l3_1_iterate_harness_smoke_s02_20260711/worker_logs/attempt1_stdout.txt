@@ -1,0 +1,1 @@
+I'll locate where Sphinx handles `Tuple[()]` type annotations and fix the empty-list `pop` that crashes the docs build.The crash is likely in annotation parsing rather than stringification; I'll dig into the Python domain and pycode AST paths next.

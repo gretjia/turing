@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "grok",
+    "-p",
+    "<visible_capsule_prompt>",
+    "--cwd",
+    "/tmp/turingos_iterate_harness_smoke_s02_worktrees/sphinx-doc__sphinx-7462",
+    "--output-format",
+    "plain",
+    "--model",
+    "grok-4.5",
+    "--always-approve",
+    "--permission-mode",
+    "bypassPermissions",
+    "--disable-web-search",
+    "--no-plan",
+    "--no-memory",
+    "--no-subagents",
+    "--max-turns",
+    "4"
+  ]
+}
