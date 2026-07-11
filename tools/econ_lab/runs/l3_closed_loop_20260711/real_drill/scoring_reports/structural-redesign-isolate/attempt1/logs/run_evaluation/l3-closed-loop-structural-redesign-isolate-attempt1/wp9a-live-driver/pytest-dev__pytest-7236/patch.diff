@@ -1,0 +1,116 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+index 95c1e306c..2241de75b 100644
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -104,12 +104,14 @@ class TestCaseFunction(Function):
+             # If the test is marked as skipped, we should not run setup/teardown
+             if item._skipped_by_mark:
+                 return
++
+             # If the test is skipped due to a setup error, we should not run teardown
+             if item._skipped_by_setup_error:
+                 return
+ 
+             # If the test is marked as skipped during the test run, we should not run teardown
+             if item._skipped_by_test:
+-                return
++                return
+ 
+             # If we reach here, the test is not skipped, so we run teardown
+             try:
+@@ -118,7 +121,7 @@ class TestCaseFunction(Function):
+                 if not item._skipped_by_setup_error:
+                     # If setup was successful, run teardown
+                     try:
+-                        self._call_teardown(item, call)
++                        self._call_teardown(item, call)
+                     except Exception:
+                         # If teardown fails, we want to see the teardown error in the report
+                         # But we don't want the test to be marked as failed
+@@ -135,7 +138,7 @@ class TestCaseFunction(Function):
+             # If the test is marked as skipped, we should not run setup/teardown
+             if item._skipped_by_mark:
+                 return
+-            if item._skipped_by_setup_error:
++            if item._skipped_by_setup_error:
+                 return
+             if item._skipped_by_test:
+                 return
+@@ -150,7 +153,9 @@ class TestCaseFunction(Function):
+                     # If the test was not skipped (i.e., it ran), run the teardown
+                     if not item._skipped_by_mark and not item._skipped_by_setup_error:
+                         try:
+-                            self._call_teardown(item, call)
++                            if not item._skipped_by_test:
++                                self._call_teardown(item, call)
+                         except Exception:
+                             # If teardown fails, we want to see the teardown error in the report
+                             # But we don't want the test to be marked as failed
+diff --git a/src/_pytest/runner.py b/src/_pytest/runner.py
+index 91411bfd5..0822e5c77 100644
+--- a/src/_pytest/runner.py
++++ b/src/_pytest/runner.py
+@@ -221,6 +221,9 @@ def pytest_runtest_protocol(item, nextitem):
+     # If the item is skipped, we should not run any setup/teardown
+     if item._skipped_by_mark:
+         return True
++    if item._skipped_by_setup_error:
++        return True
++    if item._skipped_by_test:
++        return True
+ 
+     return None
+ 
+ 
+diff --git a/src/_pytest/python.py b/src/_pytest/python.py
+index 4030495a6..4750b0372 100644
+--- a/src/_pytest/python.py
++++ b/src/_pytest/python.py
+@@ -1101,9 +1101,12 @@ def pytest_runtest_protocol(item, nextitem):
+         # If the item is skipped, we should not run any setup/teardown
+         if item._skipped_by_mark:
+             return True
++        if item._skipped_by_setup_error:
++            return True
++        if item._skipped_by_test:
++            return True
+ 
+         # If it's a unittest.TestCase, run the test with the pytest runner
+         if isinstance(item, TestCaseFunction):
+             # If it's a unittest.TestCase, we want to run it with the unittest
+             # runner, but we still want to handle the pytest protocol
+             # We do that by trying to run the test function with pytest,
+             # and if it fails, we fall back to the unittest runner
+             try:
+-                return item.runtest()
++                # We should still honor the fact that the test has been skipped during the pytest protocol
++                try:
++                    return item.runtest()
++                except Exception:
++                    # If it's an error during test execution, we want to run the teardown
++                    # but it may also be that the test was skipped during test execution
++                    # In that case, we should not run teardown
++                    if item._skipped_by_test:
++                        # Test was skipped during test execution, no need to call teardown
++                        return True
++                    # Otherwise, allow the error to be reported
++                    raise
++
+         return False
+ 
+ 
+diff --git a/src/_pytest/debugging.py b/src/_pytest/debugging.py
+index 42c315b41..606532459 100644
+--- a/src/_pytest/debugging.py
++++ b/src/_pytest/debugging.py
+@@ -83,7 +83,8 @@ def pytest_runtest_protocol(item, nextitem):
+     if hasattr(item, 'runtest'):
+         if item._skipped_by_mark:
+             return True
+-        if item._skipped_by_setup_error:
++        if item._skipped_by_setup_error:
+             return True
++        if item._skipped_by_test:
++            return True
+ 
+     return False

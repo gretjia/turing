@@ -1,0 +1,90 @@
+{
+  "candidates": [
+    {
+      "descriptor_text": {
+        "key_choices": "worker_context: capsule_only",
+        "summary": "This route leverages the existing codebase's established patterns and mechanisms to implement a targeted fix, avoiding structural changes and instead wrapping or modifying a specific area of code with minimal new surface area. The approach borrows from already battle-tested components and requires only a small change to the existing unit test module in `src/_pytest/unittest.py`. The solution is expected to be stable and less prone to introducing new regressions."
+      },
+      "exit_criteria": "If the spike edit does not pass the official pytest test harness as expected, or if repeated edits in the same place do not resolve the issue after multiple attempts, abandon this route. This route remains in the portfolio to keep diversity of approaches and because the probe is cheap and easy to perform. Additionally, this route is kept because it offers a low-risk, incremental change that allows for a quick test of a known problematic code path in the absence of deeper context.",
+      "predicted_failure_modes": [
+        "The fix does not address the root cause of the behavior because changes are too localized and miss deeper architectural flaws.",
+        "A simplistic fix may pass tests but break other unexpected functionality without proper integration testing.",
+        "The fix uses patterns that are untested in the specific context of the bug, leading to failure in production.",
+        "The spike edit fails to correctly identify the exact failure location in the test function causing the bug, leading to an ineffective workaround that does not actually resolve the problem.",
+        "The minimal workaround introduces an implicit dependency on a specific internal state that could be subject to change across pytest versions, making the fix fragile to future modifications.",
+        "The probe is not designed to detect the root cause related to test discovery logic because it focuses only on execution behavior rather than the meta-programming aspects of test case construction."
+      ],
+      "probe_design": "Perform a small spike edit to `src/_pytest/unittest.py` that modifies only the relevant test function with a minimal workaround. Run this change through the official pytest test harness and observe if it results in a different signal than the previous repeated failures. If this edit is not verified to pass the official test suite, then evaluate it as a candidate for rejection.",
+      "provenance": {
+        "origin": "dialectic_gate.v1",
+        "portfolio_digest": "sha256:6898a2d158591a6bea050d90c983cab07623e2485a2f01229a79a0ced21c3fe1",
+        "role_chain": [
+          "proposer_1",
+          "proposer_2",
+          "critic",
+          "judge"
+        ]
+      },
+      "route_descriptor_digest": "sha256:62ca9b5341a11c3fa4cd41fd0fd67b8a88301b1156133258db7eaee0576f843d",
+      "route_label": "conservative-reuse-wrap"
+    },
+    {
+      "descriptor_text": {
+        "key_choices": "worker_context: source_context_loop",
+        "summary": "This route introduces a new boundary mechanism to isolate the problematic code path in the unittest module, avoiding reuse of the failed structural redesign approach. It operates with source_context_loop to leverage repository context for identifying a clean, minimal boundary for the fix. The new mechanism encapsulates the problematic logic into a dedicated internal helper, which is then conditionally invoked, minimizing the risk of repeating prior semantic failures."
+      },
+      "exit_criteria": "If the probe design shows that a faulty implementation of the new boundary would not be caught by the test harness, or if the harness begins to timeout or crash consistently with the new boundary in place, the route should be abandoned. Additionally, if the new encapsulated function causes a test to fail in a way that does not reasonably map to the original bug, this route is abandoned. This route is kept to ensure diversity in abstraction strategies, and also because the source context loop allows the worker to make an informed choice about the new boundary that is otherwise not possible with capsule-only approaches.",
+      "predicted_failure_modes": [
+        "The new boundary mechanism introduces a logic defect that is not caught by the harness and instead produces incorrect test execution behavior",
+        "The new helper function is not used in the right place, causing a regression in test discovery or execution",
+        "The new boundary has a performance impact that causes timeouts or resource exhaustion during test runs",
+        "The new helper function is implemented in a way that oddly replicates the jaundice in the existing code structure due to its constraints, so even isolating it does not solve the deeper code logic issue.",
+        "The new boundary created has a subtle mismatched signature with the calling code, such that calling or returning data differently produces runtime-type mismatches or introspection errors that are only caught by integration-level tests not run in the spike.",
+        "The function is so tightly coupled to a fragile surrounding implementation that the abstraction is still considered part of the unstable critical path, rendering the isolation actually ineffective."
+      ],
+      "probe_design": "Implement a stub version of the new helper function with a known incorrect behavior and run the test harness in isolation to confirm that the harness detects the incorrect output from the new component, verifying the integration layer is being tested properly.",
+      "provenance": {
+        "origin": "dialectic_gate.v1",
+        "portfolio_digest": "sha256:6898a2d158591a6bea050d90c983cab07623e2485a2f01229a79a0ced21c3fe1",
+        "role_chain": [
+          "proposer_1",
+          "proposer_2",
+          "critic",
+          "judge"
+        ]
+      },
+      "route_descriptor_digest": "sha256:ab4014f6064b3d85c0f2d8883d25ede442b3e8a1ecc16597e1690d5f2e5118ed",
+      "route_label": "structural-redesign-isolate"
+    },
+    {
+      "descriptor_text": {
+        "key_choices": "worker_context: source_context_loop",
+        "summary": "This route uses the current wider context of pytest to analyze the test discovery logic by focusing on meta-programming aspects and annotation handling rather than direct code fixes. It consciously avoids patching code directly; instead, it attempts to modify how tests are collected and validated by inspecting and asserting against the implicit program structures. It works with source_context_loop to better understand how surrounding test annotations and attribute poisons are influencing behavior and targets these constructs for refinement."
+      },
+      "exit_criteria": "If the meta-programming inspections show that annotation patterns do not reveal the root cause or if the test collection system crashes during inspection, abandon the route. If modifying inspection behavior causes gross breakage in other modules or method resolution becomes severely distorted, the route is also abandoned. This route is synthesized to offer an alternative phenomenological analysis of the task, leveraging better access to repository context to investigate whether the problem lies in the test description rather than test implementation.",
+      "predicted_failure_modes": [
+        "Incorrect interpretation of the test annotation graph causes downstream test plan logic to misbehave or suppress valid errors.",
+        "Inspection of runtime expressions triggers unintended side effects that corrupt test collection process before any execution.",
+        "Too broad or under-specified assertion filtration means the route adds new test discovery codes instead of solving the problem.",
+        "The analysis misses the specific failure mode in the test case's pipeline since the underlying issue isn't in test discovery but in execution.",
+        "The fix bypasses existing validation deadlines and patterns, making the code path harder to flag in future test runs or CI pipelines."
+      ],
+      "probe_design": "Use a lightweight adjustment to pytest\u2019s internal test collection logic to log and validate meta-programming behaviors and annotation propagation before running the targeted test suite. Then apply mock differences to establish test failure attribution is consistent with the declared problem and not circumvented by possibly outdated discovery schemas.",
+      "provenance": {
+        "origin": "dialectic_gate.v1",
+        "portfolio_digest": "sha256:6898a2d158591a6bea050d90c983cab07623e2485a2f01229a79a0ced21c3fe1",
+        "role_chain": [
+          "proposer_1",
+          "proposer_2",
+          "critic",
+          "judge"
+        ]
+      },
+      "route_descriptor_digest": "sha256:79696b7c7d400b74b6d584ce19ea6b02f1291a4bfe1cb2246397cccc6be1294f",
+      "route_label": "focused-meta-inspection"
+    }
+  ],
+  "portfolio_digest": "sha256:6898a2d158591a6bea050d90c983cab07623e2485a2f01229a79a0ced21c3fe1",
+  "proposal_only": true,
+  "schema": "econ_lab.dialectic.route_market_bridge.route_candidates.v1"
+}
