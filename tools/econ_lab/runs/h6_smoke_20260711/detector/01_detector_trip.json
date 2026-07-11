@@ -1,0 +1,51 @@
+{
+  "evidence_class": "SMOKE_FIXTURE",
+  "instance_id": "pytest-dev__pytest-5787",
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.detector_trip",
+  "selected_route_id": "pytest-dev__pytest-5787::armA::deepseek",
+  "source": "replay of pre-existing real fixture tools/econ_lab/monitor/fixtures/real_settlement_pytest_dev_pytest_5787_tau_0p5.json",
+  "translated_event_stream": [
+    {
+      "boundary": "start",
+      "event_type": "phase_boundary",
+      "instance_id": "pytest-dev__pytest-5787",
+      "phase": "dispatch",
+      "route_id": "pytest-dev__pytest-5787::armA::deepseek",
+      "seq": 0
+    },
+    {
+      "action_signature": "dispatch_worker:deepseek",
+      "event_type": "command",
+      "instance_id": "pytest-dev__pytest-5787",
+      "outcome": "failed",
+      "route_id": "pytest-dev__pytest-5787::armA::deepseek",
+      "seq": 1
+    },
+    {
+      "boundary": "end",
+      "event_type": "phase_boundary",
+      "instance_id": "pytest-dev__pytest-5787",
+      "phase": "dispatch",
+      "route_id": "pytest-dev__pytest-5787::armA::deepseek",
+      "seq": 2
+    },
+    {
+      "event_type": "termination",
+      "instance_id": "pytest-dev__pytest-5787",
+      "phase": "dispatch",
+      "reason_class": "ERROR",
+      "route_id": "pytest-dev__pytest-5787::armA::deepseek",
+      "seq": 3
+    }
+  ],
+  "trip": {
+    "at_seq": 3,
+    "evidence": {
+      "fact_class": "BARE_TERMINATION",
+      "phase": "dispatch",
+      "reason_class": "ERROR"
+    },
+    "rule_id": "TERMINATION_WITHOUT_VERIFIER_EVIDENCE",
+    "tripped": true
+  }
+}

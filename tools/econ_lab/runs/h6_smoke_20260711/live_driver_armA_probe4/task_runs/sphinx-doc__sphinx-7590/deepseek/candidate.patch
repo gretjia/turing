@@ -1,0 +1,30 @@
+diff --git a/sphinx/domains/cpp.py b/sphinx/domains/cpp.py
+index 3a2b9e7..6d3b6b1 100644
+--- a/sphinx/domains/cpp.py
++++ b/sphinx/domains/cpp.py
+@@ -469,12 +469,25 @@ def _parse_number(self, definition: str) -> int:
+         float_literal = (
+             digit_seq  # .234
+             digit_seq DOT digit_seq  # 1.234
+             digit_seq DOT digit_seq exponent_part  # 1.234e-5
+             digit_seq exponent_part  # 1e-5
+         )
+ 
++        # C++ User Defined Literal suffix, e.g. 123_km, 3.14e-5q_J
++        # The suffix is an identifier starting with underscore (or single quote in C++14+)
++        # e.g. operator""_km, operator""q_J,  operator""_i,  operator""if
++        udl_suffix = r'[_\'a-zA-Z][_\'a-zA-Z0-9]*'
++
+         for regex in [
++            r'(' + float_literal + r')' + udl_suffix,
++            r'(' + digit_seq + r'\'?' + digit_seq + r')' + udl_suffix,
++            r'(0[xX]' + hex_digit_seq + r')' + udl_suffix,
++            r'(0[bB]' + bin_digit_seq + r')' + udl_suffix,
++            r'(0' + oct_digit_seq + r')' + udl_suffix,
++            r'\d+\.?\d*' + udl_suffix,
++            r'\.\d+' + udl_suffix,
++            digit_seq + udl_suffix,
+         ]:
+             match = re.match(regex, definition)
+             if match is not None:
+                 return match.group(1)

@@ -1,0 +1,28 @@
+{
+  "evidence_class": "SMOKE_FIXTURE",
+  "rollback": {
+    "event": {
+      "detector_rule_id": "TERMINATION_WITHOUT_VERIFIER_EVIDENCE",
+      "diagnostic_digest": "sha256:339c47d15e66fbbd4890fa935e1a7821fadb889968eb7b5351e29de8407552ac",
+      "event_hash": "sha256:fc5b24814a7649eb3c837dff84360778ed6ea82c9aaf9ad58aae7ab56284e069",
+      "event_type": "TrajectoryRolledBack",
+      "fork_point_event_hash": "sha256:99c6aa8a312f820070482e2a5807cd14d774be1881089f99b991c838c5e0b218",
+      "head_effect": "PRESERVE",
+      "reason_class": "BARE_TERMINATION",
+      "schema_id": "trajectory_rolled_back.v1",
+      "seq": 4
+    },
+    "fork_point": {
+      "boundary": "start",
+      "event_type": "phase_boundary",
+      "instance_id": "pytest-dev__pytest-5787",
+      "phase": "dispatch",
+      "route_id": "pytest-dev__pytest-5787::armA::deepseek",
+      "seq": 0
+    },
+    "new_tape_length": 5,
+    "new_workspace_length": 1
+  },
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.trajectory_rolled_back",
+  "source": "monitor.interventions.execute_rollback over the step-1 trip + step-2 diagnostic"
+}
