@@ -176,8 +176,9 @@ $ cargo test -p turing-economy
 $ bash tools/gates/gate_f4_econ_leakage.sh
 F4_LEAK_PASS (12 surface files scanned, 12 patterns)
 ```
-证据落盘:`tools/econ_lab/runs/h6_smoke_20260711/gate_f4/gate_f4_post_artifacts.log`
-(产物全部生成之后重新运行,exit 0)。
+证据落盘:`tools/econ_lab/runs/h6_smoke_20260711/gate_f4/gate_f4_post_artifacts.txt`
+(产物全部生成之后重新运行,exit 0;文件后缀特意用 `.txt` 而非 `.log` ——
+仓库根 `.gitignore` 有全局 `*.log` 规则,`.log` 后缀的证据不会被 git 追踪)。
 
 ## 上限声明
 
@@ -205,5 +206,5 @@ tools/econ_lab/runs/h6_smoke_20260711/
   route_market/05_route_reselection.json               # ⑤
   termination/06_termination.json                      # ⑥
   replay/replay_determinism.json                       # 重放确定性
-  gate_f4/gate_f4_post_artifacts.log                    # gate_f4 产物后 PASS
+  gate_f4/gate_f4_post_artifacts.txt                    # gate_f4 产物后 PASS
 ```
