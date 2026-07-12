@@ -1,0 +1,59 @@
+diff --git a/astropy/io/fits/diff.py b/astropy/io/fits/diff.py
+index 748ad0f3c5..a5c55abd7c 100644
+--- a/astropy/io/fits/diff.py
++++ b/astropy/io/fits/diff.py
+@@ -28,6 +28,7 @@
+ from functools import reduce
+ 
+ import numpy as np
++from numpy.testing import assert_array_equal
+ 
+ from astropy import __version__
+ from astropy.io.fits.card import BLANK_CARD
+@@ -377,6 +378,9 @@ def diff_columns(self, a, b):
+         b = b.columns
+         record_dtype = np.dtype(self.column_dtype_strs_repr(a.columns))
+ 
++        # Ensure arrays are fully loaded (e.g., for variable-length arrays)
++        a = a.readall()
++        b = b.readall()
+         # Then we can do structural comparison
+         self.diff_attrs = []
+         result = super().diff_columns(a, b)
+@@ -422,8 +426,14 @@ def _diff_comp_data(
+         a = a.data
+         b = b.data
+ 
+-        if not np.array_equal(a, b):
+-            report_diff_values = True
++        try:
++            if np.array_equal(a, b):
++                report_diff_values = False
++            else:
++                report_diff_values = True
++        except (ValueError, TypeError):
++            # Fallback for variable-length arrays that can't be compared directly
++            report_diff_values = not _is_identical_vla(a, b)
+ 
+         # Here we'll store the arguments used to call self.diff_values,
+         # if we find any differences
+@@ -514,6 +524,20 @@ def _diff_comp_data(
+         return False
+ 
+ 
++def _is_identical_vla(a, b):
++    """Check if two arrays holding variable-length array columns are identical."""
++    if a.dtype != b.dtype or a.shape != b.shape:
++        return False
++    # Compare each field/row by row
++    for row_a, row_b in zip(a, b):
++        for field_a, field_b in zip(row_a, row_b):
++            try:
++                assert_array_equal(field_a, field_b)
++            except AssertionError:
++                return False
++    return True
++
++
+ class HeaderDiff(_BaseDiff):
+     """FITS Header Difference class.

@@ -536,7 +536,7 @@ fn inv9_price_never_moves_accepted_head_property() {
             truth_status: "statistical_signal_only".to_string(),
         };
         let suggestion = MarketRouter::new(MarketRouterMode::Shadow)
-            .suggest(&[route], &[signal], &digest, &digest)
+            .suggest(&[route], &[signal], &digest, &digest, &digest)
             .expect("shadow suggestion");
         assert!(!suggestion.can_move_accepted_head, "iteration {i}");
         assert!(!suggestion.emits_authorization, "iteration {i}");

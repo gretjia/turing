@@ -1,0 +1,13 @@
+diff --git a/sklearn/preprocessing/_discretization.py b/sklearn/preprocessing/_discretization.py
+index 9903c55673..07b63f0268 100644
+--- a/sklearn/preprocessing/_discretization.py
++++ b/sklearn/preprocessing/_discretization.py
+@@ -225,7 +225,7 @@ class KBinsDiscretizer(BaseEstimator, TransformerMixin):
+             # For k-means strategy, we need to compute the bin edges from the
+             # centers
+             bin_edges = np.hstack([X_min, centers, X_max])
+-            bin_edges = np.unique(bin_edges)
++            bin_edges = np.unique(np.sort(bin_edges))
+ 
+         # We need to explicitly set the dtype to be the same as the input
+         # to avoid any potential precision loss for float32 inputs.

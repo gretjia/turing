@@ -1,0 +1,23 @@
+diff --git a/astropy/utils/inherit_docstrings.py b/astropy/utils/inherit_docstrings.py
+index 1111111..2222222 100644
+--- a/astropy/utils/inherit_docstrings.py
++++ b/astropy/utils/inherit_docstrings.py
+@@ -1,7 +1,7 @@
+ class InheritDocstrings(type):
+     def __new__(cls, name, bases, members):
+         # Ensure docstrings are inherited
+         for attr_name, attr_value in members.items():
+             if inspect.isfunction(attr_value) and attr_value.__doc__ is None:
+                 for base in bases:
+                     base_attr = base.__dict__.get(attr_name)
+                     if base_attr is not None:
+                         if hasattr(base_attr, '__doc__'):
+                             attr_value.__doc__ = base_attr.__doc__
+                             break
++            elif isinstance(attr_value, property) and attr_value.__doc__ is None:
++                for base in bases:
++                    base_attr = base.__dict__.get(attr_name)
++                    if isinstance(base_attr, property) and base_attr.__doc__ is not None:
++                        attr_value.__doc__ = base_attr.__doc__
++                        break
+         return type.__new__(cls, name, bases, members)

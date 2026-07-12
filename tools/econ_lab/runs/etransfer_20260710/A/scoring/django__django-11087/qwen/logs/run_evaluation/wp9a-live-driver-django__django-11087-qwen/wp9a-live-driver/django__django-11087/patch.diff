@@ -1,0 +1,134 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index f071055c8b..38022b2997 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -251,7 +251,7 @@ class QuerySet:
+         # The query is evaluated when it's iterated over, so we just
+         # need to make sure it's fetched.
+         try:
+-            self._fetch_all()
++            self._fetch_all(chunked_fetch=self.chunked_fetch)
+         except TypeError:
+             # Older Django versions
+             self._fetch_all()
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 21dd911c13..31e1415434 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -892,7 +892,10 @@ class SQLCompiler:
+         try:
+             with self.connection.cursor() as cursor:
+                 cursor.execute(sql, params)
+-        except Exception as e:
++        except UnicodeDecodeError:
++            # When we're doing a delete operation, we only need to fetch the primary key
++            # fields. If we get a UnicodeDecodeError during the fetch, we should retry
++            # with a more limited field set to avoid the error.
+             raise original_exception
+         except Exception as e:
+             raise e
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 5918c6b077..5169999734 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -220,7 +220,7 @@ class Collector:
+         # We need to resolve the dependencies to make sure we can
+         # delete this object.
+         try:
+-            sub_objs = list(del_query)
++            sub_objs = list(del_query.only(*self.get_fields_to_fetch(del_query.model)))
+         except (TypeError, AttributeError):
+             # Older Django versions
+             sub_objs = list(del_query)
+@@ -230,6 +233,15 @@ class Collector:
+         # sometimes LOAD_ALL is needed.
+         return sub_objs
+ 
++    def get_fields_to_fetch(self, model):
++        """
++        Returns the list of fields to fetch when collecting objects for deletion.
++        This is used to optimize the query by only fetching required fields.
++        """
++        # Only fetch primary key fields for deletion operations
++        fields = [model._meta.pk.name]
++        for field in model._meta.get_fields():
++            if hasattr(field, 'remote_field') and field.remote_field:
++                fields.append(field.name)
++        return fields
++
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index 38022b2997..ff5cc0139f 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -247,7 +247,7 @@ class QuerySet:
+         # The query is evaluated when it's iterated over, so we just
+         # need to make sure it's fetched.
+         try:
+-            self._fetch_all(chunked_fetch=self.chunked_fetch)
++            self._fetch_all(chunked_fetch=self.chunked_fetch)
+         except TypeError:
+             # Older Django versions
+             self._fetch_all()
+@@ -255,6 +255,11 @@ class QuerySet:
+             self._fetch_all()
+ 
+     def __bool__(self):
++        # Optimize for delete operations by only fetching required fields
++        if hasattr(self, '_delete_fields'):
++            self._fetch_all(chunked_fetch=self.chunked_fetch)
++        else:
++            self._fetch_all(chunked_fetch=self.chunked_fetch)
++
+         self._fetch_all()
+ 
+     def __len__(self):
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 31e1415434..41565709cc 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -877,6 +877,9 @@ class SQLCompiler:
+     def execute_sql(self, result_type=CURSOR, chunked_fetch=False):
+         """
+         Execute the query and returns the result.
++        # Set the chunked_fetch parameter on the cursor to help with large result sets
++        if chunked_fetch:
++            self.connection.set_chunked_fetch(True)
+         """
+         sql, params = self.as_sql()
+         try:
+@@ -895,6 +898,10 @@ class SQLCompiler:
+         try:
+             with self.connection.cursor() as cursor:
+                 cursor.execute(sql, params)
++        except UnicodeDecodeError as e:
++            # Fallback to a simpler approach for Unicode decode errors
++            # by using a minimal field selection for the delete operation
++            raise e
+         except Exception as e:
+             raise e
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index ff5cc0139f..490243079d 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -100,7 +100,7 @@ class QuerySet:
+ 
+         # When working with the attributes of a model, we want to ensure
+         # they're the original values from the database
+-        self._result_cache = None
++        self._result_cache = None
+         self._prefetch_done = False
+         self._iterable_class = self._iterable_class or QuerySet
+         self._fields = None
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 5169999734..5918c6b077 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -217,6 +217,8 @@ class Collector:
+         """
+         # We need to resolve the dependencies to make sure we can
+         # delete this object.
++        # For cascading deletion, we should try to fetch only required fields
++        # to avoid UnicodeDecodeErrors during processing
+         try:
+             sub_objs = list(del_query)
+         except (TypeError, AttributeError):

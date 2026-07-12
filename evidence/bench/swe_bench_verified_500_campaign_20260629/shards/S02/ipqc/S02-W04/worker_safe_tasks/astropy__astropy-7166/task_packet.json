@@ -1,0 +1,16 @@
+{
+  "base_commit": "26d147868f8a891a6009a25cd6a8576d2e1bd747",
+  "candidate_source_policy": "worker_derived_patch_only",
+  "difficulty": "<15 min fix",
+  "environment_setup_commit": "848c8fa21332abd66b44efe3cb48b72377fb32cc",
+  "forbidden_field_count_removed": 5,
+  "instance_id": "astropy__astropy-7166",
+  "ipqc_window_id": "S02-W04",
+  "problem_statement": "InheritDocstrings metaclass doesn't work for properties\nInside the InheritDocstrings metaclass it uses `inspect.isfunction` which returns `False` for properties.\n",
+  "repo": "astropy/astropy",
+  "restricted_source_fields_removed": true,
+  "schema_id": "turingos.swebench_worker_safe_task_packet.v1",
+  "shard_id": "S02",
+  "version": "1.3",
+  "visible_to_worker": true
+}

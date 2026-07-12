@@ -1,0 +1,19 @@
+diff --git a/astropy/utils/introspection.py b/astropy/utils/introspection.py
+index 756002425..477217044 100644
+--- a/astropy/utils/introspection.py
++++ b/astropy/utils/introspection.py
+@@ -1,5 +1,6 @@
+ # -*- coding: utf-8 -*-
+ 
++from pkg_resources import parse_version
+ from distutils.version import LooseVersion
+ import inspect
+ import sys
+@@ -143,7 +143,7 @@ def minversion(module, version, inclusive=True, version_path='__version__'):
+ 
+     if inclusive:
+-        return LooseVersion(have_version) >= LooseVersion(version)
++        return parse_version(have_version) >= parse_version(version)
+     else:
+-        return LooseVersion(have_version) > LooseVersion(version)
++        return parse_version(have_version) > parse_version(version)

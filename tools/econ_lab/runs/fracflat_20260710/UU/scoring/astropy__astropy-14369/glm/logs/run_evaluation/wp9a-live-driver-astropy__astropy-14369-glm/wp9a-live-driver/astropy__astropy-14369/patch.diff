@@ -1,0 +1,13 @@
+diff --git a/astropy/io/ascii/cds.py b/astropy/io/ascii/cds.py
+index 1234567..89abcde 100644
+--- a/astropy/io/ascii/cds.py
++++ b/astropy/io/ascii/cds.py
+@@ -202,7 +202,7 @@ class CdsHeader(core.BaseHeader):
+                     col.null = "0"
+ 
+                     if match.group("nullval") == "-":
+-                        col.null = "---"
++                        col.null = "-"
+                         # CDS/MRT tables can use -, --, ---, or ---- to mark missing values
+                         # see https://github.com/astropy/astropy/issues/1335
+                         for i in [1, 2, 3, 4]:

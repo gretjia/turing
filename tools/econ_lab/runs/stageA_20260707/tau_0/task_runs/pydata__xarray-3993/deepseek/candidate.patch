@@ -1,0 +1,45 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index 2cfe2c4b..1c3dee6a 100644
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -1697,7 +1697,7 @@ class DataArray(AbstractArray, DataWithArithmetic, ArithmeticMixin):
+ 
+         return self._to_temp_dataset().differentiate(coord, edge_order, datetime_unit).to_dataarray()
+ 
+-    def integrate(self, dim, datetime_unit=None):
++    def integrate(self, coord, datetime_unit=None):
+         """ integrate the array with the trapezoidal rule.
+ 
+         .. note::
+@@ -1707,11 +1707,11 @@ class DataArray(AbstractArray, DataWithArithmetic, ArithmeticMixin):
+ 
+         Parameters
+         ----------
+-        dim : str
++        coord : str
+             Coordinate to integrate over.
+         datetime_unit : str, optional
+             Can be 'Y', 'M', 'W', 'D', 'h', 'm', 's', 'ms', 'us', 'ns'
+-            or any alias used in `pandas.date_range`. Defaults to
++            or any alias used in `pandas.date_range`. Defaults to
+             the dimensions of the time coordinate.
+ 
+         Returns
+@@ -1724,13 +1724,13 @@ class DataArray(AbstractArray, DataWithArithmetic, ArithmeticMixin):
+         >>> da = xr.DataArray(
+         ...     np.arange(12).reshape((3, 4)),
+         ...     dims=['x', 'y'],
+-        ...     coords={'x': [0, 1, 2]})
+-        >>> da.integrate('x')
++        ...     coords={'x': [0, 1, 2]})
++        >>> da.integrate('x')
+         <xarray.DataArray (y: 4)>
+         array([8., 8., 8., 8.])
+         Coordinates:
+           * y        (y) int64 0 1 2 3
+         """
+-        return self._to_temp_dataset().integrate(dim, datetime_unit).to_dataarray()
++        return self._to_temp_dataset().integrate(coord, datetime_unit).to_dataarray()
+ 
+     def isin(self, test_elements):
+         """Locate the elements of a DataArray that are in `test_elements`.

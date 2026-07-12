@@ -1,0 +1,13 @@
+diff --git a/sklearn/decomposition/_sparse_encode.py b/sklearn/decomposition/_sparse_encode.py
+index 9d5b9e9..005c18f 100644
+--- a/sklearn/decomposition/_sparse_encode.py
++++ b/sklearn/decomposition/_sparse_encode.py
+@@ -349,7 +349,7 @@ def sparse_encode(X, dictionary, *, alpha=None, algorithm='lasso_cd',
+                  n_jobs=None, positive=False, max_iter=1000, random_state=None):
+     """Sparse encode the data according to the dictionary.
+ 
+-    Each row of the result, Y, is the sparse code vector for the corresponding
++    Each row of the result, Y, is the sparse code vector for the corresponding
+     row of X. The Lasso solver is coordinate descent.
+ 
+     Read more in the :ref:`User Guide <sparse_encode>`.

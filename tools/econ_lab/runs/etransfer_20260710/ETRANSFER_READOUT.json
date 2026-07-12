@@ -1,0 +1,346 @@
+{
+  "H_E1": {
+    "hypothesis": "H-E1: T > A on HELDOUT",
+    "reason": "starvation_floor_failed",
+    "supported": null
+  },
+  "arms": {
+    "A": {
+      "domain_buckets": [
+        "global"
+      ],
+      "verdict_path": "tools/econ_lab/runs/etransfer_20260710/A/verdict.json"
+    },
+    "T": {
+      "domain_bucket": "global",
+      "verdict_path": "tools/econ_lab/runs/etransfer_20260710/T/verdict.json"
+    }
+  },
+  "claims": {
+    "learned_function": false,
+    "note": "Readout maps prereg outcomes only; interpretation authority is orchestrator.",
+    "significance_outside_H_E1": false
+  },
+  "outcome": "NOT_RUN_STARVED",
+  "paired_heldout": [
+    {
+      "diff": 0.0,
+      "instance_id": "astropy__astropy-14096",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "astropy__astropy-14539",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "astropy__astropy-14182",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "astropy__astropy-14309",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": -1.0,
+      "instance_id": "astropy__astropy-14365",
+      "v_A": 1.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "astropy__astropy-14508",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": -0.918918918918919,
+      "instance_id": "psf__requests-2931",
+      "v_A": 0.918918918918919,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "pydata__xarray-4629",
+      "v_A": 1.0,
+      "v_T": 1.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "pydata__xarray-6461",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "pydata__xarray-6721",
+      "v_A": 0.0,
+      "v_T": 0.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "pytest-dev__pytest-7205",
+      "v_A": 1.0,
+      "v_T": 1.0
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "pytest-dev__pytest-6202",
+      "v_A": 1.0,
+      "v_T": 1.0
+    },
+    {
+      "diff": 0.33333333333333337,
+      "instance_id": "pytest-dev__pytest-5809",
+      "v_A": 0.6666666666666666,
+      "v_T": 1.0
+    },
+    {
+      "diff": 0.9850746268656716,
+      "instance_id": "pytest-dev__pytest-6197",
+      "v_A": 0.0,
+      "v_T": 0.9850746268656716
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "scikit-learn__scikit-learn-12585",
+      "v_A": 1.0,
+      "v_T": 1.0
+    },
+    {
+      "diff": 0.9411764705882353,
+      "instance_id": "scikit-learn__scikit-learn-13439",
+      "v_A": 0.0,
+      "v_T": 0.9411764705882353
+    },
+    {
+      "diff": 0.0,
+      "instance_id": "scikit-learn__scikit-learn-11578",
+      "v_A": 1.0,
+      "v_T": 1.0
+    }
+  ],
+  "prereg": {
+    "alpha": 0.05,
+    "hypothesis": "H-E1: T > A on HELDOUT (Wilcoxon signed-rank exact one-sided)",
+    "judgment_domain": "HELDOUT",
+    "language_ban": "no_learned_function_claims",
+    "metric": "verify_pass_fraction_v_in_0_1",
+    "outcomes": [
+      "STAGE_MECHANISM_TRANSFERS",
+      "NO_STAGE_TRANSFER_ADVANTAGE",
+      "NOT_RUN_STARVED",
+      "NOT_RUN_INSUFFICIENT"
+    ],
+    "quality_floors": {
+      "settled_frac": 0.8
+    },
+    "starvation_floors": {
+      "A_route_train_N_median": 3,
+      "T_each_stage_node_train_N": 5
+    }
+  },
+  "quality_floors": {
+    "A": {
+      "HELDOUT": {
+        "n_planned": 25,
+        "n_settled": 21,
+        "need": 20,
+        "ok": true,
+        "side": "HELDOUT"
+      },
+      "TRAIN": {
+        "n_planned": 25,
+        "n_settled": 17,
+        "need": 20,
+        "ok": false,
+        "side": "TRAIN"
+      }
+    },
+    "T": {
+      "HELDOUT": {
+        "n_planned": 25,
+        "n_settled": 18,
+        "need": 20,
+        "ok": false,
+        "side": "HELDOUT"
+      },
+      "TRAIN": {
+        "n_planned": 25,
+        "n_settled": 17,
+        "need": 20,
+        "ok": false,
+        "side": "TRAIN"
+      }
+    },
+    "ok": false
+  },
+  "schema": "econ_lab.etransfer_readout.v1",
+  "secondary_descriptive": {
+    "canary_counts": {
+      "A": 2,
+      "T": 2
+    },
+    "credit_assignment_v0_note": "v0 equal-share attribution across stage nodes (CAPSULE B memo R1); known ceiling, not causal credit",
+    "heldout_mean_v": {
+      "A": 0.50213751957938,
+      "T": 0.4403472831918837
+    },
+    "significance_on_secondary": "FORBIDDEN",
+    "t_final_stage_nodes": {
+      "context:minimal": {
+        "n": 10,
+        "p_q32": "2147483648",
+        "q_eff_q32": "976128930",
+        "s": 2,
+        "stage_option_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+      },
+      "context:source_context": {
+        "n": 25,
+        "p_q32": "2147483648",
+        "q_eff_q32": "2557038745",
+        "s": 14,
+        "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+      },
+      "repair:loop": {
+        "n": 13,
+        "p_q32": "2147483648",
+        "q_eff_q32": "2352005900",
+        "s": 7,
+        "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+      },
+      "repair:single_shot": {
+        "n": 22,
+        "p_q32": "2147483648",
+        "q_eff_q32": "1925754044",
+        "s": 9,
+        "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+      },
+      "verify:none": {
+        "n": 17,
+        "p_q32": "2147483648",
+        "q_eff_q32": "2064385883",
+        "s": 8,
+        "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+      },
+      "verify:self_check": {
+        "n": 18,
+        "p_q32": "2147483648",
+        "q_eff_q32": "2108498932",
+        "s": 8,
+        "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+      }
+    },
+    "t_stage_choice_dist_heldout": {
+      "context": {
+        "minimal": 9,
+        "source_context": 16
+      },
+      "repair": {
+        "loop": 8,
+        "single_shot": 17
+      },
+      "verify": {
+        "none": 11,
+        "self_check": 14
+      }
+    },
+    "t_stage_choice_dist_train": {
+      "context": {
+        "minimal": 9,
+        "source_context": 16
+      },
+      "repair": {
+        "loop": 9,
+        "single_shot": 16
+      },
+      "verify": {
+        "none": 9,
+        "self_check": 16
+      }
+    },
+    "train_mean_v": {
+      "A": 0.2295168067226891,
+      "T": 0.5325311942959001
+    }
+  },
+  "split_fingerprint_sha256": "1bc6725c70b64fa049f334f47b71d52d642cefa993cb22133daee7563b030c94",
+  "split_manifest_path": "tools/econ_lab/runs/etransfer_20260710/etransfer_split_manifest.json",
+  "split_manifest_sha256": "7564bb1c01776d2f2b0f6ebd7fad44ddb51ab88081cb3a9c7a4435a339034f37",
+  "starvation_check": {
+    "A": {
+      "arm": "A",
+      "floor_median": 3,
+      "median_train_n": 1.0,
+      "n_routes_observed": 37,
+      "ok": false,
+      "route_train_n": {
+        "armA::deepseek": 0,
+        "armA::glm": 0,
+        "armA::kimi": 0,
+        "armA::qwen": 0,
+        "armB::deepseek": 0,
+        "armB::glm": 0,
+        "armB::kimi": 0,
+        "armB::qwen": 0,
+        "armC::deepseek": 0,
+        "armC::glm": 0,
+        "armC::kimi": 0,
+        "armC::qwen": 0,
+        "django__django-10999::armC::deepseek": 1,
+        "django__django-11066::armA::deepseek": 1,
+        "django__django-11087::armA::qwen": 1,
+        "django__django-11095::armB::kimi": 1,
+        "django__django-11099::armA::deepseek": 1,
+        "django__django-11119::armC::deepseek": 1,
+        "django__django-11163::armC::qwen": 1,
+        "matplotlib__matplotlib-22719::armA::glm": 1,
+        "matplotlib__matplotlib-22871::armC::kimi": 1,
+        "matplotlib__matplotlib-23299::armB::kimi": 1,
+        "matplotlib__matplotlib-23314::armB::kimi": 1,
+        "matplotlib__matplotlib-24149::armA::kimi": 1,
+        "pylint-dev__pylint-6903::armB::deepseek": 1,
+        "pylint-dev__pylint-7080::armB::glm": 1,
+        "sphinx-doc__sphinx-10614::armB::kimi": 1,
+        "sphinx-doc__sphinx-11445::armC::glm": 1,
+        "sphinx-doc__sphinx-11510::armB::qwen": 1,
+        "sphinx-doc__sphinx-7440::armA::glm": 1,
+        "sphinx-doc__sphinx-7462::armC::glm": 1,
+        "sphinx-doc__sphinx-7757::armB::qwen": 1,
+        "sympy__sympy-13372::armB::qwen": 1,
+        "sympy__sympy-13480::armA::glm": 1,
+        "sympy__sympy-13551::armC::kimi": 1,
+        "sympy__sympy-13757::armB::deepseek": 1,
+        "sympy__sympy-13877::armA::kimi": 1
+      }
+    },
+    "T": {
+      "arm": "T",
+      "floor": 5,
+      "ok": true,
+      "stage_node_train_n": {
+        "context:minimal": 5,
+        "context:source_context": 12,
+        "repair:loop": 6,
+        "repair:single_shot": 11,
+        "verify:none": 7,
+        "verify:self_check": 10
+      },
+      "starved_nodes": []
+    },
+    "ok": false
+  },
+  "status_ceiling": "ADDRESSED",
+  "wilcoxon": {
+    "W_plus": 8.0,
+    "method": "exact_enumeration_midranks",
+    "n_nonzero": 5,
+    "p_one_sided": 0.5
+  }
+}

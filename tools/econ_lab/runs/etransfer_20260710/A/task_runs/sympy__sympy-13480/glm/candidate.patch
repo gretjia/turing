@@ -1,0 +1,32 @@
+diff --git a/sympy/functions/elementary/hyperbolic.py b/sympy/functions/elementary/hyperbolic.py
+index 8d1e5e9..4d1b9e5 100644
+--- a/sympy/functions/elementary/hyperbolic.py
++++ b/sympy/functions/elementary/hyperbolic.py
+@@ -587,7 +587,7 @@ class coth(Function):
+         """
+         if x.is_Number:
+             if x.is_zero:
+-                return S.NaN
++                return zoo
+             if x.is_real is False:
+                 return coth(x)
+ 
+@@ -595,6 +595,12 @@ class coth(Function):
+             arg = 2*x
+             tan_half = tan(arg/2)
+             if tan_half.is_zero:
++                return -S.One
++            elif tan_half is S.Infinity or tan_half is S.NegativeInfinity:
++                return S.One
++            elif tan_half is S.ComplexInfinity:
++                return S.NaN
++            elif abs(tan_half) == S.One:
+                 return S.NaN
++            else:
++                cot_half = S.One/tan_half
++                if cot_half.is_zero:
++                    return S.ComplexInfinity
++                return (cot_half + S.One)/(cot_half - S.One)
+ 
+         if x.is_real is False:
+             return coth(x)

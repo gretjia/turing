@@ -1,0 +1,16 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 7cb2c2d5c1..0c7cbb2f30 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -60,6 +60,11 @@ class Rst(FixedWidth):
+ 
+     def __init__(self):
+         super().__init__(delimiter_pipe=None)
++        # Allow header_rows to be passed through from write kwargs
++        self.header_rows = None
++
++    def write(self, lines):
++        super().write(lines)
+ 
+     def write(self, lines):
+         lines = super().write(lines)

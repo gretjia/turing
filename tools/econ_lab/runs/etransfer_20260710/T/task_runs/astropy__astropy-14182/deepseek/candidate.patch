@@ -1,0 +1,13 @@
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 5a2b9b6d1e..ac2a7ba8e9 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -28,7 +28,7 @@ class Rst(FixedWidth):
+     data_splitter_classes = {'header': NoHeaderSplitter}
+     data_splitter_col_defaults = {'fill_extra_cols': True, 'include_header_col': False}
+ 
+-    def __init__(self, header_rows=None):
++    def __init__(self, header_rows=["name"]):
+         super().__init__(header_rows=header_rows)
+ 
+     def write(self, lines):

@@ -1,0 +1,80 @@
+diff --git a/requests/adapters.py b/requests/adapters.py
+index xxxx..yyyy 100644
+--- a/requests/adapters.py
++++ b/requests/adapters.py
+@@ -315,6 +315,12 @@ class HTTPAdapter(BaseAdapter):
+                 resp = conn.urlopen(
+                     method, url, body=body, headers=headers, release_conn=True,
+                     **urlopen_kw)
++                
++                # Handle 407 Proxy Authentication Required as it may behave differently in Python 3.8.12
++                if resp.status == 407 and 'Proxy-Authorization' not in headers:
++                    headers = self._handle_proxy_auth_challenge(url, headers, proxies)
++                    resp.close()
++                    resp = conn.urlopen(method, url, body=body, headers=headers, release_conn=True, **urlopen_kw)
++                    
+ 
+             except ProtocolError as err:
+                 if no_retries:
+@@ -450,6 +456,12 @@ class HTTPAdapter(BaseAdapter):
+                 resp = conn.urlopen(
+                     method, url, body=body, headers=headers, release_conn=True,
+                     **urlopen_kw)
++                
++                # Handle 407 Proxy Authentication Required as it may behave differently in Python 3.8.12
++                if resp.status == 407 and 'Proxy-Authorization' not in headers:
++                    headers = self._handle_proxy_auth_challenge(url, headers, proxies)
++                    resp.close()
++                    resp = conn.urlopen(method, url, body=body, headers=headers, release_conn=True, **urlopen_kw)
+@@ -985,6 +995,26 @@ class HTTPAdapter(BaseAdapter):
+                     )
+ 
+         return conn
++    
++    def _handle_proxy_auth_challenge(self, url, headers, proxies):
++        """Handle a 407 proxy authentication challenge, which may occur differently in Python 3.8.12"""
++        # Extract proxy credentials
++        if proxies and 'http' in proxies:
++            proxy_url = proxies['http']
++            from urllib.parse import urlparse
++            parsed = urlparse(proxy_url)
++            
++            # In Python 3.8.12, there might be a change in how credentials are extracted
++            username = None
++            password = None
++            
++            # Try to get credentials using standard parsing first
++            if hasattr(parsed, 'username') and hasattr(parsed, 'password'):
++                username = parsed.username
++                password = parsed.password
++            
++            # If that doesn't work, try a manual approach for Python 3.8.12+
++            if not username or not password:
++                username, password = self._extract_proxy_credentials_manually(proxy_url)
++            
++            if username and password:
++                from requests.auth import HTTPProxyAuth
++                auth = HTTPProxyAuth()
++                auth.credentials = (unquote(username), unquote(password))
++                auth_header = auth.build_proxy_auth_header(None)
++                headers['Proxy-Authorization'] = auth_header
+                
++        return headers
++    
++    def _extract_proxy_credentials_manually(self, proxy_url):
++        """Extract proxy credentials manually for Python 3.8.12+"""
++        if '://' not in proxy_url:
++            return None, None
++        
++        scheme, _, rest = proxy_url.partition('://')
++        if '@' not in rest:
++            return None, None
++        
++        auth_part, _, _ = rest.partition('@')
++        if not auth_part or ':' not in auth_part:
++            return None, None
++        
++        username, _, password = auth_part.partition(':')
++        username = unquote(username)
++        password = unquote(password)
++        return username, password

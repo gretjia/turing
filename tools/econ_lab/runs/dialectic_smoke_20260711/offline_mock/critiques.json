@@ -1,0 +1,21 @@
+{
+  "critiques": [
+    {
+      "additional_failure_modes": [
+        "prompt template drifts out of sync with schema"
+      ],
+      "exit_criteria_critique": "concrete enough",
+      "predicted_failure_modes_adequate": "false",
+      "probe_design_critique": "fine as a first pass",
+      "route_label": "conservative-package"
+    },
+    {
+      "additional_failure_modes": [],
+      "exit_criteria_critique": "fine",
+      "predicted_failure_modes_adequate": "true",
+      "probe_design_critique": "fine",
+      "route_label": "structural-package"
+    }
+  ],
+  "schema": "econ_lab.dialectic.critique_set.v1"
+}

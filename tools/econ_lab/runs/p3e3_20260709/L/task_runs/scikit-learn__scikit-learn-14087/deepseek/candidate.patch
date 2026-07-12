@@ -1,0 +1,18 @@
+diff --git a/sklearn/linear_model/logistic.py b/sklearn/linear_model/logistic.py
+index a5743ed36..daa94e21f 100644
+--- a/sklearn/linear_model/logistic.py
++++ b/sklearn/linear_model/logistic.py
+@@ -2186,7 +2186,12 @@ def fit(self, X, y, sample_weight=None):
+         else:
+             # Take the best model across folds and Cs
+             if self.multi_class == 'ovr':
+-                w = np.mean([coefs_paths[:, i, best_indices[i], :]
++                if coefs_paths.ndim == 4:
++                    w = np.mean([coefs_paths[:, i, best_indices[i], :]
++                                 for i in range(len(folds))], axis=0)
++                else:
++                    w = np.mean([coefs_paths[:, i, best_indices[i]]
++                                 for i in range(len(folds))], axis=0)
+             elif self.multi_class == 'multinomial':
+                 w = np.mean([coefs_paths[:, i, best_indices[i], :]
+                              for i in range(len(folds))], axis=0)

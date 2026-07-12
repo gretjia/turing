@@ -1,0 +1,168 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:global:scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:d7df4f71999cd1ee74fedc8fe482ec8ec95b7338053e260aadc1f02c6b59a8c5",
+    "price_signal_hash": "sha256:a8996532814ceac0e8724ae88fe60b4f50e56c1c2ecdf532f146a41b42cf6db8",
+    "route_id": "django__django-11095::armB::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:466fc9ba86aecd5ed8d76c579e904eb14e4250e5a4d105002ace2cb3fb0325e5",
+        "verdict_fraction_q32": "4294967296"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "test_basic_add_POST (generic_inline_admin.tests.GenericAdminViewTest)",
+          "test_basic_edit_POST (generic_inline_admin.tests.GenericAdminViewTest)",
+          "test_custom_form_meta_exclude_with_readonly (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+          "test_get_fieldsets (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+          "test_get_formsets_with_inlines_returns_tuples (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+          "test_get_inline_instances_override_get_inlines (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+          "test_get_max_num (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+          "test_get_min_num (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+          "test_max_num_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+          "test_no_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 10,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "test_add (generic_inline_admin.tests.GenericInlineAdminWithUniqueTogetherTest)",
+          "test_basic_add_GET (generic_inline_admin.tests.GenericAdminViewTest)",
+          "test_basic_edit_GET (generic_inline_admin.tests.GenericAdminViewTest)",
+          "test_custom_form_meta_exclude (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+          "test_delete (generic_inline_admin.tests.GenericInlineAdminWithUniqueTogetherTest)",
+          "test_extra_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+          "test_get_extra (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+          "test_get_formset_kwargs (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+          "test_min_num_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+          "test_no_deletion (generic_inline_admin.tests.NoInlineDeletionTest)"
+        ],
+        "verify_total_count": 10,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:466fc9ba86aecd5ed8d76c579e904eb14e4250e5a4d105002ace2cb3fb0325e5",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "global",
+          "route_scaffold": "scaffold:sha256:3cdf811d8fc2918efd67477440d611c88c1757b17fa2ffdc30dcf72ff5539b07",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": true,
+          "verdict_fraction_q32": "4294967296",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:c02d058114bcc0a508089d790cdab81219df3477ad7fe5b18a4173641e7308f2"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/django__django-11095/kimi/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "django__django-11095"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "django__django-11095"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "django__django-11095"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/A/scoring/django__django-11095/kimi/wp9a-live-driver.wp9a-live-driver-django__django-11095-kimi.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_get_inline_instances_override_get_inlines (generic_inline_admin.tests.GenericInlineModelAdminTest)"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_no_deletion (generic_inline_admin.tests.NoInlineDeletionTest)",
+              "test_custom_form_meta_exclude (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+              "test_custom_form_meta_exclude_with_readonly (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+              "test_get_fieldsets (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+              "test_get_formset_kwargs (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+              "test_get_formsets_with_inlines_returns_tuples (generic_inline_admin.tests.GenericInlineModelAdminTest)",
+              "test_extra_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_get_extra (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_get_max_num (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_get_min_num (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_max_num_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_min_num_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_no_param (generic_inline_admin.tests.GenericInlineAdminParametersTest)",
+              "test_add (generic_inline_admin.tests.GenericInlineAdminWithUniqueTogetherTest)",
+              "test_delete (generic_inline_admin.tests.GenericInlineAdminWithUniqueTogetherTest)",
+              "test_basic_add_GET (generic_inline_admin.tests.GenericAdminViewTest)",
+              "test_basic_add_POST (generic_inline_admin.tests.GenericAdminViewTest)",
+              "test_basic_edit_GET (generic_inline_admin.tests.GenericAdminViewTest)",
+              "test_basic_edit_POST (generic_inline_admin.tests.GenericAdminViewTest)"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 876,
+        "candidate_patch_sha256": "sha256:2edda185c93feddb4d493422bde81aba7917db0804057925410a25ba3a079050",
+        "instance_id": "django__django-11095",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 34230
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "global",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "django__django-11095",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "kimi",
+  "selected_route_id": "django__django-11095::armB::kimi",
+  "task_index": 6
+}

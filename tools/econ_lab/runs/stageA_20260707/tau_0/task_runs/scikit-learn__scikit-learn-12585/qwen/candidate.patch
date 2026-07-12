@@ -1,0 +1,54 @@
+diff --git a/sklearn/base.py b/sklearn/base.py
+index 704192602..9a01ee90c 100644
+--- a/sklearn/base.py
++++ b/sklearn/base.py
+@@ -48,7 +48,7 @@ def clone(estimator, safe=True):
+     if estimator is None or isinstance(estimator, (str, float, int, bool)):
+         return estimator
+     elif hasattr(estimator, 'get_params'):
+-        new_object_params = estimator.get_params(deep=False)
++        if isinstance(estimator, type):
++            return estimator
++        new_object_params = estimator.get_params(deep=False)
+     else:
+         return estimator
+     new_object_params = {
+@@ -58,7 +58,7 @@ def clone(estimator, safe=True):
+     for name, param in new_object_params.items():
+         if param is not None and hasattr(param, 'get_params'):
+             # param is an estimator
+-            new_object_params[name] = clone(param, safe=False)
++            if not isinstance(param, type):
++                new_object_params[name] = clone(param, safe=False)
+     return new_object_params
+     new_object = estimator.__class__(**new_object_params)
+     return new_object
+     return new_object_params
+     return new_object
+diff --git a/sklearn/base.py b/sklearn/base.py
+index 704192602..9a01ee90c 100644
+--- a/sklearn/base.py
++++ b/sklearn/base.py
+@@ -48,7 +48,7 @@ def clone(estimator, safe=True):
+     if estimator is None or isinstance(estimator, (str, float, int, bool)):
+         return estimator
+     elif hasattr(estimator, 'get_params'):
+-        new_object_params = estimator.get_params(deep=False)
++        if isinstance(estimator, type):
++            return estimator
++        new_object_params = estimator.get_params(deep=False)
+     else:
+         return estimator
+     new_object_params = {
+@@ -58,7 +58,7 @@ def clone(estimator, safe=True):
+     for name, param in new_object_params.items():
+         if param is not None and hasattr(param, 'get_params'):
+             # param is an estimator
+-            new_object_params[name] = clone(param, safe=False)
++            if not isinstance(param, type):
++                new_object_params[name] = clone(param, safe=False)
+     return new_object_params
+     new_object = estimator.__class__(**new_object_params)
+     return new_object
+     return new_object_params
+     return new_object

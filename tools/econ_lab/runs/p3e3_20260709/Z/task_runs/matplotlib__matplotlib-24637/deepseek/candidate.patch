@@ -1,0 +1,23 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index d4c6e7fa5..eefed8b19 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1524,6 +1524,8 @@ class AnnotationBbox(Artist):
+         # update the location to match offset and parent coordinate
+         self.update_bbox_position_size(renderer)
+ 
++        self.stale = False
++
+     def set_figure(self, fig):
+         self._fig = fig
+         self.offsetbox.figure = fig
+@@ -1610,6 +1612,9 @@ class AnnotationBbox(Artist):
+             gs = clippath.get_transformed_path_and_affine()
+             renderer.draw_image(gc, rows, cols, im, *gs)
+ 
++        # pass artist's gid to the renderer
++        gc.set_gid(self.get_gid())
++
+         gc.restore()
+ 
+     def contains(self, event):

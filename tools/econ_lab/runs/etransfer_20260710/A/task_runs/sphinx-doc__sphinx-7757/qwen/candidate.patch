@@ -1,0 +1,14 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 58b64f284..0835d87a3 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -229,6 +229,9 @@ class GoogleDocstring(object):
+         if arg_name in self._args:
+             arg = self._args[arg_name]
+             if arg.default:
++                # Handle positional-only arguments with default values
++                if arg.kind == 1:  # ARG_POSITIONAL_ONLY
++                    return ' {}={}'.format(arg_name, arg.default)
+                 return ' {}={}'.format(arg_name, arg.default)
+             return ' {}'.format(arg_name)
+         return ''

@@ -1,0 +1,105 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sphinx-doc/sphinx:scaffold:sha256:e884e538e0435436d4271a7479b1194b155264081804d6bf9597c875c75730ef",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:8c2c4be45ba32441ed47da00c8f778637c3d270e2ee90e045657deebd459076d",
+    "price_signal_hash": "sha256:4132e946b15077a9c9af3265b48ca14af4a695c2329ace26d57166028921afde",
+    "route_id": "sphinx-doc__sphinx-11445::armC::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": true,
+        "routing_prior_updated_event_hash": "sha256:87bea492bf522b90059ed4ee8573ca7c0b016149f6d8255ad4edd7aefd1aa666",
+        "verdict_fraction_q32": "0"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [],
+        "verify_total_count": 0,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:87bea492bf522b90059ed4ee8573ca7c0b016149f6d8255ad4edd7aefd1aa666",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "sphinx-doc/sphinx",
+          "route_scaffold": "scaffold:sha256:e884e538e0435436d4271a7479b1194b155264081804d6bf9597c875c75730ef",
+          "schema_id": "routing_prior_updated.v2",
+          "verdict": false,
+          "verdict_fraction_q32": "0",
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:adb8bddb73e8bc0a3bd9ee25928a4b34c1f7f589e5291b877924df9a8c289f4d"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/sphinx-doc__sphinx-11445/kimi/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "sphinx-doc__sphinx-11445"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sphinx-doc__sphinx-11445"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/FL/scoring/sphinx-doc__sphinx-11445/kimi/wp9a-live-driver.wp9a-live-driver-sphinx-doc__sphinx-11445-kimi.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 961,
+        "candidate_patch_sha256": "sha256:673af863813ee595b637badffa8dcc923311c7633bdedaefe943e2fe7c38d9a4",
+        "instance_id": "sphinx-doc__sphinx-11445",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 478897
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "sphinx-doc/sphinx",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sphinx-doc__sphinx-11445",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "kimi",
+  "selected_route_id": "sphinx-doc__sphinx-11445::armC::kimi",
+  "task_index": 33
+}

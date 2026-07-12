@@ -1,0 +1,7 @@
+diff --git a/sklearn/utils/_show_versions.py b/sklearn/utils/_show_versions.py
+--- a/sklearn/utils/_show_versions.py
++++ b/sklearn/utils/_show_versions.py
+@@ -58,2 +58,2 @@
+     deps = ["pip", "setuptools", "sklearn", "numpy", "scipy", "Cython",
+-            "matplotlib", "pandas"]
++            "matplotlib", "pandas", "joblib"]

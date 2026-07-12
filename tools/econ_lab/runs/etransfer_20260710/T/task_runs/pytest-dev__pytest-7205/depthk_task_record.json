@@ -1,0 +1,384 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:14962313465aef1907ab03b68cf0d7c2fd4e75de08ffb6c899825d8e8cf8d0cd",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:162c7f9611b2158dab90014c09b0b42dc8e22509c801f207f90d293f2ee2012c"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:3d600427a7c7f671a49672c896c40327c1e91b7cc1d74e67323acc43bd9a5d68",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:383e265bd3f28d9cbe33530465b75b5033c0768587a1d14a6f971cd52d58de33"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:f225344084516d69e7ab1b9a851cb2a46ff0681487abd1c63b6ecc9be50ade00",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:78c91e074f6d8c9e15291c9535ab2c65ab1878aa0ca3c4154e04b910093e8290"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armB",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "pytest-dev__pytest-7205",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "testing/test_setuponly.py::test_capturing",
+      "testing/test_setuponly.py::test_show_different_scopes[--setup-only]",
+      "testing/test_setuponly.py::test_show_different_scopes[--setup-show]",
+      "testing/test_setuponly.py::test_show_fixture_action_with_bytes",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-only]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-show]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-only]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-plan]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids_function[--setup-show]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-show]",
+      "testing/test_setuponly.py::test_show_nested_fixtures[--setup-show]"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 15,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "testing/test_setuponly.py::test_dynamic_fixture_request",
+      "testing/test_setuponly.py::test_setup_show_with_KeyboardInterrupt_in_test",
+      "testing/test_setuponly.py::test_show_different_scopes[--setup-plan]",
+      "testing/test_setuponly.py::test_show_fixtures_and_execute_test",
+      "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-only]",
+      "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-plan]",
+      "testing/test_setuponly.py::test_show_fixtures_with_autouse[--setup-show]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameter_ids[--setup-plan]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-only]",
+      "testing/test_setuponly.py::test_show_fixtures_with_parameters[--setup-plan]",
+      "testing/test_setuponly.py::test_show_nested_fixtures[--setup-only]",
+      "testing/test_setuponly.py::test_show_nested_fixtures[--setup-plan]",
+      "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-only]",
+      "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-plan]",
+      "testing/test_setuponly.py::test_show_only_active_fixtures[--setup-show]"
+    ],
+    "verify_total_count": 15,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 19,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2051497636",
+      "s": 9,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:loop": {
+      "n": 11,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2028179000",
+      "s": 5,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:none": {
+      "n": 15,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1789569706",
+      "s": 6,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 18,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1933420285",
+      "s": 8,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:loop": {
+      "n": 10,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1822107337",
+      "s": 4,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:none": {
+      "n": 14,
+      "p_q32": "2147483648",
+      "q_eff_q32": "1622543200",
+      "s": 5,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/pytest-dev__pytest-7205/deepseek/wp9a-live-driver.wp9a-live-driver-pytest-dev__pytest-7205-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "HELDOUT",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:c9ba20e1c5356e689d4f3530cedccad5d5b319c09778cdb91174b721dbd6f395",
+        "price_signal_hash": "sha256:b32157bf6e87c4a6f1777d8d5ce64418643beee3e2e3fb81faf1ef12fcfbc938",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1542283710",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1622543200",
+          "s": 5,
+          "s_q32": "22190664362",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1443643313",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1822107337",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1933420285",
+          "s": 8,
+          "s_q32": "34587501784",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:b93ca5bb899d9e431e238b18b07fdb43dd657d3bea3cd962e1b4436c9e4e71d8",
+        "price_signal_hash": "sha256:b32157bf6e87c4a6f1777d8d5ce64418643beee3e2e3fb81faf1ef12fcfbc938",
+        "route_id": "loop",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1542283710",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1622543200",
+          "s": 5,
+          "s_q32": "22190664362",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1443643313",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1822107337",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1933420285",
+          "s": 8,
+          "s_q32": "34587501784",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "loop",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:cc3e6bf8d7367fd34e5b4de0adfede1fa6f9c4bf907470fbeaefcfadcea350aa",
+        "price_signal_hash": "sha256:b32157bf6e87c4a6f1777d8d5ce64418643beee3e2e3fb81faf1ef12fcfbc938",
+        "route_id": "none",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1542283710",
+          "s": 4,
+          "s_q32": "20986772014",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 14,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1622543200",
+          "s": 5,
+          "s_q32": "22190664362",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1443643313",
+          "s": 5,
+          "s_q32": "25281739310",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "976128930",
+          "s": 2,
+          "s_q32": "8589934592",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 10,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1822107337",
+          "s": 4,
+          "s_q32": "17895697066",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 18,
+          "p_q32": "2147483648",
+          "q_eff_q32": "1933420285",
+          "s": 8,
+          "s_q32": "34587501784",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "none",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "loop",
+    "verify": "none"
+  },
+  "task_index": 41,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/pytest-dev__pytest-7205/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

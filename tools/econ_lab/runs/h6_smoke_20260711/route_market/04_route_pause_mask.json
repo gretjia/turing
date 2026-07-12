@@ -1,0 +1,89 @@
+{
+  "after_mask": {
+    "as_of_event_ordinal": 3,
+    "budget_suggestion": {
+      "can_move_accepted_head": false,
+      "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+      "emits_authorization": false,
+      "head_effect": "PRESERVE",
+      "market_id": "route:django/django:scaffold:sha256:fd3a4aa896d508dd2cf46e51a4a04cb89f4c1f44878b4956582f234dfcb70d08",
+      "max_tokens": 12000,
+      "mode": "Softmax",
+      "pput_prior_hash": "sha256:775aa8098d584618ee03cb8dab58a1a5f031a1a4013726e2ddfe0f49da16f76b",
+      "price_signal_hash": "sha256:44a141a8655164023716358f22455ef3a7fddda48fe284becb93d0c7aecbf59b",
+      "route_id": "armB_normal_route",
+      "schema_id": "budget_allocated.v1"
+    },
+    "chosen_route": "armB_normal_route",
+    "committed_routing_events": [
+      {
+        "RouteFuseTripped": {
+          "detector_rule_id": "TERMINATION_WITHOUT_VERIFIER_EVIDENCE",
+          "diagnostic_digest": "sha256:339c47d15e66fbbd4890fa935e1a7821fadb889968eb7b5351e29de8407552ac",
+          "event_ordinal": 1,
+          "event_type": "RouteFuseTripped",
+          "head_effect": "PRESERVE",
+          "route_domain": "django/django",
+          "route_scaffold": "scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+          "schema_id": "route_fuse_tripped.v1"
+        }
+      }
+    ],
+    "paused_route_ids": [
+      "armA_bad_route"
+    ]
+  },
+  "before_mask": {
+    "as_of_event_ordinal": 0,
+    "budget_suggestion": {
+      "can_move_accepted_head": false,
+      "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+      "emits_authorization": false,
+      "head_effect": "PRESERVE",
+      "market_id": "route:django/django:scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+      "max_tokens": 12000,
+      "mode": "Softmax",
+      "pput_prior_hash": "sha256:775aa8098d584618ee03cb8dab58a1a5f031a1a4013726e2ddfe0f49da16f76b",
+      "price_signal_hash": "sha256:44a141a8655164023716358f22455ef3a7fddda48fe284becb93d0c7aecbf59b",
+      "route_id": "armA_bad_route",
+      "schema_id": "budget_allocated.v1"
+    },
+    "chosen_route": "armA_bad_route",
+    "committed_routing_events": [],
+    "paused_route_ids": []
+  },
+  "candidate_routes": [
+    {
+      "domain_bucket": "django/django",
+      "expected_failure_domain": "swe_bench_worker_repair",
+      "market_id": "route:django/django:scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+      "requested_tokens": 12000,
+      "route_id": "armA_bad_route",
+      "scaffold_id": "scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf"
+    },
+    {
+      "domain_bucket": "django/django",
+      "expected_failure_domain": "swe_bench_worker_repair",
+      "market_id": "route:django/django:scaffold:sha256:fd3a4aa896d508dd2cf46e51a4a04cb89f4c1f44878b4956582f234dfcb70d08",
+      "requested_tokens": 12000,
+      "route_id": "armB_normal_route",
+      "scaffold_id": "scaffold:sha256:fd3a4aa896d508dd2cf46e51a4a04cb89f4c1f44878b4956582f234dfcb70d08"
+    }
+  ],
+  "domain_bucket": "django/django",
+  "evidence_class": "SMOKE_FIXTURE",
+  "route_fuse_tripped_event": {
+    "RouteFuseTripped": {
+      "detector_rule_id": "TERMINATION_WITHOUT_VERIFIER_EVIDENCE",
+      "diagnostic_digest": "sha256:339c47d15e66fbbd4890fa935e1a7821fadb889968eb7b5351e29de8407552ac",
+      "event_ordinal": 1,
+      "event_type": "RouteFuseTripped",
+      "head_effect": "PRESERVE",
+      "route_domain": "django/django",
+      "route_scaffold": "scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+      "schema_id": "route_fuse_tripped.v1"
+    }
+  },
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.route_pause_mask",
+  "source": "target/debug/econ_fold_cli fold-and-suggest-route (before/after), build-route-fuse-tripped -- real subprocess calls, ADR-ECON-007 Decision 2/5"
+}

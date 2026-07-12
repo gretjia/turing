@@ -1,0 +1,23 @@
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+index 7b1e0a8d14..eae0d9a3f6 100644
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -1297,7 +1297,17 @@ class Card:
+             value_str = "T"
+         elif value is False:
+             value_str = "F"
+-        elif isinstance(value, (float, np.floating)):
++        elif isinstance(value, float):
++            # Use Python's default string representation if it's short enough
++            # and represents the value accurately. FITS uses 20 characters max
++            # for the value field.
++            s = str(value)
++            if len(s) <= 20:
++                value_str = s
++            else:
++                # Fall back to the old format with .16G
++                value_str = f"{value:.16G}"
++        elif isinstance(value, np.floating):
+             value_str = f"{value:.16G}"
+ 
+             # Note: np.floating types may have exponents with more than

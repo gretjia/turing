@@ -1,0 +1,11 @@
+diff --git a/sklearn/base.py b/sklearn/base.py
+index xxxxxxx..xxxxxxx 100644
+--- a/sklearn/base.py
++++ b/sklearn/base.py
+@@ -40,7 +40,7 @@ def clone(estimator, safe=True):
+         return estimator_type([clone(e, safe=safe) for e in estimator])
+-    elif not hasattr(estimator, 'get_params'):
++    elif not hasattr(estimator, 'get_params') or isinstance(estimator, type):
+         if not safe:
+             return copy.deepcopy(estimator)
+         else:

@@ -1,0 +1,186 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:django/django:scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:78e41ccbccd28d4512ffc73bb14c9e65d652237804d1612e6f032bd6e37dd852",
+    "price_signal_hash": "sha256:cbcf71172eecac6002c5deb5758421f4f495d0325b5eda7bdac577c64e92f3fe",
+    "route_id": "django__django-11292::armB::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:7ba62c3a1111d0007d9b0500286faa777644fa966d77fbecd185de307e61977d"
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "An unknown command raises CommandError",
+          "BaseCommand.create_parser() passes kwargs to CommandParser.",
+          "test_call_command_no_checks (user_commands.tests.CommandTests)",
+          "test_call_command_option_parsing (user_commands.tests.CommandTests)",
+          "test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error (user_commands.tests.CommandTests)",
+          "test_calling_command_with_parameters_and_app_labels_at_the_end_should_be_ok (user_commands.tests.CommandTests)",
+          "test_check_migrations (user_commands.tests.CommandTests)",
+          "test_discover_commands_in_eggs (user_commands.tests.CommandTests)",
+          "test_find_command_without_PATH (user_commands.tests.CommandTests)",
+          "test_get_random_secret_key (user_commands.tests.UtilsTests)",
+          "test_is_ignored_path_false (user_commands.tests.UtilsTests)",
+          "test_no_existent_external_program (user_commands.tests.UtilsTests)",
+          "test_no_translations_deactivate_translations (user_commands.tests.CommandTests)",
+          "test_normalize_path_patterns_truncates_wildcard_base (user_commands.tests.UtilsTests)",
+          "test_subparser_invalid_option (user_commands.tests.CommandTests)"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [
+          "Exception raised in a command should raise CommandError with",
+          "test_call_command_option_parsing_non_string_arg (user_commands.tests.CommandTests)",
+          "test_call_command_unrecognized_option (user_commands.tests.CommandTests)",
+          "test_call_command_with_required_parameters_in_mixed_options (user_commands.tests.CommandTests)",
+          "test_call_command_with_required_parameters_in_options (user_commands.tests.CommandTests)",
+          "test_calling_a_command_with_only_empty_parameter_should_ends_gracefully (user_commands.tests.CommandTests)",
+          "test_calling_command_with_app_labels_and_parameters_should_be_ok (user_commands.tests.CommandTests)",
+          "test_command (user_commands.tests.CommandTests)",
+          "test_command_add_arguments_after_common_arguments (user_commands.tests.CommandTests)",
+          "test_command_style (user_commands.tests.CommandTests)",
+          "test_disallowed_abbreviated_options (user_commands.tests.CommandRunTests)",
+          "test_is_ignored_path_true (user_commands.tests.UtilsTests)",
+          "test_language_preserved (user_commands.tests.CommandTests)",
+          "test_output_transaction (user_commands.tests.CommandTests)",
+          "test_script_prefix_set_in_commands (user_commands.tests.CommandRunTests)",
+          "test_skip_checks (user_commands.tests.CommandRunTests)",
+          "test_subparser (user_commands.tests.CommandTests)"
+        ],
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:7ba62c3a1111d0007d9b0500286faa777644fa966d77fbecd185de307e61977d",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "django/django",
+          "route_scaffold": "scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:9fb33f92e93c5d6b15d60be668320e9c2b9d1cee23a73e6e13b0bdb80b0a55e4"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/R/scoring/django__django-11292/glm/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "django__django-11292"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "django__django-11292"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "django__django-11292"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/R/scoring/django__django-11292/glm/wp9a-live-driver.wp9a-live-driver-django__django-11292-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "test_skip_checks (user_commands.tests.CommandRunTests)"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [
+              "test_get_random_secret_key (user_commands.tests.UtilsTests)",
+              "test_is_ignored_path_false (user_commands.tests.UtilsTests)",
+              "test_is_ignored_path_true (user_commands.tests.UtilsTests)",
+              "test_no_existent_external_program (user_commands.tests.UtilsTests)",
+              "test_normalize_path_patterns_truncates_wildcard_base (user_commands.tests.UtilsTests)",
+              "test_call_command_no_checks (user_commands.tests.CommandTests)",
+              "test_call_command_option_parsing (user_commands.tests.CommandTests)",
+              "test_call_command_option_parsing_non_string_arg (user_commands.tests.CommandTests)",
+              "test_call_command_unrecognized_option (user_commands.tests.CommandTests)",
+              "test_call_command_with_required_parameters_in_mixed_options (user_commands.tests.CommandTests)",
+              "test_call_command_with_required_parameters_in_options (user_commands.tests.CommandTests)",
+              "test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error (user_commands.tests.CommandTests)",
+              "test_calling_a_command_with_only_empty_parameter_should_ends_gracefully (user_commands.tests.CommandTests)",
+              "test_calling_command_with_app_labels_and_parameters_should_be_ok (user_commands.tests.CommandTests)",
+              "test_calling_command_with_parameters_and_app_labels_at_the_end_should_be_ok (user_commands.tests.CommandTests)",
+              "test_check_migrations (user_commands.tests.CommandTests)",
+              "test_command (user_commands.tests.CommandTests)",
+              "test_command_add_arguments_after_common_arguments (user_commands.tests.CommandTests)",
+              "test_command_style (user_commands.tests.CommandTests)",
+              "BaseCommand.create_parser() passes kwargs to CommandParser.",
+              "test_discover_commands_in_eggs (user_commands.tests.CommandTests)",
+              "An unknown command raises CommandError",
+              "test_find_command_without_PATH (user_commands.tests.CommandTests)",
+              "test_language_preserved (user_commands.tests.CommandTests)",
+              "test_no_translations_deactivate_translations (user_commands.tests.CommandTests)",
+              "test_output_transaction (user_commands.tests.CommandTests)",
+              "test_subparser (user_commands.tests.CommandTests)",
+              "test_subparser_invalid_option (user_commands.tests.CommandTests)",
+              "Exception raised in a command should raise CommandError with",
+              "test_disallowed_abbreviated_options (user_commands.tests.CommandRunTests)",
+              "test_script_prefix_set_in_commands (user_commands.tests.CommandRunTests)"
+            ],
+            "success": []
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armB",
+        "candidate_patch_bytes": 1924,
+        "candidate_patch_sha256": "sha256:f0bedda54d6c9867501a3139c9140508792fdfb6192f78ed5ad2299cff0378da",
+        "instance_id": "django__django-11292",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 6020
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "django/django",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "django__django-11292",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "glm",
+  "selected_route_id": "django__django-11292::armB::glm",
+  "task_index": 11
+}

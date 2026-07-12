@@ -1,0 +1,21 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index 5f5b8c7..4f1e2d3 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -1,5 +1,5 @@
+ # Licensed under a 3-clause BSD style license - see LICENSE.rst
+- 
++
+ # ...
+ import numpy as np
+ import warnings
+@@ -50,8 +50,6 @@ class Quantity(np.ndarray):
+                 value = value.to(unit).value
+             else:
+                 value = value.value
+-        # Upgrade half-precision floats to standard float64
+-        if dtype is None and hasattr(value, 'dtype') and value.dtype.kind == 'f' and value.dtype.itemsize < 4:
+-            value = np.asarray(value, dtype=np.float64)
+         if dtype is None and hasattr(value, 'dtype') and value.dtype.kind == 'i':
+             value = np.asarray(value, dtype=np.float64)
+         # ...

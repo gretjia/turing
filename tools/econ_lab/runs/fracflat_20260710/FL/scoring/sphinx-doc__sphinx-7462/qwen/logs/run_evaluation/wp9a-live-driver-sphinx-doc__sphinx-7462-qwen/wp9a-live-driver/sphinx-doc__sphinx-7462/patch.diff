@@ -1,0 +1,18 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 8171535608..b4517a94d9 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -107,10 +107,12 @@ def unparse(node: ast.AST) -> List[Node]:
+         elif isinstance(node, ast.Tuple):
+             result = []
+             for elem in node.elts:
+-                result.extend(unparse(elem))
+-                result.append(addnodes.desc_sig_punctuation('', ', '))
+-            result.pop()
++                result.extend(unparse(elem))
++                result.append(addnodes.desc_sig_punctuation('', ', '))
++            if result:
++                result.pop()
+             return result
+         else:
+             raise SyntaxError  # unsupported syntax

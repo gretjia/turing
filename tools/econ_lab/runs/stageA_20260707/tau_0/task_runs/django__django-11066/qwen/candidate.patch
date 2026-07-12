@@ -1,0 +1,13 @@
+diff --git a/django/contrib/contenttypes/management/__init__.py b/django/contrib/contenttypes/management/__init__.py
+index 2f8b825129..5007910553 100644
+--- a/django/contrib/contenttypes/management/__init__.py
++++ b/django/contrib/contenttypes/management/__init__.py
+@@ -24,7 +24,7 @@ class RenameContentType:
+         with transaction.atomic(using=db):
+             content_type.save(update_fields={'model'})
+ 
+-    def _rename(self, app_label, model, new_model, db):
++    def _rename(self, app_label, model, new_model, db):
+         content_type = self._get_content_type(app_label, model, db)
+         content_type.model = new_model
+         content_type.save(using=db, update_fields={'model'})

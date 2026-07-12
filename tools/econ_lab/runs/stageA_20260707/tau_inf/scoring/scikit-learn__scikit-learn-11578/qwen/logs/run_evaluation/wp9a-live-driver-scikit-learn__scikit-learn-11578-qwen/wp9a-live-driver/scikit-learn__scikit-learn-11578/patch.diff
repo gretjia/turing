@@ -1,0 +1,43 @@
+diff --git a/sklearn/linear_model/logistic.py b/sklearn/linear_model/logistic.py
+index 72c85a128b..5332cd5ada 100644
+--- a/sklearn/linear_model/logistic.py
++++ b/sklearn/linear_model/logistic.py
+@@ -920,7 +920,7 @@ def _log_reg_scoring_path(X, y, train, test, pos_class=None, Cs=10,
+                          max_squared_sum=None, sample_weight=None):
+     """Computes scores across logistic_regression_path
+ 
+-    log_reg = LogisticRegression(fit_intercept=fit_intercept)
++    log_reg = LogisticRegression(fit_intercept=fit_intercept, multi_class=multi_class)
+ 
+     # The score method of Logistic Regression has a classes_ attribute.
+     if multi_class == 'ovr':
+@@ -950,7 +950,7 @@ def _log_reg_scoring_path(X, y, train, test, pos_class=None, Cs=10,
+     if isinstance(scoring, six.string_types):
+         scoring = get_scorer(scoring)
+     for w in coefs:
+-        if multi_class == 'ovr':
++        if multi_class == 'ovr' and fit_intercept:
+             w = w[np.newaxis, :]
+         if fit_intercept:
+             log_reg.coef_ = w[:, :-1]
+@@ -1068,7 +1068,7 @@ def __init__(self, penalty='l2', dual=False, tol=1e-4, C=1.0,
+                  fit_intercept=True, intercept_scaling=1, class_weight=None,
+                  random_state=None, solver='liblinear', max_iter=100,
+                  multi_class='ovr', verbose=0, warm_start=False, n_jobs=1):
+ 
+-        self.intercept_scaling = intercept_scaling
++        self.intercept_scaling = float(intercept_scaling)
+ 
+         self.penalty = penalty
+         self.dual = dual
+@@ -1124,7 +1124,7 @@ def __init__(self, Cs=10, fit_intercept=True, cv=None, dual=False,
+                  penalty='l2', scoring=None, solver='lbfgs', tol=1e-4,
+                  max_iter=100, class_weight=None, n_jobs=1, verbose=0,
+                  refit=True, intercept_scaling=1., multi_class='ovr',
+                  random_state=None):
+ 
+-        self.intercept_scaling = intercept_scaling
++        self.intercept_scaling = float(intercept_scaling)
+ 
+         self.Cs = Cs
+         self.fit_intercept = fit_intercept

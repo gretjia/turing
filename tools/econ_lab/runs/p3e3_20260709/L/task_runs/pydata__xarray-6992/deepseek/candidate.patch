@@ -1,0 +1,21 @@
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index cf4c3a9c1..2bcdb9ffb 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -364,6 +364,16 @@ class DataVariables(Mapping[Hashable, "Variable"]):
+     def _data_vars(self) -> Iterator[tuple[Hashable, Variable]]:
+         datasets = self._datasets
+         for ds in datasets:
++            # During index refactor it's possible to have coord names that
++            # are not in _variables (e.g. after reset_index with drop=True).
++            # Those coordinate names are not data variables, so skip them.
++            if hasattr(ds, "_coord_names"):
++                valid_vars = set(ds._variables.keys())
++                valid_data_vars = [k for k in ds._variables
++                                   if k not in ds._coord_names or k not in valid_vars]
++                for k in valid_data_vars:
++                    if k in valid_vars:
++                        yield k, ds._variables[k]
+             for k in ds._variables:
+                 if k not in self._dataset._coord_names:
+                     yield k, ds._variables[k]

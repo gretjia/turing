@@ -1,0 +1,28 @@
+diff --git a/sympy/core/relational.py b/sympy/core/relational.py
+--- a/sympy/core/relational.py
++++ b/sympy/core/relational.py
+@@ -121,7 +121,7 @@ class Relational(Boolean, Expr, EvalfMixin):
+     def __ne__(self, other):
+         return other not in (self.lhs, self.rhs)
+ 
+     def _sympystr(self, p):
+-        return '%s(%s, %s)' % (self.__class__.__name__, self.lhs, self.rhs)
++        return '%s(%s, %s)' % (self.__class__.__name__, p._print(self.lhs), p._print(self.rhs))
+ 
+     def _latex(self, p):
+         return _latex_Relational(self, p)
+diff --git a/sympy/printing/str.py b/sympy/printing/str.py
+--- a/sympy/printing/str.py
++++ b/sympy/printing/str.py
+@@ -346,8 +346,8 @@ class StrPrinter(Printer):
+ 
+     def _print_Limit(self, expr):
+         e, z, z0, direction = expr.args
+         if direction == '+':
+-            return "Limit(%s, %s, %s)" % (e, z, z0)
+-        return "Limit(%s, %s, %s, dir='%s')" % (e, z, z0, direction)
++            return "Limit(%s, %s, %s)" % (self._print(e), self._print(z), self._print(z0))
++        return "Limit(%s, %s, %s, dir='%s')" % (self._print(e), self._print(z), self._print(z0), direction)
+ 
+     def _print_Category(self, expr):
+         return 'Category'

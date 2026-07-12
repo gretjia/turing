@@ -1,0 +1,51 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pytest-dev/pytest:scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:268620475362f6d2dedf5f89eb48da1a23b44ea9a545bef2d9db3d5b3e093b78",
+    "price_signal_hash": "sha256:2b3353b6a71f9c9f3c6435d255f3d9433e6f4fd507a35244b013f2ee69ac4521",
+    "route_id": "pytest-dev__pytest-7571::armA::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": null,
+      "provider_path": "deepseek_direct_fallback",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armA",
+        "error_message": "DeepSeek model 'deepseek-v4-pro' is not priced in the supplied price table",
+        "error_type": "ValueError",
+        "instance_id": "pytest-dev__pytest-7571",
+        "lineage": "deepseek",
+        "primary_attempt_status": "API_ERROR",
+        "provider_path": "deepseek_direct_fallback",
+        "status": "ERROR"
+      },
+      "worker_result_status": "ERROR"
+    }
+  ],
+  "domain_bucket": "pytest-dev/pytest",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pytest-dev__pytest-7571",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "pytest-dev__pytest-7571::armA::deepseek",
+  "task_index": 19
+}

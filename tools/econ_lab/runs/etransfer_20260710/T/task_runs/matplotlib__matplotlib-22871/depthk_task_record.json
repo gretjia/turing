@@ -1,0 +1,447 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:074b75131b7361532a4ed5cfb54ac9ae166b12a4dc9ecd77855ce5de1750fd0d",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "3806902830",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:775ed916bc5cbce04bc4ea1f01e72f56e81b54f68909be9767291c680d014b4f"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:5295eb195025a554b1784580ce9a61b9f96ad5025086ce44e278b172d3144a35",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "3806902830",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:45c09d0739014c6a49aa31d6a23996c7df25dc29fb73c520952d5250de4fc6b8"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:a3d8d91e57d4df10166c8bd60cd352dbde8dbfb673b46c900dd8d4aae6c919b5",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "3806902830",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:b4719ae723b6c0867ad3166b75304754fcc5d2a2ebc9f48b8fa24f27b75e1523"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armC",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "matplotlib__matplotlib-22871",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "lib/matplotlib/tests/test_dates.py::test_DateFormatter[png]",
+      "lib/matplotlib/tests/test_dates.py::test_DateLocator",
+      "lib/matplotlib/tests/test_dates.py::test_DayLocator",
+      "lib/matplotlib/tests/test_dates.py::test_RRuleLocator[png]",
+      "lib/matplotlib/tests/test_dates.py::test_RRuleLocator_close_minmax",
+      "lib/matplotlib/tests/test_dates.py::test_RRuleLocator_dayrange",
+      "lib/matplotlib/tests/test_dates.py::test_auto_date_locator_intmult",
+      "lib/matplotlib/tests/test_dates.py::test_axhline",
+      "lib/matplotlib/tests/test_dates.py::test_change_epoch",
+      "lib/matplotlib/tests/test_dates.py::test_change_interval_multiples",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_exceptions",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta1-1997-Jan-01",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta2-1997-Jan-01]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta4-1997-Jan]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta5-]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_tz",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_usetex[t_delta0-expected0]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_usetex[t_delta2-expected2]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_usetex[t_delta3-expected3]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT[datetime64[us]]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_dst",
+      "lib/matplotlib/tests/test_dates.py::test_date_axhline[png]",
+      "lib/matplotlib/tests/test_dates.py::test_date_axvspan[png]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[ms]-t00]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[ns]-t01]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[s]-t00]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[s]-t01]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[s]-t02]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[us]-t00]",
+      "lib/matplotlib/tests/test_dates.py::test_date_empty",
+      "lib/matplotlib/tests/test_dates.py::test_date_formatter_callable",
+      "lib/matplotlib/tests/test_dates.py::test_date_formatter_usetex[delta0-expected0]",
+      "lib/matplotlib/tests/test_dates.py::test_date_formatter_usetex[delta1-expected1]",
+      "lib/matplotlib/tests/test_dates.py::test_date_not_empty",
+      "lib/matplotlib/tests/test_dates.py::test_date_numpyx",
+      "lib/matplotlib/tests/test_dates.py::test_date_ticker_factory[0.02-MinuteLocator]",
+      "lib/matplotlib/tests/test_dates.py::test_date_ticker_factory[1-HourLocator]",
+      "lib/matplotlib/tests/test_dates.py::test_date_ticker_factory[19-DayLocator]",
+      "lib/matplotlib/tests/test_dates.py::test_datestr2num",
+      "lib/matplotlib/tests/test_dates.py::test_num2timedelta[1-tdelta0]",
+      "lib/matplotlib/tests/test_dates.py::test_rrulewrapper",
+      "lib/matplotlib/tests/test_dates.py::test_rrulewrapper_pytz",
+      "lib/matplotlib/tests/test_dates.py::test_too_many_date_ticks",
+      "lib/matplotlib/tests/test_dates.py::test_tz_utc",
+      "lib/matplotlib/tests/test_dates.py::test_warn_notintervals"
+    ],
+    "accept_verdict": false,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 39,
+    "verify_pass_fraction": 0.8863636363636364,
+    "verify_test_ids": [
+      "lib/matplotlib/tests/test_dates.py::test_YearLocator",
+      "lib/matplotlib/tests/test_dates.py::test_auto_date_locator",
+      "lib/matplotlib/tests/test_dates.py::test_auto_date_locator_intmult_tz",
+      "lib/matplotlib/tests/test_dates.py::test_change_converter",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_call",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_formats",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta0-1997-Jan-01",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta3-1997-Jan-02]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_show_offset[t_delta6-]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_subsecond",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_usetex[t_delta1-expected1]",
+      "lib/matplotlib/tests/test_dates.py::test_concise_formatter_zformats",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT[datetime64[ms]]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT[datetime64[ns]]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT[datetime64[s]]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT_scalar[ms]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT_scalar[ns]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT_scalar[s]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_NaT_scalar[us]",
+      "lib/matplotlib/tests/test_dates.py::test_date2num_dst_pandas",
+      "lib/matplotlib/tests/test_dates.py::test_date_axhspan[png]",
+      "lib/matplotlib/tests/test_dates.py::test_date_axvline[png]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[ms]-t01]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[ms]-t02]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[ns]-t00]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[ns]-t02]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[us]-t01]",
+      "lib/matplotlib/tests/test_dates.py::test_date_date2num_numpy[datetime64[us]-t02]",
+      "lib/matplotlib/tests/test_dates.py::test_date_formatter_usetex[delta2-expected2]",
+      "lib/matplotlib/tests/test_dates.py::test_date_formatter_usetex[delta3-expected3]",
+      "lib/matplotlib/tests/test_dates.py::test_date_inverted_limit[png]",
+      "lib/matplotlib/tests/test_dates.py::test_date_ticker_factory[200-MonthLocator]",
+      "lib/matplotlib/tests/test_dates.py::test_date_ticker_factory[2000-YearLocator]",
+      "lib/matplotlib/tests/test_dates.py::test_date_ticker_factory[40-WeekdayLocator]",
+      "lib/matplotlib/tests/test_dates.py::test_datetime64_in_list",
+      "lib/matplotlib/tests/test_dates.py::test_drange",
+      "lib/matplotlib/tests/test_dates.py::test_epoch2num",
+      "lib/matplotlib/tests/test_dates.py::test_julian2num",
+      "lib/matplotlib/tests/test_dates.py::test_locator_set_formatter",
+      "lib/matplotlib/tests/test_dates.py::test_num2timedelta[x1-tdelta1]",
+      "lib/matplotlib/tests/test_dates.py::test_offset_changes",
+      "lib/matplotlib/tests/test_dates.py::test_usetex_newline",
+      "lib/matplotlib/tests/test_dates.py::test_yearlocator_pytz"
+    ],
+    "verify_total_count": 44,
+    "verify_verdict": false
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 7,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3786566811",
+      "s": 6,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 5,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3855709277",
+      "s": 4,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 6,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3304893666",
+      "s": 4,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 6,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3783661665",
+      "s": 5,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 4,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3865470566",
+      "s": 4,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 5,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3221225472",
+      "s": 4,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/matplotlib__matplotlib-22871/deepseek/wp9a-live-driver.wp9a-live-driver-matplotlib__matplotlib-22871-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": false,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:a057ff49a80c23fabfaddac59ae2c175639f79a53b7af8e7358d5006d3e120a3",
+        "price_signal_hash": "sha256:37f60aae8ea406b757628931280e767750755961fb99cfd76cbabcd9a66a4dc2",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3221225472",
+          "s": 4,
+          "s_q32": "17179869184",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3400182442",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3865470566",
+          "s": 4,
+          "s_q32": "17179869184",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2720145954",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3783661665",
+          "s": 5,
+          "s_q32": "24338148010",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:f31c5e82b66599dea443d92f6e2dc51f7b5c4d4d59cff3434e34d891a4409db5",
+        "price_signal_hash": "sha256:37f60aae8ea406b757628931280e767750755961fb99cfd76cbabcd9a66a4dc2",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3221225472",
+          "s": 4,
+          "s_q32": "17179869184",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3400182442",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3865470566",
+          "s": 4,
+          "s_q32": "17179869184",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2720145954",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3783661665",
+          "s": 5,
+          "s_q32": "24338148010",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:c2d9caad3b57e530760e87b90684ce03e42a3e502577d736948b82371cee01a0",
+        "price_signal_hash": "sha256:37f60aae8ea406b757628931280e767750755961fb99cfd76cbabcd9a66a4dc2",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3221225472",
+          "s": 4,
+          "s_q32": "17179869184",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3400182442",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3865470566",
+          "s": 4,
+          "s_q32": "17179869184",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2720145954",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 6,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3783661665",
+          "s": 5,
+          "s_q32": "24338148010",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "self_check"
+  },
+  "task_index": 10,
+  "verify_pass_fraction": 0.8863636363636364,
+  "verify_verdict_for_credit": false,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/matplotlib__matplotlib-22871/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

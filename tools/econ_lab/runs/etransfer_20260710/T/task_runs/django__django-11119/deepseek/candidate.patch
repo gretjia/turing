@@ -1,0 +1,9 @@
+diff --git a/django/template/engine.py b/django/template/engine.py
+--- a/django/template/engine.py
++++ b/django/template/engine.py
+@@ -117,7 +117,7 @@ class Engine:
+         if isinstance(context, Context):
+             return t.render(context)
+         else:
+-            return t.render(Context(context))
++            return t.render(Context(context, autoescape=self.autoescape))

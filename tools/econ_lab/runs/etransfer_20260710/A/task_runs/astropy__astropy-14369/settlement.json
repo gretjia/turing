@@ -1,0 +1,50 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:global:scaffold:sha256:62e7bd7dd3aa149ad24023f96b751aa8fd00b46cfd423fff517e3c0686b1a4fa",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:aba393d42644199c12f0c6c5249b8cf1a5aeb007456ca7c62a86ed970f271997",
+    "price_signal_hash": "sha256:f8cd4052628bbe258e3edb53cfd4647d96ba237b0c5eeec12fc48e5aba69f8ab",
+    "route_id": "astropy__astropy-14369::armB::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "glm",
+      "live_split_verdict": null,
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armB",
+        "error_body_sha256": "sha256:dfbab7a60201ec8d837a73bdd9d81ecf403f9cdf26f7a18005cd0300b377aea4",
+        "http_status": 503,
+        "instance_id": "astropy__astropy-14369",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "API_ERROR"
+      },
+      "worker_result_status": "API_ERROR"
+    }
+  ],
+  "domain_bucket": "global",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "astropy__astropy-14369",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armB",
+  "selected_lineage": "glm",
+  "selected_route_id": "astropy__astropy-14369::armB::glm",
+  "task_index": 33
+}

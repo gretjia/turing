@@ -1,0 +1,15 @@
+diff --git a/django/template/engine.py b/django/template/engine.py
+index 3c8b19b5e2..7db0f8b7f4 100644
+--- a/django/template/engine.py
++++ b/django/template/engine.py
+@@ -80,7 +80,9 @@ class Engine:
+         debug = context.pop('debug', self.debug)
+         autoescape = context.pop('autoescape', self.autoescape)
+         context = Context(context, autoescape=autoescape, use_l10n=self.use_l10n, use_tz=self.use_tz)
+-        return self.template_backend.from_string(self, string).render(context)
++        template = self.template_backend.from_string(self, string)
++        template.engine = self
++        return template.render(context)
+ 
+     def get_template(self, template_name):
+         """

@@ -1,0 +1,42 @@
+diff --git a/sklearn/decomposition/_sparse_encode.py b/sklearn/decomposition/_sparse_encode.py
+index f6d4e0a..45e8c2f 100644
+--- a/sklearn/decomposition/_sparse_encode.py
++++ b/sklearn/decomposition/_sparse_encode.py
+@@ -405,6 +405,7 @@ class SparseCoder(BaseEstimator, TransformerMixin):
+         self.transform_algorithm = transform_algorithm
+         self.transform_n_nonzero_coefs = transform_n_nonzero_coefs
+         self.transform_alpha = transform_alpha
++        self.transform_max_iter = transform_max_iter
+         self.split_sign = split_sign
+         self.n_jobs = n_jobs
+         self.random_state = random_state
+@@ -418,6 +419,7 @@ class SparseCoder(BaseEstimator, TransformerMixin):
+         transform_algorithm='omp',
+         transform_n_nonzero_coefs=None,
+         transform_alpha=None,
++        transform_max_iter=1000,
+         split_sign=False,
+         n_jobs=1,
+         random_state=None,
+@@ -795,7 +797,7 @@ def sparse_encode(X, dictionary, *, cov=None, alpha=1.0, n_jobs=None,
+     transform_alpha=alpha,
+     transform_n_nonzero_coefs=n_nonzero_coefs,
+     transform_algorithm=transform_algorithm,
+-    transform_max_iter=1000,
++    transform_max_iter=transform_max_iter if transform_max_iter is not None else 1000,
+     split_sign=split_sign,
+     n_jobs=n_jobs,
+     random_state=random_state,
+diff --git a/sklearn/decomposition/_dict_learning.py b/sklearn/decomposition/_dict_learning.py
+index 7f5b5d2..8e5a6f3 100644
+--- a/sklearn/decomposition/_dict_learning.py
++++ b/sklearn/decomposition/_dict_learning.py
+@@ -687,7 +687,7 @@ def sparse_encode(X, dictionary, *, alpha=1.0, n_jobs=None,
+                  transform_alpha=alpha,
+                  transform_n_nonzero_coefs=n_nonzero_coefs,
+                  transform_algorithm=transform_algorithm,
+-                 transform_max_iter=1000,
++                 transform_max_iter=transform_max_iter if transform_max_iter is not None else 1000,
+                  split_sign=split_sign,
+                  n_jobs=n_jobs,
+                  random_state=random_state,

@@ -1,0 +1,13 @@
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 7600e4133e..2711a51a09 100644
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -124,7 +124,7 @@ def model_to_dict(instance, fields=None):
+         if f.name in exclude:
+             continue
+         # Skip fields that weren't included in the fields argument.
+-        if fields and f.name not in fields:
++        if fields is not None and f.name not in fields:
+             continue
+         ret[f.name] = getattr(instance, f.name)
+     return ret

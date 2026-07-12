@@ -1,0 +1,207 @@
+diff --git a/sphinx/util/docstrings.py b/sphinx/util/docstrings.py
+index 15d67200f..22c52010c 100644
+--- a/sphinx/util/docstrings.py
++++ b/sphinx/util/docstrings.py
+@@ -137,7 +137,7 @@ def parse_python_signature(signature: str, env: BuildEnvironment,
+                 # Handle positional only arguments
+                 if arg == '/':
+                     posonly = True
+-                    continue
++                    continue
+                 # Handle keyword only arguments
+                 if arg == '*':
+                     kwonly = True
+@@ -154,7 +154,7 @@ def parse_python_signature(signature: str, env: BuildEnvironment,
+                             if posonly:
+                                 if arg == '/':
+                                     # This is a positional only delimiter
+-                                    continue
++                                    continue
+                                 # Handle default values
+                                 if arg.startswith('*') and not arg.startswith('**'):
+                                     # Handle *args case
+@@ -162,12 +162,12 @@ def parse_python_signature(signature: str, env: BuildEnvironment,
+                                 default = None
+                                 if '=' in arg:
+                                     # Handle default value
+-                                    default = arg.split('=', 1)[1]
+-                                    arg = arg.split('=', 1)[0]
++                                    default = arg.split('=', 1)[1]
++                                    arg = arg.split('=', 1)[0]
+                                 if arg.startswith('**'):
+                                     # Handle **kwargs case
+                                     arg = arg[2:]
+                                 elif arg.startswith('*'):
+                                     # Handle *args case
+                                     arg = arg[1:]
+                                 else:
+                                     # Regular argument
+-                                    arg = arg.strip()
++                                    arg = arg.strip()
+                                 if kwonly and arg == '/':
+                                     # This is a positional only delimiter
+                                     continue
+                                 if posonly:
+                                     posonly_args.append(arg)
+                                 elif kwonly:
+                                     kwonly_args.append(arg)
+                                 else:
+                                     args.append(arg)
+                                 if default is not None:
+                                     if posonly:
+                                         posonly_defaults[arg] = default
+                                     elif kwonly:
+                                         kwonly_defaults[arg] = default
+                                     else:
+                                         defaults[arg] = default
+                             else:
+                                 # Handle default values for keyword only arguments
+                                 if arg.startswith('*') and not arg.startswith('**'):
+                                     # Handle *args case
+                                     arg = arg[1:]
+                                 else:
+                                     # Handle regular arguments
+                                     arg = arg.strip()
+                                 if arg != '*':
+                                     args.append(arg)
+                                 if '=' in arg:
+                                     default = arg.split('=', 1)[1]
+                                     arg = arg.split('=', 1)[0]
+                                     if kwonly:
+                                         kwonly_defaults[arg] = default
+                                     else:
+                                         defaults[arg] = default
+                         elif arg.startswith('**'):
+                             # Handle **kwargs
+                             arg = arg[2:]
+                             args.append(arg)
+                             if '=' in arg:
+                                 default = arg.split('=', 1)[1]
+                                 arg = arg.split('=', 1)[0]
+                                 defaults[arg] = default
+                         elif arg.startswith('*'):
+                             # Handle *args
+                             arg = arg[1:]
+                             args.append(arg)
+                             if '=' in arg:
+                                 default = arg.split('=', 1)[1]
+                                 arg = arg.split('=', 1)[0]
+                                 defaults[arg] = default
+                         elif arg == '/':
+                             # Handle positional only delimiter
+                             continue
+                         elif arg != '*':
+                             args.append(arg)
+                             if '=' in arg:
+                                 default = arg.split('=', 1)[1]
+                                 arg = arg.split('=', 1)[0]
+                                 defaults[arg] = default
+                 else:
+                     # Handle regular function arguments
+                     if not arg.startswith('*'):
+                         # Handle regular arguments
+                         if arg != '*':
+                             args.append(arg)
+                         if '=' in arg:
+                             default = arg.split('=', 1)[1]
+                             arg = arg.split('=', 1)[0]
+                             defaults[arg] = default
+                     else:
+                         if arg.startswith('**'):
+                             # Handle **kwargs
+                             arg = arg[2:]
+                             args.append(arg)
+                             if '=' in arg:
+                                 default = arg.split('=', 1)[1]
+                                 arg = arg.split('=', 1)[0]
+                                 defaults[arg] = default
+                         elif arg.startswith('*'):
+                             # Handle *args
+                             arg = arg[1:]
+                             args.append(arg)
+                             if '=' in arg:
+                                 default = arg.split('=', 1)[1]
+                                 arg = arg.split('=', 1)[0]
+                                 defaults[arg] = default
+                         else:
+                             # Handle argument separator
+                             pass
+         # Return the extracted information
+         return {
+             'args': args,
+             'posonly_args': posonly_args,
+             'kwonly_args': kwonly_args,
+             'defaults': defaults,
+             'posonly_defaults': posonly_defaults,
+             'kwonly_defaults': kwonly_defaults,
+             'returns': returns,
+             'raises': raises,
+         }
+diff --git a/sphinx/util/docstrings.py b/sphinx/util/docstrings.py
+index 15d67200f..22c52010c 100644
+--- a/sphinx/util/docstrings.py
++++ b/sphinx/util/docstrings.py
+@@ -163,19 +163,20 @@ def parse_python_signature(signature: str, env: BuildEnvironment,
+                                 else:
+                                     # Regular argument
+                                     arg = arg.strip()
+-                                if kwonly and arg == '/':
+-                                    # This is a positional only delimiter
+-                                    continue
+                                 if posonly:
+                                     posonly_args.append(arg)
+                                 elif kwonly:
+                                     kwonly_args.append(arg)
+                                 else:
+                                     args.append(arg)
++                                if arg == '/':
++                                    # This is a positional only delimiter
++                                    continue
+                                 if default is not None:
+                                     if posonly:
+                                         posonly_defaults[arg] = default
+                                     elif kwonly:
+                                         kwonly_defaults[arg] = default
+                                     else:
+                                         defaults[arg] = default
+                     else:
+                         # Handle default values for keyword only arguments
+                         if arg.startswith('*') and not arg.startswith('**'):
+                             # Handle *args case
+                             arg = arg[1:]
+                         else:
+                             # Handle regular arguments
+                             arg = arg.strip()
+                         if arg != '*':
+                             args.append(arg)
+                         if '=' in arg:
+                             default = arg.split('=', 1)[1]
+                             arg = arg.split('=', 1)[0]
+                             if kwonly:
+                                 kwonly_defaults[arg] = default
+                             else:
+                                 defaults[arg] = default
+diff --git a/sphinx/util/docstrings.py b/sphinx/util/docstrings.py
+index 22c52010c..39622e21c 100644
+--- a/sphinx/util/docstrings.py
++++ b/sphinx/util/docstrings.py
+@@ -172,8 +172,10 @@ def parse_python_signature(signature: str, env: BuildEnvironment,
+                         if '=' in arg:
+                             default = arg.split('=', 1)[1]
+                             arg = arg.split('=', 1)[0]
++                        if arg == '/':
++                            # This is a positional only delimiter
++                            continue
+                         if posonly:
+                             posonly_args.append(arg)
+                         elif kwonly:
+                             kwonly_args.append(arg)
+                         else:
+                             args.append(arg)
+                         if default is not None:
+                             if posonly:
+                                 posonly_defaults[arg] = default
+                             elif kwonly:
+                                 kwonly_defaults[arg] = default
+                             else:
+                                 defaults[arg] = default

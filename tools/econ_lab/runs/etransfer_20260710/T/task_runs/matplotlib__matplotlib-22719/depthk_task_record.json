@@ -1,0 +1,427 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:6620e3720950441daaa6a840bdc56eb7b14bb8779f47b0bb742c85ff585cad33",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:7ee0b328c7a14ea6499e3d195960c2cbcb76f305c26e22b2e4aecfd6e37b7da1"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:6c171a9eaa21bbf6548358708af07f1d5ca6d5794209324ac48e558d4292fbf1",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:678c61e66d875c30b92610b4ecc3ee688e54077b6f30570ed1fbf0ba9d566702"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:8b9b53c3f1518704bbed87e925bf17f7698bc078562aafaf9c6ed7d7189f1608",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:d5e1a80938972ca48d358f89915999d48faacf625891d16f3050854cbf3c4298"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armC",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "matplotlib__matplotlib-22719",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "lib/matplotlib/tests/test_category.py::TestPlotBytes::test_plot_bytes[bytes",
+      "lib/matplotlib/tests/test_category.py::TestPlotNumlike::test_plot_numlike[bytes",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_exception[missing-bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_update_exception[missing-scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_update_exception[mixed-bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_update_exception[string",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_unicode[plot]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_unicode[scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_xaxis[scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_xyaxis[bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_xyaxis[plot]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_yaxis[bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_yaxis[scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_update_plot[plot]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_update_plot[scatter]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_axisinfo",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert[ascii]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert[integer",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert[single]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert_fail[mixed]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert_float_array",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert_one_number",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert_one_string[unicode]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_default_units",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatterPlot[bar-ascii]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatterPlot[plot-ascii]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatterPlot[scatter-ascii]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatterPlot[scatter-unicode]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatter[unicode]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryLocator::test_StrCategoryLocator",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryLocator::test_StrCategoryLocatorPlot[scatter]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_non_string_fails[single]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_non_string_fails[unicode]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_non_string_update_fails[single]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_non_string_update_fails[unicode]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_unit[single]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_unit[unicode]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_update",
+      "lib/matplotlib/tests/test_category.py::test_no_deprecation_on_empty_data"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 30,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "lib/matplotlib/tests/test_category.py::TestPlotBytes::test_plot_bytes[string",
+      "lib/matplotlib/tests/test_category.py::TestPlotNumlike::test_plot_numlike[string",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_exception[missing-scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_exception[mixed-bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_exception[mixed-scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_exception[number",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_exception[string",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_update_exception[missing-bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_update_exception[mixed-scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_mixed_type_update_exception[number",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_unicode[bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_xaxis[bar]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_xaxis[plot]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_xyaxis[scatter]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_plot_yaxis[plot]",
+      "lib/matplotlib/tests/test_category.py::TestPlotTypes::test_update_plot[bar]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert[single",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert[unicode]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert_fail[string",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryConverter::test_convert_one_string[ascii]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatterPlot[bar-unicode]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatterPlot[plot-unicode]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryFormatter::test_StrCategoryFormatter[ascii]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryLocator::test_StrCategoryLocatorPlot[bar]",
+      "lib/matplotlib/tests/test_category.py::TestStrCategoryLocator::test_StrCategoryLocatorPlot[plot]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_non_string_fails[mixed]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_non_string_update_fails[mixed]",
+      "lib/matplotlib/tests/test_category.py::TestUnitData::test_unit[mixed]",
+      "lib/matplotlib/tests/test_category.py::test_hist",
+      "lib/matplotlib/tests/test_category.py::test_overriding_units_in_plot[png]"
+    ],
+    "verify_total_count": 30,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 6,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3783661665",
+      "s": 5,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 4,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3865470566",
+      "s": 4,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 5,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3221225472",
+      "s": 4,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 5,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3698444060",
+      "s": 4,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 3,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3758096384",
+      "s": 3,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:self_check": {
+      "n": 4,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3006477107",
+      "s": 3,
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/matplotlib__matplotlib-22719/deepseek/wp9a-live-driver.wp9a-live-driver-matplotlib__matplotlib-22719-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:36641e784cccfebe5eb5d561e740f25527df53fbe7ad5259939b980905977f05",
+        "price_signal_hash": "sha256:a923c90e4a227ba0f866515ddaa04b7adc0360ba80697636310c23538c786891",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3006477107",
+          "s": 3,
+          "s_q32": "12884901888",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3400182442",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3758096384",
+          "s": 3,
+          "s_q32": "12884901888",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2720145954",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3698444060",
+          "s": 4,
+          "s_q32": "20043180714",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:969bf459dc9390cdf801a7575635ae9dd406f22fa1e4e27a5f771e8646f32310",
+        "price_signal_hash": "sha256:a923c90e4a227ba0f866515ddaa04b7adc0360ba80697636310c23538c786891",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3006477107",
+          "s": 3,
+          "s_q32": "12884901888",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3400182442",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3758096384",
+          "s": 3,
+          "s_q32": "12884901888",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2720145954",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3698444060",
+          "s": 4,
+          "s_q32": "20043180714",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:06b4812d024d775fb0ed8a81cc25355e827aa8b0bd9da2ab1fae364a42082920",
+        "price_signal_hash": "sha256:a923c90e4a227ba0f866515ddaa04b7adc0360ba80697636310c23538c786891",
+        "route_id": "self_check",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3006477107",
+          "s": 3,
+          "s_q32": "12884901888",
+          "scaffold_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3400182442",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 3,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3758096384",
+          "s": 3,
+          "s_q32": "12884901888",
+          "scaffold_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 2,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2147483648",
+          "s": 1,
+          "s_q32": "4294967296",
+          "scaffold_id": "stage:sha256:b7e224aa2b94c0e78b409e28eab5da65084fcb3255398d2a07555e3c45ed45ac"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 4,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2720145954",
+          "s": 2,
+          "s_q32": "11453246122",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 5,
+          "p_q32": "2147483648",
+          "q_eff_q32": "3698444060",
+          "s": 4,
+          "s_q32": "20043180714",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "self_check",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:04a550ce525d16c46f43147c09d8b5bb33b83655319e3e39b2e5c96f942d9869"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "self_check"
+  },
+  "task_index": 7,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/matplotlib__matplotlib-22719/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

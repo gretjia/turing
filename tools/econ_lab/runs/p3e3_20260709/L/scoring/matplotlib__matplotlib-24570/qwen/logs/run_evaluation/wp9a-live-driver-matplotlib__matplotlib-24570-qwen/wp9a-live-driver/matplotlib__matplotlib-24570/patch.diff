@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index c32516042d..56522525a4 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1085,7 +1085,7 @@ class HPacker(Packer):
+         # This is the inverse of the normal case for VPacker
+         # since we are aligning horizontally
+         if self.align == "top":
+-            return [0] * len(self.children)
++            return [1] * len(self.children)
+         elif self.align == "bottom":
+-            return [1] * len(self.children)
++            return [0] * len(self.children)
+         else:
+             return [0.5] * len(self.children)

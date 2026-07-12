@@ -1,0 +1,41 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index 8f2e1d9c9d..fafed9f4c7 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -576,6 +576,14 @@ class SkyCoord(ShapedLikeNDArray):
+         """
+         Overrides getattr to return coordinates that this can be transformed
+         to, based on the alias attr in the primary transform graph.
++
++        First, check if the attribute is defined on the class or any parent
++        class (e.g. via a @property) using the descriptor protocol. If it is,
++        then we should *not* attempt any fallback behavior: instead, we let
++        the normal attribute lookup proceed, so that any error raised by the
++        descriptor (e.g. from accessing a non-existent attribute inside a
++        property) is not caught and replaced with a misleading message.
++        See https://github.com/astropy/astropy/issues/14096.
+         """
+         if "_sky_coord_frame" in self.__dict__:
+             if self._is_name(attr):
+@@ -599,6 +607,20 @@ class SkyCoord(ShapedLikeNDArray):
+             if frame_cls is not None and self.frame.is_transformable_to(frame_cls):
+                 return self.transform_to(attr)
+ 
++        # Before failing, check if the attribute is defined via the normal
++        # descriptor protocol on any class in the MRO. If so, we should not
++        # raise an AttributeError here because the real error is something
++        # else (e.g. an attribute access inside a property). Let the normal
++        # __getattr__ fallback happen, which will re-raise the original error.
++        if not attr.startswith('_') and hasattr(self.__class__, attr):
++            # The attribute exists on the class (e.g. as a @property), so
++            # we should not intercept the AttributeError. Instead, fall
++            # through to the default behavior which will raise the
++            # original error from the property lookup.
++            # This is done by raising AttributeError with the original
++            # attribute name so that Python's descriptor protocol can
++            # re-raise the correct error.
++            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
++
+         # Fail
+         raise AttributeError(
+             f"'{self.__class__.__name__}' object has no attribute '{attr}'"

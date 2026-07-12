@@ -1,0 +1,48 @@
+diff --git a/django/contrib/auth/validators.py b/django/contrib/auth/validators.py
+index 2111301182..a0110958ea 100644
+--- a/django/contrib/auth/validators.py
++++ b/django/contrib/auth/validators.py
+@@ -1,6 +1,6 @@
+ import re
+ from django.core.exceptions import ValidationError
+-from django.core.validators import RegexValidator
++from django.core.validators import RegexValidator
+ from django.utils.translation import gettext_lazy as _
+ 
+ # These validators are copied from the Django 1.0 release.
+@@ -10,7 +10,7 @@ class ASCIIUsernameValidator(RegexValidator):
+     def __init__(self):
+         super().__init__(
+             regex=r'^[\w.@+-]+$',
+-            message=_(
++            message=_(
+                 'Enter a valid username. This value may contain only English '
+                 'letters, numbers, and @/./+/-/_ characters.'
+             ),
+@@ -21,7 +21,7 @@ class UnicodeUsernameValidator(RegexValidator):
+     def __init__(self):
+         super().__init__(
+             regex=r'^[\w.@+-]+$',
+-            message=_(
++            message=_(
+                 'Enter a valid username. This value may contain only letters, '
+                 'numbers, and @/./+/-/_ characters.'
+             ),
+@@ -31,7 +31,7 @@ class UnicodeUsernameValidator(RegexValidator):
+ 
+ # For backwards compatibility
+ ASCIIUsernameValidator = ASCIIUsernameValidator()
+-VALID_USERNAME_REGEX = r'^[\w.@+-]+$'
++VALID_USERNAME_REGEX = r'\A[\w.@+-]+\Z'
+ 
+ # This is a validator function that can be used in forms or other places.
+ # It's private because it doesn't use the validator class architecture.
+@@ -41,7 +41,7 @@ def validate_username(username):
+     """
+     # This is a validator function that can be used in forms or other places.
+     # It's private because it doesn't use the validator class architecture.
+-    return RegexValidator(regex=r'^[\w.@+-]+$')(username)
++    return RegexValidator(regex=r'\A[\w.@+-]+\Z')(username)
+ 
+ # Backwards compatibility
+ username_validator = validate_username

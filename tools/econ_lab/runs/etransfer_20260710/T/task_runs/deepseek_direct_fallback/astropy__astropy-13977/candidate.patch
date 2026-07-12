@@ -1,0 +1,23 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index 4eef85d..2f9127e 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -609,9 +609,15 @@ class Quantity:
+                 converter = None
+             else:
+                 try:
+-                    converter = (can_have_arbitrary_unit
+-                                 and input_.unit.to(converter_unit))
+-                    if converter:
++                    if can_have_arbitrary_unit:
++                        # input_ is something with a .unit attribute
++                        converter = input_.unit.to(converter_unit)
++                        if converter:
++                            converter = lambda val: converter * _condition_arg(val)
++                    else:
++                        # input_ is expected to be dimensionless/plain array-like
++                        input_ = _condition_arg(input_)
++                        if not isinstance(input_, (np.ndarray, float, int, complex, np.void)):
+                         converter = lambda val: converter * _condition_arg(val)
+                 except Exception:
+                     converter = False

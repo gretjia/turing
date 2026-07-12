@@ -1,0 +1,16 @@
+{
+  "diagnostic": {
+    "decision3_legal_reassert": "PASS",
+    "digest": "sha256:339c47d15e66fbbd4890fa935e1a7821fadb889968eb7b5351e29de8407552ac",
+    "facts": {
+      "fact_class": "BARE_TERMINATION",
+      "phase": "dispatch",
+      "reason_class": "ERROR"
+    },
+    "rule_id": "TERMINATION_WITHOUT_VERIFIER_EVIDENCE",
+    "text": "Termination without verifier evidence: the trajectory ended (reason: ERROR) in phase 'dispatch' without any prior verification result. A termination must carry verifier evidence; do not end without it."
+  },
+  "evidence_class": "SMOKE_FIXTURE",
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.diagnostic_injection",
+  "source": "monitor.interventions.build_diagnostic over the step-1 trip (same production function live_driver.py's --monitor hook calls; this is the exact text that would be prepended to the NEXT dispatch's worker-visible capsule, per dispatch_via_siliconflow's own '## Prior-step diagnostic' wiring)"
+}

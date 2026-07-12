@@ -6,7 +6,22 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use turing_contracts::identity::MicroOid;
+
+/// WP3 (design doc R1.1 §7; ADR-ECON-003 Decisions 1/3/4/6): `(Q, N, P)` tape fold, τ(N)
+/// annealing, N_eff floor arbitration hook. See module docs for scope.
+pub mod routing_fold;
+
+/// WP5 (design doc R1.1 §7; ADR-ECON-003 Decision 3): N_eff / H_lineage measurement --
+/// the always-on monoculture guardrail *input* that feeds `routing_fold`'s existing floor
+/// arbitration hook. See module docs for scope.
+pub mod diversity_metrics;
+
+/// WP-H4 (ADR-ECON-007 Decision 2 "检测器信号与经济奖励解耦"): the deterministic
+/// `RouteFuseTripped` pause mask -- a pure candidate-set filter that never touches
+/// `routing_fold`'s `(Q, N, P)` state. See module docs for scope.
+pub mod route_pause_mask;
 
 const SCALE: i128 = 1_000_000_000;
 
@@ -25,6 +40,32 @@ pub enum EconomyEvent {
     /// when aggregating, falling back to the literal `agent_id` when no declaration exists
     /// (back-compat with every pre-ADR-ECON-001 fixture/call site).
     PrincipalDeclared(PrincipalDeclared),
+    /// WP4 (design doc R1.1 §7 WP4/§4 G3; ADR-ECON-003 Decision 2/6): the independent
+    /// verifier's (structurally separate from the ∏p accept predicate, per Decision 2)
+    /// PASS/FAIL verdict on one routed scaffold attempt, additive and PRESERVE-class,
+    /// following the same `ADDITIVE_AGENT_ECONOMY_V1_0` registry pattern as
+    /// `PrincipalDeclared` above. Consumed only by `routing_fold::fold_routing_state`
+    /// (via [`routing_fold::economy_events_to_routing_fold_events`]) to update a node's
+    /// `(Q, N, P)` state; never moves `accepted_head`.
+    RoutingPriorUpdated(RoutingPriorUpdated),
+    /// WP4: an exact after-the-fact reversal of one earlier `RoutingPriorUpdated`
+    /// (ADR-ECON-003 Decision 6.3 "clawback"), referenced by that event's own `event_hash`.
+    /// Additive, PRESERVE-class, same registry pattern.
+    RoutingPriorClawback(RoutingPriorClawback),
+    /// WP-H4 (ADR-ECON-007 Decision 2 "检测器信号与经济奖励解耦"): a rule-based, external
+    /// loop detector's fuse trip on one routed candidate. Additive, PRESERVE-class, follows
+    /// the same `ADDITIVE_AGENT_ECONOMY_V1_0` registry pattern as `PrincipalDeclared` above
+    /// (Decision 2: "检测器熔断不写 Q"). Consumed only by
+    /// `route_pause_mask::economy_events_to_route_fuse_trips` to compute a deterministic
+    /// pause mask over `MarketRouter`'s candidate set; never folded into
+    /// `routing_fold::NodeState` and never moves `accepted_head`.
+    RouteFuseTripped(RouteFuseTripped),
+    /// WP-H4 (ADR-ECON-007 Decision 4 "验证前置终止与路线证伪报告"): the structured,
+    /// verifier-evidence-carrying report a legal route abandonment must produce (a bare
+    /// error-out is illegal per Decision 4). Additive, PRESERVE-class, `proposal_only` --
+    /// flows to the GRILL-ME layer for human/facilitator follow-up and never advances any
+    /// accepted_head, same registry pattern as `PrincipalDeclared` above.
+    RouteFalsified(RouteFalsified),
 }
 
 impl EconomyEvent {
@@ -135,6 +176,239 @@ impl EconomyEvent {
             agent_id: agent_id.into(),
         })
     }
+
+    /// WP4 (design doc R1.1 §7 WP4; ADR-ECON-003 Decision 2/6): construct an independent
+    /// verifier's verdict event on one `(route_domain, route_scaffold)` routing key. Additive,
+    /// PRESERVE-class, follows the `principal_declared` constructor's ADDITIVE_AGENT_ECONOMY_V1_0
+    /// pattern above.
+    ///
+    /// `verdict_source_id` identifies which independent verifier instance produced the
+    /// verdict (ADR-ECON-003 Decision 2.2: a structurally separate crate/binary from the
+    /// ∏p accept predicate) -- opaque to this constructor, carries no formula/threshold value.
+    /// `verifier_attestation_hash` must already be a `sha256:`-prefixed 64-hex digest (same
+    /// format as `price_signal_hash`/`pput_prior_hash` above).
+    ///
+    /// `event_hash` is *derived*, not caller-supplied: a JCS-SHA256 digest over the event's
+    /// own identity fields (Art 0.2 determinism -- the same five inputs always fold to the
+    /// same `event_hash`, so a `RoutingPriorClawback` can reference it exactly and
+    /// `routing_fold::fold_routing_state`'s duplicate-hash dedup is meaningful).
+    pub fn routing_prior_updated(
+        route_domain: impl Into<String>,
+        route_scaffold: impl Into<String>,
+        verdict: bool,
+        verdict_source_id: impl Into<String>,
+        verifier_attestation_hash: impl Into<String>,
+    ) -> Result<Self, EconomyError> {
+        let route_domain = route_domain.into();
+        let route_scaffold = route_scaffold.into();
+        let verdict_source_id = verdict_source_id.into();
+        let verifier_attestation_hash = verifier_attestation_hash.into();
+        validate_digest(&verifier_attestation_hash)?;
+
+        let event_hash = routing_prior_event_hash(
+            &route_domain,
+            &route_scaffold,
+            verdict,
+            &verdict_source_id,
+            &verifier_attestation_hash,
+            None, // binary mode (ADR-ECON-006 default)
+        )?;
+
+        Ok(EconomyEvent::RoutingPriorUpdated(RoutingPriorUpdated {
+            schema_id: "routing_prior_updated.v1".to_string(),
+            event_type: "RoutingPriorUpdated".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_domain,
+            route_scaffold,
+            verdict,
+            // Binary mode: field absent (None) so pre-006 readers and event_hash stay
+            // byte-identical to the ADR-ECON-003 Decision 6 wire shape.
+            verdict_fraction_q32: None,
+            verdict_source_id,
+            verifier_attestation_hash,
+            event_hash,
+        }))
+    }
+
+    /// ADR-ECON-006 fractional verify reward: same as [`Self::routing_prior_updated`] but
+    /// carries `verdict_fraction_q32` (Q32.32 mantissa as decimal string) and uses schema
+    /// `routing_prior_updated.v2`. `verdict_fraction_q32` must be in `[0, Q32_ONE]`.
+    pub fn routing_prior_updated_fractional(
+        route_domain: impl Into<String>,
+        route_scaffold: impl Into<String>,
+        verdict: bool,
+        verdict_fraction_q32: i128,
+        verdict_source_id: impl Into<String>,
+        verifier_attestation_hash: impl Into<String>,
+    ) -> Result<Self, EconomyError> {
+        use crate::routing_fold::Q32_ONE;
+        if !(0..=Q32_ONE).contains(&verdict_fraction_q32) {
+            return Err(EconomyError::RoutingFoldFractionOutOfRange);
+        }
+        let route_domain = route_domain.into();
+        let route_scaffold = route_scaffold.into();
+        let verdict_source_id = verdict_source_id.into();
+        let verifier_attestation_hash = verifier_attestation_hash.into();
+        validate_digest(&verifier_attestation_hash)?;
+        let fraction_str = verdict_fraction_q32.to_string();
+
+        let event_hash = routing_prior_event_hash(
+            &route_domain,
+            &route_scaffold,
+            verdict,
+            &verdict_source_id,
+            &verifier_attestation_hash,
+            Some(fraction_str.as_str()),
+        )?;
+
+        Ok(EconomyEvent::RoutingPriorUpdated(RoutingPriorUpdated {
+            schema_id: "routing_prior_updated.v2".to_string(),
+            event_type: "RoutingPriorUpdated".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_domain,
+            route_scaffold,
+            verdict,
+            verdict_fraction_q32: Some(fraction_str),
+            verdict_source_id,
+            verifier_attestation_hash,
+            event_hash,
+        }))
+    }
+
+    /// WP4 (ADR-ECON-003 Decision 6.3): an exact inverse of one earlier
+    /// `RoutingPriorUpdated`, referenced by that event's own `event_hash` (as produced by
+    /// [`Self::routing_prior_updated`]). Additive, PRESERVE-class. Validity of the
+    /// reference (must exist, must not already be clawed back) is enforced downstream by
+    /// `routing_fold::fold_routing_state`, not here -- this constructor only shapes the
+    /// event.
+    pub fn routing_prior_clawback(updated_event_hash: impl Into<String>) -> Result<Self, EconomyError> {
+        let updated_event_hash = updated_event_hash.into();
+        validate_digest(&updated_event_hash)?;
+        Ok(EconomyEvent::RoutingPriorClawback(RoutingPriorClawback {
+            schema_id: "routing_prior_clawback.v1".to_string(),
+            event_type: "RoutingPriorClawback".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            updated_event_hash,
+        }))
+    }
+
+    /// WP-H4 (ADR-ECON-007 Decision 2): construct a rule-based loop detector's fuse trip on
+    /// one routed candidate. Additive, PRESERVE-class, follows the `principal_declared`
+    /// constructor's `ADDITIVE_AGENT_ECONOMY_V1_0` pattern above.
+    ///
+    /// `route_domain`/`route_scaffold` name the exact `(domain_bucket, scaffold_id)` fold key
+    /// this trip pauses (same field-naming convention as `RoutingPriorUpdated.route_domain`/
+    /// `route_scaffold` above -- for the route stage, `route_scaffold` is the fully-encoded
+    /// `stage_option_id(STAGE_ROUTE, route_id)` value, i.e. exactly what a
+    /// `route_pause_mask::RouteFuseTripFoldEvent.key` and a `CandidateRoute`'s market-key
+    /// mapping both resolve to).
+    ///
+    /// `detector_rule_id` identifies which rule tripped (opaque to this constructor, carries
+    /// no threshold *value* -- ADR-ECON-007 Decision 3: the detector's existence is A-zone,
+    /// its threshold values are B-zone and never echoed here). `diagnostic_digest` must
+    /// already be a `sha256:`-prefixed 64-hex digest (same format as
+    /// `verifier_attestation_hash` above) -- the raw diagnostic facts live off-tape; this
+    /// event carries only their digest, so no B-zone value can leak through this event's own
+    /// fields (Decision 3's "诊断只说检测到循环,不说数值" discipline extended to the tape
+    /// itself, not just the agent-visible message).
+    ///
+    /// `event_ordinal` is the trip's caller-supplied logical-clock position (see
+    /// `route_pause_mask`'s module doc "Known spec gap" note) that
+    /// `route_pause_mask::compute_route_pause_mask` folds against the caller's
+    /// `RoutePauseConfig::validity_window`.
+    pub fn route_fuse_tripped(
+        route_domain: impl Into<String>,
+        route_scaffold: impl Into<String>,
+        detector_rule_id: impl Into<String>,
+        diagnostic_digest: impl Into<String>,
+        event_ordinal: u64,
+    ) -> Result<Self, EconomyError> {
+        let diagnostic_digest = diagnostic_digest.into();
+        validate_digest(&diagnostic_digest)?;
+        Ok(EconomyEvent::RouteFuseTripped(RouteFuseTripped {
+            schema_id: "route_fuse_tripped.v1".to_string(),
+            event_type: "RouteFuseTripped".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_domain: route_domain.into(),
+            route_scaffold: route_scaffold.into(),
+            detector_rule_id: detector_rule_id.into(),
+            diagnostic_digest,
+            event_ordinal,
+        }))
+    }
+
+    /// WP-H4 (ADR-ECON-007 Decision 4 "验证前置终止与路线证伪报告"): construct the
+    /// structured report a legal route abandonment must produce. Field set is exactly
+    /// Decision 4's pinned shape: `{route_id, attempts, verifier_evidence[],
+    /// detector_events[], remaining_candidates[], recommendation}`. Additive, PRESERVE-class,
+    /// `proposal_only` (Decision 4: "报告是 proposal_only,不推进任何 accepted_head") --
+    /// infallible (every field is an opaque caller-supplied string/count, nothing here is
+    /// validated against a digest format), unlike the other WP-H4 constructor above.
+    #[must_use]
+    pub fn route_falsified(
+        route_id: impl Into<String>,
+        attempts: u64,
+        verifier_evidence: Vec<String>,
+        detector_events: Vec<String>,
+        remaining_candidates: Vec<String>,
+        recommendation: impl Into<String>,
+    ) -> Self {
+        EconomyEvent::RouteFalsified(RouteFalsified {
+            schema_id: "route_falsified.v1".to_string(),
+            event_type: "RouteFalsified".to_string(),
+            head_effect: "PRESERVE".to_string(),
+            route_id: route_id.into(),
+            attempts,
+            verifier_evidence,
+            detector_events,
+            remaining_candidates,
+            recommendation: recommendation.into(),
+            proposal_only: true,
+        })
+    }
+}
+
+/// `event_hash` for a `RoutingPriorUpdated` event (ADR-ECON-003 Decision 6.3 dedup key +
+/// ADR-ECON-006): JCS-canonicalize the event's own identity fields and SHA-256 them.
+/// Pure function of its arguments only (Art 0.2).
+///
+/// - Binary mode (`verdict_fraction_q32 = None`): identity schema v1 — **byte-identical**
+///   to the pre-006 five-field digest so old events keep their hashes.
+/// - Fractional mode (`Some(frac)`): identity schema v2 includes the fraction string so
+///   clawback can reverse the exact reward that was applied.
+pub(crate) fn routing_prior_event_hash(
+    route_domain: &str,
+    route_scaffold: &str,
+    verdict: bool,
+    verdict_source_id: &str,
+    verifier_attestation_hash: &str,
+    verdict_fraction_q32: Option<&str>,
+) -> Result<String, EconomyError> {
+    let value = match verdict_fraction_q32 {
+        None => serde_json::json!({
+            "schema": "routing_prior_updated_identity.v1",
+            "route_domain": route_domain,
+            "route_scaffold": route_scaffold,
+            "verdict": verdict,
+            "verdict_source_id": verdict_source_id,
+            "verifier_attestation_hash": verifier_attestation_hash,
+        }),
+        Some(frac) => serde_json::json!({
+            "schema": "routing_prior_updated_identity.v2",
+            "route_domain": route_domain,
+            "route_scaffold": route_scaffold,
+            "verdict": verdict,
+            "verdict_fraction_q32": frac,
+            "verdict_source_id": verdict_source_id,
+            "verifier_attestation_hash": verifier_attestation_hash,
+        }),
+    };
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingEventIdentity(e.to_string()))?;
+    Ok(format!(
+        "sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -227,6 +501,106 @@ pub struct PrincipalDeclared {
     pub head_effect: String,
     pub principal_id: String,
     pub agent_id: String,
+}
+
+/// WP4 (design doc R1.1 §7 WP4/§4 G3; ADR-ECON-003 Decision 2/6): one independent
+/// verifier's PASS/FAIL verdict on a routed `(route_domain, route_scaffold)` attempt.
+/// Additive, PRESERVE-class -- see [`EconomyEvent::routing_prior_updated`]. Consumed by
+/// `routing_fold::economy_events_to_routing_fold_events` to feed
+/// `routing_fold::fold_routing_state` (WP3's pre-existing seam); this struct itself never
+/// carries a τ/λ/floor value (Art III.4/F4) -- only the routing key (as
+/// caller-computed opaque strings; see `routing_fold::domain_bucket`/`scaffold_id` key
+/// functions), the verdict bit, and the independent-verifier provenance.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RoutingPriorUpdated {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    /// The routed key's domain component (ADR-ECON-003 Decision 1 `domain_bucket` key
+    /// function's *output value*, carried under a non-reserved field name -- see the F4
+    /// gate's identifier-only scan surface, `tools/gates/gate_f4_econ_leakage.sh`).
+    pub route_domain: String,
+    /// The routed key's scaffold component (ADR-ECON-003 Decision 1 `scaffold_id` key
+    /// function's *output value*; same field-naming rationale as `route_domain` above).
+    pub route_scaffold: String,
+    /// Independent verifier's verdict (ADR-ECON-003 Decision 2; `true` = PASS).
+    pub verdict: bool,
+    /// ADR-ECON-006: Q32.32 verify-side pass-ratio reward as a decimal-literal string.
+    /// Absent (`None` / missing on wire) ⇒ binary fallback `v = verdict ? 1 : 0`.
+    /// Present ⇒ fractional mode; schema_id is `routing_prior_updated.v2`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub verdict_fraction_q32: Option<String>,
+    /// Identifies which independent verifier instance produced this verdict (ADR-ECON-003
+    /// Decision 2.2: structurally separate from the ∏p accept predicate). Opaque string.
+    pub verdict_source_id: String,
+    /// `sha256:`-prefixed 64-hex attestation digest from the independent verifier.
+    pub verifier_attestation_hash: String,
+    /// JCS-SHA256 identity digest over this event's own fields (see
+    /// [`EconomyEvent::routing_prior_updated`]); the dedup/reference key a later
+    /// `RoutingPriorClawback` names.
+    pub event_hash: String,
+}
+
+/// WP4 (ADR-ECON-003 Decision 6.3): exact after-the-fact reversal of one earlier
+/// `RoutingPriorUpdated`. Additive, PRESERVE-class.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RoutingPriorClawback {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    /// References the `event_hash` of the `RoutingPriorUpdated` being reversed.
+    pub updated_event_hash: String,
+}
+
+/// WP-H4 (ADR-ECON-007 Decision 2): one rule-based external loop detector's fuse trip on a
+/// routed `(route_domain, route_scaffold)` candidate. Additive, PRESERVE-class -- see
+/// [`EconomyEvent::route_fuse_tripped`]. Consumed only by
+/// `route_pause_mask::economy_events_to_route_fuse_trips`; this struct itself never carries
+/// a τ/λ/floor/detector-threshold *value* (Art III.4/F4) -- only the routing key (as
+/// caller-computed opaque strings), an opaque rule identifier, a diagnostic *digest* (never
+/// the raw diagnostic text/values themselves), and the explicit fold-ordinal input the pause
+/// mask needs.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RouteFuseTripped {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    /// The tripped route's domain-bucket component (same convention as
+    /// `RoutingPriorUpdated.route_domain`).
+    pub route_domain: String,
+    /// The tripped route's fold-key component (same convention as
+    /// `RoutingPriorUpdated.route_scaffold`; for the route stage this is the fully-encoded
+    /// `stage_option_id(STAGE_ROUTE, route_id)` value).
+    pub route_scaffold: String,
+    /// Opaque identifier of which detector rule tripped (ADR-ECON-007 Decision 3: existence
+    /// is A-zone, no threshold value is ever carried here).
+    pub detector_rule_id: String,
+    /// `sha256:`-prefixed 64-hex digest over the off-tape diagnostic facts (never the raw
+    /// facts themselves -- Decision 3's no-numeric-leak discipline extended to the tape).
+    pub diagnostic_digest: String,
+    /// Caller-supplied logical-clock position of this trip (see `route_pause_mask`'s module
+    /// doc); folded against `route_pause_mask::RoutePauseConfig::validity_window`.
+    pub event_ordinal: u64,
+}
+
+/// WP-H4 (ADR-ECON-007 Decision 4): the structured, verifier-evidence-carrying report a
+/// legal route abandonment must produce (a bare error-out is illegal per Decision 4).
+/// Additive, PRESERVE-class -- see [`EconomyEvent::route_falsified`]. `proposal_only` is
+/// always `true`: this event never advances any accepted_head; it flows to the GRILL-ME
+/// layer for human/facilitator follow-up (Decision 4: "报告是 proposal_only,不推进任何
+/// accepted_head").
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RouteFalsified {
+    pub schema_id: String,
+    pub event_type: String,
+    pub head_effect: String,
+    pub route_id: String,
+    pub attempts: u64,
+    pub verifier_evidence: Vec<String>,
+    pub detector_events: Vec<String>,
+    pub remaining_candidates: Vec<String>,
+    pub recommendation: String,
+    pub proposal_only: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -430,7 +804,18 @@ impl MarketReplay {
                 }
                 EconomyEvent::PositionMinted(_)
                 | EconomyEvent::RewardDistributed(_)
-                | EconomyEvent::PrincipalDeclared(_) => {}
+                | EconomyEvent::PrincipalDeclared(_)
+                // WP4: independent-verifier routing-prior events are not market state
+                // (no market_id, no coin flow) -- they only feed `routing_fold`'s (Q, N, P)
+                // fold, a separate projection entirely.
+                | EconomyEvent::RoutingPriorUpdated(_)
+                | EconomyEvent::RoutingPriorClawback(_)
+                // WP-H4: RouteFuseTripped/RouteFalsified are likewise not market state (no
+                // market_id, no coin flow) -- the fuse trip only feeds
+                // `route_pause_mask`'s candidate-set filter, and the falsified report is a
+                // proposal_only GRILL-ME artifact; neither touches this projection.
+                | EconomyEvent::RouteFuseTripped(_)
+                | EconomyEvent::RouteFalsified(_) => {}
             }
         }
         Ok(MarketReplay {
@@ -518,7 +903,12 @@ impl WalletProjection {
                     wallet.coin += DecimalAmount::parse_non_negative(&reward.reward_coin)?;
                     wallet.coin -= DecimalAmount::parse_non_negative(&reward.slash_coin)?;
                 }
-                EconomyEvent::MarketCreated(_) | EconomyEvent::PrincipalDeclared(_) => {}
+                EconomyEvent::MarketCreated(_)
+                | EconomyEvent::PrincipalDeclared(_)
+                | EconomyEvent::RoutingPriorUpdated(_)
+                | EconomyEvent::RoutingPriorClawback(_)
+                | EconomyEvent::RouteFuseTripped(_)
+                | EconomyEvent::RouteFalsified(_) => {}
             }
         }
 
@@ -715,7 +1105,15 @@ pub fn check_conservation(
             }
             // ADR-ECON-001: a principal declaration is an identity fact, not a coin-flow event;
             // it carries no market_id and never affects mint/redemption conservation math.
-            EconomyEvent::PrincipalDeclared(_) => {}
+            // WP4: routing-prior events are likewise not coin-flow (no market_id, no
+            // minted/redeemed/reward coin) -- excluded from conservation math for the same
+            // reason, symmetric with PrincipalDeclared above.
+            // WP-H4: RouteFuseTripped/RouteFalsified are likewise not coin-flow events.
+            EconomyEvent::PrincipalDeclared(_)
+            | EconomyEvent::RoutingPriorUpdated(_)
+            | EconomyEvent::RoutingPriorClawback(_)
+            | EconomyEvent::RouteFuseTripped(_)
+            | EconomyEvent::RouteFalsified(_) => {}
         }
     }
 
@@ -927,6 +1325,48 @@ fn principal_position(
 pub enum MarketRouterMode {
     Shadow,
     AssistedFuture,
+    /// ADR-ECON-003 (design doc R1.1 §1.2/§4 G1): deterministic seeded softmax(Q/τ)
+    /// selection. τ configuration lives on `MarketRouter` (see `new_softmax`), never on
+    /// this marker -- the mode label itself is A-zone ("a softmax route exists" is public
+    /// per ADR-ECON-003 Decision 5), while the τ value stays B-zone (Art III.4).
+    Softmax,
+}
+
+/// Q32.32 fixed-point τ mantissa for `SoftmaxTemperature::Finite` (ADR-ECON-003 Decision 4).
+/// B-zone (Art III.4): the wrapped value must never be echoed into any agent-visible
+/// surface (error message / log / `BudgetSuggestion` field / tool schema / doc).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TauQ32(u64);
+
+impl TauQ32 {
+    /// `raw_q32_mantissa` = round(τ · 2^32); must be strictly positive. τ=0 is not a valid
+    /// `Finite` value -- use `SoftmaxTemperature::ArgmaxBypass` instead (ADR-ECON-003
+    /// Decision 4 "τ=0 = 模式旁路"), so "bypass" is a type-level state, not a runtime check
+    /// against a magic zero.
+    pub fn new(raw_q32_mantissa: u64) -> Result<Self, EconomyError> {
+        if raw_q32_mantissa == 0 {
+            return Err(EconomyError::InvalidSoftmaxTemperature);
+        }
+        Ok(TauQ32(raw_q32_mantissa))
+    }
+
+    fn raw_q32(self) -> i128 {
+        self.0 as i128
+    }
+}
+
+/// Selection temperature for `MarketRouterMode::Softmax` (ADR-ECON-003 Decision 4 extreme
+/// -- and limit-- semantics). B-zone (Art III.4): callers must never echo the wrapped
+/// configuration into any agent-visible surface.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SoftmaxTemperature {
+    /// τ=0: mode-bypass -- routes through the exact same argmax code path as
+    /// `Shadow`/`AssistedFuture` (ADR-ECON-003 Decision 4).
+    ArgmaxBypass,
+    /// 0 < τ < ∞.
+    Finite(TauQ32),
+    /// τ=∞: uniform distribution over the sorted `route_id` order (ADR-ECON-003 Decision 4).
+    Uniform,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -943,6 +1383,112 @@ pub struct PriceSignal {
     pub yes_price: String,
     pub no_price: String,
     pub truth_status: String,
+}
+
+/// G2 (`RES_ECON_emergence_toplevel_design_20260707.md` §4 "价格活化" row; spec source
+/// `ADR-ECON-003` Decision 6.1): `AmmSwapExecuted.effective_price` is a `pub` field that
+/// (per the design doc's full-repo audit) has zero downstream readers today -- every
+/// `PriceSignal` consumed by `MarketRouter::suggest` is instead hand-built from an
+/// RPC-supplied static input (see `turing-daemons::parse_signals` and
+/// `turing-qualification`'s `PriceSignal` construction). This function makes the AMM pool
+/// state already committed to the tape into a second, tape-derived price source, without
+/// touching either existing call site: both keep constructing `PriceSignal` exactly as
+/// before, so this is purely additive (RPC static-input path remains the fallback per the
+/// design doc's WP2 row and ADR-ECON-003 Decision 6.1's `P = 0.5` no-information branch for
+/// markets this function has no opinion on).
+///
+/// Pure function, deterministic fold over `events` in tape order (Art 0.2: no I/O, no
+/// live-random, no wall-clock, no map/set iteration-order dependence -- the intermediate
+/// accumulator is a `BTreeMap` keyed by `market_id` and the final `Vec` is emitted in that
+/// same sorted key order). For each `market_id` that has at least one `AmmSwapExecuted` in
+/// `events`, the *last such event in tape order* determines the derived yes-side price
+/// (ADR-ECON-003 Decision 6.1: "取最近一次 AmmSwapExecuted.effective_price 的 yes
+/// 侧"): a `BUY_YES` swap's `effective_price` already denominates the yes side directly;
+/// a `BUY_NO` swap's `effective_price` denominates the no side, so it is complemented
+/// (`1 - price`) to read as a yes-side price. Both readings are clamped to `[0, 1]`
+/// (Decision 6.1: "clamp 到 [0,1]") because a late-stage swap that nearly drains one side of
+/// the pool can otherwise push the raw ratio outside the unit interval. `no_price` is
+/// reported as the clamped complement of `yes_price`, and `truth_status` is always
+/// `"statistical_signal_only"` -- the same literal `MarketCreated`/`PriceBroadcast` already
+/// use everywhere else in this crate to mark a price as a statistical signal, never ground
+/// truth (Art I.1). Markets with no `AmmSwapExecuted` in `events` emit no signal at all
+/// (absence, not a zero/default price) so callers can distinguish "no AMM-derived price yet"
+/// from "AMM says 0".
+///
+/// Because this is a pure fold over already-committed tape events with no hidden state, it
+/// satisfies the conservation invariant the design doc requires verbatim: calling it twice
+/// on the same tape slice -- i.e. re-deriving it as if the tape had been read back out of
+/// storage and replayed -- always produces the identical `Vec<PriceSignal>`
+/// (`tests/economy_market.rs::derive_price_signals_conservation_replay_equality`).
+pub fn derive_price_signals(events: &[EconomyEvent]) -> Result<Vec<PriceSignal>, EconomyError> {
+    let mut latest_yes_price: BTreeMap<String, DecimalAmount> = BTreeMap::new();
+    for event in events {
+        if let EconomyEvent::AmmSwapExecuted(swap) = event {
+            let price = DecimalAmount::parse_non_negative(&swap.effective_price)?;
+            // The only side values this codebase ever writes are `BUY_YES`/`BUY_NO`
+            // (`AmmPool::buy_yes`/`buy_no`; the daemons RPC boundary rejects anything
+            // else). An unrecognized side on the (untrusted) tape is a hard error, never
+            // silently read as a yes-side price.
+            let yes_price = match swap.side.as_str() {
+                "BUY_YES" => clamp_unit_interval(price),
+                "BUY_NO" => clamp_unit_interval(unit_amount() - price),
+                other => return Err(EconomyError::InvalidSwapSide(other.to_string())),
+            };
+            latest_yes_price.insert(swap.market_id.clone(), yes_price);
+        }
+    }
+    Ok(latest_yes_price
+        .into_iter()
+        .map(|(market_id, yes_price)| {
+            let no_price = clamp_unit_interval(unit_amount() - yes_price);
+            PriceSignal {
+                market_id,
+                yes_price: yes_price.to_decimal_string(),
+                no_price: no_price.to_decimal_string(),
+                truth_status: "statistical_signal_only".to_string(),
+            }
+        })
+        .collect())
+}
+
+/// `DecimalAmount` representation of `1.0`, used only by [`derive_price_signals`]'s
+/// yes/no-complement and `[0, 1]` clamp arithmetic.
+fn unit_amount() -> DecimalAmount {
+    DecimalAmount { units: SCALE }
+}
+
+/// Clamps a `DecimalAmount` into `[0, 1]` (see [`derive_price_signals`]).
+fn clamp_unit_interval(amount: DecimalAmount) -> DecimalAmount {
+    if amount.units < 0 {
+        DecimalAmount { units: 0 }
+    } else if amount.units > SCALE {
+        unit_amount()
+    } else {
+        amount
+    }
+}
+
+/// ADR-ECON-003 Decision 5 A-zone artifact (design doc §7 WP5): the committed public
+/// diversity policy document whose SHA-256 digest replaces the previous all-zero
+/// `diversity_policy_hash` placeholder. Embedded at compile time (same `include_str!`
+/// pattern already used by `turing-contracts` for its pinned pack registries), so the
+/// hash below is always computed from the exact bytes of this file, never hand-typed.
+///
+/// Deliberately A-zone only: this document states that the monoculture guardrail exists
+/// and is enforced, without restating any B-zone quantity (Art III.4) -- see the
+/// document's own text for the exact scope boundary.
+const DIVERSITY_POLICY_DOCUMENT: &str =
+    include_str!("../../../docs/policy/DIVERSITY-POLICY-v1.md");
+
+/// `"sha256:" + hex(SHA256(DIVERSITY_POLICY_DOCUMENT))` (design doc §7 WP5 acceptance:
+/// "hash == 公开策略文档 sha256"). A pure function of the embedded document bytes only,
+/// so it is deterministic and tape-reconstructable (Art 0.2) exactly like every other
+/// digest in this module.
+#[must_use]
+pub fn diversity_policy_hash() -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(DIVERSITY_POLICY_DOCUMENT.as_bytes());
+    format!("sha256:{:x}", hasher.finalize())
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -963,28 +1509,110 @@ pub struct BudgetSuggestion {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MarketRouter {
     mode: MarketRouterMode,
+    /// Only consulted when `mode == MarketRouterMode::Softmax`; ignored otherwise. Defaults
+    /// to `ArgmaxBypass` (ADR-ECON-003's own τ=0 mode-bypass semantics) so an unconfigured
+    /// `Softmax` router has a safe, spec-defined default rather than a fabricated τ value
+    /// (ADR-ECON-003 Decision 5 B-zone mechanism).
+    softmax_temperature: SoftmaxTemperature,
 }
 
 impl MarketRouter {
     #[must_use]
     pub fn new(mode: MarketRouterMode) -> Self {
-        MarketRouter { mode }
+        MarketRouter {
+            mode,
+            softmax_temperature: SoftmaxTemperature::ArgmaxBypass,
+        }
     }
 
+    /// Construct a `Softmax`-mode router with an explicit τ configuration (ADR-ECON-003
+    /// Decision 4/5). The `temperature` value is B-zone (Art III.4): callers must never
+    /// echo it back through any agent-visible surface.
+    #[must_use]
+    pub fn new_softmax(temperature: SoftmaxTemperature) -> Self {
+        MarketRouter {
+            mode: MarketRouterMode::Softmax,
+            softmax_temperature: temperature,
+        }
+    }
+
+    /// The router's mode label. A-zone (ADR-ECON-003 Decision 5): safe to surface.
+    #[must_use]
+    pub fn mode(&self) -> MarketRouterMode {
+        self.mode
+    }
+
+    /// `trigger_event_hash` is the per-trigger identity digest ADR-ECON-003 Decision 4 pins
+    /// as the fourth selection-seed input (`… ‖ join(sorted(route_ids), "\x00") ‖
+    /// trigger_event_hash`): the already-committed identity of the event that triggered this
+    /// routing decision. Validated exactly like the other two hash inputs, in every mode
+    /// (the argmax bypass ignores the seed, but a malformed digest is a caller bug in any
+    /// mode and must fail closed the same way).
     pub fn suggest(
         &self,
         routes: &[CandidateRoute],
         signals: &[PriceSignal],
         price_signal_hash: &str,
         pput_prior_hash: &str,
+        trigger_event_hash: &str,
+    ) -> Result<BudgetSuggestion, EconomyError> {
+        // No stage suffix: byte-identical to the pre-depth-k 12-route path (B1 discipline).
+        self.suggest_inner(
+            routes,
+            signals,
+            price_signal_hash,
+            pput_prior_hash,
+            trigger_event_hash,
+            None,
+        )
+    }
+
+    /// Stage-level selection (CAPSULE B / ADR-ECON-005 proposed): Decision 4 seed formula
+    /// with an additive domain separator `‖ stage_name` after `trigger_event_hash`. The
+    /// pre-existing [`Self::suggest`] path is untouched (no stage suffix). Different stages
+    /// under otherwise identical committed inputs therefore draw independent samples.
+    pub fn suggest_with_stage(
+        &self,
+        routes: &[CandidateRoute],
+        signals: &[PriceSignal],
+        price_signal_hash: &str,
+        pput_prior_hash: &str,
+        trigger_event_hash: &str,
+        stage_name: &str,
+    ) -> Result<BudgetSuggestion, EconomyError> {
+        if stage_name.is_empty() {
+            return Err(EconomyError::InvalidRoutingKeyDescriptor(
+                "stage_name must be non-empty for suggest_with_stage".to_string(),
+            ));
+        }
+        self.suggest_inner(
+            routes,
+            signals,
+            price_signal_hash,
+            pput_prior_hash,
+            trigger_event_hash,
+            Some(stage_name),
+        )
+    }
+
+    fn suggest_inner(
+        &self,
+        routes: &[CandidateRoute],
+        signals: &[PriceSignal],
+        price_signal_hash: &str,
+        pput_prior_hash: &str,
+        trigger_event_hash: &str,
+        stage_name: Option<&str>,
     ) -> Result<BudgetSuggestion, EconomyError> {
         validate_digest(price_signal_hash)?;
         validate_digest(pput_prior_hash)?;
+        validate_digest(trigger_event_hash)?;
         if routes.is_empty() {
             return Err(EconomyError::NoCandidateRoutes);
         }
 
-        let mut best: Option<(&CandidateRoute, DecimalAmount)> = None;
+        let mut priced_routes: Vec<(&CandidateRoute, DecimalAmount)> =
+            Vec::with_capacity(routes.len());
         for route in routes {
             let yes_price = signals
                 .iter()
@@ -995,16 +1623,31 @@ impl MarketRouter {
                 .map(|signal| DecimalAmount::parse_non_negative(&signal.yes_price))
                 .transpose()?
                 .unwrap_or_default();
-            if best
-                .as_ref()
-                .is_none_or(|(_, best_price)| yes_price > *best_price)
-            {
-                best = Some((route, yes_price));
-            }
+            priced_routes.push((route, yes_price));
         }
-        let route = best
-            .map(|(route, _)| route)
-            .ok_or(EconomyError::NoCandidateRoutes)?;
+
+        // Mode branch (ADR-ECON-003 Decision 4): `Shadow`/`AssistedFuture` and the
+        // `Softmax`+`ArgmaxBypass` (τ=0) case all run the *identical* argmax code path, so
+        // τ=0 is byte-for-byte equivalent to the pre-existing argmax behavior by
+        // construction, not by separately re-implemented logic that merely agrees on paper.
+        let route = match (self.mode, self.softmax_temperature) {
+            (MarketRouterMode::Softmax, SoftmaxTemperature::Finite(tau)) => softmax_select(
+                &priced_routes,
+                tau,
+                price_signal_hash,
+                pput_prior_hash,
+                trigger_event_hash,
+                stage_name,
+            ),
+            (MarketRouterMode::Softmax, SoftmaxTemperature::Uniform) => uniform_select(
+                &priced_routes,
+                price_signal_hash,
+                pput_prior_hash,
+                trigger_event_hash,
+                stage_name,
+            ),
+            _ => argmax_select(&priced_routes),
+        };
         Ok(BudgetSuggestion {
             schema_id: "budget_allocated.v1".to_string(),
             mode: self.mode,
@@ -1012,15 +1655,263 @@ impl MarketRouter {
             market_id: route.market_id.clone(),
             price_signal_hash: price_signal_hash.to_string(),
             pput_prior_hash: pput_prior_hash.to_string(),
-            diversity_policy_hash:
-                "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-                    .to_string(),
+            diversity_policy_hash: diversity_policy_hash(),
             max_tokens: route.requested_tokens,
             emits_authorization: false,
             can_move_accepted_head: false,
             head_effect: "PRESERVE".to_string(),
         })
     }
+}
+
+/// Exact pre-Softmax argmax selection (unchanged logic, factored out so the `Softmax`
+/// `ArgmaxBypass` (τ=0) branch calls the *same* code, guaranteeing byte-for-byte parity
+/// rather than a separately-maintained lookalike).
+fn argmax_select<'a>(priced_routes: &[(&'a CandidateRoute, DecimalAmount)]) -> &'a CandidateRoute {
+    let mut best: Option<(&CandidateRoute, DecimalAmount)> = None;
+    for &(route, yes_price) in priced_routes {
+        if best
+            .as_ref()
+            .is_none_or(|(_, best_price)| yes_price > *best_price)
+        {
+            best = Some((route, yes_price));
+        }
+    }
+    best.map(|(route, _)| route)
+        .expect("priced_routes is non-empty: suggest() rejects empty routes before calling this")
+}
+
+/// ADR-ECON-003 Decision 4 domain separator for the deterministic softmax-selection seed.
+/// B-zone (Art III.4): must never be echoed into an error/log/schema/doc surface.
+const ROUTING_SELECT_SEED_DOMAIN: &str = "routing-select.v1";
+
+/// ADR-ECON-003 Decision 4 pins `u64 = LE(SHA256(domain ‖ price_signal_hash ‖
+/// pput_prior_hash ‖ join(sorted(route_ids), "\x00") ‖ trigger_event_hash)[0..8])`. All
+/// inputs are already-committed caller-supplied literals, so identical inputs reproduce
+/// identical bytes (Art 0.2). Byte layout matches the Python reference
+/// (`tools/econ_lab/selection.py::derive_u`) exactly: the four inputs are concatenated
+/// with no separators beyond the NUL join inside `sorted(route_ids)`.
+///
+/// CAPSULE B / ADR-ECON-005 proposed additive extension: when `stage_name` is `Some`, the
+/// seed payload appends `‖ stage_name` after `trigger_event_hash` (domain-separated stage
+/// draws). `None` is the pre-depth-k 12-route formula, bit-for-bit unchanged.
+#[cfg_attr(not(test), allow(dead_code))]
+fn derive_selection_seed_u64(
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+    sorted_route_ids: &[&str],
+    trigger_event_hash: &str,
+) -> u64 {
+    derive_selection_seed_u64_ext(
+        price_signal_hash,
+        pput_prior_hash,
+        sorted_route_ids,
+        trigger_event_hash,
+        None,
+    )
+}
+
+fn derive_selection_seed_u64_ext(
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+    sorted_route_ids: &[&str],
+    trigger_event_hash: &str,
+    stage_name: Option<&str>,
+) -> u64 {
+    let mut hasher = Sha256::new();
+    hasher.update(ROUTING_SELECT_SEED_DOMAIN.as_bytes());
+    hasher.update(price_signal_hash.as_bytes());
+    hasher.update(pput_prior_hash.as_bytes());
+    hasher.update(sorted_route_ids.join("\0").as_bytes());
+    hasher.update(trigger_event_hash.as_bytes());
+    if let Some(stage) = stage_name {
+        hasher.update(stage.as_bytes());
+    }
+    let digest = hasher.finalize();
+    u64::from_le_bytes(
+        digest[0..8]
+            .try_into()
+            .expect("sha256 digest is always >= 8 bytes"),
+    )
+}
+
+/// Q32.32 fixed-point unit (ADR-ECON-003 Decision 4: "全程 Q32.32 定点(i128 中间量,向零截断)").
+const Q32_ONE: i128 = 1i128 << 32;
+
+/// floor(1.4426950408889634 * 2^32); `exp(x)` is computed as `exp2(x * log2(e))`
+/// (ADR-ECON-003 Decision 4). log2(e) is a public math constant, not a B-zone coefficient.
+const LOG2E_Q32: i128 = 6_196_328_018;
+
+/// Pinned `exp2f` polynomial coefficients (ADR-ECON-003 Decision 4), fixed-pointed via the
+/// pinned truncation rule `floor(c_i * 2^32)`. `exp2f(f) = 1 + f*(c1 + f*(c2 + f*c3))`.
+const EXP2F_C1_Q32: i128 = 2_977_044_471;
+const EXP2F_C2_Q32: i128 = 1_031_477_962;
+const EXP2F_C3_Q32: i128 = 239_780_565;
+
+fn decimal_to_q32(amount: DecimalAmount) -> i128 {
+    amount
+        .units
+        .checked_mul(Q32_ONE)
+        .map(|scaled| scaled / SCALE)
+        .unwrap_or(i128::MAX)
+}
+
+/// Q32.32 multiply, truncating toward zero (ADR-ECON-003 Decision 4), saturating instead of
+/// panicking on the (practically unreachable at realistic magnitudes) overflow case.
+fn q32_mul(a: i128, b: i128) -> i128 {
+    match a.checked_mul(b) {
+        Some(product) => product / Q32_ONE,
+        None if (a >= 0) == (b >= 0) => i128::MAX,
+        None => i128::MIN,
+    }
+}
+
+/// Q32.32 divide, truncating toward zero (ADR-ECON-003 Decision 4); `b` is always a
+/// strictly-positive τ mantissa here (`TauQ32` rejects zero at construction).
+fn q32_div(a: i128, b: i128) -> i128 {
+    if b == 0 {
+        return i128::MAX;
+    }
+    match a.checked_mul(Q32_ONE) {
+        Some(scaled) => scaled / b,
+        None if (a >= 0) == (b >= 0) => i128::MAX,
+        None => i128::MIN,
+    }
+}
+
+/// `exp2f(f) = 1 + f*(c1 + f*(c2 + f*c3))` for `f` in Q32.32 `[0, Q32_ONE)` (ADR-ECON-003
+/// Decision 4 pinned polynomial).
+fn exp2f_q32(f: i128) -> i128 {
+    let t2 = EXP2F_C2_Q32 + q32_mul(f, EXP2F_C3_Q32);
+    let t1 = EXP2F_C1_Q32 + q32_mul(f, t2);
+    Q32_ONE + q32_mul(f, t1)
+}
+
+/// `exp2(y) = 2^floor(y) * exp2f(frac(y))` for `y` in Q32.32 (ADR-ECON-003 Decision 4).
+/// Total function: saturates to 0 / `i128::MAX` at the (unreachable in the softmax
+/// max-subtracted usage below, since `y <= 0` there) extreme ends rather than panicking.
+fn exp2_q32(y: i128) -> i128 {
+    let floor_part = y.div_euclid(Q32_ONE);
+    let frac = y.rem_euclid(Q32_ONE);
+    let base = exp2f_q32(frac);
+    if floor_part >= 0 {
+        // `base` is in `[2^32, 2^33)`, so a shift of 95 can already reach/wrap the i128
+        // sign bit (`base << 95` up to ~2^128): saturate at 95, not 96, or the "saturates"
+        // contract is violated with a huge NEGATIVE value.
+        if floor_part >= 95 {
+            i128::MAX
+        } else {
+            base << (floor_part as u32)
+        }
+    } else {
+        let negated = -floor_part;
+        if negated >= 127 {
+            0
+        } else {
+            base >> (negated as u32)
+        }
+    }
+}
+
+/// Inverse-CDF sample over `weighted` (already in the sorted-`route_id` accumulation order
+/// required by ADR-ECON-003 Decision 4) against the deterministic seed `u64_seed`. Total
+/// function: the last element's cumulative weight always equals the total, and
+/// `total * 2^64 > u64_seed * total` always holds for `u64_seed < 2^64`, so the loop always
+/// returns from inside; the trailing `expect` is unreachable given non-empty input.
+fn weighted_inverse_cdf_select<'a>(
+    weighted: &[(&'a CandidateRoute, i128)],
+    u64_seed: u64,
+) -> &'a CandidateRoute {
+    let total: i128 = weighted.iter().map(|(_, weight)| *weight).sum();
+    let mut cumulative: i128 = 0;
+    for &(route, weight) in weighted {
+        cumulative += weight;
+        let lhs = cumulative.checked_mul(1i128 << 64);
+        let rhs = (u64_seed as i128).checked_mul(total);
+        match (lhs, rhs) {
+            (Some(lhs), Some(rhs)) if lhs > rhs => return route,
+            (None, _) | (_, None) => return route,
+            _ => {}
+        }
+    }
+    weighted
+        .last()
+        .map(|(route, _)| *route)
+        .expect("weighted is non-empty: suggest() rejects empty routes before calling this")
+}
+
+/// `MarketRouterMode::Softmax` with `SoftmaxTemperature::Finite(tau)`: `Q_eff = yes_price`
+/// (WP1 scope -- the (Q,N,P) tape fold is WP3; selection here reuses the same price basis
+/// the pre-existing argmax path already used), `selection = softmax(Q_eff/τ)` sampled via
+/// the deterministic seed (ADR-ECON-003 Decision 4).
+fn softmax_select<'a>(
+    priced_routes: &[(&'a CandidateRoute, DecimalAmount)],
+    temperature: TauQ32,
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+    trigger_event_hash: &str,
+    stage_name: Option<&str>,
+) -> &'a CandidateRoute {
+    let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
+    sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
+
+    let tau_q32 = temperature.raw_q32();
+    let x_values: Vec<i128> = sorted
+        .iter()
+        .map(|(_, price)| q32_div(decimal_to_q32(*price), tau_q32))
+        .collect();
+    let max_x = x_values.iter().copied().max().unwrap_or(0);
+
+    let weighted: Vec<(&CandidateRoute, i128)> = sorted
+        .iter()
+        .zip(x_values.iter())
+        .map(|((route, _), &x)| {
+            let shifted = x - max_x; // <= 0: softmax(x) == softmax(x - max(x)), exact identity
+            let exponent = q32_mul(shifted, LOG2E_Q32);
+            (*route, exp2_q32(exponent))
+        })
+        .collect();
+
+    let route_ids: Vec<&str> = sorted
+        .iter()
+        .map(|(route, _)| route.route_id.as_str())
+        .collect();
+    let seed = derive_selection_seed_u64_ext(
+        price_signal_hash,
+        pput_prior_hash,
+        &route_ids,
+        trigger_event_hash,
+        stage_name,
+    );
+    weighted_inverse_cdf_select(&weighted, seed)
+}
+
+/// `MarketRouterMode::Softmax` with `SoftmaxTemperature::Uniform` (τ=∞): uniform
+/// distribution over the sorted `route_id` order, sampled via the same deterministic seed
+/// derivation (ADR-ECON-003 Decision 4).
+fn uniform_select<'a>(
+    priced_routes: &[(&'a CandidateRoute, DecimalAmount)],
+    price_signal_hash: &str,
+    pput_prior_hash: &str,
+    trigger_event_hash: &str,
+    stage_name: Option<&str>,
+) -> &'a CandidateRoute {
+    let mut sorted: Vec<(&CandidateRoute, DecimalAmount)> = priced_routes.to_vec();
+    sorted.sort_by(|a, b| a.0.route_id.cmp(&b.0.route_id));
+    let weighted: Vec<(&CandidateRoute, i128)> =
+        sorted.iter().map(|(route, _)| (*route, Q32_ONE)).collect();
+    let route_ids: Vec<&str> = sorted
+        .iter()
+        .map(|(route, _)| route.route_id.as_str())
+        .collect();
+    let seed = derive_selection_seed_u64_ext(
+        price_signal_hash,
+        pput_prior_hash,
+        &route_ids,
+        trigger_event_hash,
+        stage_name,
+    );
+    weighted_inverse_cdf_select(&weighted, seed)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -1264,6 +2155,50 @@ pub enum EconomyError {
     SelfTradeRejected(String),
     PrincipalPositionCapExceeded(String),
     ProposerConflictRejected(String),
+    /// `TauQ32::new` rejected a zero mantissa (ADR-ECON-003 Decision 4: τ=0 must go through
+    /// `SoftmaxTemperature::ArgmaxBypass`, not `Finite`). Carries no numeric value (F4).
+    InvalidSoftmaxTemperature,
+    /// WP3 (ADR-ECON-003 Decision 1): `scaffold_id`'s JCS canonicalization rejected the
+    /// descriptor. Carries only the generic codec diagnostic, never a routing-key value.
+    InvalidRoutingKeyDescriptor(String),
+    /// WP3 (ADR-ECON-003 Decision 6.3): a `RoutingFoldEvent::PriorUpdated` reused an
+    /// `event_hash` already seen (either still outstanding or already clawed back).
+    RoutingFoldDuplicateEventHash,
+    /// WP3 (ADR-ECON-003 Decision 6.3): a `RoutingFoldEvent::Clawback` referenced an
+    /// `event_hash` that was never applied, or was already clawed back once.
+    RoutingFoldUnknownClawbackTarget,
+    /// WP3 (ADR-ECON-003 Decision 6.4): a fold counter (`N`/`S`) would go negative.
+    RoutingFoldNegativeCounter,
+    /// WP3: a fold counter (`N`/`S`) would overflow its integer width.
+    RoutingFoldCounterOverflow,
+    /// WP3 (ADR-ECON-003 Decision 5/6): `AnnealConfig` was degenerate (zero `N_anneal`, or
+    /// a non-positive τ bound). Carries no numeric value (F4).
+    RoutingFoldInvalidAnnealConfig,
+    /// WP4 (ADR-ECON-003 Decision 6): `EconomyEvent::routing_prior_updated`'s JCS
+    /// canonicalization of its own identity fields rejected the input. Carries only the
+    /// generic codec diagnostic, never a routing-key or verdict value.
+    InvalidRoutingEventIdentity(String),
+    /// WP4 (ADR-ECON-003 Decision 2/6): `routing_fold::economy_events_to_routing_fold_events`
+    /// found a `RoutingPriorUpdated`/`RoutingPriorClawback` hash field that does not parse
+    /// as 32 raw bytes (i.e. is not a `sha256:` + 64-hex digest of the expected width).
+    RoutingFoldMalformedEventHash,
+    /// WP5 (ADR-ECON-003 Decision 3): the same `(lineage_id, settlement_index)` pair
+    /// appeared twice in a `diversity_metrics` estimation window with two different
+    /// verdicts -- a malformed/contradictory input, never silently resolved by
+    /// last-write-wins.
+    DiversityMetricConflictingSettlement,
+    /// `derive_price_signals` found an `AmmSwapExecuted.side` value that is neither
+    /// `BUY_YES` nor `BUY_NO` (the only values this codebase ever writes) -- untrusted
+    /// tape input, never silently read as a yes-side price.
+    InvalidSwapSide(String),
+    /// WP4 tape-integrity guard: a `RoutingPriorUpdated.event_hash` field does not match
+    /// the identity digest re-derived from the event's own fields
+    /// (`routing_prior_event_hash`) -- a forged/tampered tape row, never folded.
+    RoutingFoldEventHashMismatch,
+    /// ADR-ECON-006 Decision 5: a single fold tape mixed binary and fractional reward modes.
+    RoutingFoldRewardModeMix,
+    /// ADR-ECON-006 Decision 1/2: fractional reward outside `[0, Q32_ONE]` or non-parseable.
+    RoutingFoldFractionOutOfRange,
 }
 
 impl std::fmt::Display for EconomyError {
@@ -1307,6 +2242,60 @@ impl std::fmt::Display for EconomyError {
             EconomyError::ProposerConflictRejected(detail) => {
                 write!(f, "D5 proposer-conflict rule: {detail}")
             }
+            EconomyError::InvalidSoftmaxTemperature => {
+                write!(f, "invalid softmax temperature configuration")
+            }
+            EconomyError::InvalidRoutingKeyDescriptor(detail) => {
+                write!(f, "invalid routing-key descriptor: {detail}")
+            }
+            EconomyError::RoutingFoldDuplicateEventHash => {
+                write!(f, "routing fold: duplicate event_hash")
+            }
+            EconomyError::RoutingFoldUnknownClawbackTarget => {
+                write!(f, "routing fold: unknown or already-applied clawback target")
+            }
+            EconomyError::RoutingFoldNegativeCounter => {
+                write!(f, "routing fold: counter would go negative")
+            }
+            EconomyError::RoutingFoldCounterOverflow => {
+                write!(f, "routing fold: counter overflow")
+            }
+            EconomyError::RoutingFoldInvalidAnnealConfig => {
+                write!(f, "routing fold: invalid annealing configuration")
+            }
+            EconomyError::InvalidRoutingEventIdentity(detail) => {
+                write!(f, "invalid routing-event identity: {detail}")
+            }
+            EconomyError::RoutingFoldMalformedEventHash => {
+                write!(f, "routing fold: malformed event hash")
+            }
+            EconomyError::DiversityMetricConflictingSettlement => {
+                write!(
+                    f,
+                    "diversity metrics: conflicting settlement verdicts for the same lineage/index"
+                )
+            }
+            EconomyError::InvalidSwapSide(side) => {
+                write!(f, "invalid swap side {side:?} (expected BUY_YES or BUY_NO)")
+            }
+            EconomyError::RoutingFoldEventHashMismatch => {
+                write!(
+                    f,
+                    "routing fold: event_hash does not match the digest re-derived from the event's own fields"
+                )
+            }
+            EconomyError::RoutingFoldRewardModeMix => {
+                write!(
+                    f,
+                    "routing fold: binary and fractional reward modes mixed on one tape"
+                )
+            }
+            EconomyError::RoutingFoldFractionOutOfRange => {
+                write!(
+                    f,
+                    "routing fold: verdict_fraction_q32 out of [0, Q32_ONE] or unparseable"
+                )
+            }
         }
     }
 }
@@ -1321,4 +2310,94 @@ fn validate_digest(value: &str) -> Result<(), EconomyError> {
         return Err(EconomyError::InvalidDigest(value.to_string()));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod exp2_saturation_tests {
+    //! Inline (not `tests/`) because `exp2_q32` is private to this module; same regression
+    //! is covered for `routing_fold`'s own copy in `routing_fold::tests`.
+
+    use super::{exp2_q32, Q32_ONE};
+
+    /// Regression: `floor_part == 95` used to compute `base << 95` with `base` in
+    /// `[2^32, 2^33)`, wrapping the i128 sign bit into a huge NEGATIVE "exponential"
+    /// (violating the documented "saturates" contract). It must saturate to `i128::MAX`.
+    #[test]
+    fn exp2_q32_saturates_positive_at_floor_part_95_never_negative() {
+        assert_eq!(exp2_q32(95 * Q32_ONE), i128::MAX);
+        assert_eq!(exp2_q32(95 * Q32_ONE + Q32_ONE / 2), i128::MAX);
+        assert_eq!(exp2_q32(96 * Q32_ONE), i128::MAX);
+        // Just below the saturation threshold: still a plain (large, positive) shift.
+        let at_94 = exp2_q32(94 * Q32_ONE);
+        assert_eq!(at_94, Q32_ONE << 94);
+        assert!(at_94 > 0);
+        // Blanket property near the threshold: exp2 of a positive input is never negative.
+        for floor in 90..100 {
+            assert!(
+                exp2_q32(floor * Q32_ONE + Q32_ONE / 3) > 0,
+                "exp2_q32 must never go negative (floor_part={floor})"
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod selection_seed_tests {
+    //! Inline (not `tests/`) because `derive_selection_seed_u64` is private to this module.
+    //! B1 remedy (INDEPENDENT_AUDIT_ECON_LAB_20260707.md, owner decision: conform the Rust
+    //! kernel to the ADR-ECON-003 Decision 4 pin): the seed now hashes `trigger_event_hash`
+    //! as its fourth input, byte-for-byte identical to the Python reference
+    //! (`tools/econ_lab/selection.py::derive_u`).
+
+    use super::derive_selection_seed_u64;
+
+    const PRICE: &str = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    const PPUT: &str = "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    const TRIGGER_1: &str =
+        "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+    const TRIGGER_2: &str =
+        "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+    const ROUTE_IDS: [&str; 3] = ["route_a", "route_b", "route_c"];
+
+    /// Known-answer test pinning the exact seed u64 for fixed inputs. The two expected
+    /// values were computed with the *Python* reference implementation
+    /// (`tools/econ_lab/selection.py::derive_u`'s `int.from_bytes(SHA256(payload)[:8],
+    /// "little")` on the identical payload), so this test is a cross-language byte-parity
+    /// pin, not a self-referential re-derivation.
+    #[test]
+    fn selection_seed_known_answer_matches_python_reference() {
+        assert_eq!(
+            derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1),
+            9326763443915281982u64
+        );
+        assert_eq!(
+            derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_2),
+            17817110700657187936u64
+        );
+    }
+
+    /// ADR-ECON-003 Decision 4: `trigger_event_hash` is a load-bearing seed input -- two
+    /// different trigger identities under otherwise identical committed inputs must yield
+    /// different seeds (this was impossible before the B1 fix, when the term was dropped).
+    #[test]
+    fn selection_seed_differs_across_trigger_event_hashes() {
+        let seed_1 = derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1);
+        let seed_2 = derive_selection_seed_u64(PRICE, PPUT, &ROUTE_IDS, TRIGGER_2);
+        assert_ne!(
+            seed_1, seed_2,
+            "seed must depend on trigger_event_hash (ADR-ECON-003 Decision 4)"
+        );
+    }
+
+    /// CAPSULE B: stage suffix is load-bearing and must not collapse into the no-suffix seed.
+    #[test]
+    fn selection_seed_differs_across_stage_suffixes() {
+        use super::derive_selection_seed_u64_ext;
+        let base = derive_selection_seed_u64_ext(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1, None);
+        let ctx = derive_selection_seed_u64_ext(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1, Some("context"));
+        let repair =
+            derive_selection_seed_u64_ext(PRICE, PPUT, &ROUTE_IDS, TRIGGER_1, Some("repair"));
+        assert_ne!(base, ctx, "stage suffix must change the seed");
+        assert_ne!(ctx, repair, "different stages must domain-separate");
+    }
 }

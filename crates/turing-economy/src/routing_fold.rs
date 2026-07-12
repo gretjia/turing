@@ -1,0 +1,1305 @@
+//! WP3 (design doc R1.1 §7; ADR-ECON-003 Decisions 1/3/4/6): the `(Q, N, P)` tape-derived
+//! node state, the τ(N) annealing function, and the N_eff floor arbitration hook.
+//!
+//! Pure, deterministic, tape-fold-only (Art 0.2): every function here is a total function
+//! of its explicit arguments, never live-random, never a hidden/global mutable. Concrete
+//! B-zone parameter values (τ_hi/τ_lo/N_anneal, the N_eff floor/hysteresis thresholds) are
+//! never hardcoded in this module -- every one of them is an explicit caller-supplied
+//! argument, so this source file's comments, error text, and doc strings carry no
+//! parameter *value* to leak (Art III.4, F4). The concrete numbers only ever appear in
+//! test fixtures, never in production-facing code, comments, or error paths.
+//!
+//! Scope note: this module implements the fold, the arbitration hook, and (WP4, design doc
+//! §7/§4 G3) the deterministic translation from committed `crate::EconomyEvent::
+//! RoutingPriorUpdated`/`RoutingPriorClawback` tape events into this fold's own
+//! [`RoutingFoldEvent`] input contract -- see [`economy_event_to_routing_fold_event`] /
+//! [`economy_events_to_routing_fold_events`] / [`fold_routing_state_from_tape`] below. The
+//! `EconomyEvent` variants themselves (and their independent-verifier constructor wiring
+//! per ADR-ECON-003 Decision 2) live in `crate::lib` (`EconomyEvent::routing_prior_updated`/
+//! `routing_prior_clawback`), following the `PrincipalDeclared` ADDITIVE_AGENT_ECONOMY_V1_0
+//! precedent (ADR-ECON-001); this module never reads or writes them directly except through
+//! the translation functions below, so [`fold_routing_state`] itself stays untouched (WP4's
+//! job is to feed this pre-existing seam, not reimplement it).
+//!
+//! Known spec gap (reported, not guessed): ADR-ECON-003 Decision 4 pins the `exp2f` cubic
+//! polynomial but does not pin a `log2` polynomial, even though Decision 4 says "τ(N) 的幂
+//! 用同一 exp2/log2 路径". [`log2_q32`] below is therefore implemented as a deterministic,
+//! fixed-iteration-count bisection *inversion* of the already-pinned [`exp2_q32`] -- it
+//! reuses only the pinned primitive, introduces no independently-invented polynomial
+//! coefficients, and is fully deterministic (Art 0.2). If bit-for-bit reproducibility
+//! *across independent implementations* becomes load-bearing (not just within this one),
+//! this specific numerical method should be pinned by a follow-up ADR revision.
+
+use std::collections::{BTreeMap, BTreeSet};
+
+use serde::Serialize;
+use unicode_normalization::UnicodeNormalization;
+
+use crate::EconomyError;
+
+// ---------------------------------------------------------------------------
+// Q32.32 fixed-point primitives (ADR-ECON-003 Decision 4: "全程 Q32.32 定点(i128 中间量,
+// 向零截断)"). Deliberately re-declared here (rather than imported) because WP1's
+// equivalent private helpers live in a sibling worktree/branch not yet merged into this
+// one; the orchestrator dedups at merge time. Kept private to this module.
+// ---------------------------------------------------------------------------
+
+/// Q32.32 fixed-point unit (`1.0`).
+pub const Q32_ONE: i128 = 1i128 << 32;
+
+/// Q32.32 fixed-point one-half (`0.5`), the uninformative-prior default (ADR-ECON-003
+/// Decision 6.1: "否则 P = 0.5").
+const Q32_HALF: i128 = Q32_ONE / 2;
+
+/// Pinned `exp2f` polynomial coefficients (ADR-ECON-003 Decision 4), fixed-pointed via the
+/// pinned truncation rule `floor(c_i * 2^32)`. `exp2f(f) = 1 + f*(c1 + f*(c2 + f*c3))`.
+const EXP2F_C1_Q32: i128 = 2_977_044_471;
+const EXP2F_C2_Q32: i128 = 1_031_477_962;
+const EXP2F_C3_Q32: i128 = 239_780_565;
+
+/// Q32.32 multiply, truncating toward zero (ADR-ECON-003 Decision 4), saturating instead
+/// of panicking on the (practically unreachable at realistic magnitudes) overflow case.
+///
+/// `pub(crate)` (not private): WP5's `diversity_metrics` module reuses this primitive
+/// rather than re-declaring it a second time now that both live in the same crate/branch
+/// (the "re-declared rather than imported" rationale on `exp2_q32`/`log2_q32` below was
+/// specifically about cross-worktree/branch separation during parallel WP1/WP3 development;
+/// that constraint no longer applies to a module added after the merge).
+pub(crate) fn q32_mul(a: i128, b: i128) -> i128 {
+    match a.checked_mul(b) {
+        Some(product) => product / Q32_ONE,
+        None if (a >= 0) == (b >= 0) => i128::MAX,
+        None => i128::MIN,
+    }
+}
+
+/// `exp2f(f) = 1 + f*(c1 + f*(c2 + f*c3))` for `f` in Q32.32 `[0, Q32_ONE)` (ADR-ECON-003
+/// Decision 4 pinned polynomial).
+fn exp2f_q32(f: i128) -> i128 {
+    let t2 = EXP2F_C2_Q32 + q32_mul(f, EXP2F_C3_Q32);
+    let t1 = EXP2F_C1_Q32 + q32_mul(f, t2);
+    Q32_ONE + q32_mul(f, t1)
+}
+
+/// `exp2(y) = 2^floor(y) * exp2f(frac(y))` for `y` in Q32.32 (ADR-ECON-003 Decision 4).
+/// Total function: saturates to 0 / `i128::MAX` at extreme magnitudes rather than
+/// panicking or overflowing.
+fn exp2_q32(y: i128) -> i128 {
+    let floor_part = y.div_euclid(Q32_ONE);
+    let frac = y.rem_euclid(Q32_ONE);
+    let base = exp2f_q32(frac);
+    if floor_part >= 0 {
+        // `base` is in `[2^32, 2^33)`, so a shift of 95 can already reach/wrap the i128
+        // sign bit (`base << 95` up to ~2^128): saturate at 95, not 96, or the "saturates"
+        // contract is violated with a huge NEGATIVE value.
+        if floor_part >= 95 {
+            i128::MAX
+        } else {
+            base << (floor_part as u32)
+        }
+    } else {
+        let negated = -floor_part;
+        if negated >= 127 {
+            0
+        } else {
+            base >> (negated as u32)
+        }
+    }
+}
+
+/// `log2(x)` for `x > 0` in Q32.32 -- see the module-level "Known spec gap" note.
+/// Deterministic fixed-iteration-count bisection against the pinned [`exp2_q32`]; never
+/// reads any external state, never varies its iteration count by input.
+///
+/// `pub(crate)`: reused by WP5's `diversity_metrics` module for `H_lineage`'s Shannon-entropy
+/// `log2` term (same crate, no re-declaration needed post-merge; see [`q32_mul`]'s note).
+pub(crate) fn log2_q32(x: i128) -> i128 {
+    debug_assert!(x > 0, "log2_q32 domain is x > 0");
+    let mut lo: i128 = -(64 * Q32_ONE);
+    let mut hi: i128 = 64 * Q32_ONE;
+    for _ in 0..100 {
+        let mid = lo + (hi - lo) / 2;
+        if exp2_q32(mid) <= x {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    lo
+}
+
+/// Build a Q32.32 fixed-point value from an exact integer ratio `numerator/denominator`
+/// (ADR-ECON-003 Decision 4: fixed-point only, never IEEE-754 floats). Truncates toward
+/// zero on any remainder (same rounding rule as the rest of Decision 4).
+pub fn q32_from_ratio(numerator: i128, denominator: i128) -> Result<i128, EconomyError> {
+    if denominator == 0 {
+        return Err(EconomyError::DivisionByZero);
+    }
+    numerator
+        .checked_mul(Q32_ONE)
+        .map(|scaled| scaled / denominator)
+        .ok_or(EconomyError::ArithmeticOverflow)
+}
+
+fn clamp_unit_interval(p_q32: i128) -> i128 {
+    p_q32.clamp(0, Q32_ONE)
+}
+
+// ---------------------------------------------------------------------------
+// Decision 1 -- scaffold_id / domain_bucket key functions.
+// ---------------------------------------------------------------------------
+
+/// `scaffold_descriptor.v1` (ADR-ECON-003 Decision 1): the normalized descriptor whose
+/// JCS-SHA256 is `scaffold_id`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ScaffoldDescriptor {
+    pub decomposition_kind: String,
+    pub toolchain: Vec<String>,
+    pub team_spec: String,
+    pub verify_loop: String,
+}
+
+/// `scaffold_id = "scaffold:sha256:" + hex(SHA256(JCS(descriptor)))` (ADR-ECON-003
+/// Decision 1). JCS = the workspace's own `turing_contracts::jcs` codec (RFC 8785
+/// restricted profile, integers only, no floats), per the ADR's "与既有 jcs.rs 同一实现".
+pub fn scaffold_id(descriptor: &ScaffoldDescriptor) -> Result<String, EconomyError> {
+    let value = serde_json::json!({
+        "schema": "scaffold_descriptor.v1",
+        "decomposition_kind": descriptor.decomposition_kind,
+        "toolchain": descriptor.toolchain,
+        "team_spec": descriptor.team_spec,
+        "verify_loop": descriptor.verify_loop,
+    });
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingKeyDescriptor(e.to_string()))?;
+    Ok(format!(
+        "scaffold:sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
+}
+
+/// `domain_bucket` (ADR-ECON-003 Decision 1): NFC-normalize + ASCII-lowercase + trim the
+/// harness `task_family` label; missing (`None`) or blank-after-trim maps to `"default"`.
+#[must_use]
+pub fn domain_bucket(task_family: Option<&str>) -> String {
+    let Some(raw) = task_family else {
+        return "default".to_string();
+    };
+    let nfc: String = raw.nfc().collect();
+    let lowered = nfc.to_ascii_lowercase();
+    let trimmed = lowered.trim();
+    if trimmed.is_empty() {
+        "default".to_string()
+    } else {
+        trimmed.to_string()
+    }
+}
+
+/// Fold key (ADR-ECON-003 Decision 1): `(domain_bucket, scaffold_id)`. `Ord` gives every
+/// consumer (this fold, N_eff/H_lineage windows) one canonical deterministic iteration
+/// order over the node map, independent of insertion order (Art 0.2).
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct RoutingKey {
+    pub domain_bucket: String,
+    pub scaffold_id: String,
+}
+
+// ---------------------------------------------------------------------------
+// CAPSULE B / depth-k (design doc §1.4; ADR-ECON-005 proposed): scaffold_descriptor.v2
+// stage decomposition + hierarchical market keys. Additive only -- scaffold_descriptor.v1
+// / RoutingKey / fold_routing_state are untouched (B1 versioning discipline).
+// ---------------------------------------------------------------------------
+
+/// Frozen v0 stage names for depth-2 layered markets (CAPSULE B dispatch 2026-07-09).
+pub const STAGE_CONTEXT: &str = "context";
+pub const STAGE_REPAIR: &str = "repair";
+pub const STAGE_VERIFY: &str = "verify";
+
+/// Frozen v0 option space per stage (2×2×2 composition; CAPSULE B).
+pub const CONTEXT_OPTIONS: &[&str] = &["minimal", "source_context"];
+pub const REPAIR_OPTIONS: &[&str] = &["single_shot", "loop"];
+pub const VERIFY_OPTIONS: &[&str] = &["none", "self_check"];
+
+/// `scaffold_descriptor.v2` (CAPSULE B): a complete scaffold is a *sequence* of stage
+/// option choices, not an atomic arm label. Orthogonalizes the v0 armA/B/C semantics:
+/// - armA ≈ (minimal, single_shot, none)
+/// - armB ≈ (source_context, loop, none)  [armB+ ≈ + self_check]
+/// - armC-like ablation sits on the verify stage (`self_check` vs `none`)
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ScaffoldDescriptorV2 {
+    pub context: String,
+    pub repair: String,
+    pub verify: String,
+    /// Lineage short label (same discipline as v1 `toolchain` single-entry): enters the
+    /// composed worker dispatch identity, not the per-stage market key.
+    pub lineage: String,
+}
+
+/// Hierarchical market key component triple (design doc §1.4 / CAPSULE B): each stage
+/// option is an independent fold node shared across scaffolds that pick the same option.
+/// Wire-encoded for the pre-existing `(domain_bucket, scaffold_id)` fold by setting
+/// `scaffold_id = stage_option_id(stage_name, option)` (see [`stage_option_id`]).
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct StageRoutingKey {
+    pub domain_bucket: String,
+    pub stage_name: String,
+    pub option: String,
+}
+
+impl StageRoutingKey {
+    /// Encode as the pre-existing fold [`RoutingKey`] so stage nodes reuse the (Q,N,P)
+    /// tape fold without a second event schema. `scaffold_id` carries the stage-option
+    /// identity digest, never a free-form label.
+    pub fn to_routing_key(&self) -> Result<RoutingKey, EconomyError> {
+        Ok(RoutingKey {
+            domain_bucket: self.domain_bucket.clone(),
+            scaffold_id: stage_option_id(&self.stage_name, &self.option)?,
+        })
+    }
+}
+
+/// `stage_option_id = "stage:sha256:" + hex(SHA256(JCS(stage_option.v1)))` — the per-stage
+/// market identity (CAPSULE B). Parallel to [`scaffold_id`]'s JCS-SHA256 discipline;
+/// distinct prefix (`stage:` vs `scaffold:`) so the two namespaces never collide.
+pub fn stage_option_id(stage_name: &str, option: &str) -> Result<String, EconomyError> {
+    let value = serde_json::json!({
+        "schema": "stage_option.v1",
+        "stage_name": stage_name,
+        "option": option,
+    });
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingKeyDescriptor(e.to_string()))?;
+    Ok(format!(
+        "stage:sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
+}
+
+/// Validate a v0 stage name / option pair against the frozen option space. Unknown pairs
+/// are hard errors (no silent expansion of the action space).
+pub fn validate_stage_option(stage_name: &str, option: &str) -> Result<(), EconomyError> {
+    let allowed: &[&str] = match stage_name {
+        STAGE_CONTEXT => CONTEXT_OPTIONS,
+        STAGE_REPAIR => REPAIR_OPTIONS,
+        STAGE_VERIFY => VERIFY_OPTIONS,
+        other => {
+            return Err(EconomyError::InvalidRoutingKeyDescriptor(format!(
+                "unknown stage_name {other:?} (v0: context|repair|verify)"
+            )));
+        }
+    };
+    if !allowed.contains(&option) {
+        return Err(EconomyError::InvalidRoutingKeyDescriptor(format!(
+            "option {option:?} not in frozen v0 space for stage {stage_name:?}"
+        )));
+    }
+    Ok(())
+}
+
+/// Map a complete stage triple to the closest live-driver arm label for worker dispatch
+/// (CAPSULE B assembly rule, honest approximation of the orthogonalized armA/B/C space):
+/// - context=minimal → armA (regardless of repair/verify; minimal context dominates)
+/// - context=source_context ∧ verify=self_check → armC (ablation axis)
+/// - context=source_context ∧ verify=none → armB
+///
+/// This is a *dispatch* mapping only (how to call the worker). Market fold keys stay on the
+/// three stage nodes; credit assignment is per-stage, not per-arm.
+#[must_use]
+pub fn compose_dispatch_arm(descriptor: &ScaffoldDescriptorV2) -> &'static str {
+    if descriptor.context == "minimal" {
+        "armA"
+    } else if descriptor.verify == "self_check" {
+        "armC"
+    } else {
+        "armB"
+    }
+}
+
+/// Frozen ordered stage walk for a depth-2 decision sequence.
+#[must_use]
+pub fn stage_walk_v0() -> [&'static str; 3] {
+    [STAGE_CONTEXT, STAGE_REPAIR, STAGE_VERIFY]
+}
+
+// ---------------------------------------------------------------------------
+// WP-H4 (ADR-ECON-007 Decision 5 "路线作为一等定价对象"): route stage atop the depth-k
+// stage hierarchy. Additive only -- every symbol above (stage_option_id, StageRoutingKey,
+// the frozen v0 context/repair/verify stages) is untouched. Decision 5 pins the key shape
+// verbatim as `(bucket, "route", route_id)`, i.e. exactly [`StageRoutingKey`] with
+// `stage_name = STAGE_ROUTE` and `option = route_id` -- so the route layer reuses the
+// pre-existing fold / softmax / τ-anneal / N_eff-floor machinery byte-for-byte, with zero
+// new selection math (Decision 5: "选择=同一 softmax/温度机制的复用").
+// ---------------------------------------------------------------------------
+
+/// Frozen stage-name literal for the route layer (ADR-ECON-007 Decision 5). Unlike
+/// `STAGE_CONTEXT`/`STAGE_REPAIR`/`STAGE_VERIFY`, the route layer's option space is open
+/// (a route is a free-form descriptor, not a frozen small enum), so route options are never
+/// checked by [`validate_stage_option`] -- callers derive them via [`route_descriptor_id`]
+/// below instead of picking from a fixed list.
+pub const STAGE_ROUTE: &str = "route";
+
+/// `route_descriptor.v1` (ADR-ECON-007 Decision 5: "route_id=路线描述子 JCS 哈希,照
+/// Decision 1 先例"): the normalized descriptor whose JCS-SHA256 is `route_id`. One layer
+/// above [`ScaffoldDescriptorV2`] -- a route is a labeled composition of the three stage
+/// choices it commits to, not a single stage option.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct RouteDescriptor {
+    pub route_label: String,
+    pub context: String,
+    pub repair: String,
+    pub verify: String,
+}
+
+/// `route_id = "route:sha256:" + hex(SHA256(JCS(descriptor)))` (ADR-ECON-007 Decision 5,
+/// Decision-1 precedent). Distinct prefix from `scaffold:`/`stage:` so all three namespaces
+/// stay disjoint even after `StageRoutingKey::to_routing_key`'s downstream `stage_option_id`
+/// re-hash (the route layer's fold key is `stage_option_id(STAGE_ROUTE, route_id)`, i.e. a
+/// hash-of-a-hash, exactly mirroring how a `context`/`repair`/`verify` option string is
+/// itself hashed a second time to become that stage's fold key).
+pub fn route_descriptor_id(descriptor: &RouteDescriptor) -> Result<String, EconomyError> {
+    let value = serde_json::json!({
+        "schema": "route_descriptor.v1",
+        "route_label": descriptor.route_label,
+        "context": descriptor.context,
+        "repair": descriptor.repair,
+        "verify": descriptor.verify,
+    });
+    let canonical = turing_contracts::jcs::canonicalize(&value)
+        .map_err(|e| EconomyError::InvalidRoutingKeyDescriptor(e.to_string()))?;
+    Ok(format!(
+        "route:sha256:{}",
+        turing_contracts::jcs::sha256_hex(&canonical)
+    ))
+}
+
+/// Options for one frozen v0 stage, in stable lexicographic order (matches Decision 4's
+/// sorted-route-id convention when the caller uses these as route_ids).
+pub fn options_for_stage(stage_name: &str) -> Result<&'static [&'static str], EconomyError> {
+    match stage_name {
+        STAGE_CONTEXT => Ok(CONTEXT_OPTIONS),
+        STAGE_REPAIR => Ok(REPAIR_OPTIONS),
+        STAGE_VERIFY => Ok(VERIFY_OPTIONS),
+        other => Err(EconomyError::InvalidRoutingKeyDescriptor(format!(
+            "unknown stage_name {other:?}"
+        ))),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Decision 6 -- (Q, N, P) node state, tape pure fold.
+// ---------------------------------------------------------------------------
+
+/// Reward mode for a single fold tape (ADR-ECON-006 Decision 5): binary (default) or
+/// fractional. Mixing modes on the same fold is a hard error.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RewardMode {
+    /// Classic 0/1 verify-all-pass reward (ADR-ECON-003 Decision 6).
+    Binary,
+    /// Fractional verify-side pass ratio ∈ [0,1] as Q32.32 (ADR-ECON-006 Decision 1).
+    Fractional,
+}
+
+/// Per-`RoutingKey` node state (ADR-ECON-003 Decision 6 + ADR-ECON-006): `P` (frozen prior),
+/// `N` (visit / settlement count), `S` (verified-success sum as **Q32.32** non-negative
+/// fixed-point — binary mode contributes `0` or `Q32_ONE` per settlement; fractional mode
+/// contributes arbitrary `v ∈ [0,1]`). `Q_eff` is derived on read, never stored.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct NodeState {
+    p_q32: i128,
+    n: u64,
+    /// Q32.32 success sum (ADR-ECON-006 Decision 2).
+    s_q32: i128,
+}
+
+impl NodeState {
+    #[must_use]
+    pub fn p_q32(&self) -> i128 {
+        self.p_q32
+    }
+
+    #[must_use]
+    pub fn n(&self) -> u64 {
+        self.n
+    }
+
+    /// Q32.32 verified-success sum (ADR-ECON-006). Prefer this over [`Self::s`] for any
+    /// fractional-aware consumer.
+    #[must_use]
+    pub fn s_q32(&self) -> i128 {
+        self.s_q32
+    }
+
+    /// Binary success *count* (legacy accessor): `s_q32 / Q32_ONE` when `s_q32` is an exact
+    /// multiple of `Q32_ONE` (always true under binary mode). Truncates toward zero otherwise
+    /// so fractional nodes still expose a coarse integer for pre-006 CLI fields.
+    #[must_use]
+    pub fn s(&self) -> u64 {
+        (self.s_q32 / Q32_ONE) as u64
+    }
+
+    /// `Q_eff = (P*N0 + S) / (N0+N)`, `N0 = 1` (ADR-ECON-003 Decision 6.2), Q32.32,
+    /// truncated toward zero. `S` is itself Q32.32 (ADR-ECON-006), so no extra scale.
+    /// `N=0` reduces exactly to `Q_eff = P` (pure prior).
+    #[must_use]
+    pub fn q_eff_q32(&self) -> i128 {
+        let numerator = self.p_q32 + self.s_q32;
+        let denominator = 1i128 + self.n as i128;
+        numerator / denominator
+    }
+}
+
+/// A single applied fold input (ADR-ECON-003 Decision 6 + ADR-ECON-006). WP4 translates
+/// committed `EconomyEvent::RoutingPriorUpdated` / `RoutingPriorClawback` tape events into
+/// this contract; this module never reads `EconomyEvent` directly.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RoutingFoldEvent {
+    /// Independent-verifier verdict (ADR-ECON-003 Decision 2/6.2 + ADR-ECON-006).
+    /// `event_hash` uniquely identifies this update for clawback dedup (Decision 6.3).
+    /// `verdict_fraction_q32` is the Q32.32 reward contribution (binary: 0 or `Q32_ONE`).
+    PriorUpdated {
+        key: RoutingKey,
+        verdict: bool,
+        verdict_fraction_q32: i128,
+        reward_mode: RewardMode,
+        event_hash: [u8; 32],
+    },
+    /// Exact inverse of one earlier `PriorUpdated`, referenced by its `event_hash`
+    /// (ADR-ECON-003 Decision 6.3). At most one clawback per original event.
+    Clawback { updated_event_hash: [u8; 32] },
+}
+
+impl RoutingFoldEvent {
+    /// Binary-mode prior update (ADR-ECON-003 default): fraction is 0 or `Q32_ONE`.
+    #[must_use]
+    pub fn binary_update(key: RoutingKey, verdict: bool, event_hash: [u8; 32]) -> Self {
+        RoutingFoldEvent::PriorUpdated {
+            key,
+            verdict,
+            verdict_fraction_q32: if verdict { Q32_ONE } else { 0 },
+            reward_mode: RewardMode::Binary,
+            event_hash,
+        }
+    }
+
+    /// Fractional-mode prior update (ADR-ECON-006): `verdict_fraction_q32` clamped to
+    /// `[0, Q32_ONE]` by the caller (fold hard-errors on out-of-range).
+    #[must_use]
+    pub fn fractional_update(
+        key: RoutingKey,
+        verdict: bool,
+        verdict_fraction_q32: i128,
+        event_hash: [u8; 32],
+    ) -> Self {
+        RoutingFoldEvent::PriorUpdated {
+            key,
+            verdict,
+            verdict_fraction_q32,
+            reward_mode: RewardMode::Fractional,
+            event_hash,
+        }
+    }
+}
+
+/// Pure fold: `(initial_prices, events) -> per-key NodeState` (ADR-ECON-003 Decision 6).
+/// Deterministic given its inputs (Art 0.2): the same event sequence replayed against the
+/// same `initial_prices` always yields a byte-identical result. `initial_prices` supplies
+/// the AMM-derived `P` for a key's *first* appearance only (Decision 6.1: "P 在节点首次
+/// 创建时定格"); a key with no entry there gets the uninformative `P = 0.5` prior.
+///
+/// Total, never silently absorbing an invalid state (ADR-ECON-003 Decision 6.4/6.3): a
+/// duplicate `event_hash`, a clawback of an unknown/already-clawed-back hash, or a counter
+/// underflow/overflow is a hard fold error, never swallowed.
+pub fn fold_routing_state(
+    initial_prices: &BTreeMap<RoutingKey, i128>,
+    events: &[RoutingFoldEvent],
+) -> Result<BTreeMap<RoutingKey, NodeState>, EconomyError> {
+    let mut nodes: BTreeMap<RoutingKey, NodeState> = BTreeMap::new();
+    // event_hash -> (key, fraction_q32) for every update seen and not yet clawed back.
+    // Fraction is the exact reward that must be reversed on clawback (ADR-ECON-006 §2).
+    let mut outstanding: BTreeMap<[u8; 32], (RoutingKey, i128)> = BTreeMap::new();
+    let mut clawed_back: BTreeSet<[u8; 32]> = BTreeSet::new();
+    // ADR-ECON-006 Decision 5: first update freezes the tape's reward mode; mixing is hard err.
+    let mut tape_mode: Option<RewardMode> = None;
+
+    for event in events {
+        match event {
+            RoutingFoldEvent::PriorUpdated {
+                key,
+                verdict: _,
+                verdict_fraction_q32,
+                reward_mode,
+                event_hash,
+            } => {
+                if outstanding.contains_key(event_hash) || clawed_back.contains(event_hash) {
+                    return Err(EconomyError::RoutingFoldDuplicateEventHash);
+                }
+                match tape_mode {
+                    None => tape_mode = Some(*reward_mode),
+                    Some(m) if m != *reward_mode => {
+                        return Err(EconomyError::RoutingFoldRewardModeMix);
+                    }
+                    Some(_) => {}
+                }
+                // Clamp domain: v must live in [0, 1] Q32.32 (ADR-ECON-006 Decision 1).
+                if *verdict_fraction_q32 < 0 || *verdict_fraction_q32 > Q32_ONE {
+                    return Err(EconomyError::RoutingFoldFractionOutOfRange);
+                }
+                let node = nodes.entry(key.clone()).or_insert_with(|| {
+                    let p_q32 = initial_prices
+                        .get(key)
+                        .copied()
+                        .map(clamp_unit_interval)
+                        .unwrap_or(Q32_HALF);
+                    NodeState {
+                        p_q32,
+                        n: 0,
+                        s_q32: 0,
+                    }
+                });
+                node.n = node
+                    .n
+                    .checked_add(1)
+                    .ok_or(EconomyError::RoutingFoldCounterOverflow)?;
+                node.s_q32 = node
+                    .s_q32
+                    .checked_add(*verdict_fraction_q32)
+                    .ok_or(EconomyError::RoutingFoldCounterOverflow)?;
+                outstanding.insert(*event_hash, (key.clone(), *verdict_fraction_q32));
+            }
+            RoutingFoldEvent::Clawback {
+                updated_event_hash,
+            } => {
+                let (key, frac_q32) = outstanding
+                    .remove(updated_event_hash)
+                    .ok_or(EconomyError::RoutingFoldUnknownClawbackTarget)?;
+                clawed_back.insert(*updated_event_hash);
+                let node = nodes
+                    .get_mut(&key)
+                    .ok_or(EconomyError::RoutingFoldUnknownClawbackTarget)?;
+                node.n = node
+                    .n
+                    .checked_sub(1)
+                    .ok_or(EconomyError::RoutingFoldNegativeCounter)?;
+                // Exact inverse S ← S − v_original (ADR-ECON-006 Decision 2).
+                node.s_q32 = node
+                    .s_q32
+                    .checked_sub(frac_q32)
+                    .ok_or(EconomyError::RoutingFoldNegativeCounter)?;
+                if node.s_q32 < 0 {
+                    return Err(EconomyError::RoutingFoldNegativeCounter);
+                }
+            }
+        }
+    }
+    Ok(nodes)
+}
+
+// ---------------------------------------------------------------------------
+// WP4 (design doc R1.1 §7 WP4/§4 G3; ADR-ECON-003 Decision 2/6) -- deterministic
+// translation from committed `crate::EconomyEvent` tape rows into this fold's own
+// `RoutingFoldEvent` input contract. Plugs the pre-existing WP3 seam above; does not
+// reimplement it.
+// ---------------------------------------------------------------------------
+
+/// Parse a `sha256:`-prefixed 64-hex-digit digest (the format
+/// `crate::EconomyEvent::routing_prior_updated`/`routing_prior_clawback` already validate
+/// on construction) into 32 raw bytes. Total: malformed input is a hard error, never a
+/// silently-truncated/zero-padded hash.
+fn parse_event_hash(value: &str) -> Result<[u8; 32], EconomyError> {
+    let hex = value
+        .strip_prefix("sha256:")
+        .ok_or(EconomyError::RoutingFoldMalformedEventHash)?;
+    if hex.len() != 64 {
+        return Err(EconomyError::RoutingFoldMalformedEventHash);
+    }
+    // Strict lowercase-hex alphabet, mirroring the digest format this crate itself emits
+    // (`sha256_hex`'s `{:x}`): `u8::from_str_radix` alone is too lenient -- it accepts a
+    // `+` sign (`"+f"` parses as 15) and uppercase hex, so `"AB"`/`"ab"`/`"+b"` would
+    // otherwise alias to one dedup identity.
+    if !hex
+        .bytes()
+        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    {
+        return Err(EconomyError::RoutingFoldMalformedEventHash);
+    }
+    let mut bytes = [0u8; 32];
+    for (i, byte) in bytes.iter_mut().enumerate() {
+        let chunk = hex
+            .get(i * 2..i * 2 + 2)
+            .ok_or(EconomyError::RoutingFoldMalformedEventHash)?;
+        *byte = u8::from_str_radix(chunk, 16)
+            .map_err(|_| EconomyError::RoutingFoldMalformedEventHash)?;
+    }
+    Ok(bytes)
+}
+
+/// Deterministically translate one committed `crate::EconomyEvent` into this fold's own
+/// [`RoutingFoldEvent`] input contract (ADR-ECON-003 Decision 6). Every non-routing-prior
+/// `EconomyEvent` variant maps to `Ok(None)` (not a routing-fold input at all) -- this
+/// function invents no new fold semantics; it only relays the fields
+/// `EconomyEvent::routing_prior_updated`/`routing_prior_clawback` already crafted
+/// (`RoutingKey { domain_bucket, scaffold_id }` from the event's routing-key value fields,
+/// the verdict bit, and the parsed hash) into this module's pre-existing seam.
+pub fn economy_event_to_routing_fold_event(
+    event: &crate::EconomyEvent,
+) -> Result<Option<RoutingFoldEvent>, EconomyError> {
+    match event {
+        crate::EconomyEvent::RoutingPriorUpdated(updated) => {
+            let key = RoutingKey {
+                domain_bucket: updated.route_domain.clone(),
+                scaffold_id: updated.route_scaffold.clone(),
+            };
+            let event_hash = parse_event_hash(&updated.event_hash)?;
+            // Tape-integrity guard: never trust the deserialized `event_hash` field --
+            // re-derive the identity digest from the event's own fields (the same
+            // `routing_prior_event_hash` the `EconomyEvent::routing_prior_updated`
+            // constructor used to mint it) and hard-error on mismatch, so a
+            // forged/tampered row can never smuggle a chosen dedup identity into the fold.
+            let expected_event_hash = crate::routing_prior_event_hash(
+                &updated.route_domain,
+                &updated.route_scaffold,
+                updated.verdict,
+                &updated.verdict_source_id,
+                &updated.verifier_attestation_hash,
+                updated.verdict_fraction_q32.as_deref(),
+            )?;
+            if updated.event_hash != expected_event_hash {
+                return Err(EconomyError::RoutingFoldEventHashMismatch);
+            }
+            // ADR-ECON-006 Decision 3: missing field → binary fallback v = verdict?1:0.
+            let (verdict_fraction_q32, reward_mode) = match &updated.verdict_fraction_q32 {
+                Some(raw) => {
+                    let frac = raw
+                        .parse::<i128>()
+                        .map_err(|_| EconomyError::RoutingFoldFractionOutOfRange)?;
+                    (frac, RewardMode::Fractional)
+                }
+                None => (
+                    if updated.verdict { Q32_ONE } else { 0 },
+                    RewardMode::Binary,
+                ),
+            };
+            Ok(Some(RoutingFoldEvent::PriorUpdated {
+                key,
+                verdict: updated.verdict,
+                verdict_fraction_q32,
+                reward_mode,
+                event_hash,
+            }))
+        }
+        crate::EconomyEvent::RoutingPriorClawback(clawback) => {
+            let updated_event_hash = parse_event_hash(&clawback.updated_event_hash)?;
+            Ok(Some(RoutingFoldEvent::Clawback { updated_event_hash }))
+        }
+        _ => Ok(None),
+    }
+}
+
+/// Order-preserving batch form of [`economy_event_to_routing_fold_event`] (Art 0.2: a pure,
+/// tape-order-preserving map -- never reorders, never silently drops a malformed hash).
+pub fn economy_events_to_routing_fold_events(
+    events: &[crate::EconomyEvent],
+) -> Result<Vec<RoutingFoldEvent>, EconomyError> {
+    events
+        .iter()
+        .filter_map(|event| economy_event_to_routing_fold_event(event).transpose())
+        .collect()
+}
+
+/// Convenience seam (WP4): translate `events` then fold in one call, so a caller need not
+/// import [`RoutingFoldEvent`] at all. This is the "already-existing seam" the design
+/// doc/ADR direct WP4 to plug into -- [`fold_routing_state`] itself is untouched.
+pub fn fold_routing_state_from_tape(
+    initial_prices: &BTreeMap<RoutingKey, i128>,
+    events: &[crate::EconomyEvent],
+) -> Result<BTreeMap<RoutingKey, NodeState>, EconomyError> {
+    let fold_events = economy_events_to_routing_fold_events(events)?;
+    fold_routing_state(initial_prices, &fold_events)
+}
+
+// ---------------------------------------------------------------------------
+// Decision 3/4 -- τ(N) annealing + N_eff floor arbitration hook.
+// ---------------------------------------------------------------------------
+
+/// Caller-supplied annealing configuration (ADR-ECON-003 Decision 5 B-zone parameters:
+/// τ_hi, τ_lo, N_anneal). Deliberately *not* hardcoded in this module -- every concrete
+/// value is threaded in explicitly by the caller (who reads it from the B-zone config
+/// mechanism, out of this module's scope), so this source file never carries a parameter
+/// value that could leak through a doc string or error path (Art III.4, F4).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AnnealConfig {
+    pub tau_hi_q32: i128,
+    pub tau_lo_q32: i128,
+    pub n_anneal: u64,
+}
+
+/// `τ(N) = τ_hi·(τ_lo/τ_hi)^min(1, N/N_anneal)` (design doc §1.2; ADR-ECON-003 Decision 6
+/// references this as the annealing formula gated by Decision 3's floor arbitration).
+/// `N=0` returns exactly `τ_hi` (no approximation error: the zero exponent short-circuits
+/// before `exp2`/`log2` are invoked at all).
+pub fn tau_anneal_q32(n: u64, cfg: &AnnealConfig) -> Result<i128, EconomyError> {
+    // `tau_lo_q32 > tau_hi_q32` is a degenerate (inverted-bounds) configuration: the
+    // annealing schedule is defined as a decay from τ_hi down to τ_lo, and an inverted
+    // pair makes the exponent positive/unbounded (the exact shape that reaches
+    // `exp2_q32`'s saturation region). Rejected like the other degenerate configs.
+    if cfg.n_anneal == 0
+        || cfg.tau_hi_q32 <= 0
+        || cfg.tau_lo_q32 <= 0
+        || cfg.tau_lo_q32 > cfg.tau_hi_q32
+    {
+        return Err(EconomyError::RoutingFoldInvalidAnnealConfig);
+    }
+    if n == 0 {
+        return Ok(cfg.tau_hi_q32);
+    }
+    let ratio_q32 = {
+        let scaled = (n as i128)
+            .checked_mul(Q32_ONE)
+            .ok_or(EconomyError::ArithmeticOverflow)?;
+        (scaled / cfg.n_anneal as i128).min(Q32_ONE)
+    };
+    let log2_ratio_q32 = log2_q32(cfg.tau_lo_q32) - log2_q32(cfg.tau_hi_q32);
+    let exponent_times_log2 = q32_mul(ratio_q32, log2_ratio_q32);
+    Ok(q32_mul(cfg.tau_hi_q32, exp2_q32(exponent_times_log2)))
+}
+
+/// Annealing mode (ADR-ECON-003 Decision 3 hysteresis). Threaded explicitly through the
+/// fold (never a hidden/global variable) so the whole pipeline stays a pure function of
+/// already-committed inputs (Art 0.2): the caller carries `AnnealMode` forward exactly
+/// like `N`/`S` above, deterministically reconstructable from tape.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnnealMode {
+    Annealing,
+    Paused,
+}
+
+/// Caller-supplied N_eff floor/hysteresis thresholds (ADR-ECON-003 Decision 3). Q32.32.
+/// Not hardcoded here (see the module-level note) -- the caller supplies these from
+/// wherever the A-zone floor constants are published.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FloorConfig {
+    /// Enter/stay `Paused` once `N_eff <= pause_at_or_below_q32`.
+    pub pause_at_or_below_q32: i128,
+    /// Resume `Annealing` only once `N_eff >= resume_at_or_above_q32` (hysteresis band;
+    /// strictly greater than `pause_at_or_below_q32` in any valid configuration).
+    pub resume_at_or_above_q32: i128,
+}
+
+/// "N_eff 地板赢" (ADR-ECON-003 Decision 3 / design §1.5): pure, total, deterministic step
+/// function of `(prev_mode, n_eff_q32, floor)` alone -- no other input can override it.
+pub fn arbitrate_anneal_mode(
+    prev_mode: AnnealMode,
+    n_eff_q32: i128,
+    floor: &FloorConfig,
+) -> AnnealMode {
+    match prev_mode {
+        AnnealMode::Paused => {
+            if n_eff_q32 >= floor.resume_at_or_above_q32 {
+                AnnealMode::Annealing
+            } else {
+                AnnealMode::Paused
+            }
+        }
+        AnnealMode::Annealing => {
+            if n_eff_q32 <= floor.pause_at_or_below_q32 {
+                AnnealMode::Paused
+            } else {
+                AnnealMode::Annealing
+            }
+        }
+    }
+}
+
+/// `τ_eff` (ADR-ECON-003 Decision 3): `τ_hi` while `Paused`, else the `τ(N)` annealing
+/// formula. "地板赢" is structural here: [`arbitrate_anneal_mode`] must be called first,
+/// and while it reports `Paused` this function never even evaluates [`tau_anneal_q32`], so
+/// the selection law cannot trade away the diversity floor for exploitation no matter how
+/// large `N` has grown.
+pub fn tau_eff_q32(
+    n: u64,
+    mode: AnnealMode,
+    anneal_cfg: &AnnealConfig,
+) -> Result<i128, EconomyError> {
+    match mode {
+        AnnealMode::Paused => Ok(anneal_cfg.tau_hi_q32),
+        AnnealMode::Annealing => tau_anneal_q32(n, anneal_cfg),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn key(bucket: &str, scaffold: &str) -> RoutingKey {
+        RoutingKey {
+            domain_bucket: bucket.to_string(),
+            scaffold_id: scaffold.to_string(),
+        }
+    }
+
+    fn event_hash(tag: u8) -> [u8; 32] {
+        let mut h = [0u8; 32];
+        h[0] = tag;
+        h
+    }
+
+    // -- Decision 1: key functions ------------------------------------------------
+
+    #[test]
+    fn scaffold_id_is_deterministic_and_distinct() {
+        let a = ScaffoldDescriptor {
+            decomposition_kind: "linear".to_string(),
+            toolchain: vec!["rustc".to_string(), "cargo".to_string()],
+            team_spec: "solo".to_string(),
+            verify_loop: "cargo-test".to_string(),
+        };
+        let b = ScaffoldDescriptor {
+            decomposition_kind: "tree".to_string(),
+            ..a.clone()
+        };
+        let id_a1 = scaffold_id(&a).expect("scaffold_id(a) 1");
+        let id_a2 = scaffold_id(&a).expect("scaffold_id(a) 2");
+        let id_b = scaffold_id(&b).expect("scaffold_id(b)");
+        assert_eq!(id_a1, id_a2, "same descriptor must fold to the same id");
+        assert_ne!(id_a1, id_b, "different descriptor must fold to a different id");
+        assert!(id_a1.starts_with("scaffold:sha256:"));
+    }
+
+    #[test]
+    fn domain_bucket_normalizes_case_and_whitespace() {
+        assert_eq!(domain_bucket(Some("  Coding_Task  ")), "coding_task");
+        assert_eq!(domain_bucket(Some("")), "default");
+        assert_eq!(domain_bucket(Some("   ")), "default");
+        assert_eq!(domain_bucket(None), "default");
+        // NFC: composed vs. decomposed forms of the same visible string must match.
+        let composed = "\u{00e9}"; // "é" (single code point)
+        let decomposed = "e\u{0301}"; // "e" + combining acute accent
+        assert_eq!(domain_bucket(Some(composed)), domain_bucket(Some(decomposed)));
+    }
+
+    // -- WP-H4 (ADR-ECON-007 Decision 5): route_descriptor_id / route stage key -----
+
+    #[test]
+    fn route_descriptor_id_is_deterministic_and_distinct() {
+        let a = RouteDescriptor {
+            route_label: "conservative_repair".to_string(),
+            context: "minimal".to_string(),
+            repair: "single_shot".to_string(),
+            verify: "none".to_string(),
+        };
+        let b = RouteDescriptor {
+            route_label: "aggressive_repair".to_string(),
+            ..a.clone()
+        };
+        let id_a1 = route_descriptor_id(&a).expect("route_descriptor_id(a) 1");
+        let id_a2 = route_descriptor_id(&a).expect("route_descriptor_id(a) 2");
+        let id_b = route_descriptor_id(&b).expect("route_descriptor_id(b)");
+        assert_eq!(id_a1, id_a2, "same descriptor must hash to the same route_id");
+        assert_ne!(id_a1, id_b, "different route_label must hash to a different route_id");
+        assert!(id_a1.starts_with("route:sha256:"));
+    }
+
+    #[test]
+    fn route_descriptor_id_namespace_never_collides_with_scaffold_or_stage_ids() {
+        // Decision 5's "route:" prefix must stay disjoint from "scaffold:"/"stage:" even
+        // when the underlying JCS payload bytes could otherwise coincide.
+        let route = RouteDescriptor {
+            route_label: "x".to_string(),
+            context: "minimal".to_string(),
+            repair: "single_shot".to_string(),
+            verify: "none".to_string(),
+        };
+        let route_id = route_descriptor_id(&route).expect("route_descriptor_id");
+        let stage_id = stage_option_id(STAGE_CONTEXT, "minimal").expect("stage_option_id");
+        assert_ne!(route_id, stage_id);
+        assert!(!route_id.starts_with("stage:"));
+        assert!(!route_id.starts_with("scaffold:"));
+    }
+
+    #[test]
+    fn route_stage_key_reuses_stage_routing_key_verbatim() {
+        // Decision 5: key = (bucket, "route", route_id) -- exactly StageRoutingKey with
+        // stage_name = STAGE_ROUTE, so the route layer folds through the pre-existing
+        // (Q, N, P) machinery with zero new code.
+        let route = RouteDescriptor {
+            route_label: "conservative_repair".to_string(),
+            context: "minimal".to_string(),
+            repair: "single_shot".to_string(),
+            verify: "none".to_string(),
+        };
+        let route_id = route_descriptor_id(&route).expect("route_descriptor_id");
+        let stage_key = StageRoutingKey {
+            domain_bucket: "code_review".to_string(),
+            stage_name: STAGE_ROUTE.to_string(),
+            option: route_id.clone(),
+        };
+        let routing_key = stage_key.to_routing_key().expect("to_routing_key");
+        assert_eq!(routing_key.domain_bucket, "code_review");
+        assert_eq!(
+            routing_key.scaffold_id,
+            stage_option_id(STAGE_ROUTE, &route_id).expect("stage_option_id(route, route_id)")
+        );
+        // The route layer participates in the SAME fold as every other stage: a
+        // PriorUpdated event against this exact key must be foldable with no new fold code.
+        let prices = BTreeMap::new();
+        let events = vec![RoutingFoldEvent::binary_update(
+            routing_key.clone(),
+            true,
+            event_hash(0xA1),
+        )];
+        let nodes = fold_routing_state(&prices, &events).expect("route-key fold");
+        assert_eq!(nodes.get(&routing_key).expect("route node present").n(), 1);
+    }
+
+    // -- Decision 6: fold determinism ----------------------------------------------
+
+    #[test]
+    fn fold_is_deterministic_across_repeated_runs() {
+        let k1 = key("code_review", "scaffold:sha256:aaa");
+        let k2 = key("code_review", "scaffold:sha256:bbb");
+        let mut prices = BTreeMap::new();
+        prices.insert(k1.clone(), q32_from_ratio(3, 4).unwrap());
+
+        let events = vec![
+            RoutingFoldEvent::binary_update(k1.clone(), true, event_hash(1)),
+            RoutingFoldEvent::binary_update(k2.clone(), false, event_hash(2)),
+            RoutingFoldEvent::binary_update(k1.clone(), false, event_hash(3)),
+            RoutingFoldEvent::Clawback {
+                updated_event_hash: event_hash(2),
+            },
+        ];
+
+        let run1 = fold_routing_state(&prices, &events).expect("fold run 1");
+        let run2 = fold_routing_state(&prices, &events).expect("fold run 2");
+        assert_eq!(run1.len(), run2.len());
+        for (k, node1) in &run1 {
+            let node2 = run2.get(k).expect("same key present in both runs");
+            assert_eq!(node1.p_q32(), node2.p_q32());
+            assert_eq!(node1.n(), node2.n());
+            assert_eq!(node1.s(), node2.s());
+        }
+
+        // Post-clawback semantics: k2's single PriorUpdated was exactly reversed.
+        let n2 = run1.get(&k2).expect("k2 present");
+        assert_eq!(n2.n(), 0);
+        assert_eq!(n2.s(), 0);
+
+        // k1: two updates (verdict true, then false), P frozen at first observation.
+        let n1 = run1.get(&k1).expect("k1 present");
+        assert_eq!(n1.n(), 2);
+        assert_eq!(n1.s(), 1);
+        assert_eq!(n1.p_q32(), q32_from_ratio(3, 4).unwrap());
+    }
+
+    #[test]
+    fn fold_defaults_uninformative_prior_when_no_price_supplied() {
+        let k = key("code_review", "scaffold:sha256:ccc");
+        let prices = BTreeMap::new();
+        let events = vec![RoutingFoldEvent::binary_update(k.clone(), true, event_hash(9))];
+        let nodes = fold_routing_state(&prices, &events).expect("fold");
+        assert_eq!(nodes.get(&k).unwrap().p_q32(), Q32_ONE / 2);
+    }
+
+    #[test]
+    fn fold_rejects_duplicate_clawback_and_unknown_target() {
+        let k = key("code_review", "scaffold:sha256:ddd");
+        let prices = BTreeMap::new();
+        let good = vec![
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(5)),
+            RoutingFoldEvent::Clawback {
+                updated_event_hash: event_hash(5),
+            },
+        ];
+        assert!(fold_routing_state(&prices, &good).is_ok());
+
+        let double_clawback = vec![
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(6)),
+            RoutingFoldEvent::Clawback {
+                updated_event_hash: event_hash(6),
+            },
+            RoutingFoldEvent::Clawback {
+                updated_event_hash: event_hash(6),
+            },
+        ];
+        assert_eq!(
+            fold_routing_state(&prices, &double_clawback),
+            Err(EconomyError::RoutingFoldUnknownClawbackTarget)
+        );
+
+        let unknown_target = vec![RoutingFoldEvent::Clawback {
+            updated_event_hash: event_hash(7),
+        }];
+        assert_eq!(
+            fold_routing_state(&prices, &unknown_target),
+            Err(EconomyError::RoutingFoldUnknownClawbackTarget)
+        );
+
+        let duplicate_update_hash = vec![
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(8)),
+            RoutingFoldEvent::binary_update(k.clone(), false, event_hash(8)),
+        ];
+        assert_eq!(
+            fold_routing_state(&prices, &duplicate_update_hash),
+            Err(EconomyError::RoutingFoldDuplicateEventHash)
+        );
+    }
+
+    // -- Decision 4/6: τ(N) annealing ----------------------------------------------
+
+    fn test_anneal_cfg() -> AnnealConfig {
+        // Test-only constants, numerically equal to the ADR-ECON-003 Decision 5
+        // EXPERIMENTAL STARTING values (plan-directory documented, not secrets).
+        // Production code never hardcodes them: AnnealConfig is caller-supplied.
+        AnnealConfig {
+            tau_hi_q32: q32_from_ratio(2, 1).unwrap(),
+            tau_lo_q32: q32_from_ratio(1, 4).unwrap(),
+            n_anneal: 32,
+        }
+    }
+
+    #[test]
+    fn tau_anneal_at_zero_visits_is_exactly_tau_hi() {
+        let cfg = test_anneal_cfg();
+        assert_eq!(tau_anneal_q32(0, &cfg).unwrap(), cfg.tau_hi_q32);
+    }
+
+    #[test]
+    fn tau_anneal_at_saturation_is_close_to_tau_lo() {
+        let cfg = test_anneal_cfg();
+        let tau_at_n_anneal = tau_anneal_q32(cfg.n_anneal, &cfg).unwrap();
+        let diff = (tau_at_n_anneal - cfg.tau_lo_q32).abs();
+        // ADR-ECON-003 Decision 4 documents ~1e-3 relative approximation error from the
+        // pinned exp2f cubic; allow a generous tolerance band well above that.
+        let tolerance = cfg.tau_lo_q32 / 100; // 1% of τ_lo
+        assert!(
+            diff <= tolerance,
+            "tau(N_anneal) should approach tau_lo within tolerance, diff_q32={diff} tolerance_q32={tolerance}"
+        );
+    }
+
+    #[test]
+    fn tau_anneal_is_monotonically_non_increasing_in_n() {
+        let cfg = test_anneal_cfg();
+        let mut prev = tau_anneal_q32(0, &cfg).unwrap();
+        for n in [1u64, 2, 4, 8, 16, 24, 32, 64, 128] {
+            let cur = tau_anneal_q32(n, &cfg).unwrap();
+            assert!(
+                cur <= prev,
+                "tau_anneal must not increase as N grows: n={n} prev={prev} cur={cur}"
+            );
+            prev = cur;
+        }
+    }
+
+    #[test]
+    fn tau_anneal_rejects_degenerate_config() {
+        let mut cfg = test_anneal_cfg();
+        cfg.n_anneal = 0;
+        assert_eq!(
+            tau_anneal_q32(5, &cfg),
+            Err(EconomyError::RoutingFoldInvalidAnnealConfig)
+        );
+    }
+
+    #[test]
+    fn tau_anneal_rejects_inverted_tau_bounds() {
+        let mut cfg = test_anneal_cfg();
+        std::mem::swap(&mut cfg.tau_hi_q32, &mut cfg.tau_lo_q32); // now tau_lo > tau_hi
+        assert_eq!(
+            tau_anneal_q32(5, &cfg),
+            Err(EconomyError::RoutingFoldInvalidAnnealConfig)
+        );
+        // Equal bounds remain a valid (constant-τ) configuration, not newly rejected.
+        let mut flat = test_anneal_cfg();
+        flat.tau_lo_q32 = flat.tau_hi_q32;
+        assert!(tau_anneal_q32(5, &flat).is_ok());
+    }
+
+    // -- Decision 4: exp2_q32 positive-saturation regression -----------------------
+
+    /// Regression: `floor_part == 95` used to compute `base << 95` with `base` in
+    /// `[2^32, 2^33)`, wrapping the i128 sign bit into a huge NEGATIVE "exponential"
+    /// (violating the documented "saturates" contract). It must saturate to `i128::MAX`.
+    #[test]
+    fn exp2_q32_saturates_positive_at_floor_part_95_never_negative() {
+        assert_eq!(exp2_q32(95 * Q32_ONE), i128::MAX);
+        assert_eq!(exp2_q32(95 * Q32_ONE + Q32_ONE / 2), i128::MAX);
+        assert_eq!(exp2_q32(96 * Q32_ONE), i128::MAX);
+        // Just below the saturation threshold: still a plain (large, positive) shift.
+        let at_94 = exp2_q32(94 * Q32_ONE);
+        assert_eq!(at_94, Q32_ONE << 94);
+        assert!(at_94 > 0);
+        // Blanket property near the threshold: exp2 of a positive input is never negative.
+        for floor in 90..100 {
+            assert!(
+                exp2_q32(floor * Q32_ONE + Q32_ONE / 3) > 0,
+                "exp2_q32 must never go negative (floor_part={floor})"
+            );
+        }
+    }
+
+    // -- Decision 3: N_eff floor arbitration hook, "floor wins" -------------------
+
+    fn test_floor_cfg() -> FloorConfig {
+        // Deliberately the ADR-ECON-003 Decision 3 A-zone floor values -- the A-zone
+        // floor is fixed and PUBLIC by design (Art III.3), so testing with the real
+        // values is correct, not a leak.
+        FloorConfig {
+            pause_at_or_below_q32: q32_from_ratio(2, 1).unwrap(),
+            resume_at_or_above_q32: q32_from_ratio(9, 4).unwrap(), // 2.0 + 0.25 hysteresis band
+        }
+    }
+
+    #[test]
+    fn floor_wins_pauses_annealing_when_n_eff_hits_floor_and_holds_through_hysteresis() {
+        let cfg = test_anneal_cfg();
+        let floor = test_floor_cfg();
+
+        // A constructed N_eff -> floor event sequence (design doc §7 WP3 acceptance
+        // criterion): starts diverse (Annealing), collapses to the floor (must Pause),
+        // ticks up a little but stays inside the hysteresis band (must stay Paused even
+        // though N_eff is no longer falling), then clears the resume threshold (may
+        // resume annealing).
+        let n_eff_sequence_q32: Vec<i128> = vec![
+            q32_from_ratio(4, 1).unwrap(), // 4.0: healthy diversity
+            q32_from_ratio(3, 1).unwrap(), // 3.0: still healthy
+            q32_from_ratio(2, 1).unwrap(), // 2.0: hits the floor exactly
+            q32_from_ratio(21, 10).unwrap(), // 2.1: inside hysteresis band
+            q32_from_ratio(9, 4).unwrap(), // 2.25: clears resume threshold
+        ];
+
+        let mut mode = AnnealMode::Annealing;
+        let mut modes = Vec::with_capacity(n_eff_sequence_q32.len());
+        for n_eff in &n_eff_sequence_q32 {
+            mode = arbitrate_anneal_mode(mode, *n_eff, &floor);
+            modes.push(mode);
+        }
+
+        assert_eq!(modes[0], AnnealMode::Annealing);
+        assert_eq!(modes[1], AnnealMode::Annealing);
+        assert_eq!(modes[2], AnnealMode::Paused, "N_eff at floor must pause");
+        assert_eq!(
+            modes[3],
+            AnnealMode::Paused,
+            "hysteresis band must hold Paused even as N_eff ticks up"
+        );
+        assert_eq!(
+            modes[4],
+            AnnealMode::Annealing,
+            "crossing the resume threshold must resume annealing"
+        );
+
+        // The core "floor wins" property: while Paused, tau_eff is exactly tau_hi
+        // regardless of how large N has grown (i.e., annealing can never trade away the
+        // diversity floor for exploitation, no matter how much exploitation history N
+        // encodes).
+        let large_n = 10_000u64;
+        let tau_while_paused = tau_eff_q32(large_n, AnnealMode::Paused, &cfg).unwrap();
+        assert_eq!(tau_while_paused, cfg.tau_hi_q32);
+
+        let tau_while_annealing = tau_eff_q32(large_n, AnnealMode::Annealing, &cfg).unwrap();
+        assert!(
+            tau_while_annealing < cfg.tau_hi_q32,
+            "once resumed, a large N should anneal tau below tau_hi"
+        );
+    }
+
+    #[test]
+    fn floor_wins_is_a_pure_function_of_n_eff_alone() {
+        let floor = test_floor_cfg();
+        // Same (prev_mode, n_eff, floor) must always produce the same next mode,
+        // independent of call order / how many times it's re-evaluated (Art 0.2).
+        let below = q32_from_ratio(1, 1).unwrap();
+        let m1 = arbitrate_anneal_mode(AnnealMode::Annealing, below, &floor);
+        let m2 = arbitrate_anneal_mode(AnnealMode::Annealing, below, &floor);
+        assert_eq!(m1, m2);
+        assert_eq!(m1, AnnealMode::Paused);
+    }
+
+    // -- ADR-ECON-006 fractional reward ---------------------------------------------
+
+    #[test]
+    fn fractional_half_twice_yields_s_one_and_q_eff_half_plus_one_over_three() {
+        // Hand fixture (CAPSULE C): v=0.5 twice → S=1.0 Q32, N=2, P=0.5
+        // Q_eff = (0.5 + 1.0) / (1+2) = 1.5/3 = 0.5
+        let k = key("code_review", "scaffold:sha256:frac");
+        let prices = BTreeMap::new();
+        let half = Q32_ONE / 2;
+        let events = vec![
+            RoutingFoldEvent::fractional_update(k.clone(), false, half, event_hash(1)),
+            RoutingFoldEvent::fractional_update(k.clone(), false, half, event_hash(2)),
+        ];
+        let nodes = fold_routing_state(&prices, &events).expect("fold");
+        let n = nodes.get(&k).expect("node");
+        assert_eq!(n.n(), 2);
+        assert_eq!(n.s_q32(), Q32_ONE, "two half-rewards must sum to Q32_ONE");
+        assert_eq!(n.p_q32(), half);
+        // (P + S) / (1+N) = (half + Q32_ONE) / 3
+        let expected_q = (half + Q32_ONE) / 3;
+        assert_eq!(n.q_eff_q32(), expected_q);
+        assert_eq!(
+            n.q_eff_q32(),
+            half,
+            "with P=0.5 and S=1.0 over N=2, Q_eff collapses to 0.5"
+        );
+    }
+
+    #[test]
+    fn fractional_clawback_is_exact_inverse() {
+        let k = key("code_review", "scaffold:sha256:frac-cb");
+        let prices = BTreeMap::new();
+        let half = Q32_ONE / 2;
+        let events = vec![
+            RoutingFoldEvent::fractional_update(k.clone(), true, half, event_hash(1)),
+            RoutingFoldEvent::fractional_update(k.clone(), false, half / 2, event_hash(2)),
+            RoutingFoldEvent::Clawback {
+                updated_event_hash: event_hash(1),
+            },
+        ];
+        let nodes = fold_routing_state(&prices, &events).expect("fold");
+        let n = nodes.get(&k).expect("node");
+        assert_eq!(n.n(), 1);
+        assert_eq!(n.s_q32(), half / 2);
+    }
+
+    #[test]
+    fn reward_mode_mix_is_hard_error() {
+        let k = key("code_review", "scaffold:sha256:mix");
+        let prices = BTreeMap::new();
+        let events = vec![
+            RoutingFoldEvent::binary_update(k.clone(), true, event_hash(1)),
+            RoutingFoldEvent::fractional_update(k.clone(), false, Q32_ONE / 2, event_hash(2)),
+        ];
+        assert_eq!(
+            fold_routing_state(&prices, &events),
+            Err(EconomyError::RoutingFoldRewardModeMix)
+        );
+    }
+
+    #[test]
+    fn missing_fraction_field_falls_back_to_binary() {
+        // Construct via EconomyEvent::routing_prior_updated (no fraction) and translate.
+        let event = crate::EconomyEvent::routing_prior_updated(
+            "code_review",
+            "scaffold:sha256:legacy",
+            true,
+            "verifier:x",
+            "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        )
+        .expect("construct");
+        let fold_ev = economy_event_to_routing_fold_event(&event)
+            .expect("translate")
+            .expect("some");
+        match fold_ev {
+            RoutingFoldEvent::PriorUpdated {
+                reward_mode,
+                verdict_fraction_q32,
+                ..
+            } => {
+                assert_eq!(reward_mode, RewardMode::Binary);
+                assert_eq!(verdict_fraction_q32, Q32_ONE);
+            }
+            other => panic!("unexpected {other:?}"),
+        }
+    }
+}

@@ -1,0 +1,79 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index 457ed488..4b0158c4 100644
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -1765,7 +1765,7 @@ class DataArray(NumericDataArray, DataWithCoords):
+         return self._set_dims(dims, squeeze)
+ 
+     def integrate(self, dim=None, coord=None, initial=None):
+-        """
+-        Integrate along a given dimension.
++        """
++        Integrate along a given dimension or coordinate.
+ 
+         Parameters
+         ----------
+@@ -1775,10 +1775,10 @@ class DataArray(NumericDataArray, DataWithCoords):
+         coord : str, optional
+             Coordinate to integrate along. If provided, `dim` must be None.
+ 
+-        Returns
++        Returns
+         -------
+         DataArray
+             Integrated data along the specified dimension or coordinate.
+ 
+         Notes
+         -----
+-        Integration is performed using the trapezoidal rule.
++        Integration is performed using the trapezoidal rule.
+ 
+         """
+         if coord is not None:
+@@ -1791,7 +1791,7 @@ class DataArray(NumericDataArray, DataWithCoords):
+         if dim is not None and coord is not None:
+             raise ValueError("cannot specify both 'dim' and 'coord'")
+ 
+-        return self._apply_vector_op('integrate', dim=dim, initial=initial)
++        return self._apply_vector_op('integrate', dim=coord, initial=initial)
+ 
+     def differentiate(self, dim=None, coord=None):
+         """
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index 201cc5e0..a53ab1dc 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -2550,7 +2550,7 @@ class Dataset(DataWithCoords):
+         return self._set_dims(dims, squeeze)
+ 
+     def integrate(self, dim=None, coord=None, initial=None):
+-        """
+-        Integrate along a given dimension.
++        """
++        Integrate along a given dimension or coordinate.
+ 
+         Parameters
+         ----------
+@@ -2560,10 +2560,10 @@ class Dataset(DataWithCoords):
+         coord : str, optional
+             Coordinate to integrate along. If provided, `dim` must be None.
+ 
+-        Returns
++        Returns
+         -------
+         Dataset
+             Integrated data along the specified dimension or coordinate.
+ 
+         Notes
+         -----
+-        Integration is performed using the trapezoidal rule.
++        Integration is performed using the trapezoidal rule.
+ 
+         """
+         if coord is not None:
+@@ -2576,7 +2576,7 @@ class Dataset(DataWithCoords):
+         if dim is not None and coord is not None:
+             raise ValueError("cannot specify both 'dim' and 'coord'")
+ 
+-        return self._apply_vector_op('integrate', dim=dim, initial=initial)
++        return self._apply_vector_op('integrate', dim=coord, initial=initial)

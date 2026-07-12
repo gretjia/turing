@@ -1,0 +1,126 @@
+{
+  "analysis_files": {
+    "tools/econ_lab/analysis/CALIBRATION_REPORT.json": "e07d35b02132f8de5c0c6bd4c7eb0010b3596c82821271f87dd8713318f515a5",
+    "tools/econ_lab/analysis/escalation_calibration.py": "a277863167069b232a0c8c759f1f749bc959f83d9792b061628bcfddeb578a55",
+    "tools/econ_lab/analysis/fracflat_build_pool.py": "731a413b78dcd2e2399d73aff2db12f6d2c6a4ee07e82f59f36907b771bd4511",
+    "tools/econ_lab/analysis/fracflat_pool_manifest.json": "15afde7bfb4693fbfbf363d450eb920bc8fc2dd27cfbc35ea1d66a953c41a86b",
+    "tools/econ_lab/analysis/fracflat_readout.py": "0611bf465a3a1d655116901126db18f622eed34b2c14db97c7e0bb0d70efb204",
+    "tools/econ_lab/analysis/fracflat_stream_manifest.json": "bf3f8f8d79ed7e3370e2c1dbeb534809239bb7e3f6acb8236726df3485cc6d69",
+    "tools/econ_lab/analysis/gen_p3e3_priors.py": "c0f0b958bfc8b368f75c82a2606b63280dd63df8948213795a8dcde80205ed64",
+    "tools/econ_lab/analysis/gen_p3e3_stream_manifest.py": "3fa4085213297f78745b433859246d53dedb4f71441828568332b00573e8db98",
+    "tools/econ_lab/analysis/gen_stage_b_priors.py": "4f92b4a325f4de40e0c3f24057a1436c9d0fb1e2fba6d34cbd6bce000dfab34d",
+    "tools/econ_lab/analysis/p3e3_priors_s01s02.json": "5bae2a6426a95c5126e0b1b46c4fa37eb8560ce17b60836624eed891d0c9e68f",
+    "tools/econ_lab/analysis/p3e3_readout.py": "bf9faca4b2d0b5a2ab3298e80a3c13bb360fb35df9449e16f87cc905df26b5b3",
+    "tools/econ_lab/analysis/p3e3_stream_manifest.json": "d9dca4dcf8649f30b9d1cca497f9ce54c47ee978141c1b66db9b87bd5e5c457d",
+    "tools/econ_lab/analysis/stage_a_explore.py": "24363ceaba71b62b61dae8ff5e6fca76852107daefcac38f616e167743f983ec",
+    "tools/econ_lab/analysis/stage_a_readout.py": "5fa91398a2405457638058a25c0f8d770feb17dc37cdeaf7343d61a7e2a91e45",
+    "tools/econ_lab/analysis/stage_b_prime_priors_s01.json": "d7f900934d3d9c95243af717e6ee7e3fdab7df7c989c17f05a59171757fe41ac",
+    "tools/econ_lab/analysis/stage_b_prime_readout.py": "f8aaf3664cdd5544e8dbc4347f03f6513790408d60441f38c71cc3688f7310bd"
+  },
+  "generated": "2026-07-12",
+  "key_artifacts": {
+    "tools/econ_lab/runs/depthk_smoke_20260709/verdict.json": "c9f966bb533c93f553f4c1f844b1695f681e64c8a6c82f4fb59ffaad2e2c01a3",
+    "tools/econ_lab/runs/dialectic_smoke_20260711/offline_mock/verdict.json": "a1e6ae0a1e6bc728eba173f2b1748d5d6bf9288c93cb196969f3ea32e50ce568",
+    "tools/econ_lab/runs/dialectic_smoke_20260711/real_attempt/verdict.json": "fe1485aca33fedd56c0da832feb15863c430ed2d4f6c057408b241f803a3998e",
+    "tools/econ_lab/runs/etransfer_20260710/A/verdict.json": "fed374b2541d315e596d95f78cbc87b9afe7543f88186d1d545a91969fafdc90",
+    "tools/econ_lab/runs/etransfer_20260710/ETRANSFER_READOUT.json": "a456bbf548c62184b33ad55586ca75f8f2ffbe14874d2c4181ac4897ff8a057d",
+    "tools/econ_lab/runs/etransfer_20260710/T/verdict.json": "b608e5133d5d51247f5483eb28342b715acb18ebb0c431a173a17c074e837a49",
+    "tools/econ_lab/runs/fracflat_20260710/BL/verdict.json": "d434c169efa39a11edfe4995e5a9d6e36c483f4bfff8d3e92a1f613a3e52d65f",
+    "tools/econ_lab/runs/fracflat_20260710/FL/verdict.json": "411c415f26c775fab1a964f4c928bf8f5aef42ced9aaf1ef05de81a62c5967a0",
+    "tools/econ_lab/runs/fracflat_20260710/FRACFLAT_READOUT.json": "0056957c01f85a042eb408b0712d49a0c38891f5f457219ac3bd0a8643df69aa",
+    "tools/econ_lab/runs/fracflat_20260710/UU/verdict.json": "f8d9da970eeedeb1e9d51f42cdc159f85c73b906e2aebf35d2ce8c42dc3299ea",
+    "tools/econ_lab/runs/fracflat_20260710/smoke_BL/verdict.json": "c004dced6dce72b31e03e0dd2b23630c5af582b93a181a2861e80fb0fe28cb11",
+    "tools/econ_lab/runs/fracflat_20260710/smoke_FL/verdict.json": "72b7f939269db8e50195b9d41bcb74487917f26bd0d48ec1847b721913a69026",
+    "tools/econ_lab/runs/fracflat_20260710/smoke_UU/verdict.json": "2e48fbc3a4ab5891a331ed13305a28ff63d1f4d34c0a5ed84784bb4ca81be7a4",
+    "tools/econ_lab/runs/fractional_smoke_20260710/flat/verdict.json": "69a2ab7f388d1ce348e52fef4f485cadc3d8b7d72a20100a0310e3ae932f6e38",
+    "tools/econ_lab/runs/fractional_smoke_20260710/flat_more/verdict.json": "82ab8a97f29d5cd9a5e5ec9317798ef43044832b4ad6860b28f6abd63fbf2766",
+    "tools/econ_lab/runs/fractional_smoke_20260710/stage/verdict.json": "b2e8efbdc446c1346f89938bb3ad7a073e7b8ee570109bc5be276ee63286aa0c",
+    "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA/verdict.json": "6d6cfd83e98c06739618cadfec7f73ec31ac996832c099632a1040855912b0ba",
+    "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA_probe3/verdict.json": "220e3af55c4bb4d04d5d80cfe591b0055f35796120c03659e273b8ffbf95f7e1",
+    "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armA_probe4/verdict.json": "d4944eef92b0676253d17c3f09753a3b5d54e208c0134074762c9dec3e367d74",
+    "tools/econ_lab/runs/h6_smoke_20260711/live_driver_armB/verdict.json": "19c011b9b528d38a427a8b25614f5ca93e19df430e3c65bac852629d1861a53e",
+    "tools/econ_lab/runs/l3_closed_loop_20260711/real_drill/verdict.json": "d9746ec33e6e10e86fd6a515e8c43cf0cc9b623f500737c335da60b52b1e91cf",
+    "tools/econ_lab/runs/p3e3_20260709/L/verdict.json": "5984d6907c08f7dfbd525965876085aece005679ecff74b31c737e3c9e6805bd",
+    "tools/econ_lab/runs/p3e3_20260709/P3E3_READOUT.json": "84b89be5b2aaaf9f6a132d23fbcec8f209484dff165533c98c4c01fa0655fdcc",
+    "tools/econ_lab/runs/p3e3_20260709/R/verdict.json": "23ee0ac206eb0bf290d2b8a03df067e4ad6e87416c55790594bb3418056e9431",
+    "tools/econ_lab/runs/p3e3_20260709/Z/verdict.json": "a6ae5f9be5e2ba180a2476e8d960cc40e6b5155065ee199debdaef298a3dc834",
+    "tools/econ_lab/runs/p3e3_smoke_20260709/L/verdict.json": "66ee8f276bcbd3f52463d26294ead158a281314946ca85a92cdf29ccd0814361",
+    "tools/econ_lab/runs/p3e3_smoke_20260709/R/verdict.json": "5264fdbdac2dc11e9f87a2c818db30f54c6ff872ad677a591483a5929f5e3152",
+    "tools/econ_lab/runs/p3e3_smoke_20260709/Z/verdict.json": "a5a44670592e0604d3284965416ab66e9029aa2b2cac12baeeeef788886a8ad1",
+    "tools/econ_lab/runs/smoke_20260707/verdict.json": "fc528ccc4d201c0b3b043fc28078b2ace17085f0f74e0db555f156f9d3f83ac8",
+    "tools/econ_lab/runs/smoke_real2_20260707/verdict.json": "76b3d8557040a48b3a9666d62efac1f827a452304d35a3aaeaeda28572f8fed8",
+    "tools/econ_lab/runs/smoke_real_20260707/verdict.json": "476778e47bffb8e00697c20d14f12602db4126f095341c3039ba03a0df2d4935",
+    "tools/econ_lab/runs/stageA_20260707/EXPLORE_METRICS.json": "9ffe7f2272628db0784c9d6579a483cc7003842c0849424518c30f0cfb655108",
+    "tools/econ_lab/runs/stageA_20260707/STAGE_A_READOUT.json": "f06c9920ce6db24c07777a8d817967fcc36217d71cb64462f8f53b2b3b7a6c3f",
+    "tools/econ_lab/runs/stageA_20260707/tau_0/verdict.json": "e84d4451030979cba10bc72634f839829d36dc1fc4372734b276da0fc08a66da",
+    "tools/econ_lab/runs/stageA_20260707/tau_0p5/verdict.json": "f7b24800d571c56d00d4de7c9385652b6f8c1c4992a51a6cf4f0c5231f755b2a",
+    "tools/econ_lab/runs/stageA_20260707/tau_1/verdict.json": "957d2657753e2cdab76d25869ba3c039d4a79dda920bd2e2720a36e8bf946133",
+    "tools/econ_lab/runs/stageA_20260707/tau_2/verdict.json": "9915be29d59ca700885c4e6a4f734fd75ce99740ec7a37cfb3d463172a4f792e",
+    "tools/econ_lab/runs/stageA_20260707/tau_inf/verdict.json": "0fde160ea25fd37dfadb3c4a7c781cccf5daf4ddb9923abc610ef5f7f3b93c7c",
+    "tools/econ_lab/runs/stageBprime_20260708/C/verdict.json": "85eecbf3ec128ac9dfe91387bd56b72c39426220c1a734cde1dfa9926ee59071",
+    "tools/econ_lab/runs/stageBprime_20260708/F/verdict.json": "a48997c350440e9e899ade6a0a96f512f6643404562214bda3628b94a08928cd",
+    "tools/econ_lab/runs/stageBprime_20260708/STAGE_B_PRIME_READOUT.json": "bd591e063ac101a0c17ff2e8f9451ad92426e1a660d7c84c8187729a2747e2d6",
+    "tools/econ_lab/runs/stageBprime_20260708/U/verdict.json": "63c0e634cd57cf2bca1c33ff76912318f6b1a63966c551f98c7312ac965ec636",
+    "tools/econ_lab/runs/stageBprime_20260708/W/verdict.json": "33fea141e2f541576465269b337c929313ab5e7e1c392ed3a69c72d0813ef7d1"
+  },
+  "note": "sha256 of every JSON/md verdict-class artifact under tools/econ_lab/runs + key analysis files; bulk logs/patches counted not hashed",
+  "runs_summary": {
+    "depthk_smoke_20260709": {
+      "bytes": 35283,
+      "files": 16
+    },
+    "dialectic_smoke_20260711": {
+      "bytes": 135401,
+      "files": 11
+    },
+    "etransfer_20260710": {
+      "bytes": 6111286,
+      "files": 693
+    },
+    "fracflat_20260710": {
+      "bytes": 11158002,
+      "files": 1096
+    },
+    "fractional_smoke_20260710": {
+      "bytes": 715740,
+      "files": 43
+    },
+    "h6_smoke_20260711": {
+      "bytes": 110656,
+      "files": 55
+    },
+    "l3_closed_loop_20260711": {
+      "bytes": 507351,
+      "files": 47
+    },
+    "p3e3_20260709": {
+      "bytes": 5514176,
+      "files": 1044
+    },
+    "p3e3_smoke_20260709": {
+      "bytes": 44827,
+      "files": 24
+    },
+    "smoke_20260707": {
+      "bytes": 5457,
+      "files": 1
+    },
+    "smoke_real2_20260707": {
+      "bytes": 336584,
+      "files": 20
+    },
+    "smoke_real_20260707": {
+      "bytes": 71913,
+      "files": 11
+    },
+    "stageA_20260707": {
+      "bytes": 48220570,
+      "files": 2027
+    },
+    "stageBprime_20260708": {
+      "bytes": 37225768,
+      "files": 1772
+    }
+  },
+  "schema": "econ_program.evidence_manifest.v1"
+}

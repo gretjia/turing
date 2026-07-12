@@ -1,0 +1,12 @@
+diff --git a/astropy/utils/misc.py b/astropy/utils/misc.py
+--- a/astropy/utils/misc.py
++++ b/astropy/utils/misc.py
+@@ -217,7 +217,7 @@
+             value = dct[key]
+ 
+             # Check if value is something we can process
+-            if not inspect.isfunction(value) and not inspect.isclass(value):
++            if not (inspect.isfunction(value) or inspect.isclass(value) or isinstance(value, property)):
+                 continue
+ 
+             # Get the docstring if we need to inherit it

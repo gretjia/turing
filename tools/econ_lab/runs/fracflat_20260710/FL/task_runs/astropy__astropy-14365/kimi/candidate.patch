@@ -1,0 +1,34 @@
+diff --git a/astropy/io/ascii/qdp.py b/astropy/io/ascii/qdp.py
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -48,7 +48,7 @@ def _get_table(lines, table_id=0):
+     for line in lines:
+         line = line.strip()
+         if not line or line.startswith('!'):
+             continue
+ 
+-        if line == 'NO NO':
++        if line.upper() == 'NO NO':
+             table_number += 1
+             reading_data = False
+             continue
+@@ -72,13 +72,13 @@ def _get_colnames(commandlist, data):
+ 
+     for line in commandlist:
+         split_command = line.split()
+-        if split_command[0] == 'READ':
+-            errtype = split_command[1]
++        if split_command[0].upper() == 'READ':
++            errtype = split_command[1].upper()
+             cols = [int(c) for c in split_command[2:]]
+             if errtype == 'SERR':
+                 serr.extend(cols)
+             elif errtype == 'TERR':
+                 terr.extend(cols)
+             else:
+                 raise ValueError(f'Unrecognized error type: {errtype}')
+-        elif split_command[0] == 'LABEL':
++        elif split_command[0].upper() == 'LABEL':
+             labels[int(split_command[1])] = ' '.join(split_command[2:])
+         else:
+             raise ValueError(f'Unrecognized QDP line: {line}')

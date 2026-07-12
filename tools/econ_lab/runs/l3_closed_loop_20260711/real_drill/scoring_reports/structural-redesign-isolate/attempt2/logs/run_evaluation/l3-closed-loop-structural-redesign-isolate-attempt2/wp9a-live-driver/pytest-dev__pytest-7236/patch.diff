@@ -1,0 +1,137 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+index 6709b5888..9f9fee0d6 100644
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -100,7 +100,7 @@ class TestCaseFunction(Function):
+             if self._is_skipped():
+                 return
+             # For unittest, we need to run setup/teardown for all tests,
+-            # even skipped ones, to ensure that the test runner can properly
++            # even skipped ones, but we need to skip teardown when the test is skipped
+             # handle the case where the test is skipped.
+             if self._is_skipped():
+                 # When the test is skipped, we still want to run the setup/teardown
+@@ -111,6 +111,9 @@ class TestCaseFunction(Function):
+             except Exception:
+                 # If setup fails, we still want to run teardown
+                 pass
++            # If the test was skipped, don't run teardown
++            if self._is_skipped():
++                return
+             try:
+                 self._call_teardown()
+             except Exception as e:
+@@ -131,9 +134,6 @@ class TestCaseFunction(Function):
+         # unittest setUp/tearDown protocol
+         try:
+             self._call_setup()
+-        except Exception:
+-            # If setup fails, we still want to run teardown
+-            pass
+         # If the test was skipped, don't run the test
+         if self._is_skipped():
+             return
+@@ -145,6 +145,9 @@ class TestCaseFunction(Function):
+         # If the test was skipped, don't run the test
+         if self._is_skipped():
+             return
++        # If setup failed, don't run teardown
++        if hasattr(self, '_setup_failed') and self._setup_failed:
++            return
+         try:
+             self._call_teardown()
+         except Exception as e:
+@@ -148,3 +148,22 @@ class TestCaseFunction(Function):
+         # If the test was skipped, don't run the test
+         if self._is_skipped():
+             return
++        # If setup failed, don't run teardown
++        if hasattr(self, '_setup_failed') and self._setup_failed:
++            return
++        try:
++            self._call_teardown()
++        except Exception as e:
++            # If teardown fails, we still want to return the original error
++            # but we should report this error as well
++            if not hasattr(self, '_teardown_failed'):
++                self._teardown_failed = True
++                self._teardown_error = e
++            raise
++
++    def _call_teardown(self):
++        if hasattr(self, '_setup_failed') and self._setup_failed:
++            return
++        # Regular teardown logic
++        if self._testcase is not None:
++            self._testcase.tearDown()
+diff --git a/src/_pytest/runner.py b/src/_pytest/runner.py
+index 80a8f0291..d80314273 100644
+--- a/src/_pytest/runner.py
++++ b/src/_pytest/runner.py
+@@ -135,13 +135,17 @@ def pytest_runtest_makereport(item, call):
+     return result
+ 
+ 
+-def pytest_runtest_protocol(item, nextitem):
++def pytest_runtest_protocol(item, nextitem):
+     """
+     Implements the runtest protocol for the pytest framework.
+     """
+     if hasattr(item, "setup"):
+         item.setup()
+     # Skip test if it is marked as skipped
+-    if item._is_skipped():
++    if item._is_skipped():
++        # For unittest.TestCase, we need to handle the case where
++        # teardown is called even when the test is skipped
++        if hasattr(item, "_testcase") and item._testcase is not None:
++            # For unittest.TestCase with --pdb, we should not run teardown
++            import sys
++            if hasattr(sys, 'ps1') or hasattr(sys, 'gettrace') and sys.gettrace() is not None:
++                return True
+         return True
+     return None
+diff --git a/src/_pytest/python.py b/src/_pytest/python.py
+index 2e2173808..91a90663f 100644
+--- a/src/_pytest/python.py
++++ b/src/_pytest/python.py
+@@ -345,16 +345,18 @@ class Item(Node):
+     def _is_skipped(self):
+         """Return True if this item is marked as skipped."""
+         # If the test itself is marked as skipped (not the setup/teardown)
+-        if self._skipped_by_mark:
+-            return True
++        if self._skipped_by_mark:
++            return True
++        # For unittest.TestCase, we also check if the test is skipped
++        if hasattr(self, "_testcase") and self._testcase is not None:
++            # Check if the test method is skipped
++            if hasattr(self._testcase, '_testMethodName'):
++                method = getattr(self._testcase, self._testcase._testMethodName)
++                if hasattr(method, '_skipped_by_mark'):
++                    return True
+         return False
+diff --git a/src/_pytest/debugging.py b/src/_pytest/debugging.py
+index 9b88b663e..6f02a95c1 100644
+--- a/src/_pytest/debugging.py
++++ b/src/_pytest/debugging.py
+@@ -114,18 +114,16 @@ def pytest_runtest_protocol(item, nextitem):
+     # If a test is skipped with --pdb, we should also execute the teardown
+     # to ensure that the test runner can properly handle this case.
+     # If we're in debug mode and the test is skipped, we need to handle teardown
+-    if hasattr(item, "_testcase") and item._testcase is not None:
+-        if hasattr(item, "_runtest_uses_pdb") and item._runtest_uses_pdb:
+-            # We need to ensure that teardown is called
+-            try:
+-                item._testcase.tearDown()
+-            except Exception:
+-                pass
+-            return True
+-    return None
++    if hasattr(item, "_testcase") and item._testcase is not None:
++        if hasattr(item, "_runtest_uses_pdb") and item._runtest_uses_pdb:
++            # In case of unittest.TestCase and --pdb, we should skip teardown
++            # when the test is skipped
++            if item._is_skipped():
++                return True
++    return None

@@ -1,0 +1,107 @@
+diff --git a/astropy/io/ascii/core.py b/astropy/io/ascii/core.py
+index 1819e057b2..4c30f23f12 100644
+--- a/astropy/io/ascii/core.py
++++ b/astropy/io/ascii/core.py
+@@ -1710,7 +1710,7 @@ class core:
+ 
+         # Get the writer class
+         if Writer is None:
+-            Writer = get_format_class(format, io.ascii, 'write')
++            Writer = get_format_class(format, io.ascii, 'write')
+ 
+         # Get the writer instance
+         try:
+diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py
+index 2436055f7a..2a92588d56 100644
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -1,17 +1,24 @@
+ from .core import Writer, Header
+ from . import core
+ import numpy as np
++import copy
+ 
+ 
+ class RSTHeader(Header):
+     def initialize(self, table):
+         self.start_line = 0
++        if hasattr(self, 'header_rows') and self.header_rows:
++            self.header_rows = list(self.header_rows)
++        else:
++            self.header_rows = []
++
+ 
+ class RST(Writer):
+     header_class = RSTHeader
+-    outfmt = ['{0} {1}']
++    outfmt = ['{0} {1}']
+ 
+     def __init__(self, **kwargs):
+         # Handle special keywords for the RST writer
++        self.header_rows = kwargs.pop('header_rows', None)
+         super().__init__(**kwargs)
+ 
+     def write_header(self, lines):
+@@ -20,7 +27,14 @@ class RST(Writer):
+         """
+         # Write the header
+         if self.header:
+-            lines.append(self.header.colnames)
++            if self.header.header_rows:
++                # If header_rows are specified, write them first
++                for row in self.header.header_rows:
++                    if hasattr(self, 'header_rows') and self.header_rows:
++                        header_line = [str(val) for val in row]
++                        lines.append(header_line)
++
++            # Write the column names as the main header
+             lines.append(self.header.colnames)
+ 
+             # Write the separator
+diff --git a/astropy/io/ascii/fixed_width.py b/astropy/io/ascii/fixed_width.py
+index be0b1902bd..58ac958b01 100644
+--- a/astropy/io/ascii/fixed_width.py
++++ b/astropy/io/ascii/fixed_width.py
+@@ -1,18 +1,25 @@
+ from .core import Writer, Header
+ from . import core
+ import numpy as np
++import copy
+ 
+ 
+ class FixedWidthHeader(Header):
+     def initialize(self, table):
+         self.start_line = 0
++        if hasattr(self, 'header_rows') and self.header_rows:
++            self.header_rows = list(self.header_rows)
++        else:
++            self.header_rows = []
++
+ 
+ class FixedWidth(Writer):
+     header_class = FixedWidthHeader
+-    outfmt = ['| {0} | {1} |']
++    outfmt = ['| {0} | {1} |']
+ 
+     def __init__(self, **kwargs):
+         # Handle special keywords for the FixedWidth writer
++        self.header_rows = kwargs.pop('header_rows', None)
+         super().__init__(**kwargs)
+ 
+     def write_header(self, lines):
+@@ -20,7 +27,14 @@ class FixedWidth(Writer):
+         """
+         # Write the header
+         if self.header:
+-            lines.append(self.header.colnames)
++            if self.header.header_rows:
++                # If header_rows are specified, write them first
++                for row in self.header.header_rows:
++                    if hasattr(self, 'header_rows') and self.header_rows:
++                        header_line = [str(val) for val in row]
++                        lines.append(header_line)
++
++            # Write the column names as the main header
+             lines.append(self.header.colnames)
+ 
+             # Write the separator

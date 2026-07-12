@@ -1,0 +1,99 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sphinx-doc/sphinx:scaffold:sha256:fc4cf68933c35ac01d7ec72f959d260473c61b0cf3a8f88ad2e9cf59ad47ff8c",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:62e0ad07d68e00a2b413730368e14d641ccb7319916e479049fda0d8a2a2e8c4",
+    "price_signal_hash": "sha256:ad2d33cdc5ca4143008216bd962ad0d687067bb4167195aeb8dad7b1ab42f08d",
+    "route_id": "sphinx-doc__sphinx-8056::armA::kimi",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:33d47deb97ef89f1b2f19c6f603853207c5adc07e99fc48b9298ed71105609a6"
+      },
+      "lineage": "kimi",
+      "live_split_verdict": {
+        "accept_test_ids": [],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": "patch_apply_failed",
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [],
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:33d47deb97ef89f1b2f19c6f603853207c5adc07e99fc48b9298ed71105609a6",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "sphinx-doc/sphinx",
+          "route_scaffold": "scaffold:sha256:fc4cf68933c35ac01d7ec72f959d260473c61b0cf3a8f88ad2e9cf59ad47ff8c",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:0bcaa9011825de08ac864e6cc7b78df5759db3430b5f1d0cde5cabdd960504b8"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": "patch_apply_failed",
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/R/scoring/sphinx-doc__sphinx-8056/kimi/run_evaluation.log",
+        "outcome": "ERROR",
+        "raw_report": {
+          "completed_ids": [],
+          "completed_instances": 0,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [
+            "sphinx-doc__sphinx-8056"
+          ],
+          "error_instances": 1,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sphinx-doc__sphinx-8056"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/R/scoring/sphinx-doc__sphinx-8056/kimi/wp9a-live-driver.wp9a-live-driver-sphinx-doc__sphinx-8056-kimi.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": null
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 603,
+        "candidate_patch_sha256": "sha256:3135b39efa86f5ee5eb4b9d3fc46c8dbde198aa2e0935ef326075e6cbb62b603",
+        "instance_id": "sphinx-doc__sphinx-8056",
+        "lineage": "kimi",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 239652
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "sphinx-doc/sphinx",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sphinx-doc__sphinx-8056",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "kimi",
+  "selected_route_id": "sphinx-doc__sphinx-8056::armA::kimi",
+  "task_index": 38
+}

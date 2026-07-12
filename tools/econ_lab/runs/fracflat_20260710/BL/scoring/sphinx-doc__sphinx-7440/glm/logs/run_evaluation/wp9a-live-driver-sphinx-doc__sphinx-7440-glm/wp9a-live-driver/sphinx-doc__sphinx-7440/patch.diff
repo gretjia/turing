@@ -1,0 +1,24 @@
+diff --git a/sphinx/domains/std.py b/sphinx/domains/std.py
+index 1c3a3d1b..1f7a8e5e 100644
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -1455,7 +1455,7 @@ class StandardDomain(Domain):
+     def note_object(self, objtype: str, name: str, labelid: str, location: Any = None
+                     ) -> None:
+         """Note a generic object for cross reference.
+-
++        For glossary terms, normalize case to avoid duplicate warnings for 'MySQL' vs 'mysql'.
+         .. versionadded:: 3.0
+         """
+@@ -1464,10 +1464,10 @@ class StandardDomain(Domain):
+                            docname, location=location)
+                 self.objects[objtype, name] = (self.env.docname, labelid)
++        elif objtype == 'term':
++            # Normalize case for glossary terms to avoid duplicates with different cases
++            name = name.lower()
++        self.objects[objtype, name] = (self.env.docname, labelid)
+-        self.objects[objtype, name] = (self.env.docname, labelid)
+-
+     def add_object(self, objtype: str, name: str, docname: str, labelid: str) -> None:
+         warnings.warn('StandardDomain.add_object() is deprecated.',
+                       RemovedInSphinx50Warning)

@@ -1,0 +1,10 @@
+diff --git a/sympy/tensor/array/ndim_array.py b/sympy/tensor/array/ndim_array.py
+--- a/sympy/tensor/array/ndim_array.py
++++ b/sympy/tensor/array/ndim_array.py
+@@ -135,7 +135,7 @@ class NDimArray:
+ 
+     def __len__(self):
+         if self._rank == 0:
+-            return 0
++            return 1
+         return self._shape[0]

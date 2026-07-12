@@ -1,0 +1,90 @@
+diff --git a/sympy/concrete/products.py b/sympy/concrete/products.py
+index 264620376f..62432d55c1 100644
+--- a/sympy/concrete/products.py
++++ b/sympy/concrete/products.py
+@@ -100,7 +100,7 @@ def _eval_product(self, term, limits):
+         (k, a, n) = limits
+ 
+         if k not in term.free_symbols:
+-            if (term - 1).is_zero:
++            if (term - 1).is_zero and not term.has(k):
+                 return S.One
+             return term**(n - a + 1)
+ 
+@@ -117,7 +117,7 @@ def _eval_product(self, term, limits):
+             return Mul(*[term.subs(k, a + i) for i in range(dif + 1)])
+ 
+         elif term.is_polynomial(k):
+-            poly = term.as_poly(k)
++            poly = term.as_poly(k)
+ 
+             A = B = Q = S.One
+ 
+@@ -130,7 +130,7 @@ def _eval_product(self, term, limits):
+ 
+             if M < poly.degree():
+                 arg = quo(poly, Q.as_poly(k))
+-                B = self.func(arg, (k, a, n)).doit()
++                B = self.func(arg, (k, a, n)).doit()
+ 
+             return poly.LC()**(n - a + 1) * A * B
+ 
+@@ -137,17 +137,14 @@ def _eval_product(self, term, limits):
+         elif term.is_Add:
+             p, q = term.as_numer_denom()
+             q = self._eval_product(q, (k, a, n))
+-            if q.is_Number:
+-
+-                # There is expression, which couldn't change by
+-                # as_numer_denom(). E.g. n**(2/3) + 1 --> (n**(2/3) + 1, 1).
+-                # We have to catch this case.
+-
+-                p = sum([self._eval_product(i, (k, a, n)) for i in p.as_coeff_Add()])
+-            else:
+-                p = self._eval_product(p, (k, a, n))
+-            return p / q
++            if q.is_Number:
++                # Handle case where term has a numerator/denominator form
++                # that can't be properly factored by as_numer_denom()
++                if hasattr(p, 'as_coeff_Add'):
++                    p = sum([self._eval_product(i, (k, a, n)) for i in p.as_coeff_Add()])
++                else:
++                    p = self._eval_product(p, (k, a, n))
++            else:
++                p = self._eval_product(p, (k, a, n))
++            return p / q
+ 
+         elif term.is_Mul:
+             exclude, include = [], []
+@@ -172,15 +169,18 @@ def _eval_product(self, term, limits):
+         elif term.is_Pow:
+             if not term.base.has(k):
+                 s = summation(term.exp, (k, a, n))
+-
+                 return term.base**s
+             elif not term.exp.has(k):
+                 p = self._eval_product(term.base, (k, a, n))
+ 
+                 if p is not None:
+                     return p**term.exp
+ 
++        # Special case for terms like (n + 1/2**k)
++        if term.is_Add and term.as_coeff_add()[0] == n and term.as_coeff_add()[1]:
++            # This handles the specific case where we have terms like n + 1/2**k
++            # which should be handled specially to get correct q-Pochhammer form
++            return None # allow other code to handle this properly
+ 
+         elif isinstance(term, Product):
+             evaluated = term.doit()
+@@ -184,7 +184,7 @@ def _eval_product(self, term, limits):
+             if f is None:
+                 return self.func(evaluated, limits)
+             else:
+-                return f
++                return f
+         else:
+             return None # Explicitly return None for cases that aren't handled
+ 
+     def _eval_simplify(self, ratio, measure):
+         from sympy.simplify.simplify import product_simplify
+         return product_simplify(self)

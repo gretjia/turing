@@ -1,0 +1,79 @@
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -1,6 +1,7 @@
+ # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ # For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
+ 
++import re
+ import itertools
+ import os
+ import sys
+@@ -18,7 +19,7 @@
+ 
+ from pylint.config import PylintConfig
+ from pylint.constants import (
+-    PY_PACKAGES,
++    PY_PACKAGES,
+     MSG_TYPES,
+     MSG_TYPES_LONG,
+     MSG_TYPES_STATUS,
+@@ -193,11 +194,46 @@ class PyLinter:
+         self.deprecation_warnings = deprecation_warnings
+         self.extension_package = extension_package
+         self.extra_packages_paths = extra_packages_paths
++        # Precompile ignore patterns for efficiency
++        self._ignore_regexes = []
+         self._ignored_paths = []
++        self._ignore_paths_regexes = []
+         self._ignore_options = {}
+         self._ignore_funcs = []
+         self._list_messages_enabled = False
+         ...
+ 
++    def _prepare_ignore(self):
++        """Prepare ignore patterns and paths for filtering."""
++        if self._ignore_regexes:
++            return  # already prepared
++        # --ignore : comma-separated base names
++        if hasattr(self.config, "ignore") and self.config.ignore:
++            self._ignore_regexes = [
++                re.compile(f"^{re.escape(name)}$")
++                for name in self.config.ignore.split(",")
++                if name
++            ]
++        # --ignore-patterns : comma-separated regex patterns, match base names
++        if hasattr(self.config, "ignore_patterns") and self.config.ignore_patterns:
++            for pattern in self.config.ignore_patterns.split(","):
++                if pattern:
++                    self._ignore_regexes.append(re.compile(pattern))
++        # --ignore-paths : comma-separated regex patterns, match full paths
++        if hasattr(self.config, "ignore_paths") and self.config.ignore_paths:
++            self._ignore_paths_regexes = [
++                re.compile(pattern)
++                for pattern in self.config.ignore_paths.split(",")
++                if pattern
++            ]
++
++    def _is_file_ignored(self, filepath):
++        """Check if a file should be ignored based on ignore options."""
++        self._prepare_ignore()
++        base_name = filepath.name
++        if any(regex.search(base_name) for regex in self._ignore_regexes):
++            return True
++        if any(regex.search(str(filepath)) for regex in self._ignore_paths_regexes):
++            return True
++        return False
++
+     def _discover_files(self, files_or_dirs):
+         """Discover all Python files in the given directories (recursively)."""
+         for path in files_or_dirs:
+@@ -206,7 +242,7 @@ class PyLinter:
+                 for file in Path(path).rglob("*.py"):
+                     if file.is_file() and not file.name.startswith(".#") and not file.name.startswith("_"):
+                         # Also skip compiled Python files (.pyc) etc.
+-                        if not file.suffix == ".pyc" and not file.suffix == ".pyo":
++                        if file.suffix in (".py", ".pyw") and not self._is_file_ignored(file):
+                             yield file
+             else:
+                 yield path

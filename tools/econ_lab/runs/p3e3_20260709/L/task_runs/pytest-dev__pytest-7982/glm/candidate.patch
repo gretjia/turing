@@ -1,0 +1,13 @@
+diff --git a/_pytest/pathlib.py b/_pytest/pathlib.py
+index xxxx..yyyy 100644
+--- a/_pytest/pathlib.py
++++ b/_pytest/pathlib.py
+@@ -192,7 +192,7 @@ def collect_directory(self, path):
+             if not is_fs_dir(path):
+                 return
+             ihook = self.session.gethook(path)
+-            dir = Dir.from_path(path, recurse=self.recurse, hook=ihook, consider=self.session.isinitpath, follow_symlinks=False)
++            dir = Dir.from_path(path, recurse=self.recurse, hook=ihook, consider=self.session.isinitpath)
+             ihook.pytest_collect_directory(dir=path, parent=self)
+             return dir.res_subset(self.session._fixturemanager)
+         finally:

@@ -1,0 +1,141 @@
+diff --git a/sympy/stats/distributions.py b/sympy/stats/distributions.py
+index 0000000..0000000 100644
+--- a/sympy/stats/distributions.py
++++ b/sympy/stats/distributions.py
+@@ -6986,6 +6986,140 @@ class Normal(ContinuousDistribution):
+         a, b = self.a, self.b
+         return Piecewise((0, x < a), (1, x > b), (x - a)/(b - a), True)
+ 
++class Arcsin(ContinuousDistribution):
++    _argnames = ('a', 'b')
++
++    @staticmethod
++    def check(a, b):
++        _ = Symbol('x', real=True, positive=True)
++        return -oo < a < b < oo
++
++    def pdf(self, x):
++        pi = S.Pi
++        a, b = self.a, self.b
++        return 1/(pi*sqrt((x - a)*(b - x)))
++
++    def _cdf(self, x):
++        a, b = self.a, self.b
++        pi = S.Pi
++        return Piecewise((0, x < a), (1, x > b), (2/pi)*asin(sqrt((x - a)/(b - a))), True)
++
++
++class Dagum(ContinuousDistribution):
++    _argnames = ('a', 'b', 'c')
++
++    @staticmethod
++    def check(a, b, c):
++        return a > 0 and b > 0 and c > 0
++
++    def pdf(self, x):
++        a, b, c = self.a, self.b, self.c
++        return a * c * (x/b)**(a*c) / (x * ((x/b)**a + 1)**(c + 1))
++
++    def _cdf(self, x):
++        a, b, c = self.a, self.b, self.c
++        return Piecewise((0, x <= 0), (1 - (1 + (x/b)**a)**(-c), True))
++
++
++class Erlang(ContinuousDistribution):
++    _argnames = ('k', 'lamda')
++
++    @staticmethod
++    def check(k, lamda):
++        return k > 0 and lamda > 0
++
++    def pdf(self, x):
++        k, lamda = self.a, self.b
++        return x**(k - 1) * lamda**k * exp(-lamda * x) / gamma(k)
++
++    def _cdf(self, x):
++        k, lamda = self.a, self.b
++        return Piecewise((0, x <= 0), (lowergamma(k, lamda*x)/gamma(k), True))
++
++
++class Frechet(ContinuousDistribution):
++    _argnames = ('alpha', 'mu', 'beta')
++
++    @staticmethod
++    def check(alpha, mu, beta):
++        return alpha > 0 and beta > 0
++
++    def pdf(self, x):
++        alpha, mu, beta = self.a, self.b, self.c
++        return (alpha/beta) * ((x - mu)/beta)**(-alpha - 1) * exp(-((x - mu)/beta)**(-alpha))
++
++    def _cdf(self, x):
++        alpha, mu, beta = self.a, self.b, self.c
++        return Piecewise((0, x <= mu), (exp(-((x - mu)/beta)**(-alpha)), True))
++
++
++class GammaInverse(ContinuousDistribution):
++    _argnames = ('a', 'b')
++
++    @staticmethod
++    def check(a, b):
++        return a > 0 and b > 0
++
++    def pdf(self, x):
++        a, b = self.a, self.b
++        return b**a * x**(-a - 1) * exp(-b/x) / gamma(a)
++
++    def _cdf(self, x):
++        a, b = self.a, self.b
++        return Piecewise((0, x <= 0), (uppergamma(a, b/x)/gamma(a), True))
++
++
++class Kumaraswamy(ContinuousDistribution):
++    _argnames = ('a', 'b')
++
++    @staticmethod
++    def check(a, b):
++        return a > 0 and b > 0
++
++    def pdf(self, x):
++        a, b = self.a, self.b
++        return a * b * x**(a - 1) * (1 - x**a)**(b - 1)
++
++    def _cdf(self, x):
++        a, b = self.a, self.b
++        return Piecewise((0, x <= 0), (1 - (1 - x**a)**b, x >= 1), (1 - (1 - x**a)**b, True))
++
++
++class Laplace(ContinuousDistribution):
++    _argnames = ('mu', 'b')
++
++    @staticmethod
++    def check(mu, b):
++        return b > 0
++
++    def pdf(self, x):
++        mu, b = self.a, self.b
++        return exp(-Abs(x - mu)/b)/(2*b)
++
++    def _cdf(self, x):
++        mu, b = self.a, self.b
++        return Piecewise((0, x < mu - b), (exp(-(x - mu)/b)/2, x < mu), (1 - exp(-(x - mu)/b)/2, x <= mu + b), (1, True))
++
++
++class Logistic(ContinuousDistribution):
++    _argnames = ('mu', 's')
++
++    @staticmethod
++    def check(mu, s):
++        return s > 0
++
++    def pdf(self, x):
++        mu, s = self.a, self.b
++        return exp(-(x - mu)/s)/(s*(1 + exp(-(x - mu)/s))**2)
++
++    def _cdf(self, x):
++        mu, s = self.a, self.b
++        return 1/(1 + exp(-(x - mu)/s))
++
++
+ class Pareto(ContinuousDistribution):
+     _argnames = ('xm', 'alpha')

@@ -1,0 +1,282 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:8276bd5f8922add76a56e5575b870869238ea4511fffe25ba09daebc62452159",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:16c933769420af46c9cd9f1640b4094ed116b544ff803f9644d04995e7de0562"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:6b31eb8cfbb54bf40af501cf9879e493df8b2d5402b264a0df8d2e994d28ccd9",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:ad74d0c7e3349740368d20976a8f3d5371ca6c1ce29ffb627e56b10d7e452da4"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:657b956a653a0e2a1b33b0e9be99aa737c935ac2e3d8aa848370f56e8c6bb0c8",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": true,
+        "verdict_fraction_q32": "4294967296",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:38a00ab2ab6ac6a3ea2f03248743afd5b32cbc5ad172b203f0b6ed8cb6383e3d"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armB",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "django__django-11066",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "test_existing_content_type_rename (contenttypes_tests.test_operations.ContentTypeOperationsTests)"
+    ],
+    "accept_verdict": true,
+    "canary": false,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 3,
+    "verify_pass_fraction": 1.0,
+    "verify_test_ids": [
+      "test_content_type_rename_conflict (contenttypes_tests.test_operations.ContentTypeOperationsTests)",
+      "test_existing_content_type_rename_other_database (contenttypes_tests.test_operations.ContentTypeOperationsTests)",
+      "test_missing_content_type_rename_ignore (contenttypes_tests.test_operations.ContentTypeOperationsTests)"
+    ],
+    "verify_total_count": 3,
+    "verify_verdict": true
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3101920824",
+      "s": 1,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3221225472",
+      "s": 1,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:none": {
+      "n": 2,
+      "p_q32": "2147483648",
+      "q_eff_q32": "3101920824",
+      "s": 1,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2505397589",
+      "s": 0,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:single_shot": {
+      "n": 0,
+      "note": "absent_from_fold_map_means_N0_prior",
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 0,
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    "verify:none": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2505397589",
+      "s": 0,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/scoring/django__django-11066/deepseek/wp9a-live-driver.wp9a-live-driver-django__django-11066-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:00cba25338d4ac612e70f0d8503552b3167ecc8dec0ebc800443f16bbedc7121",
+        "price_signal_hash": "sha256:f05654b97e93468aefde5a1a24e56b6f093a48b53d1d0fe0783615a46ba400c9",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:3d7f09ea95f180d50ecc92a0204e2d68bc17cd4a218290604d0941c5ddebe352",
+        "price_signal_hash": "sha256:f05654b97e93468aefde5a1a24e56b6f093a48b53d1d0fe0783615a46ba400c9",
+        "route_id": "single_shot",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "single_shot",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:7c61773d7101be47c7d069a8a8f5b44365f7318b00bd0e1b3ea84b6a81db51f4"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:8c100cae453e0eb4e0596c37b9ebba6c0088f2f8a0a479dc3d7691c98a78f216",
+        "price_signal_hash": "sha256:f05654b97e93468aefde5a1a24e56b6f093a48b53d1d0fe0783615a46ba400c9",
+        "route_id": "none",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+        },
+        {
+          "domain_bucket": "global",
+          "n": 1,
+          "p_q32": "2147483648",
+          "q_eff_q32": "2505397589",
+          "s": 0,
+          "s_q32": "2863311530",
+          "scaffold_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+        }
+      ],
+      "option": "none",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "single_shot",
+    "verify": "none"
+  },
+  "task_index": 1,
+  "verify_pass_fraction": 1.0,
+  "verify_verdict_for_credit": true,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/T/task_runs/django__django-11066/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

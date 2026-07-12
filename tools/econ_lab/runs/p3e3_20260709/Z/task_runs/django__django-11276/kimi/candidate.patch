@@ -1,0 +1,31 @@
+diff --git a/django/utils/html.py b/django/utils/html.py
+--- a/django/utils/html.py
++++ b/django/utils/html.py
+@@ -1,5 +1,6 @@
++import html
+ import json
+ import re
+ from html.entities import html5
+ from html.parser import HTMLParser
+@@ -41,18 +42,9 @@
+ @keep_lazy_text
+ def escape(text):
+     """
+     Return the given text with ampersands, quotes and angle brackets encoded
+     for use in HTML.
+ 
+     This is equivalent to autoescape in the Django template engine.
+     """
+-    return mark_safe(str(text).translate(_html_escapes))
++    return mark_safe(html.escape(str(text)))
+ 
+-
+-_html_escapes = {
+-    ord('&'): '&amp;',
+-    ord('<'): '&lt;',
+-    ord('>'): '&gt;',
+-    ord('"'): '&quot;',
+-    ord("'"): '&#39;',
+-}
+ 
+ def conditional_escape(text):

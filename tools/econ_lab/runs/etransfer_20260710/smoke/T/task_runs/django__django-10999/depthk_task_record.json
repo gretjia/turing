@@ -1,0 +1,208 @@
+{
+  "credit_assignment": "v0_equal_share_not_causal",
+  "credit_events": [
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:26055a56caf8555b007c2ca36b5c64247e67835ff9ef69b8826f80d0460c2ce9",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "2863311530",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:64379d321b2b6948b5f84cffde399d3356f2864e37978d266edce156160a53a0"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:9d2ee30e0d9bf14b46aff9a0638183f3164ab907ff08b9a3ae6a04d03cb830b9",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "2863311530",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:c2ab539b1fc408a43edeb7d3ddde21b3c8c94f43d9cea35552732efac5f23b7e"
+      }
+    },
+    {
+      "RoutingPriorUpdated": {
+        "event_hash": "sha256:a435dbd152b1f67d6e4f63985582aa9a19e839182faef11a1ed4662a2636f92f",
+        "event_type": "RoutingPriorUpdated",
+        "head_effect": "PRESERVE",
+        "route_domain": "global",
+        "route_scaffold": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "schema_id": "routing_prior_updated.v2",
+        "verdict": false,
+        "verdict_fraction_q32": "2863311530",
+        "verdict_source_id": "verifier:depthk_credit_assign_v0",
+        "verifier_attestation_hash": "sha256:df86db685c99cb16b3c541e1599f7e1ddfb11c6948e9dc0789777990d851bd0f"
+      }
+    }
+  ],
+  "credit_events_count": 3,
+  "dispatch_arm": "armB",
+  "domain_bucket": "global",
+  "domain_bucket_mode": "GLOBAL_CONSTANT",
+  "instance_id": "django__django-10999",
+  "lineage": "deepseek",
+  "live_split_verdict": {
+    "accept_test_ids": [
+      "test_days (utils_tests.test_dateparse.DurationParseTests)",
+      "test_hours_minutes_seconds (utils_tests.test_dateparse.DurationParseTests)",
+      "test_parse_datetime (utils_tests.test_dateparse.DateParseTests)",
+      "test_parse_python_format (utils_tests.test_dateparse.DurationParseTests)",
+      "test_parse_time (utils_tests.test_dateparse.DateParseTests)",
+      "test_seconds (utils_tests.test_dateparse.DurationParseTests)"
+    ],
+    "accept_verdict": true,
+    "canary": true,
+    "harness_error_reason": null,
+    "not_enough_tests": false,
+    "schema": "econ_lab.live_split_verifier.verdict.v1",
+    "verify_pass_count": 4,
+    "verify_pass_fraction": 0.6666666666666666,
+    "verify_test_ids": [
+      "test_fractions_of_seconds (utils_tests.test_dateparse.DurationParseTests)",
+      "test_iso_8601 (utils_tests.test_dateparse.DurationParseTests)",
+      "test_minutes_seconds (utils_tests.test_dateparse.DurationParseTests)",
+      "test_negative (utils_tests.test_dateparse.DurationParseTests)",
+      "test_parse_date (utils_tests.test_dateparse.DateParseTests)",
+      "test_parse_postgresql_format (utils_tests.test_dateparse.DurationParseTests)"
+    ],
+    "verify_total_count": 6,
+    "verify_verdict": false
+  },
+  "nodes_after": {
+    "context:source_context": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2505397589",
+      "s": 0,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:loop": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2505397589",
+      "s": 0,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:none": {
+      "n": 1,
+      "p_q32": "2147483648",
+      "q_eff_q32": "2505397589",
+      "s": 0,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "nodes_before": {
+    "context:source_context": {
+      "n": 0,
+      "note": "absent_from_fold_map_means_N0_prior",
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 0,
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    "repair:loop": {
+      "n": 0,
+      "note": "absent_from_fold_map_means_N0_prior",
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 0,
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    "verify:none": {
+      "n": 0,
+      "note": "absent_from_fold_map_means_N0_prior",
+      "p_q32": "2147483648",
+      "q_eff_q32": "2147483648",
+      "s": 0,
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  },
+  "provider_path": "siliconflow",
+  "scoring_report_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/smoke/T/scoring/django__django-10999/deepseek/wp9a-live-driver.wp9a-live-driver-django__django-10999-deepseek.json"
+  ],
+  "scoring_status": "COMPLETED",
+  "settlement_verdict_resolved": true,
+  "side": "TRAIN",
+  "stage_chain": [
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:8a5f3dc4b83c53e5306cf3e2d3e5a04c78dbe4d8037bd66a5f50fbe2daf6114a",
+        "price_signal_hash": "sha256:25f972f8302cfe5e906bd66b4ccbf37093cc1eca31192dede52253689d2540cf",
+        "route_id": "source_context",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [],
+      "option": "source_context",
+      "stage_name": "context",
+      "stage_option_id": "stage:sha256:ccbf65bf5eada9cc690652ab9c2a46fef88edac05b76c5c221746f493deceb64"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:ff952dba2365e141e5884335462976a4980059af08804fe8f360bebf2f500ae0",
+        "price_signal_hash": "sha256:25f972f8302cfe5e906bd66b4ccbf37093cc1eca31192dede52253689d2540cf",
+        "route_id": "loop",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [],
+      "option": "loop",
+      "stage_name": "repair",
+      "stage_option_id": "stage:sha256:c17a29541713000fbd954e9a7a15c13ddbae34b77876b30d615d1c8c2226c4d3"
+    },
+    {
+      "budget_suggestion": {
+        "can_move_accepted_head": false,
+        "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+        "emits_authorization": false,
+        "head_effect": "PRESERVE",
+        "market_id": "stage:global:stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e",
+        "max_tokens": 12000,
+        "mode": "Softmax",
+        "pput_prior_hash": "sha256:1a2fc8c3baa3a53f0ef873fe9c078c8334bd7bd28ad68a03a6d46a57ece8ec75",
+        "price_signal_hash": "sha256:25f972f8302cfe5e906bd66b4ccbf37093cc1eca31192dede52253689d2540cf",
+        "route_id": "none",
+        "schema_id": "budget_allocated.v1"
+      },
+      "node_states": [],
+      "option": "none",
+      "stage_name": "verify",
+      "stage_option_id": "stage:sha256:3d5a2b0d4a6c6625f50c91d348e9f0668007a83f347b382dd164cda53da59d8e"
+    }
+  ],
+  "stage_choices": {
+    "context": "source_context",
+    "repair": "loop",
+    "verify": "none"
+  },
+  "task_index": 0,
+  "verify_pass_fraction": 0.6666666666666666,
+  "verify_verdict_for_credit": false,
+  "worker_calls_increment": 1,
+  "worker_receipt_paths": [
+    "/home/zephryj/turingos_backup/work/grok_etransfer/tools/econ_lab/runs/etransfer_20260710/smoke/T/task_runs/django__django-10999/deepseek/worker_receipt.json"
+  ],
+  "worker_result_status": "COMPLETED"
+}

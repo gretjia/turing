@@ -1,0 +1,35 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "route:pytest-dev/pytest:scaffold:sha256:ed538be157817385a321dd1dc94ae191f785662d6d7b037a26116dea396722f7",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:b16a7f2ac299c6c9574e99109e012c915cd677ac1300238800122856c25911e0",
+    "price_signal_hash": "sha256:031a3813813c8c9a88c9100488896468076fd4f2332f87f5999cdf18eaef3811",
+    "route_id": "structural-redesign-isolate",
+    "schema_id": "budget_allocated.v1"
+  },
+  "chosen_route": "structural-redesign-isolate",
+  "domain_bucket": "pytest-dev/pytest",
+  "pass_label": "pass2_reentry",
+  "paused_route_ids": [],
+  "priors_used": {
+    "conservative-reuse-wrap": 0.45,
+    "focused-meta-inspection": 0.35,
+    "structural-redesign-isolate": 0.55
+  },
+  "route_labels": [
+    "conservative-reuse-wrap",
+    "structural-redesign-isolate",
+    "focused-meta-inspection"
+  ],
+  "route_market_bridge": {
+    "route_candidates_digest": "sha256:6d0dc3ecec68ca125c017bbb55181cc452a03b7ec14f91d1655a12e693622fcd",
+    "route_candidates_path": "tools/econ_lab/runs/l3_closed_loop_20260711/real_drill/pass2_reentry/route_market_bridge/route_candidates.json",
+    "route_priors_digest": "sha256:0dcd58b33b355ee54efe630974e63b92df4286dac1d24c4ad49da9131c83ceac",
+    "route_priors_path": "tools/econ_lab/runs/l3_closed_loop_20260711/real_drill/pass2_reentry/route_market_bridge/route_priors.json"
+  }
+}

@@ -1,0 +1,13 @@
+diff --git a/sympy/tensor/array/ndim_array.py b/sympy/tensor/array/ndim_array.py
+index 0930d13790..12f91022c5 100644
+--- a/sympy/tensor/array/ndim_array.py
++++ b/sympy/tensor/array/ndim_array.py
+@@ -140,7 +140,7 @@ class NDimArray:
+         if self._shape == ():
+             return 0
+         return self._shape[0]
+-    
++
+     def __getitem__(self, index):
+         if self._shape == ():
+             if index != 0:

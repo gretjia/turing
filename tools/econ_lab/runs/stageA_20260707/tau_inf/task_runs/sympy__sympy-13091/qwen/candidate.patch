@@ -1,0 +1,234 @@
+diff --git a/sympy/core/basic.py b/sympy/core/basic.py
+index 1a2be920005..d89d494b5d4 100644
+--- a/sympy/core/basic.py
++++ b/sympy/core/basic.py
+@@ -313,7 +313,7 @@ def __eq__(self, other):
+             except SympifyError:
+                 return False    # sympy != other
+ 
+-            if type(self) != type(other):
++            if type(self) != type(other):
+                 return False
+ 
+         return self._hashable_content() == other._hashable_content()
+@@ -324,7 +324,7 @@ def __ne__(self, other):
+         return not self.__eq__(other)
+ 
+     def dummy_eq(self, other, symbol=None):
+-        """
++        """
+         Compare two expressions and handle dummy symbols.
+ 
+         Examples
+@@ -344,7 +344,7 @@ def dummy_eq(self, other, symbol=None):
+         return self.subs(dummy, tmp) == other.subs(symbol, tmp)
+ 
+     # Note, we always use the default ordering (lex) in __str__ and __repr__,
+-    # regardless of the global setting.  See issue 5487.
++    # regardless of the global setting.  See issue 5487.
+     def __repr__(self):
+         """Method to return the string representation.
+         Return the expression as a string.
+@@ -406,7 +406,7 @@ def __str__(self):
+             return n._prec != 1
+ 
+     @property
+-    def func(self):
++    def func(self):
+         """
+         The top-level function in an expression.
+ 
+@@ -420,7 +420,7 @@ def func(self):
+         return self.__class__
+ 
+     @property
+-    def args(self):
++    def args(self):
+         """Returns a tuple of arguments of 'self'.
+ 
+         Examples
+@@ -428,7 +428,7 @@ def args(self):
+         Never use self._args, always use self.args.
+         Only use _args in __new__ when creating a new function.
+         Don't override .args() from Basic (so that it's easy to
+-        change the interface in the future if needed).
++        change the interface in the future if needed).
+         """
+         return self._args
+@@ -433,7 +433,7 @@ def args(self):
+         return self._args
+ 
+     @property
+-    def _sorted_args(self):
++    def _sorted_args(self):
+         """
+         The same as ``args``.  Derived classes which don't fix an
+         order on their arguments should override this method to
+@@ -566,7 +566,7 @@ def subs(self, *args, **kwargs):
+                 sequence = [(k, v) for (k, v) in sequence.items()],
+                   key=default_sort_key)
+ 
+-        if kwargs.pop('simultaneous', False):  # XXX should this be the default for dict subs?
++        if kwargs.pop('simultaneous', False):  # XXX should this be the default for dict subs?
+             reps = {}
+             rv = self
+             kwargs['hack2'] = True
+@@ -596,7 +596,7 @@ def _subs(self, old, new, **hints):
+             return None
+ 
+         rv = self._eval_subs(old, new)
+-        if rv is None:
++        if rv is None:
+             rv = fallback(self, old, new)
+         return rv
+ 
+@@ -732,7 +732,7 @@ def xreplace(self, rule):
+         return value
+ 
+     def _xreplace(self, rule):
+-        """
++        """
+         Helper for xreplace. Tracks whether a replacement actually occurred.
+         """
+         if self in rule:
+@@ -786,7 +786,7 @@ def has(self, *patterns):
+         return any(self._has(pattern) for pattern in patterns)
+ 
+     def _has(self, pattern):
+-        """Helper for .has()"""
++        """Helper for .has()"""
+         from sympy.core.function import UndefinedFunction, Function
+         if isinstance(pattern, UndefinedFunction):
+             return any(f.func == pattern or f == pattern
+@@ -864,7 +864,7 @@ def replace(self, query, value, map=False, simultaneous=True, exact=False):
+         mapping = {}  # changes that took place
+         mask = []  # the dummies that were used as change placeholders
+ 
+-        def rec_replace(expr):
++        def rec_replace(expr):
+             result = _query(expr)
+             if result or result == {}:
+                 new = _value(expr, result)
+@@ -879,7 +879,7 @@ def rec_replace(expr):
+         return bottom_up(self, rec_replace, atoms=True)
+ 
+     def find(self, query, group=False):
+-        """Find all subexpressions matching a query. """
++        """Find all subexpressions matching a query. """
+         query = _make_find_query(query)
+         results = list(filter(query, preorder_traversal(self)))
+ 
+@@ -891,7 +891,7 @@ def count(self, query):
+         return sum(bool(query(sub)) for sub in preorder_traversal(self))
+ 
+     def matches(self, expr, repl_dict={}, old=False):
+-        """
++        """
+         Helper method for match() that looks for a match between Wild symbols
+         in self and expressions in expr.
+ 
+@@ -901,7 +901,7 @@ def matches(self, expr, repl_dict={}, old=False):
+         return None
+ 
+     def match(self, pattern, old=False):
+-        """
++        """
+         Pattern matching.
+ 
+         Wild symbols match all.
+@@ -930,7 +930,7 @@ def doit(self, **hints):
+         if hints.get('deep', True):
+             terms = [term.doit(**hints) if isinstance(term, Basic) else term
+                          for term in self.args]
+-            return self.func(*terms)
++            return self.func(*terms)
+         else:
+             return self
+ 
+@@ -1000,7 +1000,7 @@ def rewrite(self, *args, **hints):
+         if not args:
+             return self
+         else:
+-            pattern = args[:-1]
++            pattern = args[:-1]
+             if isinstance(args[-1], string_types):
+                 rule = '_eval_rewrite_as_' + args[-1]
+             else:
+@@ -1057,7 +1057,7 @@ def _exec_constructor_postprocessors(cls, obj):
+         # WARNING: This API is experimental.
+ 
+         # This is an experimental API that introduces constructor
+-        # postprosessors for SymPy Core elements. If an argument of a SymPy
++        # postprosessors for SymPy Core elements. If an argument of a SymPy
+         # expression has a `_constructor_postprocessor_mapping` attribute, it will
+         # be interpreted as a dictionary containing lists of postprocessing
+         # functions for matching expression node names.
+@@ -1069,7 +1069,7 @@ def _exec_constructor_postprocessors(cls, obj):
+         for f in postprocessors.get(clsname, []):
+             obj = f(obj)
+         if len(postprocessors) > 0 and obj not in Basic._constructor_postprocessor_mapping:
+-            Basic._constructor_postprocessor_mapping[obj] = postprocessors
++            Basic._constructor_postprocessor_mapping[obj] = postprocessors
+ 
+         return obj
+@@ -1094,7 +1094,7 @@ def _aresame(a, b):
+     from .function import AppliedUndef, UndefinedFunction as UndefFunc
+     for i, j in zip_longest(preorder_traversal(a), preorder_traversal(b)):
+         if i != j or type(i) != type(j):
+-            if ((isinstance(i, UndefFunc) and isinstance(j, UndefFunc)) or
++            if ((isinstance(i, UndefFunc) and isinstance(j, UndefFunc)) or
+                 (isinstance(i, AppliedUndef) and isinstance(j, AppliedUndef))):
+                 if i.class_key() != j.class_key():
+                     return False
+@@ -1116,7 +1116,7 @@ def _atomic(e):
+     from sympy import Derivative, Function, Symbol
+     pot = preorder_traversal(e)
+     seen = set()
+-    try:
++    try:
+         free = e.free_symbols
+     except AttributeError:
+         return {e}
+@@ -1141,7 +1141,7 @@ def _atomic(e):
+     return atoms
+ 
+ 
+-class preorder_traversal(Iterator):
++class preorder_traversal(Iterator):
+     """
+     Do a pre-order traversal of a tree.
+ 
+@@ -1150,7 +1150,7 @@ class preorder_traversal(Iterator):
+     def __init__(self, node, keys=None):
+         self._skip_flag = False
+         self._pt = self._preorder_traversal(node, keys)
+-    
++
+     def _preorder_traversal(self, node, keys):
+         yield node
+         if self._skip_flag:
+@@ -1171,7 +1171,7 @@ def skip(self):
+         """
+         self._skip_flag = True
+ 
+-    def __next__(self):
++    def __next__(self):
+         return next(self._pt)
+ 
+     def __iter__(self):
+@@ -1177,7 +1177,7 @@ def __iter__(self):
+         return self
+ 
+ 
+-def _make_find_query(query):
++def _make_find_query(query):
+     """Convert the argument of Basic.find() into a callable"""
+     try:
+         query = sympify(query)
+@@ -1185,4 +1185,4 @@ def _make_find_query(query):
+     if isinstance(query, type):
+         return lambda expr: isinstance(expr, query)
+     elif isinstance(query, Basic):
+-        return lambda expr: expr.match(query) is not None
++        return lambda expr: expr.match(query) is not None
+     return query

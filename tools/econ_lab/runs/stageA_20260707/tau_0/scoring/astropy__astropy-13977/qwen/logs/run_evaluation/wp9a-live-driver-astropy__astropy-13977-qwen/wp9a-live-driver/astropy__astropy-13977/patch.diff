@@ -1,0 +1,24 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index 240b4d6035..60170128d9 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -610,10 +610,15 @@ def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+         # Convert inputs to Quantity objects, if possible
+         arrays = []
+         for input_ in inputs:
+-            # For the special case of multiplication and division, we let the
+-            # unit system handle the conversion
+-            converter = self._get_converter(input_)
+-            arrays.append(converter(input_) if converter else input_)
++            # For the special case of multiplication and division, we let the
++            # unit system handle the conversion
++            try:
++                converter = self._get_converter(input_)
++                arrays.append(converter(input_) if converter else input_)
++            except ValueError:
++                # If conversion fails, return NotImplemented to allow
++                # other objects in the operation to handle it
++                return NotImplemented
+         # Perform the ufunc operation on the arrays
+         result = getattr(ufunc, method)(*arrays, **kwargs)
+         # Convert back to a Quantity, if possible

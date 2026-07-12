@@ -1,0 +1,29 @@
+diff --git a/xarray/core/nanops.py b/xarray/core/nanops.py
+index 0f1e0a4e6..5d6a3e1e8 100644
+--- a/xarray/core/nanops.py
++++ b/xarray/core/nanops.py
+@@ -32,9 +32,9 @@ def _get_counts(a, mask, axis=None, skipna=True, **kwargs):
+     if skipna:
+         if axis is None:
+             # Counts all non-null values
+-            count = np.sum(~mask)
++            count = (mask == 0).sum()
+         else:
+             # Counts non-null values along each dimension of reduction
+-            count = np.sum(~mask, axis=axis)
++            count = (mask == 0).sum(axis=axis)
+     else:
+         if axis is None:
+             count = np.prod(a.shape)
+@@ -42,9 +42,9 @@ def _get_counts(a, mask, axis=None, skipna=True, **kwargs):
+             # Counts all elements along each dimension of reduction
+             if np.isscalar(axis):
+                 # e.g., np.sum([1, 2, 3], axis=0) -> 3
+-                count = a.shape[axis]
++                count = (np.ones(a.shape[axis], dtype=bool) == 0).sum()
+             else:
+                 # e.g., np.sum(np.ones((2, 3)), axis=(0, 1)) -> 6
+-                count = np.take(a.shape, axis).prod()
++                count = np.prod([np.take(a.shape, ax) for ax in axis])
+ 
+     return count.astype(a.dtype)

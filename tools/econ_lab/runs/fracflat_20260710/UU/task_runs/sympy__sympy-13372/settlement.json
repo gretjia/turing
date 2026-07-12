@@ -1,0 +1,217 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sympy/sympy:scaffold:sha256:7c225e63133b5c759b5f075efbf281262240c24ae64cedd3fe202293fa24c4cd",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:05da719e88f6532edd0160da571b4a876a860b5cbccaddfd18e2e131b6fcefdf",
+    "price_signal_hash": "sha256:919f7f80689584fe8c38c4047d011dad4065f2629ab968aa050a2df55c235957",
+    "route_id": "sympy__sympy-13372::armC::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:e56f665b60fa96282f045a156bfcf2539f0ca66a7faead8c84c27ece05a3ac2c",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "test_bugs",
+          "test_evalf_complex_cancellation",
+          "test_evalf_complex_powers",
+          "test_evalf_divergent_series",
+          "test_evalf_exponentiation",
+          "test_evalf_helpers",
+          "test_evalf_logs",
+          "test_evalf_mul",
+          "test_evalf_near_integers",
+          "test_evalf_power_subs_bugs",
+          "test_evalf_powers",
+          "test_evalf_product",
+          "test_evalf_ramanujan",
+          "test_evalf_trig_zero_detection",
+          "test_implemented_function_evalf",
+          "test_infinities",
+          "test_issue_10323",
+          "test_issue_4945",
+          "test_issue_8821_highprec_from_str",
+          "test_issue_9326",
+          "test_old_docstring"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 0,
+        "verify_pass_fraction": 0.0,
+        "verify_test_ids": [
+          "test_AssocOp_Function",
+          "test_cancellation",
+          "test_chop_value",
+          "test_evalf_arguments",
+          "test_evalf_basic",
+          "test_evalf_bugs",
+          "test_evalf_complex",
+          "test_evalf_integer_parts",
+          "test_evalf_integral",
+          "test_evalf_py_methods",
+          "test_evalf_relational",
+          "test_evalf_rump",
+          "test_evalf_sum",
+          "test_evalf_trig",
+          "test_evaluate_false",
+          "test_issue_4806",
+          "test_issue_4956_5204",
+          "test_issue_5486",
+          "test_issue_5486_bug",
+          "test_issue_6632_evalf",
+          "test_issue_8853",
+          "test_scaled_zero",
+          "test_subs",
+          "test_to_mpmath"
+        ],
+        "verify_total_count": 24,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:e56f665b60fa96282f045a156bfcf2539f0ca66a7faead8c84c27ece05a3ac2c",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "sympy/sympy",
+          "route_scaffold": "scaffold:sha256:7c225e63133b5c759b5f075efbf281262240c24ae64cedd3fe202293fa24c4cd",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:4e7f4775ac667646d3cd411b0031de1b4baeb25f54b3054dda7617ef379258d8"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sympy__sympy-13372/glm/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "sympy__sympy-13372"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sympy__sympy-13372"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "sympy__sympy-13372"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sympy__sympy-13372/glm/wp9a-live-driver.wp9a-live-driver-sympy__sympy-13372-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "test_evalf_bugs"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [
+              "test_evalf_helpers",
+              "test_evalf_basic",
+              "test_cancellation",
+              "test_evalf_powers",
+              "test_evalf_rump",
+              "test_evalf_complex",
+              "test_evalf_complex_powers",
+              "test_evalf_exponentiation",
+              "test_evalf_complex_cancellation",
+              "test_evalf_logs",
+              "test_evalf_trig",
+              "test_evalf_near_integers",
+              "test_evalf_ramanujan",
+              "test_evalf_integer_parts",
+              "test_evalf_trig_zero_detection",
+              "test_evalf_sum",
+              "test_evalf_divergent_series",
+              "test_evalf_product",
+              "test_evalf_py_methods",
+              "test_evalf_power_subs_bugs",
+              "test_evalf_arguments",
+              "test_implemented_function_evalf",
+              "test_evaluate_false",
+              "test_evalf_relational",
+              "test_issue_5486",
+              "test_issue_5486_bug",
+              "test_bugs",
+              "test_subs",
+              "test_issue_4956_5204",
+              "test_old_docstring",
+              "test_issue_4806",
+              "test_evalf_mul",
+              "test_scaled_zero",
+              "test_chop_value",
+              "test_infinities",
+              "test_to_mpmath",
+              "test_issue_6632_evalf",
+              "test_issue_4945",
+              "test_evalf_integral",
+              "test_issue_8821_highprec_from_str",
+              "test_issue_8853",
+              "test_issue_9326",
+              "test_issue_10323",
+              "test_AssocOp_Function"
+            ],
+            "success": []
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 874,
+        "candidate_patch_sha256": "sha256:33c88fabc3a6276fc01df72fb7c51c92ae255b8eaf46ad2ec905454a73987944",
+        "instance_id": "sympy__sympy-13372",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 6322
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "sympy/sympy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sympy__sympy-13372",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "glm",
+  "selected_route_id": "sympy__sympy-13372::armC::glm",
+  "task_index": 37
+}

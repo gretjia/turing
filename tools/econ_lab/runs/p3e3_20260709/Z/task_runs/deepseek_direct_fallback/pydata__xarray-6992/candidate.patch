@@ -1,0 +1,38 @@
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index 63ba862d..f2c3e7c3 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -358,14 +358,28 @@ class DataVariables(Mapping[Hashable, "DataArray"]):
+     def __init__(self, dataset: "Dataset"):
+         self._dataset = dataset
+ 
++    def _get_data_var_names(self) -> set[Hashable]:
++        all_vars = set(self._dataset._variables)
++        coords = set(self._dataset._coord_names)
++        # Only consider coordinate names that actually have a corresponding variable
++        existing_coords = coords.intersection(all_vars)
++        return all_vars - existing_coords
++
+     def __iter__(self) -> Iterator[Hashable]:
+-        return (
+-            key
+-            for key in self._dataset._variables
+-            if key not in self._dataset._coord_names
+-        )
++        return iter(self._get_data_var_names())
+ 
+     def __len__(self) -> int:
++        # Use the number of actual data variables, not just variables minus coord_names.
++        return len(self._get_data_var_names())
++
++    def __contains__(self, key: object) -> bool:
++        return key in self._get_data_var_names()
++
++    def __getitem__(self, key: Hashable) -> "DataArray":
++        if key not in self._get_data_var_names():
++            raise KeyError(key)
++        return self._dataset[key]
++
+         return len(self._dataset._variables) - len(self._dataset._coord_names)
+ 
+     def __contains__(self, key: object) -> bool:

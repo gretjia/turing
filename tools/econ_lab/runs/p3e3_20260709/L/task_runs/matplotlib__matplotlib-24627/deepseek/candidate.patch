@@ -1,0 +1,72 @@
+diff --git a/lib/matplotlib/axes/_base.py b/lib/matplotlib/axes/_base.py
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -X,XX +XX,XX @@ class Axes(_AxesBase):
+ 
+     def cla(self):
+         """Clear the axis."""
++        # Unset .axes for all artists that belong to this axes.
++        for container in (self.lines, self.patches, self.texts,
++                          self.collections, self.images, self.artists):
++            for artist in container:
++                artist.axes = None
++            container.clear()
++        # Also clear child axes if any (they are not in the above containers).
++        for child_ax in self.child_axes:
++            child_ax.axes = None
++        self.child_axes.clear()
++        # Continue with existing resetting code.
+         self.set_xscale('linear')
+         self.set_yscale('linear')
+         self.set_xlim(0, 1)
+         self.set_ylim(0, 1)
+-        self.lines.clear()
+-        self.patches.clear()
+-        self.texts.clear()
+-        self.collections.clear()
+-        self.images.clear()
+-        self.artists.clear()
+         self._patch_ready = True
+ 
+         self._reset_axis_info()
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -X,XX +XX,XX @@ class Figure(FigureBase):
+ 
+     def clf(self, keep_observers=False):
+         """Clear the figure."""
++        # Unset .figure for all axes and for figure‑level artists.
++        for ax in self.axes:
++            ax.cla()          # this will unset .axes for the axes’ artists
++            ax.figure = None  # unset .figure for the axes themselves
++        self.axes.clear()
++        for container in (self.texts, self.legends, self.patches,
++                          self.lines, self.artists, self.images):
++            for artist in container:
++                artist.figure = None
++            container.clear()
++        # Existing clearing code follows (but many manual clears are now redundant).
+         self.callbacks = cbook.CallbackRegistry(
+             signals=["units_change", "constrain_viewport", "dpi_changed"])
+ 
+@@ -X,XX +XX,XX @@ class Figure(FigureBase):
+         self.legends.clear()
+         self.patches.clear()
+         self.lines.clear()
+-        self.artists.clear()
+-        self.images.clear()
++        # self.artists.clear() and self.images.clear() already done above
+         self._mouseover_set.clear()
+ 
+         self.suptitle(None)
+         if not self.get_constrained_layout():
+             self.set_layout_engine(None)
+-
+-        # Remove all axes
+-        for ax in self.axes:
+-            ax.figure = None
+-        self.axes.clear()
++        # Axes removal already done above
+         if not keep_observers:
+             self._axobservers.clear()

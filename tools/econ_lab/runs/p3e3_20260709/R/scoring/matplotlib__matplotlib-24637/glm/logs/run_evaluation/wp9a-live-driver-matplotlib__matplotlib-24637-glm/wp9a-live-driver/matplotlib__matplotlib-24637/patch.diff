@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 5d5a3b6..a1b2c3d 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -541,7 +541,7 @@ class AnnotationBbox(OffsetBox):
+         renderer = renderer or self.figure._get_renderer()
+         if self._drawFrame:
+             self.patch.draw(renderer)
+-        self.offset_artist.draw(renderer)
++        self.offset_artist.draw(renderer, gid=self.get_gid())
+         return True
+ 
+     def contains(self, mouseevent):

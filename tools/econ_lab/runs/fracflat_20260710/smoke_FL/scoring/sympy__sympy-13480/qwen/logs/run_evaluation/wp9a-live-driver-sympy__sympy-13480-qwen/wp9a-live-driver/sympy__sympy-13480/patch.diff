@@ -1,0 +1,15 @@
+diff --git a/sympy/functions/elementary/hyperbolic.py b/sympy/functions/elementary/hyperbolic.py
+index d55366cb64..1799742594 100644
+--- a/sympy/functions/elementary/hyperbolic.py
++++ b/sympy/functions/elementary/hyperbolic.py
+@@ -585,9 +585,9 @@ def eval(cls, arg):
+             if arg.is_Add:
+                 x, m = _peeloff_ipi(arg)
+                 if m:
+-                    cothm = coth(m)
+-                    if cotm is S.ComplexInfinity:
++                    cothm = coth(m)
++                    if cothm is S.ComplexInfinity:
+                         return coth(x)
+                     else: # cothm == 0
+                         return tanh(x)

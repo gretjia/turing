@@ -1,0 +1,18 @@
+{
+  "priors": {
+    "conservative-package": 0.55,
+    "hybrid-package": 0.45,
+    "structural-package": 0.35
+  },
+  "provenance": {
+    "origin": "dialectic_gate.v1",
+    "portfolio_digest": "sha256:d5ec1ea6c847c27e9e1ddd781d913feac2385a2548738897435b6c400c844994",
+    "role_chain": [
+      "proposer_1",
+      "proposer_2",
+      "critic",
+      "judge"
+    ]
+  },
+  "schema": "econ_lab.dialectic.route_market_bridge.route_priors.v1"
+}

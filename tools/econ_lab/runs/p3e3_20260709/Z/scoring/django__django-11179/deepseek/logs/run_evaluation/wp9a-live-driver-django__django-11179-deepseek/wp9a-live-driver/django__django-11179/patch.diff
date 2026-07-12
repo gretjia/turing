@@ -1,0 +1,22 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index ad2db9be67..9f11c7e5bf 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -271,14 +271,12 @@ class Collector:
+                     # that have no dependencies (like a list of objects to
+                     # delete) in a single query without any fks in the WHERE
+                     # clause.
+-                    for obj in instances:
+-                        signals.pre_delete.send(
+-                            sender=model, instance=obj, using=self.using
+-                        )
+                     fast_deletes = []
+                     for obj in instances:
+                         signals.pre_delete.send(
+                             sender=model, instance=obj, using=self.using
+                         )
++                        # Set PK to None before deletion.
++                        setattr(obj, model._meta.pk.attname, None)
+                     for obj in instances:
+                         fast_deletes.append(obj.pk)
+                     if not transaction.get_autocommit(self.using):

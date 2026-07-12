@@ -1,0 +1,49 @@
+diff --git a/astropy/coordinates/sky_coordinate.py b/astropy/coordinates/sky_coordinate.py
+index 3925275107..8f669168bc 100644
+--- a/astropy/coordinates/sky_coordinate.py
++++ b/astropy/coordinates/sky_coordinate.py
+@@ -592,12 +592,15 @@ def __getattr__(self, attr):
+         """
+         if "_sky_coord_frame" in self.__dict__:
+             if self._is_name(attr):
+-                return self  # Should this be a deepcopy of self?
++                return self  # Should this be a deepcopy of self?
+ 
+             # Anything in the set of all possible frame_attr_names is handled
+             # here. If the attr is relevant for the current frame then delegate
+             # to self.frame otherwise get it from self._<attr>.
+             if attr in frame_transform_graph.frame_attributes:
+-                if attr in self.frame.frame_attributes:
+-                    return getattr(self.frame, attr)
+-                else:
+-                    return getattr(self, "_" + attr, None)
++                try:
++                    if attr in self.frame.frame_attributes:
++                        return getattr(self.frame, attr)
++                    else:
++                        return getattr(self, "_" + attr, None)
++                except AttributeError:
++                    # Re-raise the AttributeError with the correct attribute name
++                    raise AttributeError(
++                        f"'{self.__class__.__name__}' object has no attribute '{attr}'"
++                    )
+ 
+             # Some attributes might not fall in the above category but still
+             # are available through self._sky_coord_frame.
+@@ -613,10 +616,13 @@ def __getattr__(self, attr):
+             # Try to interpret as a new frame for transforming.
+             frame_cls = frame_transform_graph.lookup_name(attr)
+             if frame_cls is not None and self.frame.is_transformable_to(frame_cls):
+-                return self.transform_to(attr)
++                try:
++                    return self.transform_to(attr)
++                except AttributeError:
++                    # Re-raise the AttributeError with the correct attribute name
++                    raise AttributeError(
++                        f"'{self.__class__.__name__}' object has no attribute '{attr}'"
++                    )
+ 
+         # Fail
+         raise AttributeError(
+             f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+         )

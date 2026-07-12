@@ -1,0 +1,22 @@
+diff --git a/sphinx/builders/linkcheck.py b/sphinx/builders/linkcheck.py
+--- a/sphinx/builders/linkcheck.py
++++ b/sphinx/builders/linkcheck.py
+@@ -248,13 +248,13 @@
+             if response.status_code == 405:
+                 response = requests.get(req_url, stream=True, **kwargs)
+ 
+-            if anchor and self.app.config.linkcheck_anchors:
+-                if not check_anchor(response, anchor):
+-                    return 'broken', '', __('Anchor %r not found') % anchor
+-
+             try:
+                 response.raise_for_status()
+             except HTTPError as err:
+                 return 'broken', '', str(err)
+ 
++            if anchor and self.app.config.linkcheck_anchors:
++                if not check_anchor(response, anchor):
++                    return 'broken', '', __('Anchor %r not found') % anchor
++
+             if response.url != req_url:
+                 return 'redirected', response.url, ''

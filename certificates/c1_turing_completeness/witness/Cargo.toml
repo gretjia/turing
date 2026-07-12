@@ -1,0 +1,39 @@
+[workspace]
+# Deliberately a STANDALONE workspace (empty table, no `members`): this crate is the C1b
+# executable-witness deliverable. It lives inside the turing_fce_integration tree but must
+# NOT be added to the root Cargo.toml (governance guard: touch nothing outside this
+# certificate directory / other atoms' files). Declaring `[workspace]` here makes Cargo
+# stop its upward search at THIS manifest, so the root workspace's `members` list is never
+# consulted and never needs editing. The path-dependencies below (turing-git-tape,
+# turing-contracts, turing-witness) still resolve correctly: each of THEM is looked up in
+# ITS OWN ancestor workspace (the root Cargo.toml, where they are already members), which
+# is unaffected by this crate's separate workspace boundary.
+
+[package]
+name = "c1b-governed-witness"
+edition = "2024"
+rust-version = "1.96.0"
+version = "0.0.0"
+publish = false
+
+[[bin]]
+name = "rule110_witness"
+path = "src/bin/rule110_witness.rs"
+
+[[bin]]
+name = "tm_witness"
+path = "src/bin/tm_witness.rs"
+
+[dependencies]
+# Path deps on the REAL kernel primitives (read-only usage; nothing here is modified).
+turing-contracts = { path = "../../../crates/turing-contracts" }
+turing-git-tape = { path = "../../../crates/turing-git-tape" }
+turing-witness = { path = "../../../crates/turing-witness" }
+serde_json = { version = "=1.0.150", features = ["preserve_order"] }
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+
+[lib]
+name = "c1b_governed_witness"
+path = "src/lib.rs"

@@ -1,0 +1,26 @@
+diff --git a/sklearn/linear_model/logistic.py b/sklearn/linear_model/logistic.py
+--- a/sklearn/linear_model/logistic.py
++++ b/sklearn/linear_model/logistic.py
+@@ -919,7 +919,14 @@ def _log_reg_scoring_path(X, y, train, test, fit_intercept, scoring,
+                          multi_class, Cs, tol, max_iter, class_weight, verbose,
+                          solver, random_state, intercept_scaling, warm_start,
+                          n_jobs):
+-    log_reg = LogisticRegression(fit_intercept=fit_intercept)
++    log_reg = LogisticRegression(
++        fit_intercept=fit_intercept,
++        multi_class=multi_class,
++        penalty=penalty,
++        dual=dual,
++        tol=tol,
++        class_weight=class_weight,
++        solver=solver,
++        max_iter=max_iter,
++        random_state=random_state,
++        intercept_scaling=float(intercept_scaling),
++        warm_start=warm_start,
++        n_jobs=n_jobs,
++        verbose=verbose
++    )
+ 
+     # The SAG solver releases the GIL so it's more efficient to use
+     # threads for the scoring path multi-C.

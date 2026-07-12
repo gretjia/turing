@@ -1,0 +1,51 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sympy/sympy:scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:55b00ecd7d7d942e9842e4d45a6caa2fa9e6801e6e19de9b63cfdc303cad5259",
+    "price_signal_hash": "sha256:c832d995c2b9a168ae84f6fefd997b2443266c61ea8cf7214d16369a7be4d564",
+    "route_id": "sympy__sympy-13877::armC::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": null,
+      "provider_path": "deepseek_direct_fallback",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armC",
+        "error_message": "DeepSeek model 'deepseek-v4-pro' is not priced in the supplied price table",
+        "error_type": "ValueError",
+        "instance_id": "sympy__sympy-13877",
+        "lineage": "deepseek",
+        "primary_attempt_status": "ERROR",
+        "provider_path": "deepseek_direct_fallback",
+        "status": "ERROR"
+      },
+      "worker_result_status": "ERROR"
+    }
+  ],
+  "domain_bucket": "sympy/sympy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sympy__sympy-13877",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "sympy__sympy-13877::armC::deepseek",
+  "task_index": 40
+}

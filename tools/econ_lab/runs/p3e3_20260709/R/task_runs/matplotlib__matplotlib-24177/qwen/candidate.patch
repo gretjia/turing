@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index 2258560202..f2f95f8a20 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -3069,6 +3069,10 @@ def hist(self, x, bins=None, range=None, density=False, weights=None,
+                     # For step histtype, we need to adjust the y-axis
+                     # to properly display the density
+                     if histtype == 'step':
++                        # Calculate the maximum density value for proper scaling
++                        max_density = np.max([np.max(y) for y in all_y])
++                        # Set the y-axis limit to accommodate the maximum density
++                        self.set_ylim(top=max_density * 1.1)
+ 
+         # Return the histogram values
+         if not ret:

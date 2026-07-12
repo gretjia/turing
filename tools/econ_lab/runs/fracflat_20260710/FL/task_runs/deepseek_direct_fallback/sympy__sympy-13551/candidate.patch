@@ -1,0 +1,13 @@
+diff --git a/sympy/concrete/products.py b/sympy/concrete/products.py
+index 1a474bd25d..a9f7640f72 100644
+--- a/sympy/concrete/products.py
++++ b/sympy/concrete/products.py
+@@ -431,7 +431,7 @@ def _eval_product(self, term, limits):
+             return term**(n - 1)
+         if k not in term.free_symbols:
+             if term.is_Add:
+-                return (term**n, term.coeff(k, 0)**n)
++                return term**n
+             return term**(n - 1)
+ 
+         poly = term.as_poly(k)

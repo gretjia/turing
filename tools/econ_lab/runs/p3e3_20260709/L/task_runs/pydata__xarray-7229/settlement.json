@@ -1,0 +1,51 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pydata/xarray:scaffold:sha256:2b7dd79d70ebba84a1517a9801acd2a74ed7a12d599e84767e4277e1a72b1faf",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:c529072cd303c449def4f0a9f7fc051d88cf87d34240601d2775cebcf2055dab",
+    "price_signal_hash": "sha256:00419977258889fa9ce7e1dd64ddf290efb51b790d6ce58f1194afd2fa9bb1c5",
+    "route_id": "pydata__xarray-7229::armA::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": null,
+      "provider_path": "deepseek_direct_fallback",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "status": "SKIPPED_NO_PATCH"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armA",
+        "error_message": "DeepSeek model 'deepseek-v4-pro' is not priced in the supplied price table",
+        "error_type": "ValueError",
+        "instance_id": "pydata__xarray-7229",
+        "lineage": "deepseek",
+        "primary_attempt_status": "ERROR",
+        "provider_path": "deepseek_direct_fallback",
+        "status": "ERROR"
+      },
+      "worker_result_status": "ERROR"
+    }
+  ],
+  "domain_bucket": "pydata/xarray",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pydata__xarray-7229",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "pydata__xarray-7229::armA::deepseek",
+  "task_index": 16
+}

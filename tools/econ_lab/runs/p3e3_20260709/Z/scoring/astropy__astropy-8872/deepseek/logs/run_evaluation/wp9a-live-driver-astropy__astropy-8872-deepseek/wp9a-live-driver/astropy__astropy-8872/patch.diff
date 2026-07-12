@@ -1,0 +1,13 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index 3a6ccb1..a82e1e9 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -256,7 +256,7 @@ class Quantity(np.ndarray):
+                 # To help avoid floating-point casting issues in the
+                 # scaling code, we do not preserve dtype for float types
+                 # smaller than 32-bit.
+-                if dtype is None and value.dtype.kind == 'f' and value.dtype.itemsize >= 4:
++                if dtype is None and value.dtype.kind == 'f':
+                     dtype = value.dtype
+                 elif dtype is None:
+                     dtype = np.float64

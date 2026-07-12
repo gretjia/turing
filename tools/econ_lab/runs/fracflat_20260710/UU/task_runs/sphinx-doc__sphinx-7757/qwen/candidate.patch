@@ -1,0 +1,31 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 1b6f1c476..8180fa11d 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -635,7 +635,7 @@ class PyObject(ObjectDescription):
+                 # Handle positional-only arguments (Python 3.8+)
+                 if arg == '/':
+                     # Skip the '/' marker
+-                    continue
++                    arg = ''
+                 elif arg.endswith('='):
+                     # Handle default values
+                     arg, default = arg.split('=', 1)
+@@ -679,7 +679,7 @@ class PyObject(ObjectDescription):
+             if arg == '/':
+                 # Skip the '/' marker
+                 # The following logic handles positional-only arguments
+-                continue
++                arg = ''
+             elif arg.endswith('='):
+                 # Handle default values
+                 arg, default = arg.split('=', 1)
+@@ -728,7 +728,7 @@ class PyObject(ObjectDescription):
+             if arg == '/':
+                 # Skip the '/' marker
+                 # The following logic handles positional-only arguments
+-                continue
++                arg = ''
+             elif arg.endswith('='):
+                 # Handle default values
+                 arg, default = arg.split('=', 1)

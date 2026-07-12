@@ -1,0 +1,3881 @@
+{
+  "buckets": {
+    "bucket_alpha": {
+      "scaffolds": {
+        "scaffold:sha256:s0": {
+          "p_prior": 0.5
+        },
+        "scaffold:sha256:s1": {
+          "p_prior": 0.5
+        },
+        "scaffold:sha256:s2": {
+          "p_prior": 0.4
+        },
+        "scaffold:sha256:s3": {
+          "p_prior": 0.3
+        }
+      },
+      "trials": [
+        {
+          "case_id": "case-bucket_alpha-0000",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0000",
+          "price_signal_hash": "sha256:price-bucket_alpha-0000",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0000"
+        },
+        {
+          "case_id": "case-bucket_alpha-0001",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0001",
+          "price_signal_hash": "sha256:price-bucket_alpha-0001",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0001"
+        },
+        {
+          "case_id": "case-bucket_alpha-0002",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0002",
+          "price_signal_hash": "sha256:price-bucket_alpha-0002",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0002"
+        },
+        {
+          "case_id": "case-bucket_alpha-0003",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0003",
+          "price_signal_hash": "sha256:price-bucket_alpha-0003",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0003"
+        },
+        {
+          "case_id": "case-bucket_alpha-0004",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0004",
+          "price_signal_hash": "sha256:price-bucket_alpha-0004",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0004"
+        },
+        {
+          "case_id": "case-bucket_alpha-0005",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0005",
+          "price_signal_hash": "sha256:price-bucket_alpha-0005",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0005"
+        },
+        {
+          "case_id": "case-bucket_alpha-0006",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0006",
+          "price_signal_hash": "sha256:price-bucket_alpha-0006",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0006"
+        },
+        {
+          "case_id": "case-bucket_alpha-0007",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0007",
+          "price_signal_hash": "sha256:price-bucket_alpha-0007",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0007"
+        },
+        {
+          "case_id": "case-bucket_alpha-0008",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0008",
+          "price_signal_hash": "sha256:price-bucket_alpha-0008",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0008"
+        },
+        {
+          "case_id": "case-bucket_alpha-0009",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0009",
+          "price_signal_hash": "sha256:price-bucket_alpha-0009",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0009"
+        },
+        {
+          "case_id": "case-bucket_alpha-0010",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0010",
+          "price_signal_hash": "sha256:price-bucket_alpha-0010",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0010"
+        },
+        {
+          "case_id": "case-bucket_alpha-0011",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0011",
+          "price_signal_hash": "sha256:price-bucket_alpha-0011",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0011"
+        },
+        {
+          "case_id": "case-bucket_alpha-0012",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0012",
+          "price_signal_hash": "sha256:price-bucket_alpha-0012",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0012"
+        },
+        {
+          "case_id": "case-bucket_alpha-0013",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0013",
+          "price_signal_hash": "sha256:price-bucket_alpha-0013",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0013"
+        },
+        {
+          "case_id": "case-bucket_alpha-0014",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0014",
+          "price_signal_hash": "sha256:price-bucket_alpha-0014",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0014"
+        },
+        {
+          "case_id": "case-bucket_alpha-0015",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0015",
+          "price_signal_hash": "sha256:price-bucket_alpha-0015",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0015"
+        },
+        {
+          "case_id": "case-bucket_alpha-0016",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0016",
+          "price_signal_hash": "sha256:price-bucket_alpha-0016",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0016"
+        },
+        {
+          "case_id": "case-bucket_alpha-0017",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0017",
+          "price_signal_hash": "sha256:price-bucket_alpha-0017",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0017"
+        },
+        {
+          "case_id": "case-bucket_alpha-0018",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0018",
+          "price_signal_hash": "sha256:price-bucket_alpha-0018",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0018"
+        },
+        {
+          "case_id": "case-bucket_alpha-0019",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0019",
+          "price_signal_hash": "sha256:price-bucket_alpha-0019",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0019"
+        },
+        {
+          "case_id": "case-bucket_alpha-0020",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0020",
+          "price_signal_hash": "sha256:price-bucket_alpha-0020",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0020"
+        },
+        {
+          "case_id": "case-bucket_alpha-0021",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0021",
+          "price_signal_hash": "sha256:price-bucket_alpha-0021",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0021"
+        },
+        {
+          "case_id": "case-bucket_alpha-0022",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0022",
+          "price_signal_hash": "sha256:price-bucket_alpha-0022",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0022"
+        },
+        {
+          "case_id": "case-bucket_alpha-0023",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0023",
+          "price_signal_hash": "sha256:price-bucket_alpha-0023",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0023"
+        },
+        {
+          "case_id": "case-bucket_alpha-0024",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0024",
+          "price_signal_hash": "sha256:price-bucket_alpha-0024",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0024"
+        },
+        {
+          "case_id": "case-bucket_alpha-0025",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0025",
+          "price_signal_hash": "sha256:price-bucket_alpha-0025",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0025"
+        },
+        {
+          "case_id": "case-bucket_alpha-0026",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0026",
+          "price_signal_hash": "sha256:price-bucket_alpha-0026",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0026"
+        },
+        {
+          "case_id": "case-bucket_alpha-0027",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0027",
+          "price_signal_hash": "sha256:price-bucket_alpha-0027",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0027"
+        },
+        {
+          "case_id": "case-bucket_alpha-0028",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0028",
+          "price_signal_hash": "sha256:price-bucket_alpha-0028",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0028"
+        },
+        {
+          "case_id": "case-bucket_alpha-0029",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0029",
+          "price_signal_hash": "sha256:price-bucket_alpha-0029",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0029"
+        },
+        {
+          "case_id": "case-bucket_alpha-0030",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0030",
+          "price_signal_hash": "sha256:price-bucket_alpha-0030",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0030"
+        },
+        {
+          "case_id": "case-bucket_alpha-0031",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0031",
+          "price_signal_hash": "sha256:price-bucket_alpha-0031",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0031"
+        },
+        {
+          "case_id": "case-bucket_alpha-0032",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0032",
+          "price_signal_hash": "sha256:price-bucket_alpha-0032",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0032"
+        },
+        {
+          "case_id": "case-bucket_alpha-0033",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0033",
+          "price_signal_hash": "sha256:price-bucket_alpha-0033",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0033"
+        },
+        {
+          "case_id": "case-bucket_alpha-0034",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0034",
+          "price_signal_hash": "sha256:price-bucket_alpha-0034",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0034"
+        },
+        {
+          "case_id": "case-bucket_alpha-0035",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0035",
+          "price_signal_hash": "sha256:price-bucket_alpha-0035",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0035"
+        },
+        {
+          "case_id": "case-bucket_alpha-0036",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0036",
+          "price_signal_hash": "sha256:price-bucket_alpha-0036",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0036"
+        },
+        {
+          "case_id": "case-bucket_alpha-0037",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0037",
+          "price_signal_hash": "sha256:price-bucket_alpha-0037",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0037"
+        },
+        {
+          "case_id": "case-bucket_alpha-0038",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0038",
+          "price_signal_hash": "sha256:price-bucket_alpha-0038",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0038"
+        },
+        {
+          "case_id": "case-bucket_alpha-0039",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0039",
+          "price_signal_hash": "sha256:price-bucket_alpha-0039",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0039"
+        },
+        {
+          "case_id": "case-bucket_alpha-0040",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0040",
+          "price_signal_hash": "sha256:price-bucket_alpha-0040",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0040"
+        },
+        {
+          "case_id": "case-bucket_alpha-0041",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0041",
+          "price_signal_hash": "sha256:price-bucket_alpha-0041",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0041"
+        },
+        {
+          "case_id": "case-bucket_alpha-0042",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0042",
+          "price_signal_hash": "sha256:price-bucket_alpha-0042",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0042"
+        },
+        {
+          "case_id": "case-bucket_alpha-0043",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0043",
+          "price_signal_hash": "sha256:price-bucket_alpha-0043",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0043"
+        },
+        {
+          "case_id": "case-bucket_alpha-0044",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0044",
+          "price_signal_hash": "sha256:price-bucket_alpha-0044",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0044"
+        },
+        {
+          "case_id": "case-bucket_alpha-0045",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0045",
+          "price_signal_hash": "sha256:price-bucket_alpha-0045",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0045"
+        },
+        {
+          "case_id": "case-bucket_alpha-0046",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0046",
+          "price_signal_hash": "sha256:price-bucket_alpha-0046",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0046"
+        },
+        {
+          "case_id": "case-bucket_alpha-0047",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_alpha-0047",
+          "price_signal_hash": "sha256:price-bucket_alpha-0047",
+          "trigger_event_hash": "sha256:trigger-bucket_alpha-0047"
+        }
+      ]
+    },
+    "bucket_beta": {
+      "scaffolds": {
+        "scaffold:sha256:s0": {
+          "p_prior": 0.5
+        },
+        "scaffold:sha256:s1": {
+          "p_prior": 0.5
+        },
+        "scaffold:sha256:s2": {
+          "p_prior": 0.4
+        },
+        "scaffold:sha256:s3": {
+          "p_prior": 0.3
+        }
+      },
+      "trials": [
+        {
+          "case_id": "case-bucket_beta-0000",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0000",
+          "price_signal_hash": "sha256:price-bucket_beta-0000",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0000"
+        },
+        {
+          "case_id": "case-bucket_beta-0001",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0001",
+          "price_signal_hash": "sha256:price-bucket_beta-0001",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0001"
+        },
+        {
+          "case_id": "case-bucket_beta-0002",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0002",
+          "price_signal_hash": "sha256:price-bucket_beta-0002",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0002"
+        },
+        {
+          "case_id": "case-bucket_beta-0003",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0003",
+          "price_signal_hash": "sha256:price-bucket_beta-0003",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0003"
+        },
+        {
+          "case_id": "case-bucket_beta-0004",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0004",
+          "price_signal_hash": "sha256:price-bucket_beta-0004",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0004"
+        },
+        {
+          "case_id": "case-bucket_beta-0005",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0005",
+          "price_signal_hash": "sha256:price-bucket_beta-0005",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0005"
+        },
+        {
+          "case_id": "case-bucket_beta-0006",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0006",
+          "price_signal_hash": "sha256:price-bucket_beta-0006",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0006"
+        },
+        {
+          "case_id": "case-bucket_beta-0007",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0007",
+          "price_signal_hash": "sha256:price-bucket_beta-0007",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0007"
+        },
+        {
+          "case_id": "case-bucket_beta-0008",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0008",
+          "price_signal_hash": "sha256:price-bucket_beta-0008",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0008"
+        },
+        {
+          "case_id": "case-bucket_beta-0009",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0009",
+          "price_signal_hash": "sha256:price-bucket_beta-0009",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0009"
+        },
+        {
+          "case_id": "case-bucket_beta-0010",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0010",
+          "price_signal_hash": "sha256:price-bucket_beta-0010",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0010"
+        },
+        {
+          "case_id": "case-bucket_beta-0011",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0011",
+          "price_signal_hash": "sha256:price-bucket_beta-0011",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0011"
+        },
+        {
+          "case_id": "case-bucket_beta-0012",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0012",
+          "price_signal_hash": "sha256:price-bucket_beta-0012",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0012"
+        },
+        {
+          "case_id": "case-bucket_beta-0013",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0013",
+          "price_signal_hash": "sha256:price-bucket_beta-0013",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0013"
+        },
+        {
+          "case_id": "case-bucket_beta-0014",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0014",
+          "price_signal_hash": "sha256:price-bucket_beta-0014",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0014"
+        },
+        {
+          "case_id": "case-bucket_beta-0015",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0015",
+          "price_signal_hash": "sha256:price-bucket_beta-0015",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0015"
+        },
+        {
+          "case_id": "case-bucket_beta-0016",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0016",
+          "price_signal_hash": "sha256:price-bucket_beta-0016",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0016"
+        },
+        {
+          "case_id": "case-bucket_beta-0017",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0017",
+          "price_signal_hash": "sha256:price-bucket_beta-0017",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0017"
+        },
+        {
+          "case_id": "case-bucket_beta-0018",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0018",
+          "price_signal_hash": "sha256:price-bucket_beta-0018",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0018"
+        },
+        {
+          "case_id": "case-bucket_beta-0019",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0019",
+          "price_signal_hash": "sha256:price-bucket_beta-0019",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0019"
+        },
+        {
+          "case_id": "case-bucket_beta-0020",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0020",
+          "price_signal_hash": "sha256:price-bucket_beta-0020",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0020"
+        },
+        {
+          "case_id": "case-bucket_beta-0021",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0021",
+          "price_signal_hash": "sha256:price-bucket_beta-0021",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0021"
+        },
+        {
+          "case_id": "case-bucket_beta-0022",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0022",
+          "price_signal_hash": "sha256:price-bucket_beta-0022",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0022"
+        },
+        {
+          "case_id": "case-bucket_beta-0023",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0023",
+          "price_signal_hash": "sha256:price-bucket_beta-0023",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0023"
+        },
+        {
+          "case_id": "case-bucket_beta-0024",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0024",
+          "price_signal_hash": "sha256:price-bucket_beta-0024",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0024"
+        },
+        {
+          "case_id": "case-bucket_beta-0025",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0025",
+          "price_signal_hash": "sha256:price-bucket_beta-0025",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0025"
+        },
+        {
+          "case_id": "case-bucket_beta-0026",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0026",
+          "price_signal_hash": "sha256:price-bucket_beta-0026",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0026"
+        },
+        {
+          "case_id": "case-bucket_beta-0027",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0027",
+          "price_signal_hash": "sha256:price-bucket_beta-0027",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0027"
+        },
+        {
+          "case_id": "case-bucket_beta-0028",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0028",
+          "price_signal_hash": "sha256:price-bucket_beta-0028",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0028"
+        },
+        {
+          "case_id": "case-bucket_beta-0029",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0029",
+          "price_signal_hash": "sha256:price-bucket_beta-0029",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0029"
+        },
+        {
+          "case_id": "case-bucket_beta-0030",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0030",
+          "price_signal_hash": "sha256:price-bucket_beta-0030",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0030"
+        },
+        {
+          "case_id": "case-bucket_beta-0031",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0031",
+          "price_signal_hash": "sha256:price-bucket_beta-0031",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0031"
+        },
+        {
+          "case_id": "case-bucket_beta-0032",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0032",
+          "price_signal_hash": "sha256:price-bucket_beta-0032",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0032"
+        },
+        {
+          "case_id": "case-bucket_beta-0033",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0033",
+          "price_signal_hash": "sha256:price-bucket_beta-0033",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0033"
+        },
+        {
+          "case_id": "case-bucket_beta-0034",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0034",
+          "price_signal_hash": "sha256:price-bucket_beta-0034",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0034"
+        },
+        {
+          "case_id": "case-bucket_beta-0035",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0035",
+          "price_signal_hash": "sha256:price-bucket_beta-0035",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0035"
+        },
+        {
+          "case_id": "case-bucket_beta-0036",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0036",
+          "price_signal_hash": "sha256:price-bucket_beta-0036",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0036"
+        },
+        {
+          "case_id": "case-bucket_beta-0037",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0037",
+          "price_signal_hash": "sha256:price-bucket_beta-0037",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0037"
+        },
+        {
+          "case_id": "case-bucket_beta-0038",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0038",
+          "price_signal_hash": "sha256:price-bucket_beta-0038",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0038"
+        },
+        {
+          "case_id": "case-bucket_beta-0039",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0039",
+          "price_signal_hash": "sha256:price-bucket_beta-0039",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0039"
+        },
+        {
+          "case_id": "case-bucket_beta-0040",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0040",
+          "price_signal_hash": "sha256:price-bucket_beta-0040",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0040"
+        },
+        {
+          "case_id": "case-bucket_beta-0041",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0041",
+          "price_signal_hash": "sha256:price-bucket_beta-0041",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0041"
+        },
+        {
+          "case_id": "case-bucket_beta-0042",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0042",
+          "price_signal_hash": "sha256:price-bucket_beta-0042",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0042"
+        },
+        {
+          "case_id": "case-bucket_beta-0043",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0043",
+          "price_signal_hash": "sha256:price-bucket_beta-0043",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0043"
+        },
+        {
+          "case_id": "case-bucket_beta-0044",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0044",
+          "price_signal_hash": "sha256:price-bucket_beta-0044",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0044"
+        },
+        {
+          "case_id": "case-bucket_beta-0045",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0045",
+          "price_signal_hash": "sha256:price-bucket_beta-0045",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0045"
+        },
+        {
+          "case_id": "case-bucket_beta-0046",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                1
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0046",
+          "price_signal_hash": "sha256:price-bucket_beta-0046",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0046"
+        },
+        {
+          "case_id": "case-bucket_beta-0047",
+          "outcomes": {
+            "scaffold:sha256:s0": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                1,
+                1
+              ]
+            },
+            "scaffold:sha256:s1": {
+              "accept": 1,
+              "verify_witnesses": [
+                0,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s2": {
+              "accept": 0,
+              "verify_witnesses": [
+                1,
+                0,
+                0
+              ]
+            },
+            "scaffold:sha256:s3": {
+              "accept": 1,
+              "verify_witnesses": [
+                1,
+                1,
+                0
+              ]
+            }
+          },
+          "pput_prior_hash": "sha256:pput-bucket_beta-0047",
+          "price_signal_hash": "sha256:price-bucket_beta-0047",
+          "trigger_event_hash": "sha256:trigger-bucket_beta-0047"
+        }
+      ]
+    }
+  },
+  "schema": "econ_lab.task_stream.v1"
+}

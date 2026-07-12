@@ -141,6 +141,10 @@ pub fn run_new_project_agent_economy_demo() -> DemoResult<NewProjectDemoReport> 
         &[price_signal],
         &digest_literal('b'),
         &digest_literal('c'),
+        // trigger_event_hash (ADR-ECON-003 Decision 4 fourth seed input; B1 remedy) -- this
+        // qualification flow routes in Shadow mode, so any well-formed committed digest
+        // literal satisfies the input contract.
+        &digest_literal('d'),
     )?;
     let budget_allocated = append_pass(
         &tape,
@@ -422,6 +426,15 @@ fn economy_payload(event: &EconomyEvent) -> DemoResult<Value> {
         // ADR-ECON-001: not emitted by this qualification demo harness today; kept exhaustive
         // so a future `PrincipalDeclared` append here would still serialize correctly.
         EconomyEvent::PrincipalDeclared(inner) => to_value(inner),
+        // WP4: likewise not emitted by this demo harness today; kept exhaustive so a
+        // future `RoutingPriorUpdated`/`RoutingPriorClawback` append would still serialize.
+        EconomyEvent::RoutingPriorUpdated(inner) => to_value(inner),
+        EconomyEvent::RoutingPriorClawback(inner) => to_value(inner),
+        // WP-H4 (ADR-ECON-007 Decision 2/4): likewise not emitted by this demo harness
+        // today; kept exhaustive so a future `RouteFuseTripped`/`RouteFalsified` append
+        // would still serialize, same precedent as the WP4 arms directly above.
+        EconomyEvent::RouteFuseTripped(inner) => to_value(inner),
+        EconomyEvent::RouteFalsified(inner) => to_value(inner),
     }
 }
 

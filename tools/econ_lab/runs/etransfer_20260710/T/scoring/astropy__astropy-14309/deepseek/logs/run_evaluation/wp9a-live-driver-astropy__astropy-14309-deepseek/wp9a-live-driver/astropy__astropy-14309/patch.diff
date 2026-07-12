@@ -1,0 +1,24 @@
+diff --git a/astropy/io/fits/connect.py b/astropy/io/fits/connect.py
+index 2d6cac3fe9..3ec6be3dac 100644
+--- a/astropy/io/fits/connect.py
++++ b/astropy/io/fits/connect.py
+@@ -65,7 +65,8 @@ def is_fits(origin, filepath, fileobj, *args, **kwargs):
+         return True
+ 
+     if filepath is not None:
+-        # If filepath is a string with a FITS suffix, we return True
++        # If filepath is a string with a FITS suffix, return True
++        # Only check the suffix if filepath is not None (i.e. string path)
+         if filepath.lower().endswith(
+             (".fits", ".fits.gz", ".fit", ".fit.gz", ".fts", ".fts.gz")
+         ):
+@@ -73,6 +74,8 @@ def is_fits(origin, filepath, fileobj, *args, **kwargs):
+ 
+         # If not, we try to read the first part of the file
+         # to identify if it is a FITS file.
++        # If filepath is None and no fileobj, we cannot determine; return False
++        if filepath is None:
++            return False
+         from astropy.io.fits.hdu.hdulist import FITS_SIGNATURE
+         from astropy.io.fits.util import first
+         with open(filepath, "rb") as f:

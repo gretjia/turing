@@ -1,0 +1,13 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index 8b1d9a2..c8e0f3a 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -57,7 +57,7 @@ def _query_cpu() -> int:
+         # if the file doesn't exist, we're not in a cgroup
+         # if the value is -1, cpu_quota is not set
+         # if the value is 0, we're not in a cgroup
+-        cpu_quota = int(shares / 1024)
++        cpu_quota = max(int(shares / 1024), 1)
+     except (ValueError, TypeError, FileNotFoundError):
+         cpu_quota = 0
+     return cpu_quota

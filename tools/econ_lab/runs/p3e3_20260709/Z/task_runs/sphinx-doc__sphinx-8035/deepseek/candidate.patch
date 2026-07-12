@@ -1,0 +1,101 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1634,6 +1634,14 @@ def members_option(arg: str) -> Union[bool, List[str]]:
+     return [x.strip() for x in arg.split(',') if x.strip()]
+ 
+ 
++def private_members_option(arg: str) -> Union[bool, List[str]]:
++    """Option for private-members: flag (True) or list of members."""
++    if arg is None:
++        return True
++    if arg.strip() == '':
++        return True
++    return [x.strip() for x in arg.split(',') if x.strip()]
++
++
+ def class_doc_from_errors(exceptions: Sequence[Exception]) -> str:
+     """Return a docstring generated from a list of exceptions."""
+     return _('Cannot determine class, the following exception was raised:\n%s') % (
+@@ -1752,6 +1760,7 @@ class Documenter:
+     option_spec: OptionSpec = {
+         'members': members_option,
+         'undoc-members': bool,
++        'no-private-members': bool,
+         'private-members': bool,  # will be overridden in subclasses
+         'special-members': bool,
+         'exclude-members': members_option,
+@@ -1904,6 +1913,7 @@ class ModuleDocumenter(Documenter):
+     option_spec: OptionSpec = {
+         'members': members_option,
+         'undoc-members': bool,
++        'no-private-members': bool,
+         'private-members': private_members_option,
+         'special-members': bool,
+         'exclude-members': members_option,
+@@ -2267,6 +2277,7 @@ class ClassDocumenter(Documenter):
+     option_spec: OptionSpec = {
+         'members': members_option,
+         'undoc-members': bool,
++        'no-private-members': bool,
+         'private-members': private_members_option,
+         'special-members': bool,
+         'exclude-members': members_option,
+@@ -1074,8 +1085,18 @@ class Documenter:
+             if not isinstance(self.options.private_members, bool):
+                 # private-members is a list: include only those members
+                 if member.startswith('_') and not member.startswith('__'):
+-                    if member in self.options.private_members:
+-                        pass  # keep
++                    if isinstance(self.options.private_members, list):
++                        if member in self.options.private_members:
++                            pass  # keep
++                        else:
++                            continue
++                    else:  # True (all private)
++                        pass  # keep
+                 else:
+                     # not private, but if it's a dunder and special-members not set?
+                     # keep original logic unchanged
+@@ -1101,7 +1122,7 @@ class Documenter:
+         # check for special members
+         if self.options.special_members:
+             if member.startswith('__') and member.endswith('__'):
+-                pass  # keep
++                pass  # keep, original logic unchanged
+         else:
+             if member.startswith('__') and member.endswith('__'):
+                 continue
+@@ -1165,10 +1186,12 @@ class Documenter:
+         # check that the output still fits in the requested name
+         if self.options.private_members is True:
+             self.options.private_members = False  # reset to no private by default
+-        if self.options.no_private_members:
++        if self.options.get('no_private_members', False):
+             self.options.private_members = False
++        elif self.options.private_members is None:
++            self.options.private_members = False
+         # handle the effect of :private-members: being a list
+-        if isinstance(self.options.private_members, list):
++        if isinstance(self.options.private_members, (list, tuple)):
+             self.options.private_members = list(self.options.private_members)  # ensure list
+         # ensure that if both :members: and :private-members: are lists,
+         # the private-members list is not overridden
+@@ -1195,7 +1218,7 @@ class Documenter:
+                 # filter by :members: list
+                 if isinstance(self.options.members, list):
+                     if member not in self.options.members:
+-                        continue
++                        continue  # exclude
+                 # if :private-members: is a list, include only those
+                 # if private-members is True, include all private
+                 # else exclude private
+@@ -1217,6 +1240,7 @@ class Documenter:
+                 if isinstance(self.options.private_members, list):
+                     if member in self.options.private_members:
+                         pass  # keep
++                    else:
++                        continue
+                 else:
+                     if self.options.private_members:
+                         pass  # keep

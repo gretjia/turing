@@ -1,0 +1,215 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:sympy/sympy:scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:87aa65f7a887ddf3b740043767991f96481735e50a9b04c7de01e09b985806a4",
+    "price_signal_hash": "sha256:01e4d2470666472304bc37c792f5cb57d0f04e0b3bd2b2bf2596e46c870332b7",
+    "route_id": "sympy__sympy-13480::armC::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:a343ca294864c23196c51688c0a8d0ac4fe902c482d482beffedf9407dfcc50f",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "test_acosh_rewrite",
+          "test_acosh_series",
+          "test_acsch",
+          "test_asech_rewrite",
+          "test_asinh",
+          "test_asinh_rewrite",
+          "test_complex",
+          "test_cosh_series",
+          "test_coth_rewrite",
+          "test_coth_series",
+          "test_csch",
+          "test_csch_rewrite",
+          "test_csch_series",
+          "test_inverses",
+          "test_issue_4136",
+          "test_leading_term",
+          "test_sech",
+          "test_sech_rewrite",
+          "test_sech_series",
+          "test_sinh",
+          "test_sinh_expansion",
+          "test_tanh"
+        ],
+        "accept_verdict": true,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 22,
+        "verify_pass_fraction": 1.0,
+        "verify_test_ids": [
+          "test_acosh",
+          "test_acoth",
+          "test_acoth_rewrite",
+          "test_acoth_series",
+          "test_acsch_infinities",
+          "test_acsch_rewrite",
+          "test_asech",
+          "test_asech_series",
+          "test_asinh_series",
+          "test_atanh",
+          "test_atanh_rewrite",
+          "test_atanh_series",
+          "test_complex_2899",
+          "test_cosh",
+          "test_cosh_rewrite",
+          "test_coth",
+          "test_derivs",
+          "test_simplifications",
+          "test_sinh_rewrite",
+          "test_sinh_series",
+          "test_tanh_rewrite",
+          "test_tanh_series"
+        ],
+        "verify_total_count": 22,
+        "verify_verdict": true
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:a343ca294864c23196c51688c0a8d0ac4fe902c482d482beffedf9407dfcc50f",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "sympy/sympy",
+          "route_scaffold": "scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": true,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:d0e40f90e141d94ddb19b3aa2cc5c9613e8ff3a79377fbf39a38a1199da0057f"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sympy__sympy-13480/qwen/run_evaluation.log",
+        "outcome": "RESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "sympy__sympy-13480"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [
+            "sympy__sympy-13480"
+          ],
+          "resolved_instances": 1,
+          "schema_version": 2,
+          "submitted_ids": [
+            "sympy__sympy-13480"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [],
+          "unresolved_instances": 0
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/sympy__sympy-13480/qwen/wp9a-live-driver.wp9a-live-driver-sympy__sympy-13480-qwen.json",
+        "resolved": true,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_coth"
+            ]
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_sinh",
+              "test_sinh_series",
+              "test_cosh",
+              "test_cosh_series",
+              "test_tanh",
+              "test_tanh_series",
+              "test_coth_series",
+              "test_csch",
+              "test_csch_series",
+              "test_sech",
+              "test_sech_series",
+              "test_asinh",
+              "test_asinh_rewrite",
+              "test_asinh_series",
+              "test_acosh",
+              "test_acosh_rewrite",
+              "test_acosh_series",
+              "test_asech",
+              "test_asech_series",
+              "test_asech_rewrite",
+              "test_acsch",
+              "test_acsch_infinities",
+              "test_acsch_rewrite",
+              "test_atanh",
+              "test_atanh_rewrite",
+              "test_atanh_series",
+              "test_acoth",
+              "test_acoth_rewrite",
+              "test_acoth_series",
+              "test_inverses",
+              "test_leading_term",
+              "test_complex",
+              "test_complex_2899",
+              "test_simplifications",
+              "test_issue_4136",
+              "test_sinh_rewrite",
+              "test_cosh_rewrite",
+              "test_tanh_rewrite",
+              "test_coth_rewrite",
+              "test_csch_rewrite",
+              "test_sech_rewrite",
+              "test_derivs",
+              "test_sinh_expansion"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 657,
+        "candidate_patch_sha256": "sha256:5b2ae86c656196b109afed90fec9d999a3e3d291979ff219ae9bbf7cf7c7b4dd",
+        "instance_id": "sympy__sympy-13480",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 26732
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "sympy/sympy",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "sympy__sympy-13480",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "qwen",
+  "selected_route_id": "sympy__sympy-13480::armC::qwen",
+  "task_index": 0
+}

@@ -1,0 +1,56 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 9638d4c37..023650326 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -285,7 +285,7 @@ def _main(config, session):
+ 
+     def _collect(self, arg):
+         from _pytest.python import Package
+-        names = self._parsearg(arg)
++        names = self._parsearg(arg)
+         argpath = names.pop(0)
+ 
+         # Start with a Session root, and delve to argpath item (dir or file)
+@@ -312,7 +312,7 @@ def _collect(self, arg):
+                 if parent.isdir():
+                     pkginit = parent.join("__init__.py")
+                     if pkginit.isfile():
+-                        if pkginit not in self._node_cache:
++                        if pkginit not in self._node_cache and not self.isinitpath(pkginit):
+                             col = self._collectfile(pkginit, handle_dupes=False)
+                             if col:
+                                 if isinstance(col[0], Package):
+@@ -328,6 +328,10 @@ def _collect(self, arg):
+                 dirpath = path.dirpath()
+                 if dirpath not in seen_dirs:
+                     # Collect packages first.
++                    pkginit = dirpath.join("__init__.py")
++                    if pkginit.exists() and self.isinitpath(pkginit):
++                        # Skip __init__.py files that are in the initial paths
++                        continue
+                     seen_dirs.add(dirpath)
+                     pkginit = dirpath.join("__init__.py")
+                     if pkginit.exists():
+@@ -367,6 +371,10 @@ def _collect(self, arg):
+                 if dirpath in self._pkg_roots:
+                     # Do not collect packages here.
+                     continue
++                if argpath.basename == "__init__.py" and self.isinitpath(path):
++                    # Skip __init__.py files that are in the initial paths
++                    continue
++
+                 for x in self._collectfile(path):
+                     key = (type(x), x.fspath)
+                     if key in self._node_cache:
+@@ -388,6 +395,9 @@ def _collectfile(self, path, handle_dupes=True):
+         assert (
+             path.isfile()
+         ), "{!r} is not a file (isdir={!r}, exists={!r}, islink={!r})".format(
+             path, path.isdir(), path.exists(), path.islink()
+         )
++        # Skip collecting __init__.py files that are in the initial paths
++        if path.basename == "__init__.py" and self.isinitpath(path):
++            return ()
+         ihook = self.gethookproxy(path)
+         if not self.isinitpath(path):
+             if ihook.pytest_ignore_collect(path=path, config=self.config):

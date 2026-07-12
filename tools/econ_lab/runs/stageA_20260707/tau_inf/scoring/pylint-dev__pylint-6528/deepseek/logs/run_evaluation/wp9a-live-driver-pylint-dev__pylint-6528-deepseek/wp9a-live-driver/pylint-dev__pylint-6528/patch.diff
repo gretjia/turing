@@ -1,0 +1,55 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 6e39adfa..5b2dee91 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -15,6 +15,23 @@ def _is_in_ignore_list_re(element: str, ignore_list_re: list[Pattern[str]]) -> b
+     return any(file_pattern.match(element) for file_pattern in ignore_list_re)
+ 
+ 
++def _is_in_ignore_list_path(
++    path: str,
++    ignore_list: list[str],
++    ignore_list_re: list[Pattern[str]],
++    ignore_list_paths_re: list[Pattern[str]],
++) -> bool:
++    """Check if a path should be ignored based on its components."""
++    if _is_in_ignore_list_re(path, ignore_list_paths_re):
++        return True
++    parts = os.path.normpath(path).split(os.sep)
++    for part in parts:
++        if part and part in ignore_list:
++            return True
++        if _is_in_ignore_list_re(part, ignore_list_re):
++            return True
++    return False
++
+ def expand_modules(
+     files_or_modules: Sequence[str],
+     ignore_list: list[str],
+@@ -27,11 +44,7 @@ def expand_modules(
+     path = sys.path.copy()
+ 
+     for something in files_or_modules:
+-        basename = os.path.basename(something)
+-        if (
+-            basename in ignore_list
+-            or _is_in_ignore_list_re(os.path.basename(something), ignore_list_re)
+-            or _is_in_ignore_list_re(something, ignore_list_paths_re)
++        if _is_in_ignore_list_path(something, ignore_list, ignore_list_re, ignore_list_paths_re):
+         ):
+             continue
+         module_path = get_python_path(something)
+@@ -89,8 +102,7 @@ def expand_modules(
+             for subfilepath in modutils.get_module_files(
+                 os.path.dirname(filepath), ignore_list, list_all=is_namespace
+             ):
+-                if filepath == subfilepath:
+-                    continue
+-                if _is_in_ignore_list_re(
+-                    os.path.basename(subfilepath), ignore_list_re
+-                ) or _is_in_ignore_list_re(subfilepath, ignore_list_paths_re):
++                if filepath == subfilepath or _is_in_ignore_list_path(
++                    subfilepath, ignore_list, ignore_list_re, ignore_list_paths_re
++                ):
+                     continue
+                 modpath = _modpath_from_file(

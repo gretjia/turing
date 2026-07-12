@@ -1,0 +1,53 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:pytest-dev/pytest:scaffold:sha256:0e7136c3e46168d9744e9297ce64deefa987a72d0321b2b02b8f1f1ebe6f7a89",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:cdd6aa92745c3dc5ea57795c694b8c2f60c84be9fcebcf54eb97d31a3e278783",
+    "price_signal_hash": "sha256:01e4d2470666472304bc37c792f5cb57d0f04e0b3bd2b2bf2596e46c870332b7",
+    "route_id": "pytest-dev__pytest-7982::armC::deepseek",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": false,
+        "reason": "SCORING_NOT_COMPLETED"
+      },
+      "lineage": "deepseek",
+      "live_split_verdict": null,
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": null,
+      "scoring_result": {
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/Z/scoring/pytest-dev__pytest-7982/deepseek/run_evaluation.log",
+        "returncode": 1,
+        "status": "SCORING_FAILED"
+      },
+      "settlement_verdict_resolved": null,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 568,
+        "candidate_patch_sha256": "sha256:b4b0c89803cf0b24daec00ed11f7d00ec647bc0fbe37ecfe4f01d400dbd8ce72",
+        "instance_id": "pytest-dev__pytest-7982",
+        "lineage": "deepseek",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 238238
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "pytest-dev/pytest",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "pytest-dev__pytest-7982",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "deepseek",
+  "selected_route_id": "pytest-dev__pytest-7982::armC::deepseek",
+  "task_index": 20
+}

@@ -1,0 +1,32 @@
+diff --git a/pylint/lint/pylinter.py b/pylint/lint/pylinter.py
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -1,6 +1,7 @@
+ # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ # For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
+ # Copyright (c) https://github.com/PyCQA/pylint/blob/main/CONTRIBUTORS.txt
++import fnmatch
+ import os
+ import re
+ import sys
+@@ -1558,6 +1559,7 @@ class PyLinter(
+         result: List[str] = []
+         for module_or_file in files_or_modules:
+             if os.path.isdir(module_or_file):
++                ignore_paths = self.config.ignore_paths
+                 for root, dirs, files in os.walk(module_or_file):
+                     # Filter directories
+                     dirs[:] = [
+@@ -1572,6 +1574,12 @@ class PyLinter(
+                     )
+                     for file in files:
+                         if file.endswith(".py"):
++                            path = os.path.join(root, file)
++                            # Check ignore_paths regex patterns
++                            if any(
++                                re.match(pattern, path) for pattern in ignore_paths
++                            ):
++                                continue
+                             result.append(os.path.join(root, file))
+             else:
+                 result.append(os.path.abspath(module_or_file))

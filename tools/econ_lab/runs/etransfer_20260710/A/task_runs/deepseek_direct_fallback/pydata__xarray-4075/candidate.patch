@@ -1,0 +1,14 @@
+diff --git a/xarray/core/weighted.py b/xarray/core/weighted.py
+index 06c72b5a..d8f6d9e2 100644
+--- a/xarray/core/weighted.py
++++ b/xarray/core/weighted.py
+@@ -139,7 +139,8 @@ class Weighted:
+ 
+         # we need to mask data values that are nan; else the weights are wrong
+         mask = da.notnull()
+-
++        # ensure mask and weights are compatible types for dot product
++        mask = mask.astype(self.weights.dtype)
+         sum_of_weights = self._reduce(mask, self.weights, dim=dim, skipna=False)
+ 
+         # 0-weights are not valid

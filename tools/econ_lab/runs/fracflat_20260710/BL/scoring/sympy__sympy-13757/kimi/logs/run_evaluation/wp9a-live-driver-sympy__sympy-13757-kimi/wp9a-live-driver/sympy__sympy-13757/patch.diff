@@ -1,0 +1,8 @@
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -715,3 +715,4 @@ class Poly(Basic):
+     """
+ 
++    _op_priority = 11.0
+     __slots__ = ('rep', 'gens')

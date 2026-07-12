@@ -1,0 +1,20 @@
+diff --git a/sympy/combinatorics/permutations.py b/sympy/combinatorics/permutations.py
+--- a/sympy/combinatorics/permutations.py
++++ b/sympy/combinatorics/permutations.py
+@@ -1,9 +1,9 @@
+ 
+ class Permutation(Basic):
+     # ... existing code ...
+-    def _af_new(perm):
+-        return Basic.__new__(Perm, perm)
++    @classmethod
++    def _af_new(cls, perm):
++        return Basic.__new__(cls, perm)
+ 
+     @classmethod
+     def __new__(cls, *args, **kwargs):
+         # ... existing argument processing ...
+-        return _af_new(array_form)
++        return cls._af_new(array_form)
+ 
+     # ... other methods ...

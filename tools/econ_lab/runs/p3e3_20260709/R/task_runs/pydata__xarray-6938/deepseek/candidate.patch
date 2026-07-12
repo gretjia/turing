@@ -1,0 +1,34 @@
+diff --git a/xarray/core/dataset.py b/xarray/core/dataset.py
+index c4e40d99..bf4a23c0 100644
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -1457,10 +1457,10 @@ class Dataset(Mapping, DataWithCoords, DatasetArithmetic, Stateful):
+             if v not in self.dims and v not in self._variables:
+                 raise ValueError(f"{v} is not a dimension or coordinate.")
+ 
+         new_variables = dict(self._variables)
+         for k, v in dims.items():
+             # The variable that becomes the new dimension coordinate must
+             # have its own dims updated.
+-            var = new_variables[v]
+-            new_dims = tuple(d if d != k else v for d in var.dims)
+-            var._dims = new_dims
++            var = new_variables[v].copy(deep=False)
++            var = var.set_dims(tuple(d if d != k else v for d in var.dims))
++            new_variables[v] = var
+             # Replace occurrences of the old dimension in all variables
+             for name, var2 in list(new_variables.items()):
+                 if k in var2.dims:
+-                    new_dims2 = tuple(d if d != k else v for d in var2.dims)
+-                    var2._dims = new_dims2
++                    new_dims2 = tuple(d if d != k else v for d in var2.dims)
++                    new_variables[name] = var2.set_dims(new_dims2)
+ 
+         return self._replace(variables=new_variables, inplace=False)
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index ... blob ...
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -... +... @@
++        # Same fix for DataArray.swap_dims if it exists
++        # (Not shown, but analogous change would be required)

@@ -1,0 +1,128 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:scikit-learn/scikit-learn:scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:28846d26a64f6ffd03e272d5e1a6cb3fad28466becb7535f8395a67c6434b6d6",
+    "price_signal_hash": "sha256:6381982597f45898542f18f25b648f411269808e8b536f05129597e1a962732f",
+    "route_id": "scikit-learn__scikit-learn-14141::armA::glm",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "routing_prior_updated_event_hash": "sha256:3941d70feb2abde2e3c4fc692e3437345ee5396b950ddce19b3015b4238cbe27"
+      },
+      "lineage": "glm",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "sklearn/utils/tests/test_show_versions.py::test_get_sys_info"
+        ],
+        "accept_verdict": false,
+        "canary": false,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_test_ids": [
+          "sklearn/utils/tests/test_show_versions.py::test_get_deps_info",
+          "sklearn/utils/tests/test_show_versions.py::test_show_versions_with_blas"
+        ],
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:3941d70feb2abde2e3c4fc692e3437345ee5396b950ddce19b3015b4238cbe27",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "scikit-learn/scikit-learn",
+          "route_scaffold": "scaffold:sha256:d9b330a8265b3cb732367103e2a31be15fed045f140003a28df4a62675f47ff5",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:73bd1af9eadb39e3d937a27090410a3262c78dd8ccecc6eb5fa4115c735124aa"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/R/scoring/scikit-learn__scikit-learn-14141/glm/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "scikit-learn__scikit-learn-14141"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "scikit-learn__scikit-learn-14141"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "scikit-learn__scikit-learn-14141"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_p3e3/tools/econ_lab/runs/p3e3_20260709/R/scoring/scikit-learn__scikit-learn-14141/glm/wp9a-live-driver.wp9a-live-driver-scikit-learn__scikit-learn-14141-glm.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "sklearn/utils/tests/test_show_versions.py::test_get_deps_info"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [
+              "sklearn/utils/tests/test_show_versions.py::test_get_sys_info",
+              "sklearn/utils/tests/test_show_versions.py::test_show_versions_with_blas"
+            ],
+            "success": []
+          }
+        }
+      },
+      "settlement_verdict_resolved": false,
+      "worker_result": {
+        "arm": "armA",
+        "candidate_patch_bytes": 480,
+        "candidate_patch_sha256": "sha256:18f2197e39ac41af10a9bda74458d2bec0f6d2dbe45de7a958bde55225d24040",
+        "instance_id": "scikit-learn__scikit-learn-14141",
+        "lineage": "glm",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 3704
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "scikit-learn/scikit-learn",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "scikit-learn__scikit-learn-14141",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armA",
+  "selected_lineage": "glm",
+  "selected_route_id": "scikit-learn__scikit-learn-14141::armA::glm",
+  "task_index": 30
+}

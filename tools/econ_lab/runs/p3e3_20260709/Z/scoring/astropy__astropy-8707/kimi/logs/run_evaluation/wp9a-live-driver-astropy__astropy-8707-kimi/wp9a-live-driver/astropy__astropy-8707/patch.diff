@@ -1,0 +1,26 @@
+diff --git a/astropy/io/fits/header.py b/astropy/io/fits/header.py
+--- a/astropy/io/fits/header.py
++++ b/astropy/io/fits/header.py
+@@ -454,6 +454,9 @@ class Header(_Verify):
+         sep : str, optional
+             Default is ``""``.
+         """
++
++        if isinstance(data, bytes):
++            data = data.decode('ascii')
+ 
+         if isinstance(data, str):
+             cards = []
+diff --git a/astropy/io/fits/card.py b/astropy/io/fits/card.py
+--- a/astropy/io/fits/card.py
++++ b/astropy/io/fits/card.py
+@@ -458,6 +458,9 @@ class Card(_Verify):
+         """
+ 
+         card = cls()
++        if isinstance(image, bytes):
++            image = image.decode('ascii')
++
+         card._image = image
+         card._verified = False
+         return card

@@ -1,0 +1,31 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+index xxxxxxx..xxxxxxx 100644
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -2331,6 +2331,20 @@ class RepeatedKFold(_RepeatedSplits):
+     def __init__(self, n_splits=5, n_repeats=10, random_state=None):
+         super().__init__(n_splits, n_repeats, random_state)
+ 
++    def __repr__(self):
++        return ('{0}(n_splits={1}, n_repeats={2}, random_state={3})'.format(
++                self.__class__.__name__,
++                self.n_splits,
++                self.n_repeats,
++                self.random_state))
++
++
++class RepeatedStratifiedKFold(_RepeatedSplits):
++    """Repeated Stratified K-Fold cross-validator."""
++    def __init__(self, n_splits=5, n_repeats=10, random_state=None):
++        super().__init__(n_splits, n_repeats, random_state)
++
++    def __repr__(self):
++        return ('{0}(n_splits={1}, n_repeats={2}, random_state={3})'.format(
++                self.__class__.__name__,
++                self.n_splits,
++                self.n_repeats,
++                self.random_state))
++
++
+ class _RepeatedSplits(BaseCrossValidator):
+     """Base class for RepeatedKFold and RepeatedStratifiedKFold"""

@@ -1,0 +1,112 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index xxxxxxx..xxxxxxx 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -219,7 +219,15 @@ class Collector:
+                 raise ValueError("The %s.mkdate() cannot be called once a set has been "
+                                  "deconstructed." % self.__class__.__name__)
+ 
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
++            # For deletion, we only need the primary key for all strategies
++            # CASCADE, SET_NULL, SET_DEFAULT also need the foreign key field
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name]
++            
++            if field.remote_field.on_delete in (CASCADE, SET_NULL, SET_DEFAULT):
++                only_fields.append(field.name)
++            
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
++
+             if sub_objs:
+                 self.collect(sub_objs, source=obj, source_attr=field.name, nullable=field.null)
+         elif field.on_delete == SET_NULL:
+@@ -242,7 +250,15 @@ class Collector:
+         not a foreign key.
+         """
+         if field.auto_created:
+-            sub_objs = field.remote_field.model._default_manager.using(self.using).filter(
++            # For auto-created relationships (like M2M), we need the primary key
++            # of the related model
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name]
++            
++            sub_objs = model._default_manager.using(self.using).filter(
+                 **{field.remote_field.limit_choices_to: obj}
++            ).only(*only_fields)
+         elif field.many_to_one:
+             # Many-to-one relationships are handled by the other side of the relation, which
+             # is handled in the elif below.
+@@ -250,34 +274,100 @@ class Collector:
+         elif field.one_to_one:
+             # One-to-one relationships are a special case where we need to handle cascading.
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name, field.name]
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
+             if sub_objs and not field.concrete:
+                 self.add_field(field, obj, self.using)
+             elif sub_objs:
+                 self.collect(sub_objs, source=obj, source_attr=field.name, nullable=field.null)
+         elif field.remote_field.on_delete == CASCADE:
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
+-            if sub_objs:
+-                self.collect(sub_objs, source=obj, source_attr=field.name,
+-                             nullable=field.null, fail_fast=self.can_fast_delete(field, sub_objs))
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name, field.name]
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
++            if sub_objs:
++                self.collect(sub_objs, source=obj, source_attr=field.name, nullable=field.null)
+         elif field.remote_field.on_delete == SET_NULL:
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name, field.name]
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
+             if sub_objs:
+                 self.collect(sub_objs, source=obj, source_attr=field.name, nullable=field.null)
+         elif field.remote_field.on_delete == SET_DEFAULT:
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name, field.name]
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
+             if sub_objs:
+                 self.collect(sub_objs, source=obj, source_attr=field.name, nullable=field.null)
+         elif field.remote_field.on_delete == PROTECT:
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
+-            if sub_objs:
+-                raise ProtectedError(
+-                    "Cannot delete some instances of model '%s' because they are "
+-                    "referenced by a protected foreign key." % field.remote_field.model.__name__,
+-                    sub_objs,
+-                )
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name]
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
++            if sub_objs:
++                raise ProtectedError(
++                    "Cannot delete some instances of model '%s' because they are "
++                    "referenced by a protected foreign key." % field.remote_field.model.__name__,
++                    sub_objs,
++                )
+         elif field.remote_field.on_delete == DO_NOTHING:
+-            sub_objs = field.remote_field.model._base_manager.using(self.using).filter(**{field.name: obj})
+-            if sub_objs:
+-                pass  # This is a NOOP operation.
++            model = field.remote_field.model
++            only_fields = [model._meta.pk.name]
++            sub_objs = model._base_manager.using(self.using).filter(
++                **{field.name: obj}
++            ).only(*only_fields)
++            # This is a NOOP operation.

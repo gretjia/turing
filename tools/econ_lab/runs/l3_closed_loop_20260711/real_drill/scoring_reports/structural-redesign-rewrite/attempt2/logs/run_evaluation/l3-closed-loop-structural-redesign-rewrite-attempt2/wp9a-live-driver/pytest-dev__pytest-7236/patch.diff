@@ -1,0 +1,49 @@
+diff --git a/src/_pytest/unittest.py b/src/_pytest/unittest.py
+index 2a0b3a015..9f14a171b 100644
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -125,6 +125,9 @@ class TestCaseFunction(Function):
+             if self._is_skipped():
+                 outcome = self.runtest()
+                 # When a test is skipped, we still want to run tearDown
++                # but only if the test is actually executed (not skipped via --pdb)
++                if self.config.getoption("--pdb") and hasattr(self, '_pdb_then_continue'):
++                    return outcome
+                 if self._setup_teardown_done:
+                     self._call_teardown()
+                 return outcome
+@@ -135,6 +138,9 @@ class TestCaseFunction(Function):
+         # Capture the outcome of the test run, but any exceptions during
+         # setUp/tearDown are always fatal (this is the same behavior as unittest).
+         was_setup = self._setup_teardown_done
++        # Ensure we don't run teardown when test is skipped with --pdb
++        if self.config.getoption("--pdb") and hasattr(self, '_pdb_then_continue'):
++            self._setup_teardown_done = True
+         outcome = self.runtest()
+         if self._setup_teardown_done and not was_setup:
+             # This is a (fatal) error in unittest.
+diff --git a/src/_pytest/runner.py b/src/_pytest/runner.py
+index 41697531b..8c577c06d 100644
+--- a/src/_pytest/runner.py
++++ b/src/_pytest/runner.py
+@@ -101,6 +101,17 @@ def pytest_runtest_protocol(item, nextitem):
+     if not hasattr(item, "runner") or item.runner is None:
+         item.runner = item.config.pluginmanager.getplugin("runner")
+ 
++    # Handle skipped tests with --pdb
++    if (item.config.getoption("--pdb") and 
++        hasattr(item, 'runtest') and 
++        hasattr(item, '_is_skipped') and
++        item._is_skipped()):
++        # Skip execution entirely when --pdb is used and test is skipped
++        try:
++            # Call the original runtest method to handle setup/cleanup properly
++            skipped_outcome = item.runtest()
++            return True
++        except Exception:
++            # If there are any exceptions, still return True to indicate
++            # we handled the test and can proceed
++            return True
++
+     return False
+ 

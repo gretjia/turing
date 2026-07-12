@@ -1,0 +1,17 @@
+diff --git a/sympy/printing/lambdarepr.py b/sympy/printing/lambdarepr.py
+--- a/sympy/printing/lambdarepr.py
++++ b/sympy/printing/lambdarepr.py
+@@ -XX,XX +XX,XX @@ class MpmathPrinter(NumPyPrinter):
+     def _print_Float(self, expr):
+         return 'mpf({0})'.format(expr)
+ 
++    def _print_Rational(self, expr):
++        p, q = expr.p, expr.q
++        if q == 1:
++            return 'mpf({0})'.format(p)
++        else:
++            return 'mpf({0})/mpf({1})'.format(p, q)
++
+     def _print_uppergamma(self, expr):
+         return "mpmath.gammainc({0}, {1})".format(
+             self._print(expr.args[0]),

@@ -1,0 +1,11 @@
+diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -103,6 +103,9 @@ class Pipeline(BaseEstimator, TransformerMixin):
+         self.steps = steps
+         self.memory = memory
+ 
++    def __len__(self):
++        return len(self.steps)
++
+     def __getitem__(self, indices):

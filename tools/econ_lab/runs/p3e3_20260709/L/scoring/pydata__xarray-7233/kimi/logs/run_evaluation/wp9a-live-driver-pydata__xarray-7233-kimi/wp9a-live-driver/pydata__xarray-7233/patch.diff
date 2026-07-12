@@ -1,0 +1,12 @@
+diff --git a/xarray/core/rolling.py b/xarray/core/rolling.py
+--- a/xarray/core/rolling.py
++++ b/xarray/core/rolling.py
+@@ -1225,7 +1225,7 @@ class DatasetCoarsen(Coarsen, DatasetRollingReductions):
+         indexes = {
+             k: v
+             for k, v in self._obj.xindexes.items()
+             if not any(d in window_dim for d in v.dims)
+         }
+ 
+-        return self._obj._construct_direct(variables, set(self._obj.dims), dims, indexes)
++        return self._obj._construct_direct(variables, self._obj._coord_names, dims, indexes)

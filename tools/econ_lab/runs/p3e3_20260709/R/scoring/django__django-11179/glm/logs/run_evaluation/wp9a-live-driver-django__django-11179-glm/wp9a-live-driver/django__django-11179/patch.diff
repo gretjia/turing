@@ -1,0 +1,12 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 0b9f4b5c3e..9515f0b3a4 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -275,6 +275,7 @@
+         # models without any dependencies.
+         if not dependencies:
+             sql = self.sql
++            instance.pk = None
+             return sql, params
+         # Delete in the order that was passed in. This is necessary
+         # because case() #280 isn't supported on all databases.

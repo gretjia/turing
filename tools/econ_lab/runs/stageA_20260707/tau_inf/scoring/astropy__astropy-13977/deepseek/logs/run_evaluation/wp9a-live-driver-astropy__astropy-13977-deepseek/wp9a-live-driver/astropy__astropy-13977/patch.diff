@@ -1,0 +1,23 @@
+diff --git a/astropy/units/quantity.py b/astropy/units/quantity.py
+index 6e02f12b64..aead9cf5bd 100644
+--- a/astropy/units/quantity.py
++++ b/astropy/units/quantity.py
+@@ -610,9 +610,16 @@ def __array_ufunc__(self, function, method, *inputs, **kwargs):
+         # Same for inputs, but here also convert if necessary.
+         arrays = []
+         for input_, converter in zip(inputs, converters):
+-            input_ = getattr(input_, "value", input_)
+-            arrays.append(converter(input_) if converter else input_)
++            input_ = getattr(input_, "value", input_)
++            if converter:
++                try:
++                    arrays.append(converter(input_))
++                except (TypeError, ValueError, UnitsError):
++                    # If conversion fails, we cannot handle the input;
++                    # return NotImplemented to allow other classes to try.
++                    return NotImplemented
++            else:
++                arrays.append(input_)
+ 
+         # Call our superclass's __array_ufunc__
+         result = super().__array_ufunc__(function, method, *arrays, **kwargs)

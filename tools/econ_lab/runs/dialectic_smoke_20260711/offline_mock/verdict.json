@@ -1,0 +1,21 @@
+{
+  "candidate_labels": [
+    "conservative-package",
+    "structural-package",
+    "hybrid-package"
+  ],
+  "evidence_class": "OFFLINE_MOCK",
+  "mode": "offline-mock",
+  "portfolio_digest": "sha256:d5ec1ea6c847c27e9e1ddd781d913feac2385a2548738897435b6c400c844994",
+  "route_market_bridge": {
+    "route_candidates_digest": "sha256:d18da7c750d330bf71a23faf96293a5cd064b11bf1b99e7a5527b2280613c77e",
+    "route_candidates_path": "tools/econ_lab/runs/dialectic_smoke_20260711/offline_mock/route_market_bridge/route_candidates.json",
+    "route_priors_digest": "sha256:46379bbf09267810bb27143c30a2597cdf1449ed4ba774f29fa351e96e2438b5",
+    "route_priors_path": "tools/econ_lab/runs/dialectic_smoke_20260711/offline_mock/route_market_bridge/route_priors.json"
+  },
+  "schema": "econ_lab.dialectic.dialectic_smoke.v1",
+  "significance_claims": "NONE -- exploratory smoke fixture only",
+  "status": "COMPLETED",
+  "task_context_digest": "sha256:4497dd3acacb7c0f9eb9964cb4ae5e91d69c00a5aa6e6abd0fe851dbc3e77b17",
+  "worker_calls_used": 4
+}

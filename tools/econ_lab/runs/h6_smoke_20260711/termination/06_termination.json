@@ -1,0 +1,79 @@
+{
+  "event": {
+    "event_hash": "sha256:5ad496ae89141cea197b9deb03932d8ae8e9669a01602539bf7f4388512a810e",
+    "event_type": "RouteFalsified",
+    "head_effect": "PRESERVE",
+    "report_digest": "sha256:d1be61df20cdb9ef75789478447707898428da94c21e41f531d58cbdfecfaf43",
+    "route_id": "armA_bad_route",
+    "schema_id": "route_falsified.v1"
+  },
+  "evidence_class": "SMOKE_FIXTURE",
+  "report": {
+    "attempts": [
+      {
+        "fact_class": "REAL_DISPATCH_ATTEMPT",
+        "harness_error_reason": "patch_apply_failed",
+        "route_id": "django__django-11119::armA::deepseek"
+      },
+      {
+        "fact_class": "REAL_DISPATCH_ATTEMPT",
+        "harness_error_reason": "patch_apply_failed",
+        "route_id": "django__django-11133::armA::qwen"
+      },
+      {
+        "fact_class": "REAL_DISPATCH_ATTEMPT",
+        "harness_error_reason": "patch_apply_failed",
+        "route_id": "django__django-11141::armA::deepseek"
+      },
+      {
+        "fact_class": "REAL_DISPATCH_ATTEMPT",
+        "harness_error_reason": "patch_apply_failed",
+        "route_id": "sphinx-doc__sphinx-7590::armA::deepseek"
+      }
+    ],
+    "detector_events": [
+      {
+        "evidence": {
+          "fact_class": "BARE_TERMINATION",
+          "phase": "dispatch",
+          "reason_class": "ERROR"
+        },
+        "rule_id": "TERMINATION_WITHOUT_VERIFIER_EVIDENCE"
+      }
+    ],
+    "digest": "sha256:d1be61df20cdb9ef75789478447707898428da94c21e41f531d58cbdfecfaf43",
+    "proposal_only": true,
+    "recommendation": "Every real dispatch on this route settled a determinate FAIL with verifier evidence (patch_apply_failed); the replayed detector evidence separately shows a real bare-termination trip on this same arm's historical record; recommend GRILL-ME review of the source-context-disabled scaffold before further dispatch.",
+    "remaining_candidates": [
+      "armB_normal_route"
+    ],
+    "route_id": "armA_bad_route",
+    "schema": "econ_lab.monitor.route_falsification_report.v1",
+    "verifier_evidence": [
+      {
+        "phase": "dispatch",
+        "result": "fail"
+      },
+      {
+        "phase": "dispatch",
+        "result": "fail"
+      },
+      {
+        "phase": "dispatch",
+        "result": "fail"
+      },
+      {
+        "phase": "dispatch",
+        "result": "fail"
+      },
+      {
+        "phase": "dispatch",
+        "result": "fail"
+      }
+    ]
+  },
+  "route_id": "armA_bad_route",
+  "schema": "econ_lab.wp_h6_integration_smoke.v1.termination",
+  "source": "monitor.termination.terminate_falsified over this session's real verifier evidence (armA x N + armB x 1, all real dispatches) + the step-1 replayed detector event",
+  "status": "FALSIFIED"
+}

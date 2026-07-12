@@ -1,0 +1,104 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index d4f4a3e..5e5b3e2 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1761,6 +1761,9 @@ class PrefetchOnelevelManager:
+ 
+ # The backwards-compatible portion of prefetch_related() implementation.
+ 
++# Import GenericForeignKey to detect GFK prefetching
++from django.contrib.contenttypes.fields import GenericForeignKey
++
+ def _prefetch_one_level(instances, prefetcher, batch_size=None):
+     """
+     Helper function for (prefetch_related) which pretends to be part of the
+@@ -1784,6 +1787,9 @@ def _prefetch_one_level(instances, prefetcher, batch_size=None):
+             (prefetcher.prefetch_to, obj.__class__.__name__)
+         )
+ 
++    # Handle GenericForeignKey prefetching
++    if isinstance(prefetcher.field, GenericForeignKey):
++        return _prefetch_gfk_related(instances, prefetcher, batch_size)
+ 
+     if isinstance(prefetcher.prefetch_through, str):
+         # 'path.to' or ('path.to')
+@@ -1847,6 +1853,62 @@ def _prefetch_one_level(instances, prefetcher, batch_size=None):
+         # instantiate, try to access something.
+         setattr(obj, field.attname, None)
+ 
++
++def _prefetch_gfk_related(instances, prefetcher, batch_size=None):
++    """
++    Helper function to prefetch GenericForeignKey related objects when the
++    primary key is a UUID.
++    """
++    if not instances:
++        return instances
++    
++    gfk_field = prefetcher.field
++    ct_field_name = gfk_field.ct_field
++    fk_field_name = gfk_field.fk_field
++    
++    # Group instances by content type
++    content_type_map = {}
++    for instance in instances:
++        ct = getattr(instance, ct_field_name)
++        if ct is None:
++            continue
++
++        if ct not in content_type_map:
++            content_type_map[ct] = []
++        content_type_map[ct].append(instance)
++    
++    # Process each content type separately
++    for ct, group_instances in content_type_map.items():
++        model = ct.model_class()
++        
++        # Check if the model has a UUID primary key
++        is_uuid_pk = model._meta.pk.get_internal_type() == 'UUIDField'
++        
++        # Collect object_ids
++        object_ids = set()
++        for instance in group_instances:
++            obj_id = getattr(instance, fk_field_name)
++            if obj_id is not None:
++                object_ids.add(obj_id)
++        
++        # Get the related objects
++        if is_uuid_pk:
++            # Convert string UUIDs to UUID objects for querying
++            from uuid import UUID
++            uuid_ids = []
++            for obj_id in object_ids:
++                try:
++                    uuid_ids.append(UUID(str(obj_id)))
++                except ValueError:
++                    # Skip invalid UUIDs
++                    pass
++
++            # Get the related objects
++            related_objects = list(model._default_manager.filter(pk__in=uuid_ids))
++            
++            # Map from string UUID to object for caching
++            related_objects_dict = {str(obj.pk): obj for obj in related_objects}
++        else:
++            # Default behavior
++            related_objects = model._default_manager.filter(pk__in=list(object_ids))
++            related_objects_dict = {obj.pk: obj for obj in related_objects}
++        
++        # Assign related objects to instances
++        for instance in group_instances:
++            obj_id = getattr(instance, fk_field_name)
++            if obj_id is None:
++                continue
++
++            # Look up the related object
++            if is_uuid_pk:
++                key = str(obj_id)
++            else:
++                key = obj_id
++
++            related_obj = related_objects_dict.get(key)
++            setattr(instance._prefetched_objects_cache, prefetcher.prefetch_to, related_obj)
++    
++    return instances

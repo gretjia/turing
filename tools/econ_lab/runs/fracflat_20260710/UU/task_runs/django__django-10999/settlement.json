@@ -1,0 +1,151 @@
+{
+  "budget_suggestion": {
+    "can_move_accepted_head": false,
+    "diversity_policy_hash": "sha256:f46bd031e0c2114ac0a934d6e1c43ef1684aef5ee7772b9170b85b7c8541b19e",
+    "emits_authorization": false,
+    "head_effect": "PRESERVE",
+    "market_id": "routing:django/django:scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+    "max_tokens": 12000,
+    "mode": "Softmax",
+    "pput_prior_hash": "sha256:28fb8eb2a50330ee3737ed58391f279d1a873ac0b6b2dfb648be488e95126f79",
+    "price_signal_hash": "sha256:0ef1c8290ac6303ef496f2304b2c968844acdfd15d123110af47315ac1f842c5",
+    "route_id": "django__django-10999::armC::qwen",
+    "schema_id": "budget_allocated.v1"
+  },
+  "dispatch_mode": "single_winner",
+  "dispatches": [
+    {
+      "backup_update": {
+        "applied": true,
+        "fractional_reward": false,
+        "routing_prior_updated_event_hash": "sha256:ccf28743e40aa521a7883452cc7eaf2606bab45123929d3db321324c70724a74",
+        "verdict_fraction_q32": null
+      },
+      "lineage": "qwen",
+      "live_split_verdict": {
+        "accept_test_ids": [
+          "test_days (utils_tests.test_dateparse.DurationParseTests)",
+          "test_hours_minutes_seconds (utils_tests.test_dateparse.DurationParseTests)",
+          "test_parse_datetime (utils_tests.test_dateparse.DateParseTests)",
+          "test_parse_python_format (utils_tests.test_dateparse.DurationParseTests)",
+          "test_parse_time (utils_tests.test_dateparse.DateParseTests)",
+          "test_seconds (utils_tests.test_dateparse.DurationParseTests)"
+        ],
+        "accept_verdict": true,
+        "canary": true,
+        "harness_error_reason": null,
+        "not_enough_tests": false,
+        "schema": "econ_lab.live_split_verifier.verdict.v1",
+        "verify_pass_count": 4,
+        "verify_pass_fraction": 0.6666666666666666,
+        "verify_test_ids": [
+          "test_fractions_of_seconds (utils_tests.test_dateparse.DurationParseTests)",
+          "test_iso_8601 (utils_tests.test_dateparse.DurationParseTests)",
+          "test_minutes_seconds (utils_tests.test_dateparse.DurationParseTests)",
+          "test_negative (utils_tests.test_dateparse.DurationParseTests)",
+          "test_parse_date (utils_tests.test_dateparse.DateParseTests)",
+          "test_parse_postgresql_format (utils_tests.test_dateparse.DurationParseTests)"
+        ],
+        "verify_total_count": 6,
+        "verify_verdict": false
+      },
+      "provider_path": "siliconflow",
+      "routing_prior_updated_event": {
+        "RoutingPriorUpdated": {
+          "event_hash": "sha256:ccf28743e40aa521a7883452cc7eaf2606bab45123929d3db321324c70724a74",
+          "event_type": "RoutingPriorUpdated",
+          "head_effect": "PRESERVE",
+          "route_domain": "django/django",
+          "route_scaffold": "scaffold:sha256:954f9a7140f8fb2c49a7eb3c9bacc6c767a34fb21ca4ce4d47ae4377d25a2fa3",
+          "schema_id": "routing_prior_updated.v1",
+          "verdict": false,
+          "verdict_source_id": "verifier:live_split_verifier.v1",
+          "verifier_attestation_hash": "sha256:736e03aafdda94dfaaeb8ead057a776cbb4435e086c04e4a623b5fe9192487d5"
+        }
+      },
+      "scoring_result": {
+        "harness_error_reason": null,
+        "log_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/django__django-10999/qwen/run_evaluation.log",
+        "outcome": "UNRESOLVED",
+        "raw_report": {
+          "completed_ids": [
+            "django__django-10999"
+          ],
+          "completed_instances": 1,
+          "empty_patch_ids": [],
+          "empty_patch_instances": 0,
+          "error_ids": [],
+          "error_instances": 0,
+          "incomplete_ids": [],
+          "resolved_ids": [],
+          "resolved_instances": 0,
+          "schema_version": 2,
+          "submitted_ids": [
+            "django__django-10999"
+          ],
+          "submitted_instances": 1,
+          "total_instances": 1,
+          "unresolved_ids": [
+            "django__django-10999"
+          ],
+          "unresolved_instances": 1
+        },
+        "report_path": "/home/zephryj/turingos_backup/work/grok_fracflat/tools/econ_lab/runs/fracflat_20260710/UU/scoring/django__django-10999/qwen/wp9a-live-driver.wp9a-live-driver-django__django-10999-qwen.json",
+        "resolved": false,
+        "status": "COMPLETED",
+        "tests_status": {
+          "FAIL_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "FAIL_TO_PASS": {
+            "failure": [
+              "test_negative (utils_tests.test_dateparse.DurationParseTests)",
+              "test_parse_postgresql_format (utils_tests.test_dateparse.DurationParseTests)"
+            ],
+            "success": []
+          },
+          "PASS_TO_FAIL": {
+            "failure": [],
+            "success": []
+          },
+          "PASS_TO_PASS": {
+            "failure": [],
+            "success": [
+              "test_parse_date (utils_tests.test_dateparse.DateParseTests)",
+              "test_parse_datetime (utils_tests.test_dateparse.DateParseTests)",
+              "test_parse_time (utils_tests.test_dateparse.DateParseTests)",
+              "test_days (utils_tests.test_dateparse.DurationParseTests)",
+              "test_fractions_of_seconds (utils_tests.test_dateparse.DurationParseTests)",
+              "test_hours_minutes_seconds (utils_tests.test_dateparse.DurationParseTests)",
+              "test_iso_8601 (utils_tests.test_dateparse.DurationParseTests)",
+              "test_minutes_seconds (utils_tests.test_dateparse.DurationParseTests)",
+              "test_parse_python_format (utils_tests.test_dateparse.DurationParseTests)",
+              "test_seconds (utils_tests.test_dateparse.DurationParseTests)"
+            ]
+          }
+        }
+      },
+      "settlement_verdict_resolved": true,
+      "worker_result": {
+        "arm": "armC",
+        "candidate_patch_bytes": 499,
+        "candidate_patch_sha256": "sha256:9b321230a6192d56cb7ae7b7886dedc52853c78ffb89f01f868ce39e9f8c7c08",
+        "instance_id": "django__django-10999",
+        "lineage": "qwen",
+        "provider_path": "siliconflow",
+        "status": "COMPLETED",
+        "wall_time_ms": 7794
+      },
+      "worker_result_status": "COMPLETED"
+    }
+  ],
+  "domain_bucket": "django/django",
+  "evidence_class": "REAL_HARNESS_OUTPUTS_AND_PROVIDER_RECEIPTS",
+  "instance_id": "django__django-10999",
+  "schema": "econ_lab.live_driver.settlement_checkpoint.v1",
+  "selected_arm": "armC",
+  "selected_lineage": "qwen",
+  "selected_route_id": "django__django-10999::armC::qwen",
+  "task_index": 1
+}

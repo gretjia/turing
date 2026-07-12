@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/cbook/__init__.py b/lib/matplotlib/cbook/__init__.py
+index 5401d6c46e..e277e367fb 100644
+--- a/lib/matplotlib/cbook/__init__.py
++++ b/lib/matplotlib/cbook/__init__.py
+@@ -1746,7 +1746,9 @@ def _safe_first_finite(obj, *, skip_nonfinite=True):
+     elif isinstance(obj, np.flatiter):
+         return _safe_first_finite(obj.copy(), skip_nonfinite=skip_nonfinite)
+     else:
+-        return next(val for val in obj if safe_isfinite(val))
++        for val in obj:
++            if safe_isfinite(val):
++                return val
+ 
+ 
+ def sanitize_sequence(data):

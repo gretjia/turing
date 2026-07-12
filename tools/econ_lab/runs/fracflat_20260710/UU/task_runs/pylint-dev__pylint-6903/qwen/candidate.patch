@@ -1,0 +1,23 @@
+diff --git a/pylint/lint/run.py b/pylint/lint/run.py
+index f3920da22..ff1e68190 100644
+--- a/pylint/lint/run.py
++++ b/pylint/lint/run.py
+@@ -57,7 +57,7 @@
+         if cpu_quota == -1:
+             # Unlimited CPU quota, use all available CPUs
+             cpu_count = os.cpu_count()
+-        else:
+-            cpu_count = int(cpu_quota / cpu_period)
++        else:
++            cpu_count = max(1, int(cpu_quota / cpu_period))
+ 
+         # Check if the CPU shares are limited
+         cpu_shares = _read_cgroup_file("/sys/fs/cgroup/cpu/cpu.shares")
+@@ -63,7 +63,7 @@
+         if cpu_shares != -1:
+             # CPU shares are limited, use the shares to calculate a fraction
+             # of the total CPU available
+-            cpu_count = int(cpu_shares / 1024)
++            cpu_count = max(1, int(cpu_shares / 1024))
+ 
+     return cpu_count

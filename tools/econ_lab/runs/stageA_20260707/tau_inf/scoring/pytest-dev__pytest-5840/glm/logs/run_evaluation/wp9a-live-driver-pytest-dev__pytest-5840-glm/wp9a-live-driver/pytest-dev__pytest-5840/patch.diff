@@ -1,0 +1,12 @@
+diff --git a/src/_pytest/config/__init__.py b/src/_pytest/config/__init__.py
+index 5a1b0b9..4c4e2f4 100644
+--- a/src/_pytest/config/__init__.py
++++ b/src/_pytest/config/__init__.py
+@@ -847,6 +847,7 @@ class Config:
+ 
+     def _preparse(self, args, addopts=True):
+         if addopts:
++            args = [str(x) for x in args]  # Convert all arguments to strings
+             env_addopts = os.environ.get("PYTEST_ADDOPTS", "")
+             if len(env_addopts):
+                 args[:] = (

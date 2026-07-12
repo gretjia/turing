@@ -1,0 +1,13 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+index 1234567..abcdefg 100644
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -X,6 +X,6 @@ class Dir(FSCollector):
+         self._check_collect_path(self.fspath)
+ 
+     def collect(self) -> Iterator[Collector]:
+-        for entry in os.scandir(str(self.fspath), follow_symlinks=False):
++        for entry in os.scandir(str(self.fspath)):
+             if entry.is_dir() and entry.name[0] != ".":
+                 yield Dir(entry.name, self)
+             elif entry.is_file() and entry.name.endswith(".py"):

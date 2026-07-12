@@ -1,0 +1,29 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 40a3c81f99..f8e3daab99 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -209,14 +209,19 @@ class Collector:
+                     self.add_field_update(
+                         field, None, objs, model
+                     )
++            sources_objs = related.related_objects(fastobjs, model, field)
++            if not sources_objs.exists():
++                continue
++            sub_objs = list(sources_objs.only('pk'))
++            if sub_objs:
++                self.collect(
++                    sub_objs, source=model,
++                    source_attr=field.name, nullable=field.null,
++                )
+ 
+     def related_objects(self, objs, model, through_field):
+-        return model._base_manager.using(self.using).filter(
+-            **{through_field.name: objs}
+-        )
++        qs = model._base_manager.using(self.using).filter(
++            **{through_field.name: objs}
++        )
++        return qs.only('pk')
+ 
+     def instances(self):
+         for model, instances in self.data.items():

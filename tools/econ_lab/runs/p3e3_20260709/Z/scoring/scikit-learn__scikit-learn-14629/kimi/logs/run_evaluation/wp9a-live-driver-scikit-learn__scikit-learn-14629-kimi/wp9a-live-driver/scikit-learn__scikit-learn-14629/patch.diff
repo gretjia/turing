@@ -1,0 +1,16 @@
+diff --git a/sklearn/multioutput.py b/sklearn/multioutput.py
+--- a/sklearn/multioutput.py
++++ b/sklearn/multioutput.py
+@@ -270,6 +270,12 @@ class MultiOutputClassifier(ClassifierMixin, _MultiOutputEstimator):
+     def __init__(self, estimator, n_jobs=None):
+         super(MultiOutputClassifier, self).__init__(estimator,
+                                                     n_jobs=n_jobs)
++
++    @property
++    def classes_(self):
++        check_is_fitted(self)
++        return [estimator.classes_ for estimator in self.estimators_]
++
+     @if_delegate_has_method(delegate='estimator')
+     def predict_proba(self, X):
+         check_is_fitted(self)

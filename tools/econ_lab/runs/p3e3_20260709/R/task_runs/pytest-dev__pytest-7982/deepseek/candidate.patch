@@ -1,0 +1,6 @@
+diff --git a/src/_pytest/main.py b/src/_pytest/main.py
+--- a/src/_pytest/main.py
++++ b/src/_pytest/main.py
+@@ -L +L @@
+-            if entry.is_dir(follow_symlinks=False):
++            if entry.is_dir():
